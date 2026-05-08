@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.soil.soil import Soil
 
 
@@ -10,9 +8,9 @@ class FertilizerApplication:
 
     Parameters
     ----------
-    soil : Soil, default=None
+    soil : Soil, optional
         Soil object to which fertilizer should be applied.
-    field_size : float, default=None
+    field_size : float, optional
         Size of the field. Used to initialize a Soil object for this module to work with, if a pre-configured
         SoilData object is not provided (ha)
 
@@ -31,7 +29,7 @@ class FertilizerApplication:
         Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.
     """
 
-    def __init__(self, soil: Optional[Soil] = None, field_size: Optional[float] = None):
+    def __init__(self, soil: Soil | None = None, field_size: float | None = None):
         self.soil = soil or Soil(field_size=field_size)
 
     def apply_fertilizer(

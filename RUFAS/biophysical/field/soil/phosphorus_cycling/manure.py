@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
 
@@ -23,7 +21,7 @@ class Manure:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_manure_update(
@@ -45,7 +43,7 @@ class Manure:
         field_size : float
             The size of the field (ha).
         mean_air_temperature : float
-            Mean air temperature on the current day (degrees C).
+            Mean air temperature on the current day (Celsius).
 
         Notes
         -----

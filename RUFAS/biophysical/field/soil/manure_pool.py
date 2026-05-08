@@ -356,7 +356,7 @@ class ManurePool:
         Parameters
         ----------
         mean_air_temperature : float
-            The average air temperature of the current day (degrees Celsius).
+            The average air temperature of the current day (Celsius).
 
         Returns
         -------
@@ -444,7 +444,7 @@ class ManurePool:
         temperature_factor: float,
     ) -> float:
         """
-        This function determines the daily change in the moisture factor of the maure based on the current days
+        This function determines the daily change in the moisture factor of the manure based on the current days
         precipitation conditions.
 
         Parameters
@@ -461,7 +461,7 @@ class ManurePool:
         Returns
         -------
         float
-            The change the moisture factor of the manure application on this day.
+            The change of the moisture factor of the manure application on this day (unitless).
 
         References
         ----------
@@ -536,11 +536,11 @@ class ManurePool:
         water_extractable_phosphorus : float
             The mass of the water extractable phosphorus pool that is being leached from (kg).
         is_organic : bool
-            Is the phosphorus being leached organic (True / False).
+            Is the phosphorus being leached organic.
 
         Returns
         -------
-        dict (keys listed below)
+        dict[str, float]
             new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg).
             infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg).
             runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg).

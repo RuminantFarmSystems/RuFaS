@@ -31,16 +31,16 @@ from RUFAS.weather import Weather
 class FieldManager:
     """
     Manages the initialization and simulation of field instances within the simulation environment. This class is
-    responsible for creating `Field` instances based on input data, managing these fields across the simulation
-    lifecycle, and interfacing with the `SimulationEngine` to execute daily and annual routines.
+    responsible for creating ``Field`` instances based on input data, managing these fields across the simulation
+    lifecycle, and interfacing with the ``SimulationEngine`` to execute daily and annual routines.
 
 
     Attributes
     ----------
     fields : list[Field]
-        A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
+        A list of ``Field`` instances that have been initialized and are managed by this ``FieldManager``.
     output_gatherer : FieldDataReporter
-        An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
+        An instance of ``FieldDataReporter`` responsible for gathering and reporting data from the managed fields.
     om : OutputManager
         Instance of the OutputManager.
 
@@ -161,7 +161,7 @@ class FieldManager:
         Returns
         -------
         Field
-            A `Field` instance configured with the specified input data
+            A ``Field`` instance configured with the specified input data
 
         """
         im = InputManager()

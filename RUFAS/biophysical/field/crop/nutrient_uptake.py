@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABC
-from typing import Optional
 from RUFAS.biophysical.field.crop.crop_data import CropData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -10,13 +9,13 @@ class NutrientUptake(ABC):
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
-        An instance of `CropData` containing crop specifications and attributes.
-        Defaults to a new instance of `CropData` if not provided.
+    crop_data : CropData, optional
+        An instance of ``CropData`` containing crop specifications and attributes.
+        Defaults to a new instance of ``CropData`` if not provided.
 
     """
 
-    def __init__(self, crop_data: Optional[CropData]):
+    def __init__(self, crop_data: CropData | None):
         self.crop_data = crop_data or CropData()
 
     @abstractmethod
@@ -59,8 +58,13 @@ class NutrientUptake(ABC):
 
         Parameters
         ----------
-        actual_nutrient_uptakes : Optional[List[float]]
+        actual_nutrient_uptakes : list[float]
             Actual nutrient uptake from each soil layer (kg/ha or mm).
+
+        Returns
+        -------
+        float
+            Total nutrient extracted from each soil layer (kg/ha).
 
         """
         return sum(actual_nutrient_uptakes)

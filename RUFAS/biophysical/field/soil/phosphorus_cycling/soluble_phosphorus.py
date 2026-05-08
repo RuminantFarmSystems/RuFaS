@@ -1,5 +1,4 @@
 from math import exp, inf
-from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.soil.layer_data import LayerData
@@ -26,7 +25,7 @@ class SolublePhosphorus:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         """
         This method initializes the SoilData object that this module will work with, or create one if none provided.
 
@@ -129,7 +128,7 @@ class SolublePhosphorus:
 
         References
         ----------
-        APLE Theoretical eqn. [9] (used to calculate `top_layer_dissolved_reactive_phosphorus_runoff`)
+        APLE Theoretical eqn. [9] (used to calculate ``top_layer_dissolved_reactive_phosphorus_runoff``)
 
         """
         runoff_in_liters = (
@@ -211,7 +210,7 @@ class SolublePhosphorus:
             Concentration of phosphorus in the soil layer (mg phosphorous per kg soil).
         isotherm_slope : float
             Slope of the phosphorus sorption isotherm (unitless).
-        isotherm_intercept
+        isotherm_intercept : float
              Intercept of the phosphorus sorption isotherm (unitless).
 
         Returns
