@@ -8,6 +8,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
@@ -333,7 +334,7 @@ class Storage(Processor):
             <= UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE
         )
         if is_temp_invalid:
-            Storage._om.add_error(
+            OutputManager().add_error(
                 "Storage arrhenius exponent calculation error",
                 f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}",
                 info_map={"class": Storage.__name__, "function": Storage._calculate_arrhenius_exponent.__name__},

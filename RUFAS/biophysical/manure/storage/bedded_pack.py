@@ -10,6 +10,7 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.user_constants import UserConstants
@@ -292,7 +293,7 @@ class BeddedPack(Storage):
         """
 
         if received_nitrogen < 0.0:
-            BeddedPack._om.add_error(
+            OutputManager().add_error(
                 "Negative received nitrogen error",
                 f"Daily nitrogen input mass must be non-negative: {received_nitrogen}",
                 info_map={
@@ -332,7 +333,7 @@ class BeddedPack(Storage):
         """
 
         if received_nitrogen < 0.0:
-            BeddedPack._om.add_error(
+            OutputManager().add_error(
                 "Negative received nitrogen error",
                 f"Daily nitrogen input mass must be non-negative: {received_nitrogen}",
                 info_map={
@@ -379,7 +380,7 @@ class BeddedPack(Storage):
 
         """
         if manure_volatile_solids < 0:
-            BeddedPack._om.add_error(
+            OutputManager().add_error(
                 "Negative manure solids error",
                 f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.",
                 info_map={
@@ -429,7 +430,7 @@ class BeddedPack(Storage):
         for (lower_bound, upper_bound), mcf in BEDDED_PACK_MCF_TABLE[mix].items():
             if lower_bound < manure_temperature <= upper_bound:
                 return mcf
-        BeddedPack._om.add_error(
+        OutputManager().add_error(
             "BeddedPack manure temp error",
             f"Temperature {manure_temperature}°C out of any defined bin",
             info_map={

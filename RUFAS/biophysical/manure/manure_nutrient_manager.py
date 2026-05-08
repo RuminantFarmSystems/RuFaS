@@ -188,7 +188,7 @@ class ManureNutrientManager:
 
         """
         if request_nutrient < 0.0:
-            ManureNutrientManager.om.add_error(
+            OutputManager().add_error(
                 "Manure nutrient request error.",
                 f"Request for nutrient cannot be negative: {request_nutrient}",
                 info_map={
@@ -199,7 +199,7 @@ class ManureNutrientManager:
             raise ValueError(f"Request for nutrient cannot be negative: {request_nutrient}")
 
         if nutrient_composition < 0.0 or nutrient_composition > 1.0:
-            ManureNutrientManager.om.add_error(
+            OutputManager().add_error(
                 "Manure nutrient request composition error.",
                 f"Nutrient composition must be between 0 and 1 (inclusive): {nutrient_composition}",
                 info_map={
@@ -241,7 +241,7 @@ class ManureNutrientManager:
         min_positive = math.inf
         for mass in projected_manure_masses:
             if mass < 0:
-                ManureNutrientManager.om.add_error(
+                OutputManager().add_error(
                     "Manure request projected mass error",
                     f"Projected manure mass cannot be negative: {mass}",
                     info_map={
@@ -283,7 +283,7 @@ class ManureNutrientManager:
 
         """
         if projected_manure_mass < 0.0:
-            ManureNutrientManager.om.add_error(
+            OutputManager().add_error(
                 "Manure request projected mass error",
                 f"Projected manure mass cannot be negative: {projected_manure_mass}",
                 info_map={

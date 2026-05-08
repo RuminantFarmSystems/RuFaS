@@ -1274,7 +1274,7 @@ class Pen:
         """Processes failures and attempts milk reduction if needed for lactating cows."""
         if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
             self.om.add_error(
-                "Milk production too low.",
+                "Milk production too low",
                 f"Check failed_constraint_summary_for_pen_{self.id} to see cause.",
                 info_map,
             )

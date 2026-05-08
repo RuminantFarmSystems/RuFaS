@@ -232,28 +232,28 @@ class Processor(ABC):
 
         """
         if total_ammoniacal_nitrogen < 0.0:
-            Processor._om.add_error(
+            OutputManager().add_error(
                 "Manure ammonia emissions calculation error",
                 "Manure total ammoniacal nitrogen must be greater than or equal to 0.0.",
                 info_map={"class": Processor.__name__, "function": Processor._calculate_ammonia_emissions.__name__},
             )
             raise ValueError("Manure total ammoniacal nitrogen must be greater than or equal to 0.0.")
         if mass < 0.0:
-            Processor._om.add_error(
+            OutputManager().add_error(
                 "Manure ammonia emissions calculation error",
                 "Manure mass must be greater than or equal to 0.0.",
                 info_map={"class": Processor.__name__, "function": Processor._calculate_ammonia_emissions.__name__},
             )
             raise ValueError("Manure mass must be greater than or equal to 0.0.")
         if density < 0.0:
-            Processor._om.add_error(
+            OutputManager().add_error(
                 "Manure ammonia emissions calculation error",
                 "Manure density must be greater than or equal to 0.0.",
                 info_map={"class": Processor.__name__, "function": Processor._calculate_ammonia_emissions.__name__},
             )
             raise ValueError("Manure density must be greater than or equal to 0.0.")
         if surface_area < 0.0:
-            Processor._om.add_error(
+            OutputManager().add_error(
                 "Manure ammonia emissions calculation error",
                 "Storage surface area must be greater than or equal to 0.0.",
                 info_map={"class": Processor.__name__, "function": Processor._calculate_ammonia_emissions.__name__},
