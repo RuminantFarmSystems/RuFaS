@@ -1244,8 +1244,22 @@ class HerdManager:
 
         """
         if len(allocation_plan) != len(animal_pens):
+            self.om.add_error(
+                "Execute Pen Allocation Error",
+                "The length of the allocation plan must match the number of pens. "
+                f"Got allocation_plan of length {len(allocation_plan)} with "
+                f"animal_pens number of {len(animal_pens)}",
+                info_map={"class": self.__class__.__name__, "function": self._execute_allocation_plan.__name__},
+            )
             raise ValueError("The length of the allocation plan must match the number of pens.")
         elif sum(allocation_plan) != len(animals):
+            self.om.add_error(
+                "Execute Pen Allocation Error",
+                "The sum of the allocation plan must match the number of animals. "
+                f"Got allocation_plan sum of {sum(allocation_plan)} with "
+                f"animal_pens number of {len(animal_pens)}",
+                info_map={"class": self.__class__.__name__, "function": self._execute_allocation_plan.__name__},
+            )
             raise ValueError("The sum of the allocation plan must match the number of animals.")
 
         start_animal_count = 0
@@ -1291,6 +1305,16 @@ class HerdManager:
         """
 
         if num_stalls < 0 or max_stocking_density < 0:
+            self.om.add_error(
+                "Calculate Max Animals Spaces Per Pen Error",
+                "The number of stalls and maximum stocking density must be greater than or equal to 0."
+                f"num_stalls must be > 0 and got {num_stalls} AND "
+                f"max_stocking_density must be > 0 and got {max_stocking_density}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._calculate_max_animal_spaces_per_pen.__name__,
+                },
+            )
             raise ValueError("The number of stalls and maximum stocking density must be greater than or equal to 0.")
 
         return int(num_stalls * max_stocking_density)
@@ -1875,7 +1899,14 @@ class HerdManager:
         dry_cows_milk_fat_kg = sum([cow.milk_production.fat_content for cow in dry_cows])
         dry_cows_milk_protein_kg = sum([cow.milk_production.true_protein_content for cow in dry_cows])
         if dry_cows_daily_milk_production > 0 or dry_cows_milk_fat_kg > 0 or dry_cows_milk_protein_kg > 0:
-            self.om.add_error("Dry cow milking error", "Unexpected milking from dry cows", info_map)
+            self.om.add_error(
+                "Dry cow milking error",
+                "Unexpected milking from dry cows: "
+                f"dry_cows_daily_milk_production should be <= 0 and got {dry_cows_daily_milk_production}, "
+                f"AND dry_cows_milk_fat_kg must be <= 0 and got {dry_cows_milk_fat_kg},"
+                f"AND dry_cows_milk_protein_kg must be <= 0 and got {dry_cows_milk_protein_kg}.",
+                info_map,
+            )
             raise ValueError("Unexpected milking from dry cows")
 
     def _update_cow_pregnancy_statistics(self) -> None:

@@ -286,8 +286,17 @@ class TillageApplication:
             or isinstance(data_container, ManurePool)
         )
         if not data_container_is_correct_type:
+            OutputManager().add_error(
+                "Invalid data container type",
+                "Expected object containing data to be type 'SoilData' or 'FieldData', received type "
+                f"'{type(data_container)}'.",
+                info_map={
+                    "class": TillageApplication.__name__,
+                    "function": TillageApplication._remove_amount_incorporated.__name__,
+                },
+            )
             raise TypeError(
-                f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
+                "Expected object containing data to be type 'SoilData' or 'FieldData', received type "
                 f"'{type(data_container)}'."
             )
 

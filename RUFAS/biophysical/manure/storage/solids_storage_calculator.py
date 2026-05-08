@@ -2,6 +2,7 @@ import math
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.user_constants import UserConstants
 
 
@@ -206,6 +207,11 @@ class SolidsStorageCalculator:
         methane_production_potential : float
             Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
 
+        Raises
+        ------
+        ValueError
+            If manure_volatile_solids < 0.
+
         Returns
         -------
         float
@@ -213,6 +219,14 @@ class SolidsStorageCalculator:
 
         """
         if manure_volatile_solids < 0:
+            OutputManager().add_error(
+                "Negative manure solids error",
+                f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.",
+                info_map={
+                    "class": SolidsStorageCalculator.__name__,
+                    "function": SolidsStorageCalculator.calculate_ifsm_methane_emission.__name__,
+                },
+            )
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
         Bo = methane_production_potential
         methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temperature)

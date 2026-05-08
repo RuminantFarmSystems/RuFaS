@@ -463,7 +463,15 @@ class FeedManager:
                 for crop in projected_crop_amounts:
                     projected_crops[feed_id_for_storage] += crop.dry_matter_mass
         else:
-            raise ValueError(f"Current date {time.current_date} is after requested inventory date {inventory_date}")
+            self._om.add_error(
+                "Total projected inventory error.",
+                f"Current date {time.current_date} is after requested inventory date {inventory_date}.",
+                {
+                    "class": self.__class__.__name__,
+                    "function": self.get_total_projected_inventory.__name__,
+                },
+            )
+            raise ValueError(f"Current date {time.current_date} is after requested inventory date {inventory_date}.")
 
         available_feed_rufas_ids = [feed.rufas_id for feed in self._available_feeds]
 
@@ -579,6 +587,11 @@ class FeedManager:
         purchase_type : PurchaseType
             Type of purchase being made, used for output variable naming.
 
+        Raises
+        ------
+        ValueError
+            When trying to purchase feed that is not in the available feeds list.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -591,6 +604,11 @@ class FeedManager:
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
             )
             if feed_info is None:
+                self._om.add_error(
+                    "Trying to purchase unavailable feed",
+                    f"Trying to purchase unavailable feed {rufas_id}.",
+                    info_map,
+                )
                 raise ValueError(f"Trying to purchase unavailable feed {rufas_id}")
 
             total_cost = purchase_amount * feed_info.purchase_cost
@@ -814,6 +832,11 @@ class FeedManager:
         for storage in self.active_storages.values():
             if storage.crop_name == crop_name:
                 return storage.rufas_feed_id
+        self._om.add_error(
+            "Feed Storage lookup error.",
+            f"No rufas id found for crop name '{crop_name}'.",
+            info_map={"class": self.__class__.__name__, "function": self._lookup_storage_rufas_id.__name__},
+        )
         raise ValueError(f"No rufas id found for crop name '{crop_name}'.")
 
     def _gather_available_feeds_by_id(

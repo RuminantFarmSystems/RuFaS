@@ -39,6 +39,8 @@ class DigestiveSystem:
         TypeError
             If the animal type in digestive_system_inputs is not supported, a TypeError is raised
             with information about supported animal types.
+        RuntimeError
+            For any other unexpected errors related to processing digestion.
 
         """
         om = OutputManager()
