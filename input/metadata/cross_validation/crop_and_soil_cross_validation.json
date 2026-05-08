@@ -1,0 +1,756 @@
+{
+  "cross_validation": [
+    {
+      "description": "All crop configurations: optimal_temperature must be greater than or equal to minimum_temperature",
+      "aliases": {
+        "variables": {
+          "crop_configurations": "crop_configurations.crop_configurations"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "crop_configurations",
+              "field": "optimal_temperature",
+              "field_to_compare": "minimum_temperature",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All crop configurations: optimal_harvest_index must be greater than or equal to minimum_harvest_index",
+      "aliases": {
+        "variables": {
+          "crop_configurations": "crop_configurations.crop_configurations"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "crop_configurations",
+              "field": "optimal_harvest_index",
+              "field_to_compare": "minimum_harvest_index",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 0 has equal planting and harvesting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.0.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.0.planting_days",
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.0.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.0.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 1 has equal planting and harvesting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.1.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.1.planting_days",
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.1.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.1.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 2 has equal planting and harvesting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.2.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.2.planting_days",
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.2.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.2.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 3 has equal planting and harvesting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.3.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.3.planting_days",
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.3.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.3.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay schedule 0 has equal planting and harvesting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "CornGrain-AlfHay.crop_schedules.0.planting_years",
+          "planting_days": "CornGrain-AlfHay.crop_schedules.0.planting_days",
+          "harvest_years": "CornGrain-AlfHay.crop_schedules.0.harvest_years",
+          "harvest_days": "CornGrain-AlfHay.crop_schedules.0.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay schedule 1 has equal planting and harvesting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "CornGrain-AlfHay.crop_schedules.1.planting_years",
+          "planting_days": "CornGrain-AlfHay.crop_schedules.1.planting_days",
+          "harvest_years": "CornGrain-AlfHay.crop_schedules.1.harvest_years",
+          "harvest_days": "CornGrain-AlfHay.crop_schedules.1.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay schedule 2 has equal planting and harvesting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "CornGrain-AlfHay.crop_schedules.2.planting_years",
+          "planting_days": "CornGrain-AlfHay.crop_schedules.2.planting_days",
+          "harvest_years": "CornGrain-AlfHay.crop_schedules.2.harvest_years",
+          "harvest_days": "CornGrain-AlfHay.crop_schedules.2.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornGrain-AlfHay schedule 3 has equal planting and harvesting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "CornGrain-AlfHay.crop_schedules.3.planting_years",
+          "planting_days": "CornGrain-AlfHay.crop_schedules.3.planting_days",
+          "harvest_years": "CornGrain-AlfHay.crop_schedules.3.harvest_years",
+          "harvest_days": "CornGrain-AlfHay.crop_schedules.3.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["planting_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_years"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["harvest_days"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "field_1 watering amount must be zero when watering interval is zero",
+      "aliases": {
+        "variables": {
+          "watering_amount_in_liters": "field_1.watering_amount_in_liters",
+          "watering_interval": "field_1.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_amount_in_liters"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_1 watering interval must be greater than zero when watering amount is positive",
+      "aliases": {
+        "variables": {
+          "watering_amount_in_liters": "field_1.watering_amount_in_liters",
+          "watering_interval": "field_1.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_amount_in_liters"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "field_2 watering amount must be zero when watering interval is zero",
+      "aliases": {
+        "variables": {
+          "watering_amount_in_liters": "field_2.watering_amount_in_liters",
+          "watering_interval": "field_2.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_amount_in_liters"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_2 watering interval must be greater than zero when watering amount is positive",
+      "aliases": {
+        "variables": {
+          "watering_amount_in_liters": "field_2.watering_amount_in_liters",
+          "watering_interval": "field_2.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_amount_in_liters"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "All soil_1 layers: field_capacity_water_concentration must be greater than or equal to wilting_point_water_concentration",
+      "aliases": {
+        "variables": {
+          "soil_1_layers": "soil_1.soil_layers"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "soil_1_layers",
+              "field": "field_capacity_water_concentration",
+              "field_to_compare": "wilting_point_water_concentration",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All soil_1 layers: saturation_point_water_concentration must be greater than or equal to field_capacity_water_concentration",
+      "aliases": {
+        "variables": {
+          "soil_1_layers": "soil_1.soil_layers"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "soil_1_layers",
+              "field": "saturation_point_water_concentration",
+              "field_to_compare": "field_capacity_water_concentration",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All soil_2 layers: field_capacity_water_concentration must be greater than or equal to wilting_point_water_concentration",
+      "aliases": {
+        "variables": {
+          "soil_2_layers": "soil_2.soil_layers"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "soil_2_layers",
+              "field": "field_capacity_water_concentration",
+              "field_to_compare": "wilting_point_water_concentration",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All soil_2 layers: saturation_point_water_concentration must be greater than or equal to field_capacity_water_concentration",
+      "aliases": {
+        "variables": {
+          "soil_2_layers": "soil_2.soil_layers"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "soil_2_layers",
+              "field": "saturation_point_water_concentration",
+              "field_to_compare": "field_capacity_water_concentration",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    }
+  ]
+}
