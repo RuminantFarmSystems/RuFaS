@@ -135,6 +135,12 @@ class HerdFactory:
 
         """
         if animal.animal_type not in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            om.add_error(
+                "Calf and Heifer_I update error",
+                f"Unexpected {animal.animal_type.value} type. "
+                f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._calf_and_heiferI_update.__name__},
+            )
             raise TypeError(
                 f"Unexpected {animal.animal_type.value} type. "
                 f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}."
@@ -170,6 +176,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type == AnimalType.HEIFER_II:
+            om.add_error(
+                "Heifer_II update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._heiferII_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
@@ -202,6 +213,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type == AnimalType.HEIFER_III:
+            om.add_error(
+                "Heifer_III update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._heiferIII_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
@@ -238,6 +254,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type.is_cow:
+            om.add_error(
+                "Cow update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting cow.",
+                info_map={"class": self.__class__.__name__, "function": self._cow_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting cow.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())

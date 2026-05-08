@@ -6,6 +6,7 @@ from RUFAS.biophysical.feed_storage.silage import Bunker, Pile, Bag
 from RUFAS.biophysical.feed_storage.baleage import Baleage
 from RUFAS.biophysical.feed_storage.grain import Dry, HighMoisture
 from RUFAS.biophysical.feed_storage.storage import Storage
+from RUFAS.output_manager import OutputManager
 
 
 class StorageType(Enum):
@@ -50,4 +51,9 @@ class StorageType(Enum):
             storage: Type["Storage"] = cls[storage_type].value
             return storage
         except KeyError:
+            OutputManager().add_error(
+                "Unknown storage type error",
+                f"Error trying to get unknown storage type: {storage_type}.",
+                info_map={"class": cls.__name__, "function": cls.get_storage_class.__name__},
+            )
             raise ValueError(f"Unknown storage type: {storage_type}.")

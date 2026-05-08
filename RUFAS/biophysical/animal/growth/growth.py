@@ -71,6 +71,14 @@ class Growth:
         tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]
             The updated animal growth properties, reproduction properties, and the general properties of the animal
             after the growth-related routines for the current day.
+
+        Raises
+        ------
+        ValueError
+            If unknown animal type encountered.
+        RuntimeError
+            For any other unexpected errors in body weight change evaluation process.
+
         """
         growth_outputs = GrowthOutputs(
             body_weight=growth_inputs.body_weight,

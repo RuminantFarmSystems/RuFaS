@@ -38,5 +38,5 @@ def test_get_processor_class_valid(input_str: str, expected_class: Type["Process
 
 
 def test_get_processor_class_invalid() -> None:
-    with pytest.raises(ValueError, match="Unknown processor type: invalid_processor."):
+    with pytest.raises(ValueError, match="Unknown manure processor type: invalid_processor."):
         ProcessorType.get_processor_class("invalid_processor")
