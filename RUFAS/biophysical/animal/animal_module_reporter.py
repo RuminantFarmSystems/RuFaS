@@ -832,6 +832,8 @@ class AnimalModuleReporter:
             animal_constants.DISEASE_CULL: MeasurementUnits.UNITLESS,
             animal_constants.UDDER_CULL: MeasurementUnits.UNITLESS,
             animal_constants.UNKNOWN_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.CALF_MORTALITY_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.HEIFER_MORTALITY_CULL: MeasurementUnits.UNITLESS,
         }
         om.add_variable(
             "cull_reason_stats",
