@@ -1,6 +1,6 @@
 import math
 from math import exp
-from typing import Dict, List, Sequence, TypeVar
+from typing import Dict, List, Sequence, TypeVar, Any
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
@@ -99,15 +99,15 @@ class Field:
 
     def __init__(
         self,
-        field_data: Optional[FieldData] = None,
-        soil: Optional[Soil] = None,
-        plantings: Optional[List[PlantingEvent]] = None,
-        harvestings: Optional[List[HarvestEvent]] = None,
-        tillage_events: Optional[List[TillageEvent]] = None,
-        fertilizer_events: Optional[List[FertilizerEvent]] = None,
-        fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
-        manure_events: Optional[List[ManureEvent]] = None,
-        daily_spread_settings: Optional[dict[str, Any]] = None,
+        field_data: FieldData | None = None,
+        soil: Soil | None = None,
+        plantings: List[PlantingEvent] | None = None,
+        harvestings: List[HarvestEvent] | None = None,
+        tillage_events: List[TillageEvent] | None = None,
+        fertilizer_events: List[FertilizerEvent] | None = None,
+        fertilizer_mixes: Dict[str, Dict[str, float]] | None = None,
+        manure_events: List[ManureEvent] | None = None,
+        daily_spread_settings: dict[str, Any] | None = None,
     ) -> None:
         # field-wide attributes
         self.om = OutputManager()
