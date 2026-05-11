@@ -192,7 +192,7 @@ class SimulationEngine:
         self._simulation_type_to_daily_simulation_function = {
             SimulationType.FULL_FARM: self._execute_full_farm_daily_simulation,
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
-            SimulationType.ANIMALS_ONLY: self._execute_animals_only_daily_simulation
+            SimulationType.ANIMALS_ONLY: self._execute_animals_only_daily_simulation,
         }
 
         self._setup_simulation_modules()
