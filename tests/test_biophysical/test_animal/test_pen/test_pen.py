@@ -1710,7 +1710,6 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
         temperature=25.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=1,
     )
 
@@ -1742,7 +1741,6 @@ def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen)
         temperature=25.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=2,
     )
 
@@ -1767,7 +1765,6 @@ def test_formulation_non_lac_cow_failure_no_previous_ration(mocker: MockerFixtur
             temperature=22.0,
             max_daily_feeds={},
             advance_purchase_allowance=MagicMock(),
-            total_inventory=MagicMock(),
             simulation_day=3,
         )
 
@@ -1789,7 +1786,6 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
         temperature=21.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=4,
     )
 
@@ -1842,7 +1838,6 @@ def test_formulation_lac_cow_user_defined_dmi_increase_triggers_retry(mocker: Mo
         temperature=25.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=10,
     )
 
@@ -1899,7 +1894,6 @@ def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(moc
         temperature=20.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=11,
     )
 

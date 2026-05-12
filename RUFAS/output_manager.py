@@ -160,6 +160,9 @@ class OutputManager(object):
     __instance = None
     pool_element_type = dict[str, list[Any]]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
+    _VARIABLE_DUMP_KEYS_TO_IGNORE = frozenset(
+        ["units", "timestep", "info_maps", "prefix", "suffix", "data_origin", "number_animals_in_pen", "simulation_day"]
+    )
 
     def __new__(cls) -> OutputManager:
         if not hasattr(cls, "instance"):
@@ -332,7 +335,75 @@ class OutputManager(object):
         else:
             pool[key]["values"].append(deepcopy(value))
 
-    def add_variable(self, name: str, value: Any, info_map: dict[str, Any], first_info_map_only: bool = False) -> None:
+    def _add_simulation_day_to_info_map(
+        self,
+        info_map: dict[str, Any],
+        overwrite: bool = False,
+        simulation_day: int | None = None,
+        name: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Update an info_map to include simulation_day
+
+        Parameters
+        ----------
+        info_map: dict[str, Any]
+            The original info_map to copy and optionally update
+        overwrite: bool, default False
+            Whether to overwrite an existing "simulation_day" entry
+        simulation_day: optional int
+            The simulation day to insert. If None, self.time.simulation_day is used when available.
+        name: optional str
+            The name of the variable for which simulation_day is added to the info_map (used for warnings)
+
+        Returns
+        -------
+        the info map, updated to include simulation_day, if it is available.
+
+        Notes
+        -----
+        A warning is triggered if the resulting info_map has no "simulation_day" value (or a value of None)
+        """
+        info_map_copy = dict(info_map)
+
+        time_day = self.time.simulation_day if hasattr(self.time, "simulation_day") else None
+
+        map_has_valid_day = info_map_copy.get("simulation_day") is not None
+
+        day_to_use = simulation_day if simulation_day is not None else time_day
+
+        # Don't overwrite a valid simulation_day with None
+        if day_to_use is None and map_has_valid_day:
+            return info_map_copy
+
+        should_add_sim_day = overwrite or "simulation_day" not in info_map_copy
+
+        if day_to_use is not None and should_add_sim_day:
+            info_map_copy["simulation_day"] = day_to_use
+
+        if day_to_use is None and not map_has_valid_day:
+            warning_info_map = {
+                "class": self.__class__.__name__,
+                "function": self._add_simulation_day_to_info_map.__name__,
+            }
+            self.add_warning(
+                name="no simulation_day available",
+                msg=f"no simulation day was available to add to the info_map for variable {name} "
+                + f"(from {info_map_copy.get('class')}.{info_map_copy.get('function')})",
+                info_map=warning_info_map,
+            )
+
+        return info_map_copy
+
+    def add_variable(
+        self,
+        name: str,
+        value: Any,
+        info_map: dict[str, Any],
+        first_info_map_only: bool = False,
+        overwrite_simulation_day: bool = False,
+        simulation_day: int | None = None,
+    ) -> None:
         """
         Adds a variable to the pool.
 
@@ -356,8 +427,17 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         first_info_map_only : bool, default False
-            If true, records only the first info map passed for that variable. If false, records all info maps passed
+            If True, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
+        overwrite_simulation_day: bool, default False
+            If True, an existing "simulation_day" value in the info_map will be replaced. The replacement value will
+            be the simulation_day argument provided to this function (if it is not None), if it is available;
+            Otherwise, `self.time.simulation_day` will be used, if available. If neither value is available, the
+            info_map is returned unchanged (no simulation_day is added or updated).
+        simulation_day: optional int
+            if present, this simulation_day will be used, otherwise the simulation_day will be taken from the time
+            attribute, if present. This option is provided to allow variables created outside the main simulation
+            loop (i.e., herd initialization) to be padded.
 
         Raises
         ------
@@ -374,8 +454,12 @@ class OutputManager(object):
             raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
-        key = self._generate_key(name, info_map)
-        self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units}, first_info_map_only)
+        updated_info_map = self._add_simulation_day_to_info_map(
+            info_map, overwrite_simulation_day, simulation_day, name
+        )
+
+        key = self._generate_key(name, updated_info_map)
+        self._add_to_pool(self.variables_pool, key, value, {**updated_info_map, "units": units}, first_info_map_only)
 
         if isinstance(value, dict):
             for k, v in value.items():
@@ -394,7 +478,10 @@ class OutputManager(object):
                 self._save_current_variable_pool()
 
     def add_variable_bulk(
-        self, variables: list[tuple[dict[str, Any], dict[str, Any]]], first_info_map_only: bool = False
+        self,
+        variables: list[tuple[dict[str, Any], dict[str, Any]]],
+        first_info_map_only: bool = False,
+        overwrite_simulation_day: bool = False,
     ) -> None:
         """
         Iterate through all variables and call add_variable() on each of them.
@@ -406,10 +493,12 @@ class OutputManager(object):
             being the variable name and the value being the output value, and its corresponding info map.
         first_info_map_only : bool, default False
             If true, records only the first info_map passed for each variable.
+        overwrite_simulation_day: bool, default False
+            Passed to add_variable(). If true, any simulation_day value provided in the info_maps is overwritten.
         """
         for variable, info_map in variables:
             name, value = list(variable.items())[0]
-            self.add_variable(name, value, info_map, first_info_map_only)
+            self.add_variable(name, value, info_map, first_info_map_only, overwrite_simulation_day)
 
     def _save_current_variable_pool(self) -> None:
         """
@@ -1817,7 +1906,7 @@ class OutputManager(object):
         data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
         self._dict_to_file_csv(data_dict, file_path_csv)
 
-    def dump_variable_names_and_contexts(  # noqa: C901
+    def dump_variable_names_and_contexts(
         self,
         path: Path,
         exclude_info_maps: bool,
@@ -1869,68 +1958,91 @@ class OutputManager(object):
 
         var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.{os.linesep}"]
         for name, variable_data in self._get_flat_variables_pool().items():
-            if "values" not in variable_data:
-                var_list.append(f"{name}: **NO VARIABLES**{os.linesep}")
-                continue
-
-            parsable_dicts = []
-
-            var_data_info_maps: list[Any] | None = []
-            if not exclude_info_maps and "info_maps" in variable_data:
-                parsable_dicts.append("info_maps")
-                var_data_info_maps = variable_data.get("info_maps")
-
-            units = var_data_info_maps[0]["units"] if var_data_info_maps else ""
-            is_variable_nested = isinstance(variable_data["values"][0], dict)
-            if is_variable_nested:
-                parsable_dicts.append("values")
-            else:
-                var_list.append(f"{name} ({units}){os.linesep}" if units else f"{name}{os.linesep}")
-
-            prefix = name
-            if format_option == "block":
-                if f"{name}{os.linesep}" not in var_list:
-                    var_list.append(f"{name}{os.linesep}")
-                prefix = " " * len(name)
-            keys_to_ignore = [
-                "units",
-                "timestep",
-                "info_maps",
-                "prefix",
-                "suffix",
-                "data_origin",
-                "number_animals_in_pen",
-                "simulation_day",
-            ]
-            for parsable_dict in parsable_dicts:
-                keys = variable_data[parsable_dict][0].keys()
-                if format_option == "inline":
-                    var_list.append(
-                        f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}"
-                        if not parsable_dict.endswith("info_maps") and units
-                        else f"{name}.{parsable_dict}: {list(keys)}{os.linesep}"
-                    )
-                else:
-                    for key in keys:
-                        if isinstance(units, dict):
-                            var_units = units.get(key, "")
-                        else:
-                            var_units = units
-                        if format_option == "basic":
-                            var_list.append(
-                                f"{name}.{key} ({var_units}){os.linesep}"
-                                if key not in keys_to_ignore and var_units
-                                else f"{name}.{key}{os.linesep}"
-                            )
-                        else:
-                            var_list.append(
-                                f"{prefix}.{parsable_dict}: {key} ({var_units}){os.linesep}"
-                                if key not in keys_to_ignore and var_units
-                                else f"{prefix}.{parsable_dict}: {key}{os.linesep}"
-                            )
-
+            var_list.extend(self._format_variable_entry(name, variable_data, exclude_info_maps, format_option))
         file_path = path / self.generate_file_name("variable_names", "txt")
         self._list_to_file_txt(var_list, file_path)
+
+    def _get_parsable_dicts(
+        self,
+        variable_data: dict[str, Any],
+        exclude_info_maps: bool,
+    ) -> tuple[list[str], list[Any]]:
+        """Returns parsable dict keys and info_maps data for a variable entry."""
+
+        parsable_dicts: list[str] = []
+        var_data_info_maps: list[Any] = []
+        if not exclude_info_maps and "info_maps" in variable_data:
+            parsable_dicts.append("info_maps")
+            var_data_info_maps = variable_data.get("info_maps", [])
+        return parsable_dicts, var_data_info_maps
+
+    def _format_variable_entry(
+        self,
+        name: str,
+        variable_data: dict[str, Any],
+        exclude_info_maps: bool,
+        format_option: str,
+    ) -> list[str]:
+        """Returns formatted lines for a single variable in the variable names dump."""
+
+        if "values" not in variable_data:
+            return [f"{name}: **NO VARIABLES**{os.linesep}"]
+
+        parsable_dicts, var_data_info_maps = self._get_parsable_dicts(variable_data, exclude_info_maps)
+        units = var_data_info_maps[0]["units"] if var_data_info_maps else ""
+        is_variable_nested = isinstance(variable_data["values"][0], dict)
+
+        lines: list[str] = []
+        if is_variable_nested:
+            parsable_dicts.append("values")
+        else:
+            lines.append(f"{name} ({units}){os.linesep}" if units else f"{name}{os.linesep}")
+
+        prefix = name
+        if format_option == "block":
+            if f"{name}{os.linesep}" not in lines:
+                lines.append(f"{name}{os.linesep}")
+            prefix = " " * len(name)
+
+        for parsable_dict in parsable_dicts:
+            keys = variable_data[parsable_dict][0].keys()
+            lines.extend(self._format_parsable_dict_lines(name, prefix, parsable_dict, keys, units, format_option))
+
+        return lines
+
+    def _format_parsable_dict_lines(
+        self,
+        name: str,
+        prefix: str,
+        parsable_dict: str,
+        keys: list[str],
+        units: str | dict[str, str],
+        format_option: str,
+    ) -> list[str]:
+        """Returns formatted lines for one parsable dict (values or info_maps) within a variable entry."""
+
+        if format_option == "inline":
+            return [
+                (
+                    f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}"
+                    if not parsable_dict.endswith("info_maps") and units
+                    else f"{name}.{parsable_dict}: {list(keys)}{os.linesep}"
+                )
+            ]
+
+        lines: list[str] = []
+        for key in keys:
+            var_units = units.get(key, "") if isinstance(units, dict) else units
+            show_units = key not in self._VARIABLE_DUMP_KEYS_TO_IGNORE and var_units
+            if format_option == "basic":
+                lines.append(f"{name}.{key} ({var_units}){os.linesep}" if show_units else f"{name}.{key}{os.linesep}")
+            else:
+                lines.append(
+                    f"{prefix}.{parsable_dict}: {key} ({var_units}){os.linesep}"
+                    if show_units
+                    else f"{prefix}.{parsable_dict}: {key}{os.linesep}"
+                )
+        return lines
 
     def dump_all_nondata_pools(
         self,

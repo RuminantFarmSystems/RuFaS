@@ -81,60 +81,6 @@ def test_print_herd_snapshot(herd_manager: HerdManager, mocker: MockerFixture) -
 
 
 @pytest.mark.parametrize(
-    "herd_data, simulate_animals",
-    [
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 1, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 2, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 3, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 4, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 5}, False),
-        ({"calf_num": 8, "heiferI_num": 10, "heiferII_num": 5, "heiferIII_num_springers": 9, "cow_num": 5}, True),
-        ({"calf_num": 5, "heiferI_num": 8, "heiferII_num": 3, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 2, "heiferIII_num_springers": 4, "cow_num": 0}, False),
-        ({"calf_num": 8, "heiferI_num": 8, "heiferII_num": 8, "heiferIII_num_springers": 5, "cow_num": 5}, False),
-        ({"calf_num": 5, "heiferI_num": 8, "heiferII_num": 8, "heiferIII_num_springers": 8, "cow_num": 0}, False),
-    ],
-)
-def test_print_animal_num_warnings(
-    herd_data: dict[str, int], simulate_animals: bool, herd_manager: HerdManager, mocker: MockerFixture
-) -> None:
-    """Unit test for _print_animal_num_warnings()"""
-    herd_manager.simulate_animals = simulate_animals
-
-    mock_om_add_log = mocker.patch.object(herd_manager.om, "add_log")
-    mock_om_add_warning = mocker.patch.object(herd_manager.om, "add_warning")
-
-    animal_keys = {
-        "calf_num",
-        "heiferI_num",
-        "heiferII_num",
-        "heiferIII_num_springers",
-        "cow_num",
-    }
-    info_map = {
-        "class": herd_manager.__class__.__name__,
-        "function": HerdManager._print_animal_num_warnings.__name__,
-        "simulate_animals": simulate_animals,
-        "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys},
-    }
-
-    herd_manager._print_animal_num_warnings(herd_data)
-
-    if simulate_animals:
-        mock_om_add_log.assert_called_once_with("simulate_animals_flag", "simulate_animals is true", info_map)
-        mock_om_add_warning.assert_not_called()
-    else:
-        expected_add_warning_counts = len([value for value in herd_data.values() if value > 0])
-        assert mock_om_add_warning.call_count == expected_add_warning_counts
-        mock_om_add_log.assert_called_once_with(
-            "num_warnings_associated_with_simulate_animals",
-            f"{expected_add_warning_counts} warnings were associated with simulate_animals",
-            info_map,
-        )
-
-
-@pytest.mark.parametrize(
     "original_grouping_scenario, new_grouping_scenario",
     [
         (
