@@ -193,7 +193,8 @@ class HerdManager:
             herd_population.replacement,
         )
         # TODO: randomly assign embryo sex for animals that are already pregnant: use Conventional Dairy
-        self._assign_embryo_sex_for_pregnant_animals()
+        pregnant_animals = [animal for animal in (self.heiferIIs + self.heiferIIIs + self.cows) if animal.is_pregnant]
+        self._assign_embryo_sex_for_pregnant_animals_entering_the_herd(pregnant_animals)
 
         self.allocate_animals_to_pens(time.simulation_day)
         self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -596,6 +597,9 @@ class HerdManager:
             )
             self._update_sold_and_died_cow_statistics(removed_animals)
             newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
+            if newly_added_animals:
+                pregnant_newly_added_animals = [animal for animal in newly_added_animals if animal.is_pregnant]
+                self._assign_embryo_sex_for_pregnant_animals_entering_the_herd(pregnant_newly_added_animals)
 
         self._update_herd_structure(
             graduated_animals=graduated_animals,
@@ -631,11 +635,12 @@ class HerdManager:
                 if cow.milk_production.daily_milk_produced == 0 and cow.is_milking and cow.days_in_milk > 1
             ]
         )
-
+        all_milking_cow_num = len([cow for cow in self.cows if cow.is_milking and cow.days_in_milk > 1]
+)
         if no_milk_cow_num > 0:
             self.om.add_warning(
                 "Warning: Lactating cows with no production.",
-                f"There are {no_milk_cow_num} lactating cows with no milking production on simulation"
+                f"There are {no_milk_cow_num}/{all_milking_cow_num} lactating cows with no milking production on simulation"
                 f" day {time.simulation_day}.",
                 info_map={
                     "class": self.__class__.__name__,
@@ -2170,9 +2175,13 @@ class HerdManager:
                         k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
                     }
 
-    def _assign_embryo_sex_for_pregnant_animals(self) -> None:
-        pregnant_animals = [animal for animal in (self.heiferIIs + self.heiferIIIs + self.cows) if animal.is_pregnant]
-        for animal in pregnant_animals:
+    def _assign_embryo_sex_for_pregnant_animals_entering_the_herd(self, animals: list[Animal]) -> None:
+        for animal in animals:
             animal.reproduction.embryo_sex = (
                 Sex.MALE if random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE
+            )
+            animal.events.add_event(
+                animal.days_born,
+                0,
+                f"Assigning embryo_sex {animal.reproduction.embryo_sex} upon import."
             )

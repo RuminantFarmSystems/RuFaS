@@ -281,6 +281,11 @@ class Reproduction:
                 self.embryo_sex = (
                     Sex.MALE if random.random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE
                 )
+                reproduction_data_stream.events.add_event(
+                    reproduction_data_stream.days_born,
+                    time.simulation_day,
+                    f"Assigning sex {self.embryo_sex} on day 0."
+                )
             reproduction_data_stream = self.cow_give_birth(reproduction_data_stream, time)
 
         if not self.do_not_breed:
@@ -463,7 +468,10 @@ class Reproduction:
 
         reproduction_data_stream = self._simulate_estrus_if_eligible(reproduction_data_stream, time.simulation_day)
 
-        assert self.embryo_sex is not None
+        # assert self.embryo_sex is not None
+        if self.embryo_sex is None:
+            self.embryo_sex = Sex.FEMALE
+            print("setting sex manually to female")
         reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
             breed=reproduction_data_stream.breed.name,
             sex=self.embryo_sex,
@@ -477,6 +485,11 @@ class Reproduction:
         )
         self.semen_type = None
         self.embryo_sex = None
+        reproduction_data_stream.events.add_event(
+            reproduction_data_stream.days_born,
+            time.simulation_day,
+            "Setting semen_type and embryo_sex to None after new birth"
+        )
 
         return reproduction_data_stream
 
@@ -870,6 +883,9 @@ class Reproduction:
                     f"{self.cow_ovsynch_program}"
                 )
             self.hormone_schedule = hormone_schedule
+            for key, value in hormone_schedule.items():
+                if value.get("set_ai_day", False) and reproduction_data_stream.is_pregnant:
+                    print(f"Setting AI day for {reproduction_data_stream.animal_type} but animal is already pregnant")
         return reproduction_data_stream
 
     def _handle_synch_ed_hormone_delivery_and_set_estrus_day(
@@ -996,6 +1012,11 @@ class Reproduction:
         )
         self.semen_type = None
         self.embryo_sex = None
+        reproduction_data_stream.events.add_event(
+            reproduction_data_stream.days_born,
+            simulation_day,
+            "Setting semen_type and embryo_sex to None due to open heifer status",
+        )
         if self.heifer_reproduction_program != HeiferReproductionProtocol.ED:
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
@@ -1060,9 +1081,19 @@ class Reproduction:
                 )
                 reproduction_data_stream = self._increment_successful_cow_conceptions(reproduction_data_stream)
             self.embryo_sex = self._determine_embryo_sex(simulation_day)
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                f"Embryo sex assigned {self.embryo_sex} after successful conception",
+            )
         else:
             self.semen_type = None
             self.embryo_sex = None
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                "Setting semen_type and embryo_sex to None due to conception failure"
+            )
             if reproduction_data_stream.animal_type == AnimalType.HEIFER_II:
                 reproduction_data_stream = self._handle_failed_heifer_conception(
                     reproduction_data_stream, simulation_day
@@ -1164,9 +1195,6 @@ class Reproduction:
             average_estrus_cycle,
             std_estrus_cycle,
         )
-        # TODO: set sex to None when animal loses preg
-        self.semen_type = None
-        self.embryo_sex = None
         return reproduction_data_stream
 
     def _calculate_gestation_length(self) -> int:
@@ -1468,6 +1496,11 @@ class Reproduction:
             reproduction_data_stream.days_in_pregnancy = 0
             self.semen_type = None
             self.embryo_sex = None
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                "Setting semen_type and embryo_sex to None: Repeat estrus simulation for cows before the voluntary waiting period (VWP)"
+            )
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
@@ -2035,8 +2068,6 @@ class Reproduction:
                         simulation_day,
                         f"Current repro state(s): {self.repro_state_manager}",
                     )
-        self.semen_type = None
-        self.embryo_sex = None
         return reproduction_data_stream
 
     def cow_pregnancy_update(
@@ -2101,6 +2132,11 @@ class Reproduction:
         self.num_conception_rate_decreases += 1
         self.semen_type = None
         self.embryo_sex = None
+        reproduction_data_stream.events.add_event(
+            reproduction_data_stream.days_born,
+            simulation_day,
+            "Setting semen_type and embryo_sex to None due to open cow",
+        )
         if (
             AnimalConfig.dry_off_day_of_pregnancy <= AnimalConfig.third_pregnancy_check_day
             and not reproduction_data_stream.is_milking
