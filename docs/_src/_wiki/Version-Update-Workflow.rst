@@ -4,8 +4,11 @@ Maintainer Team Workflow and Communication during a Version Update
 This page describes the process that RuFaS Maintainers will use to communicate
 and execute a version update.
 
+**Major** and **Minor** updates
+------------------------------
+
 In addition to the updated model and scientific documentation in the repository
-codebase, additional deliverables of this process for **Major** and **Minor**
+codebase, deliverables of this process for **Major** and **Minor**
 updates are:
 
 - A detailed technical report of the scientific review by SME Maintainers
@@ -15,9 +18,6 @@ updates are:
 
 
 Before Merging ``dev`` to ``test``
-------------------------------
-
-**Major** and **Minor** updates:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -37,16 +37,19 @@ Before Merging ``dev`` to ``test``
    previous version release and update as necessary.
 
 
-**Patch** Updates
-^^^^^^^^^^^^^^^^^^
-
-Patch updates do not require a full project. If useful, bug fixes to be included in a patch can be collected 
-as sub-issues under a Patch parent/tracker issue.
-
-
 After ``test`` is updated
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - During the testing phase, SME Maintainers will evaluate integrated model performance. (link to Scientific Evaluation Process). 
 - When the model performance has been verified by at least one SME Maintainer per Module, the Scientific Director will prepare a Scientific Report summarizing the model performance and changes in scientific methodology. 
 - The Director of Software Engineering will lead preparation of a set of Release Notes to summarize model updates. 
 - When the testing phase is complete, both the Scientific Report and Release notes are added to the project documentation on GitHub and shared with the PML for approval.
+
+
+**Patch** Updates
+-------------------------
+
+Patch updates do not require a sceintific review of the model functionality or an updated technical report. The release notes should include a brief summary of the fixes included in the updated. 
+
+The fixes to be included in a patch update should be merged directly into ``test`` for testing and approval by the PML. If useful, bug fixes to be included in a patch can be collected 
+as sub-issues under a patch parent/tracker issue. 
+
