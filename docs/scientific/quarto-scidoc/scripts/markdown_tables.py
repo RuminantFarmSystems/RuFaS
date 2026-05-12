@@ -9,7 +9,7 @@ def read_tbl(path: str | Path, **kwargs) -> pd.DataFrame:
     """
     Imports a table as a pandas.DataFrame
 
-<<<<<<< HEAD
+
     Parameters
     ----------
     path: str | Path
