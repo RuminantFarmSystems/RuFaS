@@ -61,12 +61,23 @@ following command from this directory:
 quarto preview
 ```
 
-That should open a web browser with the HTML version of the documentation.
+That should open a web browser with the HTML version of the documentation (that live updates as you save changes to
+the qmd files).
 
 To render the docs use:
 
 ```shell
 quarto render
+```
+
+To view all options for rendering or previewing quarto see the documentation with one of:
+
+```shell
+quarto preview --help
+```
+
+```shell
+quarto render --help
 ```
 
 ## Troubleshooting

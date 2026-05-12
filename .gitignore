@@ -74,3 +74,4 @@ docs/_build/
 .Rproj*
 *.Rproj*
 .positai
+.Rproj.user

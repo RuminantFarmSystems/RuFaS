@@ -20,6 +20,8 @@ book:
     - abbrevs.qmd
 
 
+execute: 
+  echo: false
 
 bibliography: resources/rufas.bib
 
