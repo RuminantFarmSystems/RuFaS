@@ -40,7 +40,7 @@ Before Merging ``dev`` to ``test``
 **Patch** Updates
 ^^^^^^^^^^^^^^^^^^
 
-Patch updates do not require a full project. Bug fixes required in the patch should be collected 
+Patch updates do not require a full project. If useful, bug fixes to be included in a patch can be collected 
 as sub-issues under a Patch parent/tracker issue.
 
 
