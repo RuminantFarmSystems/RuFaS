@@ -8,6 +8,8 @@ site_libs/
 
 # raw LaTeX files
 *.tex
+animal_files
+example_structures_files
 
 # audit output
 quarto_reference_audit.xlsx
