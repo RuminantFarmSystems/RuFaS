@@ -35,6 +35,7 @@ class HeiferTAISubProtocol(Enum):
 
     TAI_5dCG2P = "5dCG2P"
     TAI_5dCGP = "5dCGP"
+    # TODO remove these
     SynchED_CP = "CP"
     SynchED_2P = "2P"
 
