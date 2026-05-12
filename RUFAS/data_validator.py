@@ -1753,6 +1753,8 @@ class CrossValidator:
             ),
             "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
             "is_null": lambda left, _right, eager_termination: self._evaluate_is_null(left),
+            "is_not_null": lambda left, _right, eager_termination: self._evaluate_is_not_null(left),
+            "is_in": lambda left, right, _eager_termination: self._evaluate_is_in(left, right),
             "regex": lambda left, right, eager_termination: self._evaluate_regex(left, right),
             "is_equal_length": lambda left, right, eager_termination: self._evaluate_equal_data_length(
                 left, right, eager_termination
@@ -2363,19 +2365,6 @@ class CrossValidator:
             return False
 
         operation = aggregation_block.get("operation")
-        if len(operands) > 1:
-            if not operation or operation == "no_op":
-                self._log_cross_validation_error(
-                    "Invalid operation for multi-operand aggregation",
-                    "When 'operands' has more than one entry, 'operation' must be provided and " "cannot be 'no_op'.",
-                    function_name,
-                )
-                if eager_termination:
-                    raise ValueError(
-                        "Cross-validation error: 'operation' must be provided and cannot be 'no_op' "
-                        "when 'operands' has more than one entry."
-                    )
-                return False
 
         if operation is not None and operation not in AGGREGATION_FUNCTIONS:
             self._log_cross_validation_error(
@@ -2705,6 +2694,10 @@ class CrossValidator:
         """Evaluates is null condition."""
         return bool(all(value is None for value in left_hand_value))
 
+    def _evaluate_is_not_null(self, left_hand_value: Any) -> bool:
+        """Evaluates is not null condition."""
+        return bool(all(value is not None for value in left_hand_value))
+
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
         """Evaluates the if_type condition"""
         # TODO: Remove these type checks when cross validation inputs' validation is implemented - issue #2615
@@ -2750,6 +2743,32 @@ class CrossValidator:
             return False
 
         return bool(all(checker(value) for value in left_hand_value))
+
+    def _evaluate_is_in(self, left_hand_value: Any, right_hand_value: Any) -> bool:
+        """
+        Check if every value in ``left_hand_value`` is present in ``right_hand_value``.
+
+        Parameters
+        ----------
+        left_hand_value : list[Any]
+            Values to test for membership.
+        right_hand_value : list[Any]
+            Allowed values (the set to test against).
+
+        Returns
+        -------
+        bool
+            ``True`` if every element of ``left_hand_value`` is in ``right_hand_value``,
+            ``False`` otherwise.
+
+        Examples
+        --------
+        >>> cv._evaluate_is_in(["2P"], ["2P", "CP"])
+        True
+        >>> cv._evaluate_is_in(["TAI"], ["ED", "ED-TAI"])
+        False
+        """
+        return bool(all(v in right_hand_value for v in left_hand_value))
 
     def _evaluate_regex(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """
