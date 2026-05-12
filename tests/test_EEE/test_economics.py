@@ -6,21 +6,9 @@ import pytest
 
 from RUFAS.EEE.economics.framework import EconomicFramework
 from RUFAS.EEE.economics.dcfror import DCFRORCalculator
-from RUFAS.EEE.economics.metrics import (
-    calculate_roi,
-    calculate_payback_period,
-    calculate_net_annual_cash_flow,
-    calculate_mpsp,
-)
+from RUFAS.EEE.economics.metrics import EconomicMetrics
 from RUFAS.EEE.economics.digester_costs import (
-    calculate_digester_capital_cost,
-    capital_recovery_factor,
-    scale_installed_cost,
-    calculate_digester_capex,
-    calculate_digester_operational_cost,
-    estimate_digester_costs,
-    estimate_digester_trucking_cost,
-    get_digester_cost_profile,
+    DigesterCostCalculator,
 )
 from RUFAS.EEE.economics.equations import (
     construct_timeline,
@@ -88,25 +76,25 @@ def test_run_economic_analysis_uses_pba_when_no_capital(mocker: MockerFixture) -
 
 
 def test_calculate_roi() -> None:
-    assert calculate_roi(150.0, 100.0) == 50.0
+    assert EconomicMetrics.calculate_roi(150.0, 100.0) == 50.0
 
 
 def test_calculate_payback_period() -> None:
     cash_flows = [-50, 20, 20, 20]
-    assert calculate_payback_period(cash_flows) == 2.5
+    assert EconomicMetrics.calculate_payback_period(cash_flows) == 2.5
 
 
 def test_calculate_net_annual_cash_flow() -> None:
-    result = calculate_net_annual_cash_flow([100, 120], [80, 90])
+    result = EconomicMetrics.calculate_net_annual_cash_flow([100, 120], [80, 90])
     assert result.tolist() == [20, 30]
 
 
 def test_calculate_mpsp() -> None:
-    assert math.isnan(calculate_mpsp(100.0, 50.0))
+    assert math.isnan(EconomicMetrics.calculate_mpsp(100.0, 50.0))
 
 
 def test_calculate_digester_capital_cost() -> None:
-    result = calculate_digester_capital_cost(
+    result = DigesterCostCalculator.calculate_digester_capital_cost(
         animal_units=10.0,
         digester_volume=20.0,
         farm_type_flag=1.0,
@@ -127,7 +115,7 @@ def test_calculate_digester_capital_cost() -> None:
     )
     assert result == expected
 
-    legacy = calculate_digester_capital_cost(
+    legacy = DigesterCostCalculator.calculate_digester_capital_cost(
         alpha=1.0,
         r1=0.5,
         r2=0.3,
@@ -147,23 +135,25 @@ def test_calculate_digester_capital_cost() -> None:
 
 
 def test_capital_recovery_factor() -> None:
-    result = capital_recovery_factor(0.05, 10)
+    result = DigesterCostCalculator.capital_recovery_factor(0.05, 10)
     expected = 0.05 * (1 + 0.05) ** 10 / ((1 + 0.05) ** 10 - 1)
     assert pytest.approx(result, rel=1e-6) == expected
 
 
 def test_scale_installed_cost() -> None:
-    assert scale_installed_cost(1000.0, 150.0, 100.0, 0.6) == pytest.approx(1000.0 * (150.0 / 100.0) ** 0.6)
+    assert DigesterCostCalculator.scale_installed_cost(1000.0, 150.0, 100.0, 0.6) == pytest.approx(
+        1000.0 * (150.0 / 100.0) ** 0.6
+    )
 
 
 def test_calculate_digester_capex() -> None:
-    crf = capital_recovery_factor(0.05, 20)
+    crf = DigesterCostCalculator.capital_recovery_factor(0.05, 20)
     afc = 5000.0
-    assert calculate_digester_capex(afc, crf) == pytest.approx(afc / crf)
+    assert DigesterCostCalculator.calculate_digester_capex(afc, crf) == pytest.approx(afc / crf)
 
 
 def test_calculate_digester_operational_cost() -> None:
-    result = calculate_digester_operational_cost(
+    result = DigesterCostCalculator.calculate_digester_operational_cost(
         True,
         animal_units=10.0,
         farm_type_flag=1.0,
@@ -182,7 +172,7 @@ def test_calculate_digester_operational_cost() -> None:
     assert pytest.approx(result) == expected
 
     assert (
-        calculate_digester_operational_cost(
+        DigesterCostCalculator.calculate_digester_operational_cost(
             False,
             animal_units=10.0,
             farm_type_flag=1.0,
@@ -195,7 +185,7 @@ def test_calculate_digester_operational_cost() -> None:
 
 
 def test_estimate_digester_costs_linear_equations() -> None:
-    estimates = estimate_digester_costs("Covered Lagoon - RNG", 1000)
+    estimates = DigesterCostCalculator.estimate_digester_costs("Covered Lagoon - RNG", 1000)
 
     assert pytest.approx(estimates["capital_expenditure"]) == 875 * 1000 + 625_000
 
@@ -211,7 +201,7 @@ def test_estimate_digester_costs_linear_equations() -> None:
 
 
 def test_get_digester_cost_profile_normalizes_names() -> None:
-    profile = get_digester_cost_profile("plug flow chp")
+    profile = DigesterCostCalculator.get_digester_cost_profile("plug flow chp")
 
     assert pytest.approx(profile.capital_cost(5000)) == 2_625 * 5000 + 2_000_000
     operating = profile.annual_operating_costs(5000)
@@ -281,8 +271,41 @@ def test_dcfror_prepare_costs_applies_goal_seek_unit_price_multiplier(mocker: Mo
 
 
 def test_estimate_digester_trucking_cost() -> None:
-    assert pytest.approx(estimate_digester_trucking_cost(1000)) == 137.5 * 1000
-    assert pytest.approx(estimate_digester_trucking_cost(5000)) == 137.5 * 5000
+    assert pytest.approx(DigesterCostCalculator.estimate_digester_trucking_cost(1000)) == 137.5 * 1000
+    assert pytest.approx(DigesterCostCalculator.estimate_digester_trucking_cost(5000)) == 137.5 * 5000
+
+
+def test_dcfror_prepare_costs_applies_digester_cost_curve(mocker: MockerFixture) -> None:
+    calc = DCFRORCalculator.__new__(DCFRORCalculator)
+    calc.om = mocker.Mock()
+    calc.im = mocker.Mock()
+    calc.im.get_data.side_effect = lambda key: {
+        "animal_properties.herd_information.cow_num": 1000.0,
+        "economic_inputs.Manure.digester.system_type": "Covered Lagoon - RNG",
+    }[key]
+
+    prepared = calc._prepare_costs(
+        {
+            "cost_capital_multiple": [{"Item": "Digester", "Cost": 1.0}, {"Item": "Other", "Cost": 9.0}],
+            "interest_rate_construction": 0.05,
+            "construction_term": 1,
+            "construction_finish_pcts": [1.0],
+            "cost_operational_units": [[1.0, 1.0]],
+            "cost_operational_unit_cost": [[1.0, 1.0]],
+            "units_produced": [[2.0, 2.0]],
+            "unit_cost": [[10.0, 10.0]],
+            "goal_seek_unit_price_multiplier": 1.0,
+            "project_term": 2,
+        }
+    )
+
+    # Capital should replace existing digester row with modeled curve:
+    # (base 10 - old digester 1 + modeled 1,500,000)
+    assert prepared["capital_cost"] == pytest.approx(1_500_009.0)
+
+    # Annual modeled opex: labor + energy + repairs for 1000 cows
+    # = (162,000 + 34,821 + 66,730.25) and added to each year's op cost.
+    assert prepared["operating_costs"].tolist() == pytest.approx([263_552.25, 263_552.25])
 
 
 def test_equation_helpers() -> None:

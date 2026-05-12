@@ -11,6 +11,7 @@ from RUFAS.units import MeasurementUnits
 
 from .equations import EconomicEquations
 from .metrics import EconomicMetrics
+from .digester_costs import DigesterCostCalculator
 
 
 class DCFRORCalculator:
@@ -175,6 +176,44 @@ class DCFRORCalculator:
         capital_cost = base_cost
         operating_costs = np.asarray((operating_units * operating_unit_costs).sum(axis=0), dtype=float)
         revenue = np.asarray((revenue_units * revenue_prices).sum(axis=0), dtype=float)
+
+        # Apply digester cost-curve economics directly when digester capital
+        # items are present in the capital-cost breakdown.
+        # This makes the documented digester costing methods influence
+        # project CAPEX/OPEX in the DCFROR result stream.
+        digester_rows = [row for row in cap_breakdown if "digester" in str(row.get("Item", "")).lower()]
+        if digester_rows:
+            cow_count = 0.0
+            try:
+                cow_count = float(self.im.get_data("animal_properties.herd_information.cow_num"))
+            except Exception:
+                cow_count = 0.0
+            if cow_count <= 0:
+                try:
+                    cow_count = float(self.im.get_data("animal_properties.herd_information.herd_num"))
+                except Exception:
+                    cow_count = 0.0
+
+            if cow_count > 0:
+                digester_system = "Covered Lagoon - RNG"
+                try:
+                    configured = self.im.get_data("economic_inputs.Manure.digester.system_type")
+                    if isinstance(configured, str) and configured.strip():
+                        digester_system = configured
+                except Exception:
+                    pass
+
+                digester_estimates = DigesterCostCalculator.estimate_digester_costs(digester_system, cow_count)
+                digester_capex = float(digester_estimates["capital_expenditure"])
+                digester_opex = digester_estimates["operating_costs"]
+                annual_opex_total = float(
+                    digester_opex["labor"] + digester_opex["energy"] + digester_opex["repairs"]
+                )
+
+                prior_digester_capex = float(sum(float(r.get("Cost", 0.0)) for r in digester_rows))
+                base_cost = base_cost - prior_digester_capex + digester_capex
+                operating_costs = operating_costs + annual_opex_total
+                capital_cost = base_cost
 
         project_term = int(input_dict["project_term"])
         if project_term <= 0:
