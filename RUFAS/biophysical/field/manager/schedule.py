@@ -1,5 +1,5 @@
 from copy import copy
-from typing import Any, Optional
+from typing import Any
 
 from RUFAS.util import Utility
 
@@ -29,7 +29,7 @@ class Schedule:
     years : list[int]
         List of years during which the scheduled events will occur.
     days : list[int]
-        Elongated list of days to ensure a day value for each specified year, aligning with the `years` attribute.
+        Elongated list of days to ensure a day value for each specified year, aligning with the ``years`` attribute.
     pattern_skip : int
         Specifies the interval of years between each cycle of the schedule.
     pattern_repeat : int
@@ -101,7 +101,7 @@ class Schedule:
         self,
         years: list[int],
         days: list[int],
-        additional_attributes: Optional[list[Any]],
+        additional_attributes: list[Any] | None,
         additional_attributes_events: list[list[Any]],
         event_class: Any,
         pattern_skip: int,
@@ -129,7 +129,7 @@ class Schedule:
 
         Returns
         -------
-        list
+        list[Any]
             List of instantiated event objects.
 
         """
@@ -165,7 +165,7 @@ class Schedule:
 
         Returns
         -------
-        list
+        list[Any]
             list of prepared event arguments for event initialization.
 
         """
@@ -237,8 +237,8 @@ class Schedule:
     @classmethod
     def _validate_parameters(
         cls,
-        non_negative_parameters: list[Optional[tuple[str, list[Any]]]],
-        fraction_parameters: list[Optional[tuple[str, list[Any]]]],
+        non_negative_parameters: list[tuple[str, list[Any]] | None],
+        fraction_parameters: list[tuple[str, list[Any]] | None],
         years: list[int],
         days: list[int],
         name: str,

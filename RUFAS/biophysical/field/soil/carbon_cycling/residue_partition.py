@@ -1,5 +1,4 @@
 import math
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -16,7 +15,7 @@ class ResiduePartition:
         provided.
     field_size : float, optional
         Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-        not provided (ha)
+        not provided (ha).
 
     Attributes
     ----------
@@ -29,7 +28,7 @@ class ResiduePartition:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def add_residue_to_pools(self, rainfall: float) -> None:
@@ -189,7 +188,7 @@ class ResiduePartition:
     def _set_soil_structural_litter_decomposition_rate(self) -> None:
         """
         Sets the soil structural litter decomposition rate using the same methodology as the
-        `_determine_plant_structural_to_slow_or_active_rate`.
+        ``_determine_plant_structural_to_slow_or_active_rate``.
 
         """
         structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - self.data.plant_residue_metabolic_fraction)
@@ -532,7 +531,7 @@ class ResiduePartition:
 
         Notes
         -----
-        The referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
+        The referenced soil (below ground) biomass calculation was not found in the pseudocode_crop, neither is any
         mention of biomass unit.
 
         """

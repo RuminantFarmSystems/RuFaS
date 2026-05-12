@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.crop.crop_data import CropData
 from RUFAS.biophysical.field.crop.non_water_uptake import NonWaterUptake
@@ -12,59 +10,59 @@ class NitrogenUptake(NonWaterUptake):
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
-        An instance of `CropData` containing crop specifications and attributes.
-        Defaults to a new instance of `CropData` if not provided.
+    crop_data : CropData, optional
+        An instance of ``CropData`` containing crop specifications and attributes.
+        Defaults to a new instance of ``CropData`` if not provided.
     nutrient_distro_param : float, default 10.0
         Nitrogen uptake distribution parameter (unitless).
-    nutrient_shapes : Optional[List[float]], default None
+    nutrient_shapes : list[float], optional
         Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nutrient: Optional[float], default None
+    previous_nutrient: float, optional
         Nitrogen in biomass on the previous day (kg/ha).
-    potential_nutrient_uptake : Optional[float], default None
+    potential_nutrient_uptake : float, optional
         Potential nitrogen uptake under ideal conditions (kg/ha).
-    layer_nutrient_potentials : Optional[float], default None
+    layer_nutrient_potentials : float, optional
         Potential nitrogen uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : Optional[float], default None
+    unmet_nutrient_demands : float, optional
         Unmet nitrogen demands by overlaying soil layers (kg/ha).
-    nutrient_requests : Optional[float], default None
+    nutrient_requests : float, optional
         Nitrogen requested from each soil layer (kg/ha).
-    actual_nutrient_uptakes : Optional[List[float]], default None
+    actual_nutrient_uptakes : list[float], optional
         Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nutrient_uptake : Optional[float], default None
+    total_nutrient_uptake : float, optional
         Total nitrogen uptake by the plant (kg/ha).
-    fixed_nitrogen : Optional[float], default None
+    fixed_nitrogen : float, optional
         Total nitrogen fixed by the plant (kg/ha).
-    nitrate_factor : Optional[float], default None
+    nitrate_factor : float, optional
         Soil nitrate factor (unitless).
-    fixation_stage_factor : Optional[float], default None
+    fixation_stage_factor : float, optional
         Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     Attributes
     ----------
     nutrient_distro_param : float
         Nitrogen uptake distribution parameter (unitless).
-    nutrient_shapes : Optional[List[float]]
+    nutrient_shapes : List[float] | None
         Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nutrient : Optional[float]
+    previous_nutrient : float | None
         Nitrogen in biomass on the previous day (kg/ha).
-    potential_nutrient_uptake : Optional[float]
+    potential_nutrient_uptake : float | None
         Potential nitrogen uptake under ideal conditions (kg/ha).
-    layer_nutrient_potentials : Optional[float]
+    layer_nutrient_potentials : float | None
         Potential nitrogen uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : Optional[float]
+    unmet_nutrient_demands : float | None
         Unmet nitrogen demands by overlaying soil layers (kg/ha).
-    nutrient_requests : Optional[float]
+    nutrient_requests : float | None
         Nitrogen requested from each soil layer (kg/ha).
-    actual_nutrient_uptakes : Optional[List[float]]
+    actual_nutrient_uptakes : List[float] | None
         Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nutrient_uptake : Optional[float]
+    total_nutrient_uptake : float | None
         Total nitrogen uptake by the plant (kg/ha).
-    fixed_nitrogen : Optional[float]
+    fixed_nitrogen : float | None
         Total nitrogen fixed by the plant (kg/ha).
-    nitrate_factor : Optional[float]
+    nitrate_factor : float | None
         Soil nitrate factor (unitless).
-    fixation_stage_factor : Optional[float]
+    fixation_stage_factor : float | None
         Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     References
@@ -75,19 +73,19 @@ class NitrogenUptake(NonWaterUptake):
 
     def __init__(
         self,
-        crop_data: Optional[CropData] = None,
+        crop_data: CropData | None = None,
         nutrient_distro_param: float = 10.0,
-        nutrient_shapes: Optional[list[float]] = None,
-        previous_nutrient: Optional[float] = None,
-        potential_nutrient_uptake: Optional[float] = None,
-        layer_nutrient_potentials: Optional[float] = None,
-        unmet_nutrient_demands: Optional[float] = None,
-        nutrient_requests: Optional[float] = None,
-        actual_nutrient_uptakes: Optional[list[float]] = None,
-        total_nutrient_uptake: Optional[float] = None,
-        fixed_nitrogen: Optional[float] = None,
-        nitrate_factor: Optional[float] = None,
-        fixation_stage_factor: Optional[float] = None,
+        nutrient_shapes: list[float] | None = None,
+        previous_nutrient: float | None = None,
+        potential_nutrient_uptake: float | None = None,
+        layer_nutrient_potentials: float | None = None,
+        unmet_nutrient_demands: float | None = None,
+        nutrient_requests: float | None = None,
+        actual_nutrient_uptakes: list[float] | None = None,
+        total_nutrient_uptake: float | None = None,
+        fixed_nitrogen: float | None = None,
+        nitrate_factor: float | None = None,
+        fixation_stage_factor: float | None = None,
     ):
         super().__init__(
             crop_data,
@@ -220,8 +218,8 @@ class NitrogenUptake(NonWaterUptake):
         -----
         Equation 5:2.3.16 in the SWAT Theoretical documentation (and associated SWAT code in the file nfix.f) is
         seemingly wrong. This equation originates from the EPIC model (see line 31 of NFIX.f90). Also note that in EPIC,
-        the total accessible nitrates in the soil profile are divided by the amount of residue (`RD(JKK)`), which RuFaS
-        does not do.
+        the total accessible nitrates in the soil profile are divided by the amount of residue (``RD(JKK)``),
+        which RuFaS does not do.
 
         """
         if total_accessible_nitrates <= 100:

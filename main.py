@@ -6,6 +6,7 @@ This file serves as a main entry point to RuFaS.
 The main function run_rufas() will execute the model simulation(s). It accepts a path to the location of the input
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
+
 import argparse
 import sys
 import traceback
@@ -22,7 +23,7 @@ def main() -> None:
         task_manager = TaskManager()
         task_manager.start(
             metadata_path=Path(cmd_arguments.path_to_metadata),
-            verbosity=LogVerbosity(cmd_arguments.verbose),
+            verbosity=LogVerbosity(cmd_arguments.verbosity) if cmd_arguments.verbosity is not None else None,
             exclude_info_maps=cmd_arguments.exclude_info_maps,
             output_directory=Path(cmd_arguments.output_dir),
             logs_directory=Path(cmd_arguments.logs_dir),
@@ -76,10 +77,10 @@ def parse_gnu_args(args: Any | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "-v",
-        "--verbose",
+        "--verbosity",
         choices=["errors", "warnings", "logs", "credits", "none"],
-        default="credits",
-        help="Specifies the log type to be printed",
+        default=None,
+        help="Sets the log verbosity level for this run",
     )
     parser.add_argument(
         "-c",

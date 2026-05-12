@@ -1,8 +1,8 @@
 {
-  "cross-validation": [
+  "cross_validation": [
     {
       "description": "Number of stalls in calf pen",
-      "target_and_save": {
+      "aliases": {
         "variables": {
           "number_of_calves": "animal.herd_information.calf_num",
           "pen_animal_type": "animal.pen_information.0.animal_combination",
@@ -16,18 +16,22 @@
       "apply_when": [
         {
           "left_hand": {
-            "operation": "no_op",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_animal_type"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "aggregate",
+              "operands": [
+                "pen_animal_type"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "no_op",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "calf_pen_type"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "calf_pen_type"
+              ]
+            }
           },
           "relationship": "equal"
         }
@@ -35,19 +39,23 @@
       "rules": [
         {
           "left_hand": {
-            "operation": "sum",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_stall_num"
-            ]
+            "aggregation": {
+              "operation": "sum",
+              "mode": "aggregate",
+              "operands": [
+                "pen_stall_num"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "division",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "number_of_calves",
-              "pen_stocking_density"
-            ],
+            "aggregation": {
+              "operation": "division",
+              "mode": "element_wise",
+              "operands": [
+                "number_of_calves",
+                "pen_stocking_density"
+              ]
+            },
             "save_as": "min_num_stalls"
           },
           "relationship": "greater_or_equal_to"
@@ -56,7 +64,7 @@
     },
     {
       "description": "Number of stalls in growing pens",
-      "target_and_save": {
+      "aliases": {
         "variables": {
           "number_of_heifer1s": "animal.herd_information.heiferI_num",
           "number_of_heifer2s": "animal.herd_information.heiferII_num",
@@ -71,18 +79,22 @@
       "apply_when": [
         {
           "left_hand": {
-            "operation": "no_op",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_animal_type"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "aggregate",
+              "operands": [
+                "pen_animal_type"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "no_op",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "growing_pen_type"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "growing_pen_type"
+              ]
+            }
           },
           "relationship": "equal"
         }
@@ -90,38 +102,46 @@
       "rules": [
         {
           "left_hand": {
-            "operation": "sum",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_stall_num"
-            ]
+            "aggregation": {
+              "operation": "sum",
+              "mode": "aggregate",
+              "operands": [
+                "pen_stall_num"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "division",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "number_of_heifer1s",
-              "pen_stocking_density"
-            ],
+            "aggregation": {
+              "operation": "division",
+              "mode": "element_wise",
+              "operands": [
+                "number_of_heifer1s",
+                "pen_stocking_density"
+              ]
+            },
             "save_as": "min_num_stalls"
           },
           "relationship": "greater_or_equal_to"
         },
         {
           "left_hand": {
-            "operation": "sum",
-            "apply_to": "group",
-            "ordered_variables": [
-              "pen_stall_num"
-            ]
+            "aggregation": {
+              "operation": "sum",
+              "mode": "aggregate",
+              "operands": [
+                "pen_stall_num"
+              ]
+            }
           },
           "right_hand": {
-            "operation": "division",
-            "apply_to": "individual",
-            "ordered_variables": [
-              "number_of_heifer2s",
-              "pen_stocking_density"
-            ],
+            "aggregation": {
+              "operation": "division",
+              "mode": "element_wise",
+              "operands": [
+                "number_of_heifer2s",
+                "pen_stocking_density"
+              ]
+            },
             "save_as": "max_num_stalls"
           },
           "relationship": "greater_or_equal_to"
@@ -130,7 +150,7 @@
     },
     {
       "description": "Sum of three parity fractions must equal 1.0",
-      "target_and_save": {
+      "aliases": {
         "variables": {
           "p1": "animal.herd_information.parity_fractions.1",
           "p2": "animal.herd_information.parity_fractions.2",
@@ -145,22 +165,96 @@
       "rules": [
         {
           "left_hand": {
-            "operation": "sum",
-            "ordered_variables": [
-              "p1",
-              "p2",
-              "p3",
-              "p4",
-              "p5"
-            ],
+            "aggregation": {
+              "operation": "sum",
+              "operands": [
+                "p1",
+                "p2",
+                "p3",
+                "p4",
+                "p5"
+              ]
+            },
             "save_as": "sum"
           },
           "right_hand": {
-            "ordered_variables": [
-              "summed_parity_fractions"
-            ]
+            "aggregation": {
+              "operation": "no_op",
+              "operands": [
+                "summed_parity_fractions"
+              ]
+            }
           },
           "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "Example: for_each usage",
+      "aliases": {
+        "variables": {
+          "crop_configurations": "crop_configurations.crop_configurations"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "crop_configurations",
+              "field": "optimal_temperature",
+              "field_to_compare": "minimum_temperature",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "true_constant"
+              ]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "LAC pens",
+      "aliases": {
+        "variables": {
+          "pen_information": "animal.pen_information"
+        },
+        "constants": {
+          "LAC_COW": "LAC_COW",
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "pen_information",
+              "field": "animal_combination",
+              "value_to_compare": "LAC_COW",
+              "relationship": "equal"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "true_constant"
+              ]
+            }
+          },
+          "relationship": "not_equal"
         }
       ]
     }
