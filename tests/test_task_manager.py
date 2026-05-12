@@ -210,6 +210,7 @@ def test_task_manager_start(
             workers,
             Path("metadata/path"),
             Path("output/directory"),
+            verbosity,
         )
         mock_summarize.assert_not_called()
     elif is_end_to_end_test_task:
@@ -738,7 +739,13 @@ def test_task(
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
     mocker.patch.object(OutputManager, "validate_filter_constant_content")
     task_manager.task(
-        args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+        args,
+        produce_graphics,
+        2,
+        10,
+        metadata_path=Path("metadata/path"),
+        output_directory=Path("output/"),
+        verbosity=LogVerbosity.LOGS,
     )
     mock_im_init.assert_called_once_with(10)
 
@@ -783,7 +790,13 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: OutputMan
     }
     produce_graphics = False
     result = task_manager.task(
-        args, produce_graphics, 1, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+        args,
+        produce_graphics,
+        1,
+        10,
+        metadata_path=Path("metadata/path"),
+        output_directory=Path("output/"),
+        verbosity=LogVerbosity.LOGS,
     )
 
     assert result is None
@@ -840,7 +853,13 @@ def test_task_failed(task_manager: TaskManager) -> None:
     }
     produce_graphics = False
     result = task_manager.task(
-        args, produce_graphics, 2, 10, metadata_path=Path("metadata/path"), output_directory=Path("output/")
+        args,
+        produce_graphics,
+        2,
+        10,
+        metadata_path=Path("metadata/path"),
+        output_directory=Path("output/"),
+        verbosity=LogVerbosity.LOGS,
     )
     assert result == "test (1)"
 
@@ -862,18 +881,18 @@ def test_handle_herd_initialization(
     mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
-    """Unit test for TaskManager.handle_herd_initializaition()"""
+    """Unit test for TaskManager.handle_herd_initialization()"""
     args = {"init_herd": init_herd, "save_animals": save_animals, "save_animals_directory": save_animals_directory}
     mock_herd_factory = mocker.patch("RUFAS.biophysical.animal.herd_factory.HerdFactory")
     mock_herd_factory_init = mocker.patch("RUFAS.task_manager.HerdFactory", return_value=mock_herd_factory)
     mock_initialize_herd = mocker.patch.object(mock_herd_factory, "initialize_herd")
     mock_add_log = mocker.patch.object(mock_output_manager, "add_log", return_value=None)
 
-    task_manager.handle_herd_initializaition(args, mock_output_manager)
+    task_manager.handle_herd_initialization(args, mock_output_manager)
 
     info_map = {
         "class": TaskManager.__name__,
-        "function": TaskManager.handle_herd_initializaition.__name__,
+        "function": TaskManager.handle_herd_initialization.__name__,
         "units": MeasurementUnits.UNITLESS,
     }
     om_add_log_call_list = [
@@ -890,7 +909,7 @@ def test_single_simulation_run(
     task_manager: TaskManager, mock_output_manager: OutputManager, mocker: MockerFixture
 ) -> None:
     """Unit test for TaskManager.handle_single_simulation_run()"""
-    mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
+    mock_handle_herd_initialization = mocker.patch.object(TaskManager, "handle_herd_initialization")
 
     args: dict[str, Any] = {"task_type": TaskType.SIMULATION_SINGLE_RUN, "simulation_type": "full_farm"}
 
@@ -903,7 +922,7 @@ def test_single_simulation_run(
 
     task_manager.handle_single_simulation_run(args, mock_output_manager)
 
-    mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
+    mock_handle_herd_initialization.assert_called_once_with(args, mock_output_manager)
 
     info_map = {
         "class": TaskManager.__name__,
@@ -966,15 +985,13 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
     mock_output_manager = MagicMock(name="OutputManager")
     produce_graphic = False
     should_flush_im_pool = True
-    mock_handle_herd_initializaition = mocker.patch.object(
-        TaskManager, "handle_herd_initializaition", return_value=None
-    )
+    mock_handle_herd_initialization = mocker.patch.object(TaskManager, "handle_herd_initialization", return_value=None)
     mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
 
     TaskManager._handle_herd_init_tasks(
         args, mock_input_manager, mock_output_manager, task_id, produce_graphic, should_flush_im_pool
     )
-    mock_handle_herd_initializaition.assert_called_once_with(args=args, output_manager=mock_output_manager)
+    mock_handle_herd_initialization.assert_called_once_with(args=args, output_manager=mock_output_manager)
     mock_handle_post_processing.assert_called_once_with(
         args=args,
         input_manager=mock_input_manager,
@@ -1660,11 +1677,12 @@ def test_run_tasks(
     task_manager: TaskManager,
     mocker: MockerFixture,
 ) -> None:
-    """Unit tests for TaskManager._run_tasks() with all tasks run successfully"""
+    """Unit tests for TaskManager._run_tasks() with all tasks run successfully."""
     task_manager = TaskManager()
     mock_task = mocker.patch.object(task_manager, "task", return_value=None)
 
     task_manager.pool = None
+    verbosity = None
 
     task_manager._run_tasks(
         single_run_tasks,
@@ -1673,6 +1691,7 @@ def test_run_tasks(
         workers=1,
         metadata_path=Path("metadata/path"),
         output_directory=Path("output"),
+        verbosity=verbosity,
     )
 
     mock_task_call_list = [
@@ -1683,6 +1702,7 @@ def test_run_tasks(
             metadata_depth_limit=metadata_depth_limit,
             workers=1,
             output_directory=Path("output"),
+            verbosity=verbosity,
         )
         for single_run_task in single_run_tasks
     ]
@@ -1803,6 +1823,7 @@ def test_run_tasks_fail(
     mock_add_error = mocker.patch.object(mock_output_manager, "add_error", return_value=None)
 
     task_manager.pool = None
+    verbosity = LogVerbosity.LOGS
 
     task_manager._run_tasks(
         single_run_tasks,
@@ -1811,6 +1832,7 @@ def test_run_tasks_fail(
         workers=1,
         metadata_path=Path("metadata/path"),
         output_directory=Path("output"),
+        verbosity=verbosity,
     )
 
     mock_om_init.assert_called_once()

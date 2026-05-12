@@ -84,6 +84,22 @@
         "default": 100,
         "minimum": 6
       },
+      "herd_size_adjustment_period": {
+        "type": "number",
+        "description": "The period between each check to adjust the herd's size.",
+        "default": 30,
+        "minimum": 1
+      },
+      "herd_size_sell_threshold": {
+        "type": "number",
+        "description": "The threshold that should sell animals to maintain herd size.",
+        "minimum": 1
+      },
+      "herd_size_buy_threshold": {
+        "type": "number",
+        "description": "The threshold that should buy animals to maintain herd size.",
+        "minimum": 0
+      },
       "breed": {
         "type": "string",
         "default": "HO",
@@ -137,6 +153,11 @@
         "minimum": 0,
         "nullable": true,
         "default": null
+      },
+      "simulate_genetics": {
+        "type": "bool",
+        "description": "Whether or not to simulate genetics for animals",
+        "default": false
       }
     },
     "herd_initialization": {
@@ -201,12 +222,6 @@
           "type": "number",
           "description": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant",
           "default": 185,
-          "minimum": 0
-        },
-        "cull_milk_production": {
-          "type": "number",
-          "description": "Cull Milk Production (kg/d) -- Milk production threshold at which 'do not breed' cows are culled if they fall below",
-          "default": 30,
           "minimum": 0
         },
         "cow_times_milked_per_day": {
@@ -1598,30 +1613,30 @@
       }
     }
   },
-  "animal_net_merit_properties": {
+  "animal_mean_phenotype_properties": {
     "data_collection_app_compatible": false,
-    "year_month": {
+    "birth_year": {
       "type": "array",
-      "description": "The birth year and month of the animal.",
-      "properties": {
-        "type": "string",
-        "description": "The birth year and month of the animal."
-      }
-    },
-    "average": {
-      "type": "array",
-      "description": "The average net-merit values of the animal.",
+      "description": "The birth year of the animal.",
       "properties": {
         "type": "number",
-        "description": "The average net-merit values of the animal born on the given birth year and month."
+        "description": "The birth year of the animal."
       }
     },
-    "std": {
+    "fat_kg": {
       "type": "array",
-      "description": "The standard deviation of the net-merit values of the animal.",
+      "description": "The average fat phenotype values of the animal.",
       "properties": {
         "type": "number",
-        "description": "The standard deviation of the net-merit values of the animal born on the given birth year and month.",
+        "description": "The average fat phenotype values of the animal born in the given birth year."
+      }
+    },
+    "protein_kg": {
+      "type": "array",
+      "description": "The mean protein phenotype values of the animal.",
+      "properties": {
+        "type": "number",
+        "description": "The mean protein phenotype values of the animal born in the given birth year.",
         "minimum": 0
       }
     }
@@ -1636,12 +1651,20 @@
         "description": "The birth year and month of the baby calf."
       }
     },
-    "estimated_PTA": {
+    "estimated_protein": {
       "type": "array",
-      "description": "The estimated semen_predicted_transmitting_ability value for the top listing semen.",
+      "description": "The estimated protein value for the top listing semen.",
       "properties": {
         "type": "number",
-        "description": "The estimated semen_predicted_transmitting_ability value for the top listing semen."
+        "description": "The estimated protein value for the top listing semen."
+      }
+    },
+    "estimated_fat": {
+      "type": "array",
+      "description": "The estimated fat value for the top listing semen.",
+      "properties": {
+        "type": "number",
+        "description": "The estimated fat value for the top listing semen."
       }
     }
   },
@@ -4211,196 +4234,101 @@
   },
   "feed_properties": {
     "data_collection_app_compatible": true,
-    "calf_feeds": {
+    "feeds": {
       "type": "array",
-      "description": "Calf Feeds (raised off farm - 24 hrs of age).",
-      "properties": {
-        "type": "number",
-        "minimum": 1,
-        "maximum": 306,
-        "default": 155
-      }
-    },
-    "growing_feeds": {
-      "type": "array",
-      "description": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy.",
-      "properties": {
-        "type": "number",
-        "minimum": 1,
-        "maximum": 306
-      }
-    },
-    "close_up_feeds": {
-      "type": "array",
-      "description": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
-      "properties": {
-        "type": "number",
-        "minimum": 1,
-        "maximum": 306
-      }
-    },
-    "lac_cow_feeds": {
-      "type": "array",
-      "description": "Lactating Cow Feeds",
-      "properties": {
-        "type": "number",
-        "minimum": 1,
-        "maximum": 306
-      }
-    },
-    "purchased_feeds": {
-      "type": "array",
-      "description": "Purchased Feeds.",
+      "description": "Purchased feed definitions and feed-specific planning settings.",
+      "minimum_length": 0,
       "properties": {
         "type": "object",
-        "purchased_feed": {
+        "description": "Definition of a single purchased feed and its planning settings.",
+        "feed_type": {
           "type": "number",
-          "minimum": 1,
-          "maximum": 306
+          "description": "Feed type identifier.",
+          "minimum": 1
         },
         "purchased_feed_cost": {
           "type": "number",
-          "description": "Cost of Feed (US dollars/kg DM)",
+          "description": "Cost of feed (US dollars/kg DM).",
           "minimum": 0
         },
         "buffer": {
           "type": "number",
-          "description": "Fractional number 0 to 1 as a cushion for feed purchases to help plan for herd fluctuations and feed shrink.",
+          "description": "Fractional number 0 to 1 used as a cushion for feed purchases to help plan for herd fluctuations and feed shrink.",
           "minimum": 0,
           "maximum": 1,
           "default": 0.15
+        },
+        "runtime_purchase_allowance": {
+          "type": "number",
+          "description": "Upper limit of purchased feed masses and/or money that can be spent on this feed on a single day.",
+          "minimum": 0
+        },
+        "advance_purchase_allowance": {
+          "type": "number",
+          "description": "Upper limit of purchased feed masses and/or money that can be spent on this feed at the beginning of a ration interval.",
+          "minimum": 0
+        },
+        "planning_cycle_allowance": {
+          "type": "number",
+          "description": "Upper limit of purchased feed masses and/or money that can be spent on this feed at the beginning of a new planning cycle.",
+          "minimum": 0
         }
       }
     },
-    "milk_reduction_maximum": {
-      "type": "number",
-      "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
-      "minimum": 0,
-      "maximum": 50
-    },
-    "user_defined_ration_percentages": {
+    "ration_formulation_parameters": {
       "type": "object",
-      "description": "User Defined Ration Percentages",
-      "calf": {
-        "type": "array",
-        "description": "Calf Feeds.",
-        "properties": {
-          "type": "object",
-          "feed_type": {
-            "type": "number",
-            "description": "Calf Feed",
-            "minimum": 1,
-            "maximum": 306,
-            "default": 155
-          },
-          "ration_percentage": {
-            "type": "number",
-            "description": "Calf Ration Percentage",
-            "minimum": 0,
-            "maximum": 100
-          }
-        }
-      },
-      "growing": {
-        "type": "array",
-        "description": "Growing Heifers Feeds.",
-        "properties": {
-          "type": "object",
-          "feed_type": {
-            "type": "number",
-            "description": "Growing Heifers Feed",
-            "minimum": 1,
-            "maximum": 306,
-            "default": 1
-          },
-          "ration_percentage": {
-            "type": "number",
-            "description": "Growing Heifers Ration Percentage",
-            "minimum": 0,
-            "maximum": 100
-          }
-        }
-      },
-      "close_up": {
-        "type": "array",
-        "description": "Close UP Feeds.",
-        "properties": {
-          "type": "object",
-          "feed_type": {
-            "type": "number",
-            "description": "Close UP Feed",
-            "minimum": 1,
-            "maximum": 306,
-            "default": 1
-          },
-          "ration_percentage": {
-            "type": "number",
-            "description": "Close UP Ration Percentage",
-            "minimum": 0,
-            "maximum": 100
-          }
-        }
-      },
-      "lac_cow": {
-        "type": "array",
-        "description": "Lactating Cow Feeds.",
-        "properties": {
-          "type": "object",
-          "feed_type": {
-            "type": "number",
-            "description": "Lactating Cow Feed",
-            "minimum": 1,
-            "maximum": 306,
-            "default": 1
-          },
-          "ration_percentage": {
-            "type": "number",
-            "description": "Lactating Cow Ration Percentage",
-            "minimum": 0,
-            "maximum": 100
-          }
-        }
-      },
-      "tolerance": {
+      "description": "Global parameters controlling ration formulation behavior.",
+      "milk_reduction_maximum": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- fraction variance for each of the defined ration inclusion percentage values. As an example: a feed with a user defined ration percentage value of 20% and tolerance of 0.1 would correspond to an allowable range of 18% to 22%.",
+        "description": "Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements.",
+        "minimum": 0,
+        "maximum": 50
+      },
+      "max_daily_feed_recalculations_per_year": {
+        "type": "number",
+        "description": "The maximum number of feed recalculations that can be performed per year.",
+        "minimum": 1,
+        "maximum": 365,
+        "default": 4
+      },
+      "user_defined_ration_tolerance": {
+        "type": "number",
+        "description": "Allowable +/- fractional variance for each defined ration inclusion percentage values.",
         "minimum": 0,
         "maximum": 1,
         "default": 0.0
       }
     },
-    "max_daily_feed_recalculations_per_year": {
-      "type": "number",
-      "description": "The maximum number of feed recalculations that can be performed per year.",
-      "minimum": 1,
-      "maximum": 365,
-      "default": 4
-    },
-    "allowances": {
+    "rations": {
       "type": "array",
+      "description": "Ration definitions by animal group.",
+      "minimum_length": 0,
       "properties": {
         "type": "object",
-        "purchased_feed": {
-          "type": "number",
-          "minimum": 1,
-          "maximum": 306
+        "description": "Ration definition for a single animal group.",
+        "animal_combination": {
+          "type": "string",
+          "description": "Animal combination for this ration."
         },
-        "runtime_purchase_allowance": {
-          "type": "number",
-          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds on a single day. These are set by the user.",
-          "minimum": 0,
-          "maximum": 1000.0
-        },
-        "advance_purchase_allowance": {
-          "type": "number",
-          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a ration interval. These are set by the user.",
-          "minimum": 0
-        },
-        "planning_cycle_allowance": {
-          "type": "number",
-          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a new planning cycle. These are set by the user.",
-          "minimum": 0,
-          "maximum": 100000.0
+        "feeds": {
+          "type": "array",
+          "description": "Feeds available to the specified animal group.",
+          "minimum_length": 0,
+          "properties": {
+            "type": "object",
+            "description": "A single feed entry within the ration.",
+            "feed_type": {
+              "type": "number",
+              "description": "Feed type identifier used in this ration.",
+              "minimum": 1
+            },
+            "ration_percentage": {
+              "type": "number",
+              "description": "Ration inclusion percentage for this feed when user-defined ration mode is used.",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
         }
       }
     }
