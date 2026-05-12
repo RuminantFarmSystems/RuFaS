@@ -314,6 +314,75 @@ For details about the variables included in each calculation, please refer to tb
 
 * Lactating and Dry Cows
 
+### Examples of Equations
+::: {#eq-an-nrc-1}
+$$
+\text{CBW} = \text{MW} \times 0.06275
+$$
+<p style="text-align: right;">[AN.NRC.1]</p>
+:::
+
+
+::: {#eq-an-nrc-2}
+$$
+\text{CW} = (18 + (\text{DOP} - 190) \times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
+$$
+<p style="text-align: right;">[AN.NRC.2]</p>
+:::
+
+*Otherwise*
+
+::: {#eq-an-nrc-3}
+$$
+\text{NEmaint} = 0.08\times (\text{BW} - \text{CW})^{0.75} 
+$$
+<p style="text-align: right;">[AN.NRC.3]</p>
+:::
+
+* Heifers : The maintenance requirement is calculated based on metabolic body weight (body weight^0.75), body condition score, and the previous month's temperatures.
+
+::: {#eq-an-nrc-1}
+$$
+\text{CBW} = \text{MW} \times 0.06275
+$$
+<p style="text-align: right;">[AN.NRC.1]</p>
+:::
+
+
+::: {#eq-an-nrc-2}
+$$
+\text{CW} = (18 + (\text{DOP} - 190)\times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
+$$
+<p style="text-align: right;">[AN.NRC.2]</p>
+:::
+
+*Otherwise*
+
+::: {#eq-an-nrc-6}
+$$
+\text{BCS9} = (\text{BCS5} - 1) \times 2 + 1 
+$$
+<p style="text-align: right;">[AN.NRC.6]</p>
+:::
+
+::: {#eq-an-nrc-7}
+$$
+\text{NEmaint} = (\text{BW} - \text{CW})^{0.75}\times (0.086\times (0.8 + (\text{BCS9} - 5)\times 0.05) + 0.0007 \times (20 - \text{PrevTemp})) 
+$$
+<p style="text-align: right;">[AN.NRC.7]</p>
+:::
+
+*Activity* Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy. 
+
+* Lactating and Dry Cows
+
+::: {#eq-an-nrc-8}
+$$
+\text{NEa1} = 0.0012\times \text{BW} 
+$$
+<p style="text-align: right;">[AN.NRC.8]</p>
+:::
+
 ## Animal-level Process and Management
 
 ### RuFaS Bodyweight and Growth
