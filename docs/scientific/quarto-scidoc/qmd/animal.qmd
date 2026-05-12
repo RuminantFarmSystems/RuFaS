@@ -635,62 +635,34 @@ The Manure Excretion Calculator module computes manure excretion metrics for var
 drawn from pen ration files and animal module constants. They are organized into the following groups:
 
 ```{python}
-
 #| label: tbl-an-gen-manexc-inputs
-#| tbl-cap: "General animal and diet inputs used to calculate nutrient intake and manure production."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-gen-manexc-inputs.csv",
+#| tbl-cap: General animal and diet inputs used to calculate nutrient intake and manure production.
+import_table(
+  "../resources/table_data/tbl-an-gen-manexc-inputs.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
-
 ```
+
 
 ```{python}
 #| label: tbl-an-cow-input-manexc
-#| tbl-cap: "Cow related inputs, particularly relevant for lactating animals."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-cow-input-manexc.csv",
+#| tbl-cap: Cow related inputs, particularly relevant for lactating animals.
+import_table(
+  "../resources/table_data/tbl-an-cow-input-manexc.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
-
 ```
 
 ```{python}
-
 #| label: tbl-an-cow-phos-input-manexc
-#| tbl-cap: "Phosphorus related inputs relevant to lactating cows."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-cow-phos-input-manexc.csv",
+#| tbl-cap: Phosphorus related inputs relevant to lactating cows.
+import_table(
+  "../resources/table_data/tbl-an-cow-phos-input-manexc.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
-
 ```
 
 **Expected Outputs**
@@ -699,24 +671,14 @@ The outputs from the Manure Excretion Calculator are organized into two main cat
 manure nutrient composition. These outputs are consistently generated across animal categories.
 
 ```{python}
-
 #| label: tbl-an-manexc-outputs
-#| tbl-cap: "Expected outputs from the manure excretion calculator."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-manexc-outputs.csv",
+#| tbl-cap: Expected outputs from the manure excretion calculator.
+import_table(
+  "../resources/table_data/tbl-an-manexc-outputs.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
 
-print(md_tab)
-
-```
 
 **Methodology**
 
@@ -1259,63 +1221,37 @@ The calculated enteric methane emissions are directly output to the Output Manag
 
 **Required User Inputs**
 
-```{python}
 
+```{python}
 #| label: tbl-an-gen-enteric-met
-#| tbl-cap: "Animal and diet inputs used to calculate nutrient intake and manure production."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-gen-enteric-met.csv",
+#| tbl-cap: Animal and diet inputs used to calculate nutrient intake and manure production.
+import_table(
+  "../resources/table_data/tbl-an-gen-enteric-met.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
 
 ```
 
 ```{python}
-
 #| label: tbl-an-cow-enteric-met
-#| tbl-cap: "Cow specific inputs, particularly relevant for lactating animals."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-cow-enteric-met.csv",
+#| tbl-cap: Cow specific inputs, particularly relevant for lactating animals.
+import_table(
+  "../resources/table_data/tbl-an-cow-enteric-met.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
 
 ```
 
 ```{python}
-
 #| label: tbl-an-model-methane
-#| tbl-cap: "Methane emissions model and mitigation strategy inputs."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-model-methane.csv",
+#| tbl-cap: Methane emissions model and mitigation strategy inputs.
+import_table(
+  "../resources/table_data/tbl-an-model-methane.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
 
 ```
 
@@ -1323,25 +1259,18 @@ print(md_tab)
 
 This module predicts the daily enteric methane emissions for individual animals:
 
+
 ```{python}
-
 #| label: tbl-an-output-methane
-#| tbl-cap: "Expected outputs of the methane model."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-output-methane.csv",
+#| tbl-cap: Expected outputs of the methane model.
+import_table(
+  "../resources/table_data/tbl-an-output-methane.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
 
-print(md_tab)
-
 ```
+
 
 : Expected outputs. {#tbl-animal-enteric-methane-outputs}
 
@@ -1511,67 +1440,40 @@ The Methane Mitigation Calculator module evaluates the reduction in enteric meth
 composition and the use of specific feed additives. The inputs are organized into the following groups:
 
 ```{python}
-
 #| label: tbl-an-enter-met-diet-mitigate
-#| tbl-cap: "General dietary fiber and fat concentration inputs."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-enter-met-diet-mitigate.csv",
+#| tbl-cap: General dietary fiber and fat concentration inputs.
+import_table(
+  "../resources/table_data/tbl-an-enter-met-diet-mitigate.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
 
 ```
 
 ```{python}
-
 #| label: tbl-an-enter-met-additive-type-dose
-#| tbl-cap: "Feed based mitigation strategies and dosing."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-enter-met-additive-type-dose.csv",
+#| tbl-cap: Feed based mitigation strategies and dosing.
+import_table(
+  "../resources/table_data/tbl-an-enter-met-additive-type-dose.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
 
-print(md_tab)
-
 ```
-
 **Expected Outputs**
 
 This module predicts the daily enteric methane emissions for individual animals: Below is the
 [previous table from the Emissions section](#tbl-an-output-methane).
 
+
 ```{python}
-
-
-#| tbl-cap: "Expected outputs of the methane model."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-output-methane.csv",
+#| label: tbl-an-output-methane
+#| tbl-cap: Expected outputs of the methane model.
+import_table(
+  "../resources/table_data/tbl-an-output-methane.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
 
 ```
 
