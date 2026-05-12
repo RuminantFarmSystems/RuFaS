@@ -284,7 +284,7 @@ class Reproduction:
                 reproduction_data_stream.events.add_event(
                     reproduction_data_stream.days_born,
                     time.simulation_day,
-                    f"Assigning sex {self.embryo_sex} on day 0."
+                    f"Assigning sex {self.embryo_sex} on day 0.",
                 )
             reproduction_data_stream = self.cow_give_birth(reproduction_data_stream, time)
 
@@ -488,7 +488,7 @@ class Reproduction:
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,
             time.simulation_day,
-            "Setting semen_type and embryo_sex to None after new birth"
+            "Setting semen_type and embryo_sex to None after new birth",
         )
 
         return reproduction_data_stream
@@ -1092,7 +1092,7 @@ class Reproduction:
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
-                "Setting semen_type and embryo_sex to None due to conception failure"
+                "Setting semen_type and embryo_sex to None due to conception failure",
             )
             if reproduction_data_stream.animal_type == AnimalType.HEIFER_II:
                 reproduction_data_stream = self._handle_failed_heifer_conception(
@@ -1499,7 +1499,7 @@ class Reproduction:
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
-                "Setting semen_type and embryo_sex to None: Repeat estrus simulation for cows before the voluntary waiting period (VWP)"
+                "Setting semen_type and embryo_sex to None: Repeat estrus simulation for cows before the voluntary waiting period (VWP)",
             )
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,

@@ -635,8 +635,7 @@ class HerdManager:
                 if cow.milk_production.daily_milk_produced == 0 and cow.is_milking and cow.days_in_milk > 1
             ]
         )
-        all_milking_cow_num = len([cow for cow in self.cows if cow.is_milking and cow.days_in_milk > 1]
-)
+        all_milking_cow_num = len([cow for cow in self.cows if cow.is_milking and cow.days_in_milk > 1])
         if no_milk_cow_num > 0:
             self.om.add_warning(
                 "Warning: Lactating cows with no production.",
@@ -2181,7 +2180,5 @@ class HerdManager:
                 Sex.MALE if random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE
             )
             animal.events.add_event(
-                animal.days_born,
-                0,
-                f"Assigning embryo_sex {animal.reproduction.embryo_sex} upon import."
+                animal.days_born, 0, f"Assigning embryo_sex {animal.reproduction.embryo_sex} upon import."
             )
