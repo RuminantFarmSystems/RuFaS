@@ -20,7 +20,7 @@
     },
 	"milking_cow_fraction": 0.8356,
     "annual_milk_yield": null,
-    "simulate_genetics": false
+    "simulate_genetics": true
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
@@ -31,18 +31,15 @@
       "breeding_start_day_h": 380,
       "heifer_repro_method": "SynchED",
       "cow_repro_method": "TAI",
-      "semen_type": "conventional",
       "days_in_preg_when_dry": 218,
       "heifer_repro_cull_time": 500,
       "do_not_breed_time": 185,
       "cow_times_milked_per_day": 3,
-	    "milk_fat_percent": 4,
-	    "milk_protein_percent": 3.2
+      "milk_fat_percent": 4,
+      "milk_protein_percent": 3.2
     },
     "farm_level": {
       "calf": {
-        "male_calf_rate_sexed_semen": 0.1,
-        "male_calf_rate_conventional_semen": 0.53,
         "keep_female_calf_rate": 1,
         "wean_day": 60,
         "wean_length": 7,
@@ -57,6 +54,12 @@
         "std_gestation_len": 6,
         "prefresh_day": 21,
         "calving_interval": 400,
+        "selective_repro_strategy": true,
+        "ranking_method": "genetic",
+        "genetic_selection_index_weights": {
+			"fat": 0.71,
+			"protein": 0.29
+		},
         "heifers": {
             "estrus_detection_rate": 0.9,
             "estrus_conception_rate": 0.6,
@@ -64,7 +67,12 @@
             "repro_sub_properties": {
                 "conception_rate": 0.6,
                 "estrus_detection_rate": 0.9
-            }
+            },
+            "semen_allocation_proportions": {
+				"sexed_dairy": 0.5,
+				"conventional_dairy": 0.5,
+				"beef": 0.0
+			}
         },
         "cows": {
             "estrus_detection_rate": 0.6,
@@ -74,7 +82,12 @@
             "ovsynch_program": "OvSynch 56",
             "ovsynch_program_start_day": 64,
             "ovsynch_program_conception_rate": 0.6,
-            "resynch_program": "TAIafterPD"
+            "resynch_program": "TAIafterPD",
+            "semen_allocation_proportions": {
+				"sexed_dairy": 0.2,
+				"conventional_dairy": 0.5,
+				"beef": 0.3
+			}
         }
 			},
 			"bodyweight": {

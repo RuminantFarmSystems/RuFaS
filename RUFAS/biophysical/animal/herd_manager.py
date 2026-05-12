@@ -1,7 +1,10 @@
 from collections import defaultdict
 from datetime import date, timedelta
 import math
+from random import random
 from typing import Any
+
+import numpy as np
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
@@ -10,7 +13,7 @@ from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
@@ -23,7 +26,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
-from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics, SemenType
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -189,6 +192,9 @@ class HerdManager:
             herd_population.cows,
             herd_population.replacement,
         )
+        # TODO: randomly assign embryo sex for animals that are already pregnant: use Conventional Dairy
+        pregnant_animals = [animal for animal in (self.heiferIIs + self.heiferIIIs + self.cows) if animal.is_pregnant]
+        self._assign_embryo_sex_for_pregnant_animals_entering_the_herd(pregnant_animals)
 
         self.allocate_animals_to_pens(time.simulation_day)
         self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -455,8 +461,19 @@ class HerdManager:
         sold_newborn_calves: list[Animal] = []
         newborn_calves: list[Animal] = []
 
+        animal_ranking_indexes: list[float] | None = None
+        if (
+            AnimalConfig.simulate_genetics
+            and AnimalConfig.selective_repro_strategy
+            and AnimalConfig.ranking_method == "genetic"
+            and all([(animal.animal_type == AnimalType.HEIFER_II or animal.animal_type.is_cow) for animal in animals])
+        ):
+            animal_ranking_indexes: list[float] | None = [
+                animal.genetics.ranking_index_for_breeding for animal in animals if animal.is_eligible_for_breeding
+            ]
+
         for animal in animals:
-            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
+            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time, animal_ranking_indexes)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
             if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
                 self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
@@ -580,6 +597,9 @@ class HerdManager:
             )
             self._update_sold_and_died_cow_statistics(removed_animals)
             newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
+            if newly_added_animals:
+                pregnant_newly_added_animals = [animal for animal in newly_added_animals if animal.is_pregnant]
+                self._assign_embryo_sex_for_pregnant_animals_entering_the_herd(pregnant_newly_added_animals)
 
         self._update_herd_structure(
             graduated_animals=graduated_animals,
@@ -615,11 +635,12 @@ class HerdManager:
                 if cow.milk_production.daily_milk_produced == 0 and cow.is_milking and cow.days_in_milk > 1
             ]
         )
-
+        all_milking_cow_num = len([cow for cow in self.cows if cow.is_milking and cow.days_in_milk > 1]
+)
         if no_milk_cow_num > 0:
             self.om.add_warning(
                 "Warning: Lactating cows with no production.",
-                f"There are {no_milk_cow_num} lactating cows with no milking production on simulation"
+                f"There are {no_milk_cow_num}/{all_milking_cow_num} lactating cows with no milking production on simulation"
                 f" day {time.simulation_day}.",
                 info_map={
                     "class": self.__class__.__name__,
@@ -2153,3 +2174,14 @@ class HerdManager:
                     self.herd_statistics.total_enteric_methane[animal_type] = {
                         k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
                     }
+
+    def _assign_embryo_sex_for_pregnant_animals_entering_the_herd(self, animals: list[Animal]) -> None:
+        for animal in animals:
+            animal.reproduction.embryo_sex = (
+                Sex.MALE if random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE
+            )
+            animal.events.add_event(
+                animal.days_born,
+                0,
+                f"Assigning embryo_sex {animal.reproduction.embryo_sex} upon import."
+            )
