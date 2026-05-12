@@ -54,6 +54,9 @@ class NutrientRequest:
     use_supplemental_manure: bool
     """Whether to use supplemental manure if the request cannot be fulfilled by on-farm manure."""
 
+    use_daily_spread_source: bool = False
+    """Whether this request should first use DailySpread processors."""
+
     def __post_init__(self) -> None:
         """
         Validate the dataclass fields.
@@ -230,17 +233,22 @@ class NutrientRequestResults:
         else:
             combined_dry_matter_fraction = self.dry_matter_fraction
 
+        # Each combined fraction is a weighted average of inputs already in [0, 1], so it must lie in
+        # [0, 1] mathematically; clamp to absorb floating-point rounding (e.g. 1.0000000000000002).
+        def clamp(value: float) -> float:
+            return max(0.0, min(1.0, value))
+
         return NutrientRequestResults(
             nitrogen=combined_total_nitrogen,
             phosphorus=combined_total_phosphorus,
             total_manure_mass=combined_total_manure_mass,
-            organic_nitrogen_fraction=combined_organic_nitrogen_fraction,
-            inorganic_nitrogen_fraction=combined_inorganic_nitrogen_fraction,
-            ammonium_nitrogen_fraction=combined_ammonium_nitrogen_fraction,
-            organic_phosphorus_fraction=combined_organic_phosphorus_fraction,
-            inorganic_phosphorus_fraction=combined_inorganic_phosphorus_fraction,
+            organic_nitrogen_fraction=clamp(combined_organic_nitrogen_fraction),
+            inorganic_nitrogen_fraction=clamp(combined_inorganic_nitrogen_fraction),
+            ammonium_nitrogen_fraction=clamp(combined_ammonium_nitrogen_fraction),
+            organic_phosphorus_fraction=clamp(combined_organic_phosphorus_fraction),
+            inorganic_phosphorus_fraction=clamp(combined_inorganic_phosphorus_fraction),
             dry_matter=combined_total_dry_matter,
-            dry_matter_fraction=combined_dry_matter_fraction,
+            dry_matter_fraction=clamp(combined_dry_matter_fraction),
         )
 
 
