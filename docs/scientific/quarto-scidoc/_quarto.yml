@@ -1,0 +1,54 @@
+project:
+  type: book
+
+book:
+  title: "Ruminant Farm Systems (RuFaS)"
+  subtitle: "Scientific Documentation"
+  date: "4/1/2026"
+  output-file: "rufas-scientific-documentation"
+  search: true
+  page-navigation: true
+  chapters:
+    - index.qmd
+    - qmd/versionupdates.qmd
+    - qmd/example_structures.qmd
+    - qmd/animal.qmd
+    - qmd/manure.qmd
+    - qmd/crop_and_soil.qmd
+    - qmd/feed_storage.qmd
+    - qmd/economics.qmd
+    - abbrevs.qmd
+
+
+execute: 
+  echo: false
+
+bibliography: resources/rufas.bib
+
+format:
+  html:
+    theme: cosmo
+    crossref:
+      eq-prefix: ""
+    css: resources/templates/styles.css
+  pdf:
+    pdf-engine: xelatex
+    documentclass: scrbook
+    crossref:
+      eq-prefix: ""
+    classoption:
+      - oneside
+      - openany
+    papersize: letter
+    margin-top: 1in
+    margin-bottom: 1in
+    margin-left: 1in
+    margin-right: 1in
+    include-in-header: resources/templates/preamble.tex
+    toc: true
+    toc-depth: 2
+    toc-title: "Contents"
+    lof: true
+    lot: true
+    number-sections: true
+    keep-tex: true

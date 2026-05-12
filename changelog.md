@@ -25,12 +25,15 @@ v1.0.0
 
 ### Next Version Updates
 
+- [2923](https://github.com/RuminantFarmSystems/RuFaS/pull/2923) - [minor change] [Documentation] [NoInputChange] [NoOutputChange] Updates to Quarto documentation, auditing, and table creation.
+- [2835](https://github.com/RuminantFarmSystems/RuFaS/pull/2835) - [minor change] [Documentation] [Animal Module] [NoInputChange] [NoOutputChange] Document the minimum DMI (7.1 kg/d per cow) used for manure volatile solids excretion per Appuhamy et al. 2018.
 - [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
 - [2728](https://github.com/RuminantFarmSystems/MASM/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
 - [2757](https://github.com/RuminantFarmSystems/RuFaS/pull/2757) - [minor change] [NoInputChange] [NoOutputChange] Updates version number in `pyproject.toml`.
 - [2690](https://github.com/RuminantFarmSystems/RuFaS/pull/2690) - [minor change] [TaskManager] [NoInputChange] [NoOutputChange] Remove hard-coded name for output folder, use user-defined name instead.
 - [2720](https://github.com/RuminantFarmSystems/MASM/pull/2720) - [minor change] [Emissions] [NoInputChange] [NoOutputChange] Adds FGF emissions reset when there's a harvest-kill operation and there's none of that feed left in storage.
+- [2791](https://github.com/RuminantFarmSystems/MASM/pull/2791) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Updates ration percentage values in example feed files to sum to exactly 100.
 
 ### v1.0.0
 

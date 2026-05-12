@@ -1,0 +1,10 @@
+ Variable , Definition , Units 
+ body_weight , Body weight of the current animal , kg 
+ dry_matter_intake , Dry matter intake from pen ration , kg 
+ dry_matter_concentration , Dry matter intake from pen ration , kg 
+ crude_protein_conc , Crude protein concentration in the diet , % 
+ potassium_concentration , Potassium concentration in the diet , % 
+ ash_diet_content , Ash content in the diet , % 
+ neutral_detergent_fiber_concentration , Neutral detergent fiber concentration , % 
+ acid_detergent_fiber_concentrations , Acid detergent concentration , % 
+ nutrient_concentrations ," Nutrient concentrations (e.g., CP, NDF, ADF, ash) ", % 

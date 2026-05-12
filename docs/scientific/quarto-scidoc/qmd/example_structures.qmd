@@ -1,0 +1,337 @@
+# Example Inserts
+
+
+
+## Sectioning and Structure
+
+There is some variation between modules and documentation bassed on structure and needs of the model. However there are some materials, or ingredients if you will, that will remain consistent between modules. These include: Module Header, module introduction, sections representing components of module, section introductions, methodologies, relevant inputs, and relevant outputs.
+
+These should be referred to in a consistent manner throughout the document to inform tables of contents, indices, and auditing materials. 
+
+```markdown
+# Module Name
+section title and only appears once
+
+## Module Introduciton
+- subsection header
+
+## Section Title 
+- subsection header that introduces distinct portions of each module that 
+require separate methodological descriptions and equations
+
+### Section Introduction 
+- subsubsection header to introduce the concept
+
+### Methodology 
+- subsubsection header used to start descriptions
+
+#### Relevant Inputs or Relevant Outputs
+emphasized headers should be used to report the inputs and outputs of the 
+relevant subsection. These usually include tables and bulleted lists. Tables 
+of inputs should include: 
+
+- Variable
+- Definition
+- Default
+- Min
+- Max
+
+If there is no application for one of these (default, min, or max particularly), 
+do not leave the table cell blank. Please include "--" or "NA" depending on 
+what makes the most sense. 
+
+*Alternate Headers* alternate headers may be used at the discretion of the author.
+
+```
+
+There may be expanded uses for subsubsection headers and emphasized headers. The ones outlined above are only the expected uses. Feel free to use more at the discretion of the author. 
+
+## Images, Figures, and Tables
+
+### Linking - Internal and External
+
+This is an important feature of the scientific documentation. A document this large can be difficult to navigate, so anything that improves the users ability to find what they need efficiently should be optimized. 
+
+```markdown
+
+There are 3 main structures to "label" parts of the document: 
+- #sec (sections)
+- #tbl (tables)
+- #fig (figures)
+
+Naming is important for tracking and should appear with hyphens, not spaces. 
+There is no formal process to inform how you name, but it is recommended that 
+it is descriptive of the item you are labeling and it is concise to make 
+referencing easier.
+
+When you label anything, you must start with the structure type (sec, tbl, fig). Next you must indicate the 3 letter module abbreviate: 
+- an = Animal
+- ma = Manure
+- sc = Soil and Crop
+- fe = Feed Storage
+- ec = Economics
+- cx = Connecting or Gray Documents
+
+When uploading new images, screenshots, flowcharts or other image resources, the 3 letter abbreviations should be the LEADING part of the file name. The rest of the file name should be descriptive of the content of the image separated by underscores (_). If the image is used for a title page or representative of the larger model, the leading file name should be "rufas.""
+
+**Note** 
+Files that include flow charts should indicate such in the file. For example, a flow chart of the decision tree in the animal module should be names "ani_flow_decision_tree". Similarly, if the image is a screenshot of a section of code from the module, the file name should include 'code'. For example, a code screenshot for the manure module should be named "man_code_description" or something similar.
+
+```
+
+Linking internally and externally is the first step, however it can be hard to keep track of labels and how they have been used and referenced. That is the main reason we have the auditing tool. If you are creating new labels or new reference links, **be sure to check the auditor to make sure that there is no repeat labels or incorrect references**
+
+
+### Example of a Figure 
+
+All figures and images must be uploaded in the "references." When you upload your fig/img, you may name the file (best to keep it short and sweet)...
+
+<!-- #fig-animal-icon is how the code adds figures to TOC, like a label -->
+
+```markdown
+
+![Animal module icon](../resources/images/ani_icon.png.png){#fig-animal-icon width=35%}
+
+-->[Caption for the image or figure]
+--> #fig-animal-icon = #indicates the type of file-label-for-auditing
+--> width=35% = sizing adjusted as needed
+
+```
+
+The output is below : 
+
+
+![Animal module icon](../resources/images/ani_icon.png){#fig-animal-icon width=35%}
+
+### Example of a Table
+
+Our documentation include quite a few tables with long, detailed definitions and extended variable names. It is important that these are all legible and consistently formated for readability. This requires precise alignment of gridlines-- which can get tedious. Additionally, any updates to variables or defaults may make this process more time consuming in the future. 
+
+Instead, we have four excel files that correspond to each existing module. In each file, sheets are named by their label id (see next section for more on id logic). That way, you can auto-generate a .txt file with your table properly sized and formated using the make_grid_table.py (quarto-scidoc>scripts). The .txt file output will show up in quarto-scidoc>output>tables.
+
+#### Option 1 - Generate Directly from a .csv File
+This is the preferred method to generate a table because it is the most straightforward and requires the least amount of formatting. You can use the make_markdown_table function in the make_grid_table.py script to generate a markdown table from a .csv file. The .csv file should be formatted with the appropriate columns (Variable, Definition, Default, Min, Max) and should be saved in the resources/table_data folder. The name of your file should match the label used in the documentation. This will help with traceback and auditing. 
+
+All tables begin with the "tbl-" prefix followed with the 3 letter acronym for the module where the table belongs (e.g. "ani" for animal). The final segments (also separated by hyphens) should be short but descriptive. For example, the table of abbreviations is labeled "tbl-abbrevs" (it is outside of any module so no module abbreviation is used) and the corresponding .csv file is named "tbl-abbrev.csv".
+
+The main adjustments you will need to make are the label, tbl-cap (caption), and the file name in the make_markdown_table function. The rest of the code can be copied and pasted as is.
+
+If you are having trouble running this, be sure to check the sys.path.append location and the actual .csv file location.
+
+```{python}
+
+#| label: tbl-an-example-struct
+#| tbl-cap: "This is an example caption for this example table."
+#| echo: false
+#| output: asis
+
+import sys
+sys.path.append("../scripts")
+
+from make_grid_table import make_markdown_table
+
+md_tab = make_markdown_table(
+    "../resources/table_data/tbl-an-example-struct.csv",
+)
+
+print(md_tab)
+
+```
+
+
+### Option 2 - Create a .csv File before Generating the Table from your File
+A comprehensive, step-by-step guide to this process is available in qmd > scripts > quarto_python_test > python_tables_example files created by Clay. They also add some description details to option 1, so it may be good to review regardless of your preferred option.
+
+## Equation Templates and ID Logic
+If you are adding equations, it is important that you continue to use the ID logic that has been described ... 
+
+
+```markdown
+The audit label and crosslinking is tracked by #eq-an-nrc-2026. 
+It is important to follow the custom label structure even for 
+the invisible reference to make tracking easier. 
+
+All equation text or variables and custom equation IDs should use the \text function to ensure that formating is consistent throughout the Sci Doc. 
+
+For extremely long equations, you may create manual breaks with the \qquad function.
+
+::: {#eq-an-nrc-2026}
+$$
+\text{CBW} = \text{MW} \times 0.06275
+$$
+<p style="text-align: right;">[AN.NRC.2026]</p>
+
+All letters or acronyms included in equations should be wihtin the \text{} function to ensure consistent formatting and avoid stray italices.
+Multiplication may be indicated with a \times
+
+
+:::
+
+Below is how the equation can be linked in other parts of the text: 
+
+See [AN.NRC.2026](#eq-an-nrc-2026)<!-- @eq-an-nrc-2026 -->.
+
+```
+
+This is how your equation and the linking should appear.
+
+::: {#eq-an-nrc-2026}
+$$
+\text{CBW} = \text{MW} \times 0.06275
+$$
+<p style="text-align: right;">[AN.NRC.2026]</p>
+
+:::
+
+See [AN.NRC.2026](#eq-an-nrc-2026)<!-- @eq-an-nrc-2026 -->.
+
+
+
+Some equations may be too long to fit on a single line and within the margins. Unfortunately, you will need to manually break the equation into multiple lines. 
+
+To do this, you can use the \qquad function to create a break in the equation. Be sure to use the \text function for all variables and text to ensure consistent formatting throughout the document.
+```markdown
+
+$$
+\text{fecal\_water} &= (1.987 \times \text{dry\_matter\_intake}) \\
+&\quad + (0.348 \times \text{acid\_detergent\_fiber\_concentrations}) \\
+&\quad - (0.412 \times \text{crude\_protein\_concentration}) \\
+&\quad - (0.074 \times \text{dry\_matter\_concentration}) \\
+&\quad - (0.0057 \times \text{days\_in\_milk})
+$$
+
+<p style="text-align: right;">[AN.EXC.18]</p>
+
+```
+
+
+
+## Callouts, Recommendations, or Notes
+
+You may want to emphasize specific notes and annotations. Here is a helpful tool to do so correctly.
+
+```markdown
+::: {.callout-note}
+Callout text goes here
+:::
+```
+
+Your callout will appear the way it does below:
+
+::: {.callout-note}
+Note: if only interested in a PDF version of the documentation (no website version), then the original LaTeX code
+can still be used and processed by quarto. For example, the bullet points works as the original LaTeX or translated
+into markdown syntax:
+
+```{{latex}}
+\begin{itemize}
+    \item first bullet point
+    \item second bullet point
+    \item ...
+\end{itemize}
+```
+
+```{{markdown}}
+* first bullet point
+* second bullet point
+* ...
+```
+
+* first bullet point
+* second bullet point
+* ...
+
+but only the markdown works for all document types (html, pdf, word document, presentations, e-books, etc.).
+:::
+
+
+
+## References
+
+Before adding a new reference to "rufas.bib," check the file to ensure it has not already been added. All references should be listed alphabetically and then by year (most recent at the top). 
+
+If you do need to add a bibliography, the correct structure is below. Pay special attention to the green text, this formatting is important to maintain consistentcy because it helps us with our auditing report and allows us to properly cite in-text.
+
+```bibtex
+Journal Articles
+@article{LASTNAME_YEAR,
+  author = {LASTNAME, FIRSTNAME},
+  title = {Title of the article in proper formatting},
+  journal = {Journal Title with proper NCBI Abbreviations},
+  year = {YEAR PUBLISHED},
+  volume = {VOLUME NUMBER},
+  pages = {PAGES}
+}
+
+Books 
+
+@book{LASTNAME_YEAR,
+  author = {FIRSTNAME LASTNAME},
+  title = {Title of Book Referenced},
+  publisher = {Publisher},
+  year = {YEAR PUBLISHED},
+  isbn = {978-3-319-24277-4}
+}
+
+Online, Misc, Website (RARE USAGE)
+
+@online{quarto2024,
+  author = {Posit},
+  title = {Quarto Citations Guide},
+  year = {2024},
+  url = {https://quarto.org/docs/authoring/citations.html}
+}
+
+```
+If there are 2 articles with the same author and same year, add the recommended "a" or "b" (e.g. ```bibtex @LASTNAME_YEARa vs @LASTNAME_YEARb```) as they are referenced.
+
+
+
+::: {.callout-note}
+## Previews and Audits
+
+*For preview html*
+
+```{{markdown}}
+
+quarto preview
+
+```
+*For preview pdf*
+
+```{{markdown}}
+
+quarto render --to pdf
+
+```
+*For audit review*
+You can find the output in resources > reference-audit folder.
+
+```{{markdown}}
+
+python quarto_audit.py
+
+```
+:::
+
+## Section Sign Up
+
+```{python}
+
+#| label: tbl-rufas-team-quarto-transfer
+#| tbl-cap: "This will help us practice how updating tables will look as we develop RuFaS. Please take this time to update the appropriate .csv files when you have decided what section you wish to work on."
+#| echo: false
+#| output: asis
+
+import sys
+sys.path.append("../scripts")
+
+from make_grid_table import make_markdown_table
+
+md_tab = make_markdown_table(
+    "../resources/table_data/tbl-rufas-team-quarto-transfer.csv",
+)
+
+print(md_tab)
+
+```

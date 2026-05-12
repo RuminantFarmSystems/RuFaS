@@ -1,0 +1,147 @@
+# Manure Module
+
+## Introduction
+
+
+
+
+
+## Manure Handler
+
+### Introduction 
+
+### Methodology
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+### Manure Composition Update
+
+
+
+
+
+## Solid Liquid Separators
+
+### Introduction
+
+### Methodology
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+### Manure Composition Update
+
+
+## Anaerobic Digestion
+
+### Introduction
+
+### Methodology
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+### Manure Composition Update
+
+
+
+
+
+## Slurry Storage
+
+### Introduction
+
+### Methodology
+
+### Received, stored, and emptied outputs
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+### Manure Composition Update
+
+
+
+
+
+## Anaerobic Lagoon
+
+### Introduction
+
+### Methodology
+
+### Received, stored, and emptied outputs
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+### Manure Composition Update
+
+
+
+
+
+## Bedded Pack
+
+### Introduction
+
+### Methodology
+
+### Received, stored, and emptied outputs
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+### Manure Composition Update
+
+
+
+## Open Lot
+
+### Introduction
+
+### Methodology
+
+### Received, stored, and emptied outputs
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+### Manure Composition Update
+
+
+
+## Composting
+
+### Introduction
+
+### Methodology
+
+### Received, stored, and emptied outputs
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+### Manure Composition Update
+
+
+
+## Daily Spread
+
+### Introduction
+
+
+
+
+## Key constants
+
+## References
