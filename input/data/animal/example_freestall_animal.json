@@ -11,7 +11,6 @@
   	"herd_size_sell_threshold": 101,
   	"herd_size_buy_threshold": 95,
 	"breed": "HO",
-	"sum_parity_fractions ~= 1": "xv",
 	"parity_fractions": {
 		"1": 0.36,
 		"2": 0.26,
@@ -33,11 +32,8 @@
       "heifer_repro_method": "SynchED",
       "cow_repro_method": "TAI",
       "semen_type": "conventional",
-      "days_in_preg_when_dry < avg_gestation_len": "xv, cow must be dried off before calving",
       "days_in_preg_when_dry": 218,
-      "heifer_repro_cull_time > breeding_start_day_h": "xv, culling must start after breeding",
       "heifer_repro_cull_time": 500,
-      "do_not_breed_time > voluntary_waiting_period when cow_repro_method in [ED, ED-TAI]": "xv, the breeding window must have positive length",
       "do_not_breed_time": 185,
       "cow_times_milked_per_day": 3,
 	    "milk_fat_percent": 4,
@@ -48,7 +44,6 @@
         "male_calf_rate_sexed_semen": 0.1,
         "male_calf_rate_conventional_semen": 0.53,
         "keep_female_calf_rate": 1,
-        "wean_day < breeding_start_day_h": "xv",
         "wean_day": 60,
         "wean_length": 7,
         "milk_type": "whole"
@@ -60,17 +55,11 @@
         "decrease_conception_rate_by_parity": false,
         "avg_gestation_len": 276,
         "std_gestation_len": 6,
-        "prefresh_day < avg_gestation_len": "xv, close-up period must start before calving",
-        "prefresh_day < avg_gestation_len - days_in_preg_when_dry": "xv",
         "prefresh_day": 21,
-        "calving_interval > voluntary_waiting_period + avg_gestation_len": "xv",
         "calving_interval": 400,
         "heifers": {
             "estrus_detection_rate": 0.9,
             "estrus_conception_rate": 0.6,
-			"repro_sub_protocol in [2P, CP] when heifer_repro_method is SynchED": "xv",
-			"repro_sub_protocol in [5dCG2P, 5dCGP] when heifer_repro_method is TAI": "xv",
-			"repro_sub_protocol is 'NA' when heifer_repro_method is ED": "xv",
             "repro_sub_protocol": "2P",
             "repro_sub_properties": {
                 "conception_rate": 0.6,
@@ -78,46 +67,11 @@
             }
         },
         "cows": {
-			"When 'cow_repro_method' is 'ED'": [
-				"'voluntary_waiting_period' is not null (or >0)",
-				"'estrus_detection_rate' is not null (or >0)",
-				"'ED_conception_rate' is not null (or >0)",
-				"'presynch_program' is null",
-				"'presynch_program_start_day' is null",
-				"'ovsynch_program' is null",
-				"'ovsynch_program_start_day' is null",
-				"'resynch_program' is null"
-			],
-			"When 'cow_repro_method' is 'TAI'": [
-				"'ovsynch_program' is not null",
-				"'ovsynch_program_start_day' is not null (or >0)",
-				"'ovsynch_program_conception_rate' is not null (or >0)?",
-				{
-					"if 'resynch_program' is in ['PGFatPD', 'none']": [
-						"'presynch_program' is not null",
-						"'presynch_program_start_day' is not null (or >0)",
-						"'estrus_detection_rate' is not null (or >0)",
-						"'ED_conception_rate' is not null (or >0)"
-					]
-				}
-			],
-			"When 'cow_repro_method' is 'ED-TAI'": [
-				"'voluntary_waiting_period' is not null (or >0)",
-				"'estrus_detection_rate' is not null (or >0)",
-				"'ED_conception_rate' is not null (or >0)",
-				"'ovsynch_program' is not null",
-				"'ovsynch_program_start_day' is not null (or >0)",
-				"'ovsynch_program_conception_rate' is not null (or >0)"
-			],
-			"double-check the cow-repro sub-protocol": "xv",
             "estrus_detection_rate": 0.6,
             "ED_conception_rate": 0.5,
-			"presynch_program only when cow_repro_method is TAI": "xv",
             "presynch_program": "Double OvSynch",
-      		"ovsynch_program_start_day > presynch_program_start_day when presynch_program and ovsynch_program are not null": "xv",
             "presynch_program_start_day": 50,
             "ovsynch_program": "OvSynch 56",
-      		"ovsynch_program_start_day > voluntary_waiting_period when cow_repro_method in [TAI, ED-TAI]": "xv, double-check on this",
             "ovsynch_program_start_day": 64,
             "ovsynch_program_conception_rate": 0.6,
             "resynch_program": "TAIafterPD"
@@ -125,26 +79,20 @@
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,
-				"birth_weight_std_ho < 20% * birth_weight_avg_ho": "xv, birth weight std must be less than 10% of avg weight",
 				"birth_weight_std_ho": 1,
 				"birth_weight_avg_je": 27.2,
 				"birth_weight_std_je": 1,
-				"target_heifer_preg_day > breeding_start_day_h": "xv, must be after breeding",
 				"target_heifer_preg_day": 399,
-				"birth_weight_avg_ho < mature_body_weight_avg": "xv",
 				"mature_body_weight_avg": 740.1,
 				"mature_body_weight_std": 73.5
 			}
 		},
 		"from_literature": {
 			"repro": {
-				"preg_check_day_1 < preg_check_day_2 < preg_check_day_3": "xv, must be in order",
 				"preg_check_day_1": 32,
 				"preg_loss_rate_1": 0.02,
 				"preg_check_day_2": 60,
 				"preg_loss_rate_2": 0.096,
-				"preg_check_day_3 < avg_gestation_len": "xv, can't preg check after birth",
-				"preg_check_day_3 < days_in_preg_when_dry": "xv",
 				"preg_check_day_3": 200,
 				"preg_loss_rate_3": 0.017,
 				"avg_estrus_cycle_return": 23,
@@ -157,12 +105,9 @@
 				"std_estrus_cycle_after_pgf": 2
 			},
 			"culling": {
-				"all len(cull_day_count) must be equal": "xv, must be lists of equal length",
 				"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],
-				"sum(*_cull).probability = 1": "xv, all probabilities must sum to 1",
 				"feet_leg_cull": {
 					"probability": 0.1633,
-					"cull_day_prob should be in increasing order": "xv, must be in order",
 					"cull_day_prob": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1]
 				},
 				"injury_cull": {
@@ -187,7 +132,6 @@
 				},
 				"parity_death_prob": [0.039,0.056,0.085,0.117],
 				"parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
-				"len(death_day_prob) == len(cull_day_count)": "xv, must be lists of equal length",
 				"death_day_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1]
 			},
 			"life_cycle": {
@@ -197,11 +141,6 @@
 	},
 	"methane_mitigation": {
 		"methane_mitigation_method": "None",
-		"When methane_mitigation_method is 'None', 'methane_mitigation_additive_amount' must be 0": "xv, must be 0 when method is None",
-		"When methane_mitigation_method is '3-NOP', 'methane_mitigation_additive_amount' == '3-NOP_additive_amount'": "xv",
-		"When methane_mitigation_method is 'monensin', 'methane_mitigation_additive_amount' == 'monensin_additive_amount'": "xv",
-		"When methane_mitigation_method is 'essential_oils', 'methane_mitigation_additive_amount' == 'essential_oils_additive_amount'": "xv",
-		"When methane_mitigation_method is 'seaweed_additive', 'methane_mitigation_additive_amount' == 'seaweed_additive_amount'": "xv",
 		"methane_mitigation_additive_amount": 0,
 		"3-NOP_additive_amount": 70,
 		"monensin_additive_amount": 24,
@@ -230,19 +169,13 @@
 		{
 			"id": 0,
 			"pen_name": "",
-			"for LAC_COW pens, 'minutes_away_for_milking', 'first_parlor_processor', 'parlor_stream_name?' cannot be null": "xv",
 			"animal_combination": "CALF",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 10,
 			"number_of_stalls": 15,
 			"housing_type": "open air barn",
-			"When pen_type is in ['freestall', 'tiestall'], the processor type of any 'first processor' can only be in ['Handler', 'DailySpread']": "xv",
-			"When pen_type is in ['freestall', 'tiestall'], at least one 'first processor' have to be 'SingleStreamHandler'": "xv",
-			"When pen_type is 'openlot', at least one of the 'first processor' in the list has to be a type OpenLot processor?": "xv",
-			"When pen_type is 'bedded pack', at least one of the 'first processor' in the list has to be a type BeddedPack processor?": "xv",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
-			"sum(stream_proportion) = 1": "xv, total stream proportions must sum to 1",
 			"manure_streams": [
 				{
 					"stream_name": "calf_pen",
@@ -311,23 +244,9 @@
 					"first_processor": "lac_alley_scraper"
 				}
 			]
-		},
-		{
-			"1. Too few stalls (lower bound) — extends existing pattern": "",
-			"CALF and GROWING pens already have lower-bound rules.": "",
-			"CLOSE_UP": [
-				"Dry cow num = cow_num × (1 − milking_cow_fraction)",
-				"Compute total_close_up = sum(heiferIII_num_springers, dry_cows) → save_as: total_close_up",
-				"Actual check: sum(CLOSE_UP stalls) * 1.5 ≥ total_close_up / average(max_stocking_density)",
-				"CLOSE_UP stalls * 0.5 <= total_close_up / average(max_stocking_density)"
-			],
-			"LAC_COW": [
-				"same process as CLOSE_UP"
-			]
 		}
 	],
 	"bedding_configs": [
-		"reverse_lookup to make sure the bedding names in pen configs has a corresponding bedding config",
 		{
 			"name": "calf_straw",
 			"bedding_type": "straw",
