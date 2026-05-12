@@ -1,0 +1,52 @@
+# project specifications
+project:
+  type: book
+  output-dir: output
+
+# Book project specifications
+book:
+  title: "Ruminant Farm System Model"
+  subtitle: "Scientific Documentation"
+  version: 1.0
+  ## specify downloadable formats
+  downloads: [pdf]
+  date: today
+  ## list of quarto documents to render the book (in order)
+  chapters:
+    - index.qmd # required file contains the preface chapter
+    - equations.qmd
+    - read_parameters.qmd
+
+title-block-banner: true
+
+# define the formats to be rendered and format-specific settings
+format:
+  html:
+    theme:
+      - cosmo
+      # - custom.scss # option for extended CSS file for specifying HTML formating, etc.
+    html-math-method: katex
+  pdf:
+    toc: true
+    number-sections: true
+    # keep-tex: true # keep the intermediate LaTeX files
+    number-depth: 2
+    colorlinks: true
+    papersize: A4
+    pagestyle: empty
+    geometry: # PDF geometry
+      - right = 1in
+      - left = 1in
+    #include-in-header:
+    # - preamble-latex.tex # file(s) with LaTeX for document formatting, etc.
+
+crossref:
+    custom:
+    - kind: float
+      reference-prefix: Equation
+      caption-location: margin
+      key: eqn
+      latex-env: Equation
+
+# list of .bib files
+bibliography: ../resources/animal.bib

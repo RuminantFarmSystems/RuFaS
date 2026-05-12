@@ -1,0 +1,61 @@
+# code integration
+
+## Read data files
+
+```{python}
+#| echo: false
+
+# The "echo: false" tag hides the code block in the output document, but the
+# code is still evaluated.
+
+import os
+import json
+
+# relative path to the root (rufas) directory
+root_dir = "../../../"
+# path from root to data file of interest
+input_path = "input/data/animal/example_freestall_animal.json"
+# joined path
+full_path = root_dir + input_path
+# open the file (read-only, binary)
+with open(full_path, "rb") as file:
+  data_blob = json.load(file)
+# get values of interest
+H1 = data_blob["herd_information"]["heiferI_num"]
+H2 = data_blob["herd_information"]["heiferII_num"]
+```
+
+The values for some of the parameters contained within the 
+'example_freestall_animal.json' file are: 
+
+* `heiferI_num` = `{python} H1`
+* `heiferII_num` = `{python} H2` 
+
+```{python}
+#| echo: false
+from RUFAS.general_constants import GeneralConstants as gt
+
+m_per_mm = gt.MM_TO_M
+spd = gt.SECONDS_PER_DAY
+```
+
+## Read python class attributes
+
+Some constant values that RUFAS uses, taken directly from the 
+`GeneralConstants` class are:
+
+* `MM_TO_M` = `{python} m_per_mm`
+* `SECONDS_PER_DAY` = `{python} spd`
+
+and it was accessed with the following code:
+
+```{python}
+#| echo: true
+#| eval: false
+from RUFAS.general_constants import GeneralConstants as gt
+
+m_per_mm = gt.MM_TO_M
+spd = gt.SECONDS_PER_DAY
+```
+<!-- the echo:true and eval:false tags ensure that code is shown but not 
+executed-->
