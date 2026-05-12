@@ -2149,6 +2149,9 @@ class CrossValidator:
         - ``relationship``: one of the supported relationship strings (e.g. ``"equal"``).
         - ``mode``: ``"filter"`` to return the matching subset; ``"enforce"`` to
           return ``[True]`` when all entries satisfy, otherwise ``[False]``.
+        - ``field_to_save``: *(filter mode only)* key to extract from each matched
+          entry. When provided, the result is a flat list of that field's values
+          instead of a list of full dict objects.
 
         Examples
         --------
@@ -2162,6 +2165,19 @@ class CrossValidator:
                 "value_to_compare": "alias_status",
                 "relationship": "equal",
                 "mode": "filter"
+            }
+
+        Filter and extract a single field from each matched entry:
+
+        .. code-block:: python
+
+            {
+                "in": "pen_information",
+                "field": "animal_combination",
+                "value_to_compare": "LAC_COW",
+                "relationship": "equal",
+                "mode": "filter",
+                "field_to_save": "number_of_stalls"
             }
 
         Enforce that all entries have ``"age"`` greater than a peer field:
@@ -2180,6 +2196,7 @@ class CrossValidator:
         field: str = iter_block["field"]
         value_to_compare_alias: str | None = iter_block.get("value_to_compare", None)
         field_to_compare: str | None = iter_block.get("field_to_compare", None)
+        field_to_save: str | None = iter_block.get("field_to_save", None)
         relationship: str = iter_block["relationship"]
         mode: str = iter_block["mode"]
 
@@ -2196,11 +2213,14 @@ class CrossValidator:
             return None, False
 
         if mode == "filter":
-            return [
+            filtered = [
                 entry
                 for entry in array_of_dicts
                 if compare_function([entry.get(field)], comparand_for(entry), eager_termination)
-            ], True
+            ]
+            if field_to_save is not None:
+                return [entry.get(field_to_save) for entry in filtered], True
+            return filtered, True
         else:
             return [
                 all(

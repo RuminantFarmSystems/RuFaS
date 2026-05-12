@@ -3548,6 +3548,54 @@ def test_log_missing_condition_clause_field_only() -> None:
             ],
             [False],
         ),
+        # mode="filter" + field_to_save: return extracted field values, not full dicts
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "A", "val": 10}, {"type": "B", "val": 20}, {"type": "A", "val": 30}],
+                "A",
+            ],
+            [10, 30],
+        ),
+        # mode="filter" + field_to_save: no matches → empty list
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "X", "val": 1}],
+                "Z",
+            ],
+            [],
+        ),
+        # mode="filter" + field_to_save: field missing in some entries → None in result
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "A", "val": 5}, {"type": "A"}],
+                "A",
+            ],
+            [5, None],
+        ),
     ],
 )
 def test_evaluate_for_each_block_success(
