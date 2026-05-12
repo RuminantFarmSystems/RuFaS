@@ -462,8 +462,8 @@ class HerdManager:
 
         animal_ranking_indexes: list[float] | None = None
         if (
-            AnimalConfig.simulate_genetics and
-            AnimalConfig.selective_repro_strategy
+            AnimalConfig.simulate_genetics
+            and AnimalConfig.selective_repro_strategy
             and AnimalConfig.ranking_method == "genetic"
             and all([(animal.animal_type == AnimalType.HEIFER_II or animal.animal_type.is_cow) for animal in animals])
         ):
