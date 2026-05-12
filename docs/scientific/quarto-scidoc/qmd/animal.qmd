@@ -79,45 +79,24 @@ For the rest of the simulation, animals enter the herd through birth as newborn 
 
 
 ```{python}
-
 #| label: tbl-an-sim-outline
-#| tbl-cap: "Overview of the distinct phases by which animals are created and introduced to the herd."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-sim-outline.csv",
+#| tbl-cap: Overview of the distinct phases by which animals are created and introduced to the herd.
+import_table(
+  "../resources/table_data/tbl-an-sim-outline.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
-
 ```
 
 #### Relevant Inputs
-
 ```{python}
-
 #| label: tbl-an-herd-inputs
-#| tbl-cap: "User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-herd-inputs.csv",
+#| tbl-cap: User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section.
+import_table(
+  "../resources/table_data/tbl-an-herd-inputs.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
-
 ```
 
 #### Relevant Outputs
@@ -200,30 +179,16 @@ status of each animal and determined which animals need to be bought or sold, th
 pens as needed. 
 
 **Relevant Inputs**
-
 ```{python}
-
 #| label: tbl-an-grp-inputs
-#| tbl-cap: |
-#|  "User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for
-#|  each pen, key inputs are outlined here."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-grp-inputs.csv",
+#| tbl-cap: User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for
+#|  each pen, key inputs are outlined here.
+import_table(
+  "../resources/table_data/tbl-an-grp-inputs.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
-
 ```
-
-
 
 **Relevant Outputs**
 
@@ -250,28 +215,15 @@ allowed to be grouped into a single pen, a new variable called AnimalCombination
 AnimalTypes to facilitate sorting into pens. The AnimalCombination class is defined in enums.py and includes the 
 following mapping from AnimalTypes to AnimalCombinations:
 
-
 ```{python}
-
 #| label: tbl-an-def-grp
-#| tbl-cap: "Summary of animal types and their grouping included in this module."
-#| echo: false
-#| output: asis
-
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-def-grp.csv",
+#| tbl-cap: Summary of animal types and their grouping included in this module.
+import_table(
+  "../resources/table_data/tbl-an-def-grp.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+  maxcolwidths = [None, 20, None, None]
 )
-
-print(md_tab)
-
 ```
-
-
 Currently there are only two options for assigning AnimalCombinations to pens. 
 
 - *Option 1* The first and most commonly used option for grouping animals is to assign one AnimalCombination to each 
