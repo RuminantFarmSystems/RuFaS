@@ -72,3 +72,14 @@ def test_request_nutrients(nutrients: NutrientRequest, expected_result: Nutrient
     assert pytest.approx(actual.dry_matter) == expected_result.dry_matter
     assert pytest.approx(actual.total_manure_mass) == expected_result.total_manure_mass
     assert pytest.approx(actual.dry_matter_fraction) == expected_result.dry_matter_fraction
+
+
+def test_nutrient_request_results_add_tolerates_floating_point_imprecision() -> None:
+    """Adding two NutrientRequestResults with default fractions can round to just above 1.0; validation must allow it."""
+    on_farm = NutrientRequestResults(nitrogen=810.217426, phosphorus=10.0, total_manure_mass=1000.0)
+    off_farm = NutrientRequestResults(nitrogen=902.166048, phosphorus=10.0, total_manure_mass=1000.0)
+
+    combined = on_farm + off_farm
+
+    assert combined.ammonium_nitrogen_fraction == pytest.approx(1.0)
+    assert combined.nitrogen == pytest.approx(810.217426 + 902.166048)
