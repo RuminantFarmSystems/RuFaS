@@ -183,37 +183,40 @@ class DCFRORCalculator:
         # project CAPEX/OPEX in the DCFROR result stream.
         digester_rows = [row for row in cap_breakdown if "digester" in str(row.get("Item", "")).lower()]
         if digester_rows:
-            cow_count = 0.0
-            try:
-                cow_count = float(self.im.get_data("animal_properties.herd_information.cow_num"))
-            except Exception:
-                cow_count = 0.0
-            if cow_count <= 0:
-                try:
-                    cow_count = float(self.im.get_data("animal_properties.herd_information.herd_num"))
-                except Exception:
-                    cow_count = 0.0
+            cow_count = float(self.im.get_data("animal_properties.herd_information.cow_num"))
+            digester_config = self.im.get_data("manure_management_properties.anaerobic_digester")
+            hydraulic_retention_time_days = float(digester_config[0]["hydraulic_retention_time"])
+            digester_volume_proxy = max(1.0, cow_count * hydraulic_retention_time_days)
 
-            if cow_count > 0:
-                digester_system = "Covered Lagoon - RNG"
-                try:
-                    configured = self.im.get_data("economic_inputs.Manure.digester.system_type")
-                    if isinstance(configured, str) and configured.strip():
-                        digester_system = configured
-                except Exception:
-                    pass
+            annual_fixed_cost = DigesterCostCalculator.calculate_digester_capital_cost(
+                animal_units=cow_count,
+                digester_volume=digester_volume_proxy,
+            )
+            discount_rate = float(input_dict["loan_interest_rate"])
+            project_life_years = int(input_dict["project_term"])
+            crf = DigesterCostCalculator.capital_recovery_factor(discount_rate, project_life_years)
+            digester_capex = DigesterCostCalculator.calculate_digester_capex(annual_fixed_cost, crf)
+            # Equation-5 scaling factor (six-tenths rule) for installed cost
+            # adjusted by effective digester volume proxy.
+            digester_capex = DigesterCostCalculator.scale_installed_cost(
+                base_cost=digester_capex,
+                volume=digester_volume_proxy,
+                base_volume=max(1.0, cow_count),
+                install_factor=0.6,
+            )
+            annual_opex_total = DigesterCostCalculator.calculate_digester_operational_cost(
+                True,
+                animal_units=cow_count,
+                farm_type_flag=1.0,
+                below_ground_flag=1.0,
+                concrete_flag=1.0,
+                steel_flag=0.0,
+            )
 
-                digester_estimates = DigesterCostCalculator.estimate_digester_costs(digester_system, cow_count)
-                digester_capex = float(digester_estimates["capital_expenditure"])
-                digester_opex = digester_estimates["operating_costs"]
-                annual_opex_total = float(
-                    digester_opex["labor"] + digester_opex["energy"] + digester_opex["repairs"]
-                )
-
-                prior_digester_capex = float(sum(float(r.get("Cost", 0.0)) for r in digester_rows))
-                base_cost = base_cost - prior_digester_capex + digester_capex
-                operating_costs = operating_costs + annual_opex_total
-                capital_cost = base_cost
+            prior_digester_capex = float(sum(float(r.get("Cost", 0.0)) for r in digester_rows))
+            base_cost = base_cost - prior_digester_capex + digester_capex
+            operating_costs = operating_costs + annual_opex_total
+            capital_cost = base_cost
 
         project_term = int(input_dict["project_term"])
         if project_term <= 0:
