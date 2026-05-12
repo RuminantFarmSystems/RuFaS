@@ -278,8 +278,9 @@ class Reproduction:
         """
         if reproduction_data_stream.is_pregnant and reproduction_data_stream.days_in_pregnancy == self.gestation_length:
             if time.simulation_day == 0:
-                # TODO: randomize sex for cows giving birth on day 0
-                self.embryo_sex = self._determine_embryo_sex(time.simulation_day)
+                self.embryo_sex = (
+                    Sex.MALE if random.random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE
+                )
             reproduction_data_stream = self.cow_give_birth(reproduction_data_stream, time)
 
         if not self.do_not_breed:
@@ -462,6 +463,7 @@ class Reproduction:
 
         reproduction_data_stream = self._simulate_estrus_if_eligible(reproduction_data_stream, time.simulation_day)
 
+        assert self.embryo_sex is not None
         reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
             breed=reproduction_data_stream.breed.name,
             sex=self.embryo_sex,
@@ -992,6 +994,8 @@ class Reproduction:
             simulation_day,
             animal_constants.REBREEDING_NOTE,
         )
+        self.semen_type = None
+        self.embryo_sex = None
         if self.heifer_reproduction_program != HeiferReproductionProtocol.ED:
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
@@ -1017,11 +1021,14 @@ class Reproduction:
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> ReproductionDataStream:
         """Perform artificial insemination (AI) on the animal."""
-        self.assign_semen_type(
-            population_ranking_index=reproduction_data_stream.population_ranking_indexes,
-            animal_ranking_index=reproduction_data_stream.animal_ranking_index,
-            animal_type=reproduction_data_stream.animal_type,
-        )
+        if AnimalConfig.selective_repro_strategy:
+            self.assign_semen_type(
+                population_ranking_index=reproduction_data_stream.population_ranking_indexes,
+                animal_ranking_index=reproduction_data_stream.animal_ranking_index,
+                animal_type=reproduction_data_stream.animal_type,
+            )
+        else:
+            self.semen_type = SemenType.CONVENTIONAL_DAIRY
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,
             simulation_day,
@@ -1055,6 +1062,7 @@ class Reproduction:
             self.embryo_sex = self._determine_embryo_sex(simulation_day)
         else:
             self.semen_type = None
+            self.embryo_sex = None
             if reproduction_data_stream.animal_type == AnimalType.HEIFER_II:
                 reproduction_data_stream = self._handle_failed_heifer_conception(
                     reproduction_data_stream, simulation_day
@@ -1065,13 +1073,13 @@ class Reproduction:
         return reproduction_data_stream
 
     def _determine_embryo_sex(self, simulation_day) -> Sex:
-        # TODO: put male calf rate into Animal Constant
+
         if self.semen_type == SemenType.CONVENTIONAL_DAIRY:
-            male_calf_rate = 0.5
+            male_calf_rate = animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE
         elif self.semen_type == SemenType.SEXED_DAIRY:
-            male_calf_rate = 0.9
+            male_calf_rate = animal_constants.SEXED_DAIRY_MALE_CALF_RATE
         elif self.semen_type == SemenType.BEEF:
-            male_calf_rate = 0.9
+            male_calf_rate = animal_constants.BEEF_MALE_CALF_RATE
         else:
             print(simulation_day, self.semen_type)
             raise ValueError("Unexpected Semen Type.")
@@ -1458,6 +1466,8 @@ class Reproduction:
         ):
             self.repro_state_manager.enter(ReproStateEnum.FRESH)
             reproduction_data_stream.days_in_pregnancy = 0
+            self.semen_type = None
+            self.embryo_sex = None
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
@@ -2089,6 +2099,8 @@ class Reproduction:
         """Handle an open cow's status, determining next steps based on reproduction protocol and resynch program."""
 
         self.num_conception_rate_decreases += 1
+        self.semen_type = None
+        self.embryo_sex = None
         if (
             AnimalConfig.dry_off_day_of_pregnancy <= AnimalConfig.third_pregnancy_check_day
             and not reproduction_data_stream.is_milking
@@ -2234,7 +2246,7 @@ class Reproduction:
         return reproduction_data_stream
 
     def assign_semen_type(
-        self, population_ranking_index: list[float], animal_ranking_index: float, animal_type: AnimalType
+        self, population_ranking_index: list[float] | None, animal_ranking_index: float | None, animal_type: AnimalType
     ) -> None:
         animal_ranking_index_percentile: float = (
             np.mean(np.array(population_ranking_index) <= animal_ranking_index) * 100

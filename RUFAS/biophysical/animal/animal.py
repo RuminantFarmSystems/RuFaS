@@ -1611,8 +1611,8 @@ class Animal:
                 days_in_pregnancy=self.days_in_pregnancy,
                 days_in_milk=self.days_in_milk,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
-                population_ranking_indexes=population_ranking_indexes,
-                animal_ranking_index=self.genetics.ranking_index,
+                population_ranking_indexes=None,
+                animal_ranking_index=None,
             )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
 

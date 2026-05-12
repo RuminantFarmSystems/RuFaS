@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import date, timedelta
 import math
+from random import random
 from typing import Any
 
 import numpy as np
@@ -12,7 +13,7 @@ from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
@@ -192,6 +193,7 @@ class HerdManager:
             herd_population.replacement,
         )
         # TODO: randomly assign embryo sex for animals that are already pregnant: use Conventional Dairy
+        self._assign_embryo_sex_for_pregnant_animals()
 
         self.allocate_animals_to_pens(time.simulation_day)
         self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -459,9 +461,14 @@ class HerdManager:
         newborn_calves: list[Animal] = []
 
         animal_ranking_indexes: list[float] | None = None
-        if all([(animal.animal_type == AnimalType.HEIFER_II or animal.animal_type.is_cow) for animal in animals]):
+        if (
+            AnimalConfig.simulate_genetics and
+            AnimalConfig.selective_repro_strategy
+            and AnimalConfig.ranking_method == "genetic"
+            and all([(animal.animal_type == AnimalType.HEIFER_II or animal.animal_type.is_cow) for animal in animals])
+        ):
             animal_ranking_indexes: list[float] | None = [
-                animal.genetics.ranking_index for animal in animals if animal.is_eligible_for_breeding
+                animal.genetics.ranking_index_for_breeding for animal in animals if animal.is_eligible_for_breeding
             ]
 
         for animal in animals:
@@ -2162,3 +2169,10 @@ class HerdManager:
                     self.herd_statistics.total_enteric_methane[animal_type] = {
                         k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
                     }
+
+    def _assign_embryo_sex_for_pregnant_animals(self) -> None:
+        pregnant_animals = [animal for animal in (self.heiferIIs + self.heiferIIIs + self.cows) if animal.is_pregnant]
+        for animal in pregnant_animals:
+            animal.reproduction.embryo_sex = (
+                Sex.MALE if random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE
+            )

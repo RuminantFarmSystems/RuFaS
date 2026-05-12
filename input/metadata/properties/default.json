@@ -200,35 +200,6 @@
           "default": "TAI",
           "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "semen_type": {
-          "type": "string",
-          "description": "Semen type (select one) -- The semen type (sexed or conventional) that makes up a majority of the farm's breedings",
-          "default": "conventional",
-          "pattern": "^(sexed|conventional)$"
-        },
-        "semen_allocation": {
-          "type": "array",
-          "description": "",
-          "properties": {
-            "type": "object",
-            "lower_percentage": {
-              "type": "number",
-              "description": "",
-              "minimum": 0,
-              "maximum": 100
-            },
-            "upper_percentage": {
-              "type": "number",
-              "description": "",
-              "minimum": 0,
-              "maximum": 100
-            },
-            "semen_type": {
-              "type": "string",
-              "description": ""
-            }
-          }
-        },
         "days_in_preg_when_dry": {
           "type": "number",
           "description": "Days In Pregnancy When Dry (days) -- The average days in pregnancy of cows at dry-off",
@@ -348,6 +319,36 @@
             "default": 400,
             "minimum": 1
           },
+          "selective_repro_strategy": {
+            "type": "bool",
+            "description": "Selective Reproduction Strategy -- whether or not to use selective reproduction strategy (default is false)",
+            "default": false
+          },
+          "ranking_method": {
+            "type": "string",
+            "description": "Ranking Method (select one) -- The method used to rank the animals for selective breeding",
+            "default": null,
+            "pattern": "^(genetic)$",
+            "nullable": true
+          },
+          "genetic_selection_index_weights": {
+            "type": "object",
+            "description": "Genetic Selection Index Weights",
+            "fat": {
+              "type": "number",
+              "description": "The index weight for fat",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.71
+            },
+            "protein": {
+              "type": "number",
+              "description": "The index weight for protein",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.29
+            }
+          },
           "heifers": {
             "type": "object",
             "description": "Heifer Reproduction Protocols",
@@ -385,6 +386,31 @@
                 "default": 0.9,
                 "minimum": 0,
                 "maximum": 1
+              }
+            },
+            "semen_allocation_proportions": {
+              "type": "object",
+              "description": "The semen allocation proportions for the heifer selective breeding",
+              "sexed_dairy": {
+                "type": "number",
+                "description": "The sexed dairy semen allocation proportion for heifer breeding when selective_repro_strategy is turned on and ranking_method is genetic",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              },
+              "conventional_dairy": {
+                "type": "number",
+                "description": "The conventional dairy semen allocation proportion for heifer breeding when selective_repro_strategy is turned on and ranking_method is genetic",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              },
+              "beef": {
+                "type": "number",
+                "description": "The beef semen allocation proportion for heifer breeding when selective_repro_strategy is turned on and ranking_method is genetic",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
               }
             }
           },
@@ -440,6 +466,31 @@
               "description": "Resynch program for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None. If PGFatPD is chosen, the values for estrus detection rate and conception rate to that detected estrus following PGF are determined by estrus_detection_rate and ED_conception_rate. Anytime an insemination is performed after an ovsynch program, the conception rate will be changed to the ovsynch_program_conception_rate.",
               "default": "TAIafterPD",
               "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
+            },
+            "semen_allocation_proportions": {
+              "type": "object",
+              "description": "The semen allocation proportions for the cow selective breeding",
+              "sexed_dairy": {
+                "type": "number",
+                "description": "The sexed dairy semen allocation proportion for cow breeding when selective_repro_strategy is turned on and ranking_method is genetic",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.2
+              },
+              "conventional_dairy": {
+                "type": "number",
+                "description": "The conventional dairy semen allocation proportion for cow breeding when selective_repro_strategy is turned on and ranking_method is genetic",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              },
+              "beef": {
+                "type": "number",
+                "description": "The beef semen allocation proportion for heifer cow when selective_repro_strategy is turned on and ranking_method is genetic",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.3
+              }
             }
           }
         },
