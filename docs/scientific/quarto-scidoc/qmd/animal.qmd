@@ -314,7 +314,6 @@ For details about the variables included in each calculation, please refer to tb
 
 * Lactating and Dry Cows
 
-### Examples of Equations
 ::: {#eq-an-nrc-1}
 $$
 \text{CBW} = \text{MW} \times 0.06275
