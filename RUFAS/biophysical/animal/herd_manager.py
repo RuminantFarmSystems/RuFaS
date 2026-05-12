@@ -3,6 +3,8 @@ from datetime import date, timedelta
 import math
 from typing import Any
 
+import numpy as np
+
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
@@ -23,7 +25,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
-from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics, SemenType
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -189,6 +191,7 @@ class HerdManager:
             herd_population.cows,
             herd_population.replacement,
         )
+        # TODO: randomly assign embryo sex for animals that are already pregnant: use Conventional Dairy
 
         self.allocate_animals_to_pens(time.simulation_day)
         self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -455,8 +458,14 @@ class HerdManager:
         sold_newborn_calves: list[Animal] = []
         newborn_calves: list[Animal] = []
 
+        animal_ranking_indexes: list[float] | None = None
+        if all([(animal.animal_type == AnimalType.HEIFER_II or animal.animal_type.is_cow) for animal in animals]):
+            animal_ranking_indexes: list[float] | None = [
+                animal.genetics.ranking_index for animal in animals if animal.is_eligible_for_breeding
+            ]
+
         for animal in animals:
-            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
+            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time, animal_ranking_indexes)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
             if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
                 self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
