@@ -1081,6 +1081,7 @@ class Field:
         phosphorus_spread_amount = self.daily_spread_settings.get("phosphorus_spread_amount", 0.0)
         nitrogen_cap = self.daily_spread_settings.get("max_nitrogen", nitrogen_spread_amount)
         phosphorus_cap = self.daily_spread_settings.get("max_phosphorus", phosphorus_spread_amount)
+        spread_all_available_manure = bool(self.daily_spread_settings.get("spread_all_available_manure", False))
         return ManureEvent(
             nitrogen_mass=min(nitrogen_spread_amount, nitrogen_cap),
             phosphorus_mass=min(phosphorus_spread_amount, phosphorus_cap),
@@ -1092,6 +1093,7 @@ class Field:
             year=time.current_calendar_year,
             day=time.current_julian_day,
             is_daily_spread=True,
+            spread_all_available_manure=spread_all_available_manure,
         )
 
     def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
@@ -1117,12 +1119,13 @@ class Field:
             "year": event.year,
             "day": event.day,
         }
-        if event.nitrogen_mass == event.phosphorus_mass == 0.0:
+        spread_all_available_manure = bool(getattr(event, "spread_all_available_manure", False))
+        if not spread_all_available_manure and event.nitrogen_mass == event.phosphorus_mass == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             self.om.add_warning("Manure Application Warning", log_message, info_map)
             return None
 
-        use_supplemental_manure = event.manure_supplement_method in [
+        use_supplemental_manure = not spread_all_available_manure and event.manure_supplement_method in [
             ManureSupplementMethod.MANURE,
             ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
         ]
@@ -1133,6 +1136,7 @@ class Field:
             manure_type=event.manure_type,
             use_supplemental_manure=use_supplemental_manure,
             use_daily_spread_source=bool(getattr(event, "is_daily_spread", False)),
+            spread_all_available_manure=spread_all_available_manure,
         )
 
     def _check_crop_harvest_schedule(

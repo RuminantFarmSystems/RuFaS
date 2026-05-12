@@ -14,6 +14,7 @@
 
   "daily_spread": {
     "is_daily_spreading": true,
+    "spread_all_available_manure": false,
 
     "nitrogen_spread_amount": 8.0,
     "phosphorus_spread_amount": 2.5,

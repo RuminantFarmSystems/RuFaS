@@ -58,6 +58,7 @@
   "pattern_skip": 4,
   "daily_spread": {
     "is_daily_spreading": false,
+    "spread_all_available_manure": false,
     "nitrogen_spread_amount": 0.0,
     "phosphorus_spread_amount": 0.0,
     "potassium_spread_amount": 0.0,

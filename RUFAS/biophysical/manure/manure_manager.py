@@ -854,6 +854,11 @@ class ManureManager:
             Returns None if the request cannot be fulfilled.
 
         """
+        if request.spread_all_available_manure:
+            request_result = self._handle_spread_all_available_manure()
+            self._record_manure_request_results(request_result, "on_farm_manure", time)
+            return request_result
+
         if request.use_daily_spread_source:
             daily_spread_storages, _ = self._split_storages_by_daily_spread()
             request_result, is_nutrient_request_fulfilled = self._handle_nutrient_request_for_storages(
@@ -1040,6 +1045,44 @@ class ManureManager:
         for processor in daily_spread_storages:
             assert isinstance(processor, DailySpread)
             processor.export_and_clear_remaining_available(time)
+
+    def _handle_spread_all_available_manure(self) -> NutrientRequestResults | None:
+        """
+        Pool all manure currently available across DailySpread storages and clear each one.
+
+        Unlike the standard nutrient-request path, this branch ignores manure type, nutrient targets,
+        per-day caps, and supplemental-manure handling: whatever is in DailySpread that day is spread.
+
+        Returns
+        -------
+        NutrientRequestResults | None
+            Results carrying the combined contents of every DailySpread processor, or ``None`` if no
+            DailySpread manure was available.
+        """
+        daily_spread_storages, _ = self._split_storages_by_daily_spread()
+        nitrogen = 0.0
+        phosphorus = 0.0
+        total_manure_mass = 0.0
+        dry_matter = 0.0
+        for storage in daily_spread_storages:
+            assert isinstance(storage, DailySpread)
+            stream = storage.available_for_field_application
+            nitrogen += stream.nitrogen
+            phosphorus += stream.phosphorus
+            total_manure_mass += stream.mass
+            dry_matter += stream.total_solids
+            storage.set_available_for_field_application(ManureStream.make_empty_manure_stream())
+
+        if math.isclose(total_manure_mass, 0.0, abs_tol=1e-5):
+            return None
+
+        return NutrientRequestResults(
+            nitrogen=nitrogen,
+            phosphorus=phosphorus,
+            total_manure_mass=total_manure_mass,
+            dry_matter=dry_matter,
+            dry_matter_fraction=dry_matter / total_manure_mass,
+        )
 
     @staticmethod
     def _compute_stream_after_removal(

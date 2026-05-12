@@ -416,6 +416,64 @@ def test_create_daily_spread_event_uses_spread_amounts_and_caps() -> None:
     assert event.day == 200
 
 
+def test_create_daily_spread_event_propagates_spread_all_flag() -> None:
+    """Daily spread event should carry the spread_all_available_manure flag from settings."""
+    field = Field(
+        daily_spread_settings={
+            "is_daily_spreading": True,
+            "spread_all_available_manure": True,
+            "manure_type": "solid",
+            "supplement_manure_nutrient_deficiencies": "none",
+            "nitrogen_spread_amount": 0.0,
+            "phosphorus_spread_amount": 0.0,
+            "max_nitrogen": 0.0,
+            "max_phosphorus": 0.0,
+            "coverage_fraction": 0.75,
+            "application_depth": 5.0,
+            "surface_remainder_fraction": 0.5,
+        }
+    )
+    mocked_time = MagicMock(RufasTime)
+    mocked_time.current_calendar_year = 2027
+    mocked_time.current_julian_day = 45
+
+    event = field._create_daily_spread_event(mocked_time)
+
+    assert event is not None
+    assert event.is_daily_spread is True
+    assert event.spread_all_available_manure is True
+    assert event.nitrogen_mass == 0.0
+    assert event.phosphorus_mass == 0.0
+    assert event.field_coverage == 0.75
+
+
+def test_create_manure_request_spread_all_skips_zero_nutrient_short_circuit() -> None:
+    """spread_all_available_manure events bypass the 'no N or P requested' early return."""
+    field = Field()
+    field.om = MagicMock()
+    event = ManureEvent(
+        year=2027,
+        day=45,
+        nitrogen_mass=0.0,
+        phosphorus_mass=0.0,
+        manure_type=ManureType.SOLID,
+        field_coverage=1.0,
+        application_depth=0.0,
+        surface_remainder_fraction=1.0,
+        manure_supplement_method=ManureSupplementMethod.MANURE,
+        is_daily_spread=True,
+        spread_all_available_manure=True,
+    )
+
+    request = field._create_manure_request(event)
+
+    assert request is not None
+    assert request.spread_all_available_manure is True
+    assert request.use_daily_spread_source is True
+    assert request.use_supplemental_manure is False
+    field.om.add_warning.assert_not_called()
+
+
 def test_check_manure_application_schedule_daily_spread_request_uses_amounts() -> None:
     """Daily spread request should use spread amounts and mark request source as daily spread."""
     field = Field(

@@ -57,6 +57,11 @@ class NutrientRequest:
     use_daily_spread_source: bool = False
     """Whether this request should first use DailySpread processors."""
 
+    spread_all_available_manure: bool = False
+    """If true, take all manure currently available across DailySpread processors regardless of nutrient
+    targets, caps, manure type, and supplemental manure settings. ``nitrogen`` and ``phosphorus`` fields
+    are ignored when this is set."""
+
     def __post_init__(self) -> None:
         """
         Validate the dataclass fields.
@@ -65,7 +70,7 @@ class NutrientRequest:
         ------
         ValueError
             If any field is negative.
-            If no fields are positive.
+            If no fields are positive (unless ``spread_all_available_manure`` is set).
             If the manure type provided is not a valid ManureType.
 
         """
@@ -75,6 +80,9 @@ class NutrientRequest:
                 raise ValueError(f"NutrientRequest Error: Field {field.name} must be non-negative.")
             if field.name == "manure_type" and not isinstance(value, ManureType):
                 raise ValueError(f"NutrientRequest Error: Field {field.name} must be an instance of ManureType.")
+
+        if self.spread_all_available_manure:
+            return
 
         if any(
             isinstance(getattr(self, field.name), (int, float)) and getattr(self, field.name) > 0.0

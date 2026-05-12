@@ -2993,6 +2993,11 @@
         "description": "Whether this field uses daily spread manure applications.",
         "default": false
       },
+      "spread_all_available_manure": {
+        "type": "bool",
+        "description": "If true, spread all manure available in DailySpread processors that day, ignoring nutrient targets, caps, manure type, and supplemental manure settings.",
+        "default": false
+      },
       "nitrogen_spread_amount": {
         "type": "number",
         "description": "Target nitrogen amount for this field's daily spread request. Units: kg.",
