@@ -306,7 +306,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
     )
 
     assert feed_manager.active_storages == {"Test Storage": storage}
-    assert feed_manager.available_feeds == mock_available_feeds
+    assert feed_manager._available_feeds == mock_available_feeds
 
     mock_create_all_storages.assert_called_once()
     mock_purchased_feed_storage_init.assert_called_once_with(mock_available_feeds)
@@ -550,13 +550,6 @@ def test_validate_storage_config_names_duplicate_raises(feed_manager: FeedManage
     assert "['S1']" in msg
     add_error.assert_called_once()
 
-
-def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
-    """Test for FeedManager available_feeds property."""
-    feed_manager._available_feeds = mock_available_feeds
-    assert feed_manager.available_feeds == mock_available_feeds
-
-
 def test_update_available_feed_amounts(
     feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
 ) -> None:
@@ -572,7 +565,7 @@ def test_update_available_feed_amounts(
 
     mock_query_available_feed_totals.assert_called_once_with([feed.rufas_id for feed in mock_available_feeds])
     assert {
-        feed.rufas_id: feed.amount_available for feed in feed_manager.available_feeds
+        feed.rufas_id: feed.amount_available for feed in feed_manager._available_feeds
     } == expected_feeds_amount_available
 
 

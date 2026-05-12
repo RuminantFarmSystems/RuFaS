@@ -51,6 +51,8 @@ class FeedManager:
     ----------
     _om : OutputManager
         Output manager for reporting feed-related data.
+    _available_feeds : list[Feed]
+        A list of the feeds available for storage and purchasing.
     active_storages : dict[StorageType, Storage]
         Contains the list of active farmgrown crop storage units in the simulation and their mapping from StorageType.
     purchased_feed_storage : PurchasedFeedStorage
@@ -59,6 +61,8 @@ class FeedManager:
         Represents the allowances for feed purchases during a planning cycle.
     runtime_purchase_allowance : RuntimePurchaseAllowance
         Represents the allowances for feed purchases during runtime.
+    advanced_purchase_allowance : AdvancePurchaseAllowance
+        Represents the allowances for feeds purchased at the beginning of a ration interval.
     crop_to_rufas_id : dict[str, RUFAS_ID]
         Maps crop configurations to their corresponding RUFAS IDs for harvested crops.
     _cumulative_feed_requests : dict[RUFAS_ID, float]
@@ -107,25 +111,20 @@ class FeedManager:
             sorted_purchased_allowances
         )
 
-        available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
+        available_feed_ids = [feed.rufas_id for feed in self._available_feeds]
         self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
         for storage in self.active_storages.values():
             if storage.rufas_feed_id in available_feed_ids:
                 self.crop_to_rufas_id[str(storage.crop_name)] = storage.rufas_feed_id
 
-        self._cumulative_feed_requests: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
+        self._cumulative_feed_requests: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self._available_feeds}
         self._cumulative_purchased_feeds_fed: dict[RUFAS_ID, float] = {
-            feed.rufas_id: 0.0 for feed in self.available_feeds
+            feed.rufas_id: 0.0 for feed in self._available_feeds
         }
         self._cumulative_farmgrown_feeds_fed: dict[RUFAS_ID, float] = {
-            feed.rufas_id: 0.0 for feed in self.available_feeds
+            feed.rufas_id: 0.0 for feed in self._available_feeds
         }
-        self._cumulative_purchased_feeds: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self.available_feeds}
-
-    @property
-    def available_feeds(self) -> list[Feed]:
-        """Returns the list of available feeds."""
-        return self._available_feeds
+        self._cumulative_purchased_feeds: dict[RUFAS_ID, float] = {feed.rufas_id: 0.0 for feed in self._available_feeds}
 
     def _create_all_storages(
         self, feed_storage_configs: dict[str, Any], feed_storage_instances: dict[str, list[str]]
@@ -154,7 +153,7 @@ class FeedManager:
         self._validate_storage_config_names(list(instance_configs_by_name.values()))
         self._validate_crop_field_mapping(list(instance_configs_by_name.values()))
 
-        available_rufas_ids: list[int] = [feed.rufas_id for feed in self.available_feeds]
+        available_rufas_ids: list[int] = [feed.rufas_id for feed in self._available_feeds]
         for instance_name, storage_config in instance_configs_by_name.items():
             storage_type_str = storage_config["storage_type"]
             storage_class = StorageType.get_storage_class(storage_type_str)
@@ -250,9 +249,9 @@ class FeedManager:
 
     def update_available_feed_amounts(self) -> None:
         """Updates the amounts feeds available based on what is currently stored."""
-        rufas_ids_to_query = [feed.rufas_id for feed in self.available_feeds]
+        rufas_ids_to_query = [feed.rufas_id for feed in self._available_feeds]
         available_feed_amounts = self._query_available_feed_totals(rufas_ids_to_query)
-        for feed in self.available_feeds:
+        for feed in self._available_feeds:
             feed.amount_available = available_feed_amounts[feed.rufas_id]
 
     def translate_crop_config_name_to_rufas_id(
@@ -501,7 +500,7 @@ class FeedManager:
         feeds_to_purchase = {id: 0.0 for id in requested_feeds.requested_feed.keys()}
         for feed_id, amount_requested in requested_feeds.requested_feed.items():
             feed_info = next(
-                (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == feed_id), None
+                (available_feed for available_feed in self._available_feeds if available_feed.rufas_id == feed_id), None
             )
             if feed_info is None:
                 self._om.add_error(
@@ -588,7 +587,7 @@ class FeedManager:
         }
         for rufas_id, purchase_amount in feeds_to_purchase.items():
             feed_info = next(
-                (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
+                (available_feed for available_feed in self._available_feeds if available_feed.rufas_id == rufas_id), None
             )
             if feed_info is None:
                 raise ValueError(f"Trying to purchase unavailable feed {rufas_id}")
@@ -831,7 +830,7 @@ class FeedManager:
         farmgrown_by_id: DefaultDict[RUFAS_ID, list[HarvestedCrop]] = defaultdict(list)
         purchased_by_id: DefaultDict[RUFAS_ID, list[PurchasedFeed]] = defaultdict(list)
 
-        valid_feed_ids = set(feed.rufas_id for feed in self.available_feeds)
+        valid_feed_ids = set(feed.rufas_id for feed in self._available_feeds)
 
         for storage in self.active_storages.values():
             feed_id: RUFAS_ID = storage.rufas_feed_id
@@ -862,7 +861,7 @@ class FeedManager:
             A set of valid farm-grown feed ids.
         """
         farmgrown_ids: set[RUFAS_ID] = set()
-        valid_feed_ids = set(feed.rufas_id for feed in self.available_feeds)
+        valid_feed_ids = set(feed.rufas_id for feed in self._available_feeds)
         for storage in self.active_storages.values():
             feed_id: RUFAS_ID = storage.rufas_feed_id
             if feed_id in valid_feed_ids:
