@@ -68,6 +68,7 @@ Team Culture
 
    _wiki/RuFaS-Versioning-Policy
    _wiki/SCRUM-at-RuFaS
+   _wiki/Version-Update-Workflows
 
 Release Notes
 -------------
