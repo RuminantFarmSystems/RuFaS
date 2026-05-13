@@ -130,5 +130,5 @@ The parameter 'b' in the Mitscherlich Model 3 (Mills et al., 2003).
 
 # male calf rates
 CONVENTIONAL_DAIRY_MALE_CALF_RATE = 0.5
-SEXED_DAIRY_MALE_CALF_RATE = 0.9
-BEEF_MALE_CALF_RATE = 0.9
+SEXED_DAIRY_MALE_CALF_RATE = 0.1
+BEEF_MALE_CALF_RATE = 0.1
