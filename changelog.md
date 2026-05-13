@@ -25,6 +25,8 @@ v1.0.0
 
 ### Next Version Updates
 
+- [2994](https://github.com/RuminantFarmSystems/RuFaS/pull/2994) - [minor change] [NoInputChange] [OutputChange] Adds minimums to urine nitrogen equation.
+- [2997](https://github.com/RuminantFarmSystems/RuFaS/pull/2997) - [minor change] [NoInputChange] [OutputChange] Updates throughput in tractor dataset for combine headers.
 
 ### v1.0.0
 
