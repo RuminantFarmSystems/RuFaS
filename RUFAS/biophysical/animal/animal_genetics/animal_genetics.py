@@ -387,6 +387,14 @@ class Genetics:
             "ranking_index": self.ranking_index,
         }
 
+    @property
+    def ranking_index_for_breeding(self) -> float:
+        """Return ranking index for breeding."""
+        return (
+            self.EBV_fat * AnimalConfig.genetic_selection_index_weights["fat"]
+            + self.EBV_protein * AnimalConfig.genetic_selection_index_weights["protein"]
+        )
+
     @classmethod
     def set_top_semen_too_early_warning_raised(cls, birthdate_too_early_warning_raised: bool) -> None:
         """
