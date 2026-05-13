@@ -1,4 +1,7 @@
+![Manure module icon](../resources/images/man_icon.png){width=25%}
 # Manure Module
+<!-- reuse code to import functions from "../scripts/": -->
+{{< include ../scripts/_import-from-scripts.qmd >}}
 
 ## Introduction
 

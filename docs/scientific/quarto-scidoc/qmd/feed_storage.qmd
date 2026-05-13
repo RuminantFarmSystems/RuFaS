@@ -1,4 +1,8 @@
+![Feed Storage module icon](../resources/images/fee_icon.png){width=25%}
 # Feed Storage Module
+<!-- reuse code to import functions from "../scripts/": -->
+{{< include ../scripts/_import-from-scripts.qmd >}}
+
 
 ## Introduction 
 

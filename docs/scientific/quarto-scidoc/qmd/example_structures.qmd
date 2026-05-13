@@ -1,7 +1,6 @@
+<!-- reuse code to import functions from "../scripts/": -->
+{{< include ../scripts/_import-from-scripts.qmd >}}
 # Example Inserts
-
-
-
 ## Sectioning and Structure
 
 There is some variation between modules and documentation bassed on structure and needs of the model. However there are some materials, or ingredients if you will, that will remain consistent between modules. These include: Module Header, module introduction, sections representing components of module, section introductions, methodologies, relevant inputs, and relevant outputs.
@@ -25,7 +24,7 @@ require separate methodological descriptions and equations
 ### Methodology 
 - subsubsection header used to start descriptions
 
-#### Relevant Inputs or Relevant Outputs
+#### Required Inputs or Relevant Outputs
 emphasized headers should be used to report the inputs and outputs of the 
 relevant subsection. These usually include tables and bulleted lists. Tables 
 of inputs should include: 
@@ -35,6 +34,8 @@ of inputs should include:
 - Default
 - Min
 - Max
+
+Within the text, you can refer to any function or variable within the RuFaS model with `code` formatting (backticks). If you are referring to variables or items from equations 
 
 If there is no application for one of these (default, min, or max particularly), 
 do not leave the table cell blank. Please include "--" or "NA" depending on 
@@ -128,6 +129,7 @@ import_table(
 
 )
 ```
+
 ```markdown
 Each time you create a new table, you need to update 3 things within this code block: 
 * label: this should match the label of the .csv file you are using. For example, if your .csv file is named "tbl-an-example-struct.csv", then your label should be "tbl-an-example-struct". This will help with traceback and auditing. (Every file and label name should start with 'tbl' and followed with the appropriate 2 letter module abbreviation if applicable).

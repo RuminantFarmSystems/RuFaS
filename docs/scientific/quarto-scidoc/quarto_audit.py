@@ -86,18 +86,30 @@ CROSSREF_PREFIXES = (
 # $$ {#eq-an-nrc-2}
 DISPLAY_EQUATION_RE = re.compile(
     r":::\s*\{#(?P<eq_id>eq-[A-Za-z0-9][A-Za-z0-9:_-]*)\}\s*"
+    r"(?P<pre_body>.*?)"
     r"\$\$(?P<body>.*?)\$\$\s*"
-    r"(?P<label_html><div\s+class=[\"']eq-label[\"']>\s*\[?(?P<custom_id>[A-Za-z0-9.:-]+)\]?\s*</div>)?"
-    r"\s*:::",
+    r":::",
     re.DOTALL,
 )
-# Visible custom IDs inside equation text, preferred pattern
+
+# Visible custom IDs above equations, e.g.
+# [[**AN.NRC.2**]]{.aside .content-visible when-format="html"}
+EQ_CUSTOM_ASIDE_RE = re.compile(
+    r"\[\[\s*\*\*(?P<custom_id>[A-Za-z0-9.:-]+)\*\*\s*\]\]\s*\{[^}]*\.aside[^}]*\}"
+)
+
+# Older HTML-style custom IDs, e.g.
+# <p style="text-align: right;">[AN.NRC.2]</p>
+EQ_CUSTOM_HTML_RE = re.compile(
+    r"<p[^>]*>\s*\[?(?P<custom_id>[A-Za-z0-9.:-]+)\]?\s*</p>"
+)
+
+# Visible custom IDs inside equation text, e.g.
 # \text{(AN.NRC.2)}
 EQ_CUSTOM_TEXT_RE = re.compile(r"\\text\s*\{\s*\(([^(){}]+)\)\s*\}")
 
 # Optional fallback if any old \tag{...} still remains
 EQ_CUSTOM_TAG_RE = re.compile(r"\\tag\s*\{\s*([^{}]+?)\s*\}")
-
 
 # ------------------------------------------------------------
 # Helpers
@@ -395,17 +407,29 @@ def extract_equation_registry(text: str, relpath: str) -> list[dict]:
         lineno = line_number(text, match.start())
 
         custom_id = None
+        pre_body = match.group("pre_body")
 
-        if match.groupdict().get("custom_id"):
-            custom_id = normalize_custom_equation_id(match.group("custom_id"))
-        else:
-            text_match = EQ_CUSTOM_TEXT_RE.search(eq_body)
-            if text_match:
-                custom_id = normalize_custom_equation_id(text_match.group(1))
-            else:
-                tag_match = EQ_CUSTOM_TAG_RE.search(eq_body)
-                if tag_match:
-                    custom_id = normalize_custom_equation_id(tag_match.group(1))
+        aside_match = EQ_CUSTOM_ASIDE_RE.search(pre_body)
+        html_match = EQ_CUSTOM_HTML_RE.search(pre_body)
+        text_match = EQ_CUSTOM_TEXT_RE.search(eq_body)
+        tag_match = EQ_CUSTOM_TAG_RE.search(eq_body)
+
+        if aside_match:
+            custom_id = normalize_custom_equation_id(
+                aside_match.group("custom_id")
+            )
+        elif html_match:
+            custom_id = normalize_custom_equation_id(
+                html_match.group("custom_id")
+            )
+        elif text_match:
+            custom_id = normalize_custom_equation_id(
+                text_match.group(1)
+            )
+        elif tag_match:
+            custom_id = normalize_custom_equation_id(
+                tag_match.group(1)
+            )
 
         expected_id = expected_custom_equation_id(eq_id)
 

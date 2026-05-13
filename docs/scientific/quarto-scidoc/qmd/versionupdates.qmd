@@ -1,4 +1,6 @@
-# New Version Updates
+# Highlighted Updates
+<!-- reuse code to import functions from "../scripts/": -->
+{{< include ../scripts/_import-from-scripts.qmd >}}
 
 Each version of the RuFaS model is designed to improve the accuracy and precision of the predictive power of the model. This section aims to outline the changes made ... 
 

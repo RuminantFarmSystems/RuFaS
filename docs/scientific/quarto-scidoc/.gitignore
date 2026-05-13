@@ -11,9 +11,6 @@ site_libs/
 animal_files
 example_structures_files
 
-# audit output
-quarto_reference_audit.xlsx
-
 # ipynb files and checkpoints for example structure file
 *.quarto_ipynb
 .ipynb_checkpoints/
