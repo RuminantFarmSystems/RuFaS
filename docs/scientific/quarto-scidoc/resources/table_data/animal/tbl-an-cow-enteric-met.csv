@@ -1,4 +1,4 @@
- Variable Name , Definition , Units , Default , Max 
+﻿ Variable Name , Definition , Units , Default , Max 
  body_weight , Body weight of the current animal , kg ,-,-
  is_lactating , Indicates the cow's lactating status , Boolean ,-,-
  milk_fat , Milk fat content , % ,3.5,-

@@ -1,4 +1,4 @@
- Variable , Definition , Default , Min , Max 
+﻿ Variable , Definition , Default , Min , Max 
  Initial_animal_num , The initial number of animals that serve as a starting point for the population generation simulation ,10000,0, - 
  Simulation_days , The number of days to simulate for the population generation simulation ,5000,0, - 
  Calf_num , Number of Calves (head) -- The initial number of pre-weaned calves ,8,2, - 

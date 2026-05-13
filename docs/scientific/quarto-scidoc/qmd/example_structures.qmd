@@ -64,7 +64,7 @@ There is no formal process to inform how you name, but it is recommended that
 it is descriptive of the item you are labeling and it is concise to make 
 referencing easier.
 
-When you label anything, you must start with the structure type (sec, tbl, fig). Next you must indicate the 3 letter module abbreviate: 
+When you label anything, you must start with the structure type (sec, tbl, fig). Next you must indicate the 2 letter module abbreviate: 
 - an = Animal
 - ma = Manure
 - sc = Soil and Crop
@@ -118,26 +118,28 @@ The main adjustments you will need to make are the label, tbl-cap (caption), and
 
 If you are having trouble running this, be sure to check the sys.path.append location and the actual .csv file location.
 
+
 ```{python}
-
 #| label: tbl-an-example-struct
-#| tbl-cap: "This is an example caption for this example table."
-#| echo: false
-#| output: asis
+#| tbl-cap: This is an example caption for this example table.
+import_table(
+  "../resources/table_data/tbl-an-example-struct.csv",
+  colalign = ["left", "left", "right", "right", "right"]
 
-import sys
-sys.path.append("../scripts")
-
-from make_grid_table import make_markdown_table
-
-md_tab = make_markdown_table(
-    "../resources/table_data/tbl-an-example-struct.csv",
 )
+```
+```markdown
+Each time you create a new table, you need to update 3 things within this code block: 
+* label: this should match the label of the .csv file you are using. For example, if your .csv file is named "tbl-an-example-struct.csv", then your label should be "tbl-an-example-struct". This will help with traceback and auditing. (Every file and label name should start with 'tbl' and followed with the appropriate 2 letter module abbreviation if applicable).
+* tbl-cap: this is the caption for your table. It should be descriptive of the content of the table and should be concise.
+* file path: this is the location of your .csv file. It should be in the resources/table_data and then module folder before the name of the actual file. For example, if your file is named "tbl-an-example-struct.csv", then your file path should be "../resources/table_data/animal/tbl-an-example-struct.csv".
 
-print(md_tab)
+
+If you need more control over the alignment, you can use the colalign argument to specify the alignment of each column. The options are "left", "center", and "right". You can also adjust the width of the columns by adding additional spaces in the .csv file. 
+
+To command cell size, add "maxcolwidths = [5, 20, 5, 5]" (adjusting values as needed) below the colalign argument. The number in the list corresponds to the column number (starting from 0) and the value is the maximum width of that column in characters. If you want to allow the column to expand as needed, you can set the value to None.
 
 ```
-
 
 ### Option 2 - Create a .csv File before Generating the Table from your File
 A comprehensive, step-by-step guide to this process is available in qmd > scripts > quarto_python_test > python_tables_example files created by Clay. They also add some description details to option 1, so it may be good to review regardless of your preferred option.

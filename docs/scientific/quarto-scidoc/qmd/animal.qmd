@@ -81,10 +81,10 @@ For the rest of the simulation, animals enter the herd through birth as newborn 
 ```{python}
 #| label: tbl-an-sim-outline
 #| tbl-cap: Overview of the distinct phases by which animals are created and introduced to the herd.
+
 import_table(
-  "../resources/table_data/tbl-an-sim-outline.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+    "../resources/table_data/animal/tbl-an-sim-outline.csv",
+    colalign=["left", "left", "right", "right", "right"]
 )
 ```
 
@@ -93,9 +93,9 @@ import_table(
 #| label: tbl-an-herd-inputs
 #| tbl-cap: User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section.
 import_table(
-  "../resources/table_data/tbl-an-herd-inputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-herd-inputs.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 ```
 
@@ -184,9 +184,9 @@ pens as needed.
 #| tbl-cap: User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for
 #|  each pen, key inputs are outlined here.
 import_table(
-  "../resources/table_data/tbl-an-grp-inputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-grp-inputs.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 ```
 
@@ -219,9 +219,9 @@ following mapping from AnimalTypes to AnimalCombinations:
 #| label: tbl-an-def-grp
 #| tbl-cap: Summary of animal types and their grouping included in this module.
 import_table(
-  "../resources/table_data/tbl-an-def-grp.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-def-grp.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 ```
 Currently there are only two options for assigning AnimalCombinations to pens. 
@@ -382,6 +382,26 @@ $$
 <p style="text-align: right;">[AN.NRC.8]</p>
 :::
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Animal-level Process and Management
 
 ### RuFaS Bodyweight and Growth
@@ -408,10 +428,10 @@ These methods are further described by @Li2023
 #### Required User Inputs
 
 ```{python}
-#| label: tbl-animal-growth-req-inputs
+#| label: tbl-an-growth-req-inputs
 #| tbl-cap: Summary of the available inputs and their definitions.
 import_table(
-  "../resources/table_data/animal/animal-growth_required-inputs.csv",
+  "../resources/table_data/animal/tbl-an-growth-req-inputs.csv",
   colalign = ["left", "left", "right", "right", "right"]
 )
 ```
@@ -618,10 +638,10 @@ $$
 Where P1 and P2 are parameters with distinct values for primiparous and multiparous cows:
 
 ```{python}
-#| label: tbl-animal-growth-params
+#| label: tbl-an-growth-params
 #| tbl-cap: Summary of the available inputs that are available and their definitions.
 import_table(
-  "../resources/table_data/animal/animal-bwt-parameters.csv"
+  "../resources/table_data/animal/tbl-an-growth-params.csv"
 )
 ```
 
@@ -668,9 +688,7 @@ $$
 
 ## Methane Emission and Manure Excretion
 
-### Manure Excretion
-
-**Introduction**
+### Manure Excretion Introduction
 
 The Manure Excretion Calculator module computes manure excretion for different animal categories, including calves, 
 growing heifers, lactating cows, and dry cows. It calculates the quantities of total mass and nutrient composition in 
@@ -697,7 +715,7 @@ detailed manure excretion metrics, such as total manure mass, nutrient content, 
 animal-class specific methane potential is assigned to manure upon excretion. These outputs are used by the Manure 
 Module for downstream calculations, including manure methane (CH<sub>4</sub>) emissions and nutrient balance tracking.
 
-**Required User Inputs**
+#### Required User Inputs
 
 The Manure Excretion Calculator module computes manure excretion metrics for various animal categories. Inputs are 
 drawn from pen ration files and animal module constants. They are organized into the following groups:
@@ -706,9 +724,9 @@ drawn from pen ration files and animal module constants. They are organized into
 #| label: tbl-an-gen-manexc-inputs
 #| tbl-cap: General animal and diet inputs used to calculate nutrient intake and manure production.
 import_table(
-  "../resources/table_data/tbl-an-gen-manexc-inputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-gen-manexc-inputs.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 ```
 
@@ -717,9 +735,8 @@ import_table(
 #| label: tbl-an-cow-input-manexc
 #| tbl-cap: Cow related inputs, particularly relevant for lactating animals.
 import_table(
-  "../resources/table_data/tbl-an-cow-input-manexc.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-cow-input-manexc.csv",
+  colalign = ["left", "left", "right", "right", "right"]
 )
 ```
 
@@ -727,13 +744,13 @@ import_table(
 #| label: tbl-an-cow-phos-input-manexc
 #| tbl-cap: Phosphorus related inputs relevant to lactating cows.
 import_table(
-  "../resources/table_data/tbl-an-cow-phos-input-manexc.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-cow-phos-input-manexc.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 ```
 
-**Expected Outputs**
+#### Expected Outputs
 
 The outputs from the Manure Excretion Calculator are organized into two main categories: manure excretion values and 
 manure nutrient composition. These outputs are consistently generated across animal categories.
@@ -742,13 +759,13 @@ manure nutrient composition. These outputs are consistently generated across ani
 #| label: tbl-an-manexc-outputs
 #| tbl-cap: Expected outputs from the manure excretion calculator.
 import_table(
-  "../resources/table_data/tbl-an-manexc-outputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-manexc-outputs.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
+```
 
-
-**Methodology**
+### Methodology
 
 
 **1. Calf Manure Excretion (calculate_calf_manure)**
@@ -757,12 +774,13 @@ import_table(
 
 Manure: amount of feces and urine excreted daily by a calf (kg/d):
 
-::: {#eq-an-exc-1}
+:::{#eq-an-exc-1}
 [[**AN.EXC.1**]]{.aside .content-visible when-format="html"}
 $$
 \text{total\_manure\_excreted} = 3.45 \times \text{dry\_matter\_intake}
 $$
 :::
+
 
 Urine: amount of urine in kg, this is an assumption:
 
@@ -1264,9 +1282,8 @@ All references may be found at the end of this document or are based on expert c
 to 2024.
 ::: 
 
-### Enteric Methane Emission
+### Enteric Methane Emission Introduction
 
-**Introduction**
 
 The Enteric Methane Calculator module calculates daily enteric methane emissions for calves, heifers, lactating cows, 
 and dry cows. Methane emissions are estimated based on animal characteristics, dietary intake, and a variety of 
@@ -1294,9 +1311,9 @@ The calculated enteric methane emissions are directly output to the Output Manag
 #| label: tbl-an-gen-enteric-met
 #| tbl-cap: Animal and diet inputs used to calculate nutrient intake and manure production.
 import_table(
-  "../resources/table_data/tbl-an-gen-enteric-met.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-gen-enteric-met.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 
 ```
@@ -1305,9 +1322,9 @@ import_table(
 #| label: tbl-an-cow-enteric-met
 #| tbl-cap: Cow specific inputs, particularly relevant for lactating animals.
 import_table(
-  "../resources/table_data/tbl-an-cow-enteric-met.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-cow-enteric-met.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 
 ```
@@ -1316,9 +1333,9 @@ import_table(
 #| label: tbl-an-model-methane
 #| tbl-cap: Methane emissions model and mitigation strategy inputs.
 import_table(
-  "../resources/table_data/tbl-an-model-methane.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-model-methane.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 
 ```
@@ -1332,9 +1349,9 @@ This module predicts the daily enteric methane emissions for individual animals:
 #| label: tbl-an-output-methane
 #| tbl-cap: Expected outputs of the methane model.
 import_table(
-  "../resources/table_data/tbl-an-output-methane.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-output-methane.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 
 ```
@@ -1486,9 +1503,7 @@ seaweed planned for future integration.
 - The detailed methodology for methane mitigation calculations will be provided in a separate document titled Methane 
 Mitigation Calculator.
 
-### Enteric Methane Mitigation
-
-**Introduction**
+### Enteric Methane Mitigation Introduction
 
 The Methane Mitigation Calculator module evaluates the reduction in enteric methane yield due to the inclusion of 
 specific feed additives in animal diets. This module calculates methane mitigation effects on a per-animal basis by 
@@ -1502,7 +1517,7 @@ Future updates will include additional strategies such as essential oils and sea
 calculated as a percentage reduction in methane yield (methane production / DMI). Then this module integrates with 
 the Enteric Methane Calculator to adjust the initially predicted enteric methane. 
 
-**Required User Inputs**
+#### Required User Inputs
 
 The Methane Mitigation Calculator module evaluates the reduction in enteric methane yield based on dietary 
 composition and the use of specific feed additives. The inputs are organized into the following groups:
@@ -1511,9 +1526,9 @@ composition and the use of specific feed additives. The inputs are organized int
 #| label: tbl-an-enter-met-diet-mitigate
 #| tbl-cap: General dietary fiber and fat concentration inputs.
 import_table(
-  "../resources/table_data/tbl-an-enter-met-diet-mitigate.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-enter-met-diet-mitigate.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 
 ```
@@ -1522,30 +1537,32 @@ import_table(
 #| label: tbl-an-enter-met-additive-type-dose
 #| tbl-cap: Feed based mitigation strategies and dosing.
 import_table(
-  "../resources/table_data/tbl-an-enter-met-additive-type-dose.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-enter-met-additive-type-dose.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 
 ```
-**Expected Outputs**
+#### Expected Outputs
 
 This module predicts the daily enteric methane emissions for individual animals: Below is the
 [previous table from the Emissions section](#tbl-an-output-methane).
 
 
 ```{python}
-#| label: tbl-an-output-methane
+
 #| tbl-cap: Expected outputs of the methane model.
 import_table(
-  "../resources/table_data/tbl-an-output-methane.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-  maxcolwidths = [None, 20, None, None]
+  "../resources/table_data/animal/tbl-an-output-methane.csv",
+  colalign = ["left", "left", "right", "right", "right"]
+
 )
 
 ```
 
-**Methodology**
+
+
+### Methodology
 
 **3-NOP Methane Yield Reduction** Reduction is modeled as a function of additive dosage, NDF, EE, and starch concentrations.
 

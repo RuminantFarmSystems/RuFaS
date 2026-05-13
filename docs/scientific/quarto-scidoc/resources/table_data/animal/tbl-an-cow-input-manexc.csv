@@ -1,4 +1,4 @@
- Variable , Definition , Units , Default 
+﻿ Variable , Definition , Units , Default 
  is_lactating , Indicates the cow's lactating status , Boolean , NA 
  days_in_milk , Days post-parturition; for lactating cows only; Intermediate model output , days , NA 
  milk_protein , Milk protein content; for lactating cows only , % ,3.2
