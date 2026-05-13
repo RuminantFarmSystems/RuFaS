@@ -3162,6 +3162,10 @@ def test_evaluate_regex_fullmatch(text: str, pattern: str, expected: bool) -> No
 @pytest.mark.parametrize(
     "left,right,expected",
     [
+        ([], [], True),
+        ([1, 2, 3, 4], [3, 2, 1, 4], True),  # longer lists
+        ([1, 2, 3, 4], [1, 1, 5], False),  # left longer than right
+        ([1, 1, 5], [1, 2, 3, 4], False),  # right longer than left
         ([1], [2], True),
         ([1, 2], [3], False),
         ([], [], True),
