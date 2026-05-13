@@ -1,12 +1,11 @@
 {
   "cross_validation": [
     {
-      "description": "weather high, low, and average temperature arrays must have equal lengths",
+      "description": "CornSilage-CoverCrop schedule 0 has equal planting year/day lengths",
       "aliases": {
         "variables": {
-          "weather_high": "weather.high",
-          "weather_low": "weather.low",
-          "weather_avg": "weather.avg"
+          "planting_years": "CornSilage-CoverCrop.crop_schedules.0.planting_years",
+          "planting_days": "CornSilage-CoverCrop.crop_schedules.0.planting_days"
         }
       },
       "rules": [
@@ -16,7 +15,7 @@
               "operation": "no_op",
               "mode": "element_wise",
               "operands": [
-                "weather_high"
+                "planting_years"
               ]
             }
           },
@@ -25,28 +24,7 @@
               "operation": "no_op",
               "mode": "element_wise",
               "operands": [
-                "weather_low"
-              ]
-            }
-          },
-          "relationship": "is_equal_length"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": [
-                "weather_high"
-              ]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": [
-                "weather_avg"
+                "planting_days"
               ]
             }
           },
@@ -55,11 +33,11 @@
       ]
     },
     {
-      "description": "weather daily high temperatures must be greater than or equal to daily averages",
+      "description": "CornSilage-CoverCrop schedule 0 has equal harvest year/day lengths",
       "aliases": {
         "variables": {
-          "weather_high": "weather.high",
-          "weather_avg": "weather.avg"
+          "harvest_years": "CornSilage-CoverCrop.crop_schedules.0.harvest_years",
+          "harvest_days": "CornSilage-CoverCrop.crop_schedules.0.harvest_days"
         }
       },
       "rules": [
@@ -69,7 +47,7 @@
               "operation": "no_op",
               "mode": "element_wise",
               "operands": [
-                "weather_high"
+                "harvest_years"
               ]
             }
           },
@@ -78,20 +56,20 @@
               "operation": "no_op",
               "mode": "element_wise",
               "operands": [
-                "weather_avg"
+                "harvest_days"
               ]
             }
           },
-          "relationship": "greater_or_equal_to"
+          "relationship": "is_equal_length"
         }
       ]
     },
     {
-      "description": "weather daily average temperatures must be greater than or equal to daily lows",
+      "description": "CornSilage-CoverCrop schedule 1 has equal planting year/day lengths",
       "aliases": {
         "variables": {
-          "weather_avg": "weather.avg",
-          "weather_low": "weather.low"
+          "planting_years": "CornSilage-CoverCrop.crop_schedules.1.planting_years",
+          "planting_days": "CornSilage-CoverCrop.crop_schedules.1.planting_days"
         }
       },
       "rules": [
@@ -101,7 +79,7 @@
               "operation": "no_op",
               "mode": "element_wise",
               "operands": [
-                "weather_avg"
+                "planting_years"
               ]
             }
           },
@@ -110,11 +88,43 @@
               "operation": "no_op",
               "mode": "element_wise",
               "operands": [
-                "weather_low"
+                "planting_days"
               ]
             }
           },
-          "relationship": "greater_or_equal_to"
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "CornSilage-CoverCrop schedule 1 has equal harvest year/day lengths",
+      "aliases": {
+        "variables": {
+          "harvest_years": "CornSilage-CoverCrop.crop_schedules.1.harvest_years",
+          "harvest_days": "CornSilage-CoverCrop.crop_schedules.1.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
         }
       ]
     }
