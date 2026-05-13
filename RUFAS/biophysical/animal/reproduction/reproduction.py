@@ -2284,9 +2284,7 @@ class Reproduction:
     def assign_semen_type(
         self, population_ranking_index: list[float] | None, animal_ranking_index: float | None, animal_type: AnimalType
     ) -> None:
-        animal_ranking_index_percentile: float = (
-            np.mean(np.array(population_ranking_index) <= animal_ranking_index)
-        )
+        animal_ranking_index_percentile: float = np.mean(np.array(population_ranking_index) <= animal_ranking_index)
         semen_allocation_proportions = (
             AnimalConfig.heiferII_semen_allocation_proportions
             if animal_type == AnimalType.HEIFER_II
