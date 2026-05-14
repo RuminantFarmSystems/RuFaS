@@ -1,0 +1,20 @@
+﻿Variable,Description,Units
+ADG , average daily BW gain  ,grams per day (g/d)
+ADG , average daily gain ,g/d
+BW , Body weight ,kilograms (kg)
+BW , Body weight ,kg
+Ca\_Req , Total calcium requirement ,g/d
+Ca\_growth , Calcium requirement for growth ,g/d
+Ca\_lact , Calcium requirement for lactation ,g/d
+Ca\_main , Calcium requirement for maintenance ,g/d
+Ca\_preg , Calcium pregnancy requirement ,g/d
+DMI , dry matter intake  ,kg per day (kg/d)
+DOP , days of pregnancy ,d
+Milk , Milk yield ,kg/d
+MilkTP , Milk true protein ,%
+MW , mature body weight ,kg
+P\_lact , Phosphorus requirement for lactation ,g/d
+P\_Req , Total phosphorus requirement ,g/d
+P\_growth , Phosphorus requirement for growth ,g/d
+P\_main , Phosphorus requirement for maintenance ,g/d
+P\_preg , Phosphorus requirement for pregnancy ,g

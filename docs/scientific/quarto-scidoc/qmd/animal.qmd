@@ -138,7 +138,7 @@ Animals are sampled randomly with replacement from the `pre-animal-population` a
 
 All animals in RuFaS are assigned to a pen which is used to summarize nutrient requirements for diet formulation and feeding, aggregate enteric methane and manure excretions for reporting and passage to the Manure Module. Each pen tracks and updates daily a list of animals in the pen, the stocking density, the average nutrient requirement of the animals in the pen, the ration being fed to that pen, the manure excreted, and the methane emitted. In addition, constant attributes of each pen include the type of pen it is (`freestall`, `tiestall`, `open lot`, `compost bedded pack barn`), the type of animals that can be in that pen, the number stalls, the manure management practices associated with that pen, and the distance to the milking parlor for lactating cows.  Each day after the HerdManager has updated the status of each animal and determined which animals need to be bought or sold, the animals are added and removed from pens as needed. 
 
-#### Required UserInputs
+#### Required User Inputs
 ```{python}
 #| label: tbl-an-grp-inputs
 #| tbl-cap: User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for
@@ -672,16 +672,16 @@ import_table(
 )
 ```
 
-#### Mineral Requirements
-Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the mineral requirements key.
+##### Mineral Requirements
+Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the [mineral requirements key](#tbl-an-min-req-var).
 
 **Maintenance** <br>
 
 * Lactating and Dry Cows
 
-  * Calcium Equations
+*Calcium Equations*
 
-  :::{#eq-an-nrc-39}
+:::{#eq-an-nrc-39}
 [[**AN.NRC.39**]]{.aside .content-visible when-format="html"}
 $$
 \text{Ca}_{\text{main}} =
@@ -690,8 +690,7 @@ $$
 +
 0.08 \times \dfrac{\text{BW}}{100},
 & \text{for lactating cows} \\[10pt]
-
-0.0154 \times \text{BW}
+ 0.0154 \times \text{BW}
 +
 0.08 \times \dfrac{\text{BW}}{100},
 & \text{for dry cows}
@@ -700,9 +699,9 @@ $$
 :::
 
 
-  * Phosphorus Equations
+*Phosphorus Equations*
 
-  :::{#eq-an-nrc-40}
+:::{#eq-an-nrc-40}
 [[**AN.NRC.40**]]{.aside .content-visible when-format="html"}
 $$
 \text{P}_{\text{main}} =
@@ -711,7 +710,6 @@ $$
 +
 0.002 \times \text{BW},
 & \text{for lactating cows} \\[10pt]
-
 0.8 \times \text{DMI}
 +
 0.002 \times \text{BW},
@@ -722,9 +720,9 @@ $$
 
 * Heifers
 
-  * Calcium Equations
+*Calcium Equations*
 
-  :::{#eq-an-nrc-41}
+:::{#eq-an-nrc-41}
 [[**AN.NRC.41**]]{.aside .content-visible when-format="html"}
 $$
 \text{Ca}_{\text{main}}
@@ -735,23 +733,1419 @@ $$
 $$
 :::
 
+*Phosphorus Equations*
+:::{#eq-an-nrc-42}
+[[**AN.NRC.42**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{main}}
+=
+0.8 \times \text{DMI}
++
+0.002 \times \text{BW}
+$$
+:::
+
+**Growth** <br>
+
+*Calcium Equations*
+
+:::{#eq-an-nrc-43}
+[[**AN.NRC.43**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{growth}}
+=
+9.83
+\times
+\text{MW}^{0.22}
+\times
+\text{BW}^{-0.22}
+\times
+\frac{\text{ADG}}{0.96}
+$$
+:::
+
+*Phosphorus Equations*
+
+:::{#eq-an-nrc-44}
+[[**AN.NRC.44**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{growth}}
+=
+\left(
+1.2
++
+4.635
+\times
+\text{MW}^{0.22}
+\times
+\text{BW}^{-0.22}
+\right)
+\times
+\frac{\text{ADG}}{0.96}
+$$
+:::
+
+**Pregnancy** <br>
+
+*Calcium Equations*
+
+:::{#eq-an-nrc-45}
+[[**AN.NRC.45**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{preg}}
+=
+\begin{cases}
+0.02456 \times
+\exp\left(
+0.05581
+-
+0.00007 \times \text{DOP}^2
+\right)
+-
+0.02456 \times
+\exp\left(
+0.05581
+-
+0.00007 \times (\text{DOP} - 1)^2
+\right),
+& \text{if DOP > 190} \\[10pt]
+
+0,
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+*Phosphorus Equations*
+
+:::{#eq-an-nrc-46}
+[[**AN.NRC.46**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{preg}}
+=
+\begin{cases}
+0.02743 \times
+\exp\left(
+0.05527
+-
+0.000075 \times \text{DOP}^2
+\right)
+-
+0.02743 \times
+\exp\left(
+0.05527
+-
+0.000075 \times (\text{DOP} - 1)^2
+\right),
+& \text{if DOP > 190} \\[10pt]
+
+0,
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+**Lactation** <br>
+
+*Calcium Equations*
+
+:::{#eq-an-nrc-47}
+[[**AN.NRC.47**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{lact}} = 1.22 \times \text{Milk}
+$$
+:::
+
+*Phosphorus Equations*
+
+:::{#eq-an-nrc-48}
+[[**AN.NRC.48**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{lact}} = 0.9 \times \text{Milk}
+$$
+:::
+
+**Total Minerals** <br>
+
+*Calcium Equations*
+
+:::{#eq-an-nrc-49}
+[[**AN.NRC.49**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{req}}
+=
+\text{Ca}_{\text{main}}
++
+\text{Ca}_{\text{growth}}
++
+\text{Ca}_{\text{preg}}
++
+\text{Ca}_{\text{lact}}
+$$
+:::
+
+*Phosphorus Equations*
+
+:::{#eq-an-nrc-50}
+[[**AN.NRC.50**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{req}}
+=
+\text{P}_{\text{main}}
++
+\text{P}_{\text{growth}}
++
+\text{P}_{\text{preg}}
++
+\text{P}_{\text{lact}}
+$$
+:::
+
+
+```{python}
+#| label: tbl-an-min-req-var
+#| tbl-cap: Key variables used in mineral requirement calculations.
+import_table(
+  "../resources/table_data/animal/tbl-an-min-req-var.csv",
+  colalign = ["left", "left", "left"]
+
+)
+```
+
+
+##### Dry Matter Intake (DMI) Estimation
+
+Estimations are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to the [DMI requirements key](#tbl-an-dmi-var). The sum of DMI of each feed is assumed to be less than the estimated DMI:
+
+$$
+\sum_{i} \text{Feed}_{i} < \text{DMIest}
+$$
+
+**Lactating Cows** <br>
+
+:::{#eq-an-nrc-51}
+[[**AN.NRC.51**]]{.aside .content-visible when-format="html"}
+$$
+\text{FCM}
+=
+(0.4 \times \text{Milk})
++
+\left(
+15 \times \text{Fat\_Milk} \times \frac{\text{Milk}}{100}
+\right)
+$$
+:::
 
 
 
+:::{#eq-an-nrc-52}
+[[**AN.NRC.52**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest}
+=
+\left(
+0.372 \times \text{FCM}
++
+0.0968 \times \text{BW}^{0.75}
+\right)
+\times
+\left(
+1 -
+\exp\left(
+-0.192 \times \text{WOL} + 3.67
+\right)
+\right)
+$$
+:::
+
+**Dry Cows** <br>
+
+:::{#eq-an-nrc-53}
+[[**AN.NRC.53**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest}
+=
+\left(
+\frac{
+1.97
+-
+0.75 \times
+\exp\left(
+0.16 \times (\text{DOP} - 280)
+\right)
+}{
+100
+}
+\right)
+\times \text{BW}
+$$
+:::
+
+**Heifers** <br>
+
+* If the heifer is *LESS* than 365 days old:
+
+:::{#eq-an-nrc-54}
+[[**AN.NRC.54**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest}
+=
+\left(
+\text{BW}^{0.75}
+\times
+\frac{
+0.2435 \times \text{NEadj}
+-
+0.0466 \times \text{NEadj}^{2}
+-
+0.0869
+}{
+\text{NEadj}
+}
+\right)
+-
+\text{PREGadj}
+$$
+:::
+
+* If the heifer is *MORE* than 365 days old:
+
+:::{#eq-an-nrc-55}
+[[**AN.NRC.55**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest}
+=
+\left(
+\text{BW}^{0.75}
+\times
+\frac{
+0.2435 \times \text{NEadj}
+-
+0.0466 \times \text{NEadj}^{2}
+-
+0.1128
+}{
+\text{NEadj}
+}
+\right)
+-
+\text{PREGadj}
+$$
+:::
+
+
+```{python}
+#| label: tbl-an-dmi-var
+#| tbl-cap: Key variables used in DMI calculations.
+import_table(
+  "../resources/table_data/animal/tbl-an-dmi-var.csv",
+  colalign = ["left", "left", "left"]
+
+)
+```
+
+#### NASEM Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition
+
+##### Energy Requirements
+The maintenance requirement is calculated based on metabolic body weight (MBW, body weight\(^{0.75}\)) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to the NASEM energy requirements key.
+
+**Maintenance** <br>
+
+* Lactating and Dry Cows
+For Lactating cows, the body weight is adjusted both for the gravid uterine tissues and the uterine tissues for normal activity in confinement conditions, otherwise include adjustments for activity requirements under grazing conditions. 
+
+:::{#eq-an-nsm-1}
+[[**AN.NSM.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEmaint}
+=
+0.10
+\times
+(\text{MBW} - \text{GrUterW} - \text{UterW})^{0.75}
+$$
+:::
+
+:::{#eq-an-nsm-2}
+[[**AN.NSM.2**]]{.aside .content-visible when-format="html"}
+$$
+\text{GrUterW}
+=
+(\text{CBW} \times 1.825)
+\times
+\exp\left(
+-
+(0.0243 - (0.0000245 \times \text{DOP}))
+\times
+(280 - \text{DOP})
+\right)
+$$
+:::
+
+:::{#eq-an-nsm-3}
+[[**AN.NSM.3**]]{.aside .content-visible when-format="html"}
+$$
+\text{UterW}
+=
+\left(
+(\text{CBW} \times 0.2288 - 0.204)
+\times
+\exp(-0.2 \times \text{DyLact})
++
+0.204
+\right)
+$$
+:::
+
+$$
+\text{CW} = \text{inputvariable}
+$$
+
+
+*Otherwise*
+
+:::{#eq-an-nsm-4}
+[[**AN.NSM.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{CBW} = \text{MW} \times 0.06275
+$$
+:::
+
+* Heifers
+For heifers, the maintenance energy requirement is only adjusted for the gravid uterine weight:
+
+:::{#eq-an-nsm-5}
+[[**AN.NSM.5**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEmain}
+=
+0.10
+\times
+(\text{BW} - \text{GrUterW})^{0.75}
+$$
+:::
+
+**Activity** <br>
+Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy.
+
+:::{#eq-an-nsm-6}
+[[**AN.NSM.6**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa1}
+=
+\begin{cases}
+0,
+& \text{if } \dfrac{\text{Dt\_PastIn}}{\text{DtDMIn}} < 0.005 \\[10pt]
+\dfrac{\text{Dt\_PastIn}}{\text{DtDMIn}},
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+*Otherwise*
+
+:::{#eq-an-nsm-7}
+[[**AN.NSM.7**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa1}
+=
+\begin{cases}
+0.0075
+\times
+\text{BW}^{0.75}
+\times
+\left(
+\dfrac{600 - 12 \times \text{DtPastSupplIn}}{600}
+\right),
+& \text{if } \dfrac{\text{Dt\_PastIn}}{\text{DtDMIn}} \geq 0.005 \\[14pt]
+0,
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+Energy requirements for walking to and from the milking parlor are estimated as follows:
+
+:::{#eq-an-nsm-8}
+[[**AN.NSM.8**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa2}
+=
+0.00035
+\times
+\frac{\text{DistParlor}}{1000}
+\times
+\text{TripParlor}
+\times
+\text{BW}
+$$
+:::
+
+:::{#eq-an-nsm-9}
+[[**AN.NSM.9**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa3}
+=
+0.0067
+\times
+\frac{\text{EnvTopoParlor}}{1000}
+\times
+\text{BW}
+$$
+:::
+
+:::{#eq-an-nsm-10}
+[[**AN.NSM.10**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa}
+=
+\text{NEa1}
++
+\text{NEa2}
++
+\text{NEa3}
+$$
+:::
+
+
+**Growth** <br>
+In @nrc_2021, body frame gain (fat + protein) corresponds to the true growth and it is part of the calculation which is further partitioned into body reserves or condition gain (or loss), and pregnancy-associated gain (considered a pregnancy requirement). <br>
+
+The value shown below was calculated but was never utilized in any further calculations in the model’s current version. Thus, it has been omitted from the model and remains solely as a reference to past versions of the model.
+
+:::{#eq-an-nsm-11}
+[[**AN.NSM.11**]]{.aside .content-visible when-format="html"}
+$$
+\text{EBW} = 0.85 \times \text{BW}
+$$
+:::
+
+:::{#eq-an-nsm-12}
+[[**AN.NSM.12**]]{.aside .content-visible when-format="html"}
+$$
+\text{EBG} = 0.85 \times \text{ADG}
+$$
+:::
+
+:::{#eq-an-nsm-13}
+[[**AN.NSM.13**]]{.aside .content-visible when-format="html"}
+$$
+\text{FatADG}
+=
+\left(
+0.067
++
+0.375 \times \frac{\text{BW}}{\text{MW}}
+\right)
+\times
+\frac{\text{EBG}}{\text{ADG}}
+$$
+:::
+
+:::{#eq-an-nsm-14}
+[[**AN.NSM.14**]]{.aside .content-visible when-format="html"}
+$$
+\text{ProtADG}
+=
+\left(
+0.201
++
+0.081 \times \frac{\text{BW}}{\text{MW}}
+\right)
+\times
+\frac{\text{EBG}}{\text{ADG}}
+$$
+:::
+
+:::{#eq-an-nsm-15}
+[[**AN.NSM.15**]]{.aside .content-visible when-format="html"}
+$$
+\text{REFADG}
+=
+9.4 \times \text{FatADG}
++
+5.55 \times \text{ProtADG}
+$$
+:::
+
+
+:::{#eq-an-nsm-16}
+[[**AN.NSM.16**]]{.aside .content-visible when-format="html"}
+$$
+\text{MEFrameADG}
+=
+\frac{\text{REFADG}}{0.4}
+$$
+:::
+
+:::{#eq-an-nsm-17}
+[[**AN.NSM.17**]]{.aside .content-visible when-format="html"}
+$$
+\text{NElFrameADG}
+=
+\frac{\text{REFADG}}{0.61}
+$$
+:::
+
+**Pregnancy** <br>
+Daily rates of wet tissue deposition (kg/d) are derived from equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.3](#eq-an-nsm-3) as defined above.
+
+* During Gestation
+
+:::{#eq-an-nsm-18}
+[[**AN.NSM.18**]]{.aside .content-visible when-format="html"}
+$$
+\text{GrUterWGain}
+=
+\left(
+0.0243
+-
+(0.0000245 \times \text{DayGest})
+\right)
+\times
+\text{GrUterW}
+$$
+:::
+
+* During Involution
+
+:::{#eq-an-nsm-19}
+[[**AN.NSM.19**]]{.aside .content-visible when-format="html"}
+$$
+\text{MEpreg}
+=
+\begin{cases}
+\left(
+2 \times 0.00159 \times \text{DOP}
+- 0.0352
+\right)
+\times
+\dfrac{\text{CBW}}{45}
+\times
+0.14,
+& \text{if DOP > 190} \\[10pt]
+0,
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+*Otherwise*
+
+:::{#eq-an-nsm-20}
+[[**AN.NSM.20**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEpreg} = \text{MEpreg} \times 0.64
+$$
+:::
+
+**Lactation** <br>
+
+:::{#eq-an-nsm-21}
+[[**AN.NSM.21**]]{.aside .content-visible when-format="html"}
+$$
+\text{MilkEn}
+=
+0.0929 \times \text{Fat\_Milk}
++
+0.0547 \times \text{Prot\_Milk}
++
+0.0395 \times \text{Lact\_Milk}
+$$
+:::
+
+If true protein, (`TP_Milk`) is measured, its energy content is adjusted to account for the energy of Non-Protein-Nitrogen (NPN), then use the following equation. 
+
+:::{#eq-an-nsm-22}
+[[**AN.NSM.22**]]{.aside .content-visible when-format="html"}
+$$
+\text{MilkEn}
+=
+0.0929 \times \text{Fat\_Milk}
++
+0.0585 \times \text{TP\_Milk}
++
+0.0395 \times \text{Lact\_Milk}
+$$
+:::
+
+##### Protein Requirements
+These are divided into 4 components: maintenance, growth, pregnancy, and lactation (all in MP). The last is defined as the sum of rumen undegraded protein (RUP + microbial protein (MICP)). Requirements for EEA are also included in @nrc_2021 but have not yet been implemented.
+
+Each physiological function is quantified in terms of TP (true protein), instead of CP (crude protein).
+
+To convert both net protein and net amino acid values to a metabolizable basis, net values have to be divided into the calculated efficiencies for each physiological function. Efficiencies can be either fixed or combined for lactating cows. For simplicity, requirements were included on a fixed basis. For details about the variables included in each calculation, please refer to the [protein requirements key](#tbl-an-nasem-prot-req-var).
+
+
+**Maintenance** <br>
+The protein requirements for non-productive functions (the quantification of protein secretion and accretion), include: scurf + endogenous urinary loss + metabolic fecal protein.
+
+* Scurf Protein
+
+:::{#eq-an-nsm-23}
+[[**AN.NSM.23**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPscurf}
+=
+0.20
+\times
+\text{BW}^{0.60}
+\times
+0.85
+$$
+:::
+
+:::{#eq-an-nsm-24}
+[[**AN.NSM.24**]]{.aside .content-visible when-format="html"}
+$$
+\text{NetAAscurf}
+=
+\text{NPscurf}
+\times
+\frac{\text{AACorrScurf}}{100}
+$$
+:::
+
+* Endogenous Protein
+
+:::{#eq-an-nsm-25}
+[[**AN.NSM.25**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPEndUrin}
+=
+53
+\times
+6.25
+\times
+\text{BW}
+\times
+0.001
+$$
+:::
+
+:::{#eq-an-nsm-26}
+[[**AN.NSM.26**]]{.aside .content-visible when-format="html"}
+$$
+\text{NetAAEndUrin}
+=
+0.010
+\times
+6.25
+\times
+\text{BW}
+\times
+\frac{\text{AACorrWhEmpBody}}{100}
+$$
+:::
+
+* Metabolic Fecal Protein -The daily loss of CP as metabolic fecal protein (MFP) is estimated using the following equation.
+
+:::{#eq-an-nsm-27}
+[[**AN.NSM.27**]]{.aside .content-visible when-format="html"}
+$$
+\text{CPMFP}
+=
+(11.62 + 0.134 \times \text{NDF})
+\times
+\text{DMI}
+$$
+:::
+
+:::{#eq-an-nsm-28}
+[[**AN.NSM.28**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPMFP}
+=
+\text{CPMFP}
+\times
+0.73
+$$
+:::
+
+:::{#eq-an-nsm-29}
+[[**AN.NSM.29**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPAAMFP}
+=
+\text{NPMFP}
+\times
+\frac{\text{AACorrMFP}}{100}
+$$
+:::
+
+**Growth** <br>
+There are two important concepts: frame growth and BW changes related to the mobilization of body reserves.
+
+The following are the protein requirements associated with growth associated with increased frame size:
+
+:::{#eq-an-nsm-30}
+[[**AN.NSM.30**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPGrowth}_{\text{Frame}}
+=
+\text{FrameWG}
+\times
+0.11
+\times
+0.86
+$$
+:::
+
+If the change in BW is not frame growth but rather a change in body reserves, then the following equation is used because the protein content is assumed to be 8.0 percent protein.
+
+:::{#eq-an-nsm-31}
+[[**AN.NSM.31**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPGrowth}_{\text{Tissue}}
+=
+\text{TissueWG}
+\times
+0.08
+\times
+0.86
+$$
+:::
+
+The following equation is used to translate the protein requirement into the requirement for AA:
+
+:::{#eq-an-nsm-32}
+[[**AN.NSM.32**]]{.aside .content-visible when-format="html"}
+$$
+\text{NetAAGrowth}
+=
+\text{NPGrowth}
+\times
+\frac{\text{AACorrWEBW}}{100}
+$$
+:::
+
+**Pregnancy** <br>
+
+:::{#eq-an-nsm-33}
+[[**AN.NSM.33**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPGest}
+=
+\text{GainGrUter}
+\times
+125
+$$
+:::
+
+
+:::{#eq-an-nsm-34}
+[[**AN.NSM.34**]]{.aside .content-visible when-format="html"}
+$$
+\text{NetAAGest}
+=
+\text{NPGest}
+\times
+\frac{\text{AACorrWEBW}}{100}
+$$
+:::
+
+**Lactation** <br>
+
+:::{#eq-an-nsm-35}
+[[**AN.NSM.35**]]{.aside .content-visible when-format="html"}
+$$
+\text{NetAAMilk}
+=
+\text{NPMilk}
+\times
+\frac{\text{AAcalcMilk}}{100}
+$$
+:::
+
+**Total Requirements** <br>
+* Lactating Cows
+
+:::{#eq-an-nsm-36}
+[[**AN.NSM.36**]]{.aside .content-visible when-format="html"}
+$$
+\text{RecomMPSupply1}
+=
+\left[
+\frac{
+\text{NetAAScurf}
++
+\text{NetAAMFP}
++
+\text{NetAAMilk}
++
+\text{NetAAGrowth}
+}{
+\text{TargetEffMP}
+}
+\right]
++
+\frac{\text{NPGest}}{0.33}
++
+\text{NPEndUrin}
+$$
+:::
+
+:::{#eq-an-nsm-37}
+[[**AN.NSM.37**]]{.aside .content-visible when-format="html"}
+$$
+\text{RecomMPAASupply1}
+=
+\frac{
+\text{NPScurf}
++
+\text{NPMFP}
++
+\text{NPMilk}
++
+\text{NPGrowth}
+}{
+\text{TargetEffAA}
+}
++
+\frac{\text{NetAAGest}}{0.33}
++
+\text{NetAAEndUrin}
+$$
+:::
+
+* Late Gestation Heifers and Cows
+
+:::{#eq-an-nsm-38}
+[[**AN.NSM.38**]]{.aside .content-visible when-format="html"}
+$$
+\text{RecomMPSupply2}
+=
+\frac{
+\text{NPScurf}
++
+\text{NPMFP}
+}{
+\text{TargetEffMP}
+}
++
+\frac{\text{NPGest}}{0.33}
++
+\frac{\text{NPGrowth}}{0.4}
++
+\text{NPEndUrin}
+$$
+:::
+
+:::{#eq-an-nsm-39}
+[[**AN.NSM.39**]]{.aside .content-visible when-format="html"}
+$$
+\text{RecomMPAASupply2}
+=
+\frac{
+\text{NetAAScurf}
++
+\text{NetAAMFP}
+}{
+\text{NetAAMFP}
+}
++
+\frac{\text{NetAAGest}}{0.33}
++
+\frac{\text{NetAAGrowth}}{0.4}
++
+\text{NPEndUrin}
+$$
+:::
+
+```{python}
+#| label: tbl-an-nasem-prot-req-var
+#| tbl-cap: Key variables used in protein requirement calculations.
+import_table(
+  "../resources/table_data/animal/tbl-an-nasem-prot-req-var.csv",
+  colalign = ["left", "left", "left"]
+
+)
+```
+::: {.callout-note}
+AA = Amino Acids; MFP= Metabolic Fecal Protein
+*Fixed values are establish by NASEM and are not user defined (@nrc_2021)
+:::
+
+##### Mineral Requirements
+Only calcium and phosphorus requirements are included in the code at present. For details about the variables included in each calculation, please refer to the mineral requirements key.
+
+**Maintenance** <br>
+
+* Calcium Equations
+
+:::{#eq-an-nsm-40}
+[[**AN.NSM.40**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{main}}
+=
+0.90 \times \text{DMI}
+$$
+:::
+
+* Phosphorus Equations
+
+:::{#eq-an-nsm-41}
+[[**AN.NSM.41**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{main}}
+=
+1.0 \times \text{DMI}
++
+0.0006 \times \text{BW}
+$$
+:::
+
+**Growth** <br>
+
+* Calcium Equations
+
+:::{#eq-an-nsm-42}
+[[**AN.NSM.42**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{growth}}
+=
+9.83
+\times
+\text{MW}^{-0.22}
+\times
+\text{BW}^{-0.22}
+\times
+\text{ADG}
+$$
+:::
+
+* Phosphorus Equations
+
+:::{#eq-an-nsm-43}
+[[**AN.NSM.43**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{growth}}
+=
+\left(
+1.2
++
+4.635
+\times
+\text{MW}^{0.22}
+\times
+\text{BW}^{-0.22}
++
+\text{ADG}
+\right)
+$$
+:::
+
+**Pregnancy** <br>
+
+* Calcium Equations
+
+:::{#eq-an-nsm-44}
+[[**AN.NSM.44**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{preg}}
+=
+\begin{cases}
+0.02456 \times \exp\left((0.05581 - 0.00007 \times \text{DOP}) \times \text{DOP}\right)
+-
+0.02456 \times \exp\left((0.05581 - 0.00007 \times (\text{DOP} - 1)) \times (\text{DOP} - 1)\right)
+\times
+\dfrac{\text{BW}}{715},
+& \text{if DOP > 190} \\[10pt]
+0,
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+* Phosphorus Equations
+
+:::{#eq-an-nsm-45}
+[[**AN.NSM.45**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{preg}}
+=
+\begin{cases}
+\left(
+0.02743
+\times
+\exp\left(
+(0.05527 - 0.000075 \times \text{DOP})
+\times
+\text{DOP}
+\right)
+\right.
+\\[6pt]
+
+\left.
+-
+0.02743
+\times
+\exp\left(
+(0.05527 - 0.000075 \times (\text{DOP} - 1))
+\times
+(\text{DOP} - 1)
+\right)
+\times
+\left(
+\frac{\text{BW}}{715}
+\right)
+\right),
+& \text{if DOP > 190} \\[12pt]
+
+0,
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+The denominator, 715 kg, is the average cow weight in the study by @house1993; therefore, the pregnancy (gestation) requirement is scaled to that BW. For details see Page 107 in the Minerals chapter of (@nrc_2021). IF DOP $<$ 190; then it is assumed that Ca\_Preg is equal to zero.
+
+**Lactation** <br>
+
+* Calcium Equations
+
+:::{#eq-an-nsm-46}
+[[**AN.NSM.46**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{lact}}
+=
+(0.295 + 0.239 \times \text{MilkTP})
+\times
+\text{Milk}
+$$
+:::
+
+
+* Phosphorus Equations
+
+:::{#eq-an-nsm-47}
+[[**AN.NSM.47**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{lact}}
+=
+\begin{cases}
+\text{Milk}
+\times
+(0.496 + 0.13 \times \text{TPMilk}) \\[8pt]
+
+\text{Milk} \times 0.90
+\end{cases}
+$$
+:::
+
+**Total Requirements** <br>
+* Calcium Equations
+
+:::{#eq-an-nsm-48}
+[[**AN.NSM.48**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{req}}
+=
+\text{Ca}_{\text{main}}
++
+\text{Ca}_{\text{growth}}
++
+\text{Ca}_{\text{preg}}
++
+\text{Ca}_{\text{lact}}
+$$
+:::
+
+* Phosphorus Equations
+
+:::{#eq-an-nsm-49}
+[[**AN.NSM.49**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{lact}}
+=
+\text{P}_{\text{main}}
++
+\text{P}_{\text{growth}}
++
+\text{P}_{\text{preg}}
++
+\text{P}_{\text{lact}}
+$$
+:::
 
 
 
+```{python}
+#| label: tbl-an-nasem-min-req-var
+#| tbl-cap: Key variables used in mineral requirement calculations.
+import_table(
+  "../resources/table_data/animal/tbl-an-nasem-min-req-var.csv",
+  colalign = ["left", "left", "left"]
+
+)
+```
 
 
+##### DMI Estimation
+Dry matter intake estimation is different for lactating cows and dry cows. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation For details about the variables included in each calculation, please refer to the DMI estimation key.
+
+$$
+\sum_{i} \text{Feed}_{i} < \text{DMIest}
+$$
+
+**Lactating Cows** <br>
+
+:::{#eq-an-nsm-50}
+[[**AN.NSM.50**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest}
+=
+\left(
+(3.7 + \text{Parity} \times 5.7)
++
+0.305 \times \text{MilkE}
++
+0.022 \times \text{BW}
++
+(-0.689 - 1.87 \times \text{Parity}) \times \text{BCS}
+\right)
+\times
+\left(
+1
+-
+(0.212 + \text{Parity} \times 0.136)
+\times
+\exp(-0.053 \times \text{DIM})
+\right)
+$$
+:::
+
+**Dry Cows and Growing Heifers** <br>
+
+:::{#eq-an-nsm-51}
+[[**AN.NSM.51**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest}
+=
+\left(
+0.0226
+\times
+\text{MatBW}
+\times
+\left(
+1
+-
+\exp\left(
+-1.47
+\times
+\left(
+\frac{\text{BW}}{\text{MatBW}}
+\right)
+\right)
+\right)
+\right)
+-
+\left(
+0.082
+\times
+\left(
+\text{NDF}
+-
+\left(
+23.1
++
+56
+\times
+\frac{\text{BW}}{\text{MatBW}}
+-
+30.6
+\times
+\left(
+\frac{\text{BW}}{\text{MatBW}}
+\right)^2
+\right)
+\right)
+\right)
+$$
+:::
+
+```{python}
+#| label: tbl-an-nasem-dmi-var
+#| tbl-cap: Key variables used in DMI estimation calculations.
+import_table(
+  "../resources/table_data/animal/tbl-an-nasem-dmi-var.csv",
+  colalign = ["left", "left", "left"]
+
+)
+```
+
+#### NASEM Calculation Amino Acid Requirements
+The methods for estimating the amino acids requirements for lactating cows based on the \textcite{nrc2021}, into RuFaS are described below.
+
+* Amino acids are divided into essential (EAA) and non-essential (NEAA).
+* This section will focus on calculating the requirements for the essential amino acids. The EAA and NEAA are listed in the next table.
+* Find the equations in RuFaS in `amino_acid.py`
+
+```{python}
+#| label: tbl-an-nasem-eaaneaa-key
+#| tbl-cap: Essential and non-essential amino acids.
+import_table(
+  "../resources/table_data/animal/tbl-an-nasem-eaaneaa-key.csv",
+  colalign = ["left", "left", "left"]
+
+)
+```
+
+##### EEA Calculations
+The AA requirements for lactating cows are categorized into maintenance, growth, pregnancy, and lactation. Notice that the first variable from each equation comes from the outputs of the metabolizable protein equations that are already in the RuFaS model. The second variable corresponds to the composition of AA used or secreted for each metabolic state (maintenance, growth, pregnancy, and lactation) of the cow, we can find those values in Table 6-2 (page 79) of @nrc_2021. The subscript "i" in the equations represents each specific amino acid being calculated; for example, `TotalAArequirementsi_ii` refers to the total requirements for individual amino acids such as methionine, lysine, arginine, and others.
 
 
+**Maintenance** <br>
+* Scurf Protein
+
+$$
+\text{NetAAscurf}_{i}
+=
+\text{NPscurf}
+\times
+\frac{\text{AACorrScurf}_{i}}{100}
+$$
+
+* Endogenous Urinary Protein
+
+$$
+\text{NetAAEndUrine}_{i}
+=
+0.010
+\times
+6.25
+\times
+\text{BW}
+\times
+\frac{\text{AACorrWholeEmptyBody}_{i}}{100}
+$$
+
+* Metabolic Fecal Protein
+
+$$
+\text{NetAAMFP}_{i}
+=
+\text{NPMFP}
+\times
+\frac{\text{AACorrMFP}_{i}}{100}
+$$
+
+**Growth** <br>
+
+$$
+\text{NetAAGrowth}_{i}
+=
+\text{NPGrowth}
+\times
+\frac{\text{AACorrWholeEmptyBody}_{i}}{100}
+$$
+
+**Pregnancy** <br>
+$$
+\text{NetAAGest}_{i}
+=
+\text{NPGest}
+\times
+\frac{\text{AACorrWholeEmptyBody}_{i}}{100}
+$$
+
+**Lactation** <br>
+
+$$
+\text{NetAAMilk}_{i}
+=
+\text{NPMilk}
+\times
+\frac{\text{AAcalcMilk}_{i}}{100}
+$$
+
+**Total Requirements** <br>
+Here are the equations for calculating the total \(AA_{\text{i}}\) requirements for lactating cows, late-gestation cows, and heifers. 
+
+The variables needed to calculate these equations come from the outputs generated in the AA requirements equations for scurf, endogenous urine, metabolic fecal protein, growth, gestation, and milk production (see formulas above). 
+
+The $\text{TargetEfficiencyAA}_{i}$ variable, refers to the target efficiency required to convert the EAA to build proteins and support body gain. It is a fixed value, and it can be found in Table 6-4 (page 88) of @nrc_2021.
+  
+* Lactating Cows
+
+$$
+\text{TotalAArequirements}_{i}
+=
+\left(
+\frac{
+\text{NetAAscurf}_{i}
++
+\text{NetAAMFP}_{i}
++
+\text{NetAAGrowth}_{i}
++
+\text{NetAAMilk}_{i}
+}{
+\text{TargetEfficiencyAA}_{i}
+}
+\right)
++
+\left(
+\frac{
+\text{NetAAGest}_{i}
+}{
+\text{TargetEfficiencyGest}
+}
+\right)
++
+\text{NetAAEndUrine}_{i}
+$$
+
+* Late Gestation Cows and Heifers
+
+$$
+\text{TotalAArequirements}_{i}
+=
+\left(
+\frac{
+\text{NetAAscurf}_{i}
++
+\text{NetAAMFP}_{i}
+}{
+\text{TargetEfficiencyAA}_{i}
+}
+\right)
++
+\left(
+\frac{
+\text{NetAAGrowth}_{i}
+}{
+\text{TargetEfficiencyGrowth}
+}
+\right)
++
+\left(
+\frac{
+\text{NetAAGest}_{i}
+}{
+\text{TargetEfficiencyGest}
+}
+\right)
++
+\text{NetAAEndUrine}_{i}
+$$
 
 
+::: {.callout-note}
+If there are any questions regarding calculations regarding calculations of maintenance AA requirements for Lactating Cows and/or Total AA requirement of Lactating or Late Gestation Cows and Heifers, please refer to Tables 6-2 and 6-4 in @nrc_2021.
+:::
+
+```{python}
+#| label: tbl-an-nasem-aa-req-var
+#| tbl-cap: Key variables used in calculation of AA.
+import_table(
+  "../resources/table_data/animal/tbl-an-nasem-aa-req-var.csv",
+  colalign = ["left", "left", "left"]
+
+)
+```
 
 
-
-
-
+### Energy and Nutrition Supply
 
 
 ## Animal-level Process and Management

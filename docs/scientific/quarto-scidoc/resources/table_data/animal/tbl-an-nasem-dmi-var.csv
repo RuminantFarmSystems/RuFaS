@@ -1,0 +1,9 @@
+﻿Variable,Description,Units
+BCS , Body condition score ,Scale of 1 to 5
+BW , Body weight ,kilograms (kg)
+DIM , Days in milk ,days (d)
+DMIest , Dry matter intake estimation ,kg/d
+MatBW , Mature body weight ,kg/d
+MilkE , Milk energy ,Mcal/d
+NDF , Neutral detergent fiber in diet ,%
+Parity , adjustment factor ,primiparous (0) or multiparous (1)

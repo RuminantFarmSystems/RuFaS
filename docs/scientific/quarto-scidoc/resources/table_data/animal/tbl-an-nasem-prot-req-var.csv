@@ -1,0 +1,27 @@
+﻿Variable,Description,Units
+125 (coefficient)  ,  Daily gain in mass of the gravid uterus ,Estimated constant 125 grams (g) of protein per kilogram (kg) of wet weight.
+AAcalcMilk  ,  Estimated AA composition of the true protein (TP) fraction involved in the estimation of AA Supply and recommendations ,g of AA per 100 g of TP
+AACorrMFP  ,  AA corrected for MFP  , Fixed Value
+AACorrScurf , Each AA excreted as scurf  , Fixed Value
+AACorrWEBW  ,  Each AA excreted as assuming whole empty body weight  , Fixed Value
+AACorrWEBW  ,  Each AA excreted assuming whole empty body composition  , Fixed Value
+BW  ,  body weight  ,kilograms (kg)
+CPMFP  ,  Crude protein (CP) in MFP  ,grams per day (g/d)
+DMI  ,  Dry matter intake ,kg per day (kg/d)
+FrameWG  ,  Daily increase in body weight due to increased frame size ,kg/d
+GainGrUter  ,  Daily gain in mass of the gravid uterus  ,kg/d
+NetAA-Milk  ,  Net AA yield in milk  ,g/d
+NetAAGest  ,  AA composition of protein accretion associated with pregnancy ,g/d
+NetAAGrowth  ,  Net AA requirement for body frame weight gain  ,g/d
+NetAAMFP ,  Net AA requirement for metabolic fecal protein  ,g/d
+NetAAEndUrin  ,  Net AA requirement for endogenous urinary excretion  ,g/d
+NetAAscurf  ,  Net AA demand for scurf excretion  ,g/d
+NDF  ,  Neutral detergent fiber in the diet ,% DM
+NPGest ,  Net protein requirement for pregnancy  ,g/d
+NPGrowth ,  Net protein requirement for body frame weight gain ,g/d
+NPMFP  ,  Net protein requirement for metabolic fecal protein i ,g/d; assuming 73 % of TP in MFP
+NPMilk  ,  Milk's TP yield  ,g/d
+NPscurf  ,   Net protein requirement for scurf  ,g/d
+PEndUrin  ,   Net protein requirement for endogenous urinary excretion  ,g/d
+TargetEffMP and TargetEffAA ,  Proposed target efficiencies of converting metabolizable protein (MP) and essential amino acids (EAA) to export proteins and body gain  , Fixed Value
+,,
