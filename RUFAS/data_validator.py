@@ -1709,7 +1709,6 @@ class DataValidator:
         >>> DataValidator.extract_value_by_key_list(example_data, var_path)
         'straw'
         """
-
         for key in variable_path:
             if isinstance(data, list) and 0 <= int(key) < len(data):
                 data = data[int(key)]
@@ -2707,7 +2706,6 @@ class CrossValidator:
 
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
         """Evaluates the if_type condition"""
-        # TODO: Remove these type checks when cross validation inputs' validation is implemented - issue #2615
         if not isinstance(data_type[0], str):
             self._event_logs.append(
                 {
