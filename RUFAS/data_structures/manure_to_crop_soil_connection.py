@@ -168,7 +168,7 @@ class NutrientRequestResults:
                 combined_ammonium_nitrogen_fraction = (
                     self.ammonium_nitrogen_fraction * self_inorganic_contribution
                     + other.ammonium_nitrogen_fraction * other_inorganic_contribution
-                )
+                )/(self_inorganic_contribution + other_inorganic_contribution)
             else:
                 combined_ammonium_nitrogen_fraction = self.ammonium_nitrogen_fraction
         else:
