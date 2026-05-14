@@ -10,7 +10,7 @@ from RUFAS.data_structures.manure_types import ManureType
 
 @mark.parametrize("nitrogen_one", [100, 0])
 @mark.parametrize("nitrogen_two", [125, 0])
-@mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99])
+@mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99]) # TODO: how to handle zero?
 @mark.parametrize("inorganic_frac_two", [0.2, 0.01, 0.99])
 @mark.parametrize("ammonium_frac_one", [0.1, 0.01, 0.99])
 @mark.parametrize("ammonium_frac_two", [0.5, 0.01, 0.99])
@@ -49,7 +49,7 @@ def test_add_nitrogen_nutrient_request_results(
     ## Expected values
     expected_nitrogen = nitrogen_one + nitrogen_two
 
-    if expected_nitrogen <= 0: # both zero
+    if expected_nitrogen <= 0: # both zero TODO: I'm confused by this.
         expected_inorganic_frac = inorganic_frac_one
         expected_organic_frac = organic_frac_one
         expected_ammonium_frac = ammonium_frac_one
@@ -75,9 +75,49 @@ def test_add_nitrogen_nutrient_request_results(
     assert combined_request.organic_nitrogen_fraction == pytest.approx(expected_organic_frac)
     assert combined_request.ammonium_nitrogen_fraction == pytest.approx(expected_ammonium_frac)
 
+@mark.parametrize("phosphorus_one", [100, 0])
+@mark.parametrize("phosphorus_two", [125, 0])
+@mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99]) # TODO: how to handle zero?
+@mark.parametrize("inorganic_frac_two", [0.2, 0.01, 0.99])
+def test_add_phosphorus_nutrient_request_results(
+        phosphorus_one: float, phosphorus_two: float, inorganic_frac_one: float, inorganic_frac_two: float,
+):
+    # Assemble
+    organic_frac_one = 1 - inorganic_frac_one
+    organic_frac_two = 1 - inorganic_frac_two
 
-def test_add_phosphorus_nutrient_request_results():
-    assert False
+    first_request = NutrientRequestResults(
+        phosphorus = phosphorus_one,
+        inorganic_phosphorus_fraction = inorganic_frac_one,
+        organic_phosphorus_fraction = organic_frac_one,
+    )
+    second_request = NutrientRequestResults(
+        phosphorus = phosphorus_two,
+        inorganic_phosphorus_fraction = inorganic_frac_two,
+        organic_phosphorus_fraction = organic_frac_two,
+    )
+
+    # Act
+    ## Expected
+    expected_phosphorus = phosphorus_one + phosphorus_two
+
+    if expected_phosphorus <= 0:
+        expected_inorganic_fraction = inorganic_frac_one
+        expected_organic_fraction = organic_frac_one
+    else:
+        inorganic_one = inorganic_frac_one * phosphorus_one
+        inorganic_two = inorganic_frac_two * phosphorus_two
+        expected_inorganic_fraction = (inorganic_one + inorganic_two) / expected_phosphorus
+
+        expected_organic_fraction = 1 - expected_inorganic_fraction # works here because of our setup above.
+
+    ## Observed
+    combined_request = first_request + second_request
+
+    ## Assert
+    assert combined_request.phosphorus == pytest.approx(expected_phosphorus)
+    assert combined_request.inorganic_phosphorus_fraction == pytest.approx(expected_inorganic_fraction)
+    assert combined_request.organic_phosphorus_fraction == pytest.approx(expected_organic_fraction)
 
 
 def test_add_matter_nutrient_request_results():
