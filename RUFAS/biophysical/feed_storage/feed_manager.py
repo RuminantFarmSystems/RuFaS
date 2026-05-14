@@ -236,6 +236,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_feed_manager_balance.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.KILOGRAMS,
         }
         for rufas_id, amount in self._cumulative_feed_requests.items():
@@ -318,6 +319,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_cumulative_purchased_feeds.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.KILOGRAMS,
         }
         for rufas_id, amount in self._cumulative_purchased_feeds.items():
@@ -343,6 +345,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_stored_farmgrown_feeds.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "suffix": reporting_suffix,
         }
@@ -404,6 +407,7 @@ class FeedManager:
                     "function": self.manage_daily_feed_request.__name__,
                     "units": MeasurementUnits.DRY_KILOGRAMS,
                     "simulation_day": time.simulation_day,
+                    "is_daily_variable": True,
                 },
             )
             self._cumulative_feed_requests[feed_id] += amount_requested
@@ -415,6 +419,7 @@ class FeedManager:
                     "function": self.manage_daily_feed_request.__name__,
                     "units": MeasurementUnits.DRY_KILOGRAMS,
                     "simulation_day": time.simulation_day,
+                    "is_daily_variable": True,
                 },
             )
             feeds_to_remove_from_inventory[feed_id] = amount_requested
@@ -725,6 +730,7 @@ class FeedManager:
             "function": self._log_feed_deductions.__name__,
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         for feed_id, amount in total_purchased.items():
             self._om.add_variable(
