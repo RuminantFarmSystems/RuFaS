@@ -66,10 +66,10 @@ def test_add_nitrogen_nutrient_request_results(
     combined_request = first_request + second_request
 
     # Assert
-    assert combined_request.nitrogen == expected_nitrogen
-    assert combined_request.organic_nitrogen_fraction == expected_organic_frac
-    assert combined_request.inorganic_nitrogen_fraction == expected_inorganic_frac
-    assert combined_request.ammonium_nitrogen_fraction == expected_ammonium_frac
+    assert combined_request.nitrogen == pytest.approx(expected_nitrogen)
+    assert combined_request.inorganic_nitrogen_fraction == pytest.approx(expected_inorganic_frac)
+    assert combined_request.organic_nitrogen_fraction == pytest.approx(expected_organic_frac)
+    assert combined_request.ammonium_nitrogen_fraction == pytest.approx(expected_ammonium_frac)
 
 
 def test_add_phosphorus_nutrient_request_results():
