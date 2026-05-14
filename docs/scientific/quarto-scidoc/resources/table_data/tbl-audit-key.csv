@@ -1,0 +1,49 @@
+﻿Type,Metric,Meaning
+Summary,project_root,Folder scanned
+,qmd_files_scanned,Number of markdown/quarto files scanned
+,bib_files_scanned,Number of .bib files scanned
+,labels_found,Total labels discovered
+,label_references_found,Total references to labels
+,duplicate_label_groups,Number of duplicated IDs
+,missing_label_reference_rows,References pointing to missing labels
+,unused_label_rows,Labels never referenced
+,bib_entries_found,Total bibliography entries
+,bib_citations_found,Total ``` @citation ``` usages
+,duplicate_bib_key_groups,Duplicate BibTeX keys
+,missing_bib_citation_rows,Citations missing from bibliography
+,missing_declared_bib_files,Missing .bib files declared in YAML
+,hyperlinks_found,Total hyperlinks
+,broken_internal_links,Broken local file links
+,equations_found,Quarto equation blocks found
+,missing_equation_custom_ids,Equations missing visible IDs
+,equation_id_mismatches,Equation IDs not matching expected naming
+,duplicate_equation_custom_groups,Duplicate custom equation IDs
+all_labels,label,Actual ID
+,type,Figure/Table/Equation/etc
+,file,File location
+,line,Line number
+,source,Attribute block or cell label
+,context,Nearby text
+all_label_refs,"example use: ``` @fig-animal
+See [Equation](#eq-an-nrc-2) ```","Tracks where labels are used (e.g. missing references, unused labels)"
+duplicate_labels,```{#fig-results}```,Every duplicated label occurrence (e.g. pdf linking and html anchors tracked)
+duplicate_label_groups,-,Condensed summary of duplicate labels to expedite clean up
+missing_label_refs,-,References pointing to labels that do not exist.
+unused_labels,-,Labels that exist but are never referenced. These may not necessarily be 'errors' but could be helpful if cleaning up 'dead' content or unused figures.
+bib_entries,-,"All BibTeX entries found and reporting the name (bib_key), type of reference, file, and line."
+bib_citations,-,Every citation usage.
+duplicate_bib_keys,-,Duplicate citation keys in .bib files.
+duplicate_bib_groups,-,Condensed duplicate bibliography summary.
+missing_bib_cites,-,Citations used in markdown but missing from bibliography.
+missing_bib_files,-,Bibliography files declared in YAML that do not exist. This may be more helpful in the future if more than one .bib file is being used
+hyperlinks,-,All hyperlinks discovered.
+external_links,-,Only external links.
+internal_links,-,Links to local files.
+anchor_links,-,Links to anchors.
+other_links,-,Links that do not fit known categories.
+broken_internal_links,-,Internal file links whose target file does not exist.
+equations,-,"Registry of detected equation blocks. This tracks equation ID, visible customized ID, expected ID and determines if they match."
+missing_eq_custom_ids,-,Equations that are missing visible custom IDs (even if they have their hidden one).
+equation_id_mismatches,-,Visible equation ID does not match expected label-derived ID.
+dup_eq_custom_ids,-,Duplicate visible equation IDs.
+dup_eq_custom_groups,-,Condensed summary of duplicate equation IDs.
