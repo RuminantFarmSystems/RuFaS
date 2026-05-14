@@ -78,6 +78,7 @@ v1.0.0
 - [2984](https://github.com/RuminantFarmSystems/RuFaS/pull/2984) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds manure stream compatibility check to Separators to enforce that Separators cannot be first processors in a chain.
 - [2931](https://github.com/RuminantFarmSystems/RuFaS/pull/2931) - [minor change] [NoInputChange] [OutputChange] automatically add "simulation_day" to info_maps when variables are added to OutputManager, improves data padding usability.
 - [2991](https://github.com/RuminantFarmSystems/RuFaS/pull/2991) - [minor change] [NoInputChange] [NoOutputChange] Updated the docstrings in the Crop and Soil module.
+- [3000](https://github.com/RuminantFarmSystems/RuFaS/pull/3000) - [minor change] [NoInputChange] [NoOutputChange] Updated the error messages for all biophysical modules.
 
 ### v1.0.0
 

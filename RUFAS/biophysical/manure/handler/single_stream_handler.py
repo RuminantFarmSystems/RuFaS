@@ -76,6 +76,11 @@ class SingleStreamHandler(Handler):
         time : RufasTime
             RufasTime instance containing the simulations temporal information.
 
+        Raises
+        ------
+        TypeError
+            If the ManureStream is a NoneType.
+
         Returns
         -------
         dict[str, ManureStream]
