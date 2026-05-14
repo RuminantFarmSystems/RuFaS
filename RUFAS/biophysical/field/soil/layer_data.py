@@ -1,6 +1,5 @@
 from dataclasses import InitVar, dataclass, field
 from math import exp, log
-from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.user_constants import UserConstants
@@ -49,9 +48,9 @@ class LayerData:
     bulk_density : float, default 1.4
         Bulk density of the soil layer (Mg per cubic meter) (provided by user, but SWAT 2:3.1.1 has an equation for
         calculating this field as well).
-    previous_day_temperature : float, optional, default None
+    previous_day_temperature : float, optional
         Temperature of soil layer on the previous day (degrees C).
-    decomposition_temperature_effect : float, optional, default None
+    decomposition_temperature_effect : float, optional
         Temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1).
     organic_carbon_fraction : float, default 0.012
         Organic carbon content expressed as fraction of soil in this layer (unitless).
@@ -108,15 +107,15 @@ class LayerData:
         Adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6).
     active_carbon_decomposition_amount : float, default 0.0
         Active carbon decomposed into slow or passive carbon and CO2 (kg/ha).
-    active_carbon_amount : float, default None
+    active_carbon_amount : float, optional
         Active carbon stored in the layer (kg/ha).
-    slow_carbon_amount : float, optional, default None
+    slow_carbon_amount : float, optional
         Slow carbon stored in the soil (kg/ha).
     slow_carbon_decomposition_amount : float, default 0.0
         Slow carbon decomposed into active or passive carbon and CO2 (kg/ha).
     passive_carbon_decomposition_amount : float, default 0.0
         Passive carbon decomposed into active or passive carbon and CO2 (kg/ha).
-    passive_carbon_amount : float, optional, default None
+    passive_carbon_amount : float, optional
         Passive carbon stored in the soil (kg/ha).
     active_carbon_to_slow_amount : float, default 0.0
         Active carbon decomposed into slow carbon (kg/ha).
@@ -138,11 +137,11 @@ class LayerData:
         Plant carbon decomposed into the active carbon pool (kg/ha).
     soil_active_decompose_carbon : float, default 0.0
         Soil carbon decomposed into the active carbon pool (kg/ha).
-    initial_labile_inorganic_phosphorus_concentration : float, default None
+    initial_labile_inorganic_phosphorus_concentration : float, optional
         Concentration of labile inorganic phosphorus at the beginning of the simulation (mg/kg soil).
         Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable
         for soil in the plow layer of cropland.
-    mean_phosphorus_sorption_parameter : float, default None
+    mean_phosphorus_sorption_parameter : float, optional
         Parameter that determines the equilibria of the different inorganic phosphorus pools and has been adjusted so it
         is not sensitive to large immediate changes in the soil chemistry (unitless).
         Note: This value is very important, and is used a lot in both SurPhos and SWAT (SurPhos theoretical
@@ -164,7 +163,7 @@ class LayerData:
     labile_inorganic_unbalanced_counter : int, default 0
         The number of days that the labile inorganic phosphorus pool has been greater than it would be when in
         equilibrium with the active inorganic phosphorus pool.
-    previous_phosphorus_balance : float, default None
+    previous_phosphorus_balance : float
         The phosphorus balance on the previous day (unitless).
     percolated_phosphorus : float, default 0.0
         Amount of phosphorus removed from the layer by water percolating out (kg/ha).
@@ -202,13 +201,13 @@ class LayerData:
         Amount of soil structural carbon decomposed into slow or active carbon (kg/ha).
     soil_structural_to_slow_or_active_rate : float, default 0.0
         The rate at which below-ground structural carbon decomposes into slow or active carbon (unitless).
-    initial_soil_nitrate_concentration : float, optional, default None
+    initial_soil_nitrate_concentration : float, optional
         Concentration of nitrates in this soil layer at the beginning of the simulation (mg/kg soil).
-    initial_soil_ammonium_concentration : float, optional, default None
+    initial_soil_ammonium_concentration : float, optional
         Concentration of ammonium in this soil layer at the beginning of the simulation (mg/kg soil).
-    nitrate_content : float, optional, default None
+    nitrate_content : float, optional
         Nitrate (NO3) content of this soil layer (kg/ha).
-    ammonium_content : float, optional, default None
+    ammonium_content : float, optional
         Ammonium (NH4+) content of this soil layer (kg/ha).
     active_organic_nitrogen_content : float, default 0.0
         Active organic nitrogen content of this soil layer (kg/ha).
@@ -236,21 +235,21 @@ class LayerData:
         Amount of ammonium removed from the soil layer by water percolating out (kg/ha).
     percolated_active_organic_nitrogen : float, default 0.0
         Amount of active organic nitrogen removed from the soil layer by water percolating out (kg/ha).
-    soil_overall_carbon_fraction : float, optional, default None
+    soil_overall_carbon_fraction : float, optional
         The total fraction of carbon in the soil (unitless).
-    total_soil_carbon_amount : float, optional, default None
+    total_soil_carbon_amount : float, optional
         The total amount of soil carbon (kg/ha).
-    annual_decomposition_carbon_CO2_lost : float, optional, default None
+    annual_decomposition_carbon_CO2_lost : float, optional
         Amount of total carbon lost as CO2 during decomposition (kg/ha).
-    annual_carbon_CO2_lost : float, optional, default None
+    annual_carbon_CO2_lost : float, optional
         Total amount of carbon lost as CO2 (kg/ha).
 
     """
 
     field_size: InitVar[float] = None
     residue: InitVar[float] = 0
-    top_depth: Optional[float] = None
-    bottom_depth: Optional[float] = None
+    top_depth: float | None = None
+    bottom_depth: float | None = None
 
     pH: float = 7.0
 
@@ -272,8 +271,8 @@ class LayerData:
 
     # --- Temperature
     bulk_density: float = 1.4
-    previous_day_temperature: Optional[float] = None
-    decomposition_temperature_effect: Optional[float] = None
+    previous_day_temperature: float | None = None
+    decomposition_temperature_effect: float | None = None
 
     # --- Erosion
     organic_carbon_fraction: float = 0.012
@@ -316,15 +315,15 @@ class LayerData:
 
     # pseudocode_soil S.6.C.3
     active_carbon_decomposition_amount: float = 0.0
-    active_carbon_amount: Optional[float] = None
+    active_carbon_amount: float | None = None
 
     # pseudocode_soil S.6.C.4
-    slow_carbon_amount: Optional[float] = None
+    slow_carbon_amount: float | None = None
     slow_carbon_decomposition_amount: float = 0.0
 
     # pseudocode_soil S.6.C.5
     passive_carbon_decomposition_amount: float = 0.0
-    passive_carbon_amount: Optional[float] = None
+    passive_carbon_amount: float | None = None
 
     # pseudocode_soil S.6.C.7
     active_carbon_to_slow_amount: float = 0.0
@@ -380,10 +379,10 @@ class LayerData:
     soil_structural_to_slow_or_active_rate: float = 0.0
 
     # ---- Nitrogen
-    initial_soil_nitrate_concentration: Optional[float] = None
-    initial_soil_ammonium_concentration: Optional[float] = None
-    nitrate_content: Optional[float] = None
-    ammonium_content: Optional[float] = None
+    initial_soil_nitrate_concentration: float | None = None
+    initial_soil_ammonium_concentration: float | None = None
+    nitrate_content: float | None = None
+    ammonium_content: float | None = None
     active_organic_nitrogen_content: float = field(init=False)
     stable_organic_nitrogen_content: float = field(init=False)
     fresh_organic_nitrogen_content: float = 0
@@ -403,10 +402,10 @@ class LayerData:
     percolated_active_organic_nitrogen: float = 0.0
 
     # --- Carbon cycling
-    soil_overall_carbon_fraction: Optional[float] = None
-    total_soil_carbon_amount: Optional[float] = None
-    annual_decomposition_carbon_CO2_lost: Optional[float] = None
-    annual_carbon_CO2_lost: Optional[float] = None
+    soil_overall_carbon_fraction: float | None = None
+    total_soil_carbon_amount: float | None = None
+    annual_decomposition_carbon_CO2_lost: float | None = None
+    annual_carbon_CO2_lost: float | None = None
 
     def __post_init__(self, field_size: float, residue: float):
         """
@@ -429,7 +428,7 @@ class LayerData:
 
         References
         ----------
-        SWAT Theoretical documentation eqn. 3:2.1.1, 2 and last paragraph on page 208 (for phosphorus initialization)
+        SWAT Theoretical documentation eqn. 3:2.1.1, 2 and last paragraph on page 208 (for phosphorus initialization).
 
         """
         if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
@@ -938,9 +937,11 @@ class LayerData:
         float
             Relative water saturation (%).
 
-        """
+        References
+        ----------
+        pseudocode_soil S.4.B.1.
 
-        # pseudocode_soil S.4.B.1
+        """
         if self.water_content <= self.field_capacity_content:
             return (self.water_content - self.wilting_point_content) / (
                 self.field_capacity_content - self.wilting_point_content
@@ -981,7 +982,7 @@ class LayerData:
         Returns
         -------
         float
-            Total amount of CO2 emitted from carbon decomposition in this layer. (kg/ha).
+            Total amount of CO2 emitted from carbon decomposition in this layer (kg/ha).
 
         """
         return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount

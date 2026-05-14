@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import call
 from pytest_mock import MockerFixture
 
-from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter, CrossValidator
+from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter, CrossValidator, Modifiability
 
 
 def mock_input_array_data_for_fix_data() -> dict[str | int, Any] | list[Any]:
@@ -2709,84 +2709,102 @@ def test_check_target_and_save_block_message_contains_all_invalid_keys_eager_ter
 @pytest.mark.parametrize(
     "expression_block, eager_termination",
     [
-        ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
-        ({"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
-        ({"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, True),
-        ({"operation": "add", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
-        ({"operation": "subtract", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
-        ({"operation": "multiply", "ordered_variables": ["alias_0", "alias_1"], "save_as": "alias_2"}, False),
+        (
+            {"aggregation": {"operation": "add", "operands": ["alias_0", "alias_1"]}, "save_as": "alias_2"},
+            True,
+        ),
+        (
+            {
+                "aggregation": {"operation": "subtract", "operands": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            True,
+        ),
+        (
+            {
+                "aggregation": {"operation": "multiply", "operands": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            True,
+        ),
+        (
+            {"aggregation": {"operation": "add", "operands": ["alias_0", "alias_1"]}, "save_as": "alias_2"},
+            False,
+        ),
+        (
+            {
+                "aggregation": {"operation": "subtract", "operands": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            False,
+        ),
+        (
+            {
+                "aggregation": {"operation": "multiply", "operands": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            False,
+        ),
     ],
 )
-def test_evaluate_expression_unknown_operation(
-    expression_block: dict[str, Any], eager_termination: bool, mocker: MockerFixture
-) -> None:
-    """Unit tests for _evaluate_expression() in CrossValidator"""
+def test_validate_expression_block_unknown_function(expression_block: dict[str, Any], eager_termination: bool) -> None:
+    """Unknown aggregation function detected by _validate_expression_block."""
     cross_validator = CrossValidator()
-    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value")
-    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
 
     if eager_termination:
         with pytest.raises(ValueError):
-            cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
+            cross_validator._validate_expression_block(expression_block, eager_termination)
     else:
-        result, status = cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
-        assert result is None
-        assert status is False
-    mock_get_alias_value.assert_not_called()
-    mock_save_to_alias_pool.assert_not_called()
+        valid = cross_validator._validate_expression_block(expression_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
 
 
 @pytest.mark.parametrize(
     "expression_block, eager_termination",
     [
-        ({"operation": "add", "save_as": "alias_2"}, True),
-        ({"operation": "subtract", "save_as": "alias_2"}, True),
-        ({"operation": "multiply", "ordered_variables": [], "save_as": "alias_2"}, True),
-        ({"operation": "add", "save_as": "alias_2"}, False),
-        ({"operation": "subtract", "save_as": "alias_2"}, False),
-        ({"operation": "multiply", "save_as": "alias_2"}, False),
+        ({"aggregation": {"operation": "add"}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "subtract"}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "multiply", "operands": []}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "add"}, "save_as": "alias_2"}, False),
+        ({"aggregation": {"operation": "subtract"}, "save_as": "alias_2"}, False),
+        ({"aggregation": {"operation": "multiply"}, "save_as": "alias_2"}, False),
     ],
 )
-def test_evaluate_expression_no_ordered_variables(
-    expression_block: dict[str, Any], eager_termination: bool, mocker: MockerFixture
-) -> None:
-    """Test the behavior of _evaluate_expression when ordered_variables is missing or empty."""
+def test_validate_expression_block_missing_operands(expression_block: dict[str, Any], eager_termination: bool) -> None:
+    """Missing or empty operands detected by _validate_expression_block."""
     cross_validator = CrossValidator()
-    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value")
-    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
 
     if eager_termination:
         with pytest.raises(ValueError):
-            cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
+            cross_validator._validate_expression_block(expression_block, eager_termination)
     else:
-        result, status = cross_validator._evaluate_expression(expression_block, eager_termination, relationship="equal")
-        assert result is None
-        assert status is False
-    mock_get_alias_value.assert_not_called()
-    mock_save_to_alias_pool.assert_not_called()
+        valid = cross_validator._validate_expression_block(expression_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
 
 
 @pytest.mark.parametrize(
     "expression_block, selected_variables, eager_termination",
     [
-        ({"operation": "sum", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [[], []], True),
-        ({"operation": "difference", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [{}, {}], True),
+        ({"operation": "sum", "operands": ["alias_0", "alias_1"], "mode": "aggregate"}, [[], []], True),
+        ({"operation": "difference", "operands": ["alias_0", "alias_1"], "mode": "aggregate"}, [{}, {}], True),
         (
-            {"operation": "average", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            {"operation": "average", "operands": ["alias_0", "alias_1"], "mode": "aggregate"},
             [[1, 2, 3], {"a": 1, "b": 2}],
             True,
         ),
         (
-            {"operation": "product", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            {"operation": "product", "operands": ["alias_0", "alias_1"], "mode": "aggregate"},
             [[4, 5, 6], ["a", "b", "c"]],
             False,
         ),
         (
-            {"operation": "division", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"},
+            {"operation": "division", "operands": ["alias_0", "alias_1"], "mode": "aggregate"},
             [{"a": [], "b": []}, [{}, {}]],
             False,
         ),
-        ({"operation": "no_op", "ordered_variables": ["alias_0", "alias_1"], "apply_to": "group"}, [[{}], []], False),
+        ({"operation": "no_op", "operands": ["alias_0", "alias_1"], "mode": "aggregate"}, [[{}], []], False),
     ],
 )
 def test_validate_expression_block_with_complex_variable_values_multiple_complex_variable(
@@ -2813,20 +2831,20 @@ def test_validate_expression_block_with_complex_variable_values_multiple_complex
 @pytest.mark.parametrize(
     "expression_block, selected_variables, eager_termination",
     [
-        ({"operation": "sum", "ordered_variables": ["alias_0"]}, [[]], True),
-        ({"operation": "difference", "ordered_variables": ["alias_0"]}, [{}], True),
-        ({"operation": "average", "ordered_variables": ["alias_0"]}, [[1, 2, 3]], True),
-        ({"operation": "product", "ordered_variables": ["alias_0"]}, [{"a": 1, "b": 2, "c": 3}], False),
-        ({"operation": "division", "ordered_variables": ["alias_0"]}, [{"a": [], "b": []}], False),
-        ({"operation": "no_op", "ordered_variables": ["alias_0"]}, [[{}]], False),
+        ({"operation": "sum", "operands": ["alias_0"]}, [[]], True),
+        ({"operation": "difference", "operands": ["alias_0"]}, [{}], True),
+        ({"operation": "average", "operands": ["alias_0"]}, [[1, 2, 3]], True),
+        ({"operation": "product", "operands": ["alias_0"]}, [{"a": 1, "b": 2, "c": 3}], False),
+        ({"operation": "division", "operands": ["alias_0"]}, [{"a": [], "b": []}], False),
+        ({"operation": "no_op", "operands": ["alias_0"]}, [[{}]], False),
     ],
 )
-def test_validate_expression_block_with_complex_variable_values_no_apply_to(
+def test_validate_expression_block_with_complex_variable_values_no_mode(
     expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
 ) -> None:
     """
     Unit tests for _validate_expression_block_with_complex_variable_values() in CrossValidator
-    when a complex variable is selected and the `apply_to` key is missing.
+    when a complex variable is selected and the `mode` key is missing.
     """
     cross_validator = CrossValidator()
 
@@ -2843,62 +2861,66 @@ def test_validate_expression_block_with_complex_variable_values_no_apply_to(
 
 
 @pytest.mark.parametrize(
-    "expression_block, selected_variables, eager_termination",
+    "aggregation_block, eager_termination",
     [
-        ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "unknown"}, [[]], True),
-        ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "unknown"}, [[]], False),
+        ({"operation": "sum", "operands": ["alias_0"], "mode": "unknown"}, True),
+        ({"operation": "sum", "operands": ["alias_0"], "mode": "unknown"}, False),
     ],
 )
-def test_validate_expression_block_with_complex_variable_values_unknown_apply_to_value(
-    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
+def test_validate_aggregation_block_structure_unknown_mode(
+    aggregation_block: dict[str, Any], eager_termination: bool
 ) -> None:
-    """
-    Unit tests for _validate_expression_block_with_complex_variable_values() in CrossValidator
-    when a complex variable is selected and the `apply_to` key is set to an unknown value.
-    """
+    """Unknown mode value detected by _validate_aggregation_block_structure."""
     cross_validator = CrossValidator()
 
     if eager_termination:
         with pytest.raises(ValueError):
-            cross_validator._validate_expression_block_with_complex_variable_values(
-                expression_block, selected_variables, eager_termination
-            )
+            cross_validator._validate_aggregation_block_structure(aggregation_block, eager_termination)
     else:
-        result = cross_validator._validate_expression_block_with_complex_variable_values(
-            expression_block, selected_variables, eager_termination
-        )
-        assert result is False
+        valid = cross_validator._validate_aggregation_block_structure(aggregation_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
 
 
 @pytest.mark.parametrize(
     "expression_block, selected_variables, expected_result",
     [
-        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [[1, 2, 3]], [1, 2, 3]),
-        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [[]], []),
         (
-            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "abc"},
+            {"aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"}},
+            [[1, 2, 3]],
+            [1, 2, 3],
+        ),
+        ({"aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"}}, [[]], []),
+        (
+            {
+                "aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"},
+                "save_as": "abc",
+            },
             [{"a": 1, "b": 2, "c": 3}],
             [1, 2, 3],
         ),
-        ({"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"}, [{}], []),
+        ({"aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"}}, [{}], []),
         (
-            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual", "save_as": "def"},
+            {
+                "aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"},
+                "save_as": "def",
+            },
             [{"a": [], "b": []}],
             [[], []],
         ),
         (
-            {"operation": "no_op", "ordered_variables": ["alias_0"], "apply_to": "individual"},
+            {"aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"}},
             [[{}, {}, {}]],
             [{}, {}, {}],
         ),
     ],
 )
-def test_evaluate_expression_apply_to_individual(
+def test_evaluate_expression_element_wise_mode(
     expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
 ) -> None:
     """
     Unit tests for _evaluate_expression() in CrossValidator when a complex variable is selected
-    and `apply_to` is set to `individual`
+    and `mode` is set to `element_wise`
     """
     cross_validator = CrossValidator()
     mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
@@ -2917,23 +2939,42 @@ def test_evaluate_expression_apply_to_individual(
 @pytest.mark.parametrize(
     "expression_block, selected_variables, expected_result",
     [
-        ({"operation": "sum", "ordered_variables": ["alias_0"], "apply_to": "group"}, [[1, 2, 3]], [6]),
-        ({"operation": "difference", "ordered_variables": ["alias_0"], "apply_to": "group"}, [[]], [None]),
         (
-            {"operation": "product", "ordered_variables": ["alias_0"], "apply_to": "group", "save_as": "abc"},
+            {"aggregation": {"operation": "sum", "operands": ["alias_0"], "mode": "aggregate"}},
+            [[1, 2, 3]],
+            [6],
+        ),
+        (
+            {"aggregation": {"operation": "difference", "operands": ["alias_0"], "mode": "aggregate"}},
+            [[]],
+            [None],
+        ),
+        (
+            {
+                "aggregation": {"operation": "product", "operands": ["alias_0"], "mode": "aggregate"},
+                "save_as": "abc",
+            },
             [{"a": 1, "b": 2, "c": 3}],
             [6],
         ),
-        ({"operation": "division", "ordered_variables": ["alias_0"], "apply_to": "group"}, [{}], [None]),
-        ({"operation": "no_op", "ordered_variables": ["a", "b", "c"], "save_as": "def"}, [2, 5, 8], [2, 5, 8]),
         (
-            {"operation": "average", "ordered_variables": ["a", "b", "c", "d", "e", "f", "g", "h"]},
+            {"aggregation": {"operation": "division", "operands": ["alias_0"], "mode": "aggregate"}},
+            [{}],
+            [None],
+        ),
+        (
+            {"aggregation": {"operation": "no_op", "operands": ["a", "b", "c"]}, "save_as": "def"},
+            [2, 5, 8],
+            [2, 5, 8],
+        ),
+        (
+            {"aggregation": {"operation": "average", "operands": ["a", "b", "c", "d", "e", "f", "g", "h"]}},
             [8, 7, 6, 5, 4, 3, 2, 1],
             [4.5],
         ),
     ],
 )
-def test_evaluate_expression_apply_to_group(
+def test_evaluate_expression_aggregate_mode(
     expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
 ) -> None:
     cross_validator = CrossValidator()
@@ -2958,10 +2999,8 @@ def test_validate_relationship_valid_values(relationship: str, eager_termination
     """Valid relationship strings should pass with no event logs."""
     cv = CrossValidator()
 
-    # Act
     result = cv._validate_relationship(relationship, eager_termination)
 
-    # Assert
     assert result is True
     assert len(cv._event_logs) == 0
 
@@ -2978,9 +3017,7 @@ def test_validate_relationship_non_string(eager_termination: bool) -> None:
             cv._validate_relationship(123, eager_termination=True)
         assert len(cv._event_logs) == 1
     else:
-        # Act
         ok = cv._validate_relationship(123, eager_termination=False)
-        # Assert
         assert ok is False
         assert len(cv._event_logs) == 1
 
@@ -3073,7 +3110,6 @@ def test_evaluate_is_type_supported_types(
     """Supported types honor bool/int nuances and case-insensitive type strings."""
     cv = CrossValidator()
     assert cv._evaluate_is_type(left_value, data_type, eager_termination) is expected
-    # No error logs on supported types
     assert all(e["error"] != "Invalid data type expectation." for e in cv._event_logs)
 
 
@@ -3126,6 +3162,9 @@ def test_evaluate_regex_fullmatch(text: str, pattern: str, expected: bool) -> No
 @pytest.mark.parametrize(
     "left,right,expected",
     [
+        ([1, 2, 3, 4], [3, 2, 1, 4], True),  # longer lists
+        ([1, 2, 3, 4], [1, 1, 5], False),  # left longer than right
+        ([1, 1, 5], [1, 2, 3, 4], False),  # right longer than left
         ([1], [2], True),
         ([1, 2], [3], False),
         ([], [], True),
@@ -3218,7 +3257,6 @@ def test_evaluate_condition_returns_false_when_side_not_evaluated(
     """If either side doesn't evaluate, the condition returns False."""
     cv = CrossValidator()
     mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
-    # Left evaluated False; right True
     mocker.patch.object(cv, "_evaluate_expression", side_effect=[("L", False), ("R", True)])
 
     valid = cv._evaluate_condition({"relationship": "equal", "left_hand": {}, "right_hand": {}}, eager_termination)
@@ -3305,7 +3343,6 @@ def test_evaluate_condition_is_null_branch(mocker: MockerFixture, eager_terminat
     """'is_null' should evaluate only semantics of left-hand (we still provide right to enter branch)."""
     cv = CrossValidator()
     mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
-    # Both evaluated True so the code enters the relationship switch
     mocker.patch.object(cv, "_evaluate_expression", side_effect=[(None, True), ("ignored", True)])
     mock_is_null = mocker.patch.object(cv, "_evaluate_is_null", return_value=True)
 
@@ -3342,11 +3379,12 @@ def test_evaluate_condition_clause_array_all_true(mocker: MockerFixture, eager_t
 
 
 def test_validate_condition_clause_ok(mocker: MockerFixture) -> None:
-    """True when relationship valid and both sides present."""
+    """True when relationship valid, both sides present, and expression blocks pass."""
     v = CrossValidator()
     mocker.patch.object(v, "_validate_relationship", return_value=True)
+    mocker.patch.object(v, "_validate_expression_block", return_value=True)
     log = mocker.patch.object(v, "_log_missing_condition_clause_field")
-    clause = {"left_hand": 1, "right_hand": 2, "relationship": "equal"}
+    clause = {"left_hand": {"aggregation": {}}, "right_hand": {"aggregation": {}}, "relationship": "equal"}
     result = v._validate_condition_clause(clause, eager_termination=False)
     assert result is True
     log.assert_not_called()
@@ -3416,3 +3454,679 @@ def test_log_missing_condition_clause_field_only() -> None:
     e = v._event_logs[0]
     assert e["error"] == "Missing required condition clause field"
     assert e["message"] == "Missing the left hand field in condition clause."
+
+
+@pytest.mark.parametrize(
+    "iter_block, alias_values, expected_result",
+    [
+        # mode="filter": keep entries where field == compare_value
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+            },
+            [
+                [{"type": "A", "val": 1}, {"type": "B", "val": 2}, {"type": "A", "val": 3}],
+                "A",
+            ],
+            [{"type": "A", "val": 1}, {"type": "A", "val": 3}],
+        ),
+        # mode="filter": no entries match
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+            },
+            [
+                [{"type": "X"}, {"type": "Y"}],
+                "Z",
+            ],
+            [],
+        ),
+        # mode="enforce": all entries satisfy → [True]
+        (
+            {
+                "mode": "enforce",
+                "in": "items",
+                "field": "status",
+                "value_to_compare": "expected_status",
+                "relationship": "equal",
+            },
+            [
+                [{"status": "ok"}, {"status": "ok"}],
+                "ok",
+            ],
+            [True],
+        ),
+        # mode="enforce": not all entries satisfy → [False]
+        (
+            {
+                "mode": "enforce",
+                "in": "items",
+                "field": "status",
+                "value_to_compare": "expected_status",
+                "relationship": "equal",
+            },
+            [
+                [{"status": "ok"}, {"status": "fail"}],
+                "ok",
+            ],
+            [False],
+        ),
+    ],
+)
+def test_evaluate_for_each_block_success(
+    iter_block: dict[str, Any], alias_values: list[Any], expected_result: Any, mocker: MockerFixture
+) -> None:
+    """_evaluate_iterate_array_of_dicts returns correct filtered/enforced result."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_get_alias_value", side_effect=alias_values)
+
+    result, status = cv._evaluate_for_each_block(iter_block, eager_termination=False, outer_relationship="equal")
+    assert status is True
+    assert result == expected_result
+
+
+def test_validate_for_each_block_unknown_operator_no_eager() -> None:
+    """Unknown operator returns False and logs error when not eager."""
+    cv = CrossValidator()
+    for_each_block = {
+        "mode": "filter",
+        "in": "items",
+        "field": "x",
+        "value_to_compare": "cmp",
+        "relationship": "unknown_rel",
+    }
+    valid = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+    assert valid is False
+    assert len(cv._event_logs) == 1
+
+
+def test_validate_for_each_block_unknown_operator_eager() -> None:
+    """Unknown operator raises ValueError when eager."""
+    cv = CrossValidator()
+    for_each_block = {
+        "mode": "filter",
+        "in": "items",
+        "field": "x",
+        "value_to_compare": "cmp",
+        "relationship": "unknown_rel",
+    }
+    with pytest.raises(ValueError, match="Invalid relationship"):
+        cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
+
+
+def test_evaluate_expression_with_for_each_block_and_save_as(mocker: MockerFixture) -> None:
+    """save_as at the expression_block level is applied when using iterate_array_of_dicts."""
+    cv = CrossValidator()
+    expression_block = {
+        "for_each": {
+            "mode": "filter",
+            "in": "items",
+            "field": "type",
+            "value_to_compare": "cmp",
+            "relationship": "equal",
+        },
+        "save_as": "filtered_items",
+    }
+    array_data = [{"type": "A"}, {"type": "B"}]
+    mocker.patch.object(cv, "_get_alias_value", side_effect=[array_data, "A"])
+    mock_save = mocker.patch.object(cv, "_save_to_alias_pool")
+
+    result, status = cv._evaluate_expression(expression_block, eager_termination=False, relationship="equal")
+    assert status is True
+    assert result == [{"type": "A"}]
+    mock_save.assert_called_once_with(alias_name="filtered_items", value=[{"type": "A"}])
+
+
+def test_validate_properties_returns_early_when_type_validator_fails(mocker: MockerFixture) -> None:
+    """validate_properties propagates the invalid result from a type-specific validator."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "_metadata_number_validator", return_value=(False, "bad number property"))
+    metadata = {"properties": {"field_a": {"type": "number"}}}
+
+    valid, msg = dv.validate_properties(metadata, metadata_depth_limit=10)
+
+    assert valid is False
+    assert msg == "bad number property"
+
+
+def test_metadata_number_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_number_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad number keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_number_validator(["some_key"], {"type": "number", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad number keys"
+
+
+def test_metadata_string_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_string_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad string keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_string_validator(["some_key"], {"type": "string", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad string keys"
+
+
+def test_metadata_bool_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_bool_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad bool keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_bool_validator(["some_key"], {"type": "bool", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad bool keys"
+
+
+def test_metadata_array_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_array_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad array keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_array_validator(["some_key"], {"type": "array", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad array keys"
+
+
+def test_metadata_object_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_object_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad object keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_object_validator(["some_key"], {"type": "object", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad object keys"
+
+
+def test_validate_metadata_returns_early_when_path_or_paths_missing(mocker: MockerFixture) -> None:
+    """validate_metadata propagates the invalid result when neither 'path' nor 'paths' is present."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "_validate_metadata_keys", return_value=(True, ""))
+    mocker.patch.object(dv, "_validate_has_path_or_paths", return_value=(False, "missing path"))
+
+    metadata = {"files": {"file_a": {"type": "json", "properties": {}}}}
+    valid, msg = dv.validate_metadata(
+        metadata,
+        valid_data_types={"json"},
+        address_to_data="files",
+        input_root=Path("."),
+    )
+
+    assert valid is False
+    assert msg == "missing path"
+
+
+def test_validate_data_by_type_raises_for_unsupported_type(mocker: MockerFixture) -> None:
+    """validate_data_by_type raises ValueError when the metadata type is not in the supported map."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "convert_variable_path_to_str", return_value="root.field")
+
+    with pytest.raises(ValueError, match="is not valid"):
+        dv.validate_data_by_type(
+            variable_path=["root", "field"],
+            variable_properties={"type": "unsupported_type"},
+            data={"anything": []},
+            eager_termination=True,
+            properties_blob_key="blob",
+            elements_counter=mocker.MagicMock(autospec=ElementsCounter),
+            called_during_initialization=True,
+            fixable_data_types=set(),
+        )
+
+
+def test_log_missing_data_raises_when_not_during_initialization() -> None:
+    """_log_missing_data raises KeyError immediately when called outside initialization."""
+    dv = DataValidator()
+
+    with pytest.raises(KeyError, match="required to update variable during runtime"):
+        dv._log_missing_data(
+            var_name="my_var",
+            variable_properties={},
+            called_during_initialization=False,
+        )
+
+    assert any("Missing required data" in str(log) for log in dv.event_logs)
+
+
+def test_log_missing_data_raises_when_required_during_initialization(mocker: MockerFixture) -> None:
+    """_log_missing_data raises KeyError when called during initialization for a required variable."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "_is_data_required_upon_initialization", return_value=True)
+
+    with pytest.raises(KeyError, match="required for this variable upon program initialization"):
+        dv._log_missing_data(
+            var_name="my_var",
+            variable_properties={"modifiability": "required locked"},
+            called_during_initialization=True,
+        )
+
+    assert any("Missing required data" in str(log) for log in dv.event_logs)
+
+
+def test_log_missing_data_logs_warning_when_not_required_during_initialization(mocker: MockerFixture) -> None:
+    """_log_missing_data logs a warning and does not raise when variable is optional at init."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "_is_data_required_upon_initialization", return_value=False)
+
+    dv._log_missing_data(
+        var_name="my_var",
+        variable_properties={"modifiability": "unrequired unlocked"},
+        called_during_initialization=True,
+    )
+
+    assert any("not required upon initialization" in str(log) for log in dv.event_logs)
+
+
+@pytest.mark.parametrize(
+    "modifiability, expected",
+    [
+        ("required locked", True),
+        ("required unlocked", True),
+        ("unrequired unlocked", False),
+    ],
+)
+def test_is_data_required_upon_initialization(modifiability: str, expected: bool) -> None:
+    """_is_data_required_upon_initialization returns True only for required modifiability values."""
+    dv = DataValidator()
+
+    result = dv._is_data_required_upon_initialization(
+        variable_name="my_var",
+        variable_properties={"modifiability": modifiability},
+    )
+
+    assert result is expected
+
+
+@pytest.mark.parametrize(
+    "modifiability_str, expected",
+    [
+        ("required locked", Modifiability.REQUIRED_LOCKED),
+        ("required unlocked", Modifiability.REQUIRED_UNLOCKED),
+        ("unrequired unlocked", Modifiability.UNREQUIRED_UNLOCKED),
+        ("REQUIRED LOCKED", Modifiability.REQUIRED_LOCKED),
+    ],
+)
+def test_get_variable_modifiability_valid_values(modifiability_str: str, expected: Modifiability) -> None:
+    """_get_variable_modifiability maps valid modifiability strings to the correct enum member."""
+    dv = DataValidator()
+
+    result = dv._get_variable_modifiability(
+        variable_name="my_var",
+        variable_properties={"modifiability": modifiability_str},
+    )
+
+    assert result == expected
+
+
+def test_get_variable_modifiability_invalid_value_falls_back_to_default() -> None:
+    """_get_variable_modifiability logs a warning and returns the default for unknown values."""
+    dv = DataValidator()
+
+    result = dv._get_variable_modifiability(
+        variable_name="my_var",
+        variable_properties={"modifiability": "totally invalid value"},
+    )
+
+    assert result == Modifiability.UNREQUIRED_UNLOCKED
+    assert any("Unknown modifiability entry" in str(log) for log in dv.event_logs)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_expression_unknown_block_eager(eager_termination: bool) -> None:
+    """_evaluate_expression logs an error and raises/returns when block has no known key."""
+    cv = CrossValidator()
+    unknown_block = {"unknown_key": {"operands": ["a"]}}
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="Supported blocks are"):
+            cv._evaluate_expression(unknown_block, eager_termination=True, relationship="equal")
+    else:
+        result, evaluated = cv._evaluate_expression(unknown_block, eager_termination=False, relationship="equal")
+        assert result is None
+        assert evaluated is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_evaluate_aggregation_block_returns_none_false_when_complex_validation_fails(
+    mocker: MockerFixture,
+) -> None:
+    """_evaluate_aggregation_block returns (None, False) when complex variable validation fails."""
+    cv = CrossValidator()
+    cv._alias_pool = {"alias_a": [1, 2, 3]}
+    mocker.patch.object(cv, "_validate_expression_block_with_complex_variable_values", return_value=False)
+
+    aggregation_block = {"operation": "sum", "operands": ["alias_a"], "mode": "aggregate"}
+    result, evaluated = cv._evaluate_aggregation_block(aggregation_block, eager_termination=False, relationship="equal")
+
+    assert result is None
+    assert evaluated is False
+
+
+@pytest.mark.parametrize(
+    "alias_value, eager_termination",
+    [
+        (None, False),
+        ("not_a_list", False),
+        ([1, 2, 3], False),
+        (None, True),
+    ],
+)
+def test_resolve_for_each_source_invalid(alias_value: Any, eager_termination: bool, mocker: MockerFixture) -> None:
+    """_resolve_for_each_source returns None (or raises) when source is not a list of dicts."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_get_alias_value", return_value=alias_value)
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="must resolve to a list of dicts"):
+            cv._resolve_for_each_source("src", eager_termination=True, outer_relationship="equal")
+    else:
+        result = cv._resolve_for_each_source("src", eager_termination=False, outer_relationship="equal")
+        assert result is None
+
+    assert len(cv._event_logs) == 1
+
+
+def test_build_comparand_getter_returns_none_when_alias_unresolved(mocker: MockerFixture) -> None:
+    """_build_comparand_getter returns None when compare_value_alias cannot be resolved."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_get_alias_value", return_value=None)
+
+    result = cv._build_comparand_getter(
+        value_to_compare_alias="missing_alias",
+        field_to_compare=None,
+        eager_termination=False,
+        outer_relationship="equal",
+    )
+
+    assert result is None
+
+
+def test_build_comparand_getter_returns_callable_for_compare_field() -> None:
+    """_build_comparand_getter returns a callable extracting compare_field from each entry."""
+    cv = CrossValidator()
+
+    getter = cv._build_comparand_getter(
+        value_to_compare_alias=None,
+        field_to_compare="score",
+        eager_termination=False,
+        outer_relationship="equal",
+    )
+
+    assert getter is not None
+    assert getter({"score": 42, "other": 99}) == [42]
+    assert getter({"other": 99}) == [None]
+
+
+def test_evaluate_for_each_block_returns_none_false_when_source_fails(mocker: MockerFixture) -> None:
+    """_evaluate_for_each_block returns (None, False) when the source alias cannot be resolved."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_resolve_for_each_source", return_value=None)
+
+    iter_block = {"in": "src", "field": "x", "value_to_compare": "cmp", "relationship": "equal", "mode": "filter"}
+    result, evaluated = cv._evaluate_for_each_block(iter_block, eager_termination=False, outer_relationship="equal")
+
+    assert result is None
+    assert evaluated is False
+
+
+def test_evaluate_for_each_block_returns_none_false_when_comparand_fails(mocker: MockerFixture) -> None:
+    """_evaluate_for_each_block returns (None, False) when the comparand getter cannot be built."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_resolve_for_each_source", return_value=[{"x": 1}])
+    mocker.patch.object(cv, "_build_comparand_getter", return_value=None)
+
+    iter_block = {"in": "src", "field": "x", "value_to_compare": "cmp", "relationship": "equal", "mode": "filter"}
+    result, evaluated = cv._evaluate_for_each_block(iter_block, eager_termination=False, outer_relationship="equal")
+
+    assert result is None
+    assert evaluated is False
+
+
+@pytest.mark.parametrize(
+    "expression_block, eager_termination",
+    [
+        ({}, False),
+        ({"aggregation": {}, "for_each": {}}, False),
+        ({}, True),
+        ({"aggregation": {}, "for_each": {}}, True),
+    ],
+)
+def test_validate_expression_block_invalid_structure(expression_block: dict[str, Any], eager_termination: bool) -> None:
+    """_validate_expression_block logs an error and raises/returns False for invalid structure."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="either an 'aggregation' or a 'for_each'"):
+            cv._validate_expression_block(expression_block, eager_termination=True)
+    else:
+        result = cv._validate_expression_block(expression_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_validate_expression_block_dispatches_to_for_each_validator(mocker: MockerFixture) -> None:
+    """_validate_expression_block delegates to _validate_for_each_block_structure for for_each blocks."""
+    cv = CrossValidator()
+    mock_validate = mocker.patch.object(cv, "_validate_for_each_block_structure", return_value=True)
+
+    result = cv._validate_expression_block({"for_each": {"mode": "filter"}}, eager_termination=False)
+
+    assert result is True
+    mock_validate.assert_called_once_with({"mode": "filter"}, False)
+
+
+@pytest.mark.parametrize(
+    "aggregation_block, eager_termination",
+    [
+        ({"operands": ["a", "b"]}, False),
+        ({"operands": ["a", "b"], "operation": "no_op"}, False),
+        ({"operands": ["a", "b"]}, True),
+        ({"operands": ["a", "b"], "operation": "no_op"}, True),
+    ],
+)
+def test_validate_aggregation_block_structure_multi_operand_no_op(
+    aggregation_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """_validate_aggregation_block_structure rejects multi-operand blocks with no_op or missing function."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="cannot be 'no_op'"):
+            cv._validate_aggregation_block_structure(aggregation_block, eager_termination=True)
+    else:
+        result = cv._validate_aggregation_block_structure(aggregation_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_validate_aggregation_block_structure_returns_true_when_valid() -> None:
+    """_validate_aggregation_block_structure returns True for a well-formed aggregation block."""
+    cv = CrossValidator()
+
+    result = cv._validate_aggregation_block_structure(
+        {"operands": ["a", "b"], "operation": "sum"}, eager_termination=False
+    )
+
+    assert result is True
+    assert len(cv._event_logs) == 0
+
+
+@pytest.mark.parametrize(
+    "for_each_block, eager_termination",
+    [
+        ({"mode": "invalid"}, False),
+        ({"mode": None}, False),
+        ({}, False),
+        ({"mode": "invalid"}, True),
+    ],
+)
+def test_validate_for_each_block_structure_invalid_mode(
+    for_each_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """_validate_for_each_block_structure rejects blocks with an invalid or missing mode."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="'mode' must be"):
+            cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
+    else:
+        result = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "for_each_block, eager_termination",
+    [
+        ({"mode": "filter", "value_to_compare": "cmp", "relationship": "equal"}, False),
+        ({"mode": "filter", "in": "src", "value_to_compare": "cmp", "relationship": "equal"}, False),
+        ({"mode": "filter", "value_to_compare": "cmp", "relationship": "equal"}, True),
+    ],
+)
+def test_validate_for_each_block_structure_missing_required_keys(
+    for_each_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """_validate_for_each_block_structure rejects blocks missing 'in' or 'field'."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="Missing required key"):
+            cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
+    else:
+        result = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "for_each_block, eager_termination",
+    [
+        ({"mode": "filter", "in": "src", "field": "x", "relationship": "equal"}, False),
+        (
+            {
+                "mode": "filter",
+                "in": "src",
+                "field": "x",
+                "value_to_compare": "cmp",
+                "field_to_compare": "y",
+                "relationship": "equal",
+            },
+            False,
+        ),
+        ({"mode": "filter", "in": "src", "field": "x", "relationship": "equal"}, True),
+    ],
+)
+def test_validate_for_each_block_structure_invalid_comparison_target(
+    for_each_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """_validate_for_each_block_structure rejects blocks with both or neither comparison keys."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="Exactly one of"):
+            cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
+    else:
+        result = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_validate_for_each_block_structure_returns_true_when_valid() -> None:
+    """_validate_for_each_block_structure returns True for a well-formed for_each block."""
+    cv = CrossValidator()
+
+    result = cv._validate_for_each_block_structure(
+        {
+            "mode": "filter",
+            "in": "src",
+            "field": "x",
+            "value_to_compare": "cmp",
+            "relationship": "equal",
+        },
+        eager_termination=False,
+    )
+
+    assert result is True
+    assert len(cv._event_logs) == 0
+
+
+def test_validate_condition_clause_sets_valid_false_when_expression_block_invalid(
+    mocker: MockerFixture,
+) -> None:
+    """_validate_condition_clause returns False when an expression block is structurally invalid."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_relationship", return_value=True)
+    mocker.patch.object(cv, "_validate_expression_block", return_value=False)
+
+    condition_clause = {
+        "relationship": "equal",
+        "left_hand": {"aggregation": {"operands": ["a"]}},
+        "right_hand": {"aggregation": {"operands": ["b"]}},
+    }
+    result = cv._validate_condition_clause(condition_clause, eager_termination=False)
+
+    assert result is False
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_pairwise_condition_unequal_list_lengths(eager_termination: bool) -> None:
+    """_evaluate_pairwise_condition logs an error and raises/returns False for unequal length lists."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="equal length"):
+            cv._evaluate_pairwise_condition([1, 2, 3], [1, 2], lambda a, b: a == b, eager_termination=True)
+    else:
+        result = cv._evaluate_pairwise_condition([1, 2, 3], [1, 2], lambda a, b: a == b, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_evaluate_condition_clause_array_returns_false_on_unsatisfied_clause(
+    mocker: MockerFixture,
+) -> None:
+    """_evaluate_condition_clause_array logs and returns False when a clause is not satisfied."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, False, True])
+
+    clauses = [{"relationship": "equal"}, {"relationship": "equal"}, {"relationship": "equal"}]
+    result = cv._evaluate_condition_clause_array(clauses, eager_termination=False)
+
+    assert result is False
+    assert any("Unsatisfied condition clause" in str(log) for log in cv._event_logs)

@@ -665,11 +665,11 @@ class TaskManager:
             return f"{output_prefix} ({task_id})"
 
     @staticmethod
-    def handle_herd_initializaition(args: dict[str, Any], output_manager: OutputManager) -> None:
+    def handle_herd_initialization(args: dict[str, Any], output_manager: OutputManager) -> None:
         """Handles initialization of the herd based on specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
-            "function": TaskManager.handle_herd_initializaition.__name__,
+            "function": TaskManager.handle_herd_initialization.__name__,
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Herd initialization start", "Initializing herd data...", info_map)
@@ -698,7 +698,8 @@ class TaskManager:
 
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
 
-        TaskManager.handle_herd_initializaition(args, output_manager)
+        if simulation_type.simulate_animals:
+            TaskManager.handle_herd_initialization(args, output_manager)
 
         simulator = SimulationEngine(simulation_type=simulation_type)
         simulator.simulate()
@@ -993,7 +994,7 @@ class TaskManager:
     ) -> None:
         """Handler for all methods related to herd initialization."""
         args["init_herd"] = True
-        TaskManager.handle_herd_initializaition(args=args, output_manager=output_manager)
+        TaskManager.handle_herd_initialization(args=args, output_manager=output_manager)
         TaskManager.handle_post_processing(
             args=args,
             input_manager=input_manager,

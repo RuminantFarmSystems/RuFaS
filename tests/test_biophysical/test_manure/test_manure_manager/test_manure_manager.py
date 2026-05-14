@@ -6,7 +6,6 @@ import pytest
 from pytest_mock import MockerFixture, MockFixture
 
 from RUFAS.biophysical.manure.digester.digester import Digester
-from RUFAS.biophysical.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.biophysical.manure.manure_manager import STORAGE_CLASS_TO_TYPE, ManureManager
 from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.biophysical.manure.processor import Processor
@@ -17,7 +16,11 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
-from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequestResults, NutrientRequest
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    FieldManureSupplier,
+    NutrientRequestResults,
+    NutrientRequest,
+)
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -894,12 +897,10 @@ def test_generate_origin_key_invalid_logs_and_raises(manure_manager: ManureManag
     )
 
 
-@pytest.mark.parametrize("animals_simulated", [True, False])
 @pytest.mark.parametrize("use_supplemental_manure", [True, False])
 @pytest.mark.parametrize("request_result_is_none", [True, False])
 def test_request_nutrients(
     mocker: MockerFixture,
-    animals_simulated: bool,
     use_supplemental_manure: bool,
     request_result_is_none: bool,
 ) -> None:
@@ -936,28 +937,23 @@ def test_request_nutrients(
     mocker.patch.object(manure_manager, "_calculate_supplemental_manure_needed", return_value="calculated_supplemental")
 
     # Act
-    actual_results = manure_manager.request_nutrients(mock_nutrient_request, animals_simulated, mock_time)
+    actual_results = manure_manager.request_nutrients(mock_nutrient_request, mock_time)
 
     # Assert
-    if animals_simulated:
-        if request_result_is_none:
-            if use_supplemental_manure:
-                mock_field_request.assert_called_once_with("calculated_supplemental")
-                mock_remove.assert_not_called()
-                assert actual_results == supplemental_result
-            else:
-                assert actual_results is None
+    if request_result_is_none:
+        if use_supplemental_manure:
+            mock_field_request.assert_called_once_with("calculated_supplemental")
+            mock_remove.assert_not_called()
+            assert actual_results == supplemental_result
         else:
-            mock_remove.assert_called_once()
-            if use_supplemental_manure:
-                mock_add_log.assert_called_once()
-                assert actual_results == request_result + supplemental_result
-            else:
-                assert actual_results == request_result
-
+            assert actual_results is None
     else:
-        mock_field_request.assert_called_once_with(mock_nutrient_request)
-        assert actual_results == supplemental_result
+        mock_remove.assert_called_once()
+        if use_supplemental_manure:
+            mock_add_log.assert_called_once()
+            assert actual_results == request_result + supplemental_result
+        else:
+            assert actual_results == request_result
 
 
 @pytest.mark.parametrize("is_nitrogen_limiting_nutrient", [True, False])

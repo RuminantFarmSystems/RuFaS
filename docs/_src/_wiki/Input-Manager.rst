@@ -484,9 +484,292 @@ Examples of properties blobs in action:
 The "cross-validation" blob
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This blob is intended to provide a way to ensure input data for
-different parts of the codebase are congruent. This blob is yet to be
-implemented.
+Cross-validation enforces coherence across fields and files — ensuring that independently valid inputs also make sense when considered together. While individual-field validation in the properties blob can confirm that values are well-formed and within acceptable ranges, it cannot capture relationships between different parts of the input structure.
+
+Cross-validation fills this gap by validating cross-field dependencies and system-level constraints. For example, verifying that the total number of stalls across all calf pens is at least as large as the number of calves divided by the maximum stocking density requires values from multiple parts of the input tree. These checks ensure that the overall configuration is not just syntactically valid, but operationally realistic and internally consistent, helping prevent subtle configuration errors that could lead to invalid or misleading simulation results.
+
+The cross-validation configuration is stored in one or more standalone
+JSON files (separate from the main metadata file). Each file contains a
+top-level ``"cross_validation"`` key whose value is an array of
+*validation blocks*.
+
+Cross-validation file paths are registered in the metadata under a
+dedicated ``cross_validation_file_paths`` entry. Input Manager loads
+every file in that list and runs all blocks from all files in order.
+
+Structure of a validation block
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Each block has four top-level keys:
+
+- ``description`` — human-readable label reported in error logs when
+  the block fails.
+- ``aliases`` — maps short local names (used inside this block) to
+  actual data addresses or literal constant values.
+- ``apply_when`` *(optional)* — an array of condition clauses that
+  act as a guard: if any clause is not satisfied the entire block is
+  skipped and counted as passing.
+- ``rules`` — an array of condition clauses that must all be satisfied
+  for the block to pass.
+
+Template:
+
+::
+
+   {
+     "description": "<human-readable label>",
+     "aliases": {
+       "variables": {
+         "<alias>": "<dot-separated address in IM pool>"
+       },
+       "constants": {
+         "<alias>": <literal value>
+       }
+     },
+     "apply_when": [ <condition clause>, ... ],
+     "rules":      [ <condition clause>, ... ]
+   }
+
+
+Aliases
+'''''''
+
+The ``aliases`` block populates a local *alias pool* used only while
+evaluating cross validation rules. It has two optional sub-keys:
+
+- ``variables`` — a mapping of alias name → dot-separated address.
+  Input Manager resolves each address against the IM data pool (the
+  same pool used by ``get_data()``) and stores the result under the
+  alias name.
+- ``constants`` — a mapping of alias name → literal value (number,
+  string, boolean). No pool lookup is performed; the literal is stored
+  as-is.
+
+Only the keys ``variables`` and ``constants`` are accepted; any other
+key in ``aliases`` is treated as an error.
+
+
+Condition clauses
+'''''''''''''''''
+
+Both ``apply_when`` entries and ``rules`` entries are *condition
+clauses*. A condition clause compares a left-hand expression to a
+right-hand expression using a relationship operator:
+
+::
+
+   {
+     "left_hand":  <expression block>,
+     "right_hand": <expression block>,
+     "relationship": "<operator>"
+   }
+
+Supported relationship operators:
+
++-------------------------+-----------------------------------------------+
+| Operator                | Meaning                                       |
++=========================+===============================================+
+| ``equal``               | LHS == RHS (pairwise when both are lists)     |
++-------------------------+-----------------------------------------------+
+| ``not_equal``           | LHS != RHS                                    |
++-------------------------+-----------------------------------------------+
+| ``greater``             | LHS > RHS (pairwise when both are lists)      |
++-------------------------+-----------------------------------------------+
+| ``greater_or_equal_to`` | LHS >= RHS (pairwise when both are lists)     |
++-------------------------+-----------------------------------------------+
+| ``is_of_type``          | All LHS values match the type string in RHS   |
+|                         | (``"string"``, ``"integer"``, ``"float"``,    |
+|                         | ``"boolean"``, ``"number"``)                  |
++-------------------------+-----------------------------------------------+
+| ``is_null``             | All LHS values are ``None``                   |
++-------------------------+-----------------------------------------------+
+| ``regex``               | LHS value fully matches the RHS regex pattern |
++-------------------------+-----------------------------------------------+
+| ``is_equal_length``     | LHS and RHS are lists of the same length      |
++-------------------------+-----------------------------------------------+
+
+When both sides resolve to lists of equal length, comparison operators
+(``equal``, ``not_equal``, ``greater``, ``greater_or_equal_to``) are
+applied pairwise and every pair must pass.
+
+Expression blocks
+'''''''''''''''''
+
+Each of ``left_hand`` and ``right_hand`` is an *expression block*.
+Exactly one of the following sub-block types must be present:
+
+**aggregation** — resolves one or more aliases from the pool and
+applies an operation.
+
+::
+
+   {
+     "aggregation": {
+       "operation": "<op>",
+       "operands":  ["<alias>", ...],
+       "mode":      "<element_wise | aggregate>"
+     },
+     "save_as": "<alias>"
+   }
+
+- ``operands`` — non-empty list of alias names to resolve.
+- ``operation`` — aggregation function to apply. Supported operations:
+  ``"no_op"`` (pass through), ``"sum"``, ``"division"``. When
+  ``operands`` contains more than one entry, ``operation`` must be
+  provided and cannot be ``"no_op"``.
+- ``mode`` — required when any resolved operand is a list or dict:
+
+  - ``"element_wise"`` — return the resolved values as-is, one per
+    element.
+  - ``"aggregate"`` — apply the operation across all elements and
+    return a single result.
+
+**for_each** — iterates over a list of dicts in the alias pool and
+either filters entries or enforces a condition on every entry.
+
+::
+
+   {
+     "for_each": {
+       "in":               "<alias for list[dict]>",
+       "field":            "<key within each dict to evaluate>",
+       "value_to_compare": "<alias for scalar comparand>",
+       "field_to_compare": "<key within each dict used as comparand>",
+       "relationship":     "<operator>",
+       "mode":             "<filter | enforce>"
+     },
+     "save_as": "<alias>"
+   }
+
+- ``in`` — alias that resolves to a ``list`` of ``dict`` objects.
+- ``field`` — the dict key whose value is the left-hand comparand for
+  each entry.
+- Exactly one of ``value_to_compare`` or ``field_to_compare`` must be
+  provided:
+
+  - ``value_to_compare`` — alias resolved once from the pool; the same
+    value is used as the right-hand comparand for every entry.
+  - ``field_to_compare`` — key read from each entry at comparison time.
+
+- ``relationship`` — one of the supported operators listed above.
+- ``mode``:
+
+  - ``"filter"`` — returns the subset of entries that satisfy the
+    condition.
+  - ``"enforce"`` — returns ``[True]`` when all entries satisfy the
+    condition, otherwise ``[False]``.
+
+**save_as** (optional, applies to both block types)
+
+If ``"save_as"`` is present on an expression block, the result of that
+expression is written back into the local alias pool under the given
+name. This allows a computed intermediate value to be referenced by
+subsequent expressions within the same block.
+
+::
+
+   "right_hand": {
+     "aggregation": {
+       "operation": "division",
+       "operands": ["number_of_calves", "pen_stocking_density"]
+     },
+     "save_as": "min_num_stalls"
+   }
+
+The ``apply_when`` guard
+''''''''''''''''''''''''
+
+When ``apply_when`` is present, Input Manager evaluates every clause in
+the array before running the ``rules``. If any ``apply_when`` clause is
+*not* satisfied, the entire block is skipped and treated as passing.
+This is useful for blocks whose rules only make sense under specific
+conditions — for example, a rule that applies only when a pen's animal
+type is ``"CALF"``.
+
+::
+
+   "apply_when": [
+     {
+       "left_hand": {
+         "aggregation": { "operation": "no_op", "mode": "aggregate",
+                          "operands": ["pen_animal_type"] }
+       },
+       "right_hand": {
+         "aggregation": { "operation": "no_op", "mode": "element_wise",
+                          "operands": ["calf_pen_type"] }
+       },
+       "relationship": "equal"
+     }
+   ]
+
+Error behaviour and ``eager_termination``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When a block's rules fail, Input Manager records the block's
+``description`` in a list of failures. Two termination modes control
+what happens next:
+
+- **Eager termination on** (normal simulation): the first failing rule
+  inside a block stops evaluation of that block immediately. The first
+  failing block stops evaluation of the entire ruleset.
+- **Eager termination off** (``-ov`` mode): all rules in all blocks are
+  evaluated. At the end, if any block failed, Input Manager logs all
+  failing block descriptions and returns ``False``.
+
+In both modes, ``apply_when`` failures are silent — they mean "this
+block does not apply" and are always counted as passing.
+
+Full example
+^^^^^^^^^^^^
+
+The following example checks that the total number of stalls in all
+calf pens is sufficient to hold every calf at the configured maximum
+stocking density. The ``apply_when`` guard ensures the rule is skipped
+if the first pen is not a calf pen:
+
+::
+
+   {
+     "description": "Number of stalls in calf pen",
+     "aliases": {
+       "variables": {
+         "number_of_calves":    "animal.herd_information.calf_num",
+         "pen_animal_type":     "animal.pen_information.0.animal_combination",
+         "pen_stall_num":       "animal.pen_information.0.number_of_stalls",
+         "pen_stocking_density":"animal.pen_information.0.max_stocking_density"
+       },
+       "constants": {
+         "calf_pen_type": "CALF"
+       }
+     },
+     "apply_when": [
+       {
+         "left_hand":  { "aggregation": { "operation": "no_op",
+                          "mode": "aggregate", "operands": ["pen_animal_type"] } },
+         "right_hand": { "aggregation": { "operation": "no_op",
+                          "mode": "element_wise", "operands": ["calf_pen_type"] } },
+         "relationship": "equal"
+       }
+     ],
+     "rules": [
+       {
+         "left_hand":  { "aggregation": { "operation": "sum",
+                          "mode": "aggregate", "operands": ["pen_stall_num"] } },
+         "right_hand": { "aggregation": { "operation": "division",
+                          "mode": "element_wise",
+                          "operands": ["number_of_calves", "pen_stocking_density"] },
+                         "save_as": "min_num_stalls" },
+         "relationship": "greater_or_equal_to"
+       }
+     ]
+   }
+
+Decision-tree flow diagram
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. mermaid:: /_static/cross_validation_flow.mmd
+   :zoom:
+
+
 
 .. |RuFaS Overview - IM| image:: https://github.com/RuminantFarmSystems/RuFaS/assets/70217952/33d2952d-a49e-4cbd-b2d8-798a0ea69dcc
 .. |Input Manager Data Validation Overview| image:: https://github.com/RuminantFarmSystems/RuFaS/assets/70217952/064328ad-eeda-4936-91a7-a026ace4fbf3

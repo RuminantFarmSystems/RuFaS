@@ -1,5 +1,4 @@
 from math import exp, inf
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -23,7 +22,7 @@ class MineralizationDecomposition:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_and_decompose_nitrogen(self) -> None:
@@ -168,6 +167,8 @@ class MineralizationDecomposition:
         References
         ----------
         SWAT Theoretical documentation eqn. 3:1.2.8
+        Current return value is a temporary fix to replace the process based method for the effect of the soil C, N,
+         and P on the decomposition rate factor. # TODO: Check if the temporary solution is till intended = issue #2990
 
         Notes
         -----
@@ -181,8 +182,6 @@ class MineralizationDecomposition:
             carbon_phosphorus_ratio, 200
         )
         assert nitrogen_term is not None and phosphorus_term is not None
-        # temporary fix to replace the process based method for the effect of the soil C, N, and P on the decomposition
-        # rate factor
         return 1
 
     @staticmethod
