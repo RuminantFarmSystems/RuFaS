@@ -8,12 +8,12 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest
 from RUFAS.data_structures.manure_types import ManureType
 
 
-@mark.parametrize("nitrogen_one", [100])
-@mark.parametrize("nitrogen_two", [125])
-@mark.parametrize("inorganic_frac_one", [0.5])
-@mark.parametrize("inorganic_frac_two", [0.2])
-@mark.parametrize("ammonium_frac_one", [0.1])
-@mark.parametrize("ammonium_frac_two", [0.5])
+@mark.parametrize("nitrogen_one", [100, 0])
+@mark.parametrize("nitrogen_two", [125, 0])
+@mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99])
+@mark.parametrize("inorganic_frac_two", [0.2, 0.01, 0.99])
+@mark.parametrize("ammonium_frac_one", [0.1, 0.01, 0.99])
+@mark.parametrize("ammonium_frac_two", [0.5, 0.01, 0.99])
 def test_add_nitrogen_nutrient_request_results(
     nitrogen_one: float,
     nitrogen_two: float,
@@ -49,29 +49,31 @@ def test_add_nitrogen_nutrient_request_results(
     ## Expected values
     expected_nitrogen = nitrogen_one + nitrogen_two
 
-    org_one = organic_frac_one * nitrogen_one
-    org_two = organic_frac_two * nitrogen_two
-    expected_organic_frac = (org_one + org_two) / expected_nitrogen
+    if expected_nitrogen <= 0: # both zero
+        expected_inorganic_frac = inorganic_frac_one
+        expected_organic_frac = organic_frac_one
+        expected_ammonium_frac = ammonium_frac_one
+    else:
+        inorganic_one = inorganic_frac_one * nitrogen_one
+        inorganic_two = inorganic_frac_two * nitrogen_two
+        total_inorganic = inorganic_one + inorganic_two
+        expected_inorganic_frac =  total_inorganic / expected_nitrogen
 
-    inorg_one = inorganic_frac_one * nitrogen_one
-    inorg_two = inorganic_frac_two * nitrogen_two
-    expected_inorganic_frac = (inorg_one + inorg_two) / expected_nitrogen
+        expected_organic_frac = 1 - expected_inorganic_frac # works here because of our setup above.
 
-    inorg_total = expected_inorganic_frac * expected_nitrogen
-    ammonium_one = ammonium_frac_one * inorganic_frac_one * nitrogen_one
-    ammonium_two = ammonium_frac_two * inorganic_frac_two * nitrogen_two
-    expected_ammonium_frac = (ammonium_one + ammonium_two) / inorg_total
-
-    ## TODO: does not yet account for the ``combined_total_nitrogen <= 0`` case
+        inorganic_total = (expected_inorganic_frac * expected_nitrogen)
+        ammonium_one = (ammonium_frac_one * inorganic_frac_one * nitrogen_one)
+        ammonium_two = ammonium_frac_two * inorganic_frac_two * nitrogen_two
+        expected_ammonium_frac = (ammonium_one + ammonium_two) / inorganic_total
 
     ## Observed
     combined_request = first_request + second_request
 
     # Assert
-    assert combined_request.nitrogen == expected_nitrogen
-    assert combined_request.organic_nitrogen_fraction == expected_organic_frac
-    assert combined_request.inorganic_nitrogen_fraction == expected_inorganic_frac
-    assert combined_request.ammonium_nitrogen_fraction == expected_ammonium_frac
+    assert combined_request.nitrogen == pytest.approx(expected_nitrogen)
+    assert combined_request.inorganic_nitrogen_fraction == pytest.approx(expected_inorganic_frac)
+    assert combined_request.organic_nitrogen_fraction == pytest.approx(expected_organic_frac)
+    assert combined_request.ammonium_nitrogen_fraction == pytest.approx(expected_ammonium_frac)
 
 
 def test_add_phosphorus_nutrient_request_results():
