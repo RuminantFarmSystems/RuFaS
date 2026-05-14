@@ -14,3 +14,17 @@ example_structures_files
 # ipynb files and checkpoints for example structure file
 *.quarto_ipynb
 .ipynb_checkpoints/
+
+# ------------------------------------------------------------
+# Quarto generated build/cache/output directories
+# These folders are automatically regenerated during
+# `quarto render` and should not be version controlled.
+# Ignoring them does NOT affect HTML/PDF compilation.
+# ------------------------------------------------------------
+
+docs/scientific/quarto-test/output/
+docs/scientific/quarto-test/_book/
+docs/scientific/quarto-test/.quarto/
+
+docs/scientific/quarto-scidoc/_book/
+docs/scientific/quarto-scidoc/.quarto/
