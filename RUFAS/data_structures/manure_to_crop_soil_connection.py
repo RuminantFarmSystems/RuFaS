@@ -177,34 +177,27 @@ class NutrientRequestResults:
         combined_total_dry_matter = self.dry_matter + other.dry_matter
 
         if combined_total_nitrogen > 0:
-            self_nitrogen_contribution = self.nitrogen / combined_total_nitrogen
-            other_nitrogen_contribution = other.nitrogen / combined_total_nitrogen
-
+        
             combined_organic_nitrogen_fraction = (
-                self.organic_nitrogen_fraction * self_nitrogen_contribution
-                + other.organic_nitrogen_fraction * other_nitrogen_contribution
-            )
-            combined_inorganic_nitrogen_fraction = (
-                self.inorganic_nitrogen_fraction * self_nitrogen_contribution
-                + other.inorganic_nitrogen_fraction * other_nitrogen_contribution
-            )
+                self.organic_nitrogen_fraction * self.nitrogen
+                + other.organic_nitrogen_fraction * other.nitrogen
+            ) / combined_total_nitrogen
 
-            combined_total_inorganic_nitrogen = (
-                self.inorganic_nitrogen_fraction * self.nitrogen + other.inorganic_nitrogen_fraction * other.nitrogen
-            )
+            self_inorganic_nitrogen_mass = self.inorganic_nitrogen_fraction * self.nitrogen
+            other_inorganic_nitrogen_mass = other.inorganic_nitrogen_fraction * other.nitrogen
+            combined_total_inorganic_nitrogen = (self_inorganic_nitrogen_mass + other_inorganic_nitrogen_mass)
+
+            combined_inorganic_nitrogen_fraction = (
+                self_inorganic_nitrogen_mass
+                + other_inorganic_nitrogen_mass
+            ) / combined_total_nitrogen
 
             if combined_total_inorganic_nitrogen > 0:
-                self_inorganic_contribution = (
-                    self.inorganic_nitrogen_fraction * self.nitrogen / combined_total_inorganic_nitrogen
-                )
-                other_inorganic_contribution = (
-                    other.inorganic_nitrogen_fraction * other.nitrogen / combined_total_inorganic_nitrogen
-                )
 
                 combined_ammonium_nitrogen_fraction = (
-                    self.ammonium_nitrogen_fraction * self_inorganic_contribution
-                    + other.ammonium_nitrogen_fraction * other_inorganic_contribution
-                )
+                    self.ammonium_nitrogen_fraction * self_inorganic_nitrogen_mass
+                    + other.ammonium_nitrogen_fraction * other_inorganic_nitrogen_mass
+                ) / combined_total_inorganic_nitrogen
             else:
                 combined_ammonium_nitrogen_fraction = self.ammonium_nitrogen_fraction
         else:
