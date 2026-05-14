@@ -61,7 +61,7 @@ class FeedManager:
         Represents the allowances for feed purchases during a planning cycle.
     runtime_purchase_allowance : RuntimePurchaseAllowance
         Represents the allowances for feed purchases during runtime.
-    advanced_purchase_allowance : AdvancePurchaseAllowance
+    advance_purchase_allowance : AdvancePurchaseAllowance
         Represents the allowances for feeds purchased at the beginning of a ration interval.
     crop_to_rufas_id : dict[str, RUFAS_ID]
         Maps crop configurations to their corresponding RUFAS IDs for harvested crops.
@@ -107,7 +107,7 @@ class FeedManager:
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(
             sorted_purchased_allowances
         )
-        self.advanced_purchase_allowance: AdvancePurchaseAllowance = AdvancePurchaseAllowance(
+        self.advance_purchase_allowance: AdvancePurchaseAllowance = AdvancePurchaseAllowance(
             sorted_purchased_allowances
         )
 
@@ -522,13 +522,13 @@ class FeedManager:
             amount_to_purchase = max(amount_requested - available_amount, 0.0) * (1 + feed_info.buffer)
             is_fulfillable_with_purchase = (
                 amount_requested - available_amount
-            ) <= self.advanced_purchase_allowance.allowances.get(feed_id, 0.0) + allowance_tolerance
+            ) <= self.advance_purchase_allowance.allowances.get(feed_id, 0.0) + allowance_tolerance
             if not is_fulfillable_with_purchase:
                 self._om.add_warning(
                     "Ration Interval Purchase Warning",
                     f"Requested feed {feed_id} exceeds ration interval purchases allowance. "
                     f"Requested: {amount_requested}, Available: {available_amount}, "
-                    f"Allowance: ${self.advanced_purchase_allowance.allowances.get(feed_id, 0.0)}. "
+                    f"Allowance: ${self.advance_purchase_allowance.allowances.get(feed_id, 0.0)}. "
                     f"Still making full purchase.",
                     info_map,
                 )

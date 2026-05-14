@@ -217,7 +217,7 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
     feed_manager.runtime_purchase_allowance = RuntimePurchaseAllowance(
         [{"purchased_feed": feed.rufas_id, "runtime_purchase_allowance": 10.0} for feed in mock_available_feeds]
     )
-    feed_manager.advanced_purchase_allowance = AdvancePurchaseAllowance(
+    feed_manager.advance_purchase_allowance = AdvancePurchaseAllowance(
         [{"purchased_feed": feed.rufas_id, "advance_purchase_allowance": 10.0} for feed in mock_available_feeds]
     )
 
@@ -269,7 +269,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
         "__init__",
         return_value=None,
     )
-    mock_advanced_purchase_allowance_init = mocker.patch.object(
+    mock_advance_purchase_allowance_init = mocker.patch.object(
         AdvancePurchaseAllowance,
         "__init__",
         return_value=None,
@@ -321,7 +321,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
     ]
     mock_planning_cycle_allowance_init.assert_called_once_with(sorted_allowances)
     mock_runtime_purchase_allowance_init.assert_called_once_with(sorted_allowances)
-    mock_advanced_purchase_allowance_init.assert_called_once_with(sorted_allowances)
+    mock_advance_purchase_allowance_init.assert_called_once_with(sorted_allowances)
 
     assert feed_manager.crop_to_rufas_id == {"corn_silage": 1}
     assert feed_manager._cumulative_feed_requests == {1: 0.0, 2: 0.0}
