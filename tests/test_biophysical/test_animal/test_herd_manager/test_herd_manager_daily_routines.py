@@ -71,18 +71,26 @@ def test_update_sold_animal_statistics(
     mock_update_sold_newborn_calves = mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_newborn_calf_statistics"
     )
+    mock_update_youngstock_mortality = mocker.patch(
+        "RUFAS.biophysical.animal.herd_manager.HerdManager._update_youngstock_mortality_statistics"
+    )
 
     sold_newborn_calves = mock_herd["calves"]
     sold_heiferIIs = mock_herd["heiferIIs"]
     sold_and_died_cows = mock_herd["lac_cows"]
+    removed_animals = sold_newborn_calves + sold_heiferIIs + sold_and_died_cows
 
     herd_manager._update_sold_animal_statistics(
-        sold_newborn_calves=sold_newborn_calves, sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
+        sold_newborn_calves=sold_newborn_calves,
+        sold_heiferIIs=sold_heiferIIs,
+        sold_and_died_cows=sold_and_died_cows,
+        removed_animals=removed_animals,
     )
 
     mock_update_sold_newborn_calves.assert_called_once_with(sold_newborn_calves)
     mock_update_sold_heiferIIs.assert_called_once_with(sold_heiferIIs)
     mock_update_sold_and_died_cows.assert_called_once_with(sold_and_died_cows)
+    mock_update_youngstock_mortality.assert_called_once_with(removed_animals)
 
 
 @pytest.mark.parametrize(
@@ -688,7 +696,10 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         call(mock_time, herd_manager.cows),
     ]
     mock_update_sold_animal_statistics.assert_called_once_with(
-        sold_newborn_calves=[], sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
+        sold_newborn_calves=[],
+        sold_heiferIIs=sold_heiferIIs,
+        sold_and_died_cows=sold_and_died_cows,
+        removed_animals=sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows,
     )
     assert mock_check_if_cows_need_to_be_sold.call_count == 0
     assert mock_check_if_replacement_heifers_needed.call_count == 0

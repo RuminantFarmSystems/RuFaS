@@ -1,6 +1,6 @@
 import sys
 from datetime import timedelta
-from random import random
+from random import random, randint
 from typing import Callable, cast
 
 from scipy.stats import truncnorm
@@ -212,6 +212,7 @@ class Animal:
         self._days_in_pregnancy: int = 0
         self._future_cull_date: int | None = None
         self._future_death_date: int | None = None
+        self._future_death_reason: str = animal_constants.DEATH_CULL
         self._daily_horizontal_distance: float = 0.0
         self._daily_vertical_distance: float = 0.0
         self._daily_distance: float = 0.0
@@ -1245,6 +1246,8 @@ class Animal:
         )
         self.nutrients.total_phosphorus_in_animal = args.get("initial_phosphorus")
 
+        self._setup_calf_mortality()
+
     def _initialize_calf_or_heiferI(self, args: CalfValuesTypedDict | HeiferIValuesTypedDict) -> None:
         """
         Initializes the attributes of a calf or heifer.
@@ -1261,6 +1264,11 @@ class Animal:
         self.wean_weight = args.get("wean_weight")
         self.mature_body_weight = args.get("mature_body_weight")
         self.events.init_from_string(args.get("events"))
+
+        if self.animal_type == AnimalType.CALF:
+            self._setup_calf_mortality()
+        elif self.animal_type == AnimalType.HEIFER_I:
+            self._setup_heifer_mortality()
 
     def _determine_heifer_reproduction_programs(
         self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
@@ -1632,6 +1640,7 @@ class Animal:
                     wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
                 )
                 self.future_death_date = self.determine_future_death_date()
+                self._future_death_reason = animal_constants.DEATH_CULL
                 self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
         self.events += reproduction_outputs.events
@@ -1840,9 +1849,9 @@ class Animal:
         if self.days_born == self.future_cull_date:
             self.sold_at_day = time.simulation_day
             animal_status = AnimalStatus.SOLD
-        if self.days_born == self.future_death_date:
+        if self._future_death_date is not None and self.days_born == self._future_death_date:
             self.dead_at_day = time.simulation_day
-            self.cull_reason = animal_constants.DEATH_CULL
+            self.cull_reason = self._future_death_reason
             animal_status = AnimalStatus.DEAD
 
         return animal_status, newborn_calf_config
@@ -1921,6 +1930,71 @@ class Animal:
 
         """
         self.animal_type = AnimalType.HEIFER_I
+        self._setup_heifer_mortality()
+
+    def _setup_calf_mortality(self) -> None:
+        """
+        Roll for pre-wean mortality and schedule a death day if the calf is fated to die.
+
+        The cumulative probability of pre-wean death is :attr:`AnimalConfig.calf_mortality_rate`.
+        The death day is sampled uniformly across the pre-wean window ``[1, wean_day - 1]``.
+        If the sampled day falls on or before the calf's current age, the calf has already
+        survived past that day and no death is scheduled.
+
+        Skipped for stillborn calves and for calves removed from the herd at birth
+        (male calves and culled female calves).
+        """
+        if self.stillborn_day is not None or self.sold_at_day is not None:
+            return
+        rate = AnimalConfig.calf_mortality_rate
+        if rate <= 0:
+            return
+        if random() >= rate:
+            return
+        if AnimalConfig.wean_day <= 1:
+            return
+        death_day = randint(1, AnimalConfig.wean_day - 1)
+        if death_day > self.days_born:
+            self._future_death_date = death_day
+            self._future_death_reason = animal_constants.CALF_MORTALITY_CULL
+
+    def _setup_heifer_mortality(self) -> None:
+        """
+        Roll for post-wean mortality and schedule a death day if the heifer is fated to die.
+
+        The cumulative probability of post-wean death is
+        :attr:`AnimalConfig.heifer_mortality_rate`. Of these deaths, 2/3 are allocated to
+        the HeiferI window ``[wean_day + 1, heifer_breed_start_day - 1]`` and 1/3 to the
+        HeiferII window ``[heifer_breed_start_day + 1, heifer_breed_start_day +
+        average_gestation_length - heifer_prefresh_day]``. The upper bound for HeiferII is
+        the typical entry day into HeiferIII (springer), keeping pre-springer mortality
+        cleanly within the youngstock window; any outlier that calves into the cow stage
+        before the drawn death day falls through to cow-stage death/cull logic.
+
+        If the sampled day falls on or before the animal's current age, no death is
+        scheduled.
+        """
+        rate = AnimalConfig.heifer_mortality_rate
+        if rate <= 0:
+            return
+        if random() >= rate:
+            return
+        if random() < 2 / 3:
+            lower = AnimalConfig.wean_day + 1
+            upper = AnimalConfig.heifer_breed_start_day - 1
+        else:
+            lower = AnimalConfig.heifer_breed_start_day + 1
+            upper = (
+                AnimalConfig.heifer_breed_start_day
+                + AnimalConfig.average_gestation_length
+                - AnimalConfig.heifer_prefresh_day
+            )
+        if upper < lower:
+            return
+        death_day = randint(lower, upper)
+        if death_day > self.days_born:
+            self._future_death_date = death_day
+            self._future_death_reason = animal_constants.HEIFER_MORTALITY_CULL
 
     def _transition_heiferI_to_heiferII(self, time: RufasTime) -> None:
         """
