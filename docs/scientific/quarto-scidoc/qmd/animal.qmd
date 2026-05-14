@@ -309,6 +309,431 @@ $$
 $$
 :::
 
+*Otherwise*
+
+:::{#eq-an-nrc-9}
+[[**AN.NRC.9**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa2} = 0.006 \times \text{BW} \qquad \text{if Topography = Hilly}
+$$
+:::
+
+*Otherwise*
+
+:::{#eq-an-nrc-10}
+[[**AN.NRC.10**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa2} = 0.00045 \times \text{Distance} \times \text{BW} + \text{NEa1} + \text{NEa2}
+$$
+:::
+
+* Heifers
+
+:::{#eq-an-nrc-11}
+[[**AN.NRC.11**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa1} = 0.0009 \times \text{BW} + 0.0016 \times \text{BW}
+\qquad \text{if Housing = Grazing}
+$$
+:::
+
+*Otherwise*
+
+:::{#eq-an-nrc-12}
+[[**AN.NRC.12**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEa2} = 0.006 \times \text{BW}
+\qquad \text{if Topography = Hilly}
+$$
+:::
+
+*Otherwise*
+
+$$
+\text{NEa2} = 0.00045 \times \text{Distance} \times \text{BW} + \text{NEa1} + \text{NEa2}
+$$
+[See [AN.NRC.10](#eq-an-nrc-10)]{.aside .content-visible when-format="html"}
+
+**Growth** <br>
+* Lactating and Dry Cows - will continue to grow toward their mature body weight until the end of their second lactation.
+
+:::{#eq-an-nrc-13}
+[[**AN.NRC.13**]]{.aside .content-visible when-format="html"}
+$$
+\text{MSBW} = 0.96 \times \text{MW}
+$$
+:::
+
+:::{#eq-an-nrc-14}
+[[**AN.NRC.14**]]{.aside .content-visible when-format="html"}
+$$
+\text{SBW} = 0.96 \times \text{BW}
+$$
+:::
+
+:::{#eq-an-nrc-15}
+[[**AN.NRC.15**]]{.aside .content-visible when-format="html"}
+$$
+\text{EBW} = 0.96 \times \text{SBW}
+$$
+:::
+
+:::{#eq-an-nrc-16}
+[[**AN.NRC.16**]]{.aside .content-visible when-format="html"}
+$$
+\text{EQSBW} = (\text{SBW} - \text{CW}) \times \frac{478}{\text{MSBW}} \times \text{SBW}
+$$
+:::
+
+:::{#eq-an-nrc-17}
+[[**AN.NRC.17**]]{.aside .content-visible when-format="html"}
+$$
+\text{ADG} =
+\begin{cases}
+\dfrac{(0.92 - 0.82)\times \text{MSBW}}{\text{CI}}, & \text{if Parity = 1} \\
+\dfrac{(1 - 0.92)\times \text{MSBW}}{\text{CI}}, & \text{if Parity = 2} \\
+0, & \text{if Parity > 2}
+\end{cases}
+$$
+:::
+
+:::{#eq-an-nrc-18}
+[[**AN.NRC.18**]]{.aside .content-visible when-format="html"}
+$$
+\text{EQEBG} = 0.956 \times \text{ADG}
+$$
+:::
+
+:::{#eq-an-nrc-19}
+[[**AN.NRC.19**]]{.aside .content-visible when-format="html"}
+$$
+\text{EQEBW} = 0.891 \times \text{EQSBW}
+$$
+:::
+
+:::{#eq-an-nrc-20}
+[[**AN.NRC.20**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEg} = 0.0635 \times \text{EQEBW}^{0.75} \times \text{EQEBG}^{1.097}
+$$
+:::
+
+* Heifers
+
+:::{#eq-an-nrc-21}
+[[**AN.NRC.21**]]{.aside .content-visible when-format="html"}
+$$
+\text{ADG} =
+\begin{cases}
+\dfrac{0.55 \times \text{MSBW} - \text{SBW}}
+     {(\text{Age1stBred} - \text{Age}) \times 30.4},
+& \text{before breeding} \\[10pt]
+
+\dfrac{0.82 \times \text{MSBW} - \text{SBW}}
+     {(\text{Age1st} - \text{Age}) \times 30.4},
+& \text{after breeding}
+\end{cases}
+$$
+:::
+
+:::{#eq-an-nrc-22}
+[[**AN.NRC.22**]]{.aside .content-visible when-format="html"}
+$$
+\text{EQEBG} = 0.956 \times \text{ADG}
+$$
+:::
+
+:::{#eq-an-nrc-23}
+[[**AN.NRC.23**]]{.aside .content-visible when-format="html"}
+$$
+\text{EQEBW} = 0.891 \times \text{EQSBW}
+$$
+:::
+
+:::{#eq-an-nrc-24}
+[[**AN.NRC.24**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEg} = 0.0635 \times \text{EQEBW}^{0.75} \times \text{EQEBG}^{1.097}
+$$
+:::
+
+**Pregnancy** <br>
+
+:::{#eq-an-nrc-25}
+[[**AN.NRC.25**]]{.aside .content-visible when-format="html"}
+$$
+\text{MEpreg} =
+\left(
+2 \times 0.00159 \times \text{DOP} - 0.0352
+\right)
+\times
+\frac{\text{CBW}}{45}
+\times 0.14
+\qquad
+\text{if DOP > 190}
+$$
+:::
+
+:::{#eq-an-nrc-26}
+[[**AN.NRC.26**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEpreg} = \text{MEpreg} \times 0.664
+$$
+:::
+
+**Lactation** <br>
+
+:::{#eq-an-nrc-27}
+[[**AN.NRC.27**]]{.aside .content-visible when-format="html"}
+$$
+\text{Milk}_{\text{Energy}}
+=
+0.0929 \times \text{Fat\_Milk}
++
+\frac{0.0563}{0.93} \times \text{TP\_Milk}
++
+0.0395 \times \text{Lactose\_Milk}
+$$
+:::
+
+:::{#eq-an-nrc-28}
+[[**AN.NRC.28**]]{.aside .content-visible when-format="html"}
+$$
+\text{NElact} = \text{Milken} \times \text{Milk}
+$$
+:::
+
+##### Protein Requirements
+
+**Total Protein** <br>
+Reporting of protein requirements is divided into 4 components: maintenance, growth, pregnancy, and lactation (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
+
+:::{#eq-an-nrc-36}
+[[**AN.NRC.36**]]{.aside .content-visible when-format="html"}
+$$
+\text{MPreq} = \text{MPm} + \text{MPg} + \text{MPpreg} + \text{MPlact}
+$$
+:::
+
+**Maintenance** <br>
+
+* Lactating and Dry Cows
+
+:::{#eq-an-nrc-29}
+[[**AN.NRC.29**]]{.aside .content-visible when-format="html"}
+$$
+\text{MPm}
+=
+0.3 \times (\text{BW} - \text{CW})^{0.6}
++
+4.1 \times (\text{BW} - \text{CW})^{0.5}
++
+\left(
+\text{DMI} \times 1000 \times 0.03
+-
+0.5 \times
+\left(
+\frac{\text{MPbact}}{0.8} - \text{MPbact}
+\right)
+\right)
++
+0.4 \times 11.8 \times \frac{\text{DMI}}{0.67}
+$$
+:::
+
+**Growth** <br>
+
+* Lactating and Dry Cows
+
+:::{#eq-an-nrc-30}
+[[**AN.NRC.30**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPg} =
+\begin{cases}
+0, & \text{if ADG = 0} \\[8pt]
+
+\text{ADG} \times
+\left(
+268 - 29.4 \times \frac{\text{NEg}}{\text{ADG}}
+\right),
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+:::{#eq-an-nrc-31}
+[[**AN.NRC.31**]]{.aside .content-visible when-format="html"}
+$$
+\text{EffMP\_NPg} =
+\begin{cases}
+\dfrac{83.4 - 0.114 \times \text{EQSBW}}{100},
+& \text{if EQSBW} \leq 478 \\[10pt]
+
+0.28908,
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+:::{#eq-an-nrc-32}
+[[**AN.NRC.32**]]{.aside .content-visible when-format="html"}
+$$
+\text{MPg} = \frac{\text{NPg}}{\text{EffMP\_NPg}}
+$$
+:::
+
+* Heifers
+
+:::{#eq-an-nrc-33}
+[[**AN.NRC.33**]]{.aside .content-visible when-format="html"}
+$$
+\text{Npg} =
+\begin{cases}
+0, & \text{if ADG = 0} \\[8pt]
+
+\text{ADG} \times
+\left(
+268 - 29.4 \times \frac{\text{NEg}}{\text{ADG}}
+\right),
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+:::{#eq-an-nrc-34}
+[[**AN.NRC.34**]]{.aside .content-visible when-format="html"}
+$$
+\text{EffMP\_NPg} =
+\begin{cases}
+\dfrac{83.4 - 0.114 \times \text{EQSBW}}{100},
+& \text{if EQSBW} \leq 478 \\[10pt]
+
+0.28908,
+& \text{otherwise}
+\end{cases}
+$$
+:::
+
+*Otherwise*
+
+:::{#eq-an-nrc-35}
+[[**AN.NRC.35**]]{.aside .content-visible when-format="html"}
+$$
+\text{MPg} = \frac{\text{NPg}}{\text{EffMP\_NPg}}
+$$
+:::
+
+:::{#eq-an-nrc-36}
+[[**AN.NRC.36**]]{.aside .content-visible when-format="html"}
+$$
+\text{MPreq} = \text{MPm} + \text{MPg} + \text{MPpreg} + \text{MPlact}
+$$
+:::
+
+**Pregnancy** <br>
+
+:::{#eq-an-nrc-37}
+[[**AN.NRC.37**]]{.aside .content-visible when-format="html"}
+$$
+\text{MPpreg}
+=
+\left(
+0.69 \times \text{DOP} - 69.2
+\right)
+\times
+\frac{\text{CBW}}{45 \times 0.33}
+\qquad
+\text{if DOP > 190}
+$$
+:::
+
+**Lactation** <br>
+
+:::{#eq-an-nrc-38}
+[[**AN.NRC.38**]]{.aside .content-visible when-format="html"}
+$$
+\text{MPlact}
+=
+\text{Milk}
+\times
+\frac{\text{TP}_{\text{Milk}}}{100}
+\times
+\frac{1000}{0.67}
+$$
+:::
+
+```{python}
+#| label: tbl-an-prot-req-var
+#| tbl-cap: Key variables used in protein requirement calculations.
+import_table(
+  "../resources/table_data/animal/tbl-an-prot-req-var.csv",
+  colalign = ["left", "left", "left"]
+
+)
+```
+
+#### Mineral Requirements
+Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the mineral requirements key.
+
+**Maintenance** <br>
+
+* Lactating and Dry Cows
+
+  * Calcium Equations
+
+  :::{#eq-an-nrc-39}
+[[**AN.NRC.39**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{main}} =
+\begin{cases}
+0.031 \times \text{BW}
++
+0.08 \times \dfrac{\text{BW}}{100},
+& \text{for lactating cows} \\[10pt]
+
+0.0154 \times \text{BW}
++
+0.08 \times \dfrac{\text{BW}}{100},
+& \text{for dry cows}
+\end{cases}
+$$
+:::
+
+
+  * Phosphorus Equations
+
+  :::{#eq-an-nrc-40}
+[[**AN.NRC.40**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_{\text{main}} =
+\begin{cases}
+1 \times \text{DMI}
++
+0.002 \times \text{BW},
+& \text{for lactating cows} \\[10pt]
+
+0.8 \times \text{DMI}
++
+0.002 \times \text{BW},
+& \text{for dry cows}
+\end{cases}
+$$
+:::
+
+* Heifers
+
+  * Calcium Equations
+
+  :::{#eq-an-nrc-41}
+[[**AN.NRC.41**]]{.aside .content-visible when-format="html"}
+$$
+\text{Ca}_{\text{main}}
+=
+0.0154 \times \text{BW}
++
+0.08 \times \frac{\text{BW}}{100}
+$$
+:::
 
 
 

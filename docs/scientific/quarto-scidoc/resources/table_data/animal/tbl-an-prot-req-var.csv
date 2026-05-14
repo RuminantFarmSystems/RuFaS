@@ -1,0 +1,6 @@
+﻿Variable,Description,Units
+EffMP_NPg ,Efficiency of converting metabolizable protein or net protein  ,
+MPg ,Metabolizable protein requirement for growth  ,g
+MPlact ,Metabolizable protein requirement for lactation  ,g
+MPpreg ,Metabolizable protein requirement for pregnancy ,g
+NPg , Net protein requirement for growth  ,g
