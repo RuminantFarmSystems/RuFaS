@@ -97,7 +97,7 @@ def test_add_phosphorus_nutrient_request_results(
     ## Expected
     expected_phosphorus = phosphorus_one + phosphorus_two
 
-    if expected_phosphorus <= 0:
+    if expected_phosphorus <= 0: # TODO: I'm confused by this
         expected_inorganic_fraction = inorganic_frac_one
         expected_organic_fraction = organic_frac_one
     else:
@@ -115,8 +115,40 @@ def test_add_phosphorus_nutrient_request_results(
     assert combined_request.inorganic_phosphorus_fraction == pytest.approx(expected_inorganic_fraction)
     assert combined_request.organic_phosphorus_fraction == pytest.approx(expected_organic_fraction)
 
-def test_add_matter_nutrient_request_results():
-    assert False
+@mark.parametrize("mass_one", [100, 0])
+@mark.parametrize("mass_two", [125, 0])
+@mark.parametrize("dry_frac_one", [0.5, 0.01, 0.99]) # TODO: how to handle zero?
+@mark.parametrize("dry_frac_two", [0.2, 0.01, 0.99])
+def test_add_matter_nutrient_request_results(mass_one: float, mass_two: float, dry_frac_one: float, dry_frac_two: float):
+    # Assemble
+    dry_matter_one = dry_frac_one * mass_one
+    dry_matter_two = dry_frac_two * mass_two
+
+    first_request = NutrientRequestResults(
+        total_manure_mass = mass_one,
+        dry_matter_fraction = dry_frac_one,
+        dry_matter = dry_matter_one
+    )
+    second_request = NutrientRequestResults(
+        total_manure_mass = mass_two,
+        dry_matter_fraction = dry_frac_two,
+        dry_matter = dry_matter_two
+    )
+
+    # Act
+
+    ## Expected
+    expected_mass = mass_one + mass_two
+    expected_dry_matter = dry_matter_one + dry_matter_two
+    expected_dry_fraction = expected_dry_matter / expected_mass if expected_mass > 0 else dry_frac_one # TODO: I'm confused by the <= 0 case
+
+    ## Observed
+    combined_request = first_request + second_request
+
+    ## Assert
+    assert combined_request.total_manure_mass == pytest.approx(expected_mass)
+    assert combined_request.dry_matter == expected_dry_matter
+    assert combined_request.dry_matter_fraction == pytest.approx(expected_dry_fraction)
 
 @mark.parametrize(
     "manure_type, nitrogen, phosphorus, potassium, dry_matter, total_manure_mass, "
