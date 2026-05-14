@@ -1051,25 +1051,51 @@ class AnimalModuleReporter:
                 )
 
     @classmethod
-    def report_305d_milk(cls, average_herd_305_days_milk_production: float) -> None:
+    def report_305_day_milk_yield(
+        cls,
+        herd_mean: float,
+        l1_mean: float,
+        l2_mean: float,
+        l3_plus_mean: float,
+    ) -> None:
         """
-        Adds herd mean of latest_milk_production_305days to the output manager,
-        though only for lactating cows with nonzero values.
+        Adds herd-level average 305-day milk yield outputs to the output manager.
 
         Parameters
         ----------
-        average_herd_305_days_milk_production : float
-            The herd average total past 305-day milk production.
+        herd_mean : float
+            The whole-herd average 305-day milk yield across adult cows.
+        l1_mean : float
+            The average 305-day milk yield for lactation 1 cows.
+        l2_mean : float
+            The average 305-day milk yield for lactation 2 cows.
+        l3_plus_mean : float
+            The average 305-day milk yield for lactation 3+ cows.
 
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_305d_milk.__name__,
+            "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
             "data_origin": [("MilkProduction", "perform_daily_milking_update")],
         }
         om.add_variable(
-            "milk_production_305days_herd_mean",
-            average_herd_305_days_milk_production,
+            "milk_305_day_yield_herd_mean",
+            herd_mean,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        om.add_variable(
+            "milk_305_day_yield_l1_mean",
+            l1_mean,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        om.add_variable(
+            "milk_305_day_yield_l2_mean",
+            l2_mean,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        om.add_variable(
+            "milk_305_day_yield_l3plus_mean",
+            l3_plus_mean,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
         )
 
