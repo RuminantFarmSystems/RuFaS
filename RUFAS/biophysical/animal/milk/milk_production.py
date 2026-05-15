@@ -84,7 +84,8 @@ class MilkProduction:
         self.wood_n = wood_n
 
     def _get_current_lactation_history(self) -> list[MilkProductionRecord]:
-        """Returns only the current lactation records from the full milk history."""
+        """Returns milk production records since this cow's most recent dry-off marker
+        (the last record with ``days_in_milk == 0``), so prior lactations are excluded."""
         current_lactation_history: list[MilkProductionRecord] = []
         for record in reversed(self.milk_production_history):
             if record["days_in_milk"] == 0:
