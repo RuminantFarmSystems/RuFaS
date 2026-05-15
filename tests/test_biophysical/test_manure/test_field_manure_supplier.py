@@ -75,7 +75,7 @@ def test_request_nutrients(nutrients: NutrientRequest, expected_result: Nutrient
 
 
 def test_nutrient_request_results_add_tolerates_floating_point_imprecision() -> None:
-    """Adding two NutrientRequestResults with default fractions can round to just above 1.0; validation must allow it."""
+    """Adding two NutrientRequestResults with default fractions can round just above 1.0; clamp must absorb it."""
     on_farm = NutrientRequestResults(nitrogen=810.217426, phosphorus=10.0, total_manure_mass=1000.0)
     off_farm = NutrientRequestResults(nitrogen=902.166048, phosphorus=10.0, total_manure_mass=1000.0)
 

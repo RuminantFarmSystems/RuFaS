@@ -5,7 +5,6 @@ from unittest.mock import call, MagicMock
 import pytest
 from pytest_mock import MockerFixture, MockFixture
 
-from RUFAS.biophysical.manure.digester.digester import Digester
 from RUFAS.biophysical.manure.manure_manager import STORAGE_CLASS_TO_TYPE, ManureManager
 from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.biophysical.manure.processor import Processor
@@ -88,7 +87,7 @@ def test_init(
         "RUFAS.biophysical.manure.manure_manager.ManureManager._populate_adjacency_matrix"
     )
 
-    ManureManager()
+    ManureManager(0.5, 0.5, 0.5)
 
     assert mock_get_data.call_args_list == [call("manure_management"), call("manure_processor_connection")]
     mock_get_processor_configs_by_name.assert_called_once_with(manure_management_input_json)
@@ -96,7 +95,7 @@ def test_init(
         processor_connections_input_json, expected_processor_definitions_by_name
     )
     mock_create_all_processors.assert_called_once_with(
-        expected_processor_connections_by_name, expected_processor_definitions_by_name
+        expected_processor_connections_by_name, expected_processor_definitions_by_name, 0.5, 0.5, 0.5
     )
     mock_populate_adjacency_matrix.assert_called_once_with(expected_processor_connections_by_name)
 
@@ -384,7 +383,7 @@ def test_create_all_processors(
     )
 
     manure_manager._create_all_processors(
-        expected_processor_connections_by_name, expected_processor_definitions_by_name
+        expected_processor_connections_by_name, expected_processor_definitions_by_name, 0.5, 0.5, 0.5
     )
 
     assert mock_separator_init.call_count == 2
@@ -989,6 +988,7 @@ def test_remove_nutrients_from_storage(
         volume=1.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0,
     )
     STORAGE_CLASS_TO_TYPE[type(composting)] = ManureType.LIQUID
     mock_split.return_value = ([], [composting])
@@ -1144,7 +1144,7 @@ def test_request_nutrients_daily_spread_with_supplement(mocker: MockerFixture) -
     mocker.patch.object(manure_manager, "_calculate_supplemental_manure_needed", return_value="daily_shortfall")
     mock_off_farm = mocker.patch.object(FieldManureSupplier, "request_nutrients", return_value=off_farm_result)
 
-    actual = manure_manager.request_nutrients(request, True, MagicMock(spec=RufasTime))
+    actual = manure_manager.request_nutrients(request, MagicMock(spec=RufasTime))
 
     assert actual == daily_result + off_farm_result
     mock_split.assert_called_once_with()
@@ -1152,7 +1152,9 @@ def test_request_nutrients_daily_spread_with_supplement(mocker: MockerFixture) -
     assert mock_remove.call_args_list == [
         call(daily_result, ManureType.SOLID, include_daily_spread=True, update_nutrient_manager_pool=False),
     ]
-    mock_record.assert_called_once()
+    assert mock_record.call_count == 2
+    assert mock_record.call_args_list[0].args[1] == "on_farm_manure"
+    assert mock_record.call_args_list[1].args[1] == "off_farm_manure"
     mock_off_farm.assert_called_once_with("daily_shortfall")
 
 
@@ -1194,6 +1196,7 @@ def test_compute_stream_after_removal_with_real_manure_stream(
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=0.0,
     )
 
     non_lim_fields: list[str] = []
