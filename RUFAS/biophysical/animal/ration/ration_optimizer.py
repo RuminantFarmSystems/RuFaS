@@ -1000,6 +1000,14 @@ class RationOptimizer:
             AnimalCombination.GROWING_AND_CLOSE_UP,
         ):
             return self.heifer_constraints
+        OutputManager().add_error(
+            "Ration Optimization Error",
+            f"Invalid animal combination: {animal_combination}",
+            info_map={
+                "class": self.__class__.__name__,
+                "function": self._select_constraints.__name__,
+            },
+        )
         raise ValueError(f"Invalid animal combination: {animal_combination}")
 
     @staticmethod

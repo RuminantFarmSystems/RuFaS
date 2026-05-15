@@ -240,9 +240,19 @@ class ManureManager:
         """
         for origin, destinations in self._adjacency_matrix.items():
             if destinations[origin] != 0:
+                self._om.add_error(
+                    "Manure Processor Adjacency Matrix Error",
+                    f"The diagonal for origin {origin} is not 0.",
+                    info_map={"class": self.__class__.__name__, "function": self._validate_adjacency_matrix.__name__},
+                )
                 raise ValueError(f"The diagonal for origin {origin} is not 0.")
             column_sum = sum(destinations.values())
             if not math.isclose(column_sum, 0, abs_tol=1e-8) and not math.isclose(column_sum, 1, abs_tol=1e-8):
+                self._om.add_error(
+                    "Manure Processor Adjacency Matrix Error",
+                    f"Sum for {origin} column must be 0 or 1, but got {column_sum}",
+                    info_map={"class": self.__class__.__name__, "function": self._validate_adjacency_matrix.__name__},
+                )
                 raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
 
     def _traverse_adjacency_matrix(self) -> list[str]:
@@ -278,6 +288,11 @@ class ManureManager:
         sorted_order = self._perform_topological_sort(in_degree, start_nodes, matrix_to_traverse)
 
         if len(sorted_order) != len(all_nodes):
+            self._om.add_error(
+                "Manure Processor Adjacency Matrix Error",
+                "Cycle detected — topological sort not possible.",
+                info_map={"class": self.__class__.__name__, "function": self._traverse_adjacency_matrix.__name__},
+            )
             raise ValueError("Cycle detected — topological sort not possible.")
 
         return sorted_order
@@ -322,6 +337,12 @@ class ManureManager:
                 liquid_value = liquid_row.get(destination, 0.0)
 
                 if solid_value > 0.0 and liquid_value > 0.0:
+                    self._om.add_error(
+                        "Manure Processor Adjacency Matrix Error",
+                        f"Invalid output split in '{separator_name}': destination '{destination}' "
+                        f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})",
+                        info_map={"class": self.__class__.__name__, "function": self._merge_separator_rows.__name__},
+                    )
                     raise ValueError(
                         f"Invalid output split in '{separator_name}': destination '{destination}' "
                         f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})"
@@ -518,6 +539,14 @@ class ManureManager:
                 unknown_processor_names.add(processor_name)
                 self._om.add_error("Unknown Processor Name.", f"No configuration found for {processor_name}.", info_map)
         if len(unknown_processor_names) > 0:
+            self._om.add_error(
+                "Manure Processor Setup Error",
+                f"Unknown Processor: no processor config found for {unknown_processor_names}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._check_for_unknown_processor_names.__name__,
+                },
+            )
             raise ValueError(f"Unknown Processor: no processor config found for {unknown_processor_names}.")
 
     def _check_for_processors_without_connection_definition(
@@ -554,6 +583,11 @@ class ManureManager:
                     info_map,
                 )
         if len(processors_without_connection_definition) > 0:
+            self._om.add_error(
+                "Undefined Routing Connections.",
+                f"Undefined Routing Connections for {processors_without_connection_definition}.",
+                info_map,
+            )
             raise ValueError(f"Undefined Routing Connections for {processors_without_connection_definition}.")
 
     def _find_all_processor_names_in_connection_map(self, processor_connections: list[dict[str, Any]]) -> set[str]:
