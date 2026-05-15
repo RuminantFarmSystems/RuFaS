@@ -57,7 +57,7 @@ def test_add_nitrogen_nutrient_request_results(
         inorganic_one = inorganic_frac_one * nitrogen_one
         inorganic_two = inorganic_frac_two * nitrogen_two
         total_inorganic = inorganic_one + inorganic_two
-        expected_inorganic_frac =  total_inorganic / expected_nitrogen
+        expected_inorganic_frac = total_inorganic / expected_nitrogen
 
         expected_organic_frac = 1 - expected_inorganic_frac # works here because of our setup above.
 
