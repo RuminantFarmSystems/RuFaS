@@ -17,7 +17,7 @@ from RUFAS.data_structures.manure_types import ManureType
 def test_add_nitrogen_nutrient_request_results(
         nitrogen_one: float, nitrogen_two: float, inorganic_frac_one: float, inorganic_frac_two: float,
         ammonium_frac_one: float, ammonium_frac_two: float
-):
+) -> None:
     """Tests that the various nitrogen components of two ``NutrientRequestResults`` object are properly added together
     via the custom ``__add__`` method.
 
@@ -78,7 +78,7 @@ def test_add_nitrogen_nutrient_request_results(
 @mark.parametrize("inorganic_frac_two", [0.2, 0.01, 0.99])
 def test_add_phosphorus_nutrient_request_results(
         phosphorus_one: float, phosphorus_two: float, inorganic_frac_one: float, inorganic_frac_two: float,
-):
+) -> None:
     # Assemble
     organic_frac_one = 1 - inorganic_frac_one
     organic_frac_two = 1 - inorganic_frac_two
@@ -122,7 +122,7 @@ def test_add_phosphorus_nutrient_request_results(
 @mark.parametrize("dry_frac_one", [0.5, 0.01, 0.99])  # TODO: how to handle zero?
 @mark.parametrize("dry_frac_two", [0.2, 0.01, 0.99])
 def test_add_matter_nutrient_request_results(
-        mass_one: float, mass_two: float, dry_frac_one: float, dry_frac_two: float):
+        mass_one: float, mass_two: float, dry_frac_one: float, dry_frac_two: float) -> None:
     # Assemble
     dry_matter_one = dry_frac_one * mass_one
     dry_matter_two = dry_frac_two * mass_two
