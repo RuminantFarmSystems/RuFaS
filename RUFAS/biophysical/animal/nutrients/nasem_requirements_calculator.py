@@ -6,6 +6,7 @@ from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstan
 from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.user_constants import UserConstants
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 
 from .nutrition_requirements_calculator import NutritionRequirementsCalculator
 
@@ -657,13 +658,16 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         """
         if lactating:
-            parity_adjustment_factor = 1 if parity > 1 else 0
-            dry_matter_intake_estimate = (
-                (3.7 + parity_adjustment_factor * 5.7)
-                + 0.305 * net_energy_lactation
-                + 0.022 * body_weight
-                + (-0.689 - 1.87 * parity_adjustment_factor) * body_condition_score_5
-            ) * (1 - (0.212 + parity_adjustment_factor * 0.136) * exp(-0.053 * days_in_milk))
+            if RationManager.lac_cow_dry_matter_intake == 0:
+                parity_adjustment_factor = 1 if parity > 1 else 0
+                dry_matter_intake_estimate = (
+                    (3.7 + parity_adjustment_factor * 5.7)
+                    + 0.305 * net_energy_lactation
+                    + 0.022 * body_weight
+                    + (-0.689 - 1.87 * parity_adjustment_factor) * body_condition_score_5
+                ) * (1 - (0.212 + parity_adjustment_factor * 0.136) * exp(-0.053 * days_in_milk))
+            else:
+                dry_matter_intake_estimate = RationManager.lac_cow_dry_matter_intake
         else:
             dry_matter_intake_estimate = (
                 0.0226 * mature_body_weight * (1 - exp(-1.47 * (body_weight / mature_body_weight)))

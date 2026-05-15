@@ -134,6 +134,7 @@ class HerdManager:
 
         self.is_ration_defined_by_user = is_ration_defined_by_user
         ration_feed_config = self.im.get_data("feed")
+        RationManager.lac_cow_dry_matter_intake = ration_feed_config["lac_cow_dry_matter_intake"]
         if self.is_ration_defined_by_user:
             RationManager.set_user_defined_rations(ration_feed_config)
             RationManager.set_user_defined_ration_tolerance(ration_feed_config)

@@ -4375,6 +4375,12 @@
       "maximum": 365,
       "default": 4
     },
+    "lac_cow_dry_matter_intake": {
+      "type": "number",
+      "description": "Fixed amount of dry matter intake (kg) for lactating cows. Set to 0 to use NASEM or NRC predicted dry matter intake.",
+      "minimum": 0,
+      "default": 0
+    },
     "allowances": {
       "type": "array",
       "properties": {
