@@ -808,7 +808,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """
         Validates the data based on its specified type.
@@ -872,7 +872,7 @@ class DataValidator:
                     ElementsCounter,
                     bool,
                     set[str],
-                    Path
+                    Path,
                 ],
                 bool,
             ],
@@ -900,7 +900,7 @@ class DataValidator:
             elements_counter,
             called_during_initialization,
             fixable_data_types,
-            input_path
+            input_path,
         )
 
         if data_type not in fixable_data_types:
@@ -1018,7 +1018,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """
         Validates a data element of type array.
@@ -1073,7 +1073,7 @@ class DataValidator:
                 elements_counter,
                 called_during_initialization,
                 fixable_data_types,
-                input_path
+                input_path,
             )
             is_whole_array_acceptable = is_whole_array_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -1090,7 +1090,7 @@ class DataValidator:
         elements_counter: ElementsCounter,
         called_during_initialization: bool,
         fixable_data_types: set[str],
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """
         Validates a data element of type object.
@@ -1162,7 +1162,7 @@ class DataValidator:
                 elements_counter,
                 called_during_initialization,
                 fixable_data_types,
-                input_path
+                input_path,
             )
             is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -1194,7 +1194,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """Validates an data number element."""
         data_value = self._extract_data_by_key_list(
@@ -1257,7 +1257,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """Validates a data string element."""
         data_value = self._extract_data_by_key_list(
@@ -1332,7 +1332,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """Validates a data bool element."""
         data_value = self._extract_data_by_key_list(
@@ -1370,7 +1370,7 @@ class DataValidator:
         element_hierarchy: list[str | int],
         data: dict[str | int, Any] | list[Any],
         properties_blob_key: str,
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """
         Attempt to fix the invalid data.
@@ -1457,7 +1457,7 @@ class DataValidator:
         variable_path: Sequence[str | int],
         variable_properties: dict[str, Any],
         called_during_initialization: bool,
-        input_path: Path
+        input_path: Path,
     ) -> Any:
         """
         Extracts a value from the data based on a specified path and handles missing data by calling
@@ -1499,12 +1499,15 @@ class DataValidator:
                 variable_properties=variable_properties,
                 var_name=var_name,
                 called_during_initialization=called_during_initialization,
-                input_path=input_path
+                input_path=input_path,
             )
         return result
 
     def _log_missing_data(
-        self, variable_properties: dict[str, Any], var_name: str, called_during_initialization: bool,
+        self,
+        variable_properties: dict[str, Any],
+        var_name: str,
+        called_during_initialization: bool,
         input_path: Path,
     ) -> None:
         """
@@ -1676,8 +1679,7 @@ class DataValidator:
         return ".".join(formatted_path_elems)
 
     def extract_value_by_key_list(
-        self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int],
-        input_path: Path | None = None
+        self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int], input_path: Path | None = None
     ) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).

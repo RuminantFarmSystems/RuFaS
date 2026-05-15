@@ -847,7 +847,7 @@ class InputManager:
                     elements_counter=self.elements_counter,
                     called_during_initialization=True,
                     fixable_data_types=FIXABLE_INPUT_DATA_TYPES,
-                    input_path=file_path
+                    input_path=file_path,
                 )
 
                 valid_data = valid_data and is_element_acceptable
