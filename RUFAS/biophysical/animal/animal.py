@@ -2610,6 +2610,25 @@ class Animal:
 
         return requirements
 
+    def update_305_day_milk_yield(self) -> None:
+        """
+        Update the cow's 305-day milk yield estimate.
+
+        Dry cows (DIM == 0) retain their previous estimate so a value carried over from
+        the prior lactation isn't wiped out. The exception is a dry cow that has never
+        had an in-sim lactation yet (estimate still at the 0.0 init default) — those fall
+        through to ``calculate_305_day_milk_yield``, which returns the pure Wood's-curve
+        integral when no current-lactation history exists. This avoids zero-valued dry
+        cows pulling the herd mean down at sim start.
+
+        For all other cows the estimate is recomputed from observed daily production
+        combined with Wood's curve predictions for any unobserved DIMs in 1..305.
+        """
+        if self.days_in_milk == 0 and self.milk_production.milk_305_day_yield > 0.0:
+            return
+
+        self.milk_production.milk_305_day_yield = self.milk_production.calculate_305_day_milk_yield()
+
     def update_genetic_history(self, simulation_day: int) -> None:
         """
         Updates the genetic history record for the animal on the given simulation day.
