@@ -828,7 +828,7 @@ def test_setup_manure_schedule(
     """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=manure_schedule_data)
     expected_manure_events = expected_manure_schedule.generate_manure_events()
-    actual_manure_events = FieldManager._setup_manure_events("test_manure_schedule")
+    actual_manure_events, actual_daily_spread_settings = FieldManager._setup_manure_events("test_manure_schedule")
     assert actual_manure_events == expected_manure_events
     mock_get_data.assert_called_once_with("test_manure_schedule")
 
@@ -1966,7 +1966,7 @@ def test_setup_field(
     )
     mock_setup_manure_events = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_manure_events",
-        return_value=mock_manure_events,
+        return_value=(mock_manure_events, {"is_daily_spreading": True}),
     )
     mock_setup_tillage_events = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_tillage_events",
@@ -1997,6 +1997,7 @@ def test_setup_field(
         "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0},
         "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0},
     }
+    assert new_field.daily_spread_settings == {"is_daily_spreading": True}
 
     mock_get_data.assert_called_once_with(field_name)
     mock_setup_fertilizer_events.assert_called_once_with(field_config.get("fertilizer_management_specification"))
