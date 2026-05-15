@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
+from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
@@ -365,7 +366,9 @@ def test_calculate_predicted_305_day_milk_yield(
     )
 
 
-def _make_milk_production(l_param: float, m_param: float, n_param: float, history: list) -> MilkProduction:
+def _make_milk_production(
+    l_param: float, m_param: float, n_param: float, history: list[MilkProductionRecord]
+) -> MilkProduction:
     mp = MilkProduction()
     mp.set_wood_parameters(l_param, m_param, n_param)
     mp.milk_production_history = history
@@ -385,7 +388,7 @@ def test_calculate_305_day_milk_yield_falls_back_to_prediction_with_no_history()
 def test_calculate_305_day_milk_yield_uses_available_history() -> None:
     """Partial 305-day milk yield estimates include recorded production history plus a
     Wood's-curve fill for unobserved future DIMs."""
-    milk_production_history = [
+    milk_production_history: list[MilkProductionRecord] = [
         {"simulation_day": 1, "days_in_milk": 1, "milk_production": 100.0, "days_born": 1000},
         {"simulation_day": 2, "days_in_milk": 2, "milk_production": 100.0, "days_born": 1001},
         {"simulation_day": 3, "days_in_milk": 0, "milk_production": 0.0, "days_born": 1002},
@@ -405,7 +408,7 @@ def test_calculate_305_day_milk_yield_uses_available_history() -> None:
 def test_calculate_305_day_milk_yield_fills_unobserved_early_dims() -> None:
     """When the cow's history starts mid-lactation (e.g. mid-lactation at sim start),
     Wood's curve fills in the unobserved early days so the metric is meaningful from day 1."""
-    milk_production_history = [
+    milk_production_history: list[MilkProductionRecord] = [
         {"simulation_day": 1, "days_in_milk": 100, "milk_production": 30.0, "days_born": 1000},
         {"simulation_day": 2, "days_in_milk": 101, "milk_production": 30.0, "days_born": 1001},
         {"simulation_day": 3, "days_in_milk": 102, "milk_production": 30.0, "days_born": 1002},
