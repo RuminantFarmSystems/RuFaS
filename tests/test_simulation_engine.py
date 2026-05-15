@@ -348,7 +348,7 @@ def test_execute_animals_only_daily_simulation(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _execute_full_farm_daily_simulation in file
+    Unit test for function _execute_animals_only_daily_simulation in file
     RUFAS/simulation_engine.py
     """
     # Arrange

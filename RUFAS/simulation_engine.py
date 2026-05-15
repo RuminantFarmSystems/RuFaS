@@ -363,7 +363,7 @@ class SimulationEngine:
         """
         self._execute_ration_planning()
 
-        daily_manure_data, daily_purchased_feeds_fed = self._execute_daily_animal_operations()
+        _, daily_purchased_feeds_fed = self._execute_daily_animal_operations()
 
         self._report_daily_records(daily_purchased_feeds_fed)
 
