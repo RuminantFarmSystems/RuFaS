@@ -847,6 +847,7 @@ class InputManager:
                     elements_counter=self.elements_counter,
                     called_during_initialization=True,
                     fixable_data_types=FIXABLE_INPUT_DATA_TYPES,
+                    input_path=file_path
                 )
 
                 valid_data = valid_data and is_element_acceptable
@@ -1071,7 +1072,7 @@ class InputManager:
         }
         element_hierarchy = data_address.split(".")
         try:
-            data_value = self.data_validator.extract_value_by_key_list(self.__pool, element_hierarchy)
+            data_value = self.data_validator.extract_value_by_key_list(self.__pool, element_hierarchy, None)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
