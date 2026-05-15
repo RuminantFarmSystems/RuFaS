@@ -46,7 +46,7 @@ def test_add_nitrogen_nutrient_request_results(
     )
     # Act
 
-    ## Expected values
+    # Expected values
     expected_nitrogen = nitrogen_one + nitrogen_two
 
     if expected_nitrogen <= 0:  # both zero TODO: I'm confused by this.
@@ -66,7 +66,7 @@ def test_add_nitrogen_nutrient_request_results(
         ammonium_two = ammonium_frac_two * inorganic_frac_two * nitrogen_two
         expected_ammonium_frac = (ammonium_one + ammonium_two) / inorganic_total
 
-    ## Observed
+    # Observed
     combined_request = first_request + second_request
 
     # Assert
@@ -102,7 +102,7 @@ def test_add_phosphorus_nutrient_request_results(
     )
 
     # Act
-    ## Expected
+    # Expected
     expected_phosphorus = phosphorus_one + phosphorus_two
 
     if expected_phosphorus <= 0:  # TODO: I'm confused by this
@@ -115,10 +115,10 @@ def test_add_phosphorus_nutrient_request_results(
 
         expected_organic_fraction = 1 - expected_inorganic_fraction  # works here because of our setup above.
 
-    ## Observed
+    # Observed
     combined_request = first_request + second_request
 
-    ## Assert
+    # Assert
     assert combined_request.phosphorus == pytest.approx(expected_phosphorus)
     assert combined_request.inorganic_phosphorus_fraction == pytest.approx(expected_inorganic_fraction)
     assert combined_request.organic_phosphorus_fraction == pytest.approx(expected_organic_fraction)
@@ -144,17 +144,17 @@ def test_add_matter_nutrient_request_results(
 
     # Act
 
-    ## Expected
+    # Expected
     expected_mass = mass_one + mass_two
     expected_dry_matter = dry_matter_one + dry_matter_two
     expected_dry_fraction = (
         expected_dry_matter / expected_mass if expected_mass > 0 else dry_frac_one
     )  # TODO: I'm confused by the <= 0 case
 
-    ## Observed
+    # Observed
     combined_request = first_request + second_request
 
-    ## Assert
+    # Assert
     assert combined_request.total_manure_mass == pytest.approx(expected_mass)
     assert combined_request.dry_matter == expected_dry_matter
     assert combined_request.dry_matter_fraction == pytest.approx(expected_dry_fraction)
