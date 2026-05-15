@@ -8,6 +8,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
@@ -127,6 +128,11 @@ class Storage(Processor):
         minimum_manure_temperature : float
             The minimum temperature of the manure in storage (°C).
 
+        Raises
+        ------
+        ValueError
+            If missing data needed to calculate outdoor storage temp.
+
         Returns
         -------
         float
@@ -149,6 +155,16 @@ class Storage(Processor):
             )
             return max(minimum_manure_temperature, estimated_temperature)
         else:
+            self._om.add_error(
+                "Storage temperature calculation error",
+                "No data for outdoor storage temperature calculations. "
+                f"amplitude is {self.amplitude}, intercept_mean_temp is {self.intercept_mean_temp} "
+                f"phase_shift is {self.phase_shift}.",
+                info_map={
+                    "class": Storage.__name__,
+                    "function": Storage._determine_outdoor_storage_temperature.__name__,
+                },
+            )
             raise ValueError("No data for outdoor storage temperature calculations.")
 
     def _calculate_surface_area(self) -> None:
@@ -318,6 +334,11 @@ class Storage(Processor):
             <= UserConstants.GENERAL_UPPER_BOUND_TEMPERATURE
         )
         if is_temp_invalid:
+            OutputManager().add_error(
+                "Storage arrhenius exponent calculation error",
+                f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}",
+                info_map={"class": Storage.__name__, "function": Storage._calculate_arrhenius_exponent.__name__},
+            )
             raise ValueError(
                 f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}"
             )

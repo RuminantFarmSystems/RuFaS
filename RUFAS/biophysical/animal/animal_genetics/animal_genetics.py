@@ -203,6 +203,7 @@ class Genetics:
                     Genetics.set_birthdate_too_recent_warning_raised(True)
 
             else:
+                self.om.add_error("Newborn calf tbv calculation key error.", str(key_error), info_map)
                 raise key_error
         std_tbv_fat_national_average, std_tbv_protein_national_average = TBV_FAT_STD, TBV_PROTEIN_STD
 
@@ -269,6 +270,7 @@ class Genetics:
                     Genetics.set_phenotype_too_recent_warning_raised(True)
 
             else:
+                self.om.add_error("Phenotype value calculation key error.", str(key_error), info_map)
                 raise key_error
         phenotype_fat = mean_fat + self.TBV_fat + self.E_permanent_fat + self.E_temporary_fat
         phenotype_protein = mean_protein + self.TBV_protein + self.E_permanent_protein + self.E_temporary_protein

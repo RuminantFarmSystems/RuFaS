@@ -10,6 +10,7 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.user_constants import UserConstants
@@ -45,7 +46,7 @@ class BeddedPack(Storage):
         is_mixed: bool,
         storage_time_period: int | None,
         surface_area: float = inf,
-        cover: StorageCover = StorageCover.NO_COVER
+        cover: StorageCover = StorageCover.NO_COVER,
     ):
         super().__init__(
             name=name,
@@ -84,7 +85,7 @@ class BeddedPack(Storage):
                 self._manure_to_process.degradable_volatile_solids
                 + self._manure_to_process.non_degradable_volatile_solids,
                 self._determine_barn_temperature(manure_annual_temperature),
-                self._manure_to_process.methane_production_potential
+                self._manure_to_process.methane_production_potential,
             )
         else:
             storage_methane = 0
@@ -181,14 +182,20 @@ class BeddedPack(Storage):
         degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
             self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_volatile_solids
         )
-        non_degradable_volatile_solids_after_losses = max(0, (
-            self._manure_to_process.non_degradable_volatile_solids
-            - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
-        ))
-        degradable_volatile_solids_after_losses = max(0, (
-            self._manure_to_process.degradable_volatile_solids
-            - dry_matter_loss * degradable_volatile_solids_fraction
-        ))
+        non_degradable_volatile_solids_after_losses = max(
+            0,
+            (
+                self._manure_to_process.non_degradable_volatile_solids
+                - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
+            ),
+        )
+        degradable_volatile_solids_after_losses = max(
+            0,
+            (
+                self._manure_to_process.degradable_volatile_solids
+                - dry_matter_loss * degradable_volatile_solids_fraction
+            ),
+        )
         total_solids_after_losses = self._manure_to_process.total_solids - dry_matter_loss
 
         errors = []
@@ -286,6 +293,14 @@ class BeddedPack(Storage):
         """
 
         if received_nitrogen < 0.0:
+            OutputManager().add_error(
+                "Negative received nitrogen error",
+                f"Daily nitrogen input mass must be non-negative: {received_nitrogen}",
+                info_map={
+                    "class": BeddedPack.__name__,
+                    "function": BeddedPack._calculate_bedded_pack_nitrous_oxide_emission.__name__,
+                },
+            )
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
         if is_mixed:
             coefficient = ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING
@@ -318,8 +333,15 @@ class BeddedPack(Storage):
         """
 
         if received_nitrogen < 0.0:
+            OutputManager().add_error(
+                "Negative received nitrogen error",
+                f"Daily nitrogen input mass must be non-negative: {received_nitrogen}",
+                info_map={
+                    "class": BeddedPack.__name__,
+                    "function": BeddedPack._calculate_bedded_pack_ammonia_emission.__name__,
+                },
+            )
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
-
         if is_mixed:
             coefficient = ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING
         else:
@@ -328,10 +350,9 @@ class BeddedPack(Storage):
         return coefficient * received_nitrogen
 
     @staticmethod
-    def calculate_bedded_pack_methane_emission(is_mixed: bool,
-                                               manure_volatile_solids: float,
-                                               manure_temperature: float,
-                                               methane_production_potential : float) -> float:
+    def calculate_bedded_pack_methane_emission(
+        is_mixed: bool, manure_volatile_solids: float, manure_temperature: float, methane_production_potential: float
+    ) -> float:
         """
         Calculates emission of methane on the current day based on methodology from IPCC 2019
         for mixed and unmixed bedded pack barns.
@@ -347,6 +368,10 @@ class BeddedPack(Storage):
         methane_production_potential : float
             Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
 
+        Raises
+        ------
+        ValueError
+            If manure_volatile_solids is < 0.
 
         Returns
         -------
@@ -355,12 +380,22 @@ class BeddedPack(Storage):
 
         """
         if manure_volatile_solids < 0:
+            OutputManager().add_error(
+                "Negative manure solids error",
+                f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.",
+                info_map={
+                    "class": BeddedPack.__name__,
+                    "function": BeddedPack.calculate_bedded_pack_methane_emission.__name__,
+                },
+            )
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
         Bo = methane_production_potential
-        methane_conversion_factor = BeddedPack.calculate_bedded_pack_methane_conversion_factor(is_mixed,
-                                                                                               manure_temperature)
-        methane_emissions_in_kg = \
-            (manure_volatile_solids * Bo * UserConstants.METHANE_FACTOR * methane_conversion_factor) / 100
+        methane_conversion_factor = BeddedPack.calculate_bedded_pack_methane_conversion_factor(
+            is_mixed, manure_temperature
+        )
+        methane_emissions_in_kg = (
+            manure_volatile_solids * Bo * UserConstants.METHANE_FACTOR * methane_conversion_factor
+        ) / 100
         return methane_emissions_in_kg
 
     @staticmethod
@@ -376,6 +411,11 @@ class BeddedPack(Storage):
         manure_temperature : float
             The annual average temperature of the barn (Celsius).
 
+        Raises
+        ------
+        ValueError
+            If manure temperature is out of defined range.
+
         Returns
         -------
         float
@@ -390,4 +430,12 @@ class BeddedPack(Storage):
         for (lower_bound, upper_bound), mcf in BEDDED_PACK_MCF_TABLE[mix].items():
             if lower_bound < manure_temperature <= upper_bound:
                 return mcf
+        OutputManager().add_error(
+            "BeddedPack manure temp error",
+            f"Temperature {manure_temperature}°C out of any defined bin",
+            info_map={
+                "class": BeddedPack.__name__,
+                "function": BeddedPack.calculate_bedded_pack_methane_conversion_factor.__name__,
+            },
+        )
         raise ValueError(f"Temperature {manure_temperature}°C out of any defined bin")

@@ -1123,23 +1123,55 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
     assert mock_om_add_variable.call_count == 2 + (total_days + 1) * 2
 
 
-def test_report_305d_milk(mocker: MockerFixture) -> None:
-    """Unit test for report_305d_milk()"""
+def test_report_305_day_milk_yield(mocker: MockerFixture) -> None:
+    """Unit test for report_305_day_milk_yield()"""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
 
-    AnimalModuleReporter.report_305d_milk(101.11)
+    AnimalModuleReporter.report_305_day_milk_yield(101.11, 98.5, 102.25, 104.75)
 
-    mock_om_add_variable.assert_called_once_with(
-        "milk_production_305days_herd_mean",
-        101.11,
-        {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_305d_milk.__name__,
-            "data_origin": [("MilkProduction", "perform_daily_milking_update")],
-            "units": MeasurementUnits.KILOGRAMS,
-        },
-    )
+    assert mock_om_add_variable.call_args_list == [
+        call(
+            "milk_305_day_yield_herd_mean",
+            101.11,
+            {
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
+                "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "units": MeasurementUnits.KILOGRAMS,
+            },
+        ),
+        call(
+            "milk_305_day_yield_l1_mean",
+            98.5,
+            {
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
+                "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "units": MeasurementUnits.KILOGRAMS,
+            },
+        ),
+        call(
+            "milk_305_day_yield_l2_mean",
+            102.25,
+            {
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
+                "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "units": MeasurementUnits.KILOGRAMS,
+            },
+        ),
+        call(
+            "milk_305_day_yield_l3plus_mean",
+            104.75,
+            {
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
+                "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "units": MeasurementUnits.KILOGRAMS,
+            },
+        ),
+    ]
 
 
 def test_report_end_of_simulation_empty_sold_animal_info(mocker: MockerFixture) -> None:

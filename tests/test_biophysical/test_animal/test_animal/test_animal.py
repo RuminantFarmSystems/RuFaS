@@ -61,6 +61,68 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStan
 from RUFAS.rufas_time import RufasTime
 
 
+def _make_cow_for_305_day_milk_yield(days_in_milk: int, calves: int) -> tuple[Animal, MagicMock]:
+    cow = Animal.__new__(Animal)
+    cow.animal_type = AnimalType.LAC_COW
+    cow.days_in_milk = days_in_milk
+    cow.reproduction = MagicMock()
+    cow.reproduction.calves = calves
+    milk_production_mock = MagicMock()
+    milk_production_mock.wood_l = 1.0
+    milk_production_mock.wood_m = 2.0
+    milk_production_mock.wood_n = 3.0
+    milk_production_mock.milk_production_history = []
+    milk_production_mock.milk_305_day_yield = 0.0
+    cow.milk_production = milk_production_mock
+    return cow, milk_production_mock
+
+
+def test_update_305_day_milk_yield_for_partial_lactation() -> None:
+    """Test that the 305-day milk yield uses the calculator for cows before day 305."""
+    cow, milk_production_mock = _make_cow_for_305_day_milk_yield(days_in_milk=120, calves=1)
+    milk_production_mock.calculate_305_day_milk_yield.return_value = 8000.0
+
+    cow.update_305_day_milk_yield()
+
+    milk_production_mock.calculate_305_day_milk_yield.assert_called_once_with()
+    assert milk_production_mock.milk_305_day_yield == pytest.approx(8000.0)
+
+
+def test_update_305_day_milk_yield_for_completed_lactation() -> None:
+    """Test that cows at or past DIM 305 also go through the unified calculator."""
+    cow, milk_production_mock = _make_cow_for_305_day_milk_yield(days_in_milk=305, calves=1)
+    milk_production_mock.calculate_305_day_milk_yield.return_value = 9000.0
+
+    cow.update_305_day_milk_yield()
+
+    milk_production_mock.calculate_305_day_milk_yield.assert_called_once_with()
+    assert milk_production_mock.milk_305_day_yield == pytest.approx(9000.0)
+
+
+def test_update_305_day_milk_yield_retains_value_for_dry_cow_with_prior_yield() -> None:
+    """Dry cows that already have a value (from a prior lactation) retain it."""
+    cow, milk_production_mock = _make_cow_for_305_day_milk_yield(days_in_milk=0, calves=1)
+    milk_production_mock.milk_305_day_yield = 9100.0
+
+    cow.update_305_day_milk_yield()
+
+    milk_production_mock.calculate_305_day_milk_yield.assert_not_called()
+    assert milk_production_mock.milk_305_day_yield == pytest.approx(9100.0)
+
+
+def test_update_305_day_milk_yield_computes_for_dry_cow_with_no_prior_yield() -> None:
+    """Dry cows with no in-sim lactation yet (yield still at the 0.0 init default) are
+    populated with the pure Wood's-curve integral so they don't drag down the herd mean."""
+    cow, milk_production_mock = _make_cow_for_305_day_milk_yield(days_in_milk=0, calves=1)
+    milk_production_mock.milk_305_day_yield = 0.0
+    milk_production_mock.calculate_305_day_milk_yield.return_value = 11500.0
+
+    cow.update_305_day_milk_yield()
+
+    milk_production_mock.calculate_305_day_milk_yield.assert_called_once_with()
+    assert milk_production_mock.milk_305_day_yield == pytest.approx(11500.0)
+
+
 @pytest.fixture
 def mock_time() -> RufasTime:
     mock_time = MagicMock(spec=RufasTime)
