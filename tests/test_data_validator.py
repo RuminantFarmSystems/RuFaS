@@ -3087,6 +3087,38 @@ def test_evaluate_is_null(value: Any, expected: bool) -> None:
 
 
 @pytest.mark.parametrize(
+    "left_hand_value,right_hand_value,expected",
+    [
+        (["2P"], ["2P", "CP"], True),
+        (["CP"], ["2P", "CP"], True),
+        (["TAI"], ["ED", "ED-TAI"], False),
+        (["ED"], ["ED", "ED-TAI", "TAI"], True),
+        (["x", "y"], ["x", "y", "z"], True),
+        (["x", "w"], ["x", "y", "z"], False),
+        ([], ["a", "b"], True),
+    ],
+)
+def test_evaluate_is_in(left_hand_value: Any, right_hand_value: Any, expected: bool) -> None:
+    """_evaluate_is_in returns True iff every left element is in right list."""
+    cv = CrossValidator()
+    assert cv._evaluate_is_in(left_hand_value, right_hand_value) is expected
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_is_in_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_in' dispatches to _evaluate_is_in with left and right."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(["2P"], True), (["2P", "CP"], True)])
+    mock_is_in = mocker.patch.object(cv, "_evaluate_is_in", return_value=True)
+
+    valid = cv._evaluate_condition({"relationship": "is_in", "left_hand": {}, "right_hand": {}}, eager_termination)
+
+    assert valid
+    mock_is_in.assert_called_once_with(["2P"], ["2P", "CP"])
+
+
+@pytest.mark.parametrize(
     "data_type,left_value,expected",
     [
         (["string"], ["abc"], True),
@@ -3518,6 +3550,54 @@ def test_log_missing_condition_clause_field_only() -> None:
                 "ok",
             ],
             [False],
+        ),
+        # mode="filter" + field_to_save: return extracted field values, not full dicts
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "A", "val": 10}, {"type": "B", "val": 20}, {"type": "A", "val": 30}],
+                "A",
+            ],
+            [10, 30],
+        ),
+        # mode="filter" + field_to_save: no matches → empty list
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "X", "val": 1}],
+                "Z",
+            ],
+            [],
+        ),
+        # mode="filter" + field_to_save: field missing in some entries → None in result
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "A", "val": 5}, {"type": "A"}],
+                "A",
+            ],
+            [5, None],
         ),
     ],
 )
