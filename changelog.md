@@ -82,6 +82,7 @@ v1.0.0
 - [3000](https://github.com/RuminantFarmSystems/RuFaS/pull/3000) - [minor change] [NoInputChange] [NoOutputChange] Updated the error messages for all biophysical modules.
 - [2715](https://github.com/RuminantFarmSystems/RuFaS/pull/2715) - [minor change] [Animal] [NoInputChange] [OutputChange] Renames the 305-day milk yield output from `milk_production_305days_herd_mean` to `milk_305_day_yield_herd_mean`, splits the calculation into a pure Wood's-curve integral and a per-cow simulation estimate, and adds L1/L2/L3+ herd-level reporting.
 - [3022](https://github.com/RuminantFarmSystems/RuFaS/pull/3022) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Adds missing changelog entry for #2715 and fixes the one mypy error it introduced by typing the `history` parameter of `_make_milk_production` in `test_milk_production.py`.
+- [2935](https://github.com/RuminantFarmSystems/RuFaS/pull/2935) - [minor change] [Animal] [Cross Validation] [InputChange] [NoOutputChange] Adds 24 cross-validation rules for the Animal module and extends `CrossValidator` with `is_not_null`, `is_in` operators and a `field_to_save` option in `for_each` blocks.
 
 ### v1.0.0
 
