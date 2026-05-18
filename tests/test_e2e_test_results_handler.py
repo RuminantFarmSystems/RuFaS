@@ -353,13 +353,10 @@ def test_filter_insignificant_changes(
     [
         # Significant numeric change
         ({"old_value": 10.0, "new_value": 10.2}, 0.01, True),
-
         # Insignificant numeric change
         ({"old_value": 10.0, "new_value": 10.001}, 0.01, False),
-
         # Non-numeric values are treated as significant
         ({"old_value": "a", "new_value": "b"}, 0.01, True),
-
         # Nested dict with only insignificant changes
         (
             {
@@ -375,7 +372,6 @@ def test_filter_insignificant_changes(
             0.01,
             False,
         ),
-
         # Nested dict with one significant change
         (
             {
@@ -391,7 +387,6 @@ def test_filter_insignificant_changes(
             0.01,
             True,
         ),
-
         # Missing key in new_value
         (
             {
@@ -406,7 +401,6 @@ def test_filter_insignificant_changes(
             0.01,
             True,
         ),
-
         # Missing key in old_value
         (
             {
@@ -421,7 +415,6 @@ def test_filter_insignificant_changes(
             0.01,
             True,
         ),
-
         # Deep recursive nested dict with insignificant changes
         (
             {
@@ -439,7 +432,6 @@ def test_filter_insignificant_changes(
             0.01,
             False,
         ),
-
         # Deep recursive nested dict with significant changes
         (
             {
@@ -457,7 +449,6 @@ def test_filter_insignificant_changes(
             0.01,
             True,
         ),
-
         # Nested dict with non-numeric change
         (
             {

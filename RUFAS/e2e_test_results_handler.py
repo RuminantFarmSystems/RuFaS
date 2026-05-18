@@ -270,11 +270,7 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
-        if not (
-            isinstance(changes, dict)
-            and "old_value" in changes
-            and "new_value" in changes
-        ):
+        if not (isinstance(changes, dict) and "old_value" in changes and "new_value" in changes):
             return True
 
         old_value = changes["old_value"]
