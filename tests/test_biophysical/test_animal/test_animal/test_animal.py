@@ -1714,7 +1714,7 @@ def test_heifer_reproduction_sub_program_setter(
     animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal
 ) -> None:
     reproduction_obj = Reproduction()
-    reproduction_obj.heifer_reproduction_sub_program = HeiferTAISubProtocol.SynchED_CP
+    reproduction_obj.heifer_reproduction_sub_program = HeiferTAISubProtocol.TAI_5dCG2P
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
