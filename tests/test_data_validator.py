@@ -3110,7 +3110,9 @@ def test_evaluate_condition_is_not_null_branch(mocker: MockerFixture, eager_term
     mocker.patch.object(cv, "_evaluate_expression", side_effect=[(42, True), ("ignored", True)])
     mock_is_not_null = mocker.patch.object(cv, "_evaluate_is_not_null", return_value=True)
 
-    valid = cv._evaluate_condition({"relationship": "is_not_null", "left_hand": {}, "right_hand": {}}, eager_termination)
+    valid = cv._evaluate_condition(
+        {"relationship": "is_not_null", "left_hand": {}, "right_hand": {}}, eager_termination
+    )
 
     assert valid
     mock_is_not_null.assert_called_once_with(42)
