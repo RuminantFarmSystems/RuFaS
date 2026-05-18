@@ -829,7 +829,7 @@
       "type": "object",
       "description": "Ration",
       "user_input": {
-        "description":  "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
+        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
         "type": "bool",
         "default": true
       },
@@ -4210,6 +4210,12 @@
   },
   "feed_properties": {
     "data_collection_app_compatible": true,
+    "manure_N_override": {
+      "type": "number",
+      "description": "Amount of N in manure excreted on a per lactating cow basis, in kg",
+      "minimum": 0.0,
+      "default": 0.0
+    },
     "calf_feeds": {
       "type": "array",
       "description": "Calf Feeds (raised off farm - 24 hrs of age).",

@@ -120,6 +120,7 @@ class DigestiveSystem:
             )
 
             phosphorus, excretion = ManureExcretionCalculator.calculate_cow_manure(
+                AnimalConfig.manure_N_override,
                 digestive_system_inputs.is_milking,
                 digestive_system_inputs.body_weight,
                 digestive_system_inputs.days_in_milk,

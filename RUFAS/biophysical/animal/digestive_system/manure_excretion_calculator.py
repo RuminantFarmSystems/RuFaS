@@ -258,6 +258,7 @@ class ManureExcretionCalculator:
 
     @staticmethod
     def calculate_cow_manure(
+        manure_N_override: float,
         is_lactating: bool,
         body_weight: float,
         days_in_milk: int,
@@ -312,6 +313,7 @@ class ManureExcretionCalculator:
                 fecal_phosphorus,
                 urine_phosphorus_required,
                 nutrient_amounts,
+                manure_N_override
             )
         else:
             return ManureExcretionCalculator._calculate_dry_cow_manure(
@@ -330,6 +332,7 @@ class ManureExcretionCalculator:
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
         nutrient_amounts: NutritionSupply,
+        manure_N_override: float
     ) -> Tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a lactating cow with information from the ration formulation.
@@ -421,6 +424,8 @@ class ManureExcretionCalculator:
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
         fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
 
+        if manure_N_override > 0:
+            manure_nitrogen = manure_N_override * GeneralConstants.GRAMS_TO_KG
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
         organic_matter_intake = dry_matter_intake - ash_diet_content

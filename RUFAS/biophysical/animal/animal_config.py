@@ -183,7 +183,7 @@ class AnimalConfig:
         The methods to use for each animal type.
 
     """
-
+    manure_N_override: float = 0.0
     wean_day: int = 60
     wean_length: int = 7
     target_heifer_pregnant_day: int = 399
@@ -382,6 +382,8 @@ class AnimalConfig:
         im = InputManager()
         animal_data = im.get_data("animal")
         animal_config_data = animal_data["animal_config"]
+        feed_data = im.get_data("feed")
+        cls.manure_N_override = feed_data["manure_N_override"]
 
         cls.wean_day = animal_config_data["farm_level"]["calf"]["wean_day"]
         cls.wean_length = animal_config_data["farm_level"]["calf"]["wean_length"]
