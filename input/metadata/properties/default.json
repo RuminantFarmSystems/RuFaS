@@ -4212,7 +4212,7 @@
     "data_collection_app_compatible": true,
     "manure_N_override": {
       "type": "number",
-      "description": "Amount of N in manure excreted on a per lactating cow basis, in kg",
+      "description": "Amount of N in manure excreted on a per lactating cow basis, in g",
       "minimum": 0.0,
       "default": 0.0
     },
