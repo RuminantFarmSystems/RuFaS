@@ -37,25 +37,25 @@ HerdReproductionStatistics, ensuring he has all the data he needs for
 the day’s activities.
 
 *Daily Routine* - After leaving their pens, each animal lines up in
-front of the barn. Julie, the diligent farm veterinarian, examines them
+front of the barn. Dr. Julie, the diligent farm veterinarian, examines them
 one by one. This daily check includes updates on the following areas:
 
 * Nutrients: Each animal begins its day with a quick phosphorus requirement
-assessment. Julie records these details and updates the animal’s
+assessment. Dr. Julie records these details and updates the animal’s
 phosphorus-related metrics.
 
-* Digestive System: With nutrient information in hand, Julie shifts focus to
+* Digestive System: With nutrient information in hand, Dr. Julie shifts focus to
 each animal’s digestive system, estimating manure output and enteric methane
 production for that day.
 
 * Milk Production: All milking cows are assessed to gauge daily milk yield and
 milk component content (fat and protein). Any necessary adjustments are noted.
 
-* Animal Growth: Around midday, Julie returns to each animal to evaluate daily
+* Animal Growth: Around midday, Dr. Julie returns to each animal to evaluate daily
 weight changes. She updates each animal’s body weight accordingly.
 
 * Reproduction: HeiferII and Cow stage animals undergo a reproduction check.
-Julie closely monitors their reproductive progress and updates the
+Dr. Julie closely monitors their reproductive progress and updates the
 HerdReproductionStatistics details on Joe’s whiteboard.
 
 * Life Stage Evaluation: Once the daily routines are complete, Julie determines
@@ -75,7 +75,7 @@ removal (sold or deceased) are taken out of the herd and removed from the farm
 records.
 
 
-**Output Reporting** At day’s end, Joe and Julie review the updated
+**Output Reporting** At day’s end, Joe and Dr. Julie review the updated
 HerdReproductionStatistics on the whiteboard. Joe then compiles a concise
 report summarizing the day’s herd stats. He forwards this information to the
 OutputManager before wrapping up another successful day on the RuFaS farm.
