@@ -1754,7 +1754,7 @@ def test_add_variable_to_pool_valid(
         input_data=data,
         properties_blob_key=properties_blob_key,
         eager_termination=False,
-        input_path=input_path
+        input_path=input_path,
     )
 
     # Assert
@@ -1890,7 +1890,7 @@ def test_add_variable_to_pool_invalid(
         input_data=data,
         properties_blob_key=properties_blob_key,
         eager_termination=False,
-        input_path=input_path
+        input_path=input_path,
     )
 
     # Assert
@@ -2026,7 +2026,7 @@ def test_add_variable_to_pool_eager_termination(
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=True,
-            input_path=input_path
+            input_path=input_path,
         )
 
     # Assert
@@ -2065,7 +2065,7 @@ def test_add_runtime_variable_to_pool(
             data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
-            input_path=input_path
+            input_path=input_path,
         )
 
     assert result is True
@@ -2076,7 +2076,7 @@ def test_add_runtime_variable_to_pool(
         input_data=data,
         properties_blob_key=properties_blob_key,
         eager_termination=False,
-        input_path=input_path
+        input_path=input_path,
     )
 
     mocker.patch.object(
@@ -2118,7 +2118,7 @@ def test_add_runtime_variable_to_pool_type_error(
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=False,
-                input_path=input_path
+                input_path=input_path,
             )
 
         assert mock_om_add_error.call_count == 1
@@ -2163,7 +2163,7 @@ def test_add_runtime_variable_to_pool_invalid_data(
             data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
-            input_path=input_path
+            input_path=input_path,
         )
 
         assert result is False
@@ -2174,7 +2174,7 @@ def test_add_runtime_variable_to_pool_invalid_data(
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
-            input_path=input_path
+            input_path=input_path,
         )
 
         mocker.patch.object(
@@ -2204,7 +2204,7 @@ def test_add_runtime_variable_to_pool_metadata_properties_do_not_exist(
             data={"a": 1},
             properties_blob_key="key2",
             eager_termination=False,
-            input_path=input_path
+            input_path=input_path,
         )
 
         assert result is False
@@ -2750,7 +2750,7 @@ def test_add_variable_to_pool_nested(
                 input_data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                input_path=input_path
+                input_path=input_path,
             )
     elif not is_modifiable_during_runtime:
         assert not input_manager._add_variable_to_pool(
@@ -2758,7 +2758,7 @@ def test_add_variable_to_pool_nested(
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=eager_termination,
-            input_path=input_path
+            input_path=input_path,
         )
     else:
         result = input_manager._add_variable_to_pool(
@@ -2766,7 +2766,7 @@ def test_add_variable_to_pool_nested(
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
-            input_path=input_path
+            input_path=input_path,
         )
 
         assert result
@@ -3539,7 +3539,7 @@ def test_validate_data(
         eager_termination=eager_termination,
         properties_blob_key=properties_blob_key,
         elements_counter=elements_counter,
-        input_path=input_path
+        input_path=input_path,
     )
 
     assert validated_data == expected_validated_data

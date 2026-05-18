@@ -493,7 +493,7 @@ class InputManager:
                 data=input_data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                input_path=file_path
+                input_path=file_path,
             )
         except (TypeError, ValueError, PermissionError) as exc:
             self.om.add_error(
@@ -1387,7 +1387,7 @@ class InputManager:
         input_data: dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1566,7 +1566,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        input_path: Path
+        input_path: Path,
     ) -> dict[str, Any]:
         """
         Validate input data based on metadata properties.
@@ -1607,7 +1607,7 @@ class InputManager:
                 elements_counter=elements_counter,
                 called_during_initialization=False,
                 fixable_data_types=FIXABLE_INPUT_DATA_TYPES,
-                input_path=input_path
+                input_path=input_path,
             )
 
             if is_element_acceptable:
@@ -1645,7 +1645,7 @@ class InputManager:
         data: dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
-        input_path: Path
+        input_path: Path,
     ) -> bool:
         """
         Adds a variable to the InputManager's pool after validating it against metadata.
@@ -1705,7 +1705,7 @@ class InputManager:
                 input_data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
-                input_path=input_path
+                input_path=input_path,
             )
             return add_variable_success
         else:
