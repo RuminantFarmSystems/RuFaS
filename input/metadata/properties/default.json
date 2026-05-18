@@ -4214,7 +4214,8 @@
       "type": "number",
       "description": "Amount of N in manure excreted on a per lactating cow basis, in g",
       "minimum": 0.0,
-      "default": 0.0
+      "default": 0.0,
+      "nullable": true
     },
     "calf_feeds": {
       "type": "array",
