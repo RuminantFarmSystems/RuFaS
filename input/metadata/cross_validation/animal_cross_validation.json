@@ -158,7 +158,7 @@
       ]
     },
     {
-      "description": "Prefresh day must precede both calving and dry-off start",
+      "description": "prefresh_day must be shorter than both gestation length (avg_gestation_len) and the dry period duration (avg_gestation_len - days_in_preg_when_dry)",
       "aliases": {
         "variables": {
           "prefresh_day": "animal.animal_config.farm_level.repro.prefresh_day"
@@ -358,7 +358,7 @@
       ]
     },
     {
-      "description": "When cow repro method is ED: presynch_program must be null, estrus detection rate and ED conception rate must be positive",
+      "description": "When cow repro method is ED: voluntary_waiting_period must be positive, presynch_program, presynch_program_start_day, and ovsynch_program_start_day must be null, and estrus_detection_rate and ED_conception_rate must be positive",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -518,7 +518,7 @@
       ]
     },
     {
-      "description": "When cow repro method is TAI: ovsynch start day must be positive, exceed voluntary waiting period, and exceed presynch start day",
+      "description": "When cow repro method is TAI: ovsynch_program must be set, ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
       "aliases": {
         "variables": {
           "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
@@ -609,7 +609,7 @@
       ]
     },
     {
-      "description": "When cow repro method is TAI and 'resynch_program' is in ['PGFatPD', 'none']: ovsynch start day must be positive, exceed voluntary waiting period, and exceed presynch start day",
+      "description": "When cow repro method is TAI and resynch_program is in ['PGFatPD', 'none']: presynch_program must be set, presynch_program_start_day must be positive, and estrus_detection_rate and ED_conception_rate must be positive",
       "aliases": {
         "variables": {
           "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
@@ -716,7 +716,7 @@
       ]
     },
     {
-      "description": "When cow repro method is ED-TAI: estrus detection rate and ED conception rate must be positive, ovsynch start day must be positive and exceed voluntary waiting period",
+      "description": "When cow repro method is ED-TAI: voluntary_waiting_period must be positive, estrus_detection_rate and ED_conception_rate must be positive, ovsynch_program must be set, and ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -885,7 +885,7 @@
       ]
     },
     {
-      "description": "When 'presynch_program' and 'ov_synch_program' are not null: ovsynch_program_start_day > presynch_program_start_day",
+      "description": "When presynch_program and ovsynch_program are both not null: ovsynch_program_start_day must exceed presynch_program_start_day",
       "apply_when": [
         {
           "left_hand": {
@@ -966,7 +966,7 @@
       ]
     },
     {
-      "description": "Target heifer pregnancy day must be after breeding star,",
+      "description": "Target heifer pregnancy day must be after breeding start: target_heifer_preg_day > breeding_start_day_h",
       "aliases": {
         "variables": {
           "target_heifer_preg_day": "animal.animal_config.farm_level.bodyweight.target_heifer_preg_day"
@@ -991,7 +991,7 @@
       ]
     },
     {
-      "description": "Birth weight must be less than mature weight",
+      "description": "Average Holstein birth weight must be less than average mature body weight: birth_weight_avg_ho < mature_body_weight_avg",
       "aliases": {
         "variables": {
           "mature_body_weight_avg": "animal.animal_config.farm_level.bodyweight.mature_body_weight_avg"
