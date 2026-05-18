@@ -2365,8 +2365,6 @@ class CrossValidator:
         The following rules are enforced:
 
         - ``operands`` must be a non-empty list.
-        - When ``operands`` has more than one entry, ``operation`` must be provided
-          and cannot be ``"no_op"``.
         - ``operation``, when provided, must be a known aggregation function.
         - ``mode``, when provided, must be ``"element_wise"`` or ``"aggregate"``.
         """
@@ -2778,13 +2776,6 @@ class CrossValidator:
         bool
             ``True`` if every element of ``left_hand_value`` is in ``right_hand_value``,
             ``False`` otherwise.
-
-        Examples
-        --------
-        >>> cv._evaluate_is_in(["2P"], ["2P", "CP"])
-        True
-        >>> cv._evaluate_is_in(["TAI"], ["ED", "ED-TAI"])
-        False
         """
         return bool(all(v in right_hand_value for v in left_hand_value))
 
