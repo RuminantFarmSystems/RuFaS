@@ -13,6 +13,7 @@ from RUFAS.biophysical.manure.storage.daily_spread import DailySpread
 from RUFAS.biophysical.manure.storage.open_lot import OpenLot
 from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurryStorageUnderfloor
+from RUFAS.output_manager import OutputManager
 
 
 class ProcessorType(Enum):
@@ -68,4 +69,9 @@ class ProcessorType(Enum):
             processor: Type["Processor"] = cls[processor_type].value
             return processor
         except KeyError:
-            raise ValueError(f"Unknown processor type: {processor_type}.")
+            OutputManager().add_error(
+                "Bad manure processor type",
+                f"Unknown processor type: {processor_type}.",
+                info_map={"class": ProcessorType.__name__, "function": ProcessorType.get_processor_class.__name__},
+            )
+            raise ValueError(f"Unknown manure processor type: {processor_type}.")

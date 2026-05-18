@@ -371,7 +371,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Days in pregnancy setter error",
+                "Pregnant animal cannot be type CALF or Heifer_I.",
+                info_map={"class": self.__class__.__name__, "function": "days_in_pregnancy.setter"},
+            )
+            raise TypeError("Pregnant animal cannot be type CALF or Heifer_I.")
         self._days_in_pregnancy = days_in_pregnancy
 
     @property
@@ -442,7 +447,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Future cull date setter error",
+                "The animal attempting to be assigned a cull date must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "future_cull_date.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a cull date is not a cow.")
         self._future_cull_date = future_cull_date
 
     @property
@@ -480,7 +490,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Future death date setter error",
+                "The animal attempting to be assigned a future death date must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "future_death_date.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a future death date is not a cow.")
         self._future_death_date = future_death_date
 
     @property
@@ -500,7 +515,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Daily horizontal distance property error",
+                "The animal whose daily horizontal distance is attempting to be referenced must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "daily_horizontal_distance.property"},
+            )
+            raise TypeError("The animal's daily horizontal distance attempting to be referenced here is not a cow.")
         return self._daily_horizontal_distance
 
     @daily_horizontal_distance.setter
@@ -520,7 +540,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Daily horizontal distance setter error",
+                "The animal attempting to be assigned a daily horizontal distance must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "daily_horizontal_distance.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a daily horizontal distance is not a cow.")
         self._daily_horizontal_distance = daily_horizontal_distance
 
     @property
@@ -540,7 +565,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Daily vertical distance property error",
+                "The animal whose daily vertical distance is attempting to be referenced must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "daily_vertical_distance.property"},
+            )
+            raise TypeError("The animal's daily vertical distance attempting to be referenced here is not a cow.")
         return self._daily_vertical_distance
 
     @daily_vertical_distance.setter
@@ -560,7 +590,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Daily vertical distance setter error",
+                "The animal attempting to be assigned a daily vertical distance must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "daily_vertical_distance.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a daily vertical distance is not a cow.")
         self._daily_vertical_distance = daily_vertical_distance
 
     @property
@@ -599,7 +634,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Daily distance setter error",
+                "The animal attempting to be assigned a daily distance must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "daily_distance.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a daily distance is not a cow.")
         self._daily_distance = daily_distance
 
     @property
@@ -632,7 +672,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Reproduction setter error",
+                "Reproduction attribute cannot be set for an Animal of type CALF or Heifer_I.",
+                info_map={"class": self.__class__.__name__, "function": "reproduction.setter"},
+            )
+            raise TypeError("Reproduction attribute cannot be set for an Animal of type CALF or Heifer_I.")
         self._reproduction = reproduction
 
     @property
@@ -670,7 +715,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Calves setter error",
+                "The animal attempting to be assigned calves must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "calves.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned calves is not a cow.")
         self.reproduction.calves = calves
 
     @property
@@ -708,7 +758,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Calving interval setter error",
+                "The animal attempting to be assigned a calving interval must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "calving_interval.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a calving interval is not a cow.")
         self.reproduction.calving_interval = calving_interval
 
     @property
@@ -776,7 +831,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Gestation length setter error",
+                "The animal attempting to be assigned a gestation length cannot be a CALF or HEIFER_I.",
+                info_map={"class": self.__class__.__name__, "function": "gestation_length.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a gestation length cannot be a CALF or HEIFER_I.")
         self.reproduction.gestation_length = gestation_length
 
     @property
@@ -801,10 +861,6 @@ class Animal:
         """
         Setter method for the calf_birth_weight attribute.
 
-        This method sets the calf birth weight for the animal. However, it raises a
-        TypeError if the animal type is either CALF or HEIFER_I, as these types are
-        not applicable for setting the calf birth weight.
-
         Parameters
         ----------
         calf_birth_weight : float
@@ -817,7 +873,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Calf birth weight setter error",
+                "Calf birth weight cannot be set for an Animal of type CALF or Heifer_I.",
+                info_map={"class": self.__class__.__name__, "function": "calf_birth_weight.setter"},
+            )
+            raise TypeError("Calf birth weight cannot be set for an Animal of type CALF or Heifer_I.")
         self.reproduction.calf_birth_weight = calf_birth_weight
 
     @property
@@ -837,7 +898,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Calving interval history property error",
+                "Calving interval history is only a property of a cow.",
+                info_map={"class": self.__class__.__name__, "function": "calving_interval_history.property"},
+            )
+            raise TypeError("The calving interval history property is only available for cows.")
         return self.reproduction.calving_interval_history
 
     @property
@@ -858,7 +924,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Heifer repro program property error",
+                "heifer_reproduction_program property is not available for an Animal of type CALF or Heifer_I.",
+                info_map={"class": self.__class__.__name__, "function": "heifer_reproduction_program.property"},
+            )
+            raise TypeError("heifer_reproduction_program is not available for an Animal of type CALF or Heifer_I.")
         return self.reproduction.heifer_reproduction_program
 
     @heifer_reproduction_program.setter
@@ -878,7 +949,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Heifer repro program setter error",
+                "heifer_reproduction_program cannot be set for an Animal of type CALF or Heifer_I.",
+                info_map={"class": self.__class__.__name__, "function": "heifer_reproduction_program.setter"},
+            )
+            raise TypeError("heifer_reproduction_program cannot be set for an Animal of type CALF or Heifer_I.")
         self.reproduction.heifer_reproduction_program = heifer_reproduction_program
 
     @property
@@ -901,7 +977,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Heifer repro sub program property error",
+                "heifer_reproduction_sub_program property is not available for an Animal of type CALF or Heifer_I.",
+                info_map={"class": self.__class__.__name__, "function": "heifer_reproduction_sub_program.property"},
+            )
+            raise TypeError("heifer_reproduction_sub_program is not available for an Animal of type CALF or Heifer_I.")
         return self.reproduction.heifer_reproduction_sub_program
 
     @heifer_reproduction_sub_program.setter
@@ -923,7 +1004,12 @@ class Animal:
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            self.om.add_error(
+                "Heifer repro sub program setter error",
+                "heifer_reproduction_sub_program cannot be set for an Animal of type CALF or Heifer_I.",
+                info_map={"class": self.__class__.__name__, "function": "heifer_reproduction_sub_program.setter"},
+            )
+            raise TypeError("heifer_reproduction_sub_program cannot be set for an Animal of type CALF or Heifer_I.")
         self.reproduction.heifer_reproduction_sub_program = heifer_reproduction_sub_program
 
     @property
@@ -946,7 +1032,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow repro program property error",
+                "The animal whose cow_reproduction_program is attempting to be referenced must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "cow_reproduction_program.property"},
+            )
+            raise TypeError("The animal's cow_reproduction_program attempting to be referenced here is not a cow.")
         return self.reproduction.cow_reproduction_program
 
     @cow_reproduction_program.setter
@@ -966,7 +1057,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow repro program setter error",
+                "The animal attempting to be assigned a cow_reproduction_program must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "cow_reproduction_program.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a cow_reproduction_program is not a cow.")
         self.reproduction.cow_reproduction_program = cow_program
 
     @property
@@ -986,7 +1082,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow presynch program property error",
+                "The animal whose cow_presynch_program is attempting to be referenced must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "cow_presynch_program.property"},
+            )
+            raise TypeError("The animal's cow_presynch_program attempting to be referenced here is not a cow.")
         return self.reproduction.cow_presynch_program
 
     @cow_presynch_program.setter
@@ -1010,7 +1111,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow presynch program setter error",
+                "The animal attempting to be assigned a cow_presynch_program must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "cow_presynch_program.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a cow_presynch_program is not a cow.")
         self.reproduction.cow_presynch_program = cow_presynch_program
 
     @property
@@ -1030,7 +1136,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow ovsynch program property error",
+                "The animal whose cow_ovsynch_program is attempting to be referenced must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "cow_ovsynch_program.property"},
+            )
+            raise TypeError("The animal's cow_ovsynch_program attempting to be referenced here is not a cow.")
         return self.reproduction.cow_ovsynch_program
 
     @cow_ovsynch_program.setter
@@ -1050,7 +1161,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow ovsynch program setter error",
+                "The animal attempting to be assigned a cow_ovsynch_program must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "cow_ovsynch_program.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a cow_ovsynch_program is not a cow.")
         self.reproduction.cow_ovsynch_program = cow_ovsynch_program
 
     @property
@@ -1070,7 +1186,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow resynch program property error",
+                "The animal whose cow_resynch_program is attempting to be referenced must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "cow_resynch_program.property"},
+            )
+            raise TypeError("The animal's cow_resynch_program attempting to be referenced here is not a cow.")
         return self.reproduction.cow_resynch_program
 
     @cow_resynch_program.setter
@@ -1092,7 +1213,12 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow resynch program setter error",
+                "The animal attempting to be assigned a cow_resynch_program must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "cow_resynch_program.setter"},
+            )
+            raise TypeError("The animal attempting to be assigned a cow_resynch_program is not a cow.")
         self.reproduction.cow_resynch_program = cow_resynch_program
 
     @property
@@ -1139,7 +1265,12 @@ class Animal:
     def milk_statistics(self) -> MilkProductionStatistics:
         """Returns the milk statistics for the animal."""
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self.om.add_error(
+                "Cow milk statistics property error",
+                "The animal whose milk_statistics property is attempting to be referenced must be a cow.",
+                info_map={"class": self.__class__.__name__, "function": "milk_statistics.property"},
+            )
+            raise TypeError("The animal whose milk_statistics property is attempting to be referenced must be a cow.")
         if AnimalConfig.simulate_genetics and self.genetics is not None:
             return MilkProductionStatistics(
                 cow_id=self.id,
@@ -1567,7 +1698,12 @@ class Animal:
                 return 1
             return self._milk_production_output_days_in_milk
         else:
-            raise ValueError("Unexpected days in milk value")
+            self.om.add_error(
+                "Cow days in milk error",
+                f"Unexpected days in milk value: {self.days_in_milk}",
+                info_map={"class": self.__class__.__name__, "function": self._determine_days_in_milk.__name__},
+            )
+            raise ValueError(f"Unexpected days in milk value: {self.days_in_milk}")
 
     def daily_reproduction_update(
         self, time: RufasTime
@@ -2053,6 +2189,11 @@ class Animal:
         newborn_calf_config, _ = self.daily_reproduction_update(time)
 
         if not newborn_calf_config:
+            self.om.add_error(
+                "HeiferIII transition error",
+                f"HeiferIII {self.id} should give birth to a calf when transitioning to cow.",
+                info_map={"class": self.__class__.__name__, "function": self.transition_heiferIII_to_cow.__name__},
+            )
             raise ValueError(f"HeiferIII {self.id} should give birth to a calf when transitioning to cow.")
 
         wood_parameters = LactationCurve.get_wood_parameters(self.calves)
@@ -2404,6 +2545,11 @@ class Animal:
 
         """
         if not self.animal_type.is_cow:
+            self.om.add_error(
+                "Daily walking distance set method error",
+                "Cannot calculate daily walking distance for animal types other than cow.",
+                info_map={"class": self.__class__.__name__, "function": self.set_daily_walking_distance.__name__},
+            )
             raise ValueError("Cannot calculate daily walking distance for animal types other than cow.")
         self.daily_vertical_distance = 2 * vertical_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
         self.daily_horizontal_distance = 2 * horizontal_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
@@ -2537,6 +2683,25 @@ class Animal:
             )
 
         return requirements
+
+    def update_305_day_milk_yield(self) -> None:
+        """
+        Update the cow's 305-day milk yield estimate.
+
+        Dry cows (DIM == 0) retain their previous estimate so a value carried over from
+        the prior lactation isn't wiped out. The exception is a dry cow that has never
+        had an in-sim lactation yet (estimate still at the 0.0 init default) — those fall
+        through to ``calculate_305_day_milk_yield``, which returns the pure Wood's-curve
+        integral when no current-lactation history exists. This avoids zero-valued dry
+        cows pulling the herd mean down at sim start.
+
+        For all other cows the estimate is recomputed from observed daily production
+        combined with Wood's curve predictions for any unobserved DIMs in 1..305.
+        """
+        if self.days_in_milk == 0 and self.milk_production.milk_305_day_yield > 0.0:
+            return
+
+        self.milk_production.milk_305_day_yield = self.milk_production.calculate_305_day_milk_yield()
 
     def update_genetic_history(self, simulation_day: int) -> None:
         """

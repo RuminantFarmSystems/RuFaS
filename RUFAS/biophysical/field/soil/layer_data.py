@@ -2,6 +2,7 @@ from dataclasses import InitVar, dataclass, field
 from math import exp, log
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.user_constants import UserConstants
 
 
@@ -407,7 +408,7 @@ class LayerData:
     annual_decomposition_carbon_CO2_lost: float | None = None
     annual_carbon_CO2_lost: float | None = None
 
-    def __post_init__(self, field_size: float, residue: float):
+    def __post_init__(self, field_size: float, residue: float) -> None:
         """
         Initialize all attributes in the dataclass that depend on other attributes.
 
@@ -432,14 +433,30 @@ class LayerData:
 
         """
         if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
+            OutputManager().add_error(
+                "Invalid layer values",
+                "Expected positive values for top and bottom depths of soil layer where top < bottom, "
+                f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise ValueError(
-                f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
+                "Expected positive values for top and bottom depths of soil layer where top < bottom, "
                 f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'."
             )
 
         if field_size is None:
+            OutputManager().add_error(
+                "Invalid field_size",
+                "'field_size' attribute is NoneType, must be given value when LayerData is initialized.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise TypeError("'field_size' attribute is NoneType, must be given value when LayerData is initialized.")
         elif field_size <= 0:
+            OutputManager().add_error(
+                "Invalid field_size",
+                f"Expected field_size to be greater than 0, received '{field_size}'.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise ValueError(f"Expected field_size to be greater than 0, received '{field_size}'.")
 
         self.water_content = self.soil_water_concentration * self.layer_thickness

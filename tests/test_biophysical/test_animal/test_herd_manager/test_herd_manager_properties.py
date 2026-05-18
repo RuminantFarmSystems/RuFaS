@@ -148,73 +148,32 @@ def test_cow_events_by_id_empty_when_no_cows(herd_manager: HerdManager) -> None:
     assert result == {}
 
 
-def test_average_herd_305_days_milk_production_all_zero_or_not_milking(
-    herd_manager: HerdManager,
-) -> None:
-    """If no milking cows with positive 305-day production, return 0.0."""
-    herd_manager.cows = []
-
-    for i in range(3):
-        cow = MagicMock()
-        cow.is_milking = False
-        cow.milk_production.current_lactation_305_day_milk_produced = 0
-        herd_manager.cows.append(cow)
-
-    assert herd_manager.average_herd_305_days_milk_production == 0.0
-
-
-def test_average_herd_305_days_milk_production_single_cow(
-    herd_manager: HerdManager,
-) -> None:
-    """Correctly returns single cow's positive 305-day milk production."""
-
-    herd_manager.cows = []
-
-    cow = MagicMock()
-    cow.is_milking = True
-    cow.milk_production.current_lactation_305_day_milk_produced = 9000
-    herd_manager.cows.append(cow)
-
-    assert herd_manager.average_herd_305_days_milk_production == 9000
-
-
-def test_average_herd_305_days_milk_production_multiple_cows(
-    herd_manager: HerdManager,
-) -> None:
-    """Correct average for multiple milking cows with positive 305-day production."""
-
+def test_average_305_day_milk_yield_by_lactation_group(herd_manager: HerdManager) -> None:
+    """Correctly returns average 305-day milk yield values for L1, L2, and L3+ cohorts."""
     herd_manager.cows = []
 
     cow1 = MagicMock()
-    cow1.is_milking = True
-    cow1.milk_production.current_lactation_305_day_milk_produced = 10000
+    cow1.reproduction.calves = 1
+    cow1.milk_production.milk_305_day_yield = 9000
 
     cow2 = MagicMock()
-    cow2.is_milking = True
-    cow2.milk_production.current_lactation_305_day_milk_produced = 8000
+    cow2.reproduction.calves = 1
+    cow2.milk_production.milk_305_day_yield = 7000
 
     cow3 = MagicMock()
-    cow3.is_milking = False
-    cow3.milk_production.current_lactation_305_day_milk_produced = 5000
+    cow3.reproduction.calves = 2
+    cow3.milk_production.milk_305_day_yield = 8500
 
-    herd_manager.cows.extend([cow1, cow2, cow3])
+    cow4 = MagicMock()
+    cow4.reproduction.calves = 3
+    cow4.milk_production.milk_305_day_yield = 10000
 
-    expected_avg = (10000 + 8000) / 2
+    cow5 = MagicMock()
+    cow5.reproduction.calves = 4
+    cow5.milk_production.milk_305_day_yield = 11000
 
-    assert herd_manager.average_herd_305_days_milk_production == expected_avg
+    herd_manager.cows.extend([cow1, cow2, cow3, cow4, cow5])
 
-
-def test_average_herd_305_days_milk_production_milking_but_production_nonpositive(
-    herd_manager: HerdManager,
-) -> None:
-    """Milking cows with ≤0 production should be excluded; if all excluded → 0.0."""
-
-    herd_manager.cows = []
-
-    for prod in [0, -2000, 0]:
-        cow = MagicMock()
-        cow.is_milking = True
-        cow.milk_production.current_lactation_305_day_milk_produced = prod
-        herd_manager.cows.append(cow)
-
-    assert herd_manager.average_herd_305_days_milk_production == 0.0
+    assert herd_manager.average_l1_305_day_milk_yield == 8000
+    assert herd_manager.average_l2_305_day_milk_yield == 8500
+    assert herd_manager.average_l3_plus_305_day_milk_yield == 10500

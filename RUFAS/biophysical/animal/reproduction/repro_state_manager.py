@@ -1,4 +1,5 @@
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import ReproStateEnum
+from RUFAS.output_manager import OutputManager
 
 
 class ReproStateManager:
@@ -78,6 +79,11 @@ class ReproStateManager:
         if not keep_existing or self._states == {ReproStateEnum.NONE}:
             self._states.clear()
         if state in self._states:
+            OutputManager().add_error(
+                "ReproStateManager Error",
+                f"Attempting to re-enter the same state: {state} during entering process.",
+                info_map={"class": self.__class__.__name__, "function": self.enter.__name__},
+            )
             raise ValueError(f"Attempting to re-enter the same state: {state}")
         self._states.add(state)
 
@@ -103,6 +109,11 @@ class ReproStateManager:
         if state is ReproStateEnum.NONE or self._states == {ReproStateEnum.NONE}:
             return
         if state not in self._states:
+            OutputManager().add_error(
+                "ReproStateManager Error",
+                f"Attempting to exit a state that is not entered: {state}.",
+                info_map={"class": self.__class__.__name__, "function": self.exit.__name__},
+            )
             raise ValueError(f"Attempting to exit a state that is not entered: {state}")
         self._states.remove(state)
         if not self._states:
