@@ -85,7 +85,7 @@
       ]
     },
     {
-      "description": "When cow repro method is ED, do_not_breed_time must exceed voluntary_waiting_period",
+      "description": "When cow repro method is in ['ED', 'ED-TAI'], do_not_breed_time must exceed voluntary_waiting_period",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -363,8 +363,13 @@
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
           "presynch_program": "animal.animal_config.farm_level.repro.cows.presynch_program",
+          "ovsynch_program": "animal.animal_config.farm_level.repro.cows.ovsynch_program",
+          "resynch_program": "animal.animal_config.farm_level.repro.cows.resynch_program",
           "estrus_detection_rate": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
-          "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate"
+          "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
+          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+          "presynch_program_start_day": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day",
+          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period"
         },
         "constants": {
           "ED": "ED",
@@ -394,7 +399,82 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
+              "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
               "operands": ["presynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_start_day"]
             }
           },
           "right_hand": {
@@ -441,10 +521,7 @@
       "description": "When cow repro method is TAI: ovsynch start day must be positive, exceed voluntary waiting period, and exceed presynch start day",
       "aliases": {
         "variables": {
-          "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
-          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
-          "presynch_program_start_day": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day",
-          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period"
+          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
         },
         "constants": {
           "TAI": "TAI",
@@ -469,6 +546,21 @@
         }
       ],
       "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
         {
           "left_hand": {
             "aggregation": {
@@ -503,13 +595,120 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["ovsynch_program_start_day"]
+              "operands": ["ovsynch_program_conception_rate"]
             }
           },
           "right_hand": {
             "aggregation": {
               "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "When cow repro method is TAI and 'resynch_program' is in ['PGFatPD', 'none']: ovsynch start day must be positive, exceed voluntary waiting period, and exceed presynch start day",
+      "aliases": {
+        "variables": {
+          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
+        },
+        "constants": {
+          "TAI": "TAI",
+          "zero": 0,
+          "PGFatPD_or_none": ["PFGatPD", "none"]
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["cow_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["TAI"]
+            }
+          },
+          "relationship": "equal"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["resynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["PGFatPD_or_none"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
               "operands": ["presynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["estrus_detection_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ED_conception_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
             }
           },
           "relationship": "greater"
@@ -553,6 +752,21 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
+              "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
               "operands": ["estrus_detection_rate"]
             }
           },
@@ -583,6 +797,21 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
+              "operands": ["ovsynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
               "operands": ["ovsynch_program_start_day"]
             }
           },
@@ -605,6 +834,102 @@
             "aggregation": {
               "operation": "no_op",
               "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_conception_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "Holstein birth weight std dev must be less than 20% of average: birth_weight_std_ho < 0.2 * birth_weight_avg_ho",
+      "aliases": {
+        "variables": {
+          "birth_weight_std_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_std_ho",
+          "birth_weight_avg_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_avg_ho"
+        },
+        "constants": {
+          "twenty_percent": 0.2
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "product",
+              "operands": ["twenty_percent", "birth_weight_avg_ho"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["birth_weight_std_ho"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "When 'presynch_program' and 'ov_synch_program' are not null: ovsynch_program_start_day > presynch_program_start_day",
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ov_synch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program_start_day"]
             }
           },
           "relationship": "greater"
@@ -803,7 +1128,7 @@
       ]
     },
     {
-      "description": "All cull_day_prob and death)day_prob must have the same length as cull_day_count",
+      "description": "All cull_day_prob and death_day_prob must have the same length as cull_day_count",
       "aliases": {
         "variables": {
           "cull_day_count": "animal.animal_config.from_literature.culling.cull_day_count",
