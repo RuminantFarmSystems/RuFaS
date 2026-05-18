@@ -270,6 +270,28 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
+        """
+        Determines if a numerical change is significant based if the change between the
+        "old_value" and "new_value" exceeds the specified tolerance.
+
+        Parameters
+        ----------
+        changes : dict[str, float | str]
+            A dictionary representing changes with "old_value" and "new_value".
+        tolerance : float
+            The threshold for considering a difference as significant.
+
+        Returns
+        -------
+        bool
+            True if the change is both numerical and significant, False otherwise.
+
+        Notes
+        -----
+        The comparison is based on the absolute difference between the "old_value" and "new_value",
+        relative to the "old_value". If the "old_value" is zero, a fallback reference value of 1 is used
+        to ensure the tolerance comparison remains meaningful.
+        """
         if not (isinstance(changes, dict) and "old_value" in changes and "new_value" in changes):
             return True
 
