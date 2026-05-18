@@ -1689,7 +1689,7 @@ class DataValidator:
         ----------
         data : list[Any] | dict[str, Any]
             The data containing the value to be extracted.
-        variable_path : dist[str | int]
+        variable_path : list[str | int]
             A list of keys to be used to extract the value from the data.
         input_path : Path | str | None, default=None
             Reference identifying the origin of the data currently being extracted.
