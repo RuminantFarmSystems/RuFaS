@@ -2,6 +2,7 @@ import math
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 class Snow:
@@ -172,6 +173,11 @@ class Snow:
 
         """
         if self.soil_data.snow_content < 0.0:
+            OutputManager().add_error(
+                "Negative snow content",
+                f"Snow Content should not be a negative number and got {self.soil_data.snow_content}.",
+                info_map={"class": self.__class__.__name__, "function": self.update_snow.__name__},
+            )
             raise ValueError("Snow Content should not be a negative number.")
 
         self.soil_data.snow_content += current_day_conditions.snowfall

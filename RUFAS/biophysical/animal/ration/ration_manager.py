@@ -119,6 +119,11 @@ class RationManager:
         ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
             Collection of animal requirements and feed supply information for ration formulation.
 
+        Raises
+        ------
+        ValueError
+            If one or more invalid rations is found.
+
         """
         info_map: dict[str, object] = {"class": cls.__name__, "function": cls.set_user_defined_rations.__name__}
 

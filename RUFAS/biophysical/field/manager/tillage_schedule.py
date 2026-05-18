@@ -3,6 +3,7 @@ from typing import Any
 from RUFAS.data_structures.events import TillageEvent
 from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.biophysical.field.manager.schedule import Schedule
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -77,12 +78,7 @@ class TillageSchedule(Schedule):
         Raises
         ------
         ValueError
-            If not all tilling years are valid.
-            If not all tilling days are valid.
-            If not all tillage depths are valid.
-            If not all incorporation fractions are valid.
-            If not all mixing fractions are valid.
-            If number of years, days, depths, and incorporation and mixing fractions are not equal.
+            If depths are not valid.
 
         """
         error_header = f"'{self.name}': "
@@ -94,6 +90,11 @@ class TillageSchedule(Schedule):
         self._validate_parameters([], fraction_parameters, self.years, self.days, self.name)
         valid_depths = self.validate_positive_values(self.tillage_depths)
         if not valid_depths:
+            OutputManager().add_error(
+                "invalid tillage depths",
+                f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'.",
+                info_map={"class": self.__class__.__name__, "function": self._validate_tillage_parameters.__name__},
+            )
             raise ValueError(
                 error_header + f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'."
             )

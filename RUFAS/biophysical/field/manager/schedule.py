@@ -1,6 +1,7 @@
 from copy import copy
 from typing import Any
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -227,6 +228,12 @@ class Schedule:
         """
         lengths = {key: len(value) for key, value in kwargs.items()}
         if len(set(lengths.values())) != 1:
+            OutputManager().add_error(
+                "Parameter length mismatch",
+                f"Provided parameters are: {', '.join(f'{key}={value}' for key, value in kwargs.items())}. "
+                f"Lengths are: {lengths}.",
+                info_map={"class": Schedule.__name__, "function": Schedule.validate_equal_lengths.__name__},
+            )
             raise ValueError(
                 f"{header} Mismatch in length of parameters. "
                 f"Provided parameters are: {', '.join(f'{key}={value}' for key, value in kwargs.items())}. "
@@ -276,15 +283,32 @@ class Schedule:
 
         valid_days = Schedule._validate_days(years, days)
         if not valid_days:
+            OutputManager().add_error(
+                "Days not valid",
+                f"'{name}': " + f"expected all days to be in range [1, 366], received '{days}'.",
+                info_map={"class": Schedule.__name__, "function": Schedule._validate_parameters.__name__},
+            )
             raise ValueError(f"'{name}': " + f"expected all days to be in range [1, 366], received '{days}'.")
 
         for parameter_name, parameter in non_negative_parameters:
             if not Utility.determine_if_all_non_negative_values(parameter):
+                OutputManager().add_error(
+                    "All values not non-negative",
+                    f"'{name}': " + f"expected all {parameter_name} to be" f" in >= 0, received '{parameter}'.",
+                    info_map={"class": Schedule.__name__, "function": Schedule._validate_parameters.__name__},
+                )
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be" f" in >= 0, received '{parameter}'."
                 )
         for parameter_name, parameter in fraction_parameters:
             if not Utility.validate_fractions(parameter):
+                OutputManager().add_error(
+                    "Invalid fractions",
+                    f"'{name}': " + f"expected all {parameter_name} to be in"
+                    f" range [0.0, 1.0], "
+                    f"received '{parameter}'.",
+                    info_map={"class": Schedule.__name__, "function": Schedule._validate_parameters.__name__},
+                )
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be in"
                     f" range [0.0, 1.0], "
