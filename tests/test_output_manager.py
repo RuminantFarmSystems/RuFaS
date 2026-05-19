@@ -1798,7 +1798,7 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     expected_daily_full_path = Path(path, expected_daily_file_name)
     expected_non_daily_full_path = Path(path, expected_non_daily_file_name)
     output_manager = OutputManager()
-    output_manager._variables_usage_counter = Counter()
+    output_manager._filtered_variable_key_counter = Counter()
 
     mocker.patch.object(output_manager, "variables_pool", {})  # didn't work
 

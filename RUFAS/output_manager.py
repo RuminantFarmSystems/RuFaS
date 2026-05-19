@@ -135,7 +135,7 @@ class OutputManager(object):
         counts increase when post-processing filters select matching variables or subkeys. The pre-seeding exists
         because dictionary-valued variables can later be filtered by subkey (for example `variable.min`), even though
         those subkeys are not stored as standalone top-level variables in the pool. Non-dictionary variables are not
-        pre-seeded; they only appear here once a filter actually selects them. f
+        pre-seeded; they only appear here once a filter actually selects them.
     is_end_to_end_testing_run : bool, default False
         Indicates if end-to-end testing is being run.
     is_first_post_processing : bool, default True
@@ -162,8 +162,9 @@ class OutputManager(object):
 
     Notes
     -----
-    `report_variables_usage_counts()` writes two diagnostic CSVs for new users inspecting output behavior:
-    `variables_usage_counts` reports how often variables were selected by configured filters, while
+    `report_variables_usage_counts()` writes three diagnostic CSVs for new users inspecting output behavior:
+    `variables_usage_counts` reports how often variables were selected by configured filters,
+    `variables_reported_daily` lists variables marked as daily for reporting diagnostics, and
     `variables_not_reported_daily` lists variables marked as non-daily for reporting diagnostics and summarizes how
     many times each variable was reported.
     """
@@ -1909,11 +1910,13 @@ class OutputManager(object):
 
     def report_variables_usage_counts(self, path: Path) -> None:
         """
-        Reports variable filter usage and non-daily reporting counts to CSV files.
+        Reports variable filter usage and daily/non-daily reporting diagnostics to CSV files.
 
         The `variables_usage_counts` CSV contains counts of how often each variable was used by OutputManager filters
         during post-processing. These counts do not represent how often a variable was reported to OutputManager during
         the simulation.
+
+        The `variables_reported_daily` CSV lists variables treated as daily for reporting diagnostics.
 
         The `variables_not_reported_daily` CSV lists variables treated as non-daily for reporting diagnostics and
         records each entry as a `{"variable_name": report_count}` mapping.
