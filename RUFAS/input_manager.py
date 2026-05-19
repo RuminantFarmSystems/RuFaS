@@ -1449,13 +1449,13 @@ class InputManager:
         if elements_counter.invalid_elements > 0:
             self.om.add_error(
                 "Invalid variable",
-                f"Variable {variable_name} from {input_path} has invalid components. "
+                f"Variable {variable_name} from '{input_path}' has invalid components. "
                 "Only successfully validated components are added to InputManager pool during runtime.",
                 info_map,
             )
             if eager_termination:
                 raise ValueError(
-                    f"Variable {variable_name} from {input_path} has invalid components. "
+                    f"Variable {variable_name} from '{input_path}' has invalid components. "
                     "Only successfully validated components are added to InputManager pool during runtime."
                 )
             return False
@@ -1687,7 +1687,7 @@ class InputManager:
         if not (isinstance(data, dict)):
             self.om.add_error(
                 "Incorrect variable type",
-                f"Variable {variable_name} from {input_path} has type {type(data)}; does not match "
+                f"Variable {variable_name} from '{input_path}' has type {type(data)}; does not match "
                 f"the expected type of `dict[str, Any]`.",
                 info_map,
             )
