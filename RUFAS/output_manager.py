@@ -338,8 +338,9 @@ class OutputManager(object):
             pool[key] = self._pool_element_factory()
             discard_info_map = False
 
-        is_daily_variable = info_map.get("is_daily_variable", False)
-        pool[key]["is_daily_variable"] = is_daily_variable if isinstance(is_daily_variable, bool) else False
+        new_daily_flag = info_map.get("is_daily_variable", False)
+        new_daily_flag = new_daily_flag if isinstance(new_daily_flag, bool) else False
+        pool[key]["is_daily_variable"] = bool(pool[key].get("is_daily_variable", False)) or new_daily_flag
 
         if not self._exclude_info_maps_flag and not discard_info_map:
             reduced_info_map = {
@@ -1918,8 +1919,8 @@ class OutputManager(object):
 
         The `variables_reported_daily` CSV lists variables treated as daily for reporting diagnostics.
 
-        The `variables_not_reported_daily` CSV lists variables treated as non-daily for reporting diagnostics and
-        records each entry as a `{"variable_name": report_count}` mapping.
+        The `variables_not_reported_daily` CSV lists variables treated as non-daily for reporting diagnostics with
+        columns `variable_name` and `report_count`.
 
         Parameters
         ----------
@@ -1963,7 +1964,7 @@ class OutputManager(object):
 
     def _get_variables_not_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
         """Builds a CSV-ready dictionary listing variables treated as non-daily for reporting diagnostics."""
-        variable_report_counts: set[str] = set()
+        rows: set[tuple[str, int]] = set()
 
         for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
             values = variable_data.get("values", [])
@@ -1973,12 +1974,14 @@ class OutputManager(object):
             if self._is_reported_daily(variable_data):
                 continue
 
-            reported_variable_names = self._get_reported_variable_names(variable_name, values)
-            variable_report_counts.update(
-                f'{{"{reported_name}": {len(values)}}}' for reported_name in reported_variable_names
-            )
+            for reported_name in self._get_reported_variable_names(variable_name, values):
+                rows.add((reported_name, len(values)))
 
-        return {"variable_report_count": {"values": sorted(variable_report_counts)}}
+        sorted_rows = sorted(rows)
+        return {
+            "variable_name": {"values": [name for name, _ in sorted_rows]},
+            "report_count": {"values": [count for _, count in sorted_rows]},
+        }
 
     def _is_reported_daily(self, variable_data: dict[str, Any]) -> bool:
         """Determines whether a variable should be treated as daily for reporting diagnostics."""

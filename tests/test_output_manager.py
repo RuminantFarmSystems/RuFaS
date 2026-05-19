@@ -1631,6 +1631,27 @@ def test_add_to_pool_defaults_missing_daily_flag_to_false(mock_output_manager: O
     assert pool["dummy_key"]["info_maps"] == [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}]
 
 
+def test_add_to_pool_daily_flag_is_sticky_true(mock_output_manager: OutputManager) -> None:
+    """A key marked daily once stays daily even if a later call omits or unsets the flag."""
+
+    pool: dict[str, dict[str, Any]] = {}
+    base_info_map = {
+        "class": "dummy_class",
+        "function": "dummy_func",
+        "context": "dummy_context",
+        "units": MeasurementUnits.ANIMALS.value,
+    }
+
+    mock_output_manager._add_to_pool(pool, "k", "v", {**base_info_map, "is_daily_variable": True})
+    assert pool["k"]["is_daily_variable"] is True
+
+    mock_output_manager._add_to_pool(pool, "k", "v", {**base_info_map, "is_daily_variable": False})
+    assert pool["k"]["is_daily_variable"] is True
+
+    mock_output_manager._add_to_pool(pool, "k", "v", base_info_map)
+    assert pool["k"]["is_daily_variable"] is True
+
+
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
     """Test case to ensure output_manager is singleton"""
     key = "key1"
@@ -1828,7 +1849,8 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
             call({"variable_name": {"values": []}}, expected_daily_full_path),
             call(
                 {
-                    "variable_report_count": {"values": []},
+                    "variable_name": {"values": []},
+                    "report_count": {"values": []},
                 },
                 expected_non_daily_full_path,
             ),
@@ -1894,13 +1916,14 @@ def test_get_variables_not_reported_daily() -> None:
     actual = output_manager._get_variables_not_reported_daily()
 
     assert actual == {
-        "variable_report_count": {
+        "variable_name": {
             "values": [
-                '{"every_other_day_variable": 4}',
-                '{"irregular_nested_variable.a": 2}',
-                '{"irregular_nested_variable.b": 2}',
+                "every_other_day_variable",
+                "irregular_nested_variable.a",
+                "irregular_nested_variable.b",
             ]
         },
+        "report_count": {"values": [4, 2, 2]},
     }
 
 
@@ -1919,7 +1942,8 @@ def test_missing_daily_flag_defaults_to_non_daily() -> None:
 
     assert output_manager._get_variables_reported_daily() == {"variable_name": {"values": []}}
     assert output_manager._get_variables_not_reported_daily() == {
-        "variable_report_count": {"values": ['{"unmarked_variable": 3}']}
+        "variable_name": {"values": ["unmarked_variable"]},
+        "report_count": {"values": [3]},
     }
 
 
