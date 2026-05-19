@@ -236,6 +236,7 @@ class Weather:
             "class": self.__class__.__name__,
             "function": self.record_weather.__name__,
             "prefix": "Weather",
+            "is_daily_variable": True,
         }
         current_weather = self.get_current_day_conditions(time)
         self.om.add_variable(
