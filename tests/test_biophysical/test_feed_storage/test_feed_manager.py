@@ -217,7 +217,7 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
     feed_manager.runtime_purchase_allowance = RuntimePurchaseAllowance(
         [{"purchased_feed": feed.rufas_id, "runtime_purchase_allowance": 10.0} for feed in mock_available_feeds]
     )
-    feed_manager.advanced_purchase_allowance = AdvancePurchaseAllowance(
+    feed_manager.advance_purchase_allowance = AdvancePurchaseAllowance(
         [{"purchased_feed": feed.rufas_id, "advance_purchase_allowance": 10.0} for feed in mock_available_feeds]
     )
 
@@ -269,7 +269,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
         "__init__",
         return_value=None,
     )
-    mock_advanced_purchase_allowance_init = mocker.patch.object(
+    mock_advance_purchase_allowance_init = mocker.patch.object(
         AdvancePurchaseAllowance,
         "__init__",
         return_value=None,
@@ -306,7 +306,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
     )
 
     assert feed_manager.active_storages == {"Test Storage": storage}
-    assert feed_manager.available_feeds == mock_available_feeds
+    assert feed_manager._available_feeds == mock_available_feeds
 
     mock_create_all_storages.assert_called_once()
     mock_purchased_feed_storage_init.assert_called_once_with(mock_available_feeds)
@@ -321,7 +321,7 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
     ]
     mock_planning_cycle_allowance_init.assert_called_once_with(sorted_allowances)
     mock_runtime_purchase_allowance_init.assert_called_once_with(sorted_allowances)
-    mock_advanced_purchase_allowance_init.assert_called_once_with(sorted_allowances)
+    mock_advance_purchase_allowance_init.assert_called_once_with(sorted_allowances)
 
     assert feed_manager.crop_to_rufas_id == {"corn_silage": 1}
     assert feed_manager._cumulative_feed_requests == {1: 0.0, 2: 0.0}
@@ -551,12 +551,6 @@ def test_validate_storage_config_names_duplicate_raises(feed_manager: FeedManage
     add_error.assert_called_once()
 
 
-def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
-    """Test for FeedManager available_feeds property."""
-    feed_manager._available_feeds = mock_available_feeds
-    assert feed_manager.available_feeds == mock_available_feeds
-
-
 def test_update_available_feed_amounts(
     feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
 ) -> None:
@@ -572,7 +566,7 @@ def test_update_available_feed_amounts(
 
     mock_query_available_feed_totals.assert_called_once_with([feed.rufas_id for feed in mock_available_feeds])
     assert {
-        feed.rufas_id: feed.amount_available for feed in feed_manager.available_feeds
+        feed.rufas_id: feed.amount_available for feed in feed_manager._available_feeds
     } == expected_feeds_amount_available
 
 

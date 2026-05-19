@@ -473,6 +473,7 @@ class SimulationEngine:
         if self._is_time_to_reformulate_ration:
             self.next_ration_reformulation = (self.time.current_date + self.ration_formulation_interval_length).date()
             self._formulate_ration()
+            self.herd_manager.update_herd_305_day_milk_yields()
 
     @property
     def _is_time_to_reformulate_ration(self) -> bool:

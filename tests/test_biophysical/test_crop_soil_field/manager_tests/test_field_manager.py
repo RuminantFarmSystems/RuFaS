@@ -1600,9 +1600,8 @@ def test_setup_soil_layer(
 )
 def test_setup_soil_layer_error(config: dict[str, float | int]) -> None:
     """Tests that errors are thrown correctly when not enough information is provided to create one."""
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(KeyError, match="Bottom depth is required for each soil layer."):
         FieldManager._setup_soil_layer(1.0, 0.0, 0.0, config)
-    assert str(e.value) == "Bottom depth is required for each soil layer."
 
 
 @pytest.mark.parametrize(

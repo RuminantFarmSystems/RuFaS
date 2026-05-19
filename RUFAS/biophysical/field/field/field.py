@@ -286,6 +286,18 @@ class Field:
         try:
             fertilizer_mix = self.available_fertilizer_mixes[mix_name]
         except KeyError:
+            self.om.add_error(
+                "Incorrect fertilizer mix error",
+                f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
+                f"received '{self.available_fertilizer_mixes}'.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._execute_fertilizer_application.__name__,
+                    "suffix": f"field='{self.field_data.name}'",
+                    "year": year,
+                    "day": day,
+                },
+            )
             raise KeyError(
                 f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
                 f"received '{self.available_fertilizer_mixes}'."
@@ -714,10 +726,26 @@ class Field:
 
         soil_layers = self.soil.data.soil_layers
         if not soil_layers:
+            self.om.add_error(
+                "Soil layers not initialized error",
+                "soil_layers is not initialized",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_application_depth_and_fraction.__name__,
+                },
+            )
             raise ValueError("soil_layers is not initialized")
 
         bottom_layer = soil_layers[-1]
         if bottom_layer.bottom_depth is None:
+            self.om.add_error(
+                "Bottom depth error",
+                "bottom_depth is not set for the last soil layer",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_application_depth_and_fraction.__name__,
+                },
+            )
             raise ValueError("bottom_depth is not set for the last soil layer")
 
         max_depth = bottom_layer.bottom_depth

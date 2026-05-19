@@ -376,8 +376,11 @@ class LactationCurve:
 
     @staticmethod
     def _calculate_305_day_milk_yield_error(l_param: float, m_param: float, n_param: float, milk_yield: float) -> float:
-        """Calculates absolute difference between an estimated 305 day milk yield and a predetermined one."""
-        return abs(MilkProduction.calc_305_day_milk_yield(l_param, m_param, n_param) - milk_yield)
+        """
+        Calculate the absolute difference between Wood's-curve-predicted 305-day milk yield
+        and a target yield. Used as the objective in fitting Wood's l parameter.
+        """
+        return abs(MilkProduction.calculate_predicted_305_day_milk_yield(l_param, m_param, n_param) - milk_yield)
 
     @classmethod
     def _fit_wood_l_param_to_milk_yield(

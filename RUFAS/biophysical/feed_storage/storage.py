@@ -174,15 +174,17 @@ class Storage:
 
         Raises
         ------
-        NotImplementedError
-            If the storage's acceptable crops is not populated.
-        ValueError
-            If the crop's category is not compatible with the storage.
         Exception
             If adding the crop exceeds the storage's capacity.
 
         """
         if self.stored_mass + crop.fresh_mass > self.capacity:
+            self.om.add_error(
+                "Exceeds feed storage capacity error",
+                f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "
+                f"exceeds the storage capacity ({self.capacity})",
+                info_map={"class": self.__class__.__name__, "function": self.receive_crop.__name__},
+            )
             raise Exception(
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "
                 f"exceeds the storage capacity ({self.capacity})"
