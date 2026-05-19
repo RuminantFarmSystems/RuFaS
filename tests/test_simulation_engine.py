@@ -47,6 +47,7 @@ def test_simulation_type_enum_values() -> None:
     [
         (SimulationType.FULL_FARM, True),
         (SimulationType.FIELD_AND_FEED, False),
+        (SimulationType.ANIMALS_ONLY, True),
     ],
 )
 def test_simulate_animals(
@@ -59,7 +60,7 @@ def test_simulate_animals(
 
 def test_animal_simulation_types() -> None:
     """Unit test for SimulationType._animal_simulation_types."""
-    assert SimulationType._animal_simulation_types() == {SimulationType.FULL_FARM}
+    assert SimulationType._animal_simulation_types() == {SimulationType.FULL_FARM, SimulationType.ANIMALS_ONLY}
 
 
 def test_field_simulation_types() -> None:
@@ -82,6 +83,7 @@ def test_feed_simulation_types() -> None:
     [
         ("full_farm", SimulationType.FULL_FARM),
         ("field_and_feed", SimulationType.FIELD_AND_FEED),
+        ("animals_only", SimulationType.ANIMALS_ONLY),
     ],
 )
 def test_get_simulation_type_valid(
@@ -339,6 +341,45 @@ def test_execute_field_and_feed_daily_simulation(
     mock_execute_ration_planning.assert_not_called()
     mock_execute_daily_animal_operations.assert_not_called()
     mock_execute_daily_manure_operations.assert_not_called()
+
+
+def test_execute_animals_only_daily_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_animals_only_daily_simulation in file
+    RUFAS/simulation_engine.py
+    """
+    # Arrange
+    daily_manure_data = {"manure": "data"}
+    daily_purchased_feeds_fed = {"feed_1": 12.5}
+    mock_execute_ration_planning = mocker.patch.object(
+        simulation_engine,
+        "_execute_ration_planning",
+    )
+    mock_execute_daily_animal_operations = mocker.patch.object(
+        simulation_engine,
+        "_execute_daily_animal_operations",
+        return_value=(daily_manure_data, daily_purchased_feeds_fed),
+    )
+    mock_report_daily_records = mocker.patch.object(
+        simulation_engine,
+        "_report_daily_records",
+    )
+    mock_advance_time = mocker.patch.object(
+        simulation_engine,
+        "_advance_time",
+    )
+
+    # Act
+    simulation_engine._execute_animals_only_daily_simulation()
+
+    # Assert
+    mock_execute_ration_planning.assert_called_once_with()
+    mock_execute_daily_animal_operations.assert_called_once_with()
+    mock_report_daily_records.assert_called_once_with(daily_purchased_feeds_fed)
+    mock_advance_time.assert_called_once_with()
 
 
 def test_execute_daily_field_operations(
