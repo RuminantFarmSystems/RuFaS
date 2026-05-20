@@ -136,7 +136,7 @@ Merging to ``main``
 
 3. **PML Approval**
 
-   - The **Project Management Lead (PML)** must approve the release and
+   - The **Program Management Lead (PML)** must approve the release and
      the release notes before the merge to ``main`` is performed.
 
 4. **Merge to Main**

@@ -145,7 +145,7 @@ Steps
 
 5. **PML Approval**
 
-   - The **Project Management Lead (PML)** must approve the release and
+   - The **Program Management Lead (PML)** must approve the release and
      the release notes before the release is finalized.
 
 6. **Merge into Main**
