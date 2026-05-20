@@ -1733,6 +1733,7 @@ def test_add_variable_to_pool_valid(
 
     # Arrange
     input_manager = InputManager()
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
@@ -1753,6 +1754,7 @@ def test_add_variable_to_pool_valid(
         input_data=data,
         properties_blob_key=properties_blob_key,
         eager_termination=False,
+        input_path=input_path,
     )
 
     # Assert
@@ -1872,6 +1874,7 @@ def test_add_variable_to_pool_invalid(
 
     # Arrange
     input_manager = InputManager()
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=False)
@@ -1887,6 +1890,7 @@ def test_add_variable_to_pool_invalid(
         input_data=data,
         properties_blob_key=properties_blob_key,
         eager_termination=False,
+        input_path=input_path,
     )
 
     # Assert
@@ -2005,6 +2009,7 @@ def test_add_variable_to_pool_eager_termination(
 
     # Arrange
     input_manager = InputManager()
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=False)
@@ -2021,6 +2026,7 @@ def test_add_variable_to_pool_eager_termination(
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=True,
+            input_path=input_path,
         )
 
     # Assert
@@ -2051,6 +2057,7 @@ def test_add_runtime_variable_to_pool(
 ) -> None:
     mock_check = mocker.patch.object(mock_input_manager, "_metadata_properties_exist", return_value=True)
     mock_add = mocker.patch.object(mock_input_manager, "_add_variable_to_pool", return_value=True)
+    input_path: Path = Path("path/to/input")
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_runtime_variable_to_pool(
@@ -2058,6 +2065,7 @@ def test_add_runtime_variable_to_pool(
             data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
+            input_path=input_path,
         )
 
     assert result is True
@@ -2068,6 +2076,7 @@ def test_add_runtime_variable_to_pool(
         input_data=data,
         properties_blob_key=properties_blob_key,
         eager_termination=False,
+        input_path=input_path,
     )
 
     mocker.patch.object(
@@ -2100,6 +2109,7 @@ def test_add_runtime_variable_to_pool_type_error(
 ) -> None:
     mock_check = mocker.patch.object(mock_input_manager, "_metadata_properties_exist", return_value=True)
     mock_add = mocker.patch.object(mock_input_manager, "_add_variable_to_pool", return_value=True)
+    input_path: Path = Path("path/to/input")
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         with pytest.raises(TypeError):
@@ -2108,6 +2118,7 @@ def test_add_runtime_variable_to_pool_type_error(
                 data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=False,
+                input_path=input_path,
             )
 
         assert mock_om_add_error.call_count == 1
@@ -2144,6 +2155,7 @@ def test_add_runtime_variable_to_pool_invalid_data(
 ) -> None:
     mock_check = mocker.patch.object(mock_input_manager, "_metadata_properties_exist", return_value=True)
     mock_add = mocker.patch.object(mock_input_manager, "_add_variable_to_pool", return_value=False)
+    input_path: Path = Path("path/to/input")
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_runtime_variable_to_pool(
@@ -2151,6 +2163,7 @@ def test_add_runtime_variable_to_pool_invalid_data(
             data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
+            input_path=input_path,
         )
 
         assert result is False
@@ -2161,6 +2174,7 @@ def test_add_runtime_variable_to_pool_invalid_data(
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
+            input_path=input_path,
         )
 
         mocker.patch.object(
@@ -2182,6 +2196,7 @@ def test_add_runtime_variable_to_pool_metadata_properties_do_not_exist(
 ) -> None:
     mock_check = mocker.patch.object(mock_input_manager, "_metadata_properties_exist", return_value=False)
     mock_add = mocker.patch.object(mock_input_manager, "_add_variable_to_pool", return_value=False)
+    input_path: Path = Path("path/to/input")
 
     with patch("RUFAS.output_manager.OutputManager.add_error") as mock_om_add_error:
         result = mock_input_manager.add_runtime_variable_to_pool(
@@ -2189,6 +2204,7 @@ def test_add_runtime_variable_to_pool_metadata_properties_do_not_exist(
             data={"a": 1},
             properties_blob_key="key2",
             eager_termination=False,
+            input_path=input_path,
         )
 
         assert result is False
@@ -2725,6 +2741,7 @@ def test_add_variable_to_pool_nested(
     mocker.patch.object(OutputManager, "add_log")
     patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
     mocker.patch.object(OutputManager, "add_error")
+    input_path: Path = Path("path/to/input")
 
     if (not is_modifiable_during_runtime) and eager_termination:
         with pytest.raises(PermissionError):
@@ -2733,6 +2750,7 @@ def test_add_variable_to_pool_nested(
                 input_data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
+                input_path=input_path,
             )
     elif not is_modifiable_during_runtime:
         assert not input_manager._add_variable_to_pool(
@@ -2740,6 +2758,7 @@ def test_add_variable_to_pool_nested(
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=eager_termination,
+            input_path=input_path,
         )
     else:
         result = input_manager._add_variable_to_pool(
@@ -2747,6 +2766,7 @@ def test_add_variable_to_pool_nested(
             input_data=data,
             properties_blob_key=properties_blob_key,
             eager_termination=False,
+            input_path=input_path,
         )
 
         assert result
@@ -3501,13 +3521,14 @@ def test_validate_data(
 ) -> None:
     """Unit test for _validate_data to ensure proper validation"""
     input_manager = InputManager()
+    input_path: Path = Path("path/to/input")
 
     mock_validate_input_by_type = mocker.patch.object(
         DataValidator,
         "validate_data_by_type",
         # fmt: off
         side_effect=lambda variable_path, variable_properties, data, eager_termination, properties_blob_key,
-        elements_counter, called_during_initialization, fixable_data_types:
+        elements_counter, called_during_initialization, fixable_data_types, input_path:
         data.get(variable_path[0]) is not None,
         # fmt: on
     )
@@ -3518,6 +3539,7 @@ def test_validate_data(
         eager_termination=eager_termination,
         properties_blob_key=properties_blob_key,
         elements_counter=elements_counter,
+        input_path=input_path,
     )
 
     assert validated_data == expected_validated_data
@@ -3654,6 +3676,7 @@ def test_load_runtime_metadata_success(mock_input_manager: InputManager, mocker:
     mocked_validate = mocker.patch.object(
         mock_input_manager.data_validator, "validate_metadata", return_value=(True, "")
     )
+    mock_input_manager.input_root = tmp_path
     mocked_loader = mocker.patch.object(mock_input_manager, "_load_data_from_csv", return_value={"value": [1]})
     mocked_add = mocker.patch.object(mock_input_manager, "add_runtime_variable_to_pool", return_value=True)
     metadata_exists_spy = mocker.spy(mock_input_manager, "_metadata_properties_exist")
@@ -3669,6 +3692,7 @@ def test_load_runtime_metadata_success(mock_input_manager: InputManager, mocker:
         data={"value": [1]},
         properties_blob_key="commodity_prices_calves_all_dollar_per_kilogram_csv_properties",
         eager_termination=True,
+        input_path=tmp_path / "commodity_prices.calves_all.dollar_per_kilogram.csv",
     )
     metadata_exists_spy.assert_called_once_with(
         "commodity_prices.calves_all.dollar_per_kilogram",
