@@ -9,7 +9,7 @@ from tqdm import tqdm
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
@@ -86,7 +86,6 @@ class HerdFactory:
         self.CI = self.im.get_data("animal.animal_config.farm_level.repro.calving_interval")
         self.initial_animal_num = self.im.get_data("animal.herd_initialization.initial_animal_num")
         self.simulation_days = self.im.get_data("animal.herd_initialization.simulation_days")
-        AnimalGenetics.initialize_class_variables()
 
         self.pre_animal_population = AnimalPopulation(
             calves=[],
@@ -136,6 +135,12 @@ class HerdFactory:
 
         """
         if animal.animal_type not in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            om.add_error(
+                "Calf and Heifer_I update error",
+                f"Unexpected {animal.animal_type.value} type. "
+                f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._calf_and_heiferI_update.__name__},
+            )
             raise TypeError(
                 f"Unexpected {animal.animal_type.value} type. "
                 f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}."
@@ -171,6 +176,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type == AnimalType.HEIFER_II:
+            om.add_error(
+                "Heifer_II update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._heiferII_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
@@ -203,6 +213,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type == AnimalType.HEIFER_III:
+            om.add_error(
+                "Heifer_III update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._heiferIII_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
@@ -239,6 +254,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type.is_cow:
+            om.add_error(
+                "Cow update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting cow.",
+                info_map={"class": self.__class__.__name__, "function": self._cow_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting cow.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
@@ -317,7 +337,6 @@ class HerdFactory:
             days_born=0,
             initial_phosphorus=cow.nutrients.phosphorus_for_gestation_required_for_calf,
             birth_weight=cow.reproduction.calf_birth_weight,
-            net_merit=0.0,
             animal_type=AnimalType.CALF.value,
         )
         cow.nutrients.total_phosphorus_in_animal = (
@@ -329,10 +348,9 @@ class HerdFactory:
         cow.nutrients.phosphorus_for_gestation_required_for_calf = 0.0
         cow.reproduction.calf_birth_weight = 0.0
 
-        calf = Animal(args)
+        calf = Animal(args, self.time)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
-            calf.net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(self.time, calf.breed, cow.net_merit)
 
     def _heiferIIIs_update(self, day: int) -> None:
         """
@@ -386,20 +404,15 @@ class HerdFactory:
             args = NewBornCalfValuesTypedDict(
                 id=self.pre_animal_population.next_id(),
                 breed=self.breed.name,
-                birth_date="",
+                birth_date=self.time.current_date.strftime("%Y-%m-%d"),
                 days_born=0,
                 initial_phosphorus=0,
                 birth_weight=birth_weight,
-                net_merit=0.0,
                 animal_type=AnimalType.CALF.value,
             )
-            calf = Animal(args)
+            calf = Animal(args, self.time)
             if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
-                birth_date_str: str = self.time.current_date.strftime("%Y-%m-%d")
-                calf.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-                    birth_date_str, self.breed
-                )
 
         for day in tqdm(range(self.simulation_days)):
             self._cows_update()
@@ -422,11 +435,7 @@ class HerdFactory:
         animal_data.update(id=self.pre_animal_population.next_id())
         if animal_type == "calf":
             animal_data.update(initial_phosphorus=0)
-        animal = Animal(animal_data)
-        animal_birth_date: str = self._backtrack_animal_birth_date(animal_data["days_born"], self.time)
-        animal.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-            birth_date=animal_birth_date, breed=animal.breed
-        )
+        animal = Animal(animal_data, self.time)
         return animal
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:
@@ -439,6 +448,7 @@ class HerdFactory:
                 herd_data["calves"],
             )
         )
+        self._update_genetic_values(calves)
         heiferIs = list(
             map(
                 self._init_animal_from_data,
@@ -446,6 +456,7 @@ class HerdFactory:
                 herd_data["heiferIs"],
             )
         )
+        self._update_genetic_values(heiferIs)
         heiferIIs = list(
             map(
                 self._init_animal_from_data,
@@ -453,6 +464,7 @@ class HerdFactory:
                 herd_data["heiferIIs"],
             )
         )
+        self._update_genetic_values(heiferIIs)
         heiferIIIs = list(
             map(
                 self._init_animal_from_data,
@@ -460,6 +472,7 @@ class HerdFactory:
                 herd_data["heiferIIIs"],
             )
         )
+        self._update_genetic_values(heiferIIIs)
         cows = list(
             map(
                 self._init_animal_from_data,
@@ -467,6 +480,7 @@ class HerdFactory:
                 herd_data["cows"],
             )
         )
+        self._update_genetic_values(cows)
         replacement = list(
             map(
                 self._init_animal_from_data,
@@ -474,6 +488,7 @@ class HerdFactory:
                 herd_data["replacement"],
             )
         )
+        self._update_genetic_values(replacement)
 
         return AnimalPopulation(
             calves=calves,
@@ -484,6 +499,22 @@ class HerdFactory:
             replacement=replacement,
             current_animal_id=self.pre_animal_population.current_animal_id,
         )
+
+    def _update_genetic_values(
+        self,
+        animals: list[Animal],
+    ) -> None:
+        """Function to update EBV and ranking index values of a specific group of animals."""
+        if not AnimalConfig.simulate_genetics:
+            return
+        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
+            [animal.genetics for animal in animals if animal.genetics is not None]
+        )
+        for animal in animals:
+            assert animal.genetics is not None
+            animal.genetics.calculate_ebv_and_ranking_index(
+                animal.animal_type, mean_tbv_fat, mean_tbv_protein, animal.calves
+            )
 
     def _random_sample_with_replacement(self) -> AnimalPopulation:
         """Function to randomly sample the herd with replacement"""

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
 
@@ -29,7 +27,7 @@ class PoolGasPartition:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def partition_pool_gas(self):
@@ -39,7 +37,7 @@ class PoolGasPartition:
         Notes
         ------
         This method applies all the gas-partitioning sub routines to each layer of soil that is present in the soil
-        `data` object.
+        ``data`` object.
 
         """
         layer = self.data.soil_layers[0]
@@ -700,7 +698,6 @@ class PoolGasPartition:
             * passive_carbon_decomposition_factor
         )
 
-    # ---- S.6.C.4
     @staticmethod
     def _determine_slow_carbon_decomposition_amount(
         decomposition_moisture_effect: float,
@@ -809,12 +806,13 @@ class PoolGasPartition:
     ) -> float:
         """
         Calculate plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
+
         Parameters
         ----------
         plant_metabolic_active_carbon_usage : float
             Plant metabolic carbon decomposed into active carbon (kg/ha).
         metabolic_active_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of metabolic to active carbon.
+            Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).
 
         Returns
         -------
@@ -842,7 +840,7 @@ class PoolGasPartition:
         plant_metabolic_active_carbon_usage : float
             Plant metabolic carbon decomposed into active carbon (kg/ha).
         metabolic_active_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of metabolic to active carbon.
+            Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).
 
         Returns
         -------
@@ -870,7 +868,7 @@ class PoolGasPartition:
         plant_structural_active_carbon_usage : float
             Plant structural carbon decomposed into active carbon (kg/ha).
         structural_active_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of structural to active carbon.
+            Rate of carbon dioxide loss during transformation of structural to active carbon (unitless).
 
         Returns
         -------
@@ -898,7 +896,7 @@ class PoolGasPartition:
         plant_structural_active_carbon_usage : float
             Plant metabolic carbon decomposed into active carbon (kg/ha).
         structural_active_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of structural to active carbon.
+            Rate of carbon dioxide loss during transformation of structural to active carbon (unitless).
 
         Returns
         -------
@@ -919,14 +917,14 @@ class PoolGasPartition:
     ) -> float:
         """
         Calculate plant structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
-        layer (kg/ha).
+        layer.
 
         Parameters
         ----------
         plant_structural_slow_carbon_usage : float
             Plant structural carbon decomposed into slow carbon (kg/ha).
-        structural_slow_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of structural to slow carbon.
+        structural_slow_carbon_loss_rate : float, default = 0.3
+            Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).
 
         Returns
         -------
@@ -947,14 +945,14 @@ class PoolGasPartition:
     ) -> float:
         """
         Calculate plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
-        layer (kg/ha).
+        layer.
 
         Parameters
         ----------
         plant_structural_slow_carbon_usage : float
             Plant metabolic carbon decomposed into slow carbon (kg/ha).
         structural_slow_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of structural to slow carbon.
+            Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).
 
         Returns
         -------
@@ -982,7 +980,7 @@ class PoolGasPartition:
         soil_metabolic_active_carbon_usage : float
             Soil metabolic carbon decomposed into active carbon (kg/ha).
         metabolic_active_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of metabolic to active carbon.
+            Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).
 
         Returns
         -------
@@ -1010,7 +1008,7 @@ class PoolGasPartition:
         soil_metabolic_active_carbon_usage : float
             Soil metabolic carbon decomposed into active carbon (kg/ha).
         metabolic_active_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of metabolic to active carbon.
+            Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).
 
         Returns
         -------
@@ -1038,7 +1036,7 @@ class PoolGasPartition:
         soil_structural_active_carbon_usage : float
             Soil structural carbon decomposed into active carbon (kg/ha).
         structural_active_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of structural to active carbon.
+            Rate of carbon dioxide loss during transformation of structural to active carbon. (unitless)
 
         Returns
         -------
@@ -1066,7 +1064,7 @@ class PoolGasPartition:
         soil_structural_active_carbon_usage : float
             Soil structural carbon decomposed into active carbon (kg/ha).
         structural_active_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of structural to active carbon.
+            Rate of carbon dioxide loss during transformation of structural to active carbon (unitless).
 
         Returns
         -------
@@ -1087,14 +1085,14 @@ class PoolGasPartition:
     ) -> float:
         """
         Calculate soil structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
-        layer (kg/ha).
+        layer.
 
         Parameters
         ----------
         soil_structural_slow_carbon_usage : float
             Soil structural carbon decomposed into slow carbon (kg/ha).
         structural_slow_carbon_loss_rate : float
-            Rate of carbon dioxide loss during transformation of structural to slow carbon.
+            Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).
 
         Returns
         -------
@@ -1115,7 +1113,7 @@ class PoolGasPartition:
     ) -> float:
         """
         Calculate soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
-        layer (kg/ha).
+        layer.
 
         Parameters
         ----------

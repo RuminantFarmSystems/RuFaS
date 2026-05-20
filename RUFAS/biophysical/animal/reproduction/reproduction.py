@@ -1,3 +1,4 @@
+from sys import maxsize
 import math
 import random
 from math import floor
@@ -7,7 +8,6 @@ from scipy.stats import truncnorm
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -34,6 +34,7 @@ from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import Horm
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
@@ -171,6 +172,11 @@ class Reproduction:
         -------
         ReproductionOutputs
             Updated reproduction outputs for the animal.
+
+        Raises
+        ------
+        TypeError
+            If unknown animal type is encountered.
         """
         reproduction_data_stream = ReproductionDataStream(
             animal_type=reproduction_inputs.animal_type,
@@ -180,7 +186,10 @@ class Reproduction:
             days_in_pregnancy=reproduction_inputs.days_in_pregnancy,
             days_in_milk=reproduction_inputs.days_in_milk,
             events=AnimalEvents(),
-            net_merit=reproduction_inputs.net_merit,
+            dam_tbv_fat=reproduction_inputs.dam_tbv_fat if reproduction_inputs.dam_tbv_fat is not None else None,
+            dam_tbv_protein=(
+                reproduction_inputs.dam_tbv_protein if reproduction_inputs.dam_tbv_protein is not None else None
+            ),
             phosphorus_for_gestation_required_for_calf=reproduction_inputs.phosphorus_for_gestation_required_for_calf,
             herd_reproduction_statistics=HerdReproductionStatistics(),
             newborn_calf_config=None,
@@ -192,7 +201,12 @@ class Reproduction:
         elif reproduction_data_stream.animal_type.is_cow:
             reproduction_data_stream = self.cow_reproduction_update(reproduction_data_stream, time)
         else:
-            raise TypeError(f"Unknown animal type: {reproduction_data_stream.animal_type}")
+            OutputManager().add_error(
+                "Reproduction Update Error",
+                f"Unknown animal type: {reproduction_data_stream.animal_type}.",
+                info_map={"class": self.__class__.__name__, "function": self.reproduction_update.__name__},
+            )
+            raise TypeError(f"Unknown animal type: {reproduction_data_stream.animal_type}.")
 
         return ReproductionOutputs(
             body_weight=reproduction_data_stream.body_weight,
@@ -295,7 +309,15 @@ class Reproduction:
             CowReproductionProtocol.TAI,
             CowReproductionProtocol.ED_TAI,
         ]:
-            raise ValueError(f"Invalid cow repro program: {self.cow_reproduction_program}")
+            OutputManager().add_error(
+                "Cow Reproduction Validation Error",
+                f"Invalid cow repro program: {self.cow_reproduction_program}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_cow_reproduction_program.__name__,
+                },
+            )
+            raise ValueError(f"Invalid cow repro program: {self.cow_reproduction_program}.")
 
     def _update_cow_repro_program_and_log_repro_stats_if_needed(
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
@@ -384,6 +406,14 @@ class Reproduction:
         elif self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
             return self.execute_heifer_synch_ed_protocol(reproduction_data_stream, simulation_day)
         else:
+            OutputManager().add_error(
+                "Heifer Reproduction Protocol Error",
+                f"Invalid heifer repro program: {self.heifer_reproduction_program}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._execute_heifer_reproduction_protocol.__name__,
+                },
+            )
             raise ValueError(f"Invalid heifer repro program: {self.heifer_reproduction_program}")
 
     def _add_cow_give_birth_events(
@@ -450,9 +480,6 @@ class Reproduction:
 
         reproduction_data_stream = self._simulate_estrus_if_eligible(reproduction_data_stream, time.simulation_day)
 
-        newborn_calf_net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
-            time, reproduction_data_stream.breed, reproduction_data_stream.net_merit
-        )
         reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
             breed=reproduction_data_stream.breed.name,
             animal_type=AnimalType.CALF.value,
@@ -460,7 +487,8 @@ class Reproduction:
             days_born=0,
             birth_weight=self.calf_birth_weight,
             initial_phosphorus=reproduction_data_stream.phosphorus_for_gestation_required_for_calf,
-            net_merit=newborn_calf_net_merit,
+            dam_tbv_fat=reproduction_data_stream.dam_tbv_fat,
+            dam_tbv_protein=reproduction_data_stream.dam_tbv_protein,
         )
 
         return reproduction_data_stream
@@ -478,6 +506,11 @@ class Reproduction:
             HeiferReproductionProtocol.TAI,
             HeiferReproductionProtocol.SynchED,
         ]:
+            OutputManager().add_error(
+                "Heifer Reproduction Setter Error",
+                f"Invalid repro program: {repro_program}.",
+                info_map={"class": self.__class__.__name__, "function": self._set_heifer_reproduction_program.__name__},
+            )
             raise ValueError(f"Invalid repro program: {repro_program}")
 
         if self.heifer_reproduction_program == repro_program:
@@ -506,7 +539,12 @@ class Reproduction:
             CowReproductionProtocol.TAI,
             CowReproductionProtocol.ED_TAI,
         ]:
-            raise ValueError(f"Invalid repro program: {repro_program}")
+            OutputManager().add_error(
+                "Cow Reproduction Setter Error",
+                f"Invalid repro program: {repro_program}.",
+                info_map={"class": self.__class__.__name__, "function": self._set_cow_reproduction_program.__name__},
+            )
+            raise ValueError(f"Invalid repro program: {repro_program}.")
 
         if self.cow_reproduction_program == repro_program:
             return reproduction_data_stream
@@ -528,7 +566,7 @@ class Reproduction:
         simulation_day: int,
         estrus_note: str,
         avg_estrus_cycle: float,
-        max_cycle_length: float = math.inf,
+        max_cycle_length: int = maxsize,
     ) -> ReproductionDataStream:
         """
         Calculate and set first next estrus day for an heiferII.
@@ -543,7 +581,7 @@ class Reproduction:
             Note explaining the reason for estrus simulation.
         avg_estrus_cycle : float
             Average length of the estrus cycle.
-        max_cycle_length : float, optional
+        max_cycle_length : int, optional
             Maximum allowable length for the estrus cycle, by default inf.
 
         Returns
@@ -593,9 +631,11 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction datastream after estrus simulation.
         """
-        estrus_cycle = truncnorm.rvs(-animal_constants.STDI, animal_constants.STDI, avg_estrus_cycle, std_estrus_cycle)
+        estrus_cycle: float = float(
+            truncnorm.rvs(-animal_constants.STDI, animal_constants.STDI, avg_estrus_cycle, std_estrus_cycle)
+        )
         if abs(estrus_cycle) >= max_cycle_length:
-            estrus_cycle = max_cycle_length - 1
+            estrus_cycle = float(max_cycle_length - 1)
         self.estrus_day = int(start_day + abs(estrus_cycle))
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born, simulation_day, f"{estrus_note} on day {self.estrus_day}"
@@ -728,7 +768,12 @@ class Reproduction:
                 self.reproduction_statistics.CIDR_injections += 1
                 event = animal_constants.INJECT_CIDR
             else:
-                raise ValueError(f"Invalid hormone: {hormone}")
+                OutputManager().add_error(
+                    "Hormone Delivery Error",
+                    f"Invalid hormone: {hormone}.",
+                    info_map={"class": self.__class__.__name__, "function": self._deliver_hormones.__name__},
+                )
+                raise ValueError(f"Invalid hormone: {hormone}.")
 
             reproduction_data_stream.events.add_event(
                 delivery_day,
@@ -837,6 +882,12 @@ class Reproduction:
                 "heifers", reproduction_sub_protocol, start_from
             )
             if hormone_schedule is None:
+                OutputManager().add_error(
+                    "Hormone Schedule Error",
+                    f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
+                    f"{self.heifer_reproduction_sub_program}",
+                    info_map={"class": self.__class__.__name__, "function": self._set_up_hormone_schedule.__name__},
+                )
                 raise Exception(
                     f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
                     f"{self.heifer_reproduction_sub_program}"
@@ -848,6 +899,12 @@ class Reproduction:
                 "cows", reproduction_sub_protocol, start_from
             )
             if hormone_schedule is None:
+                OutputManager().add_error(
+                    "Hormone Schedule Error",
+                    f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
+                    f"{self.cow_ovsynch_program}",
+                    info_map={"class": self.__class__.__name__, "function": self._set_up_hormone_schedule.__name__},
+                )
                 raise Exception(
                     f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
                     f"{self.cow_ovsynch_program}"

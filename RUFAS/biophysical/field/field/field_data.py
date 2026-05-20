@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.crop.dormancy import Dormancy
+from RUFAS.output_manager import OutputManager
 
 
 @dataclass(kw_only=True)
@@ -67,11 +67,11 @@ class FieldData:
         Converts an amount in liters to an amount in mm based on the area the liters are distributed over.
     """
 
-    name: Optional[str] = None
+    name: str | None = None
     absolute_latitude: float = 43.5
     longitude: float = -88.6
     minimum_daylength: float = 6.33
-    dormancy_threshold_daylength: Optional[float] = None
+    dormancy_threshold_daylength: float | None = None
     current_residue: float = 0.0
 
     transpiration: float = 0.0
@@ -81,9 +81,9 @@ class FieldData:
     field_size: float = 1.0
 
     # --- Irrigation variables ---
-    watering_amount_in_liters: Optional[float] = None
+    watering_amount_in_liters: float | None = None
     watering_amount_in_mm: float = 0.0
-    watering_interval: Optional[int] = None
+    watering_interval: int | None = None
     days_into_watering_interval: int = 0
     current_water_deficit: float = 0.0
     watering_occurs: bool = True
@@ -120,8 +120,18 @@ class FieldData:
         )
         if should_water:
             if self.watering_amount_in_liters < 0.0:
+                OutputManager().add_error(
+                    "Watering amount error",
+                    f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.",
+                    info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+                )
                 raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
             elif self.watering_interval < 0:
+                OutputManager().add_error(
+                    "Watering interval error",
+                    f"Expected watering interval to be >= 0, received '{self.watering_interval}'.",
+                    info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+                )
                 raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
 
             self.watering_amount_in_mm = self.convert_liters_to_millimeters(
@@ -142,14 +152,14 @@ class FieldData:
         Parameters
         ----------
         liter_amount : float
-            Volume to be converted (liters)
+            Volume to be converted (liters).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Returns
         -------
         float
-            Millimeter amount that is distributed evenly across the specified field area (mm)
+            Amount that is distributed evenly across the specified field area (mm).
 
         """
         amount_in_cubic_millimeters = liter_amount * GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS

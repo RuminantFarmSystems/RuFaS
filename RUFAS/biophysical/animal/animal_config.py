@@ -37,8 +37,6 @@ class AnimalConfig:
         Maximum day at which a heifer is culled if not pregnant, (simulation days).
     do_not_breed_time : int
         The duration after which breeding is stopped, (simulation days).
-    cull_milk_production : int
-        The threshold milk production below which cows are culled, (simulation days).
     semen_type : str
         Types of semen used for reproduction, e.g., "conventional", (unitless).
     male_calf_rate_conventional_semen : float
@@ -193,7 +191,6 @@ class AnimalConfig:
     dry_off_day_of_pregnancy: int = 218
     heifer_reproduction_cull_day: int = 500
     do_not_breed_time: int = 185
-    cull_milk_production: int = 30
 
     semen_type: str = "conventional"
     male_calf_rate_conventional_semen: float = 0.53
@@ -376,6 +373,10 @@ class AnimalConfig:
 
     milk_reduction_maximum: float
 
+    average_phenotype: dict[str, dict[int, float]] = {}
+    top_listing_semen: dict[str, dict[str, float]] = {}
+    simulate_genetics: bool = False
+
     @classmethod
     def initialize_animal_config(cls) -> None:
         """Initialize the animal config from the input manager user input data."""
@@ -392,7 +393,6 @@ class AnimalConfig:
         cls.dry_off_day_of_pregnancy = animal_config_data["management_decisions"]["days_in_preg_when_dry"]
         cls.heifer_reproduction_cull_day = animal_config_data["management_decisions"]["heifer_repro_cull_time"]
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
-        cls.cull_milk_production = animal_config_data["management_decisions"]["cull_milk_production"]
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
@@ -517,7 +517,7 @@ class AnimalConfig:
         cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]
         cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"]["methane_mitigation_additive_amount"]
 
-        cls.milk_reduction_maximum = im.get_data("feed.milk_reduction_maximum")
+        cls.milk_reduction_maximum = im.get_data("feed.ration_formulation_parameters.milk_reduction_maximum")
 
         if cls.third_pregnancy_check_day >= cls.dry_off_day_of_pregnancy:
             om = OutputManager()
@@ -531,3 +531,18 @@ class AnimalConfig:
                     "function": "initialize_animal_config",
                 },
             )
+
+        average_phenotype = im.get_data("animal_mean_phenotype")
+        cls.average_phenotype = {
+            trait: dict(zip(average_phenotype["birth_year"], values))
+            for trait, values in average_phenotype.items()
+            if trait != "birth_year"
+        }
+
+        top_listing_semen = im.get_data("animal_top_listing_semen")
+        cls.top_listing_semen = {
+            trait: dict(zip(top_listing_semen["year_month"], values))
+            for trait, values in top_listing_semen.items()
+            if trait != "year_month"
+        }
+        cls.simulate_genetics = animal_data["herd_information"]["simulate_genetics"]

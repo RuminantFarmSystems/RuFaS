@@ -20,7 +20,6 @@ from RUFAS.data_structures.animal_to_manure_connection import (
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     AdvancePurchaseAllowance,
-    TotalInventory,
     NutrientStandard,
 )
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -860,9 +859,22 @@ class Pen:
         ManureStream
             A new ManureStream object with updated attributes reflecting the impact of the applied bedding.
 
+        Raises
+        ------
+        ValueError
+            If Pen's manure_stream has no pen_manure_data.
+
         """
         bedding = self.beddings[bedding_name]
         if manure_stream.pen_manure_data is None:
+            self.om.add_error(
+                "PenManureData not set",
+                f"Pen {self.id} had a manure_stream with no pen_manure_data.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._apply_bedding.__name__,
+                },
+            )
             raise ValueError(f"No PenManureData for pen {self.id}: pen_manure_data must be set to apply bedding.")
         num_animals = manure_stream.pen_manure_data.num_animals
         total_bedding_mass = bedding.calculate_total_bedding_mass(num_animals)
@@ -943,6 +955,16 @@ class Pen:
         }
 
         if self.pen_type not in exposed_manure_surface_area_by_pen_type:
+            self.om.add_error(
+                "Invalid PenType Error.",
+                f"Invalid pen type: {self.pen_type}. "
+                "Cannot calculate manure surface area, pen_type must be in "
+                f"{exposed_manure_surface_area_by_pen_type.keys()}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._calculate_manure_surface_area.__name__,
+                },
+            )
             raise ValueError(f"Invalid pen type: {self.pen_type}")
 
         exposed_manure_surface_area = exposed_manure_surface_area_by_pen_type[self.pen_type]
@@ -1031,7 +1053,6 @@ class Pen:
         temperature: float,
         max_daily_feeds: dict[RUFAS_ID, float],
         advance_purchase_allowance: AdvancePurchaseAllowance,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> None:
         """
@@ -1047,14 +1068,13 @@ class Pen:
             Maximum amounts of each feed type that may be fed per animal per day.
         advance_purchase_allowance : AdvancePurchaseAllowance
             Maximum amounts of each feed type that may be purchased at the beginning of a feed interval.
-        total_inventory : TotalInventory
-            Amounts of feeds currently held in storage.
         simulation_day : int
             Day of simulation.
 
-        Returns
-        -------
-        None
+        Raises
+        ------
+        ValueError
+            If no previous ration is available when needed.
 
         """
         info_map = {
@@ -1153,12 +1173,12 @@ class Pen:
             )
         elif self.ration == {}:
             self.om.add_error(
-                "No previous ration available",
+                "No previous ration available.",
                 f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
                 f"Possible solution is to provide additional feed ingredients to {self.animal_combination.name}.",
                 info_map,
             )
-            raise ValueError("No previous ration available")
+            raise ValueError("No previous ration available.")
         else:
             self.om.add_log(
                 "Previous ration used because automated ration formulation failed for non lactating cow pen.",
