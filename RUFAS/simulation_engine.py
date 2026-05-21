@@ -48,6 +48,7 @@ class SimulationType(Enum):
 
     FULL_FARM = "full_farm"
     FIELD_AND_FEED = "field_and_feed"
+    FIELD_ONLY = "field_only"
     ANIMALS_ONLY = "animals_only"
 
     @property
@@ -88,7 +89,7 @@ class SimulationType(Enum):
     @classmethod
     def _fields_simulation_types(cls) -> set["SimulationType"]:
         """Return the set of simulation types that simulate crops, soil, and fields."""
-        return {cls.FULL_FARM, cls.FIELD_AND_FEED}
+        return {cls.FULL_FARM, cls.FIELD_AND_FEED, cls.FIELD_ONLY}
 
     @classmethod
     def _feed_simulation_types(cls) -> set["SimulationType"]:
@@ -192,6 +193,7 @@ class SimulationEngine:
         self._simulation_type_to_daily_simulation_function = {
             SimulationType.FULL_FARM: self._execute_full_farm_daily_simulation,
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
+            SimulationType.FIELD_ONLY: self._execute_field_only_simulation,
             SimulationType.ANIMALS_ONLY: self._execute_animals_only_daily_simulation,
         }
 
@@ -323,6 +325,22 @@ class SimulationEngine:
         self._execute_daily_manure_operations(daily_manure_data)
 
         self._report_daily_records(daily_purchased_feeds_fed)
+
+        self._advance_time()
+
+    def _execute_field_only_simulation(self) -> None:
+        """
+        Executes the daily simulation routines for a field only modules.
+
+        Daily Field Process:
+        1. Field operations without sending the crops to the feed manager
+        2. Record keeping (time, weather, purchased feeds fed emissions)
+        3. Advance simulation date
+
+        """
+        self._execute_daily_field_operations()
+
+        self._report_daily_records()
 
         self._advance_time()
 
