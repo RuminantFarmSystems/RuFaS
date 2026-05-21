@@ -402,6 +402,13 @@ class AnimalConfig:
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
         cls.calf_mortality_rate = animal_config_data["management_decisions"]["calf_mortality_rate"]
         cls.heifer_mortality_rate = animal_config_data["management_decisions"]["heifer_mortality_rate"]
+        # TEMP DEBUG: remove once mortality investigation is complete.
+        # Confirms the rates that were actually loaded from the input file at runtime.
+        print(
+            f"[MORTALITY-DEBUG] AnimalConfig loaded: "
+            f"calf_mortality_rate={cls.calf_mortality_rate}, "
+            f"heifer_mortality_rate={cls.heifer_mortality_rate}"
+        )
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][

@@ -145,6 +145,13 @@ class Animal:
 
     nutrient_standard: NutrientStandard
 
+    # TEMP DEBUG: counters for the mortality investigation. Remove once resolved.
+    # Class-level (shared across all animals); track the lifecycle of scheduled vs fired deaths.
+    _debug_calf_mortality_scheduled = 0
+    _debug_calf_mortality_fired = 0
+    _debug_heifer_mortality_scheduled = 0
+    _debug_heifer_mortality_fired = 0
+
     def __init__(
         self,
         args: (
@@ -1989,6 +1996,11 @@ class Animal:
             self.dead_at_day = time.simulation_day
             self.cull_reason = self._future_death_reason
             animal_status = AnimalStatus.DEAD
+            # TEMP DEBUG: count every fired death by youngstock cull-reason tag.
+            if self.cull_reason == animal_constants.CALF_MORTALITY_CULL:
+                Animal._debug_calf_mortality_fired += 1
+            elif self.cull_reason == animal_constants.HEIFER_MORTALITY_CULL:
+                Animal._debug_heifer_mortality_fired += 1
 
         return animal_status, newborn_calf_config
 
@@ -2114,6 +2126,8 @@ class Animal:
         if death_day > self.days_born:
             self._future_death_date = death_day
             self._future_death_reason = animal_constants.CALF_MORTALITY_CULL
+            # TEMP DEBUG: count every committed pre-wean mortality scheduling.
+            Animal._debug_calf_mortality_scheduled += 1
 
     def _setup_heifer_mortality(self) -> None:
         """
@@ -2155,13 +2169,19 @@ class Animal:
             upper = AnimalConfig.heifer_breed_start_day - 1
         else:
             # HeiferII window: from the day after breeding starts up to the typical day a
-            # heifer would enter HeiferIII (springer status).
+            # heifer of average gestation length would enter HeiferIII (springer status).
             # The upper bound = breed_start + (avg_gestation - prefresh_day) is the day a
-            # heifer who bred immediately on day breed_start_day_h would have
-            # days_in_pregnancy = (avg_gestation - prefresh_day), which is when RuFaS
-            # transitions her into HeiferIII. By stopping at that day, all post-bred deaths
-            # land in HeiferII and the springer (HeiferIII) phase stays out of scope.
-            # The 21-day prefresh buffer absorbs gestation-length variation in outliers.
+            # heifer who bred immediately on day breed_start_day_h and has an average-length
+            # gestation would have days_in_pregnancy = (avg_gestation - prefresh_day), which
+            # is when RuFaS transitions her into HeiferIII. The 21-day prefresh buffer is
+            # chosen to absorb most gestation-length variation, so the vast majority of
+            # post-bred deaths land in HeiferII.
+            #
+            # NOTE: a small outlier fraction (heifers with shorter-than-average gestation
+            # who also bred on the first cycle) can already be in HeiferIII (springer) when
+            # the death day fires. The cull_reason is still HEIFER_MORTALITY_CULL for those
+            # animals, but their animal_type at death is HEIFER_III. Per SME guidance this
+            # residual mis-assignment is acceptable; the cap was tuned to minimize it.
             lower = AnimalConfig.heifer_breed_start_day + 1
             upper = (
                 AnimalConfig.heifer_breed_start_day
@@ -2184,6 +2204,8 @@ class Animal:
         if death_day > self.days_born:
             self._future_death_date = death_day
             self._future_death_reason = animal_constants.HEIFER_MORTALITY_CULL
+            # TEMP DEBUG: count every committed post-wean mortality scheduling.
+            Animal._debug_heifer_mortality_scheduled += 1
 
     def _transition_heiferI_to_heiferII(self, time: RufasTime) -> None:
         """
