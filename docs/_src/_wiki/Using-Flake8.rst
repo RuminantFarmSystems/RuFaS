@@ -239,4 +239,4 @@ External Resources
 ```flake8``
 Documentation <https://flake8.pycqa.org/en/latest/index.html>`__
 
-.. |linting_fail| image:: https://github.com/RuminantFarmSystems/MASM/assets/43901812/6683becd-5b13-4482-8157-802218e1ca1b
+.. |linting_fail| image:: https://github.com/RuminantFarmSystems/RuFaS/assets/43901812/6683becd-5b13-4482-8157-802218e1ca1b

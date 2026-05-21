@@ -19,14 +19,14 @@ branches.
 How
 ---
 
-Github Actions are in the MASM/.github/workflows folder saved as
+Github Actions are in the RuFaS/.github/workflows folder saved as
 ``.yml`` files.
 
 As of September 2024, RuFaS has two Actions files:
 ``combined_format_lint_test_mypy.yml`` and ``sphinx.yml``.
 ``combined_format_lint_test_mypy.yml`` runs 2 different jobs, described
 below. ``sphinx.yml`` must be triggered manually, instructions for how
-to do that are located in the :doc:`Sphinx Wiki Page <Using-Sphinx>`.
+to do that are located in the :doc:`Sphinx Page <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Using-Sphinx.html>`.
 
 format_code
 ~~~~~~~~~~~
@@ -38,7 +38,7 @@ The first job in ``combined_format_lint_test_mypy.yml`` does 4 things:
    tracked in Github. The Github Actions will exit out and fail at this
    point if the user has changed any unauthorized files.
 2. Checks and records if the
-   `changelog <https://github.com/RuminantFarmSystems/MASM/blob/dev/changelog.md>`__
+   `changelog <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/changelog.md>`__
    has been updated in this PR.
 3. Formats the code using the :doc:`Black formatting tool <Using-Python's-Black-Formatter>`.
 4. Commits and adds the Black-formatted code to the PR.
