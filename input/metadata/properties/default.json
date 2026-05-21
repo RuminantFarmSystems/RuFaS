@@ -17,7 +17,7 @@
       "type": "string",
       "description": "The type of daily simulation to run. Will determine daily simulation function in SimulationEngine.",
       "default": "full_farm",
-      "pattern": "^(full_farm|field_and_feed)$"
+      "pattern": "^(full_farm|field_and_feed|animals_only)$"
     },
     "nutrient_standard": {
       "type": "string",

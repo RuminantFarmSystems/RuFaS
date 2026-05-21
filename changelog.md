@@ -78,11 +78,13 @@ v1.0.0
 - [2984](https://github.com/RuminantFarmSystems/RuFaS/pull/2984) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds manure stream compatibility check to Separators to enforce that Separators cannot be first processors in a chain.
 - [2931](https://github.com/RuminantFarmSystems/RuFaS/pull/2931) - [minor change] [NoInputChange] [OutputChange] automatically add "simulation_day" to info_maps when variables are added to OutputManager, improves data padding usability.
 - [2991](https://github.com/RuminantFarmSystems/RuFaS/pull/2991) - [minor change] [NoInputChange] [NoOutputChange] Updated the docstrings in the Crop and Soil module.
+- [3002](https://github.com/RuminantFarmSystems/RuFaS/pull/3002) - [minor change] [InputChange] [NoOutputChange] Adds animals-only simulation type.
 - [3004](https://github.com/RuminantFarmSystems/RuFaS/pull/3004) - [minor change] [NoInputChange] [NoOutputChange] Removes public `available_feeds` property from FeedManager.
 - [3000](https://github.com/RuminantFarmSystems/RuFaS/pull/3000) - [minor change] [NoInputChange] [NoOutputChange] Updated the error messages for all biophysical modules.
 - [2715](https://github.com/RuminantFarmSystems/RuFaS/pull/2715) - [minor change] [Animal] [NoInputChange] [OutputChange] Renames the 305-day milk yield output from `milk_production_305days_herd_mean` to `milk_305_day_yield_herd_mean`, splits the calculation into a pure Wood's-curve integral and a per-cow simulation estimate, and adds L1/L2/L3+ herd-level reporting.
 - [3022](https://github.com/RuminantFarmSystems/RuFaS/pull/3022) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Adds missing changelog entry for #2715 and fixes the one mypy error it introduced by typing the `history` parameter of `_make_milk_production` in `test_milk_production.py`.
 - [3003](https://github.com/RuminantFarmSystems/RuFaS/pull/3003) - [minor change] [Animal] [InputChange] [OutputChange] Added `calf_mortality_rate` and `heifer_mortality_rate` user inputs to model pre-wean and post-wean youngstock mortality.
+- [3024](https://github.com/RuminantFarmSystems/RuFaS/pull/3024) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Adds path to input to error/warning messages in `DataValidator` for easier invalid input fixing.
 
 ### v1.0.0
 
