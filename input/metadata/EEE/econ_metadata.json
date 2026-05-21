@@ -434,13 +434,6 @@
       "type": "csv",
       "properties": "commodity_prices_net_fertilizer_anhydrous-ammonia_dollar_per_kilogram_csv_properties"
     },
-    "commodity_prices_net_fertilizer_anhydrous_ammonia_dollar_per_kilogram": {
-      "title": "Fertilizer",
-      "description": "Anhydrous ammonia fertilizer prices expressed in dollars per kilogram.",
-      "path": "input/data/EEE/econ/commodity_prices.net_fertilizer_anhydrous_ammonia.dollar_per_kilogram.csv",
-      "type": "csv",
-      "properties": "commodity_prices_net_fertilizer_anhydrous_ammonia_dollar_per_kilogram_csv_properties"
-    },
     "commodity_prices_net_fertilizer_diammonium_phosphate_dollar_per_kilogram": {
       "title": "Fertilizer",
       "description": "Diammonium Phosphate 18-46-0 prices",

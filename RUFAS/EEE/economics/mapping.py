@@ -85,9 +85,8 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
         },
         "Revenue": {
-            
             "FPCM (Milk Production)": {
-                "biophysical_simulation": ["Economic_preprocessing.Animal.FPCM"],
+                "biophysical_simulation": ["AnimalModuleReporter.report_herd_statistics_data.daily_milk_production"],
                 "economics_files": ["commodity_prices_milk_retail_dollar_per_liter"],
                 "preprocessing": "FPCM "
                 "calculation "
