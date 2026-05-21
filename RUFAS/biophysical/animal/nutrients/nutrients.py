@@ -6,6 +6,7 @@ from RUFAS.general_constants import GeneralConstants
 
 
 class Nutrients:
+    """Representation of the nutrients of an animal."""
     phosphorus_excess_in_diet: float
     phosphorus_intake: float
     phosphorus_requirement: float
@@ -18,6 +19,7 @@ class Nutrients:
     phosphorus_for_gestation_required_for_calf: float
 
     def __init__(self) -> None:
+        """Init method for Nutrients class."""
         self.phosphorus_excess_in_diet = 0.0
         self.phosphorus_intake = 0.0
         self.phosphorus_requirement = 0.0
@@ -46,13 +48,13 @@ class Nutrients:
     def _calculate_total_animal_phosphorus(self) -> None:
         """Calculates the total phosphorus for the animal.
 
+        Notes
+        -----
+        Change in body P reserves (g), must be <= 0
+
         References
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1G.A.1, A.1G.A.2, A.1G.A.3.
-
-        Notes
-        -----
-        - Change in body P reserves (g), must be <= 0
 
         """
         self.phosphorus_excess_in_diet = max(self.phosphorus_intake - self.phosphorus_requirement, 0)
@@ -97,6 +99,7 @@ class Nutrients:
         References
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1A-D.E.1, A.1EF.E.1.
+
         """
         if not nutrients_inputs.animal_type.is_cow:
             return 0.0008 * self._dry_matter_intake * GeneralConstants.KG_TO_GRAMS
@@ -109,12 +112,13 @@ class Nutrients:
         References
         ----------
         RuFaS Phosphorus Animal Module documentation section A.1A-F.E.3.
+
         """
         if (
             not nutrients_inputs.animal_type.is_cow
             or nutrients_inputs.body_weight < nutrients_inputs.mature_body_weight
         ):
-            return (
+            return float(
                 (
                     0.0012
                     + 0.004635 * (nutrients_inputs.mature_body_weight**0.22) * (nutrients_inputs.body_weight ** (-0.22))
@@ -132,6 +136,7 @@ class Nutrients:
         References
         ----------
         RuFaS Phosphorus Animal Module documentation section A.1C-F.E.4.
+
         """
         if nutrients_inputs.days_in_pregnancy >= 190:
             exp_1 = (0.05527 - 0.000075 * nutrients_inputs.days_in_pregnancy) * nutrients_inputs.days_in_pregnancy
@@ -148,6 +153,7 @@ class Nutrients:
         References
         ----------
         RuFaS Phosphorus Animal Module documentation section A.1E.E.5.
+
         """
         if nutrients_inputs.is_milking:
             return 0.0009 * nutrients_inputs.daily_milk_produced * GeneralConstants.KG_TO_GRAMS
@@ -165,6 +171,7 @@ class Nutrients:
         References
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1EF.E.6, A.1A-F.E.6.
+
         """
         if nutrients_inputs.animal_type.is_cow:
             return (
@@ -192,6 +199,7 @@ class Nutrients:
         References
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1A.E.7, A.1B-D.E.7, A.1EF.E.7.
+
         """
         if nutrients_inputs.animal_type.is_cow and nutrients_inputs.is_milking:
             return absorbed_phosphorus / (

@@ -2513,7 +2513,7 @@ class Animal:
 
         """
         if self.animal_type is AnimalType.CALF:
-            calf_intake = CalfRationManager.calc_intake(
+            calf_intake = CalfRationManager.calculate_intake(
                 self.birth_weight,
                 self.body_weight,
                 AnimalConfig.wean_day,
@@ -2521,7 +2521,7 @@ class Animal:
                 cast(list[NASEMFeed | NRCFeed], available_feeds),
                 self.nutrient_standard,
             )
-            calf_requirements = CalfRationManager.calc_requirements(
+            calf_requirements = CalfRationManager.calculate_requirements(
                 self.days_born, self.body_weight, previous_temperature, calf_intake
             )
             # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue 2517.
