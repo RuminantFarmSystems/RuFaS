@@ -40,6 +40,8 @@ def test_simulation_type_enum_values() -> None:
     """Unit test for SimulationType enum values."""
     assert SimulationType.FULL_FARM.value == "full_farm"
     assert SimulationType.FIELD_AND_FEED.value == "field_and_feed"
+    assert SimulationType.FIELD_ONLY.value == "field_only"
+    assert SimulationType.ANIMALS_ONLY.value == "animals_only"
 
 
 @pytest.mark.parametrize(
@@ -47,6 +49,7 @@ def test_simulation_type_enum_values() -> None:
     [
         (SimulationType.FULL_FARM, True),
         (SimulationType.FIELD_AND_FEED, False),
+        (SimulationType.FIELD_ONLY, False),
         (SimulationType.ANIMALS_ONLY, True),
     ],
 )
@@ -65,7 +68,11 @@ def test_animal_simulation_types() -> None:
 
 def test_field_simulation_types() -> None:
     """Unit test for SimulationType._fields_simulation_types."""
-    assert SimulationType._fields_simulation_types() == {SimulationType.FULL_FARM, SimulationType.FIELD_AND_FEED}
+    assert SimulationType._fields_simulation_types() == {
+        SimulationType.FULL_FARM,
+        SimulationType.FIELD_AND_FEED,
+        SimulationType.FIELD_ONLY,
+    }
 
 
 def test_manure_simulation_types() -> None:
@@ -75,32 +82,26 @@ def test_manure_simulation_types() -> None:
 
 def test_feed_simulation_types() -> None:
     """Unit test for SimulationType._feed_simulation_types."""
-    assert SimulationType._feed_simulation_types() == {SimulationType.FULL_FARM, SimulationType.FIELD_AND_FEED}
+    assert SimulationType._feed_simulation_types() == {
+        SimulationType.FULL_FARM,
+        SimulationType.FIELD_AND_FEED,
+    }
 
 
-@pytest.mark.parametrize(
-    "simulation_type_str, expected_result",
-    [
-        ("full_farm", SimulationType.FULL_FARM),
-        ("field_and_feed", SimulationType.FIELD_AND_FEED),
-        ("animals_only", SimulationType.ANIMALS_ONLY),
-    ],
-)
-def test_get_simulation_type_valid(
-    simulation_type_str: str,
-    expected_result: SimulationType,
-) -> None:
+@pytest.mark.parametrize("simulation_type", list(SimulationType))
+def test_get_simulation_type_valid(simulation_type: SimulationType) -> None:
     """Unit test for SimulationType.get_simulation_type with valid values."""
-    assert SimulationType.get_simulation_type(simulation_type_str) is expected_result
+    assert SimulationType.get_simulation_type(simulation_type.value) is simulation_type
 
 
 def test_get_simulation_type_invalid() -> None:
     """Unit test for SimulationType.get_simulation_type with an invalid value."""
     invalid_simulation_type = "not_a_real_simulation"
+    valid_simulation_types = ", ".join(simulation_type.value for simulation_type in SimulationType)
 
     with pytest.raises(
         ValueError,
-        match=("Unknown simulation type: not_a_real_simulation. " "Expected one of: full_farm, field_and_feed."),
+        match=(f"Unknown simulation type: {invalid_simulation_type}. " f"Expected one of: {valid_simulation_types}."),
     ):
         SimulationType.get_simulation_type(invalid_simulation_type)
 
@@ -458,6 +459,38 @@ def test_execute_daily_field_operations_no_harvested_crops(
     )
     simulation_engine.feed_manager.receive_crop.assert_not_called()
     assert result == harvested_crops
+
+
+def test_execute_field_only_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_field_only_simulation
+    in file RUFAS/simulation_engine.py
+    """
+    parent = MagicMock()
+
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_execute_daily_field_operations"),
+        "execute_daily_field_operations",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_report_daily_records"),
+        "report_daily_records",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_advance_time"),
+        "advance_time",
+    )
+
+    simulation_engine._execute_field_only_simulation()
+
+    assert parent.mock_calls == [
+        call.execute_daily_field_operations(),
+        call.report_daily_records(),
+        call.advance_time(),
+    ]
 
 
 def test_build_harvest_schedule_no_feed_recalculation(
