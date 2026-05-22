@@ -113,7 +113,6 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Sold heifer IIIs": {
                 "biophysical_simulation": [
-                    "AnimalModuleReporter.report_life_cycle_manager_data.sold_heiferII_num",
                     "AnimalModuleReporter.report_life_cycle_manager_data.sold_heiferIII_oversupply_num",
                 ],
                 "economics_files": ["commodity_prices_cow_dairy_heifer_bred_t3_dollar_per_animal"],
@@ -134,7 +133,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
             },
             "Purchased feed costs": {
-                "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_*_cost"],
+                "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_.*_cost"],
                 "economics_files": [
                     "commodity_prices_alfalfa_hay_dollar_per_kilogram",
                     "commodity_prices_alfalfa_silage_dollar_per_kilogram",
