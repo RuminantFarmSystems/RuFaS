@@ -11,6 +11,7 @@ from RUFAS.units import MeasurementUnits
 
 from .equations import EconomicEquations
 from .metrics import EconomicMetrics
+from .digester_costs import DigesterCostCalculator
 
 
 class DCFRORCalculator:
@@ -175,6 +176,47 @@ class DCFRORCalculator:
         capital_cost = base_cost
         operating_costs = np.asarray((operating_units * operating_unit_costs).sum(axis=0), dtype=float)
         revenue = np.asarray((revenue_units * revenue_prices).sum(axis=0), dtype=float)
+
+        # Apply digester cost-curve economics directly when digester capital
+        # items are present in the capital-cost breakdown.
+        # This makes the documented digester costing methods influence
+        # project CAPEX/OPEX in the DCFROR result stream.
+        digester_rows = [row for row in cap_breakdown if "digester" in str(row.get("Item", "")).lower()]
+        if digester_rows:
+            cow_count = float(self.im.get_data("animal_properties.herd_information.cow_num"))
+            digester_config = self.im.get_data("manure_management_properties.anaerobic_digester")
+            hydraulic_retention_time_days = float(digester_config[0]["hydraulic_retention_time"])
+            digester_volume_proxy = max(1.0, cow_count * hydraulic_retention_time_days)
+
+            annual_fixed_cost = DigesterCostCalculator.calculate_digester_capital_cost(
+                animal_units=cow_count,
+                digester_volume=digester_volume_proxy,
+            )
+            discount_rate = float(input_dict["loan_interest_rate"])
+            project_life_years = int(input_dict["project_term"])
+            crf = DigesterCostCalculator.capital_recovery_factor(discount_rate, project_life_years)
+            digester_capex = DigesterCostCalculator.calculate_digester_capex(annual_fixed_cost, crf)
+            # Equation-5 scaling factor (six-tenths rule) for installed cost
+            # adjusted by effective digester volume proxy.
+            digester_capex = DigesterCostCalculator.scale_installed_cost(
+                base_cost=digester_capex,
+                volume=digester_volume_proxy,
+                base_volume=max(1.0, cow_count),
+                install_factor=0.6,
+            )
+            annual_opex_total = DigesterCostCalculator.calculate_digester_operational_cost(
+                True,
+                animal_units=cow_count,
+                farm_type_flag=1.0,
+                below_ground_flag=1.0,
+                concrete_flag=1.0,
+                steel_flag=0.0,
+            )
+
+            prior_digester_capex = float(sum(float(r.get("Cost", 0.0)) for r in digester_rows))
+            base_cost = base_cost - prior_digester_capex + digester_capex
+            operating_costs = operating_costs + annual_opex_total
+            capital_cost = base_cost
 
         project_term = int(input_dict["project_term"])
         if project_term <= 0:
