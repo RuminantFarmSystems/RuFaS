@@ -97,18 +97,57 @@ class EconomicFramework:
             )
         return True
 
+    def _build_line_item_breakdown(
+        self, preprocessed_results: dict[str, dict[str, dict[str, dict[str, object]]]]
+    ) -> dict[str, dict[str, dict[str, object]]]:
+        """Build user-facing breakdown of economics line items by flow type."""
+
+        breakdown: dict[str, dict[str, dict[str, object]]] = {}
+        for section, section_data in preprocessed_results.items():
+            if not isinstance(section_data, dict):
+                continue
+            section_breakdown = breakdown.setdefault(section, {"costs": {}, "revenues": {}})
+            for category_data in section_data.values():
+                if not isinstance(category_data, dict):
+                    continue
+                for item_name, item_data in category_data.items():
+                    if not isinstance(item_data, dict):
+                        continue
+                    flow_type = item_data.get("flow_type", "cost")
+                    key = "revenues" if flow_type == "revenue" else "costs"
+
+                    total_by_scenario = item_data.get("line_item_values_by_scenario", {})
+                    total_value = 0.0
+                    if isinstance(total_by_scenario, dict):
+                        for raw in total_by_scenario.values():
+                            try:
+                                total_value += float(raw)
+                            except (TypeError, ValueError):
+                                continue
+
+                    section_breakdown[key][item_name] = {
+                        "total": total_value,
+                        "biophysical_values": item_data.get("biophysical_values", []),
+                        "prices": item_data.get("price_values", []),
+                        "value_by_scenario": total_by_scenario,
+                    }
+
+        return breakdown
+
     def run_economic_analysis(self) -> None:
         """Execute economic analysis using the Flexible Economic Framework."""
 
         preprocessed_results = self.preprocessor.preprocess()
+        info_map = {
+            "class": __name__,
+            "function": self.run_economic_analysis.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        self.om.add_variable("econ_preprocessed_economic_inputs", preprocessed_results, info_map=info_map)
         self.om.add_variable(
-            "econ_preprocessed_economic_inputs",
-            preprocessed_results,
-            info_map={
-                "class": __name__,
-                "function": self.run_economic_analysis.__name__,
-                "units": MeasurementUnits.UNITLESS,
-            },
+            "econ_economic_line_item_breakdown",
+            self._build_line_item_breakdown(preprocessed_results),
+            info_map=info_map,
         )
         capital_present = self._capital_cost_present()
         partial_budget_requested = self.partial_budget.has_partial_budget_activity(preprocessed_results)
