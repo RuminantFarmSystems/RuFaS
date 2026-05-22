@@ -1,0 +1,11 @@
+Variable,Units,Calculation
+ water , kg ,"Entering water (kg) + (total_cleaning_water (m^3) x WATER_DENSITY_KG_PER_M3)"
+ total_ammoniacal_nitrogen , kg ,"min(0, entering ammoniacal_nitrogen (kg) - NH3-N emissions (kg))"
+ nitrogen , kg ,"min(0, entering nitrogen (kg) - NH3-N emissions (kg))"
+ phosphorus , kg , Entering phosphorus (kg)
+ potassium , kg , Entering potassium (kg)
+ ash , kg , Entering ash (kg)
+ non_degradable_volatile_solids , kg ,"Entering non_degradable_volatile_solids - (total_VS_loss x (1 - degradable_VS_frac))"
+ degradable_volatile_solids , kg ,"Entering degradable_volatile_solids - (total_VS_loss x degradable_VS_frac)"
+ total_solids , kg , Entering total_solids - total_VS_loss
+ volume , m^3 ,"Entering volume - (total_VS_loss / ManureConstants.SLURRY_MANURE_DENSITY)"
