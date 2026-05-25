@@ -100,6 +100,8 @@ MASTITIS_CULL = "culled for mastitis"
 DISEASE_CULL = "culled for disease"
 UDDER_CULL = "culled for udder"
 UNKNOWN_CULL = "culled for unknown"
+CALF_MORTALITY_CULL = "died from pre-wean mortality"
+HEIFER_MORTALITY_CULL = "died from post-wean mortality"
 
 # STATS
 STDI = 2

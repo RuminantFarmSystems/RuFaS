@@ -176,6 +176,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 0,
                 animal_constants.UDDER_CULL: 0,
                 animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.CALF_MORTALITY_CULL: 0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0,
             },
             0,
             {
@@ -187,6 +189,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 0.0,
                 animal_constants.UDDER_CULL: 0.0,
                 animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.CALF_MORTALITY_CULL: 0.0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0.0,
             },
         ),
         # 2. One reason has all culls, matches exit_num -> 100% that reason
@@ -200,6 +204,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 0,
                 animal_constants.UDDER_CULL: 0,
                 animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.CALF_MORTALITY_CULL: 0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0,
             },
             5,
             {
@@ -211,6 +217,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 0.0,
                 animal_constants.UDDER_CULL: 0.0,
                 animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.CALF_MORTALITY_CULL: 0.0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0.0,
             },
         ),
         # 3. Multiple reasons evenly split
@@ -225,6 +233,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 0,
                 animal_constants.UDDER_CULL: 0,
                 animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.CALF_MORTALITY_CULL: 0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0,
             },
             10,
             {
@@ -236,6 +246,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 0.0,
                 animal_constants.UDDER_CULL: 0.0,
                 animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.CALF_MORTALITY_CULL: 0.0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0.0,
             },
         ),
         # 4. Partial distribution
@@ -250,6 +262,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 0,
                 animal_constants.UDDER_CULL: 0,
                 animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.CALF_MORTALITY_CULL: 0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0,
             },
             10,
             {
@@ -261,6 +275,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 0.0,
                 animal_constants.UDDER_CULL: 0.0,
                 animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.CALF_MORTALITY_CULL: 0.0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0.0,
             },
         ),
         # 5. Non-zero exit, some reasons zero
@@ -276,6 +292,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 8,
                 animal_constants.UDDER_CULL: 0,
                 animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.CALF_MORTALITY_CULL: 0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0,
             },
             10,
             {
@@ -287,6 +305,8 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
                 animal_constants.DISEASE_CULL: 80.0,
                 animal_constants.UDDER_CULL: 0.0,
                 animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.CALF_MORTALITY_CULL: 0.0,
+                animal_constants.HEIFER_MORTALITY_CULL: 0.0,
             },
         ),
     ],
