@@ -110,6 +110,20 @@ class Pen:
         The output manager instance used to store and manage output data.
     """
 
+    # Constraint failures that indicate a lactating-cow ration retry should bump the dry matter intake.
+    _DMI_INCREASE_CONSTRAINTS: frozenset[str] = frozenset(
+        {
+            "NE_total_constraint",
+            "NE_maintenance_and_activity_constraint",
+            "NE_lactation_constraint",
+            "NE_growth_constraint",
+            "calcium_constraint",
+            "phosphorus_constraint",
+            "protein_constraint_lower",
+            "DMI_constraint_lower",
+        }
+    )
+
     def __init__(
         self,
         pen_id: int,
@@ -1046,7 +1060,7 @@ class Pen:
             animal.nutrients.set_dry_matter_intake(animal.nutrition_supply.dry_matter)
             animal.nutrients.set_phosphorus_intake(animal.nutrition_supply.phosphorus)
 
-    def formulate_optimized_ration(  # noqa: C901
+    def formulate_optimized_ration(
         self,
         is_ration_defined_by_user: bool,
         pen_available_feeds: list[Feed],
@@ -1064,6 +1078,8 @@ class Pen:
             True if user defined ration methodology to be used.
         pen_available_feeds : list[Feed]
             List of feeds available to formulate a new ration with for a pen.
+        temperature : float
+            Temperature of the animals' environment (°C).
         max_daily_feeds : dict[RUFAS_ID, float]
             Maximum amounts of each feed type that may be fed per animal per day.
         advance_purchase_allowance : AdvancePurchaseAllowance
@@ -1083,15 +1099,36 @@ class Pen:
         }
         if self.animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
-        previous_ration = getattr(self, "ration", None)
-        num_attempts = 0
+
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-        initial_pen_average_nutrition_requirements = self.average_nutrition_requirements
-        initial_dry_matter_requirement = initial_pen_average_nutrition_requirements.dry_matter
-        initial_protein_requirement = initial_pen_average_nutrition_requirements.metabolizable_protein
+        initial_requirements = self.average_nutrition_requirements
 
-        initial_dry_matter_requirement_fixed = initial_dry_matter_requirement
+        solution = self._run_formulation_attempts(
+            is_ration_defined_by_user=is_ration_defined_by_user,
+            pen_available_feeds=pen_available_feeds,
+            temperature=temperature,
+            previous_ration=getattr(self, "ration", None),
+            original_dmi_requirement=initial_requirements.dry_matter,
+            initial_protein_requirement=initial_requirements.metabolizable_protein,
+            simulation_day=simulation_day,
+            info_map=info_map,
+        )
+        self._finalize_ration_outcome(solution, is_ration_defined_by_user, pen_available_feeds, info_map)
 
+    def _run_formulation_attempts(
+        self,
+        is_ration_defined_by_user: bool,
+        pen_available_feeds: list[Feed],
+        temperature: float,
+        previous_ration: Any,
+        original_dmi_requirement: float,
+        initial_protein_requirement: float,
+        simulation_day: int,
+        info_map: dict[str, str],
+    ) -> OptimizeResult:
+        """Runs formulation attempts until success or an exit condition is met."""
+        current_dmi_requirement = original_dmi_requirement
+        num_attempts = 0
         while True:
             num_attempts += 1
             solution, ration_config = self._attempt_formulation(
@@ -1099,79 +1136,107 @@ class Pen:
                 pen_available_feeds,
                 temperature,
                 previous_ration,
-                initial_dry_matter_requirement,
+                current_dmi_requirement,
                 initial_protein_requirement,
             )
+            if solution.success:
+                return solution
 
-            if not solution.success:
-                constraints_failed_list = self.ration_optimizer.handle_failed_constraints(
-                    num_attempts=num_attempts,
-                    solution=solution,
-                    ration_config=ration_config,
-                    animal_combination=self.animal_combination,
-                    pen_id=self.id,
-                    pen_available_feeds=pen_available_feeds,
-                    average_nutrient_requirements=self.average_nutrition_requirements,
-                    initial_dry_matter_requirement=initial_dry_matter_requirement,
-                    initial_protein_requirement=initial_protein_requirement,
-                    sim_day=simulation_day,
-                )
+            constraints_failed_list = self.ration_optimizer.handle_failed_constraints(
+                num_attempts=num_attempts,
+                solution=solution,
+                ration_config=ration_config,
+                animal_combination=self.animal_combination,
+                pen_id=self.id,
+                pen_available_feeds=pen_available_feeds,
+                average_nutrient_requirements=self.average_nutrition_requirements,
+                initial_dry_matter_requirement=current_dmi_requirement,
+                initial_protein_requirement=initial_protein_requirement,
+                sim_day=simulation_day,
+            )
 
-            # Lac cow success exit and non lac cow one time run only exit
-            if solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
-                break
+            # Non-lactating cow pens get a single attempt; only LAC_COW retries.
+            if self.animal_combination is not AnimalCombination.LAC_COW:
+                return solution
             if num_attempts > RationManager.maximum_ration_reformulation_attempts:
                 om.add_log(
                     "Maximum ration reformulation attempts exceeded.",
                     f"See output variable failed_constraint_summary_for_pen_{self.id} for more information.",
                     info_map,
                 )
-                break
-            adjusted_dry_matter_lower = initial_dry_matter_requirement_fixed * (
-                1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + RationManager.tolerance
-            )
-            adjusted_dry_matter_upper = initial_dry_matter_requirement_fixed * (
-                1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - RationManager.tolerance
-            )
-            need_dry_matter_increase = bool(
-                set(
-                    [
-                        "NE_total_constraint",
-                        "NE_maintenance_and_activity_constraint",
-                        "NE_lactation_constraint",
-                        "NE_growth_constraint",
-                        "calcium_constraint",
-                        "phosphorus_constraint",
-                        "protein_constraint_lower",
-                        "DMI_constraint_lower",
-                    ]
-                )
-                & set(constraints_failed_list)
-            )
+                return solution
 
-            if is_ration_defined_by_user and (
-                adjusted_dry_matter_lower < initial_dry_matter_requirement < adjusted_dry_matter_upper
-            ):
-                if need_dry_matter_increase:
-                    initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
-                    continue
+            increased_dmi = self._maybe_increased_dmi_for_retry(
+                is_ration_defined_by_user=is_ration_defined_by_user,
+                current_dmi_requirement=current_dmi_requirement,
+                original_dmi_requirement=original_dmi_requirement,
+                constraints_failed_list=constraints_failed_list,
+            )
+            if increased_dmi is not None:
+                current_dmi_requirement = increased_dmi
+                continue
 
-            if is_ration_defined_by_user:
-                if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
-                    break
-            else:
-                self._reduce_on_lactation_failure(info_map=info_map)
+            if self._handle_lactation_failure_in_loop(is_ration_defined_by_user, info_map):
+                return solution
 
+    def _maybe_increased_dmi_for_retry(
+        self,
+        is_ration_defined_by_user: bool,
+        current_dmi_requirement: float,
+        original_dmi_requirement: float,
+        constraints_failed_list: list[str],
+    ) -> float | None:
+        """
+        Returns a bumped dry matter intake requirement if a retry with higher DMI is warranted, else None.
+
+        A retry is only warranted when the user defined the ration, the current DMI is still within the
+        original tolerance band, and at least one failing constraint indicates increasing DMI could help.
+        """
+        if not is_ration_defined_by_user:
+            return None
+        dmi_lower_bound = original_dmi_requirement * (
+            1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + RationManager.tolerance
+        )
+        dmi_upper_bound = original_dmi_requirement * (
+            1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - RationManager.tolerance
+        )
+        if not (dmi_lower_bound < current_dmi_requirement < dmi_upper_bound):
+            return None
+        if not (self._DMI_INCREASE_CONSTRAINTS & set(constraints_failed_list)):
+            return None
+        return current_dmi_requirement * 1.1
+
+    def _handle_lactation_failure_in_loop(
+        self,
+        is_ration_defined_by_user: bool,
+        info_map: dict[str, str],
+    ) -> bool:
+        """Dispatches lactation-failure handling for the formulation loop. Returns True if the loop should stop."""
+        if is_ration_defined_by_user:
+            return self._reduce_on_lactation_failure_user_defined(info_map=info_map)
+        self._reduce_on_lactation_failure(info_map=info_map)
+        return False
+
+    def _finalize_ration_outcome(
+        self,
+        solution: OptimizeResult,
+        is_ration_defined_by_user: bool,
+        pen_available_feeds: list[Feed],
+        info_map: dict[str, str],
+    ) -> None:
+        """Applies the appropriate ration outcome once the formulation loop has exited."""
         if solution.success:
             self._apply_successful_solution(solution, pen_available_feeds)
-        elif is_ration_defined_by_user:
+            return
+        if is_ration_defined_by_user:
             self._apply_user_defined_ration(pen_available_feeds)
             self.om.add_log(
                 "User defined ration used for non lactating cow pen after failed formulation attempt.",
                 f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. ",
                 info_map,
             )
-        elif self.ration == {}:
+            return
+        if self.ration == {}:
             self.om.add_error(
                 "No previous ration available.",
                 f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
@@ -1179,15 +1244,14 @@ class Pen:
                 info_map,
             )
             raise ValueError("No previous ration available.")
-        else:
-            self.om.add_log(
-                "Previous ration used because automated ration formulation failed for non lactating cow pen.",
-                f"Automated ration formulation for a {self.animal_combination.name} pen failed."
-                "Used most recently formulated ration instead."
-                f"If this was unexpected, check failed_constraint_summary_for_pen_{self.id} to see what "
-                "caused formulation to fail.",
-                info_map,
-            )
+        self.om.add_log(
+            "Previous ration used because automated ration formulation failed for non lactating cow pen.",
+            f"Automated ration formulation for a {self.animal_combination.name} pen failed."
+            "Used most recently formulated ration instead."
+            f"If this was unexpected, check failed_constraint_summary_for_pen_{self.id} to see what "
+            "caused formulation to fail.",
+            info_map,
+        )
 
     def _attempt_formulation(
         self,
