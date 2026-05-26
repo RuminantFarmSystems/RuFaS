@@ -45,17 +45,18 @@ def reset_animal_config_state() -> Generator[None, None, None]:
 
 
 @pytest.mark.parametrize(
-    "heifer_method, expected_subprogram_type",
+    "heifer_method, repro_sub_protocol, expected_subprogram_type",
     [
-        ("TAI", HeiferTAISubProtocol),  # if branch
-        ("SynchED", HeiferSynchEDSubProtocol),  # elif branch
-        ("ED", HeiferTAISubProtocol),  # else fallback to default TAI subprogram
+        ("TAI", "5dCG2P", HeiferTAISubProtocol),  # if branch
+        ("SynchED", "2P", HeiferSynchEDSubProtocol),  # elif branch
+        ("ED", "5dCG2P", HeiferTAISubProtocol),  # else fallback to default TAI subprogram
     ],
     ids=["heifer_tai", "heifer_synched", "heifer_other_fallback"],
 )
 def test_initialize_animal_config_heifer_subprogram_and_core_fields(
     mocker: pytest_mock.MockerFixture,
     heifer_method: str,
+    repro_sub_protocol: str,
     expected_subprogram_type: type,
 ) -> None:
     mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
@@ -99,7 +100,7 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
                 "heifers": {
                     "estrus_detection_rate": 0.9,
                     "estrus_conception_rate": 0.6,
-                    "repro_sub_protocol": "2P",
+                    "repro_sub_protocol": repro_sub_protocol,
                     "repro_sub_properties": {
                         "conception_rate": 0.6,
                         "estrus_detection_rate": 0.9,
