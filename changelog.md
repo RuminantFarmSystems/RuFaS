@@ -87,6 +87,7 @@ v1.0.0
 - [3026](https://github.com/RuminantFarmSystems/RuFaS/pull/3026) - [minor change] [E2ETesting] [NoInputChange] [NoOutputChange] Fixes E2E test results comparison tolerence.
 - [2999](https://github.com/RuminantFarmSystems/RuFaS/pull/2999) - [minor change] [Cross Validation] [Feed Storage] [NoInputChange] [NoOutputChange] Added cross validation rules for feed storage inputs.
 - [3024](https://github.com/RuminantFarmSystems/RuFaS/pull/3024) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Adds path to input to error/warning messages in `DataValidator` for easier invalid input fixing.
+- [2935](https://github.com/RuminantFarmSystems/RuFaS/pull/2935) - [minor change] [Animal] [Cross Validation] [InputChange] [NoOutputChange] Adds 24 cross-validation rules for the Animal module and extends `CrossValidator` with `is_not_null`, `is_in` operators and a `field_to_save` option in `for_each` blocks.
 
 ### v1.0.0
 

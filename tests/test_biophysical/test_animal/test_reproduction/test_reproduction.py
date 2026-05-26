@@ -2214,7 +2214,7 @@ def test_handle_estrus_not_detected_in_synch_ed(
 
     if expected_hormone_schedule_setup:
         mock_set_up_hormone_schedule.assert_called_once_with(
-            mock_outputs, mock_outputs.days_born, HeiferTAISubProtocol.SynchED_2P.value
+            mock_outputs, mock_outputs.days_born, HeiferSynchEDSubProtocol.SynchED_2P.value
         )
 
     mock_execute_hormone_schedule.assert_called_once_with(
