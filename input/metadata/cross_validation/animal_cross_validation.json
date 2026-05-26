@@ -442,7 +442,7 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["presynch_program"]
+              "operands": ["resynch_program"]
             }
           },
           "right_hand": {
@@ -457,7 +457,7 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["presynch_program"]
+              "operands": ["ovsynch_program"]
             }
           },
           "right_hand": {
