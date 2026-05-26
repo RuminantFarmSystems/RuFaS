@@ -808,6 +808,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """
         Validates the data based on its specified type.
@@ -826,10 +827,12 @@ class DataValidator:
             The metadata properties for the data file being checked.
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
-        called_during_initialization: bool
+        called_during_initialization : bool
             Boolean variable indicating whether the function is being called during initialization.
-        fixable_data_types: set[str]
+        fixable_data_types : set[str]
             Set enumerating the data types that the caller will attempt to fix while validating data.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -869,6 +872,7 @@ class DataValidator:
                     ElementsCounter,
                     bool,
                     set[str],
+                    Path,
                 ],
                 bool,
             ],
@@ -883,7 +887,7 @@ class DataValidator:
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{path}' "
+                f"The metadata type of the element '{path}' in input '{input_path}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
@@ -896,13 +900,14 @@ class DataValidator:
             elements_counter,
             called_during_initialization,
             fixable_data_types,
+            input_path,
         )
 
         if data_type not in fixable_data_types:
             if not is_valid:
                 error_message = (
-                    f"Variable: '{path}' data type '{data_type}' is not fixable by Input Manager."
-                    f" Please check the inputs."
+                    f"Variable: '{path}' data type '{data_type}' from the '{input_path}' "
+                    "is not fixable by Input Manager. Please check the inputs."
                 )
                 self.event_logs.append(
                     {
@@ -917,7 +922,7 @@ class DataValidator:
             elements_counter.increment(ElementState.VALID)
             return True
 
-        is_fixed = self._fix_data(variable_properties, variable_path, data, properties_blob_key)
+        is_fixed = self._fix_data(variable_properties, variable_path, data, properties_blob_key, input_path)
 
         if is_fixed:
             elements_counter.increment(ElementState.FIXED)
@@ -1013,6 +1018,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """
         Validates a data element of type array.
@@ -1035,6 +1041,8 @@ class DataValidator:
             Boolean variable indicating whether the function is being called during initialization.
         fixable_data_types: set[str]
             Set of data types that are fixable.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -1043,7 +1051,7 @@ class DataValidator:
         """
 
         array_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
 
         if variable_properties.get("nullable", False) and array_value is None:
@@ -1065,6 +1073,7 @@ class DataValidator:
                 elements_counter,
                 called_during_initialization,
                 fixable_data_types,
+                input_path,
             )
             is_whole_array_acceptable = is_whole_array_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -1081,6 +1090,7 @@ class DataValidator:
         elements_counter: ElementsCounter,
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """
         Validates a data element of type object.
@@ -1101,6 +1111,8 @@ class DataValidator:
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -1119,7 +1131,7 @@ class DataValidator:
         }
 
         object_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
         variable_path_str = self.convert_variable_path_to_str(variable_path)
         properties_violation_message = (
@@ -1129,7 +1141,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "warning": "Validation: object is not a dictionary",
-                    "message": f"Variable: '{variable_path_str}' is"
+                    "message": f"Variable: '{variable_path_str}' in '{input_path}' is"
                     f" not an object but has type: {type(object_value)}. "
                     f"{properties_violation_message}",
                     "info_map": info_map,
@@ -1150,6 +1162,7 @@ class DataValidator:
                 elements_counter,
                 called_during_initialization,
                 fixable_data_types,
+                input_path,
             )
             is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -1160,7 +1173,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "warning": "Validation: object contains extraneous data",
-                    "message": f"Variable: '{variable_path_str}' contains "
+                    "message": f"Variable: '{variable_path_str}' in '{input_path}' contains "
                     f"data at key '{key}' that is not specified in "
                     f"the metadata"
                     f" properties. {properties_violation_message}",
@@ -1181,10 +1194,11 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """Validates an data number element."""
         data_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
@@ -1205,7 +1219,7 @@ class DataValidator:
         if type(data_value) is not float and type(data_value) is not int:
             warning_string = "Validation: value is not a number"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
+                f"Variable: '{variable_path_str}' in '{input_path}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
             self.event_logs.append({"warning": warning_string, "message": warning_message, "info_map": info_map})
@@ -1215,8 +1229,8 @@ class DataValidator:
             if not is_in_range:
                 warning_name = "Validation: value less than minimum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: {data_value}, less than minimum value: "
-                    f"{minimum_value: .2f}. {properties_violation_message}"
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: {data_value}, "
+                    f"less than minimum value: {minimum_value: .2f}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
                 return False
@@ -1225,8 +1239,8 @@ class DataValidator:
             if not is_in_range:
                 warning_name = "Validation: value greater than maximum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: {data_value}, greater than maximum value: "
-                    f"{maximum_value: .2f}. {properties_violation_message}"
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: {data_value}, "
+                    f"greater than maximum value: {maximum_value: .2f}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
                 return False
@@ -1243,10 +1257,11 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """Validates a data string element."""
         data_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
@@ -1264,7 +1279,7 @@ class DataValidator:
         if type(data_value) is not str:
             warning_name = "Validation: string variable is not a string"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
+                f"Variable: '{variable_path_str}' in '{input_path}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
             self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
@@ -1276,8 +1291,8 @@ class DataValidator:
             if not is_valid_string:
                 warning_name = "Validation: string variable does not match pattern"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{data_value}', does not match pattern: "
-                    f"{pattern_check}. {properties_violation_message}"
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: '{data_value}', "
+                    f"does not match pattern: {pattern_check}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
                 return False
@@ -1289,7 +1304,7 @@ class DataValidator:
             if not is_valid_string:
                 warning_name = "Validation: string length less than minimum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{data_value}', length is less than "
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: '{data_value}', length is less than "
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
@@ -1299,8 +1314,8 @@ class DataValidator:
             if not is_valid_string:
                 warning_name = "Validation: string length greater than maximum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{data_value}', length is greater than "
-                    f"maximum length: {maximum_length}. {properties_violation_message}"
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: '{data_value}', "
+                    f"length is greater than maximum length: {maximum_length}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
                 return False
@@ -1317,10 +1332,11 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """Validates a data bool element."""
         data_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
@@ -1339,7 +1355,7 @@ class DataValidator:
         if type(data_value) is not bool:
             warning_name = "Validation: bool variable is not a bool"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: '{data_value}', is type: "
+                f"Variable: '{variable_path_str}' in '{input_path}' has value: '{data_value}', is type: "
                 f"'{type(data_value)}'. {properties_violation_message}"
             )
             self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
@@ -1354,6 +1370,7 @@ class DataValidator:
         element_hierarchy: list[str | int],
         data: dict[str | int, Any] | list[Any],
         properties_blob_key: str,
+        input_path: Path,
     ) -> bool:
         """
         Attempt to fix the invalid data.
@@ -1362,15 +1379,14 @@ class DataValidator:
         ----------
         variable_properties : dict[str, Any]
             The properties for the variable of interest.
-
         element_hierarchy: list[str | int]
             A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.
-
         data: dict[str | int, Any] | list[Any]
             A buffer dictionary that holds the data for validation and fixing.
-
         properties_blob_key : str
             The metadata properties section keyword for the data file being checked.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -1397,7 +1413,7 @@ class DataValidator:
                 else variable_parent[int(element_hierarchy[-1])]
             )
             error_message = (
-                f"Variable: '{element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
+                f"Variable: '{element_hierarchy[-1]}' in '{input_path}' has invalid value: '{invalid_value}'"
                 f", and cannot be changed to a default value. {properties_violation_message}"
             )
             self.event_logs.append(
@@ -1416,7 +1432,8 @@ class DataValidator:
             original_invalid_value = variable_parent.get(str(element_hierarchy[-1]))
 
         warning_message = (
-            f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
+            f"Variable: '{element_path}' in '{input_path}' has value: {original_invalid_value}."
+            f" {properties_violation_message}"
         )
         self.event_logs.append(
             {"warning": "Validation: invalid data found", "message": warning_message, "info_map": info_map}
@@ -1428,8 +1445,8 @@ class DataValidator:
             variable_parent[str(element_hierarchy[-1])] = variable_properties["default"]
 
         warning_message = (
-            f"Invalid data fixed: '{element_path}' value changed from {original_invalid_value} to "
-            f"{variable_properties['default']}. Fix enabled by default value specified in "
+            f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from "
+            f"{original_invalid_value} to {variable_properties['default']}. Fix enabled by default value specified in "
             f"'{properties_blob_key}'."
         )
         self.event_logs.append({"warning": "Validation: data fixed", "message": warning_message, "info_map": info_map})
@@ -1441,6 +1458,7 @@ class DataValidator:
         variable_path: Sequence[str | int],
         variable_properties: dict[str, Any],
         called_during_initialization: bool,
+        input_path: Path,
     ) -> Any:
         """
         Extracts a value from the data based on a specified path and handles missing data by calling
@@ -1456,6 +1474,8 @@ class DataValidator:
             The metadata properties for the variable being validated.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -1473,18 +1493,23 @@ class DataValidator:
         """
         result = None
         try:
-            result = self.extract_value_by_key_list(data, variable_path)
+            result = self.extract_value_by_key_list(data, variable_path, input_path)
         except KeyError:
             var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
             self._log_missing_data(
                 variable_properties=variable_properties,
                 var_name=var_name,
                 called_during_initialization=called_during_initialization,
+                input_path=input_path,
             )
         return result
 
     def _log_missing_data(
-        self, variable_properties: dict[str, Any], var_name: str, called_during_initialization: bool
+        self,
+        variable_properties: dict[str, Any],
+        var_name: str,
+        called_during_initialization: bool,
+        input_path: Path,
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -1498,6 +1523,8 @@ class DataValidator:
             The name of the variable with missing data.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Raises
         ------
@@ -1512,7 +1539,10 @@ class DataValidator:
         """
         info_map = {"class": DataValidator.__name__, "function": DataValidator._log_missing_data.__name__}
         if not called_during_initialization:
-            error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."
+            error_msg = (
+                f"Key {var_name} not found in data from '{input_path}'. "
+                "A value is required to update variable during runtime."
+            )
             self.event_logs.append({"error": "Missing required data", "message": error_msg, "info_map": info_map})
             raise KeyError(error_msg)
 
@@ -1520,23 +1550,20 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Missing required data",
-                    "message": f"Key {var_name} not found in data. Data value is required for"
-                    f" this "
-                    "variable upon program initialization.",
+                    "message": f"Key {var_name} not found in data from source '{input_path}'. Data value is required "
+                    "for this variable upon program initialization.",
                     "info_map": info_map,
                 }
             )
             raise KeyError(
-                f"Key {var_name} not found in input data. Data value is required for this "
+                f"Key {var_name} not found in input data source '{input_path}'. Data value is required for this "
                 "variable upon program initialization."
             )
         self.event_logs.append(
             {
-                "warning": "Validation: key not found in input data -- data not required upon initialization",
-                "message": f"Key {var_name} not found in data. Data value is not required for "
-                f"this "
-                "variable upon program initialization, setting the variable value "
-                "to None.",
+                "warning": "Validation: key not found in input data. Data not required upon initialization",
+                "message": f"Key {var_name} not found in data source '{input_path}'. Data value is not required for "
+                "this variable upon program initialization, setting the variable value to None.",
                 "info_map": info_map,
             }
         )
@@ -1653,17 +1680,20 @@ class DataValidator:
         return ".".join(formatted_path_elems)
 
     def extract_value_by_key_list(
-        self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int]
+        self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int], input_path: Path | None = None
     ) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 
         Parameters
         ----------
-        data : List[Any] | Dict[str, Any]
+        data : list[Any] | dict[str, Any]
             The data containing the value to be extracted.
-        variable_path : List[str | int]
+        variable_path : list[str | int]
             A list of keys to be used to extract the value from the data.
+        input_path : Path | str | None, default=None
+            Reference identifying the origin of the data currently being extracted.
+            None indicates that the extraction process is in-simulation data retrieval.
 
         Returns
         -------
@@ -1715,7 +1745,14 @@ class DataValidator:
             elif isinstance(data, dict) and isinstance(key, str) and key in data:
                 data = data[key]
             else:
+                if input_path is not None:
+                    raise KeyError(
+                        f"There is an error at key {key} in path {variable_path} "
+                        f"from input source '{input_path}'. Data cannot be extracted."
+                    )
+
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}. Data cannot be extracted.")
+
         return data
 
 
