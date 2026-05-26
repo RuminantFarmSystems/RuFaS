@@ -1909,6 +1909,348 @@ def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(moc
     pen.om.add_log.assert_called_once()
 
 
+def test_formulate_optimized_ration_orchestrates_helpers(mocker: MockerFixture, pen: Pen) -> None:
+    """formulate_optimized_ration delegates to _run_formulation_attempts and _finalize_ration_outcome."""
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.ration = {}
+    pen.id = 1
+
+    avg_reqs = MagicMock()
+    avg_reqs.dry_matter = 12.0
+    avg_reqs.metabolizable_protein = 3.0
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+
+    mock_reset = mocker.patch.object(pen, "reset_milk_production_reduction")
+    mocker.patch.object(pen, "set_animal_nutritional_requirements")
+
+    fake_solution = _mock_solution(True)
+    mock_run = mocker.patch.object(pen, "_run_formulation_attempts", return_value=fake_solution)
+    mock_finalize = mocker.patch.object(pen, "_finalize_ration_outcome")
+
+    feeds = _mock_feeds()
+    pen.formulate_optimized_ration(
+        True,
+        pen_available_feeds=feeds,
+        temperature=22.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        simulation_day=7,
+    )
+
+    mock_reset.assert_called_once()
+    mock_run.assert_called_once()
+    _, run_kwargs = mock_run.call_args
+    assert run_kwargs["is_ration_defined_by_user"] is True
+    assert run_kwargs["pen_available_feeds"] is feeds
+    assert run_kwargs["temperature"] == 22.0
+    assert run_kwargs["original_dmi_requirement"] == 12.0
+    assert run_kwargs["initial_protein_requirement"] == 3.0
+    assert run_kwargs["simulation_day"] == 7
+    assert run_kwargs["info_map"]["class"] == "Pen"
+    assert run_kwargs["info_map"]["function"] == "formulate_optimized_ration"
+
+    mock_finalize.assert_called_once_with(fake_solution, True, feeds, run_kwargs["info_map"])
+
+
+def test_formulate_optimized_ration_skips_milk_reset_for_non_lac_cow(mocker: MockerFixture, pen: Pen) -> None:
+    """reset_milk_production_reduction is only called for LAC_COW pens."""
+    pen.animal_combination = AnimalCombination.GROWING
+    pen.ration = {}
+
+    avg_reqs = MagicMock(dry_matter=1.0, metabolizable_protein=1.0)
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+    mocker.patch.object(pen, "set_animal_nutritional_requirements")
+    mocker.patch.object(pen, "_run_formulation_attempts", return_value=_mock_solution(True))
+    mocker.patch.object(pen, "_finalize_ration_outcome")
+    mock_reset = mocker.patch.object(pen, "reset_milk_production_reduction")
+
+    pen.formulate_optimized_ration(
+        False,
+        pen_available_feeds=_mock_feeds(),
+        temperature=22.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        simulation_day=1,
+    )
+
+    mock_reset.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "is_user_defined,current_dmi,original_dmi,constraints,expected",
+    [
+        pytest.param(False, 100.0, 100.0, ["NE_total_constraint"], None, id="not_user_defined"),
+        pytest.param(True, 50.0, 100.0, ["NE_total_constraint"], None, id="dmi_below_band"),
+        pytest.param(True, 200.0, 100.0, ["NE_total_constraint"], None, id="dmi_above_band"),
+        pytest.param(True, 100.0, 100.0, ["unrelated_constraint"], None, id="no_matching_constraint"),
+        pytest.param(True, 100.0, 100.0, ["NE_total_constraint"], 110.0, id="ne_total_triggers_bump"),
+        pytest.param(True, 100.0, 100.0, ["DMI_constraint_lower"], 110.0, id="dmi_lower_triggers_bump"),
+        pytest.param(True, 100.0, 100.0, ["calcium_constraint", "unrelated"], 110.0, id="any_overlap_triggers_bump"),
+    ],
+)
+def test_maybe_increased_dmi_for_retry(
+    mocker: MockerFixture,
+    pen: Pen,
+    is_user_defined: bool,
+    current_dmi: float,
+    original_dmi: float,
+    constraints: list[str],
+    expected: float | None,
+) -> None:
+    """_maybe_increased_dmi_for_retry returns a bumped DMI only when all three conditions hold."""
+    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
+
+    result = pen._maybe_increased_dmi_for_retry(
+        is_ration_defined_by_user=is_user_defined,
+        current_dmi_requirement=current_dmi,
+        original_dmi_requirement=original_dmi,
+        constraints_failed_list=constraints,
+    )
+
+    if expected is None:
+        assert result is None
+    else:
+        assert result == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("user_defined_reduce_returns", [True, False])
+def test_handle_lactation_failure_in_loop_user_defined(
+    mocker: MockerFixture, pen: Pen, user_defined_reduce_returns: bool
+) -> None:
+    """User-defined path: returns whatever the user-defined reducer returns; never touches the auto reducer."""
+    mock_user = mocker.patch.object(
+        pen, "_reduce_on_lactation_failure_user_defined", return_value=user_defined_reduce_returns
+    )
+    mock_auto = mocker.patch.object(pen, "_reduce_on_lactation_failure")
+    info_map = {"k": "v"}
+
+    result = pen._handle_lactation_failure_in_loop(is_ration_defined_by_user=True, info_map=info_map)
+
+    assert result is user_defined_reduce_returns
+    mock_user.assert_called_once_with(info_map=info_map)
+    mock_auto.assert_not_called()
+
+
+def test_handle_lactation_failure_in_loop_auto_path(mocker: MockerFixture, pen: Pen) -> None:
+    """Auto path: invokes _reduce_on_lactation_failure and always returns False (does not break the loop)."""
+    mock_user = mocker.patch.object(pen, "_reduce_on_lactation_failure_user_defined")
+    mock_auto = mocker.patch.object(pen, "_reduce_on_lactation_failure")
+    info_map = {"a": "b"}
+
+    result = pen._handle_lactation_failure_in_loop(is_ration_defined_by_user=False, info_map=info_map)
+
+    assert result is False
+    mock_auto.assert_called_once_with(info_map=info_map)
+    mock_user.assert_not_called()
+
+
+def test_finalize_ration_outcome_success_applies_solution(mocker: MockerFixture, pen: Pen) -> None:
+    """On success, applies the successful solution and emits no log or error."""
+    mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
+    pen.om = MagicMock()
+    feeds = _mock_feeds()
+    solution = _mock_solution(True)
+
+    pen._finalize_ration_outcome(solution, is_ration_defined_by_user=False, pen_available_feeds=feeds, info_map={})
+
+    mock_apply.assert_called_once_with(solution, feeds)
+    pen.om.add_log.assert_not_called()
+    pen.om.add_error.assert_not_called()
+
+
+def test_finalize_ration_outcome_user_defined_fallback(mocker: MockerFixture, pen: Pen) -> None:
+    """On failure with a user-defined ration, falls back to applying the user-defined ration and logs."""
+    mock_user = mocker.patch.object(pen, "_apply_user_defined_ration")
+    mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
+    pen.om = MagicMock()
+    pen.id = 7
+    feeds = _mock_feeds()
+
+    pen._finalize_ration_outcome(_mock_solution(False), True, feeds, {})
+
+    mock_user.assert_called_once_with(feeds)
+    mock_apply.assert_not_called()
+    pen.om.add_log.assert_called_once()
+    pen.om.add_error.assert_not_called()
+
+
+def test_finalize_ration_outcome_no_previous_ration_raises(pen: Pen) -> None:
+    """On automated failure with no previous ration, logs an error and raises ValueError."""
+    pen.ration = {}
+    pen.om = MagicMock()
+    pen.id = 8
+    pen.animal_combination = AnimalCombination.GROWING
+
+    with pytest.raises(ValueError, match="No previous ration available."):
+        pen._finalize_ration_outcome(_mock_solution(False), False, _mock_feeds(), {})
+
+    pen.om.add_error.assert_called_once()
+
+
+def test_finalize_ration_outcome_falls_back_to_previous_ration(pen: Pen) -> None:
+    """On automated failure with a previous ration, logs the fallback and keeps the existing ration."""
+    pen.ration = {1: 2.0}
+    pen.om = MagicMock()
+    pen.id = 9
+    pen.animal_combination = AnimalCombination.GROWING
+
+    pen._finalize_ration_outcome(_mock_solution(False), False, _mock_feeds(), {})
+
+    pen.om.add_log.assert_called_once()
+    pen.om.add_error.assert_not_called()
+
+
+def test_run_formulation_attempts_returns_immediately_on_success(mocker: MockerFixture, pen: Pen) -> None:
+    """First successful attempt returns straight away without invoking any retry helpers."""
+    pen.animal_combination = AnimalCombination.LAC_COW
+    succeeding = _mock_solution(True)
+    mocker.patch.object(pen, "_attempt_formulation", return_value=(succeeding, MagicMock()))
+    mock_handle = mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints")
+    mock_lac = mocker.patch.object(pen, "_handle_lactation_failure_in_loop")
+    mock_dmi = mocker.patch.object(pen, "_maybe_increased_dmi_for_retry")
+
+    result = pen._run_formulation_attempts(
+        is_ration_defined_by_user=False,
+        pen_available_feeds=_mock_feeds(),
+        temperature=20.0,
+        previous_ration=None,
+        original_dmi_requirement=10.0,
+        initial_protein_requirement=2.0,
+        simulation_day=1,
+        info_map={},
+    )
+
+    assert result is succeeding
+    mock_handle.assert_not_called()
+    mock_lac.assert_not_called()
+    mock_dmi.assert_not_called()
+
+
+def test_run_formulation_attempts_non_lac_cow_returns_after_one_failure(mocker: MockerFixture, pen: Pen) -> None:
+    """Non-LAC_COW pens get a single attempt; failure returns immediately without entering retry path."""
+    pen.animal_combination = AnimalCombination.GROWING
+    failing = _mock_solution(False)
+    mock_attempt = mocker.patch.object(pen, "_attempt_formulation", return_value=(failing, MagicMock()))
+    mock_handle = mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints", return_value=[])
+    mock_lac = mocker.patch.object(pen, "_handle_lactation_failure_in_loop")
+    mock_dmi = mocker.patch.object(pen, "_maybe_increased_dmi_for_retry")
+
+    result = pen._run_formulation_attempts(
+        is_ration_defined_by_user=False,
+        pen_available_feeds=_mock_feeds(),
+        temperature=20.0,
+        previous_ration=None,
+        original_dmi_requirement=10.0,
+        initial_protein_requirement=2.0,
+        simulation_day=1,
+        info_map={},
+    )
+
+    assert result is failing
+    assert mock_attempt.call_count == 1
+    mock_handle.assert_called_once()
+    mock_lac.assert_not_called()
+    mock_dmi.assert_not_called()
+
+
+def test_run_formulation_attempts_stops_after_max_attempts(mocker: MockerFixture, pen: Pen) -> None:
+    """LAC_COW pens stop after RationManager.maximum_ration_reformulation_attempts and log via the module om."""
+    mocker.patch.object(RationManager, "maximum_ration_reformulation_attempts", 2, create=True)
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.id = 4
+    failing = _mock_solution(False)
+    mock_attempt = mocker.patch.object(pen, "_attempt_formulation", return_value=(failing, MagicMock()))
+    mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints", return_value=[])
+    mocker.patch.object(pen, "_maybe_increased_dmi_for_retry", return_value=None)
+    mocker.patch.object(pen, "_handle_lactation_failure_in_loop", return_value=False)
+    mock_module_om = mocker.patch("RUFAS.biophysical.animal.pen.om")
+
+    info_map = {"class": "Pen", "function": "formulate_optimized_ration"}
+    result = pen._run_formulation_attempts(
+        is_ration_defined_by_user=False,
+        pen_available_feeds=_mock_feeds(),
+        temperature=20.0,
+        previous_ration=None,
+        original_dmi_requirement=10.0,
+        initial_protein_requirement=2.0,
+        simulation_day=1,
+        info_map=info_map,
+    )
+
+    assert result is failing
+    # Two attempts performed before max-attempts check fires on the third pass.
+    assert mock_attempt.call_count == 3
+    mock_module_om.add_log.assert_called_once()
+
+
+def test_run_formulation_attempts_retries_with_increased_dmi(mocker: MockerFixture, pen: Pen) -> None:
+    """When the DMI helper returns a bumped value, the loop retries with that value and can then succeed."""
+    pen.animal_combination = AnimalCombination.LAC_COW
+    failing = _mock_solution(False)
+    succeeding = _mock_solution(True)
+    mock_attempt = mocker.patch.object(
+        pen,
+        "_attempt_formulation",
+        side_effect=[(failing, MagicMock()), (succeeding, MagicMock())],
+    )
+    mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints", return_value=[])
+    mocker.patch.object(pen, "_maybe_increased_dmi_for_retry", return_value=33.0)
+    mock_lac = mocker.patch.object(pen, "_handle_lactation_failure_in_loop")
+
+    result = pen._run_formulation_attempts(
+        is_ration_defined_by_user=True,
+        pen_available_feeds=_mock_feeds(),
+        temperature=20.0,
+        previous_ration=None,
+        original_dmi_requirement=30.0,
+        initial_protein_requirement=2.0,
+        simulation_day=1,
+        info_map={},
+    )
+
+    assert result is succeeding
+    # The second attempt should be called with the bumped DMI (positional arg index 4).
+    second_call_args = mock_attempt.call_args_list[1].args
+    assert second_call_args[4] == 33.0
+    mock_lac.assert_not_called()
+
+
+def test_run_formulation_attempts_breaks_when_lactation_handler_returns_true(
+    mocker: MockerFixture, pen: Pen
+) -> None:
+    """When DMI retry returns None and lactation handler returns True, the loop returns the failing solution."""
+    pen.animal_combination = AnimalCombination.LAC_COW
+    failing = _mock_solution(False)
+    mocker.patch.object(pen, "_attempt_formulation", return_value=(failing, MagicMock()))
+    mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints", return_value=[])
+    mocker.patch.object(pen, "_maybe_increased_dmi_for_retry", return_value=None)
+    mock_lac = mocker.patch.object(pen, "_handle_lactation_failure_in_loop", return_value=True)
+
+    result = pen._run_formulation_attempts(
+        is_ration_defined_by_user=True,
+        pen_available_feeds=_mock_feeds(),
+        temperature=20.0,
+        previous_ration=None,
+        original_dmi_requirement=10.0,
+        initial_protein_requirement=2.0,
+        simulation_day=1,
+        info_map={},
+    )
+
+    assert result is failing
+    mock_lac.assert_called_once()
+
+
 def test_attempt_formulation(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     """Tests the function _attempt_formulation"""
     mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
