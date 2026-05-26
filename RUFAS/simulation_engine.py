@@ -281,54 +281,6 @@ class SimulationEngine:
             ManureExcretionCalculator.emit_dmi_below_min_summary(info_map)
 
         EEEManager.estimate_all()
-
-        # TEMP DEBUG: end-of-simulation mortality scheduling vs. firing summary.
-        # Compares configured rate against what actually happened across the whole run,
-        # plus final population counts so the population-dynamics impact is visible.
-        # Remove (along with the counters on Animal) once the investigation is complete.
-        if self.simulate_animals:
-            from RUFAS.biophysical.animal.animal import Animal
-            from RUFAS.biophysical.animal.animal_config import AnimalConfig
-            hm = self.herd_manager
-            final_calves = len(hm.calves)
-            final_heiferIs = len(hm.heiferIs)
-            final_heiferIIs = len(hm.heiferIIs)
-            final_heiferIIIs = len(hm.heiferIIIs)
-            final_cows = len(hm.cows)
-            calf_fire_rate = (
-                Animal._debug_calf_mortality_fired / Animal._debug_calf_mortality_scheduled
-                if Animal._debug_calf_mortality_scheduled > 0
-                else 0.0
-            )
-            heifer_fire_rate = (
-                Animal._debug_heifer_mortality_fired / Animal._debug_heifer_mortality_scheduled
-                if Animal._debug_heifer_mortality_scheduled > 0
-                else 0.0
-            )
-            print(
-                "\n" + "=" * 70 + "\n"
-                "[MORTALITY-DEBUG] End-of-simulation summary\n"
-                + "=" * 70 + "\n"
-                "  Config:\n"
-                f"    calf_mortality_rate                   = {AnimalConfig.calf_mortality_rate}\n"
-                f"    heifer_mortality_rate                 = {AnimalConfig.heifer_mortality_rate}\n"
-                f"    simulation_day at end                 = {self.time.simulation_day}\n"
-                "  Mortality activity (cumulative across run):\n"
-                f"    calf mortality scheduled              = {Animal._debug_calf_mortality_scheduled}\n"
-                f"    calf mortality fired                  = {Animal._debug_calf_mortality_fired}"
-                f"    (fire/scheduled = {calf_fire_rate:.1%})\n"
-                f"    heifer mortality scheduled            = {Animal._debug_heifer_mortality_scheduled}\n"
-                f"    heifer mortality fired                = {Animal._debug_heifer_mortality_fired}"
-                f"    (fire/scheduled = {heifer_fire_rate:.1%})\n"
-                "  Final population snapshot (animals alive at end of sim):\n"
-                f"    calves                                = {final_calves}\n"
-                f"    heiferIs                              = {final_heiferIs}\n"
-                f"    heiferIIs                             = {final_heiferIIs}\n"
-                f"    heiferIIIs (springers)                = {final_heiferIIIs}\n"
-                f"    cows                                  = {final_cows}\n"
-                + "=" * 70
-            )
-
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
