@@ -452,12 +452,36 @@ class HerdManager:
         ]
 
     def _update_sold_animal_statistics(
-        self, sold_newborn_calves: list[Animal], sold_heiferIIs: list[Animal], sold_and_died_cows: list[Animal]
+        self,
+        sold_newborn_calves: list[Animal],
+        sold_heiferIIs: list[Animal],
+        sold_and_died_cows: list[Animal],
+        removed_animals: list[Animal],
     ) -> None:
         """Call the corresponding functions to update the statistics for sold animals"""
         self._update_sold_and_died_cow_statistics(sold_and_died_cows)
         self._update_sold_heiferII_statistics(sold_heiferIIs)
         self._update_sold_newborn_calf_statistics(sold_newborn_calves)
+        self._update_youngstock_mortality_statistics(removed_animals)
+
+    def _update_youngstock_mortality_statistics(self, removed_animals: list[Animal]) -> None:
+        """
+        Count youngstock-mortality cull reasons across the day's removed animals.
+
+        Pre-wean and post-wean mortality tags are exclusive to calves and heifers, so
+        scanning the combined ``removed_animals`` list (which also contains cows) does
+        not double-count cow-stage reasons handled by
+        ``_update_sold_and_died_cow_statistics``.
+        """
+        youngstock_reasons = (
+            animal_constants.CALF_MORTALITY_CULL,
+            animal_constants.HEIFER_MORTALITY_CULL,
+        )
+        for reason in youngstock_reasons:
+            self.herd_statistics.cull_reason_stats[reason] += sum(
+                1 for animal in removed_animals if animal.cull_reason == reason
+            )
+        self._calculate_cull_reason_percentages()
 
     def _perform_daily_routines_for_animals(
         self, time: RufasTime, animals: list[Animal]
@@ -719,6 +743,7 @@ class HerdManager:
             sold_newborn_calves=daily_herd_updates.sold_newborn_calves,
             sold_heiferIIs=daily_herd_updates.sold_heiferIIs,
             sold_and_died_cows=daily_herd_updates.sold_and_died_cows,
+            removed_animals=daily_herd_updates.removed_animals,
         )
 
         self._update_stillborn_calf_statistics(daily_herd_updates.stillborn_newborn_calves)

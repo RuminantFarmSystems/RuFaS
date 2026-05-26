@@ -267,6 +267,8 @@ class HerdStatistics:
             animal_constants.DISEASE_CULL: 0,
             animal_constants.UDDER_CULL: 0,
             animal_constants.UNKNOWN_CULL: 0,
+            animal_constants.CALF_MORTALITY_CULL: 0,
+            animal_constants.HEIFER_MORTALITY_CULL: 0,
         }
         self.parity_culling_stats_range = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
         self.num_cow_for_parity = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
@@ -281,6 +283,8 @@ class HerdStatistics:
             animal_constants.DISEASE_CULL: 0.0,
             animal_constants.UDDER_CULL: 0.0,
             animal_constants.UNKNOWN_CULL: 0.0,
+            animal_constants.CALF_MORTALITY_CULL: 0.0,
+            animal_constants.HEIFER_MORTALITY_CULL: 0.0,
         }
         self.percent_cow_for_parity = {
             "1": 0.0,
