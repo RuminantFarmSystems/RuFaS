@@ -2,6 +2,7 @@ from math import exp
 from unittest.mock import MagicMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.soil.layer_data import LayerData
@@ -139,9 +140,10 @@ def test_determine_phosphorus_percolated_from_layer(
     clay_content: float,
     percolated_water: float,
     area: float,
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the correct amount of phosphorus removed from a layer of soil is calculated."""
-    LayerData.determine_soil_nutrient_concentration = MagicMock(return_value=3.8)
+    mocker.patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=3.8)
     SolublePhosphorus._determine_isotherm_slope = MagicMock(return_value=35)
     SolublePhosphorus._determine_isotherm_intercept = MagicMock(return_value=155)
     SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate = MagicMock(return_value=2_000_000)

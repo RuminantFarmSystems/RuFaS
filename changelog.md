@@ -87,6 +87,7 @@ v1.0.0
 - [3026](https://github.com/RuminantFarmSystems/RuFaS/pull/3026) - [minor change] [E2ETesting] [NoInputChange] [NoOutputChange] Fixes E2E test results comparison tolerence.
 - [2999](https://github.com/RuminantFarmSystems/RuFaS/pull/2999) - [minor change] [Cross Validation] [Feed Storage] [NoInputChange] [NoOutputChange] Added cross validation rules for feed storage inputs.
 - [3024](https://github.com/RuminantFarmSystems/RuFaS/pull/3024) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Adds path to input to error/warning messages in `DataValidator` for easier invalid input fixing.
+- [3033](https://github.com/RuminantFarmSystems/RuFaS/pull/3033) - [minor change] [Tests] [pyproject.toml] [NoInputChange] [NoOutputChange] Bumps `pytest` from `==7.4.4` to `>=9.0.3`, swaps the unmaintained `pytest-lazy-fixture` for the maintained `pytest-lazy-fixtures` fork.
 
 ### v1.0.0
 
