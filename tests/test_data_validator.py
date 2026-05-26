@@ -49,6 +49,7 @@ def test_bool_type_validator(
     Unit test for function _bool_type_validator in file input_manager.py
     """
     # Arrange
+    input_path: Path = Path("path/to/input")
     var_path: list[str | int] = ["dummy_var_path"]
     variable_properties: dict[str, Any] = dummy_variable_properties
     dummy_properties_key = "dummy_variable_properties"
@@ -70,10 +71,13 @@ def test_bool_type_validator(
         dummy_counter,
         unused_bool_input,
         {"string", "number", "bool"},
+        input_path,
     )
 
     # Assert
-    patch_extract.assert_called_once_with(dummy_input_data, var_path, variable_properties, unused_bool_input)
+    patch_extract.assert_called_once_with(
+        dummy_input_data, var_path, variable_properties, unused_bool_input, input_path
+    )
     if dummy_variable_properties.get("nullable", False) is False:
         patch_path_to_str.assert_called_once_with(var_path)
     if not expected_result:
@@ -89,7 +93,7 @@ def test_bool_type_validator(
             {
                 "warning": "Validation: bool variable is not a bool",
                 "message": (
-                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: '{input_data_value}', is type: "
                     f"'{type(input_data_value)}'. {properties_violation_message}"
                 ),
                 "info_map": info_map,
@@ -123,6 +127,7 @@ def test_number_type_validator(
     """Unit test for function _number_type_validator in file input_manager.py"""
 
     # Arrange
+    input_path: Path = Path("path/to/input")
     dummy_var_path: list[str | int] = ["dummy_num"]
     dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1}
     dummy_properties_key = "dummy_variable_properties"
@@ -142,10 +147,11 @@ def test_number_type_validator(
         dummy_counter,
         unused_bool_input,
         {"string", "number", "bool"},
+        input_path,
     )
 
     patch_extract.assert_called_once_with(
-        dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input
+        dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input, input_path
     )
     if dummy_variable_properties.get("nullable", False) is False:
         patch_path_to_str.assert_called_once_with(dummy_var_path)
@@ -179,6 +185,7 @@ def test_string_type_validator(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _string_type_validator function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     var_path: list[str | int] = ["dummy_var_path"]
     dummy_properties_key = "dummy_variable_properties"
     dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
@@ -198,9 +205,12 @@ def test_string_type_validator(
         dummy_counter,
         unused_bool_input,
         {"string", "number", "bool"},
+        input_path,
     )
 
-    patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_properties, unused_bool_input)
+    patch_extract.assert_called_once_with(
+        dummy_input_data, var_path, dummy_variable_properties, unused_bool_input, input_path
+    )
     if dummy_variable_properties.get("nullable", False) is False:
         patch_path_to_str.assert_called_once_with(var_path)
     assert result == expected_result
@@ -264,6 +274,7 @@ def test_fix_array_type_fixable_data(
     expected_result: bool,
 ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
@@ -288,10 +299,7 @@ def test_fix_array_type_fixable_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     variable_to_check = dummy_input_data
@@ -305,13 +313,13 @@ def test_fix_array_type_fixable_data(
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' in '{input_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
@@ -367,6 +375,7 @@ def test_fix_array_type_critical_data(
     expected_result: bool,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
@@ -384,7 +393,7 @@ def test_fix_array_type_critical_data(
         else variable_parent[int(dummy_element_hierarchy[-1])]
     )
     error_message = (
-        f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
+        f"Variable: '{dummy_element_hierarchy[-1]}' in '{input_path}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
@@ -395,10 +404,7 @@ def test_fix_array_type_critical_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     assert result == expected_result
@@ -483,6 +489,7 @@ def test_fix_string_type_fixable_data(
     expected_result: bool,
 ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
@@ -507,10 +514,7 @@ def test_fix_string_type_fixable_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     variable_to_check: dict[str | int, Any] | list[Any] = dummy_input_data
@@ -524,13 +528,13 @@ def test_fix_string_type_fixable_data(
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' in '{input_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
@@ -541,6 +545,7 @@ def test_fix_string_type_fixable_data(
 
 def test_fix_string_type_csv_data() -> None:
     """Unit test for fixable number-type data from a csv array for _fix_data function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data: dict[str | int, Any] | list[Any] = {"element1": [1, 2, 3, 4, 5]}
     dummy_variable_properties = {"type": "number", "maximum": 4, "default": 3}
     dummy_element_hierarchy: list[str | int] = ["element1", 4]
@@ -566,10 +571,7 @@ def test_fix_string_type_csv_data() -> None:
 
     dv: DataValidator = DataValidator()
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     fixed_variable = dummy_input_data
@@ -585,13 +587,13 @@ def test_fix_string_type_csv_data() -> None:
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' in '{input_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
@@ -651,6 +653,7 @@ def test_fix_string_type_critical_data(
     expected_result: bool,
 ) -> None:
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     variable_parent = dummy_input_data
@@ -665,7 +668,7 @@ def test_fix_string_type_critical_data(
         else variable_parent[int(dummy_element_hierarchy[-1])]
     )
     error_message = (
-        f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
+        f"Variable: '{dummy_element_hierarchy[-1]}' in '{input_path}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
@@ -676,10 +679,7 @@ def test_fix_string_type_critical_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     assert result == expected_result
@@ -761,6 +761,7 @@ def test_fix_number_type_fixable_data(
     expected_result: bool,
 ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
@@ -785,10 +786,7 @@ def test_fix_number_type_fixable_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     variable_to_check: Any = dummy_input_data
@@ -802,13 +800,13 @@ def test_fix_number_type_fixable_data(
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' in '{input_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
@@ -864,6 +862,7 @@ def test_fix_number_type_critical_data(
     expected_result: bool,
 ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
@@ -881,7 +880,7 @@ def test_fix_number_type_critical_data(
         else variable_parent[int(dummy_element_hierarchy[-1])]
     )
     error_message = (
-        f"Variable: '{dummy_element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
+        f"Variable: '{dummy_element_hierarchy[-1]}' in '{input_path}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
@@ -892,10 +891,7 @@ def test_fix_number_type_critical_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     assert result == expected_result
@@ -1052,6 +1048,7 @@ def test_object_type_validator(
     """
 
     # Arrange
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=patch_extract_return)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_validate_return)
     mock_elements_counter = mocker.MagicMock()
@@ -1067,6 +1064,7 @@ def test_object_type_validator(
         mock_elements_counter,
         True,
         {"string", "number", "bool"},
+        input_path,
     )
 
     # Assert
@@ -1085,6 +1083,7 @@ def test_object_type_validator_key_removal(
     mocker: MockerFixture, data: dict[str, Any], removed_keys: list[str]
 ) -> None:
     """Tests that extraneous keys are properly removed by the _object_type_validator in Input Manager."""
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=data)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
     mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy path")
@@ -1098,7 +1097,7 @@ def test_object_type_validator_key_removal(
         {
             "warning": "Validation: object contains extraneous data",
             "message": (
-                f"Variable: 'dummy path' contains data at key '{key}' "
+                f"Variable: 'dummy path' in '{input_path}' contains data at key '{key}' "
                 f"that is not specified in the metadata properties. {violation_msg}"
             ),
             "info_map": info_map,
@@ -1115,6 +1114,7 @@ def test_object_type_validator_key_removal(
         mock_elements_counter,
         True,
         {"string", "number", "bool"},
+        input_path,
     )
 
     assert result
@@ -1311,6 +1311,7 @@ def test_array_type_validator(
     """
 
     # Arrange
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=patch_extract_return)
     mocker.patch.object(DataValidator, "_validate_array_container_properties", return_value=patch_container_valid)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_element_valid)
@@ -1328,6 +1329,7 @@ def test_array_type_validator(
         mock_elements_counter,
         True,
         {"string", "number", "bool"},
+        input_path,
     )
 
     # Assert
@@ -1380,6 +1382,7 @@ def test_validate_input_by_type(
     """
 
     # Arrange
+    input_path: Path = Path("path/to/input")
     variable_properties = {"type": data_type}
     variable_path: List[Union[str, int]] = ["path", "to", "variable"]
     input_data: dict[str | int, Any] | list[Any] = {"path": {"to": {"variable": input_value}}}
@@ -1403,6 +1406,7 @@ def test_validate_input_by_type(
         elements_counter,
         True,
         {"string", "number", "bool"},
+        input_path,
     )
 
     # Assert
@@ -1425,6 +1429,8 @@ def test_validate_input_by_type(
 
 
 def test_validate_input_by_type_key_error() -> None:
+    """Tests validate_data_by_type() method in DataValidator."""
+    input_path: Path = Path("path/to/input")
     variable_properties = {"a": "b"}
     variable_path: list[Union[str, int]] = ["valid_key"]
     properties_blob_key = "dummy_properties_blob_key"
@@ -1444,6 +1450,7 @@ def test_validate_input_by_type_key_error() -> None:
             elements_counter,
             True,
             {"string", "number", "bool"},
+            input_path,
         )
 
 
@@ -2482,6 +2489,7 @@ def test_validate_metadata_properties_keys(
 
 def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
     """Unit tests for making sure data were extracted when no error"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
     dummy_var_path: list[str | int] = ["dummy_var_path"]
     dummy_var_properties: dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
@@ -2495,6 +2503,7 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=True,
+        input_path=input_path,
     )
 
     assert result == dummy_value
@@ -2505,10 +2514,13 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=False,
+        input_path=input_path,
     )
 
     assert result == dummy_value
-    patch_extract.assert_has_calls([call(dummy_input_data, dummy_var_path), call(dummy_input_data, dummy_var_path)])
+    patch_extract.assert_has_calls(
+        [call(dummy_input_data, dummy_var_path, input_path), call(dummy_input_data, dummy_var_path, input_path)]
+    )
     patch_log_missing_data.assert_not_called()
 
 
@@ -2531,6 +2543,7 @@ def test_extract_input_data_by_key_list_key_error(
     var_path: List[str | int], var_name: str, called_during_initialization: bool, mocker: MockerFixture
 ) -> None:
     """Unit tests for making sure data were extracted when error occurs"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
     dummy_var_properties: dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
     patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", side_effect=KeyError)
@@ -2542,14 +2555,16 @@ def test_extract_input_data_by_key_list_key_error(
         variable_path=var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=called_during_initialization,
+        input_path=input_path,
     )
 
     assert result is None
-    patch_extract.assert_called_once_with(dummy_input_data, var_path)
+    patch_extract.assert_called_once_with(dummy_input_data, var_path, input_path)
     patch_log_missing_data.assert_called_once_with(
         variable_properties=dummy_var_properties,
         var_name=var_name,
         called_during_initialization=called_during_initialization,
+        input_path=input_path,
     )
 
 
@@ -3689,6 +3704,7 @@ def test_validate_data_by_type_raises_for_unsupported_type(mocker: MockerFixture
     """validate_data_by_type raises ValueError when the metadata type is not in the supported map."""
     dv = DataValidator()
     mocker.patch.object(dv, "convert_variable_path_to_str", return_value="root.field")
+    input_path: Path = Path("path/to/input")
 
     with pytest.raises(ValueError, match="is not valid"):
         dv.validate_data_by_type(
@@ -3700,6 +3716,7 @@ def test_validate_data_by_type_raises_for_unsupported_type(mocker: MockerFixture
             elements_counter=mocker.MagicMock(autospec=ElementsCounter),
             called_during_initialization=True,
             fixable_data_types=set(),
+            input_path=input_path,
         )
 
 
@@ -3712,6 +3729,7 @@ def test_log_missing_data_raises_when_not_during_initialization() -> None:
             var_name="my_var",
             variable_properties={},
             called_during_initialization=False,
+            input_path=Path("path/to/input"),
         )
 
     assert any("Missing required data" in str(log) for log in dv.event_logs)
@@ -3727,6 +3745,7 @@ def test_log_missing_data_raises_when_required_during_initialization(mocker: Moc
             var_name="my_var",
             variable_properties={"modifiability": "required locked"},
             called_during_initialization=True,
+            input_path=Path("path/to/input"),
         )
 
     assert any("Missing required data" in str(log) for log in dv.event_logs)
@@ -3741,6 +3760,7 @@ def test_log_missing_data_logs_warning_when_not_required_during_initialization(m
         var_name="my_var",
         variable_properties={"modifiability": "unrequired unlocked"},
         called_during_initialization=True,
+        input_path=Path("path/to/input"),
     )
 
     assert any("not required upon initialization" in str(log) for log in dv.event_logs)
