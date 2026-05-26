@@ -85,7 +85,7 @@
       ]
     },
     {
-      "description": "When cow repro method is in ['ED', 'ED-TAI'], do_not_breed_time must exceed voluntary_waiting_period",
+      "description": "When cow repro method is in ['ED', 'ED-TAI'], do_not_breed_time > voluntary_waiting_period",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -136,7 +136,8 @@
       "description": "Wean day must be before heifer breeding start: wean_day < breeding_start_day_h",
       "aliases": {
         "variables": {
-          "wean_day": "animal.animal_config.farm_level.calf.wean_day"
+          "wean_day": "animal.animal_config.farm_level.calf.wean_day",
+          "breeding_start_day_h": "animal.animal_config.management_decisions.breeding_start_day_h"
         }
       },
       "rules": [
@@ -161,7 +162,9 @@
       "description": "prefresh_day must be shorter than both gestation length (avg_gestation_len) and the dry period duration (avg_gestation_len - days_in_preg_when_dry)",
       "aliases": {
         "variables": {
-          "prefresh_day": "animal.animal_config.farm_level.repro.prefresh_day"
+          "prefresh_day": "animal.animal_config.farm_level.repro.prefresh_day",
+          "avg_gestation_len": "animal.animal_config.farm_level.repro.avg_gestation_len",
+          "days_in_preg_when_dry": "animal.animal_config.management_decisions.days_in_preg_when_dry"
         }
       },
       "rules": [
@@ -201,7 +204,9 @@
       "description": "Calving interval must exceed voluntary waiting period plus gestation length",
       "aliases": {
         "variables": {
-          "calving_interval": "animal.animal_config.farm_level.repro.calving_interval"
+          "calving_interval": "animal.animal_config.farm_level.repro.calving_interval",
+          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period",
+          "avg_gestation_len": "animal.animal_config.farm_level.repro.avg_gestation_len"
         }
       },
       "rules": [
@@ -272,6 +277,10 @@
     {
       "description": "When heifer repro method is TAI, repro_sub_protocol must be in ['5dCG2P', '5dCGP']",
       "aliases": {
+        "variables": {
+          "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
+          "heifer_repro_sub_protocol": "animal.animal_config.farm_level.repro.heifers.repro_sub_protocol"
+        },
         "constants": {
           "TAI": "TAI",
           "5dCG2P": "5dCG2P",
@@ -316,6 +325,10 @@
     {
       "description": "When heifer repro method is SynchED, repro_sub_protocol must be in ['2P', 'CP']",
       "aliases": {
+        "variables": {
+          "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
+          "heifer_repro_sub_protocol": "animal.animal_config.farm_level.repro.heifers.repro_sub_protocol"
+        },
         "constants": {
           "SynchED": "SynchED",
           "2P": "2P",
@@ -521,11 +534,16 @@
       "description": "When cow repro method is TAI: ovsynch_program must be set, ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
       "aliases": {
         "variables": {
-          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
+          "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
+          "ovsynch_program": "animal.animal_config.farm_level.repro.cows.ovsynch_program",
+          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate",
+          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period"
         },
         "constants": {
           "TAI": "TAI",
-          "zero": 0
+          "zero": 0,
+          "true_constant": true
         }
       },
       "apply_when": [
@@ -612,12 +630,21 @@
       "description": "When cow repro method is TAI and resynch_program is in ['PGFatPD', 'none']: presynch_program must be set, presynch_program_start_day must be positive, and estrus_detection_rate and ED_conception_rate must be positive",
       "aliases": {
         "variables": {
+          "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
+          "resynch_program": "animal.animal_config.farm_level.repro.cows.resynch_program",
+          "presynch_program": "animal.animal_config.farm_level.repro.cows.presynch_program",
+          "presynch_program_start_day": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day",
+          "estrus_detection_rate": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
+          "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
           "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
         },
         "constants": {
           "TAI": "TAI",
           "zero": 0,
-          "PGFatPD_or_none": ["PFGatPD", "none"]
+          "true_constant": true,
+          "PGFatPD_or_none": ["PGFatPD", "none"],
+          "PGFatPD": "PGFatPD",
+          "none": "none"
         }
       },
       "apply_when": [
@@ -646,7 +673,7 @@
           "right_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["PGFatPD_or_none"]
+              "operands": ["PGFatPD", "none"]
             }
           },
           "relationship": "is_in"
@@ -720,14 +747,17 @@
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
+          "ovsynch_program": "animal.animal_config.farm_level.repro.cows.ovsynch_program",
+          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate",
           "estrus_detection_rate": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
           "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
-          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
           "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period"
         },
         "constants": {
           "ED_TAI": "ED-TAI",
-          "zero": 0
+          "zero": 0,
+          "true_constant": true
         }
       },
       "apply_when": [
@@ -886,6 +916,17 @@
     },
     {
       "description": "When presynch_program and ovsynch_program are both not null: ovsynch_program_start_day must exceed presynch_program_start_day",
+      "aliases": {
+        "variables": {
+          "presynch_program": "animal.animal_config.farm_level.repro.cows.presynch_program",
+          "ovsynch_program": "animal.animal_config.farm_level.repro.cows.ovsynch_program",
+          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+          "presynch_program_start_day": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
       "apply_when": [
         {
           "left_hand": {
@@ -906,7 +947,7 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["ov_synch_program"]
+              "operands": ["ovsynch_program"]
             }
           },
           "right_hand": {
@@ -937,39 +978,11 @@
       ]
     },
     {
-      "description": "Holstein birth weight std dev must be less than 20% of average: birth_weight_std_ho < 0.2 * birth_weight_avg_ho",
-      "aliases": {
-        "variables": {
-          "birth_weight_std_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_std_ho",
-          "birth_weight_avg_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_avg_ho"
-        },
-        "constants": {
-          "twenty_percent": 0.2
-        }
-      },
-      "rules": [
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "product",
-              "operands": ["twenty_percent", "birth_weight_avg_ho"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["birth_weight_std_ho"]
-            }
-          },
-          "relationship": "greater"
-        }
-      ]
-    },
-    {
       "description": "Target heifer pregnancy day must be after breeding start: target_heifer_preg_day > breeding_start_day_h",
       "aliases": {
         "variables": {
-          "target_heifer_preg_day": "animal.animal_config.farm_level.bodyweight.target_heifer_preg_day"
+          "target_heifer_preg_day": "animal.animal_config.farm_level.bodyweight.target_heifer_preg_day",
+          "breeding_start_day_h": "animal.animal_config.management_decisions.breeding_start_day_h"
         }
       },
       "rules": [
@@ -994,7 +1007,8 @@
       "description": "Average Holstein birth weight must be less than average mature body weight: birth_weight_avg_ho < mature_body_weight_avg",
       "aliases": {
         "variables": {
-          "mature_body_weight_avg": "animal.animal_config.farm_level.bodyweight.mature_body_weight_avg"
+          "mature_body_weight_avg": "animal.animal_config.farm_level.bodyweight.mature_body_weight_avg",
+          "birth_weight_avg_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_avg_ho"
         }
       },
       "rules": [
@@ -1021,7 +1035,9 @@
         "variables": {
           "preg_check_day_1": "animal.animal_config.from_literature.repro.preg_check_day_1",
           "preg_check_day_2": "animal.animal_config.from_literature.repro.preg_check_day_2",
-          "preg_check_day_3": "animal.animal_config.from_literature.repro.preg_check_day_3"
+          "preg_check_day_3": "animal.animal_config.from_literature.repro.preg_check_day_3",
+          "avg_gestation_len": "animal.animal_config.farm_level.repro.avg_gestation_len",
+          "days_in_preg_when_dry": "animal.animal_config.management_decisions.days_in_preg_when_dry"
         }
       },
       "rules": [
@@ -1314,6 +1330,8 @@
       "description": "When methane mitigation method is 3-NOP, additive amount must equal 3-NOP additive amount",
       "aliases": {
         "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount",
           "3nop_additive_amount": "animal.methane_mitigation.3-NOP_additive_amount"
         },
         "constants": {
@@ -1359,6 +1377,8 @@
       "description": "When methane mitigation method is monensin, additive amount must equal monensin additive amount",
       "aliases": {
         "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount",
           "monensin_amount": "animal.methane_mitigation.monensin_additive_amount"
         },
         "constants": {
@@ -1404,6 +1424,8 @@
       "description": "When methane mitigation method is essential_oils, additive amount must equal essential oils additive amount",
       "aliases": {
         "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount",
           "essential_oils_amount": "animal.methane_mitigation.essential_oils_additive_amount"
         },
         "constants": {
@@ -1449,6 +1471,8 @@
       "description": "When methane mitigation method is seaweed_additive, additive amount must equal seaweed additive amount",
       "aliases": {
         "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount",
           "seaweed_amount": "animal.methane_mitigation.seaweed_additive_amount"
         },
         "constants": {
