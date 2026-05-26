@@ -69,10 +69,23 @@ class Animal:
     """
     This class represents an animal in the RuFaS simulation.
 
-    DO NOT USE THE PROPERTIES THAT START WITH '_'. INSTEAD, USE THE FUNCTIONS THAT ARE DECORATED WITH @property.
+    Parameters
+    ----------
+    args : NewBornCalfValuesTypedDict | CalfValuesTypedDict | HeiferIValuesTypedDict | HeiferIIValuesTypedDict \
+        | HeiferIIIValuesTypedDict | CowValuesTypedDict
+        Configuration data used to initialize the animal. The required keys depend on the animal type being created and
+        may include identifiers, breed, age, body weight, reproduction status, and other life-stage-specific attributes.
+
+    time : RufasTime
+        Simulation time information used during initialization, including the
+        current simulation day and calendar date.
 
     Attributes
     ----------
+    nutrient_standard: NutrientStandard
+        The nutrient standard used to calculate nutrition related values.
+    om : OutputManager
+        The singleton output manager used for model outputs.
     id: int
         The unique identifier of the animal, (unitless).
     breed: Breed
@@ -81,18 +94,10 @@ class Animal:
         The current life stage of the animal.
     days_born: int
         The age of the animal, (simulation days).
-    body_weight: float
-        The body weight of the animal, (kg).
     birth_weight: float
         The birth weight of the animal, (kg).
-    mature_body_weight: float
-        The mature body weight of the animal, (kg).
-    wean_weight: float
-        The body weight of the animal at weaning, (kg).
-    genetics: Genetics
-        The genetic attributes of the animal.
-    genetic_history: list[GeneticHistory]
-        The genetic history of the animal.
+    body_weight: float
+        The body weight of the animal, (kg).
     body_condition_score_5: float
         The body condition score on a scale of 1 to 5, (unitless).
     cull_reason: str
@@ -101,9 +106,11 @@ class Animal:
         The body weight history of the animal.
     pen_history: list[PenHistory]
         The pen history of the animal.
-    sold_at_day: int | None
+    sold_at_day: int, optional
         The simulation day in which the animal was sold.
-    dead_at_day: int | None
+    stillborn_day : int, optional
+        The simulation day on which the animal was stillborn.
+    dead_at_day: int, optional
         The simulation day in which the animal died, (simulation day).
     events: AnimalEvents
         The AnimalEvents object that records all major events of the animal.
@@ -115,32 +122,41 @@ class Animal:
         The milk production submodule that handles the daily milk production of the animal.
     nutrients: Nutrients
         The nutrients submodule that handles the daily phosphorus update of the animal.
-    _reproduction: Reproduction
+    reproduction: Reproduction
         The reproduction submodule that handles the daily reproduction update of the animal.
     nutrition_requirements: NutrientsRequirements
         The nutrition requirement for the animal.
     nutrition_supply: NutritionSupply
         The supplied nutrition in the current ration interval for the animal.
-    previous_nutrition_supply: NutritionSupply
-        The previously supplied nutrition from the las ration interval for the animal.
-    _days_in_milk: int
+    previous_nutrition_supply: NutritionSupply, optional
+        Nutrition supplied during the previous ration interval.
+    days_in_milk: int
         The number of days that the animal has been in milk production, (days).
-    _days_in_pregnancy: int
+    _milk_production_output_days_in_milk : int
+        Days in milk used for milk production output reporting, (simulation days).
+    days_in_pregnancy: int
         The number of days that the animal has been in pregnancy, (days).
-    _future_cull_date: int | None
+    future_cull_date: int, optional
         The age of which the animal will be culled, (day).
-    _future_death_date: int | None
+    future_death_date: int, optional
         The age of which the animal will die, (day).
-    _daily_horizontal_distance: float
+    daily_horizontal_distance: float
         The daily horizontal distance traveled by the animal, (m).
-    _daily_vertical_distance: float
+    daily_vertical_distance: float
         The daily vertical distance traveled by the animal, (m).
-    _daily_distance: float
+    daily_distance: float
         The total daily distance traveled by the animal, (m).
+    genetics: Genetics, optional
+        The genetic attributes of the animal.
+    mature_body_weight: float
+        The mature body weight of the animal, (kg).
+    wean_weight: float
+        The body weight of the animal at weaning, (kg).
+    genetic_history: list[GeneticHistory]
+        The genetic history of the animal.
     sex: Sex
         The sex of the animal.
-    nutrient_standard: NutrientStandard
-        The nutrient standard used to calculate nutrition related values.
+
     """
 
     nutrient_standard: NutrientStandard
@@ -159,18 +175,6 @@ class Animal:
     ) -> None:
         """
         Initializes an Animal object.
-
-        Parameters
-        ----------
-        args : (
-                    NewBornCalfValuesTypedDict |
-                    CalfValuesTypedDict |
-                    HeiferIValuesTypedDict |
-                    HeiferIIValuesTypedDict |
-                    CowValuesTypedDict
-                )
-            The dictionary that contains the configuration to initialize an Animal object.
-
         """
         self.om = OutputManager()
         initialize_animal_methods: dict[AnimalType, Callable[..., None]] = {
@@ -398,9 +402,6 @@ class Animal:
         """
         Check if the animal is milking.
 
-        This property determines if the animal is currently milking. It specifically checks if the animal type is a cow
-        and if the cow has been in milk for at least one day.
-
         Returns
         -------
         bool
@@ -415,9 +416,6 @@ class Animal:
     def future_cull_date(self) -> int:
         """
         Returns the cull death date of the animal.
-
-        If the animal is not a cow, the method returns the maximum possible integer value.
-        Otherwise, it returns the pre-calculated future cull date.
 
         Returns
         -------
@@ -458,9 +456,6 @@ class Animal:
     def future_death_date(self) -> int:
         """
         Returns the future death date of the animal.
-
-        If the animal is not a cow, the method returns the maximum possible integer value.
-        Otherwise, it returns the pre-calculated future death date.
 
         Returns
         -------
@@ -602,14 +597,15 @@ class Animal:
         """
         Returns the daily distance traveled by the animal.
 
-        If the animal is not a cow and is currently milking, the daily distance
-        is considered to be 0.0. Otherwise, it returns the value of
-        the stored daily distance.
-
         Returns
         -------
         float
             The daily distance traveled by the animal.
+
+        Notes
+        -----
+        If the animal is not a cow and is currently milking, the daily distance is considered to be 0.0.
+        Otherwise, it returns the value of the stored daily distance.
 
         """
         if not self.animal_type.is_cow and self.is_milking:
@@ -727,9 +723,6 @@ class Animal:
         """
         Returns the calving interval for the animal.
 
-        If the animal type is not a cow, the calving interval is 0.
-        Otherwise, it retrieves the calving interval from the reproduction information.
-
         Returns
         -------
         int
@@ -814,9 +807,8 @@ class Animal:
     @gestation_length.setter
     def gestation_length(self, gestation_length: int) -> None:
         """
-        Sets the gestation length for the animal. This property is not applicable
-        for animals of type CALF or HEIFER_I and will raise a TypeError if attempted
-        to set for these types.
+        Sets the gestation length for the animal. This property is not applicable for animals of type CALF or HEIFER_I
+        and will raise a TypeError if attempted to set for these types.
 
         Parameters
         ----------
@@ -1196,9 +1188,7 @@ class Animal:
     @cow_resynch_program.setter
     def cow_resynch_program(self, cow_resynch_program: CowReSynchSubProtocol) -> None:
         """
-        Sets the cow ReSynch program for the object. This method ensures
-        that the operation is allowed only for objects with an animal type of 'cow'.
-        If the animal type is not 'cow', a TypeError is raised.
+        Sets the cow ReSynch program for the object.
 
         Parameters
         ----------
@@ -1313,10 +1303,6 @@ class Animal:
     def _assign_sex_to_newborn_calf(self) -> None:
         """
         Assign a sex to a newborn calf based on the semen type and male calf rate.
-
-        Determines the sex of the calf by evaluating the type of semen used (conventional
-        or sexed) and the corresponding male calf rate. Raises a ValueError if an
-        unexpected semen type is encountered.
 
         Raises
         ------
@@ -1514,6 +1500,8 @@ class Animal:
         """
         Updates the daily nutrients requirements and performs phosphorus update.
 
+        Notes
+        -----
         This method compiles the daily nutrient inputs required for the animal
         based on its type, weight, growth, pregnancy stages, milk production,
         and other factors. It then triggers the process to update the animal's
@@ -1535,6 +1523,8 @@ class Animal:
         """
         Performs the daily digestive system updates for the animal.
 
+        Notes
+        -----
         This method gathers all relevant inputs related to the animal's digestive
         system, including nutritional supply, metabolic energy intake, and milk
         production factors, into a `DigestiveSystemInputs` instance. It then
@@ -1562,6 +1552,8 @@ class Animal:
         """
         Performs the daily milk production update.
 
+        Notes
+        -----
         If the animal type is not a cow, the method exits without performing any operation.
         For cows, the method calculates the milking updates using the animal's daily metrics
         and adjusts the milking-related data accordingly.
@@ -1588,6 +1580,9 @@ class Animal:
     def daily_milking_update_without_history(self) -> None:
         """
         Performs the daily milk production update without updating the milk production history attributes.
+
+        Notes
+        -----
         Intended for use prior to first ration formulation interval, since that process requires the milk production
         to be set for proper estimation of animal requirements.
 
@@ -1612,13 +1607,15 @@ class Animal:
         """
         Updates the daily growth parameters of the animal based on the provided time input.
 
-        This method gathers the necessary animal attributes and performs the daily body weight update. It then updates
-        attributes such as body weight, conceptual weight, and events of the animal accordingly.
-
         Parameters
         ----------
         time : RufasTime
             The RufasTime instance used for updating growth and body weight changes.
+
+        Notes
+        -----
+        This method gathers the necessary animal attributes and performs the daily body weight update. It then updates
+        attributes such as body weight, conceptual weight, and events of the animal accordingly.
 
         """
         growth_inputs = GrowthInputs(
@@ -1710,7 +1707,7 @@ class Animal:
 
         Returns
         -------
-        NewBornCalfValuesTypedDict or None
+        NewBornCalfValuesTypedDict | None
             A dictionary containing details related to a newly born calf if a calf is born during this update;
             otherwise, None.
         HerdReproductionStatistics
@@ -1821,7 +1818,6 @@ class Animal:
     def _calf_life_stage_update(self, _: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Determines and updates the life stage of a calf based on specific evaluation criteria.
-        Transitions the calf to the 'HeiferI' stage if the criteria are met, otherwise retains the current life stage.
 
         Parameters
         ----------
@@ -1835,6 +1831,10 @@ class Animal:
             (AnimalStatus.LIFE_STAGE_CHANGED) or remains the same (AnimalStatus.REMAIN).
             The second value is always None.
 
+        Notes
+        -----
+        Transitions the calf to the 'HeiferI' stage if the criteria are met, otherwise retains the current life stage.
+
         """
         if self._evaluate_calf_for_heiferI():
             self._transition_calf_to_heiferI()
@@ -1844,8 +1844,6 @@ class Animal:
     def _heiferI_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a heiferI animal based on specific evaluation criteria.
-        If the evaluation determines that the heiferI should transition to heiferII,
-        the necessary transition is performed. Otherwise, the animal remains in its current life stage.
 
         Parameters
         ----------
@@ -1858,6 +1856,11 @@ class Animal:
             AnimalStatus.LIFE_STAGE_CHANGED, None: If the heiferI transitions to the heifer II life stage.
             AnimalStatus.REMAIN, None: If the heiferI remains in the current life stage.
 
+        Notes
+        -----
+        If the evaluation determines that the heiferI should transition to heiferII,
+        the necessary transition is performed. Otherwise, the animal remains in its current life stage.
+
         """
         if self._evaluate_heiferI_for_heiferII():
             self._transition_heiferI_to_heiferII(time)
@@ -1867,8 +1870,6 @@ class Animal:
     def _heiferII_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a heiferII based on evaluation criteria such as culling or transitioning to heiferIII.
-        If the evaluation determines that the heiferII should transition to heiferIII,
-        the necessary transition is performed. Otherwise, the animal remains in its current life stage.
 
         Parameters
         ----------
@@ -1880,6 +1881,11 @@ class Animal:
         tuple[AnimalStatus, None]
             A tuple containing the status of the animal (whether it is sold, its life stage
             has changed, or it remains in the current state) and None.
+
+        Notes
+        -----
+        If the evaluation determines that the heiferII should transition to heiferIII,
+        the necessary transition is performed. Otherwise, the animal remains in its current life stage.
 
         """
         if self._evaluate_heiferII_for_culling():
@@ -2428,10 +2434,9 @@ class Animal:
 
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """
-        Updates the animal's pen history by either appending to the existing
-        history if the animal is in a different pen than it was the last time
-        this method is called or modifying the last element in the pen_history
-        list to reflect the current simulation day.
+        Updates the animal's pen history by either appending to the existing history if the animal is in a different
+        pen than it was the last time this method is called or modifying the last element in the pen_history list to
+        reflect the current simulation day.
 
         Parameters
         ----------
@@ -2459,8 +2464,7 @@ class Animal:
 
     def set_daily_walking_distance(self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float) -> None:
         """
-        Calculates and sets the animal's daily vertical and horizontal
-        walking distance (DVD and DHD).
+        Calculates and sets the animal's daily vertical and horizontal walking distance (DVD and DHD).
 
         Parameters
         ----------
@@ -2513,7 +2517,7 @@ class Animal:
 
         """
         if self.animal_type is AnimalType.CALF:
-            calf_intake = CalfRationManager.calc_intake(
+            calf_intake = CalfRationManager.calculate_intake(
                 self.birth_weight,
                 self.body_weight,
                 AnimalConfig.wean_day,
@@ -2521,7 +2525,7 @@ class Animal:
                 cast(list[NASEMFeed | NRCFeed], available_feeds),
                 self.nutrient_standard,
             )
-            calf_requirements = CalfRationManager.calc_requirements(
+            calf_requirements = CalfRationManager.calculate_requirements(
                 self.days_born, self.body_weight, previous_temperature, calf_intake
             )
             # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue 2517.
@@ -2614,6 +2618,8 @@ class Animal:
         """
         Update the cow's 305-day milk yield estimate.
 
+        Notes
+        -----
         Dry cows (DIM == 0) retain their previous estimate so a value carried over from
         the prior lactation isn't wiped out. The exception is a dry cow that has never
         had an in-sim lactation yet (estimate still at the 0.0 init default) — those fall
@@ -2633,15 +2639,17 @@ class Animal:
         """
         Updates the genetic history record for the animal on the given simulation day.
 
-        If the animal's current genetics differ from the most recent genetic history entry,
-        a new ``GeneticHistory`` record is appended. Otherwise, the end day of the most
-        recent entry is extended to the current simulation day. A warning is issued if a
-        duplicate entry is detected for the same day.
-
         Parameters
         ----------
         simulation_day : int
             The current simulation day used to timestamp the genetic history entry.
+
+        Notes
+        -----
+        If the animal's current genetics differ from the most recent genetic history entry, a new ``GeneticHistory``
+        record is appended. Otherwise, the end day of the most recent entry is extended to the current simulation day.
+        A warning is issued if a duplicate entry is detected for the same day.
+
         """
         if AnimalConfig.simulate_genetics and self.genetics is not None:
             if (
