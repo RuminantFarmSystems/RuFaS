@@ -45,8 +45,8 @@ def test_calculate_eroded_organic_nitrogen(
 ) -> None:
     """Tests that the amount of organic nitrogen lost to eroded sediment is calculated correctly."""
     mocker.patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=26)
-    LeachingRunoffErosion._determine_enrichment_ratio = MagicMock(return_value=2.5)
-    LeachingRunoffErosion._determine_erosion_nitrogen_loss_content = MagicMock(return_value=33)
+    mocker.patch.object(LeachingRunoffErosion, "_determine_enrichment_ratio", return_value=2.5)
+    mocker.patch.object(LeachingRunoffErosion, "_determine_erosion_nitrogen_loss_content", return_value=33)
 
     observed = LeachingRunoffErosion._calculate_eroded_organic_nitrogen(nitrogen, density, depth, area, sediment)
     expected_sediment_per_ha = sediment / area
