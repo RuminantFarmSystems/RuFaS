@@ -1912,7 +1912,7 @@ def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(moc
 def test_formulate_optimized_ration_orchestrates_helpers(mocker: MockerFixture, pen: Pen) -> None:
     """formulate_optimized_ration delegates to _run_formulation_attempts and _finalize_ration_outcome."""
     pen.animal_combination = AnimalCombination.LAC_COW
-    pen.ration = {}
+    pen.ration = {99: 4.2}
     pen.id = 1
 
     avg_reqs = MagicMock()
@@ -1948,6 +1948,7 @@ def test_formulate_optimized_ration_orchestrates_helpers(mocker: MockerFixture, 
     assert run_kwargs["is_ration_defined_by_user"] is True
     assert run_kwargs["pen_available_feeds"] is feeds
     assert run_kwargs["temperature"] == 22.0
+    assert run_kwargs["previous_ration"] is pen.ration
     assert run_kwargs["original_dmi_requirement"] == 12.0
     assert run_kwargs["initial_protein_requirement"] == 3.0
     assert run_kwargs["simulation_day"] == 7
@@ -2327,6 +2328,40 @@ def test_attempt_formulation_user_defined_and_nasem(
     assert kwargs["user_defined_ration_tolerance"] == pytest.approx(0.123)
     assert kwargs["pen_average_enteric_methane"] == pytest.approx(69.4)
     assert kwargs["pen_average_urine_nitrogen"] == pytest.approx(15.0)
+
+
+def _animal_with_nasem_values(enteric_methane: float, urine_nitrogen: float) -> Animal:
+    """Builds a mocked Animal whose digestive_system exposes the given NASEM averaging inputs."""
+    animal = MagicMock(spec=Animal)
+    animal.digestive_system = MagicMock()
+    animal.digestive_system.enteric_methane_emission = enteric_methane
+    animal.digestive_system.manure_excretion = MagicMock()
+    animal.digestive_system.manure_excretion.urine_nitrogen = urine_nitrogen
+    return animal
+
+
+def test_pen_nasem_averages_arithmetic_mean(pen: Pen) -> None:
+    """_pen_nasem_averages returns the arithmetic mean across all animals in the pen."""
+    pen.animals_in_pen = {
+        1: _animal_with_nasem_values(enteric_methane=10.0, urine_nitrogen=4.0),
+        2: _animal_with_nasem_values(enteric_methane=20.0, urine_nitrogen=8.0),
+        3: _animal_with_nasem_values(enteric_methane=30.0, urine_nitrogen=12.0),
+    }
+
+    avg_methane, avg_nitrogen = pen._pen_nasem_averages()
+
+    assert avg_methane == pytest.approx(20.0)
+    assert avg_nitrogen == pytest.approx(8.0)
+
+
+def test_pen_nasem_averages_single_animal(pen: Pen) -> None:
+    """A single-animal pen returns that animal's values directly."""
+    pen.animals_in_pen = {1: _animal_with_nasem_values(enteric_methane=42.0, urine_nitrogen=7.5)}
+
+    avg_methane, avg_nitrogen = pen._pen_nasem_averages()
+
+    assert avg_methane == pytest.approx(42.0)
+    assert avg_nitrogen == pytest.approx(7.5)
 
 
 def test_apply_successful_solution(mocker: MockerFixture, pen: Pen) -> None:

@@ -123,6 +123,8 @@ class Pen:
             "DMI_constraint_lower",
         }
     )
+    # Multiplier applied to the dry matter intake when a lactating-cow ration retry is warranted.
+    _DMI_RETRY_INCREASE_FACTOR: float = 1.1
 
     def __init__(
         self,
@@ -1107,7 +1109,7 @@ class Pen:
             is_ration_defined_by_user=is_ration_defined_by_user,
             pen_available_feeds=pen_available_feeds,
             temperature=temperature,
-            previous_ration=getattr(self, "ration", None),
+            previous_ration=self.ration,
             original_dmi_requirement=initial_requirements.dry_matter,
             initial_protein_requirement=initial_requirements.metabolizable_protein,
             simulation_day=simulation_day,
@@ -1204,7 +1206,7 @@ class Pen:
             return None
         if not (self._DMI_INCREASE_CONSTRAINTS & set(constraints_failed_list)):
             return None
-        return current_dmi_requirement * 1.1
+        return current_dmi_requirement * self._DMI_RETRY_INCREASE_FACTOR
 
     def _handle_lactation_failure_in_loop(
         self,
@@ -1264,25 +1266,16 @@ class Pen:
     ) -> tuple[OptimizeResult, RationConfig]:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
-        if is_ration_defined_by_user:
-            user_defined_ration_dictionary = RationManager.user_defined_rations[self.animal_combination]
-            tolerance = RationManager.tolerance
-        else:
-            user_defined_ration_dictionary = None
-            tolerance = None
-        nutrient_standard = list(self.animals_in_pen.values())[0].nutrient_standard
 
-        if nutrient_standard is NutrientStandard.NASEM:
-            enteric_methane_list = []
-            urine_nitrogen_list = []
-            for animal in self.animals_in_pen.values():
-                enteric_methane_list.append(animal.digestive_system.enteric_methane_emission)
-                urine_nitrogen_list.append(animal.digestive_system.manure_excretion.urine_nitrogen)
-            pen_average_enteric_methane = sum(enteric_methane_list) / len(enteric_methane_list)
-            pen_average_urine_nitrogen = sum(urine_nitrogen_list) / len(urine_nitrogen_list)
-        else:
-            pen_average_enteric_methane = None
-            pen_average_urine_nitrogen = None
+        user_defined_ration_dictionary = (
+            RationManager.user_defined_rations[self.animal_combination] if is_ration_defined_by_user else None
+        )
+        tolerance = RationManager.tolerance if is_ration_defined_by_user else None
+
+        nutrient_standard = next(iter(self.animals_in_pen.values())).nutrient_standard
+        pen_average_enteric_methane, pen_average_urine_nitrogen = (
+            self._pen_nasem_averages() if nutrient_standard is NutrientStandard.NASEM else (None, None)
+        )
 
         return self.ration_optimizer.attempt_optimization(
             nutrient_standard=nutrient_standard,
@@ -1298,6 +1291,13 @@ class Pen:
             user_defined_ration_dictionary=user_defined_ration_dictionary,
             user_defined_ration_tolerance=tolerance,
         )
+
+    def _pen_nasem_averages(self) -> tuple[float, float]:
+        """Returns the pen-average enteric methane emission and urine nitrogen excretion (NASEM standard)."""
+        animals = list(self.animals_in_pen.values())
+        avg_enteric_methane = sum(a.digestive_system.enteric_methane_emission for a in animals) / len(animals)
+        avg_urine_nitrogen = sum(a.digestive_system.manure_excretion.urine_nitrogen for a in animals) / len(animals)
+        return avg_enteric_methane, avg_urine_nitrogen
 
     def _apply_successful_solution(self, solution: OptimizeResult | None, pen_feeds: list[Feed]) -> None:
         """Applies the optimizer solution to the pen."""
