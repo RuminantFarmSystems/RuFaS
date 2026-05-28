@@ -73,7 +73,6 @@ def test_process_manure(
     daily_spread_instance.process_manure(mock_conditions, mock_time)
 
     mock_report.assert_any_call(received_manure, "received", 50)
-    mock_report.assert_any_call(available_stream, "available_for_application", 50)
     mock_process.assert_called_once_with(mock_conditions, mock_time)
     assert daily_spread_instance.available_for_field_application == available_stream
 

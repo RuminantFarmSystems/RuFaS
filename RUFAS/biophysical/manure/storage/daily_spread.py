@@ -55,9 +55,6 @@ class DailySpread(Storage):
         self._report_manure_stream(self._received_manure, "received", time.simulation_day)
         output_streams = super().process_manure(current_day_conditions, time)
         self.available_for_field_application = output_streams.get("manure", ManureStream.make_empty_manure_stream())
-        self._report_manure_stream(
-            self.available_for_field_application, "available_for_application", time.simulation_day
-        )
         return {}
 
     def set_available_for_field_application(self, stream: ManureStream) -> None:
