@@ -3016,24 +3016,6 @@
         "minimum": 0.0,
         "default": 0.0
       },
-      "max_nitrogen": {
-        "type": "number",
-        "description": "Cap on nitrogen this field can receive per day from daily spread manure. Units: kg.",
-        "minimum": 0.0,
-        "default": 0.0
-      },
-      "max_phosphorus": {
-        "type": "number",
-        "description": "Cap on phosphorus this field can receive per day from daily spread manure. Units: kg.",
-        "minimum": 0.0,
-        "default": 0.0
-      },
-      "max_potassium": {
-        "type": "number",
-        "description": "Cap on potassium this field can receive per day from daily spread manure. Units: kg.",
-        "minimum": 0.0,
-        "default": 0.0
-      },
       "coverage_fraction": {
         "type": "number",
         "description": "Fraction of field area covered by each daily spread manure application.",

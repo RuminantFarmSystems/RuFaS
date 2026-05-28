@@ -1107,12 +1107,10 @@ class Field:
         )
         nitrogen_spread_amount = self.daily_spread_settings.get("nitrogen_spread_amount", 0.0)
         phosphorus_spread_amount = self.daily_spread_settings.get("phosphorus_spread_amount", 0.0)
-        nitrogen_cap = self.daily_spread_settings.get("max_nitrogen", nitrogen_spread_amount)
-        phosphorus_cap = self.daily_spread_settings.get("max_phosphorus", phosphorus_spread_amount)
         spread_all_available_manure = bool(self.daily_spread_settings.get("spread_all_available_manure", False))
         return ManureEvent(
-            nitrogen_mass=min(nitrogen_spread_amount, nitrogen_cap),
-            phosphorus_mass=min(phosphorus_spread_amount, phosphorus_cap),
+            nitrogen_mass=nitrogen_spread_amount,
+            phosphorus_mass=phosphorus_spread_amount,
             manure_type=manure_type,
             manure_supplement_method=manure_supplement_method,
             field_coverage=self.daily_spread_settings.get("coverage_fraction", 1.0),

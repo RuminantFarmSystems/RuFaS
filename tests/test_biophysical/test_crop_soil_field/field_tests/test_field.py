@@ -383,8 +383,8 @@ def test_check_manure_application_schedule_integration() -> None:
     assert manure_requests[0].nutrient_request.manure_type == ManureType.LIQUID
 
 
-def test_create_daily_spread_event_uses_spread_amounts_and_caps() -> None:
-    """Daily spread event should request spread amounts while honoring max caps."""
+def test_create_daily_spread_event_uses_spread_amounts() -> None:
+    """Daily spread event should request the configured spread amounts."""
     field = Field(
         daily_spread_settings={
             "is_daily_spreading": True,
@@ -393,9 +393,6 @@ def test_create_daily_spread_event_uses_spread_amounts_and_caps() -> None:
             "nitrogen_spread_amount": 12.0,
             "phosphorus_spread_amount": 4.0,
             "potassium_spread_amount": 2.0,
-            "max_nitrogen": 10.0,
-            "max_phosphorus": 5.0,
-            "max_potassium": 3.0,
             "coverage_fraction": 1.0,
             "application_depth": 0.0,
             "surface_remainder_fraction": 1.0,
@@ -408,7 +405,7 @@ def test_create_daily_spread_event_uses_spread_amounts_and_caps() -> None:
     event = field._create_daily_spread_event(mocked_time)
 
     assert event is not None
-    assert event.nitrogen_mass == 10.0
+    assert event.nitrogen_mass == 12.0
     assert event.phosphorus_mass == 4.0
     assert event.manure_type == ManureType.SOLID
     assert event.is_daily_spread is True
@@ -426,8 +423,6 @@ def test_create_daily_spread_event_propagates_spread_all_flag() -> None:
             "supplement_manure_nutrient_deficiencies": "none",
             "nitrogen_spread_amount": 0.0,
             "phosphorus_spread_amount": 0.0,
-            "max_nitrogen": 0.0,
-            "max_phosphorus": 0.0,
             "coverage_fraction": 0.75,
             "application_depth": 5.0,
             "surface_remainder_fraction": 0.5,
@@ -485,9 +480,6 @@ def test_check_manure_application_schedule_daily_spread_request_uses_amounts() -
             "nitrogen_spread_amount": 6.0,
             "phosphorus_spread_amount": 3.0,
             "potassium_spread_amount": 1.0,
-            "max_nitrogen": 8.0,
-            "max_phosphorus": 2.0,
-            "max_potassium": 2.0,
             "coverage_fraction": 1.0,
             "application_depth": 0.0,
             "surface_remainder_fraction": 1.0,
@@ -506,9 +498,9 @@ def test_check_manure_application_schedule_daily_spread_request_uses_amounts() -
     assert request.field_name == "field_daily"
     assert request.event.is_daily_spread is True
     assert request.event.nitrogen_mass == 6.0
-    assert request.event.phosphorus_mass == 2.0
+    assert request.event.phosphorus_mass == 3.0
     assert request.nutrient_request.nitrogen == 6.0
-    assert request.nutrient_request.phosphorus == 2.0
+    assert request.nutrient_request.phosphorus == 3.0
     assert request.nutrient_request.use_daily_spread_source is True
 
 

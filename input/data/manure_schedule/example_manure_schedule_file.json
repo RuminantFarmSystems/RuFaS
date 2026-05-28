@@ -20,10 +20,6 @@
     "phosphorus_spread_amount": 2.5,
     "potassium_spread_amount": 3.0,
 
-    "max_nitrogen": 8.0,
-    "max_phosphorus": 2.5,
-    "max_potassium": 3.0,
-
     "coverage_fraction": 1.0,
     "application_depth": 0.0,
     "surface_remainder_fraction": 1.0,
