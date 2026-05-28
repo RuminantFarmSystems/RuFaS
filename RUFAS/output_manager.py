@@ -1371,11 +1371,12 @@ class OutputManager(object):
         Returns
         -------
         tuple[list[dict[str, str|int]], str | None]
-            A tuple of:
-            - A list of dictionaries, each containing the loaded filter content, with keys and values depending on the
-            file type.
-            - A string representing the output CSV direction, either "portrait" or "landscape". If no direction is
-            specified, None is returned.
+            1. list[dict[str, str|int]]
+                A list of dictionaries, each containing the loaded filter content, with keys and values depending on the
+                file type.
+            2. str | None
+                A string representing the output CSV direction, either "portrait" or "landscape". If no direction is
+                specified, ``None`` is returned.
 
         Raises
         ------
@@ -2375,7 +2376,12 @@ class OutputManager(object):
         Returns
         -------
         tuple[int, int, int]
-            The total number of errors, warnings, and logs in the ``OutputManager``'s errors, warnings, and logs pools.
+            1. int
+                Total number of errors in the ``OutputManager``'s errors pool.
+            2. int
+                Total number of warnings in the ``OutputManager``'s warnings pool.
+            3. int
+                Total number of logs in the ``OutputManager``'s logs pool.
         """
 
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])

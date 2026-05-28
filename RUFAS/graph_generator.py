@@ -328,7 +328,10 @@ class GraphGenerator:
         Returns
         -------
         tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]
-            The updated data with units added and logs if ``info_maps`` aren't found to get units.
+            1. dict[str, dict[str, list[Any]]]
+                The updated data with units added.
+            2. list[dict[str, str | dict[str, str]]]
+                Logs if ``info_maps`` aren't found to get units.
         """
         updated_data = {}
         info_map = {
@@ -595,8 +598,10 @@ class GraphGenerator:
         Returns
         -------
         tuple[NDArray[Any], NDArray[np.float32]]
-            list of ``NumPy`` arrays, the first containing the indices of the masked data and the second containing the
-            actual masked data.
+            1. ``NDArray[Any]``
+                The indices of the masked data.
+            2. ``NDArray[np.float32]``
+                The actual masked data.
         """
         np_values = np.array(values)
         mask = ~np.isnan(np_values)
