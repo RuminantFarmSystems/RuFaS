@@ -2226,9 +2226,7 @@ def test_run_formulation_attempts_retries_with_increased_dmi(mocker: MockerFixtu
     mock_lac.assert_not_called()
 
 
-def test_run_formulation_attempts_breaks_when_lactation_handler_returns_true(
-    mocker: MockerFixture, pen: Pen
-) -> None:
+def test_run_formulation_attempts_breaks_when_lactation_handler_returns_true(mocker: MockerFixture, pen: Pen) -> None:
     """When DMI retry returns None and lactation handler returns True, the loop returns the failing solution."""
     pen.animal_combination = AnimalCombination.LAC_COW
     failing = _mock_solution(False)
