@@ -27,9 +27,10 @@ class UserConstants:
         General temperature lower bound (°C).
     GENERAL_UPPER_BOUND_TEMPERATURE : float
         General temperature upper bound (°C).
+    SPECIFIC_FUEL_CONSUMPTION : float
+        The specific fuel consumption of a single unit of fuel (L/kWh).
     CONSTANTS_TO_UNITS : dict[str, MeasurementUnits]
         A dictionary mapping constant names to their respective measurement units.
-
     """
 
     # Density-related
