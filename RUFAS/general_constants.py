@@ -57,7 +57,7 @@ class GeneralConstants:
     MJ_CH4_TO_G_CH4 : float
         Conversion factor from megajoules of methane to grams of methane (g CH₄/MJ CH₄).
     EARTH_ANGULAR_VELOCITY : float
-        Earth's angular velocity (rad/s).
+        Earth's angular velocity (rad/h).
     CELSIUS_TO_KELVIN : float
         Conversion factor from Celsius to Kelvin (K/°C).
     PERCENTAGE_TO_FRACTION : float
@@ -86,9 +86,8 @@ class GeneralConstants:
         The ideal gas constant (J/(K·mol)).
     IDEAL_GAS_LAW_R : float
         Value of R in the ideal gas law (L·atm/(mol·K)).
-    CONSTANTS_TO_UNITS : dict
+    CONSTANTS_TO_UNITS : dict[str, MeasurementUnits]
         A dictionary mapping constant names to their associated units.
-
     """
 
     # Memory related
@@ -125,7 +124,7 @@ class GeneralConstants:
     HOURS_PER_DAY = 24
 
     # Biochemistry-related
-    KCAL_TO_MJ = 4.184
+    KCAL_TO_MJ = 0.004184
     MJ_CH4_TO_G_CH4 = 0.05565
 
     # Earth related data
@@ -178,7 +177,7 @@ class GeneralConstants:
         "LEAP_YEAR_LENGTH": MeasurementUnits.DAYS_PER_LEAP_YEAR,
         "SECONDS_PER_DAY": MeasurementUnits.SECONDS_PER_DAY,
         "HOURS_PER_DAY": MeasurementUnits.HOURS_PER_DAY,
-        "KCAL_TO_MJ": MeasurementUnits.MCAL_PER_MJ,
+        "KCAL_TO_MJ": MeasurementUnits.MJ_PER_KCAL,
         "MJ_CH4_TO_G_CH4": MeasurementUnits.MJ_CH4_PER_G_CH4,
         "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
         "CELSIUS_TO_KELVIN": MeasurementUnits.DEGREES_CELSIUS,
