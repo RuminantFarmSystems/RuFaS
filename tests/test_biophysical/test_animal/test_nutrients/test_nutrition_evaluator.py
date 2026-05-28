@@ -1,6 +1,6 @@
 from dataclasses import asdict
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf as lazy_fixture
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements

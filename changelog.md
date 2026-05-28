@@ -84,9 +84,11 @@ v1.0.0
 - [3000](https://github.com/RuminantFarmSystems/RuFaS/pull/3000) - [minor change] [NoInputChange] [NoOutputChange] Updated the error messages for all biophysical modules.
 - [2715](https://github.com/RuminantFarmSystems/RuFaS/pull/2715) - [minor change] [Animal] [NoInputChange] [OutputChange] Renames the 305-day milk yield output from `milk_production_305days_herd_mean` to `milk_305_day_yield_herd_mean`, splits the calculation into a pure Wood's-curve integral and a per-cow simulation estimate, and adds L1/L2/L3+ herd-level reporting.
 - [3022](https://github.com/RuminantFarmSystems/RuFaS/pull/3022) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Adds missing changelog entry for #2715 and fixes the one mypy error it introduced by typing the `history` parameter of `_make_milk_production` in `test_milk_production.py`.
+- [3027](https://github.com/RuminantFarmSystems/RuFaS/pull/3027) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Moves daily animal update earlier in day to align feed reporting across `HerdManager` and `FeedManager` modules.
 - [3026](https://github.com/RuminantFarmSystems/RuFaS/pull/3026) - [minor change] [E2ETesting] [NoInputChange] [NoOutputChange] Fixes E2E test results comparison tolerence.
 - [2999](https://github.com/RuminantFarmSystems/RuFaS/pull/2999) - [minor change] [Cross Validation] [Feed Storage] [NoInputChange] [NoOutputChange] Added cross validation rules for feed storage inputs.
 - [3024](https://github.com/RuminantFarmSystems/RuFaS/pull/3024) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Adds path to input to error/warning messages in `DataValidator` for easier invalid input fixing.
+- [3033](https://github.com/RuminantFarmSystems/RuFaS/pull/3033) - [minor change] [Tests] [pyproject.toml] [NoInputChange] [NoOutputChange] Bumps `pytest` from `==7.4.4` to `>=9.0.3`, swaps the unmaintained `pytest-lazy-fixture` for the maintained `pytest-lazy-fixtures` fork.
 
 ### v1.0.0
 

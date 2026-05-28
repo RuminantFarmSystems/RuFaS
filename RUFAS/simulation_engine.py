@@ -549,6 +549,12 @@ class SimulationEngine:
               from the daily routines. If animals are not being simulated, this will be None.
             - A dictionary mapping feed types to the amount of purchased feed fed to the herd.
         """
+        all_manure_data = self.herd_manager.execute_daily_routines(
+            self.available_feeds,
+            self.time,
+            self.weather,
+        )
+
         requested_feed: RequestedFeed = self.herd_manager.collect_daily_feed_request()
         if self.simulate_feed:
             is_ok_to_feed_animals, daily_feeds_fed = self.feed_manager.manage_daily_feed_request(
@@ -565,12 +571,6 @@ class SimulationEngine:
             info_map = {"class": self.__class__.__name__, "function": self._execute_daily_animal_operations.__name__}
             self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
-
-        all_manure_data = self.herd_manager.execute_daily_routines(
-            self.available_feeds,
-            self.time,
-            self.weather,
-        )
 
         return all_manure_data, daily_purchased_feeds_fed
 
