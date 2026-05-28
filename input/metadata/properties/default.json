@@ -2985,6 +2985,88 @@
         "pattern": "^(manure|synthetic fertilizer|none|synthetic fertilizer and manure)$"
       }
     },
+    "daily_spread": {
+      "type": "object",
+      "description": "Configuration for daily spread manure application sourced from DailySpread processors.",
+      "is_daily_spreading": {
+        "type": "bool",
+        "description": "Whether this field uses daily spread manure applications.",
+        "default": false
+      },
+      "spread_all_available_manure": {
+        "type": "bool",
+        "description": "If true, spread all manure available in DailySpread processors that day, ignoring nutrient targets, caps, manure type, and supplemental manure settings.",
+        "default": false
+      },
+      "nitrogen_spread_amount": {
+        "type": "number",
+        "description": "Target nitrogen amount for this field's daily spread request. Units: kg.",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "phosphorus_spread_amount": {
+        "type": "number",
+        "description": "Target phosphorus amount for this field's daily spread request. Units: kg.",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "potassium_spread_amount": {
+        "type": "number",
+        "description": "Target potassium amount for this field's daily spread request. Units: kg.",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "max_nitrogen": {
+        "type": "number",
+        "description": "Cap on nitrogen this field can receive per day from daily spread manure. Units: kg.",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "max_phosphorus": {
+        "type": "number",
+        "description": "Cap on phosphorus this field can receive per day from daily spread manure. Units: kg.",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "max_potassium": {
+        "type": "number",
+        "description": "Cap on potassium this field can receive per day from daily spread manure. Units: kg.",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "coverage_fraction": {
+        "type": "number",
+        "description": "Fraction of field area covered by each daily spread manure application.",
+        "minimum": 0.01,
+        "maximum": 1.0,
+        "default": 1.0
+      },
+      "application_depth": {
+        "type": "number",
+        "description": "Depth of daily spread manure application. Units: mm.",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "surface_remainder_fraction": {
+        "type": "number",
+        "description": "Fraction of daily spread manure remaining on soil surface.",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 1.0
+      },
+      "manure_type": {
+        "type": "string",
+        "description": "Type of manure requested for daily spread applications.",
+        "pattern": "^(liquid|solid)$",
+        "default": "solid"
+      },
+      "supplement_manure_nutrient_deficiencies": {
+        "type": "string",
+        "description": "Whether daily spread nutrient shortfalls can be supplemented.",
+        "pattern": "^(manure|synthetic fertilizer|none|synthetic fertilizer and manure)$",
+        "default": "none"
+      }
+    },
     "pattern_repeat": {
       "type": "number",
       "description": "Number of times that this manure application schedule should be repeated.",
