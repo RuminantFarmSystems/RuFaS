@@ -17,7 +17,7 @@ class UserConstants:
     NITROGEN_TO_PROTEIN : float
         Conversion factor from nitrogen to protein (unitless).
     MILK_FAT_WEIGHT : float
-        Average weight of milk fat (unitless).
+        Average weight of milk fat (kg).
     FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL : float
         Fraction of humic nitrogen in an active pool (unitless).
         Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:1.1.4.
@@ -56,7 +56,7 @@ class UserConstants:
         "WATER_DENSITY_KG_PER_M3": MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,
         "PROTEIN_TO_NITROGEN": MeasurementUnits.UNITLESS,
         "NITROGEN_TO_PROTEIN": MeasurementUnits.UNITLESS,
-        "MILK_FAT_WEIGHT": MeasurementUnits.UNITLESS,
+        "MILK_FAT_WEIGHT": MeasurementUnits.KILOGRAMS,
         "FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL": MeasurementUnits.UNITLESS,
         "METHANE_FACTOR": MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,
         "GENERAL_LOWER_BOUND_TEMPERATURE": MeasurementUnits.DEGREES_CELSIUS,
