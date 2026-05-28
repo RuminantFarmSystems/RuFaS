@@ -620,6 +620,18 @@ class HerdManager:
 
         return herd_manager_output, animal_manure_excretions_by_pen, enteric_methane_emission_by_pen
 
+    def _collect_heifer_average_daily_weight_gain(self) -> tuple[dict[str, float], dict[AnimalCombination, float]]:
+        """Collect heifer average daily weight gain from all pens and animal combinations."""
+        heifer_average_daily_weight_gain_by_pen: dict[str, float] = {}
+        for pen in self.all_pens:
+            heifers_in_pen = [heifer for heifer in pen.animals_in_pen.values() if heifer.animal_type.is_heifer]
+            if len(heifers_in_pen) > 0:
+                average_daily_weight_gain = sum([heifer.growth.daily_growth for heifer in heifers_in_pen]) / len(
+                    heifers_in_pen
+                )
+                heifer_average_daily_weight_gain_by_pen[str(pen.id)] = average_daily_weight_gain
+        return heifer_average_daily_weight_gain_by_pen, {}
+
     def _warn_when_lactating_cows_have_no_milk(self, time: RufasTime) -> None:
         """Warn when lactating cows have no milk production after the first day in milk."""
         no_milk_cow_num = len(
