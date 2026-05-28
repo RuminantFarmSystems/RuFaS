@@ -1,0 +1,8 @@
+{
+    "soil_specification": "no_soil",
+    "crop_specification": "no_crop",
+    "fertilizer_management_specification": "no_fertilizer",
+    "manure_management_specification": "no_manure",
+    "tillage_management_specification": "no_tillage",
+    "field_size": 0.0
+}

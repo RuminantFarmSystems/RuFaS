@@ -477,7 +477,8 @@ class InputManager:
             )
             return False
         try:
-            input_data = data_loader(Path(file_path_value))
+            file_path = Path(file_path_value)
+            input_data = data_loader(file_path)
         except Exception as exc:
             self.om.add_error(
                 "Runtime metadata load failure",
@@ -492,6 +493,7 @@ class InputManager:
                 data=input_data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
+                input_path=file_path,
             )
         except (TypeError, ValueError, PermissionError) as exc:
             self.om.add_error(
@@ -847,6 +849,7 @@ class InputManager:
                     elements_counter=self.elements_counter,
                     called_during_initialization=True,
                     fixable_data_types=FIXABLE_INPUT_DATA_TYPES,
+                    input_path=file_path,
                 )
 
                 valid_data = valid_data and is_element_acceptable
@@ -1384,6 +1387,7 @@ class InputManager:
         input_data: dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
+        input_path: Path,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1406,6 +1410,8 @@ class InputManager:
             The key in the metadata properties against which the data is validated.
         eager_termination : bool
             Flag indicating whether the function should return early in case of invalid data.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -1433,7 +1439,7 @@ class InputManager:
             return modifiable
 
         validated_data = self._validate_data(
-            data, metadata_properties, eager_termination, properties_blob_key, elements_counter
+            data, metadata_properties, eager_termination, properties_blob_key, elements_counter, input_path
         )
 
         if validated_data:
@@ -1443,14 +1449,14 @@ class InputManager:
         if elements_counter.invalid_elements > 0:
             self.om.add_error(
                 "Invalid variable",
-                f"Variable {variable_name} has invalid components. Only successfully validated components are "
-                f"added to InputManager pool during runtime.",
+                f"Variable {variable_name} from '{input_path}' has invalid components. "
+                "Only successfully validated components are added to InputManager pool during runtime.",
                 info_map,
             )
             if eager_termination:
                 raise ValueError(
-                    f"Variable {variable_name} has invalid components. Only successfully validated components are added"
-                    f" to InputManager pool during runtime."
+                    f"Variable {variable_name} from '{input_path}' has invalid components. "
+                    "Only successfully validated components are added to InputManager pool during runtime."
                 )
             return False
 
@@ -1560,6 +1566,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
+        input_path: Path,
     ) -> dict[str, Any]:
         """
         Validate input data based on metadata properties.
@@ -1577,6 +1584,8 @@ class InputManager:
             The key in the metadata properties against which the data is validated.
         elements_counter : ElementsCounter
             An ElementsCounter object to keep track of status of variables.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -1598,6 +1607,7 @@ class InputManager:
                 elements_counter=elements_counter,
                 called_during_initialization=False,
                 fixable_data_types=FIXABLE_INPUT_DATA_TYPES,
+                input_path=input_path,
             )
 
             if is_element_acceptable:
@@ -1635,6 +1645,7 @@ class InputManager:
         data: dict[str, Any],
         properties_blob_key: str,
         eager_termination: bool,
+        input_path: Path,
     ) -> bool:
         """
         Adds a variable to the InputManager's pool after validating it against metadata.
@@ -1655,6 +1666,8 @@ class InputManager:
         eager_termination : bool
             If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
             If False, the function returns False.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -1674,7 +1687,7 @@ class InputManager:
         if not (isinstance(data, dict)):
             self.om.add_error(
                 "Incorrect variable type",
-                f"Variable {variable_name} has type {type(data)}, does not match "
+                f"Variable {variable_name} from '{input_path}' has type {type(data)}; does not match "
                 f"the expected type of `dict[str, Any]`.",
                 info_map,
             )
@@ -1692,6 +1705,7 @@ class InputManager:
                 input_data=data,
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
+                input_path=input_path,
             )
             return add_variable_success
         else:
