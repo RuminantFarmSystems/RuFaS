@@ -2,7 +2,8 @@ from RUFAS.units import MeasurementUnits
 
 
 class GeneralConstants:
-    """Contains general constants used in RuFaS.
+    """
+    Contains general constants used in RuFaS.
 
     Attributes
     ----------
@@ -52,8 +53,8 @@ class GeneralConstants:
         Number of seconds in a day (s/day).
     HOURS_PER_DAY : int
         Number of hours in a day (hr/day).
-    KCAL_TO_MJ : float
-        Conversion factor from kilocalories to megajoules (MJ/kcal).
+    MCAL_TO_MJ : float
+        Conversion factor from megacalories to megajoules (MJ/Mcal).
     MJ_CH4_TO_G_CH4 : float
         Conversion factor from megajoules of methane to grams of methane (g CH₄/MJ CH₄).
     EARTH_ANGULAR_VELOCITY : float
@@ -124,7 +125,7 @@ class GeneralConstants:
     HOURS_PER_DAY = 24
 
     # Biochemistry-related
-    KCAL_TO_MJ = 0.004184
+    MCAL_TO_MJ = 4.184
     MJ_CH4_TO_G_CH4 = 0.05565
 
     # Earth related data
@@ -177,7 +178,7 @@ class GeneralConstants:
         "LEAP_YEAR_LENGTH": MeasurementUnits.DAYS_PER_LEAP_YEAR,
         "SECONDS_PER_DAY": MeasurementUnits.SECONDS_PER_DAY,
         "HOURS_PER_DAY": MeasurementUnits.HOURS_PER_DAY,
-        "KCAL_TO_MJ": MeasurementUnits.MJ_PER_KCAL,
+        "MCAL_TO_MJ": MeasurementUnits.MJ_PER_MCAL,
         "MJ_CH4_TO_G_CH4": MeasurementUnits.MJ_CH4_PER_G_CH4,
         "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
         "CELSIUS_TO_KELVIN": MeasurementUnits.DEGREES_CELSIUS,
