@@ -859,36 +859,51 @@ def test_execute_daily_animal_operations(
         return_value=all_manure_data,
     )
 
+    call_tracker = MagicMock()
+    call_tracker.attach_mock(mock_daily_routines, "execute_daily_routines")
+    call_tracker.attach_mock(mock_collect_daily_feed_request, "collect_daily_feed_request")
+    call_tracker.attach_mock(mock_manage_daily_feed_request, "manage_daily_feed_request")
+    call_tracker.attach_mock(simulation_engine.om.add_warning, "add_warning")
+    call_tracker.attach_mock(mock_formulate_ration, "formulate_ration")
+
     # Act
     result_manure_data, result_purchased_feeds = simulation_engine._execute_daily_animal_operations()
 
     # Assert
-    mock_collect_daily_feed_request.assert_called_once_with()
-    mock_manage_daily_feed_request.assert_called_once_with(requested_feed, simulation_engine.time)
+    expected_calls = [
+        call.execute_daily_routines(
+            available_feeds,
+            simulation_engine.time,
+            simulation_engine.weather,
+        ),
+        call.collect_daily_feed_request(),
+        call.manage_daily_feed_request(
+            requested_feed,
+            simulation_engine.time,
+        ),
+    ]
 
     if expect_warning:
-        simulation_engine.om.add_warning.assert_called_once_with(
-            "Value: not enough feed for the herd",
-            "Reformulating ration for all pens",
-            {
-                "class": "SimulationEngine",
-                "function": "_execute_daily_animal_operations",
-            },
+        expected_calls.extend(
+            [
+                call.add_warning(
+                    "Value: not enough feed for the herd",
+                    "Reformulating ration for all pens",
+                    {
+                        "class": "SimulationEngine",
+                        "function": "_execute_daily_animal_operations",
+                    },
+                ),
+                call.formulate_ration(),
+            ]
         )
-    else:
-        simulation_engine.om.add_warning.assert_not_called()
 
     if expect_formulate_ration:
         mock_formulate_ration.assert_called_once_with()
     else:
         mock_formulate_ration.assert_not_called()
 
-    mock_daily_routines.assert_called_once_with(
-        available_feeds,
-        simulation_engine.time,
-        simulation_engine.weather,
-    )
-
+    assert call_tracker.mock_calls == expected_calls
     assert result_manure_data == all_manure_data
     assert result_purchased_feeds == expected_purchased_feeds
 
