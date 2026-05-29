@@ -10,11 +10,11 @@ INITIAL_LOSS_PERIOD = 30
 
 class Baleage(Storage):
     """
-    Class representing Baleage storage, a subclass of Storage.
+    Represents Baleage storage, a subclass of ``Storage``.
 
     Parameters
     ----------
-    config : dict[str, str | float]
+    config : dict[str, str | float | list[str]]
         Configuration dictionary for the baleage storage.
 
     Attributes
@@ -24,10 +24,6 @@ class Baleage(Storage):
     post_wilting_moisture_percentage : float
         The post-wilting moisture level that baleage will dry down to (unitless).
 
-    Methods
-    -------
-    calculate_protein_loss():
-        Calculates the protein loss specific to Baleage storage.
     """
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
@@ -42,7 +38,7 @@ class Baleage(Storage):
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the loss of moisture in baled crops, and calls the base class's implementation of
-        `process_degradations` to process the loss of dry matter.
+        ``process_degradations`` to process the loss of dry matter.
 
         Parameters
         ----------
@@ -65,7 +61,7 @@ class Baleage(Storage):
         Parameters
         ----------
         crops : list[HarvestedCrop]
-            List of HarvestedCrops to project degradations for.
+            List of ``HarvestedCrop`` objects to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
@@ -83,11 +79,5 @@ class Baleage(Storage):
         return super().project_degradations(moisture_loss_projected_crops, weather, time)
 
     def calculate_protein_loss(self) -> None:
-        """
-        Calculate the protein loss specific to Baleage storage.
-
-        Returns
-        -------
-        None
-        """
+        """Calculate the protein loss specific to Baleage storage."""
         pass
