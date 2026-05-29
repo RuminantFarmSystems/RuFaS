@@ -856,9 +856,7 @@ class ManureManager:
                 result_row_names.append(row_name)
         return result_row_names
 
-    def request_nutrients(
-        self, request: NutrientRequest, field_name: str, time: RufasTime
-    ) -> NutrientRequestResults:
+    def request_nutrients(self, request: NutrientRequest, field_name: str, time: RufasTime) -> NutrientRequestResults:
         """
         Handle the request for specific nutrients from the crop and soil module.
         This method evaluates the nutrient request made by considering both nitrogen and phosphorus
