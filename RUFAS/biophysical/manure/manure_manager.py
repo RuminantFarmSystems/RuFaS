@@ -890,10 +890,11 @@ class ManureManager:
         """
         if request.spread_all_available_manure:
             request_result = self._handle_spread_all_available_manure()
-            self._record_manure_request_results(request_result, "on_farm_manure", time)
+            self._record_manure_request_results(request_result, "on_farm_manure", "daily_spread", time)
             return request_result
 
         if request.use_daily_spread_source:
+            manure_source = "daily_spread"
             daily_spread_storages, _ = self._split_storages_by_daily_spread()
             request_result, is_nutrient_request_fulfilled = self._handle_nutrient_request_for_storages(
                 request=request, storages=daily_spread_storages
@@ -906,6 +907,7 @@ class ManureManager:
                     update_nutrient_manager_pool=False,
                 )
         else:
+            manure_source = "stored_manure"
             request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(
                 request
             )
@@ -915,7 +917,7 @@ class ManureManager:
                     request.manure_type,
                     include_daily_spread=False,
                 )
-        self._record_manure_request_results(request_result, "on_farm_manure", time)
+        self._record_manure_request_results(request_result, "on_farm_manure", manure_source, time)
 
         if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
             self._om.add_log(
@@ -925,7 +927,7 @@ class ManureManager:
             )
             amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
             supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
-            self._record_manure_request_results(supplemental_manure, "off_farm_manure", time)
+            self._record_manure_request_results(supplemental_manure, "off_farm_manure", "supplemental_manure", time)
             if request_result is None:
                 return supplemental_manure
             return request_result + supplemental_manure
@@ -1264,7 +1266,11 @@ class ManureManager:
             return min(limiting_nutrient_requested_mass / limited_nutrient_available, 1)
 
     def _record_manure_request_results(
-        self, manure_request_results: NutrientRequestResults | None, manure_source: str, time: RufasTime
+        self,
+        manure_request_results: NutrientRequestResults | None,
+        output_name: str,
+        manure_source: str,
+        time: RufasTime,
     ) -> None:
         """
         Record the results of a manure request in the Output Manager.
@@ -1273,8 +1279,12 @@ class ManureManager:
         ----------
         manure_request_results : NutrientRequestResults | None
             The results of a manure request. If None, it means that there was no available on-farm manure.
+        output_name : str
+            The name of the output variable group to record under (e.g. ``"on_farm_manure"`` or
+            ``"off_farm_manure"``).
         manure_source : str
-            The source of the manure.
+            Which source fulfilled this application: ``"stored_manure"`` (regular storage pool),
+            ``"daily_spread"`` (DailySpread processors), or ``"supplemental_manure"`` (off-farm manure).
         time : RufasTime
             The current time in the simulation.
 
@@ -1283,6 +1293,7 @@ class ManureManager:
             "class": ManureManager.__name__,
             "function": ManureManager._record_manure_request_results.__name__,
             "units": {
+                "manure_source": MeasurementUnits.UNITLESS,
                 "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
                 "dry_matter_fraction": MeasurementUnits.FRACTION,
                 "total_manure_mass": MeasurementUnits.KILOGRAMS,
@@ -1299,6 +1310,7 @@ class ManureManager:
         }
         if not manure_request_results:
             request_result_values = {
+                "manure_source": manure_source,
                 "dry_matter_mass": 0.0,
                 "dry_matter_fraction": 0.0,
                 "total_manure_mass": 0.0,
@@ -1317,6 +1329,7 @@ class ManureManager:
             )
         else:
             request_result_values = {
+                "manure_source": manure_source,
                 "dry_matter_mass": manure_request_results.dry_matter,
                 "dry_matter_fraction": manure_request_results.dry_matter_fraction,
                 "total_manure_mass": manure_request_results.total_manure_mass,
@@ -1330,7 +1343,7 @@ class ManureManager:
                 "request_julian_day": time.current_julian_day,
                 "request_calendar_year": time.current_calendar_year,
             }
-        self._om.add_variable(manure_source, request_result_values, info_maps)
+        self._om.add_variable(output_name, request_result_values, info_maps)
 
     @staticmethod
     def _calculate_supplemental_manure_needed(

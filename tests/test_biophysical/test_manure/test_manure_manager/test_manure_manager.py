@@ -1035,7 +1035,7 @@ def test_request_nutrients_spread_all_available_manure(mocker: MockerFixture) ->
     mock_pool.assert_called_once_with()
     mock_record.assert_called_once()
     args, _ = mock_record.call_args
-    assert args[0] is pooled and args[1] == "on_farm_manure"
+    assert args[0] is pooled and args[1] == "on_farm_manure" and args[2] == "daily_spread"
     mock_split.assert_not_called()
     mock_handle.assert_not_called()
     mock_remove.assert_not_called()
@@ -1153,8 +1153,8 @@ def test_request_nutrients_daily_spread_with_supplement(mocker: MockerFixture) -
         call(daily_result, ManureType.SOLID, include_daily_spread=True, update_nutrient_manager_pool=False),
     ]
     assert mock_record.call_count == 2
-    assert mock_record.call_args_list[0].args[1] == "on_farm_manure"
-    assert mock_record.call_args_list[1].args[1] == "off_farm_manure"
+    assert mock_record.call_args_list[0].args[1:3] == ("on_farm_manure", "daily_spread")
+    assert mock_record.call_args_list[1].args[1:3] == ("off_farm_manure", "supplemental_manure")
     mock_off_farm.assert_called_once_with("daily_shortfall")
 
 
@@ -1306,6 +1306,7 @@ def test_determine_limiting_nutrient_proportion_to_be_removed(
         (
             None,
             {
+                "manure_source": "stored_manure",
                 "dry_matter_mass": 0.0,
                 "dry_matter_fraction": 0.0,
                 "total_manure_mass": 0.0,
@@ -1336,6 +1337,7 @@ def test_determine_limiting_nutrient_proportion_to_be_removed(
                 phosphorus=10.0,
             ),
             {
+                "manure_source": "stored_manure",
                 "dry_matter_mass": 100.0,
                 "dry_matter_fraction": 0.25,
                 "total_manure_mass": 400.0,
@@ -1363,7 +1365,7 @@ def test_record_manure_request_results_parametrized(
     Parametrized unit test for the _record_manure_request_results method of the ManureManager class.
     """
     # Arrange
-    manure_source = "on_farm_manure"
+    output_name = "on_farm_manure"
     mock_time = mocker.MagicMock()
     mock_time.current_julian_day = 150
     mock_time.current_calendar_year = 2025
@@ -1375,7 +1377,7 @@ def test_record_manure_request_results_parametrized(
     manure_manager._om = mock_output_manager
 
     # Act
-    manure_manager._record_manure_request_results(manure_request_results, manure_source, mock_time)
+    manure_manager._record_manure_request_results(manure_request_results, output_name, "stored_manure", mock_time)
 
     # Assert
     if expected_log_called:
@@ -1386,6 +1388,7 @@ def test_record_manure_request_results_parametrized(
                 "class": "ManureManager",
                 "function": "_record_manure_request_results",
                 "units": {
+                    "manure_source": MeasurementUnits.UNITLESS,
                     "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
                     "dry_matter_fraction": MeasurementUnits.FRACTION,
                     "total_manure_mass": MeasurementUnits.KILOGRAMS,
@@ -1405,15 +1408,16 @@ def test_record_manure_request_results_parametrized(
         mock_output_manager.add_log.assert_not_called()
 
     mock_output_manager.add_variable.assert_called_once()
-    actual_manure_source, actual_request_result_values, actual_info_maps = mock_output_manager.add_variable.call_args[0]
+    actual_output_name, actual_request_result_values, actual_info_maps = mock_output_manager.add_variable.call_args[0]
 
-    assert actual_manure_source == manure_source
+    assert actual_output_name == output_name
     assert actual_request_result_values == expected_request_result_values
 
     expected_info_maps = {
         "class": "ManureManager",
         "function": "_record_manure_request_results",
         "units": {
+            "manure_source": MeasurementUnits.UNITLESS,
             "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
             "dry_matter_fraction": MeasurementUnits.FRACTION,
             "total_manure_mass": MeasurementUnits.KILOGRAMS,
