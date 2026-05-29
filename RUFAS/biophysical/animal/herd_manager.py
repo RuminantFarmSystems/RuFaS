@@ -636,9 +636,9 @@ class HerdManager:
             AnimalType.HEIFER_III: self.heiferIIIs,
         }
         for animal_type, heifers in heifers_by_animal_type.items():
-            self.herd_statistics.heifer_average_daily_gain_by_animal_type[animal_type] = sum(
-                [heifer.growth.daily_growth for heifer in heifers]
-            ) / len(heifers) if len(heifers) > 0 else None
+            self.herd_statistics.heifer_average_daily_gain_by_animal_type[animal_type] = (
+                sum([heifer.growth.daily_growth for heifer in heifers]) / len(heifers) if len(heifers) > 0 else None
+            )
 
     def _warn_when_lactating_cows_have_no_milk(self, time: RufasTime) -> None:
         """Warn when lactating cows have no milk production after the first day in milk."""

@@ -850,9 +850,21 @@ class AnimalModuleReporter:
                 heifer_adg,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
             )
-        om.add_variable("heiferI_average_daily_gain", herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I], dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}))
-        om.add_variable("heiferII_average_daily_gain", herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II], dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}))
-        om.add_variable("heiferIII_average_daily_gain", herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III], dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}))
+        om.add_variable(
+            "heiferI_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "heiferII_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "heiferIII_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
 
     @classmethod
     def report_daily_pen_total(
