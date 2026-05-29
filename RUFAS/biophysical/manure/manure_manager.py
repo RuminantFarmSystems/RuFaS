@@ -927,7 +927,7 @@ class ManureManager:
             )
             amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
             supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
-            self._record_manure_request_results(supplemental_manure, "off_farm_manure", "supplemental_manure", time)
+            self._record_manure_request_results(supplemental_manure, "on_farm_manure", "supplemental_manure", time)
             if request_result is None:
                 return supplemental_manure
             return request_result + supplemental_manure
@@ -1280,8 +1280,9 @@ class ManureManager:
         manure_request_results : NutrientRequestResults | None
             The results of a manure request. If None, it means that there was no available on-farm manure.
         output_name : str
-            The name of the output variable group to record under (e.g. ``"on_farm_manure"`` or
-            ``"off_farm_manure"``).
+            The name of the output variable group to record under (e.g. ``"on_farm_manure"``). All manure
+            applications are recorded under one group so that multiple applications on the same day appear as
+            separate records, each distinguished by ``manure_source``.
         manure_source : str
             Which source fulfilled this application: ``"stored_manure"`` (regular storage pool),
             ``"daily_spread"`` (DailySpread processors), or ``"supplemental_manure"`` (off-farm manure).

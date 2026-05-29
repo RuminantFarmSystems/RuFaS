@@ -1154,7 +1154,7 @@ def test_request_nutrients_daily_spread_with_supplement(mocker: MockerFixture) -
     ]
     assert mock_record.call_count == 2
     assert mock_record.call_args_list[0].args[1:3] == ("on_farm_manure", "daily_spread")
-    assert mock_record.call_args_list[1].args[1:3] == ("off_farm_manure", "supplemental_manure")
+    assert mock_record.call_args_list[1].args[1:3] == ("on_farm_manure", "supplemental_manure")
     mock_off_farm.assert_called_once_with("daily_shortfall")
 
 
