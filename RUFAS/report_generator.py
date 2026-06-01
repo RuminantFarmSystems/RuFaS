@@ -802,7 +802,7 @@ class ReportGenerator:
         key: str,
     ) -> tuple[float | None, dict[str, str | dict[str, str]]]:
         """
-        Wrapper function for ``ReportGenerator`` aggregators to catch ``Nones`` and ``NaNs``.
+        Wrapper function for ``ReportGenerator`` aggregators to catch ``None``s and ``NaN``s.
 
         Parameters
         ----------

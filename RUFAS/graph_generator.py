@@ -126,7 +126,6 @@ AXES_SETTERS: dict[str, FUNCTION_TYPE] = {
 class GraphGenerator:
     """
     GraphGenerator is used to generate graphs from the simulation results.
-    NOTE: This class is not multi-thread safe!!!
 
     Attributes
     ----------
@@ -134,6 +133,10 @@ class GraphGenerator:
         A string to prefix the metadata of the graph.
     time : RufasTime
         A ``RufasTime`` object used to track the simulation time
+
+    Notes
+    -----
+    This class is not multi-thread safe!!!
     """
 
     def __init__(self, metadata_prefix: str = "", time=None) -> None:
