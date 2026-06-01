@@ -18,6 +18,7 @@ from RUFAS.general_constants import GeneralConstants
 
 class Utility:
     """This class contains utility functions that are used throughout the project."""
+
     @staticmethod
     def convert_list_of_dicts_to_dict_of_lists(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]:
         """
@@ -443,6 +444,7 @@ class Utility:
             A closure function that already stores the denominator internally so the user only needs to pass in the
             numerator.
         """
+
         def calc(numerator: float) -> float:
             return numerator * 100 / denominator
 
@@ -1256,6 +1258,7 @@ class Utility:
 
 class Aggregator:
     """This class houses the aggregation functions used in the simulation."""
+
     @staticmethod
     def average(data: list[float]) -> float:
         """

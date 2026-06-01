@@ -29,6 +29,7 @@ class RufasTime:
     simulation_length_years : int
         The number of years in the simulation.
     """
+
     def __init__(self, start_date: datetime = None, end_date: datetime = None, current_date: datetime = None) -> None:
         """
         Initializes the ``RufasTime`` object.

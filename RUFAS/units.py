@@ -7,6 +7,7 @@ class MeasurementUnits(Enum):
     """
     An enumeration of acceptable units used within the RuFaS model.
     """
+
     ANIMALS = "animals"
     ARTIFICIAL_INSEMINATIONS = "AI"
     BYTES = "bytes"
