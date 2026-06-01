@@ -35,7 +35,7 @@ class EntericMethaneCalculator:
         if methane_model == "Pattanaik":
             methane_emission = (
                 0.013 * (body_weight**0.75) * GeneralConstants.MCAL_TO_MJ
-            ) / GeneralConstants.MJ_CH4_TO_G_CH4
+            ) / GeneralConstants.G_CH4_TO_MJ_CH4
             return methane_emission
         else:
             return 0.0
@@ -293,7 +293,7 @@ class EntericMethaneCalculator:
         methane_emission_MJ = mitscherlich_parameter_a - (mitscherlich_parameter_a + mitscherlich_parameter_b) * exp(
             -mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.MCAL_TO_MJ
         )
-        methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
+        methane_emission = methane_emission_MJ / GeneralConstants.G_CH4_TO_MJ_CH4
         return methane_emission
 
     @staticmethod
@@ -335,5 +335,5 @@ class EntericMethaneCalculator:
             + 0.198 * neutral_detergent_fiber_concentration
             + 0.160 * soluble_residue
         )
-        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / GeneralConstants.MJ_CH4_TO_G_CH4
+        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / GeneralConstants.G_CH4_TO_MJ_CH4
         return methane_emission

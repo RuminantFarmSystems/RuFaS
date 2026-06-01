@@ -80,7 +80,7 @@ class MeasurementUnits(Enum):
     MILLIMETERS = "mm"
     MILLIMETERS_PER_CENTIMETER = "mm/cm"
     MILLIMETERS_PER_HECTARE = "mm/ha"
-    MJ_CH4_PER_G_CH4 = "MJ/g"
+    MJ_CH4_PER_G_CH4 = "MJ/g CH4"
     ORDINAL_DAY = "ordinal day"
     PERCENT = "percent"
     PERCENT_OF_DRY_MATTER = "percent of DM"
