@@ -11,12 +11,12 @@ class PurchasedFeed:
     """
     Stores the identifier, available mass and storage date of a purchased feed.
 
-    Parameters
+    Attributes
     ----------
     rufas_id : RUFAS_ID
         RuFaS ID of the feed.
-    dry_matter_mass : RUFAS_ID
-        Dry matter mass of the feed still available.
+    dry_matter_mass : float
+        Dry matter mass of the feed still available (kg).
     storage_time : date
         Date on which this feed was purchased.
 
@@ -33,7 +33,20 @@ class PurchasedFeed:
 
 class PurchasedFeedStorage:
     """
-    Storage class which holds feeds which were purchased and are not stored alongside farm-grown feeds.
+    Holds feeds which were purchased and are not stored alongside farm-grown feeds.
+
+    Parameters
+    ----------
+    available_feeds : list[Feed]
+        The list of feeds available for storage and purchasing.
+
+    Attributes
+    ----------
+    available_feeds : list[Feed]
+        The list of feeds available for storage and purchasing.
+    stored : list[PurchasedFeed]
+        The currently stored purchased feeds.
+
     """
 
     def __init__(self, available_feeds: list[Feed]) -> None:
@@ -43,6 +56,15 @@ class PurchasedFeedStorage:
         self._om = OutputManager()
 
     def receive_feed(self, purchased_feed: PurchasedFeed) -> None:
+        """
+        Add a purchased feed to storage.
+
+        Parameters
+        ----------
+        purchased_feed : PurchasedFeed
+            The purchased feed to add to storage.
+
+        """
         self.stored.append(purchased_feed)
 
     def remove_empty_crops(self) -> None:
@@ -50,7 +72,17 @@ class PurchasedFeedStorage:
         self.stored = [feed for feed in self.stored if feed.dry_matter_mass >= 0.000_001]
 
     def report_stored_purchased_feeds(self, simulation_day: int, reporting_suffix: str) -> None:
-        """Reports dry matter of stored feeds."""
+        """
+        Reports dry matter of stored feeds.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current simulation day.
+        reporting_suffix : str
+            The suffix appended to the reported variable names.
+
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.report_stored_purchased_feeds.__name__,
@@ -64,7 +96,15 @@ class PurchasedFeedStorage:
             self._om.add_variable(f"stored_feed_{rufas_id}", mass, info_map)
 
     def create_consolidated_feed_report(self) -> dict[RUFAS_ID, float]:
-        """Creates report of all stored feeds consolidated by type."""
+        """
+        Create a report of all stored feeds consolidated by type.
+
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            A mapping from RuFaS feed ID to the total dry matter mass currently stored for that feed (kg).
+
+        """
         report = {}
         for feed in self.stored:
             if feed.rufas_id not in report:
