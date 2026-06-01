@@ -452,7 +452,10 @@ class HerdManager:
         ]
 
     def _update_sold_animal_statistics(
-        self, sold_newborn_calves: list[Animal], sold_heiferIIs: list[Animal], sold_and_died_cows: list[Animal]
+        self,
+        sold_newborn_calves: list[Animal],
+        sold_heiferIIs: list[Animal],
+        sold_and_died_cows: list[Animal],
     ) -> None:
         """Call the corresponding functions to update the statistics for sold animals"""
         self._update_sold_and_died_cow_statistics(sold_and_died_cows)

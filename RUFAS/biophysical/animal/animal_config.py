@@ -37,6 +37,11 @@ class AnimalConfig:
         Maximum day at which a heifer is culled if not pregnant, (simulation days).
     do_not_breed_time : int
         The duration after which breeding is stopped, (simulation days).
+    calf_mortality_rate : float
+        Cumulative probability that a live-born calf dies before weaning, (unitless, [0, 1]).
+    heifer_mortality_rate : float
+        Cumulative probability that a post-wean heifer dies before calving, with 2/3 of
+        deaths allocated to HeiferI and 1/3 to HeiferII, (unitless, [0, 1]).
     semen_type : str
         Types of semen used for reproduction, e.g., "conventional", (unitless).
     male_calf_rate_conventional_semen : float
@@ -191,6 +196,8 @@ class AnimalConfig:
     dry_off_day_of_pregnancy: int = 218
     heifer_reproduction_cull_day: int = 500
     do_not_breed_time: int = 185
+    calf_mortality_rate: float = 0.0
+    heifer_mortality_rate: float = 0.0
 
     semen_type: str = "conventional"
     male_calf_rate_conventional_semen: float = 0.53
@@ -393,6 +400,8 @@ class AnimalConfig:
         cls.dry_off_day_of_pregnancy = animal_config_data["management_decisions"]["days_in_preg_when_dry"]
         cls.heifer_reproduction_cull_day = animal_config_data["management_decisions"]["heifer_repro_cull_time"]
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
+        cls.calf_mortality_rate = animal_config_data["management_decisions"]["calf_mortality_rate"]
+        cls.heifer_mortality_rate = animal_config_data["management_decisions"]["heifer_mortality_rate"]
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
