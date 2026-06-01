@@ -1178,6 +1178,13 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
         return_value=mock_weather,
     )
 
+    mock_field_data = {"field_1": {"dummy": "field config"}}
+    mocker.patch.object(
+        SimulationEngine,
+        "_gather_field_data",
+        return_value=mock_field_data,
+    )
+
     mock_field_manager = MagicMock(autospec=FieldManager)
     mock_field_manager_init = mocker.patch(
         "RUFAS.simulation_engine.FieldManager",
@@ -1241,7 +1248,7 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
     mock_emissions_estimator_init.assert_called_once_with()
     assert simulation_engine.emissions_estimator == mock_emissions_estimator
 
-    mock_field_manager_init.assert_called_once_with()
+    mock_field_manager_init.assert_called_once_with(mock_field_data)
     assert simulation_engine.field_manager == mock_field_manager
 
     mock_nutrient_standard_init.assert_called_once_with(mock_config_nutrient_standard)
@@ -1411,3 +1418,62 @@ def test_run_simulation_main_loop(
 
     # Assert
     assert mock_annual_simulation.call_count == expected_iterations
+
+
+def test_gather_field_data_with_fields(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_field_data in simulation_engine.py when fields are present.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.FULL_FARM)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    field_names = ["field_1", "field_2"]
+    field_1_config = {"field_size": 10.0, "absolute_latitude": 42.5}
+    field_2_config = {"field_size": 20.0, "absolute_latitude": 43.0}
+
+    mock_input_manager.get_data_keys_by_properties.return_value = field_names
+    mock_input_manager.get_data.side_effect = [field_1_config, field_2_config]
+
+    # Act
+    result = simulation_engine._gather_field_data()
+
+    # Assert
+    assert result == {"field_1": field_1_config, "field_2": field_2_config}
+    mock_input_manager.get_data_keys_by_properties.assert_called_once_with("field_properties")
+    mock_input_manager.get_data.assert_any_call("field_1")
+    mock_input_manager.get_data.assert_any_call("field_2")
+    mock_output_manager.add_warning.assert_not_called()
+
+
+def test_gather_field_data_no_fields(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_field_data in simulation_engine.py when no fields are found.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.FULL_FARM)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    mock_input_manager.get_data_keys_by_properties.return_value = []
+
+    # Act
+    result = simulation_engine._gather_field_data()
+
+    # Assert
+    assert result == {}
+    mock_input_manager.get_data.assert_not_called()
+    mock_output_manager.add_warning.assert_called_once_with(
+        "No field input files.",
+        "No fields will be simulated.",
+        {"class": "SimulationEngine", "function": "_gather_field_data"},
+    )

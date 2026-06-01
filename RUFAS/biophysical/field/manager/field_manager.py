@@ -151,6 +151,8 @@ class FieldManager:
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
+        field_configuration_data : dict[str, Any]
+            The configuration data for the field, including soil, crop rotation, and other parameters.
         available_crop_configs : list[str]
             A list of the names of the available crop configurations.
 
@@ -158,7 +160,6 @@ class FieldManager:
         -------
         Field
             A ``Field`` instance configured with the specified input data
-
         """
         field_data = FieldManager._setup_field_data(field_name, field_configuration_data)
 
