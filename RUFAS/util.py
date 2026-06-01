@@ -7,7 +7,7 @@ from copy import deepcopy
 from datetime import timedelta
 from pathlib import Path
 from random import random
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Optional
 
 import numpy as np
 import pandas as pd
@@ -17,23 +17,25 @@ from RUFAS.general_constants import GeneralConstants
 
 
 class Utility:
+    """This class contains utility functions that are used throughout the project."""
+
     @staticmethod
-    def convert_list_of_dicts_to_dict_of_lists(list_of_dicts: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
+    def convert_list_of_dicts_to_dict_of_lists(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]:
         """
         Convert a list of dictionaries into a dictionary of lists.
 
         Parameters
         ----------
-        list_of_dicts : List[Dict[str, Any]]
+        list_of_dicts : list[dict[str, Any]]
             A list of dictionaries with string keys and integer values.
 
         Returns
         -------
-        Dict[str, List[Any]]
+        dict[str, list[Any]]
             A dictionary where keys are unique keys from input dictionaries,
             and values are lists of corresponding values from input dictionaries.
         """
-        result: Dict[str, List[Any]] = {}
+        result: dict[str, list[Any]] = {}
 
         for item in list_of_dicts:
             for key, value in item.items():
@@ -62,7 +64,7 @@ class Utility:
         return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
 
     @staticmethod
-    def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def flatten_keys_to_nested_structure(input_dict: dict[str, Any]) -> dict[str, Any]:
         """
         Convert a dictionary with flat, dot-separated keys into a nested structure composed of
         dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
@@ -70,21 +72,21 @@ class Utility:
 
         Parameters
         ----------
-        input_dict : Dict[str, Any]
+        input_dict : dict[str, Any]
             A dictionary where the keys are strings that may include dots to signify hierarchical
             levels in the resulting nested structure. Numeric key segments result in list creations,
             and non-numeric segments result in dictionary creations.
 
         Returns
         -------
-        Dict[str, Union[Dict, list]]
+        dict[str, Any]
             A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.
 
         """
-        nested_structure: Dict[str, Any] = {}
+        nested_structure: dict[str, Any] = {}
         for flat_key, value in input_dict.items():
             keys = flat_key.split(".")
-            current: Dict[str, Any] | List[Any] = nested_structure
+            current: dict[str, Any] | list[Any] = nested_structure
             for i, key in enumerate(keys[:-1]):
                 next_key_is_digit = keys[i + 1].isdigit() if i + 1 < len(keys) else False
 
@@ -119,14 +121,14 @@ class Utility:
         """
         Extracts unique group prefixes from flattened keys of the form:
 
-            <group_prefix>.<suffix>
+            ``<group_prefix>.<suffix>``
 
         For example:
-            Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass
-            Field._record_fertilizer_application.fertilizer_application.field='field_1'.year
+            ``Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass``
+            ``Field._record_fertilizer_application.fertilizer_application.field='field_1'.year``
 
         would yield the group prefix:
-            Field._record_fertilizer_application.fertilizer_application.field='field_1'
+            ``Field._record_fertilizer_application.fertilizer_application.field='field_1'``
 
         Parameters
         ----------
@@ -174,37 +176,40 @@ class Utility:
         ----------
         data_to_expand : dict[str, dict[str, list[Any]]]
             The data to be padded and expanded. The top level key is a variable name, and points to a dictionary that
-            contains the keys "values" and optionally "info_maps".
+            contains the keys ``values`` and optionally ``info_maps``.
         simulation_length : int
             Total number of simulation days.
         fill_value : Any, default numpy.nan
             Value used when a region is configured to use fill values.
         use_fill_value_before_start : bool, default True
-            If true, days before the first known datapoint are filled with `fill_value`. If false, they are filled with
-            the first known value.
+            If ``True``, days before the first known datapoint are filled with `fill_value`; otherwise, they are filled
+            with the first known value.
         use_fill_value_in_gaps : bool, default True
-            If true, days between known datapoints are filled with `fill_value`. If false, they are filled with the last
-            known value.
+            If ``True``, days between known datapoints are filled with `fill_value`; otherwise, they are filled with the
+            last known value.
         use_fill_value_at_end : bool, default True
-            If true, days after the last known datapoint are filled with `fill_value`. If false, they are filled
+            If ``True``, days after the last known datapoint are filled with `fill_value`; otherwise, they are filled
             with the last known value.
         expand_data_to_observed_range : bool, default False
-            If false, expands data from simulation day 1 through `simulation_length`. If true, expands only
+            If ``False``, expands data from simulation day 1 through ``simulation_length``. If ``True``, expands only
             from the first simulation day present in the dataset through the last simulation day present in the dataset.
 
         Returns
         -------
         tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]
-            A tuple of the expanded data and the logs generated from the expansion process.
+            1. dict[str, dict[str, list[Any]]]
+                The expanded data.
+            2. list[dict[str, str | dict[str, str]]]
+                The logs generated from the expansion process.
 
         Raises
         ------
         TypeError
-            If a variable has no info maps.
+            If a variable has no ``info_map``.
         ValueError
             If there is no data to be filled.
-            If the number of info maps does not match the number of values for a variable.
-            If a value for "simulation_day" is not present in every info map.
+            If the number of ``info_map`` does not match the number of values for a variable.
+            If a value for ``simulation_day`` is not present in every ``info_map``.
         """
         if not data_to_expand:
             raise ValueError("Data Expansion error: Cannot fill empty dataset.")
@@ -297,8 +302,8 @@ class Utility:
     @staticmethod
     def _gather_data_sim_days(data_to_expand: dict[str, dict[str, list[Any]]]) -> list[int]:
         """
-        Helper function for `expand_data_temporally()`.
-        Validates the data structure and gathers the simulations days from the accompanying info maps.
+        Helper function for ``expand_data_temporally()``.
+        Validates the data structure and gathers the simulation days from the accompanying info maps.
 
         Parameters
         ----------
@@ -308,16 +313,16 @@ class Utility:
         Returns
         -------
         list[int]
-            A list of simulation days from the info maps of the data_to_expand.
+            A list of simulation days from the info maps of the ``data_to_expand``.
 
         Raises
         ------
         TypeError
-            If info_maps are not present in the data_to_expand.
+            If ``info_map``s are not present in the ``data_to_expand``.
         ValueError
-            If the lists of info_maps and values are not the same length.
+            If the lists of ``info_map``s and values are different length.
         ValueError
-            If `simulation_day` has not been reported in every info_maps instance.
+            If ``simulation_day`` has not been reported in every ``info_map`` instance.
         """
         all_simulation_days = []
         for key, value in data_to_expand.items():
@@ -337,17 +342,21 @@ class Utility:
         return all_simulation_days
 
     @staticmethod
-    def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
+    def deep_merge(target: dict[Any, Any], updates: dict[Any, Any]) -> None:
         """
-        Recursively merges 'updates' into 'target'. Supports deep merging for dictionaries and lists, including lists
-        that contain dictionaries and dictionaries that contain lists.
+        Recursively merges ``updates`` into ``target``. Supports deep merging for dictionaries and lists, including
+        lists that contain dictionaries and dictionaries that contain lists.
 
         Parameters
         ----------
-        target : Dict[Any, Any]
+        target : dict[Any, Any]
             The primary dictionary to be updated.
-        updates : Dict[Any, Any]
+        updates : dict[Any, Any]
             The dictionary containing updates to be merged into target.
+
+        Notes
+        -----
+        This function modifies the ``target`` dictionary in-place.
         """
         for key, value in updates.items():
             if key in target:
@@ -371,21 +380,26 @@ class Utility:
                 target[key] = value
 
     @staticmethod
-    def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
+    def calc_average(num_values: int, cur_avg: float, new_value: float) -> tuple[int, float]:
         """
-        Calculate the new average given the number of values,
-        the current average, and the new value.
+        Calculates the new average given the number of values, the current average, and the new value.
 
         Parameters
         ----------
-        num_values: number of values for the current average
-        cur_avg: the current average value
-        new_value: the new value to be averaged
+        num_values : int
+            Number of values in the current average.
+        cur_avg : float
+            The current average value.
+        new_value : float
+            The new value to incorporate into the average.
 
         Returns
         -------
-        new_num_values: the new number of values for the new average
-        new_avg: the new average value calculated
+        tuple[int, float]
+            1. int
+                Updated number of values.
+            2. float
+                Updated average.
 
         """
         new_num_values = num_values + 1
@@ -394,43 +408,41 @@ class Utility:
         return new_num_values, new_avg
 
     @staticmethod
-    def remove_items_from_list_by_indices(data: List[Any], indices_to_remove: List[int]) -> None:
+    def remove_items_from_list_by_indices(data: list[Any], indices_to_remove: list[int]) -> None:
         """
         Remove items from a list given a list of indices.
         The operation is done in-place.
 
         Parameters
         ----------
-        data: List[Any] a list of items
-            The list to remove items from
-        indices_to_remove : List[Any]
-            The list that contains indices of the items to be removed
+        data : list[Any]
+            The list to remove items from.
+        indices_to_remove : list[int]
+            The list that contains indices of the items to be removed.
 
-        Returns
-        -------
-        None
-
+        Notes
+        -----
+        Indices are sorted in reverse before removal to prevent index shifting from
+        affecting later deletions.
         """
-
-        # Sort and reverse the index list before removing items to make sure items are removed from the end of the list
-        # to prevent the shifting of indices from affecting later removals.
         for idx in sorted(indices_to_remove, reverse=True):
             del data[idx]
 
     @staticmethod
     def percent_calculator(denominator: float) -> Callable[[float], float]:
         """
-        Return a percent calculator closure that already stores the value of the given denominator.
+        Returns a percent calculator closure that already stores the value of the given denominator.
 
         Parameters
         ----------
-        denominator: the denominator to
+        denominator : float
+            The denominator for the percentage calculation.
 
         Returns
         -------
-        A closure function that already stores the denominator internally
-        so the user only needs to pass in the numerator.
-
+        Callable[[float], float]
+            A closure function that already stores the denominator internally so the user only needs to pass in the
+            numerator.
         """
 
         def calc(numerator: float) -> float:
@@ -440,25 +452,27 @@ class Utility:
 
     @classmethod
     def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
-        """Converts the given object into a serializable object.
+        """
+        Converts the given object into a serializable object.
 
         Parameters
         ----------
-        obj
+        obj : object
             The object to be serialized.
         max_depth : int, optional
             The maximum depth of recursion.
 
         Returns
         -------
-        A serializable object.
-
+        object
+            A serializable object.
         """
         return cls._make_serializable(obj, depth=0, max_depth=max_depth)
 
     @classmethod
     def _make_serializable(cls, obj: object, depth: int, max_depth: int) -> object:
-        """Makes the given object serializable.
+        """
+        Makes the given object serializable.
 
         The object can be a primitive type, a list, a tuple, a set, a dictionary,
         or an instance of a custom class.
@@ -480,7 +494,6 @@ class Utility:
         -------
         object
             A serializable object.
-
         """
         # If the object is a primitive type, return it directly
         if isinstance(obj, (int, float, str, bool, type(None))):
@@ -522,7 +535,8 @@ class Utility:
 
     @classmethod
     def _get_str(cls, obj: object) -> str:
-        """Returns a string representation of the given object.
+        """
+        Returns a string representation of the given object.
 
         Parameters
         ----------
@@ -536,16 +550,15 @@ class Utility:
 
         Notes
         -----
-        If the object has a custom __str__ method, then that method will be used.
-        Otherwise, a variant of the default __str__ method will be used.
+        If the object has a custom ``__str__`` method, then that method will be used.
+        Otherwise, a variant of the default ``__str__`` method will be used.
 
-        Normally, the default __str__ method returns a string of the format:
-        `<module>.<class> object at <memory address>`.
+        Normally, the default ``__str__`` method returns a string of the format:
+        ``<module>.<class> object at <memory address>``.
         Here, we want to simplify that string to the format:
-        `<class> object at <memory address>`.
+        ``<class> object at <memory address>``.
 
         This turns out to be saving quite a bit of space when serializing objects.
-
         """
         if obj.__class__.__str__ != object.__str__:
             return str(obj)
@@ -555,20 +568,16 @@ class Utility:
         return f"{class_name} object at {memory_address}"
 
     @classmethod
-    def empty_dir(cls, dir_path: Path, keep: Optional[List[str]] = None) -> None:
-        """Empties the given directory, except for the files or subdirectories in the keep list.
+    def empty_dir(cls, dir_path: Path, keep: Optional[list[str]] = None) -> None:
+        """
+        Empties the given directory, except for the files or subdirectories in the keep list.
 
         Parameters
         ----------
         dir_path : Path
             The path to the directory to be emptied.
-        keep : List, optional
+        keep : list[str], optional
             A list of file or subdirectory names to be kept.
-
-        Returns
-        -------
-        None
-
         """
         if keep is None:
             keep = []
@@ -588,7 +597,7 @@ class Utility:
         Parameters
         ----------
         include_millis : bool
-            If True, adds milliseconds to the timestamp.
+            If ``True``, adds milliseconds to the timestamp.
 
         Returns
         -------
@@ -597,9 +606,16 @@ class Utility:
 
         Example
         --------
-        >>> Utility.get_timestamp(include_millis=True)
+        .. code-block:: python
+
+            Utility.get_timestamp(include_millis=True)
+
         28-Jun-2023_Wed_15-48-21.406585
-        >>> Utility.get_timestamp(include_millis=False)
+
+        .. code-block:: python
+
+            Utility.get_timestamp(include_millis=False)
+
         28-Jun-2023_Wed_15-48-21
         """
 
@@ -609,16 +625,16 @@ class Utility:
 
     @staticmethod
     def filter_dictionary(
-        dict_to_filter: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
-    ) -> Dict[Any, Any]:
+        dict_to_filter: dict[str, Any], filter_patterns: list[str], filter_by_exclusion: bool
+    ) -> dict[Any, Any]:
         """
         Returns a filtered dictionary based on either inclusion or exclusion.
 
         Parameters
         ----------
-        dict_to_filter : Dict[str, Any]
+        dict_to_filter : dict[str, Any]
             The dictionary to be filtered.
-        filter_patterns : List[str]
+        filter_patterns : list[str]
             A list of patterns by which to filter the dictionary.
         filter_by_exclusion : bool
             A flag indicating whether the dictionary should be filtered by exclusion
@@ -626,7 +642,7 @@ class Utility:
 
         Returns
         -------
-        Dict[str, Any]
+        dict[str, Any]
             The filtered dictionary.
         """
         if filter_by_exclusion:
@@ -643,11 +659,12 @@ class Utility:
 
     @staticmethod
     def remove_special_chars(input_string: str | list[str]) -> str:
-        """Function to remove special characters from a string.
+        """
+        Function to remove special characters from a string.
 
         Parameters
         ----------
-        input_string : str
+        input_string : str | list[str]
             The string from which the special characters should be removed.
 
         Returns
@@ -664,7 +681,7 @@ class Utility:
     @staticmethod
     def is_leap_year(year: int) -> bool:
         """
-        Helper method determines if the given year is a leap year
+        Determines if the given year is a leap year
 
         Parameters
         ----------
@@ -674,7 +691,7 @@ class Utility:
         Returns
         -------
         bool
-            True if the year is a leap year, otherwise False.
+            ``True`` if the year is a leap year, otherwise ``False``.
         """
         if year % 400 == 0:
             return True
@@ -703,23 +720,45 @@ class Utility:
         Raises
         ------
         ValueError
-            If the starting_offset is greater than the ending_offset.
+            If the ``starting_offset`` is greater than the ``ending_offset``.
 
         Examples
         --------
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
-        [datetime.date(2024, 6, 1)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
-        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
-        [datetime.date(2024, 5, 30)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
-        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
-        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
-        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
+        .. code-block:: python
 
+            Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
+
+        [datetime.date(2024, 6, 1)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
+
+        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
+
+        [datetime.date(2024, 5, 30)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
+
+        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
+
+        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
+
+        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
         """
         if starting_offset > ending_offset:
             raise ValueError(
@@ -733,12 +772,43 @@ class Utility:
 
     @staticmethod
     def convert_celsius_to_kelvin(temperature: float) -> float:
-        """Converts a temperature in degrees Celsius to degrees Kelvin."""
+        """
+        Converts a temperature from Celsius to Kelvin.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in degrees Celsius.
+
+        Returns
+        -------
+        float
+            Temperature in Kelvin.
+        """
         return temperature + GeneralConstants.CELSIUS_TO_KELVIN
 
     @staticmethod
     def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
-        """Generates a datetime.date based on a year and ordinal day."""
+        """
+        Converts a year and ordinal day to a ``datetime.date``.
+
+        Parameters
+        ----------
+        year : int
+            The year.
+        day : int
+            Ordinal day of the year.
+
+        Returns
+        -------
+        datetime.date
+            Date corresponding to the given year and ordinal day.
+
+        Raises
+        ------
+        ValueError
+            If ``day`` is outside the valid range for the given year.
+        """
         maximum_day = (
             GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
         )
@@ -751,7 +821,21 @@ class Utility:
 
     @staticmethod
     def generate_random_number(mean: float, std_dev: float) -> float:
-        """Generates a normally distributed random number using the provided mean and standard deviation."""
+        """
+        Generates a normally distributed random number.
+
+        Parameters
+        ----------
+        mean : float
+            Mean of the normal distribution.
+        std_dev : float
+            Standard deviation of the normal distribution.
+
+        Returns
+        -------
+        float
+            Random sample drawn from the specified normal distribution.
+        """
         return np.random.normal(mean, std_dev)
 
     @staticmethod
@@ -759,11 +843,7 @@ class Utility:
         mu_x: float, mu_y: float, sigma_x: float, sigma_y: float, rho: float
     ) -> tuple[float, float]:
         """
-        Generates multivariate random numbers based on provided parameters.
-
-        This method generates two correlated random numbers from a bivariate
-        normal distribution, using the specified means, standard deviations,
-        and correlation coefficient.
+        Generates two correlated random numbers from a bivariate normal distribution.
 
         Parameters
         ----------
@@ -781,8 +861,16 @@ class Utility:
         Returns
         -------
         tuple[float, float]
-            A tuple containing two correlated random numbers generated
-            from the bivariate normal distribution.
+            1. float
+                The first random number.
+            2. float
+                The second random number.
+
+        Raises
+        ------
+        ValueError
+            If either standard deviation is non-positive, or if ``rho`` is
+            outside the range ``[-1, 1]``.
         """
         if sigma_x <= 0 or sigma_y <= 0:
             raise ValueError("The standard deviations for a bivariate distribution must be positive.")
@@ -797,7 +885,24 @@ class Utility:
         input_dictionary: dict[str, Any], parent_key: str = "", separator: str = "."
     ) -> dict[str, Any]:
         """
-        Flatten a nested dictionary to a single level of depth by joining the keys with "."
+        Flattens a nested dictionary to a single level by joining keys with a separator.
+
+        List-of-dict values are flattened by index, with each index appended to
+        the key as ``_{i}``.
+
+        Parameters
+        ----------
+        input_dictionary : dict[str, Any]
+            Nested dictionary to flatten.
+        parent_key : str, optional
+            Prefix prepended to all keys. Defaults to ``""``.
+        separator : str, optional
+            String used to join nested keys. Defaults to ``"."``.
+
+        Returns
+        -------
+        dict[str, Any]
+            Flattened dictionary with all keys joined by the separator.
         """
         items: list[tuple[str, Any]] = []
         for key, value in input_dictionary.items():
@@ -816,7 +921,24 @@ class Utility:
         saved_csv_working_folder: Path, output_csv_path: Path, import_csv_path: Path | None
     ) -> None:
         """
-        Merge multiple saved input data CSVs files into one single CSV file for a direct side-by-side comparison.
+        Merges multiple saved input data CSV files into a single CSV for side-by-side comparison.
+
+        Parameters
+        ----------
+        saved_csv_working_folder : Path
+            Directory containing the CSV files to merge. Deleted after merging.
+        output_csv_path : Path
+            Directory where the merged ``saved_input_data.csv`` file will be written.
+        import_csv_path : Path or None
+            Optional path to an existing CSV to include as the base frame. Ignored
+            if ``None`` or an empty path.
+
+        Notes
+        -----
+        All CSV files in ``saved_csv_working_folder`` are merged on ``property_group`` and ``variable_name``.
+        If an optional base CSV is provided via ``import_csv_path``, it is included as the starting frame.
+        Duplicate column prefixes are disambiguated by appending numeric suffixes. The working folder
+        is deleted after the merged file is written.
         """
         result_df = pd.DataFrame(columns=["property_group", "variable_name"])
 
@@ -850,50 +972,65 @@ class Utility:
         shutil.rmtree(saved_csv_working_folder)
 
     @staticmethod
-    def convert_list_to_dict_by_key(list_of_dicts: List[Dict[str, Any]], id_key: str) -> Dict[Any, Dict[str, Any]]:
+    def convert_list_to_dict_by_key(list_of_dicts: list[dict[str, Any]], id_key: str) -> dict[Any, dict[str, Any]]:
         """
         Convert a list of dictionaries into a dictionary keyed by a specified identifier,
         where each value is the original dictionary minus the identifier key.
 
         Parameters
         ----------
-        list_of_dicts : List[Dict[str, Any]]
+        list_of_dicts : list[dict[str, Any]]
             A list of dictionaries, each containing a unique identifier and other data.
         id_key : str
             The key in each dictionary to use as the unique identifier.
 
         Returns
         -------
-        Dict[Any, Dict[str, Any]]
+        Dict[Any, dict[str, Any]]
             A dictionary where each key is the unique identifier from the list and each
             value is the corresponding dictionary minus the identifier key.
 
+        Raises
+        ------
+        KeyError
+            When the specified ``id_key`` is not found in any of the dictionaries in the list.
+
         Notes
         -----
-        The use of dict_.pop('ID') mutates the original dictionaries in list_of_dicts by removing their 'ID' keys.
-        If you need to keep the original list and dictionaries intact, make a copy before calling this function.
+        The use of ``dict_.pop('ID')`` mutates the original dictionaries in ``list_of_dicts`` by removing their
+        ``ID`` keys. If you need to keep the original list and dictionaries intact, make a copy before calling
+        this function.
+
+        The use ``deepcopy`` is necessary here because ``dict_.pop('ID')`` mutates ``list_of_dicts`` in place.
+        To avoid side effects, we use ``deepcopy`` to make a copy before mutating the original list.
 
         Example
         -------
         Given a list of dictionaries like this:
-        [
-            {"ID": 1, "value": 2, "other_keys": "other values"},
-            {"ID": 3, "value": 4, "other_keys": "other values"}
-        ]
-        And using 'ID' as the id_key:
 
-        convert_list_to_dict_by_key(list_of_dicts, 'ID')
+        .. code-block:: python
+
+            [
+                {"ID": 1, "value": 2, "other_keys": "other values"},
+                {"ID": 3, "value": 4, "other_keys": "other values"}
+            ]
+
+        And using ``ID`` as the ``id_key``:
+
+        .. code-block:: python
+
+            convert_list_to_dict_by_key(list_of_dicts, 'ID')
+
 
         Would return:
+
+        .. code-block:: python
+
         {
             1: {"value": 2, "other_keys": "other values"},
             3: {"value": 4, "other_keys": "other values"}
         }
 
-        Notes
-        -----
-        The use `deepcopy` is necessary here because `dict_.pop('ID')` mutates `list_of_dicts` in place.
-        To avoid side effects, we use `deepcopy` to make a copy before mutating the original list.
         """
         result = {}
         for dict_ in deepcopy(list_of_dicts):
@@ -926,7 +1063,6 @@ class Utility:
         -----
         In the context of Schedule-descendant classes, the reference list length will always be the length of the years
         list.
-
         """
         if len(list_to_elongate) != 1:
             return list_to_elongate
@@ -940,36 +1076,34 @@ class Utility:
 
         Parameters
         ----------
-        values : List[Any]
+        values : list[int | float]
             List of values to be checked.
 
         Returns
         -------
         bool
-            True if all values are >= 0, False otherwise.
-
+            ``True`` if all values are >= 0, ``False`` otherwise.
         """
         return all(value >= 0 for value in values)
 
     @staticmethod
-    def validate_fractions(fractions: List[float]) -> bool:
+    def validate_fractions(fractions: list[float]) -> bool:
         """
         Checks that all fractions passed are valid.
 
         Parameters
         ----------
-        fractions : List[float]
-            List of fractions to be valid
+        fractions : list[float]
+            List of fractions to be validated.
 
         Returns
         -------
         bool
-            True if all fractions passed are valid, False otherwise.
+            ``True`` if all fractions passed are valid, ``False`` otherwise.
 
         Notes
         -----
         A fraction is valid if it is in the range[0.0, 1.0]
-
         """
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
 
@@ -980,35 +1114,43 @@ class Utility:
 
         Parameters
         ----------
-        data : dict[str, any]
+        data : dict[str, Any]
             The dictionary containing numeric values to be rounded.
         significant_digits : int
             The number of significant digits to round the numeric values to.
 
         Returns
         -------
-        dict[str, any]
+        dict[str, Any]
             The dictionary with numeric values rounded to the specified number of significant digits.
 
         Notes
         -----
-        Some specific behavior of the round() function used by this method:
+        Some specific behavior of the ``round()`` function used by this method:
 
-        If significant_digits is None or 0, floats are converted to ints.
-        round(12.7) -> 13 (int)
-        round(12.3) -> 12 (int)
-        round(-12.7) -> -13 (int)
-        round(12.5) -> 12 (int) - If rounded number is 5, Python rounds to the nearest even number.
-        round(11.5) -> 12 (int) - Because of this rule, both 11.5 and 12.5 round to 12.
+        - If ``significant_digits`` is ``None`` or ``0``, floats are converted to ints.
+            .. code-block:: python
 
-        If significant_digits is less than 0, it rounds to the nearest multiple of 10, 100, 1000, etc.
-        round(1234, -2) -> 1200 (rounds to the nearest multiple of 100)
-        round(1234, -3) -> 1000 (rounds to the nearest multiple of 1000)
-        round(-1234, -1) -> -1230 (rounds to the nearest multiple of 10)
+                round(12.7) -> 13 (int)
+                round(12.3) -> 12 (int)
+                round(-12.7) -> -13 (int)
+                round(12.5) -> 12 (int)     # If the rounded number is 5, Python rounds to the nearest even number.
+                round(11.5) -> 12 (int)     # Because of this rule, both 11.5 and 12.5 round to 12.
 
-        If significant_digits is 0, it rounds to the nearest integer and converts it to a float.
-        round(12.7, 0) -> 13.0 (float)
-        round(-12.3, 0) -> -12.0 (float)
+        - If ``significant_digits`` is less than ``0``, it rounds to the nearest multiple of 10, 100, 1000, etc.
+
+            .. code-block:: python
+
+                round(1234, -2) -> 1200     # (rounds to the nearest multiple of 100)
+                round(1234, -3) -> 1000     # (rounds to the nearest multiple of 1000)
+                round(-1234, -1) -> -1230   # (rounds to the nearest multiple of 10)
+
+        - If ``significant_digits`` is ``0``, it rounds to the nearest integer and converts it to a float.
+        .. code-block:: python
+
+                round(12.7, 0) -> 13.0          # (float)
+                round(-12.3, 0) -> -12.0        # (float)
+
         """
         return {
             key: (
@@ -1032,7 +1174,7 @@ class Utility:
         Returns
         -------
         bool
-            True if the randomized rate is less than the reference rate, False otherwise.
+            ``True`` if the randomized rate is less than the reference rate, ``False`` otherwise.
         """
 
         return random() < reference_rate
@@ -1040,7 +1182,7 @@ class Utility:
     @staticmethod
     def validate_date_format(date_format: str) -> bool:
         """
-        Checks if date_format is a valid Python datetime format for both strftime() and strptime().
+        Checks if date_format is a valid Python datetime format for both ``strftime()`` and ``strptime()``.
 
         Parameters
         ----------
@@ -1050,7 +1192,7 @@ class Utility:
         Returns
         -------
         bool
-
+            ``True`` if valid, ``False`` otherwise.
         """
         test_date = datetime.datetime(2020, 12, 31, 00, 00, 00, 00)
         try:
@@ -1063,11 +1205,11 @@ class Utility:
     @staticmethod
     def get_date_formatter(date_format: str | None) -> DateFormatter:
         """
-        Get a `matplotlib.dates.DateFormatter` instance for the requested date format.
+        Get a ``matplotlib.dates.DateFormatter`` instance for the requested date format.
 
         Parameters
         ----------
-        date_format : str
+        date_format : str | None
             The format requested by the user. Common date formats are:
             - "%j/%Y": Formats dates as "day_of_year/year" (e.g., "123/2024").
             - "%d/%m/%Y": Formats dates as "day/month/year" (e.g., "23/12/2024").
@@ -1081,11 +1223,11 @@ class Utility:
         Returns
         -------
         matplotlib.dates.DateFormatter
-            A `DateFormatter` instance for the specified format.
+            A ``DateFormatter`` instance for the specified format.
 
         Notes
         -----
-        If the date_format is None or invalid, the default format "%d/%m/%Y" will be used instead.
+        If the ``date_format`` is ``None`` or invalid, the default format "%d/%m/%Y" will be used instead.
 
         """
 
@@ -1097,7 +1239,7 @@ class Utility:
     @staticmethod
     def back_track_birth_date(days_born: int, current_date: datetime.datetime) -> datetime.datetime:
         """
-        Calculates the birth date by subtracting a given number of days from the current date.
+        Calculates the birthdate by subtracting a given number of days from the current date.
 
         Parameters
         ----------
@@ -1110,12 +1252,13 @@ class Utility:
         -------
         datetime.datetime
             The calculated date of birth.
-
         """
         return current_date - timedelta(days_born)
 
 
 class Aggregator:
+    """This class houses the aggregation functions used in the simulation."""
+
     @staticmethod
     def average(data: list[float]) -> float:
         """
@@ -1145,7 +1288,7 @@ class Aggregator:
 
         Returns
         -------
-        float
+        float | None
             The result of dividing the first number by each subsequent number.
             Returns None if the list is empty or has only one element.
         """
@@ -1225,7 +1368,7 @@ class Aggregator:
 
         Returns
         -------
-        float
+        float | None
             The result of subtracting each subsequent number from the first number.
             Returns None if the list is empty or has only one element.
         """
@@ -1238,4 +1381,17 @@ class Aggregator:
 
     @staticmethod
     def no_op(data: list[Any]) -> Any | None:
+        """
+        Returns the data unchanged, or ``None`` if the data is empty or falsy.
+
+        Parameters
+        ----------
+        data : list[Any]
+            Input data to pass through.
+
+        Returns
+        -------
+        Any | None
+            The input data if it is not None, otherwise ``None``.
+        """
         return data if data else None
