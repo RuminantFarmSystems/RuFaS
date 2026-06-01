@@ -2120,9 +2120,10 @@ class Animal:
         Roll for post-wean mortality and schedule a death day if the heifer is fated to die.
 
         The cumulative probability of post-wean death is
-        :attr:`AnimalConfig.heifer_mortality_rate`. Of these deaths, 2/3 are allocated to
-        the HeiferI window ``[wean_day + 1, heifer_breed_start_day - 1]`` and 1/3 to the
-        HeiferII window ``[heifer_breed_start_day + 1, heifer_breed_start_day +
+        :attr:`AnimalConfig.heifer_mortality_rate`. Of these deaths, a
+        :attr:`AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION` share are allocated
+        to the HeiferI window ``[wean_day + 1, heifer_breed_start_day - 1]`` and the remainder
+        to the HeiferII window ``[heifer_breed_start_day + 1, heifer_breed_start_day +
         average_gestation_length - heifer_prefresh_day]``. The upper bound for HeiferII is
         the typical entry day into HeiferIII (springer), keeping pre-springer mortality
         cleanly within the youngstock window; any outlier that calves into the cow stage
@@ -2143,11 +2144,11 @@ class Animal:
             return
 
         # Second roll: which life stage does the death fall in?
-        # Per SME guidance, 2/3 of post-wean heifer deaths happen in HeiferI (pre-breeding)
-        # and 1/3 in HeiferII (breeding through pregnancy, before springer entry).
-        # HeiferIII (springer) is intentionally excluded -- those losses belong with
-        # prefresh / fresh-cow mortality, not youngstock mortality.
-        if random() < 2 / 3:
+        # Per SME guidance, HEIFER_MORTALITY_HEIFERI_FRACTION (2/3) of post-wean heifer deaths
+        # happen in HeiferI (pre-breeding) and the rest in HeiferII (breeding through pregnancy,
+        # before springer entry). HeiferIII (springer) is intentionally excluded -- those losses
+        # belong with prefresh / fresh-cow mortality, not youngstock mortality.
+        if random() < AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION:
             # HeiferI window: from the day after weaning up to the day before breeding starts.
             # The +1/-1 boundaries keep the death strictly inside HeiferI; the wean day and
             # breed-start day are themselves stage-transition days handled elsewhere.
