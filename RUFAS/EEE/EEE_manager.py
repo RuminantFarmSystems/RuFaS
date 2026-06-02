@@ -5,13 +5,14 @@ from .energy import EnergyEstimator
 
 
 class EEEManager:
+    """Coordinates the energy and emissions estimations for the EEE module."""
 
     def __init__(self) -> None:
-        pass
+        """Initializes the EEEManager."""
 
     @staticmethod
     def estimate_all() -> None:
-        """Runs all estimation functions and records all results from them."""
+        """Runs all emissions and energy estimations and records their results to the ``OutputManager``."""
         om = OutputManager()
         info_map = {"class": EEEManager.__class__.__name__, "function": EEEManager.estimate_all.__name__}
 
