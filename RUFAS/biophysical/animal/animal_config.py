@@ -20,23 +20,23 @@ class AnimalConfig:
     Attributes
     ----------
     wean_day : int
-        The number of days after birth when a calf is weaned, (simulation days).
+        The number of days after birth when a calf is weaned, (simulation day).
     wean_length : int
-        The duration required for weaning, (simulation days).
+        The duration required for weaning, (simulation day).
     target_heifer_pregnant_day : int
-        The target day for heifers to become pregnant, (simulation days).
+        The target day for heifers to become pregnant, (simulation day).
     heifer_breed_start_day : int
-        The day heifer breeding starts, , (simulation days).
+        The day heifer breeding starts, (simulation day).
     heifer_prefresh_day : int
-        The number of days for prefresh heifer preparation , (simulation days).
+        The number of days for prefresh heifer preparation , (simulation day).
     calving_interval : int
-        The targeted interval between calvings, (simulation days).
+        The targeted interval between calvings, (simulation day).
     dry_off_day_of_pregnancy : int
-        The day of pregnancy when a cow is dried off, (simulation days).
+        The day of pregnancy when a cow is dried off, (simulation day).
     heifer_reproduction_cull_day : int
-        Maximum day at which a heifer is culled if not pregnant, (simulation days).
+        Maximum day at which a heifer is culled if not pregnant, (simulation day).
     do_not_breed_time : int
-        The duration after which breeding is stopped, (simulation days).
+        The duration after which breeding is stopped, (simulation day).
     semen_type : str
         Types of semen used for reproduction, e.g., "conventional", (unitless).
     male_calf_rate_conventional_semen : float
@@ -48,9 +48,9 @@ class AnimalConfig:
     still_birth_rate : float
         Probability of stillbirth occurring during calving, (unitless).
     average_gestation_length : int
-        The average gestation length, (simulation days).
+        The average gestation length, (simulation day).
     std_gestation_length : float
-        The standard deviation for gestation length, (simulation days).
+        The standard deviation for gestation length, (simulation day).
     cow_times_milked_per_day : int
         Number of times a cow is milked per day, (unitless).
     milk_fat_percent : float
@@ -84,13 +84,13 @@ class AnimalConfig:
     cow_estrus_detection_rate : float
         Probability of detecting estrus in cows.
     ovsynch_program_start_day : int
-        The starting day for the Ovsynch program, (simulation days).
+        The starting day for the Ovsynch program, (simulation day).
     ovsynch_program_conception_rate : float
         Conception rate associated with the Ovsynch program, (unitless).
     presynch_program_start_day : int
-        The starting day for the presynchronization program, (simulation days).
+        The starting day for the presynchronization program, (simulation day).
     voluntary_waiting_period : int
-        The voluntary waiting period before breeding is resumed after calving, (simulation days).
+        The voluntary waiting period before breeding is resumed after calving, (simulation day).
     birth_weight_avg_ho : float
         Average Holstein birth weight, (kg).
     birth_weight_std_ho : float
@@ -110,31 +110,31 @@ class AnimalConfig:
     should_decrease_conception_rate_by_parity : bool
         Whether to adjust conception rates based on parity number, (unitless).
     average_estrus_cycle_return : int
-        Average number of days before an estrus cycle returns, (simulation days).
+        Average number of days before an estrus cycle returns, (simulation day).
     std_estrus_cycle_return : float
-        Standard deviation for estrus cycle return time, (simulation days).
+        Standard deviation for estrus cycle return time, (simulation day).
     average_estrus_cycle_heifer : int
-        Average estrus cycle length for heifers, (simulation days).
+        Average estrus cycle length for heifers, (simulation day).
     std_estrus_cycle_heifer : float
-        Standard deviation for heifer estrus cycle length, (simulation days).
+        Standard deviation for heifer estrus cycle length, (simulation day).
     average_estrus_cycle_cow : int
-        Average estrus cycle length for cows, (simulation days).
+        Average estrus cycle length for cows, (simulation day).
     std_estrus_cycle_cow : float
-        Standard deviation for cow estrus cycle length, (simulation days).
+        Standard deviation for cow estrus cycle length, (simulation day).
     average_estrus_cycle_after_pgf : int
-        Average estrus cycle length after prostaglandin injection, (simulation days).
+        Average estrus cycle length after prostaglandin injection, (simulation day).
     std_estrus_cycle_after_pgf : float
-        Standard deviation for estrus cycle length after prostaglandin injection, (simulation days).
+        Standard deviation for estrus cycle length after prostaglandin injection, (simulation day).
     first_pregnancy_check_day : int
-        First pregnancy check day post-breeding, (simulation days).
+        First pregnancy check day post-breeding, (simulation day).
     first_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the first pregnancy check, (unitless).
     second_pregnancy_check_day : int
-        Second pregnancy check day post-breeding, (simulation days).
+        Second pregnancy check day post-breeding, (simulation day).
     second_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the second pregnancy check, (unitless).
     third_pregnancy_check_day : int
-        Third pregnancy check day post-breeding, (simulation days).
+        Third pregnancy check day post-breeding, (simulation day).
     third_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the third pregnancy check, (unitless).
     parity_death_probability : list[float]
@@ -144,7 +144,7 @@ class AnimalConfig:
     parity_cull_probability : list[float]
         List of culling probabilities based on parity number, (unitless).
     cull_day_count : list[int]
-        List of day intervals for culling analysis, (simulation days).
+        List of day intervals for culling analysis, (simulation day).
     feet_leg_cull_probability : float
         Probability of feet and leg-related culling, (unitless).
     feet_leg_cull_day_probability : list[float]
@@ -169,16 +169,20 @@ class AnimalConfig:
         Probability of culling for unknown reasons, (unitless).
     unknown_cull_day_probability : list[float]
         Cumulative distribution for unknown reasons of culling over time, (unitless).
-    methane_model : str
-        The methane emission model being used, e.g., "IPCC", (unitless).
     methane_mitigation_method : str
         The mitigation method applied for methane reduction, e.g., "None", (unitless).
     methane_mitigation_additive_amount : float
         The amount of additive used for methane mitigation, (kg).
     milk_reduction_maximum : float
         Maximum possible milk production reduction from a given cause, (kg).
-    methane_model: dict[str, dict[str, bool]]
-        The methods to use for each animal type.
+    methane_model: dict[str, Any]
+        Methane emission model selections for each animal category and production stage.
+    average_phenotype : dict[str, dict[int, float]]
+        Average genetic phenotype values used for genetic simulations.
+    top_listing_semen : dict[str, dict[str, float]]
+        Semen sire information used for genetic simulations and breeding selection.
+    simulate_genetics : bool
+        Whether genetic simulation functionality is enabled.
 
     """
 

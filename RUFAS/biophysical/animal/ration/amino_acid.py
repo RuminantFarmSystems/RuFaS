@@ -6,6 +6,8 @@ from RUFAS.general_constants import GeneralConstants
 
 
 class AminoAcidComposition(TypedDict):
+    """A container for the amino acids components"""
+
     duodenal_endogenous: float
     microbial: float
     scurf: float
@@ -16,6 +18,8 @@ class AminoAcidComposition(TypedDict):
 
 @dataclass
 class EssentialAminoAcidRequirements:
+    """The requirements for essential amino acids"""
+
     histidine: float
     isoleucine: float
     leucine: float
