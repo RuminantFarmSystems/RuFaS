@@ -48,6 +48,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 from RUFAS.weather import Weather
 
@@ -675,6 +676,39 @@ class HerdManager:
 
         return herd_manager_output, animal_manure_excretions_by_pen, enteric_methane_emission_by_pen
 
+    def _calculate_heifer_average_daily_weight_gain(self, simulation_day: int) -> None:
+        """Calculates the heifer average daily weight gain from all pens and animal types."""
+        for pen in self.all_pens:
+            heifers_in_pen = [heifer for heifer in pen.animals_in_pen.values() if heifer.animal_type.is_heifer]
+            if len(heifers_in_pen) > 0:
+                average_daily_weight_gain = sum([heifer.growth.daily_growth for heifer in heifers_in_pen]) / len(
+                    heifers_in_pen
+                )
+                if str(pen.id) not in self.herd_statistics.heifer_average_daily_gain_by_pen:
+                    om = OutputManager()
+                    info_map = {
+                        "class": AnimalModuleReporter.__name__,
+                        "function": AnimalModuleReporter.report_herd_statistics_data.__name__,
+                        "units": MeasurementUnits.KILOGRAMS_PER_DAY,
+                    }
+                    om.add_variable_bulk(
+                        [
+                            ({"name": "", "value": None}, dict(info_map, **{"simulation_day": sim_day}))
+                            for sim_day in range(0, simulation_day)
+                        ]
+                    )
+                self.herd_statistics.heifer_average_daily_gain_by_pen[str(pen.id)] = average_daily_weight_gain
+
+        heifers_by_animal_type = {
+            AnimalType.HEIFER_I: self.heiferIs,
+            AnimalType.HEIFER_II: self.heiferIIs,
+            AnimalType.HEIFER_III: self.heiferIIIs,
+        }
+        for animal_type, heifers in heifers_by_animal_type.items():
+            self.herd_statistics.heifer_average_daily_gain_by_animal_type[animal_type] = (
+                sum([heifer.growth.daily_growth for heifer in heifers]) / len(heifers) if len(heifers) > 0 else None
+            )
+
     def _warn_when_lactating_cows_have_no_milk(self, time: RufasTime) -> None:
         """Warn when lactating cows have no milk production after the first day in milk."""
         no_milk_cow_num = len(
@@ -793,7 +827,7 @@ class HerdManager:
             enteric_methane_emission_by_pen,
         ) = self._collect_manure_outputs_by_pen()
 
-        self.update_herd_statistics()
+        self.update_herd_statistics(time.simulation_day)
         self._warn_when_lactating_cows_have_no_milk(time)
 
         self._report_daily_routine_outputs(
@@ -1705,7 +1739,7 @@ class HerdManager:
                 simulation_day,
             )
 
-    def update_herd_statistics(self) -> None:
+    def update_herd_statistics(self, simulation_day: int) -> None:
         """Calculates and updates herd statistics."""
         (
             self.herd_statistics.calf_num,
@@ -1727,6 +1761,8 @@ class HerdManager:
         self._update_average_mature_body_weight()
         self._update_average_cow_body_weight()
         self._update_average_cow_parity()
+
+        self._calculate_heifer_average_daily_weight_gain(simulation_day)
 
     def _calculate_herd_percentages(self) -> None:
         """Calculates and updates the herd percentages for different animal types."""
