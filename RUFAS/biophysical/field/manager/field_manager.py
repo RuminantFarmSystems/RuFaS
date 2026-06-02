@@ -31,16 +31,16 @@ from RUFAS.weather import Weather
 class FieldManager:
     """
     Manages the initialization and simulation of field instances within the simulation environment. This class is
-    responsible for creating `Field` instances based on input data, managing these fields across the simulation
-    lifecycle, and interfacing with the `SimulationEngine` to execute daily and annual routines.
+    responsible for creating ``Field`` instances based on input data, managing these fields across the simulation
+    lifecycle, and interfacing with the ``SimulationEngine`` to execute daily and annual routines.
 
 
     Attributes
     ----------
     fields : list[Field]
-        A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
+        A list of ``Field`` instances that have been initialized and are managed by this ``FieldManager``.
     output_gatherer : FieldDataReporter
-        An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
+        An instance of ``FieldDataReporter`` responsible for gathering and reporting data from the managed fields.
     om : OutputManager
         Instance of the OutputManager.
 
@@ -161,7 +161,7 @@ class FieldManager:
         Returns
         -------
         Field
-            A `Field` instance configured with the specified input data
+            A ``Field`` instance configured with the specified input data
 
         """
         im = InputManager()
@@ -281,6 +281,11 @@ class FieldManager:
         tuple[dict[str, dict[str, float], FertilizerSchedule]
             Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
+        Raises
+        ------
+        ValueError
+            If no fertilizer data sent.
+
         """
         im = InputManager()
         fertilizer_data: dict[str, Any] = im.get_data(fertilizer_schedule)
@@ -335,6 +340,11 @@ class FieldManager:
         list[ManureEvent]
             A list of generated manure events.
 
+        Raises
+        ------
+        ValueError
+            If no manure data provided.
+
         """
         im = InputManager()
         manure_schedule_data: dict[str, Any] = im.get_data(manure_schedule)
@@ -384,6 +394,11 @@ class FieldManager:
         -------
         list[TillageEvent]
             A list of generated tillage events.
+
+        Raises
+        ------
+        ValueError
+            If no tillage data provided.
 
         """
         im = InputManager()
@@ -509,6 +524,11 @@ class FieldManager:
         residue = soil_configuration_data["initial_residue"]
         soil_layers_config = soil_configuration_data.get("soil_layers")
         if soil_layers_config is None:
+            OutputManager().add_error(
+                "Soil layer configs not provided",
+                "Configuration for soil layers must be provided.",
+                info_map={"class": FieldManager.__name__, "function": FieldManager._setup_soil.__name__},
+            )
             raise ValueError("Configuration for soil layers must be provided.")
         soil_layers_config.sort(key=lambda x: x.get("bottom_depth"))
         soil_layers = []
@@ -573,7 +593,12 @@ class FieldManager:
         try:
             config_dictionary["bottom_depth"] = layer_config["bottom_depth"]
         except KeyError:
-            raise ValueError("Bottom depth is required for each soil layer.")
+            OutputManager().add_error(
+                "Bottom depth not provided",
+                "Bottom depth is required for each soil layer.",
+                info_map={"class": FieldManager.__name__, "function": FieldManager._setup_soil_layer.__name__},
+            )
+            raise KeyError("Bottom depth is required for each soil layer.")
 
         expected_values = [
             "soil_water_concentration",

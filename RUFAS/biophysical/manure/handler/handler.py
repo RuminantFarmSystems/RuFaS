@@ -65,6 +65,10 @@ class Handler(Processor):
         manure_stream : ManureStream
             The ManureStream instance being checked for compatibility.
 
+        Raises
+        ------
+        ValueError
+            If manure stream is not compatible.
         """
         info_map = {"class": self.__class__.__name__, "function": self.receive_manure.__name__}
         if not self.check_manure_stream_compatibility(manure_stream):
@@ -85,6 +89,11 @@ class Handler(Processor):
             Current weather and environmental conditions that manure is being processed in.
         time : RufasTime
             RufasTime instance containing the simulations temporal information.
+
+        Raises
+        ------
+        TypeError
+            If ManureStream is NoneType.
 
         Returns
         -------
@@ -188,7 +197,7 @@ class Handler(Processor):
             total_solids=total_solids,
             methane_production_potential=methane_production_potential,
             pen_manure_data=None,
-            bedding_non_degradable_volatile_solids=bedding_non_degradable_volatile_solids
+            bedding_non_degradable_volatile_solids=bedding_non_degradable_volatile_solids,
         )
         self._report_manure_stream(output_stream, "", time.simulation_day)
 

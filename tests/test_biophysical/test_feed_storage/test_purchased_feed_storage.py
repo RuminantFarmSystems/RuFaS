@@ -1,7 +1,7 @@
 from dataclasses import replace
 from datetime import date, datetime
 
-from mock import MagicMock, call
+from unittest.mock import MagicMock, call
 import pytest
 from pytest_mock import MockerFixture
 

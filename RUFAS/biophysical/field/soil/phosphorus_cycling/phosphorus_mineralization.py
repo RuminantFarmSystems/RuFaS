@@ -1,5 +1,4 @@
 from math import exp, log
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -24,7 +23,7 @@ class PhosphorusMineralization:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_phosphorus(self, field_size) -> None:
@@ -146,8 +145,8 @@ class PhosphorusMineralization:
         is added to soils in fertilizer and manure, and we don’t want PSP changing rapidly." Be recalculating the
         phosphorus sorption parameter with this equation every day (as opposed to recalculating it with
         calculate_phosphorus_sorption_parameter() in LayerData), we keep changes in it limited. This equation
-        approximates taking a weighted average over a time span that is determined by the `days_to_average_over_value`,
-        currently set to the length of a year.
+        approximates taking a weighted average over a time span that is determined by the
+        ``days_to_average_over_value``, currently set to the length of a year.
 
         """
         days_to_average_over = 365
@@ -330,7 +329,7 @@ class PhosphorusMineralization:
 
         Parameters
         ----------
-        sorption_scalar
+        sorption_scalar : float
             The scalar used in determining how much phosphorus is removed from the labile inorganic phosphorus pool and
             transferred to the active inorganic phosphorus pool (unitless).
 

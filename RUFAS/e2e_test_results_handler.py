@@ -269,7 +269,7 @@ class E2ETestResultsHandler:
         return test_result_paths
 
     @staticmethod
-    def is_significant(changes: dict[str, float | str], tolerance: float) -> bool:
+    def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
         """
         Determines if a numerical change is significant based if the change between the
         "old_value" and "new_value" exceeds the specified tolerance.
@@ -292,13 +292,33 @@ class E2ETestResultsHandler:
         relative to the "old_value". If the "old_value" is zero, a fallback reference value of 1 is used
         to ensure the tolerance comparison remains meaningful.
         """
-        if isinstance(changes, dict) and "old_value" in changes and "new_value" in changes:
-            old_value = changes["old_value"]
-            new_value = changes["new_value"]
-            if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
-                reference = abs(old_value) if abs(old_value) > 0 else 1
-                difference = abs(new_value - old_value)
-                return difference > tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+        if not (isinstance(changes, dict) and "old_value" in changes and "new_value" in changes):
+            return True
+
+        old_value = changes["old_value"]
+        new_value = changes["new_value"]
+
+        if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
+            reference = abs(old_value) if abs(old_value) > 0 else 1
+            difference = abs(new_value - old_value)
+            threshold = tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+            return difference > threshold
+
+        if isinstance(old_value, dict) and isinstance(new_value, dict):
+            for key in old_value.keys() | new_value.keys():
+                if key not in old_value or key not in new_value:
+                    return True
+
+                nested_change = {
+                    "old_value": old_value[key],
+                    "new_value": new_value[key],
+                }
+
+                if E2ETestResultsHandler.is_significant(nested_change, tolerance):
+                    return True
+
+            return False
+
         return True
 
     @staticmethod

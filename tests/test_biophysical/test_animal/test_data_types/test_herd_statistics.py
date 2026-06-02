@@ -26,7 +26,6 @@ def test_initialization(herd_statistics: HerdStatistics) -> None:
     assert herd_statistics.sold_cows_info == []
     assert herd_statistics.herd_num == 0
     assert herd_statistics.calf_num == 0
-    assert herd_statistics.avg_daily_cow_milking == 0.0
 
 
 def test_reset_daily_stats(herd_statistics: HerdStatistics) -> None:

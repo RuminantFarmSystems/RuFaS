@@ -11,7 +11,7 @@ from RUFAS.output_manager import OutputManager
 
 class DigestiveSystem:
     """
-    This class serves as an entry point for the animal digestive systems.
+    An entry point for the animal digestive systems.
     """
 
     manure_excretion: AnimalManureExcretions
@@ -39,6 +39,8 @@ class DigestiveSystem:
         TypeError
             If the animal type in digestive_system_inputs is not supported, a TypeError is raised
             with information about supported animal types.
+        RuntimeError
+            For any other unexpected errors related to processing digestion.
 
         """
         om = OutputManager()
@@ -179,6 +181,7 @@ class DigestiveSystem:
             A tuple containing two values:
             - The amount of phosphorus excreted in urine (g).
             - The amount of phosphorus excreted in feces (g).
+
         """
 
         # amount of P required for urine production (g) (A.1G.B.1)

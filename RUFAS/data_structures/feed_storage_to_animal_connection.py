@@ -1,15 +1,21 @@
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
+from typing import Any
 
+from RUFAS.input_manager import InputManager
 from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
 
 """
-Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library file used, and are used throughout
-other input files and the RuFaS codebase.
+Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library used, and are used throughout
+other inputs and the RuFaS codebase.
 """
 RUFAS_ID = int
+
+"""Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
+ON_FARM_TO_PURCHASED_PRICE_RATIO = 0.01
 
 
 class FeedCategorization(Enum):
@@ -111,7 +117,7 @@ class Feed:
     is_wetforage : bool
         Identifier of wet forage type feed (unitless).
     units : MeasurementUnits
-        The units with which the feed is measured.
+        The units with which the feed is measured (unitless).
     limit : float
         Upper limit of feed that is allowed to be used in a single animal's diet (kg).
     lower_limit : float
@@ -127,7 +133,7 @@ class Feed:
     purchase_cost : float
         Price of buying feed from off-farm ($ / kg).
     buffer : float
-        Fraction of extra feed purchases to account for shrinkage.
+        Fraction of extra feed purchases to account for shrinkage (unitless).
 
     """
 
@@ -191,58 +197,107 @@ class NASEMFeed(Feed):
     DE_Base : float
         Digestible energy standard (Mcal / kg).
     copper : float
+        Copper (% dry matter).
     iron : float
+        Iron (% dry matter).
     manganese : float
+        Manganese (% dry matter).
     zinc : float
+        Zinc (% dry matter).
     molibdenum : float
+        Molibdenum (% dry matter).
     chromium : float
+        Chromium (% dry matter).
     cobalt : float
+        Cobalt (% dry matter).
     iodine : float
+        Iodine (% dry matter).
     selenium : float
+        Selenium (% dry matter).
     arginine : float
+        Arginine (% dry matter).
     histidine : float
+        Histidine (% dry matter).
     isoleucine : float
+        Isoleucine (% dry matter).
     leucine : float
+        Leucine (% dry matter).
     lysine : float
+        Lysine (% dry matter).
     methionine : float
+        Methionine (% dry matter).
     phenylalanine : float
+        Phenylalanine (% dry matter).
     threonine : float
+        Threonine (% dry matter).
     triptophan : float
+        Triptophan (% dry matter).
     valine : float
+        Valine (% dry matter).
     C120_FA : float
+        C120_FA (% dry matter).
     C140_FA : float
+        C140_FA (% dry matter).
     C160_FA : float
+        C160_FA (% dry matter).
     C161_FA : float
+        C161_FA (% dry matter).
     C180_FA : float
+        C180_FA (% dry matter).
     C181t_FA : float
+        C181t_FA (% dry matter).
     C181c_FA : float
+        C181c_FA (% dry matter).
     C182_FA : float
+        C182_FA (% dry matter).
     C183_FA : float
+        C183_FA (% dry matter).
     otherFA_FA : float
+        OtherFA_FA (% dry matter).
     NPN_source : float
         Non-protein nitrogen fraction (%).
     starch_digested : float
         Base starch digestibility (%).
     FA_dig : float
+        FA_dig (% dry matter).
     P_inorg : float
+        P_inorg (% dry matter).
     P_org : float
+        P_org (% dry matter).
     B_Carotene : float
+        B_Carotene (% dry matter).
     biotin : float
+        Biotin (% dry matter).
     choline : float
+        Choline (% dry matter).
     niacin : float
+        Niacin (% dry matter).
     Vit_A : float
+        Vita_A (% dry matter).
     Vit_D : float
+        Vit_D (% dry matter).
     Vit_E : float
+        Vit_E (% dry matter).
     Abs_calcium : float
+        Abs_calcium (% dry matter).
     Abs_phosphorus : float
+        Abs_phosphorus (% dry matter).
     Abs_sodium : float
+        Abs_sodium (% dry matter).
     Abs_chloride : float
+        Abs_chloride (% dry matter).
     Abs_potassium : float
+        Abs_potassium (% dry matter).
     Abs_copper : float
+        Abs_copper (% dry matter).
     Abs_iron : float
+        Abs_iron (% dry matter).
     Abs_magnesium : float
+        Abs_magnesium (% dry matter).
     Abs_manganesum : float
+        Abs_manganesum (% dry matter).
     Abs_zinc : float
+        Abs_zinc (% dry matter).
 
     """
 
@@ -324,6 +379,90 @@ class NRCFeed(Feed):
     PAF: float
 
 
+class AvailableFeedsBuilder:
+    """
+    Builds the list of feeds available for use in the simulation.
+
+    This class is responsible for loading feed composition data from the input
+    manager, translating it into simulation-friendly types, and constructing
+    the purchased feeds configured for the simulation.
+    """
+
+    @staticmethod
+    def setup_available_feeds(feed_config: dict[str, list[Any]], nutrient_standard: NutrientStandard) -> list[Feed]:
+        """
+        Creates sorted list of feeds available for use in the simulation.
+
+        Parameters
+        ----------
+        feed_config : list[dict[str, Any]]
+            Mapping of the feeds available for purchase to the prices of those feeds.
+        nutrient_standard : NutrientStandard
+            Indicates whether the NASEM or NRC nutrient standards is being used.
+
+        Returns
+        -------
+        list[Feed]
+            Nutrition and price information of feeds available in the simulation.
+
+        """
+        feed_library = AvailableFeedsBuilder._process_feed_library(nutrient_standard)
+
+        feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
+        available_feeds: list[Feed] = []
+        feeds_to_parse = feed_config["feeds"]
+        for feed in feeds_to_parse:
+            rufas_id = feed["feed_type"]
+            price = feed["purchased_feed_cost"]
+            buffer = feed["buffer"]
+            try:
+                nutritive_properties = feed_library[rufas_id]
+            except KeyError:
+                raise KeyError(f"Feed with RUFAS ID '{rufas_id}' not found in the feed library.")
+            new_feed = feed_representation(
+                rufas_id=rufas_id,
+                amount_available=0.0,
+                on_farm_cost=price * ON_FARM_TO_PURCHASED_PRICE_RATIO,
+                purchase_cost=price,
+                buffer=buffer,
+                **nutritive_properties,
+            )
+            available_feeds.append(new_feed)
+
+        return sorted(available_feeds, key=lambda feed: feed.rufas_id)
+
+    @staticmethod
+    def _process_feed_library(nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
+        """
+        Collects and processes the feed library input so that it can be translated into a simulation-friendly format.
+
+        Parameters
+        ----------
+        nutrient_standard : NutrientStandard
+            Indicates whether the NASEM or NRC nutrient standards is being used.
+
+        Returns
+        -------
+        dict[RUFAS_ID, dict[str, Any]]
+            Mapping of RuFaS feed IDs to the nutritional properties of those feeds.
+
+        """
+        im = InputManager()
+        feed_library: dict[str, list[Any]] = (
+            im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
+        )
+
+        converted_feed_library = Utility.convert_dict_of_lists_to_list_of_dicts(feed_library)
+
+        processed_feed_library = {feed["rufas_id"]: feed for feed in converted_feed_library}
+        for feed in processed_feed_library.values():
+            del feed["rufas_id"]
+            feed["feed_type"] = FeedComponentType(feed["feed_type"])
+            feed["Fd_Category"] = FeedCategorization(feed["Fd_Category"])
+            feed["units"] = MeasurementUnits(feed["units"])
+        return processed_feed_library
+
+
 @dataclass
 class TotalInventory:
     """
@@ -393,6 +532,54 @@ class RequestedFeed:
 
     def __rmul__(self, multiplier: int | float) -> "RequestedFeed":
         return multiplier * self
+
+
+@dataclass
+class FeedFulfillmentResults:
+    """Tracks how much feed was deducted from purchased and farmgrown sources to fulfill a request."""
+
+    purchased: dict[RUFAS_ID, float] = field(default_factory=dict)
+    farmgrown: dict[RUFAS_ID, float] = field(default_factory=dict)
+
+    @classmethod
+    def fulfill_feed_request_as_purchased(cls, requested_feed: RequestedFeed) -> "FeedFulfillmentResults":
+        """
+        Create a fulfillment result where all requested feed is satisfied by purchased sources.
+
+        This is used when the feed module is not simulated.
+        """
+        return cls(
+            purchased=dict(requested_feed.requested_feed),
+            farmgrown={},
+        )
+
+    @classmethod
+    def empty(
+        cls,
+        *,
+        requested_feed_ids: list[RUFAS_ID] | None = None,
+        farmgrown_feed_ids: list[RUFAS_ID] | None = None,
+    ) -> "FeedFulfillmentResults":
+        """Create an empty results object with optional initialized keys."""
+        requested_feed_ids = requested_feed_ids or []
+        farmgrown_feed_ids = farmgrown_feed_ids or []
+
+        return cls(
+            purchased={feed_id: 0.0 for feed_id in requested_feed_ids},
+            farmgrown={feed_id: 0.0 for feed_id in farmgrown_feed_ids},
+        )
+
+    def add_purchased(self, feed_id: RUFAS_ID, amount: float) -> None:
+        """Add deducted purchased feed for a given feed ID."""
+        self.purchased[feed_id] = self.purchased.get(feed_id, 0.0) + amount
+
+    def add_farmgrown(self, feed_id: RUFAS_ID, amount: float) -> None:
+        """Add deducted farmgrown feed for a given feed ID."""
+        self.farmgrown[feed_id] = self.farmgrown.get(feed_id, 0.0) + amount
+
+    def total_deducted_for_feed(self, feed_id: RUFAS_ID) -> float:
+        """Return total deducted amount for a single feed ID across all sources."""
+        return self.purchased.get(feed_id, 0.0) + self.farmgrown.get(feed_id, 0.0)
 
 
 class PurchaseAllowance:

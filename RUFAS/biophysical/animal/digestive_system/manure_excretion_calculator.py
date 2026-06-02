@@ -1,4 +1,6 @@
-from typing import Tuple
+from __future__ import annotations
+
+from typing import Any, Tuple
 
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
@@ -6,9 +8,78 @@ from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalM
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.user_constants import UserConstants
+from RUFAS.output_manager import OutputManager
 
 
 class ManureExcretionCalculator:
+    """Calculates manure excretion values for animals."""
+
+    _dmi_below_min_stats: dict[str, dict[str, int]] = {
+        "lact": {"n_total": 0, "n_below_min": 0},
+        "dry": {"n_total": 0, "n_below_min": 0},
+    }
+
+    @staticmethod
+    def _track_and_warn_dmi_threshold(
+        *,
+        dmi_kind: str,
+        dmi_effective: float,
+    ) -> None:
+        """Track DMI threshold outcomes for end-of-simulation reporting.
+
+        Parameters
+        ----------
+        kind : {"lact", "dry"}
+            Which DMI floor applies (lactating or dry cows).
+        dmi_effective : float
+            Effective DMI after applying the minimum bound (kg/day).
+
+        Notes
+        -----
+        This helper records how often the effective DMI falls below the literature
+        minimum used for manure volatile solids calculations. Counters are stored
+        per herd type so a single summary warning can be emitted at the end of
+        the simulation. It does not alter DMI values; it only tracks occurrences.
+
+        """
+        stats = ManureExcretionCalculator._dmi_below_min_stats[dmi_kind]
+        stats["n_total"] += 1
+
+        if dmi_kind == "lact":
+            floor = AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS
+        else:
+            floor = AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS
+
+        if dmi_effective < floor:
+            stats["n_below_min"] += 1
+
+    @staticmethod
+    def emit_dmi_below_min_summary(info_map: dict[str, Any]) -> None:
+        """Emit a summary warning for DMI below-minimum frequency."""
+        for kind in ("lact", "dry"):
+            stats = ManureExcretionCalculator._dmi_below_min_stats[kind]
+            if stats["n_below_min"] == 0:
+                continue
+
+            if kind == "lact":
+                floor = AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS
+            else:
+                floor = AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS
+
+            pct_below = (100.0 * stats["n_below_min"] / stats["n_total"]) if stats["n_total"] else 0.0
+
+            msg = (
+                f"Final counts for effective DMI below the literature minimum for {kind} cows "
+                f"({floor:.3f} kg/d): {stats['n_below_min']}/{stats['n_total']} "
+                f"({pct_below:.1f}%)."
+            )
+
+            OutputManager().add_warning(
+                "DMI minimum summary (manure excretion)",
+                msg,
+                info_map,
+            )
+
     @staticmethod
     def calculate_calf_manure(
         body_weight: float,
@@ -18,18 +89,6 @@ class ManureExcretionCalculator:
     ) -> Tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a calf with information from the ration formulation.
-
-        Notes
-        -----
-        Manure excretion: [AN.EXC.1]
-        Urine excretion: [AN.EXC.2]
-        Manure total solids excretion: [AN.EXC.3]
-        Total volatile solids: [AN.EXC.4]
-        Degradable volatile solids excretion: [AN.EXC.5]
-        Non-degradable volatile solids excretion: [AN.EXC.6]
-        Manure nitrogen excretion: [AN.EXC.7]
-        Urine N excretion: [AN.EXC.8]
-        Manure total ammoniacal nitrogen: [AN.EXC.9]
 
         Parameters
         ----------
@@ -53,6 +112,15 @@ class ManureExcretionCalculator:
         References
         ----------
         (ASABE, 2003; Nennich et al., 2005)
+        Manure excretion: [AN.EXC.1]
+        Urine excretion: [AN.EXC.2]
+        Manure total solids excretion: [AN.EXC.3]
+        Total volatile solids: [AN.EXC.4]
+        Degradable volatile solids excretion: [AN.EXC.5]
+        Non-degradable volatile solids excretion: [AN.EXC.6]
+        Manure nitrogen excretion: [AN.EXC.7]
+        Urine N excretion: [AN.EXC.8]
+        Manure total ammoniacal nitrogen: [AN.EXC.9]
 
         """
         dry_matter_intake = nutrient_amounts.dry_matter
@@ -126,20 +194,6 @@ class ManureExcretionCalculator:
         Calculates the manure excretion values for a growing and close-up heifer with information from the ration
         formulation.
 
-        Notes
-        -----
-        Urine excretion: [AN.EXC.10]
-        Total manure excretion: [AN.EXC.11]
-        Total solids excretion: [AN.EXC.12]
-        Total volatile solids excretion: [AN.EXC.13]
-        Degradable volatile solids excretion: [AN.EXC.5]
-        Non-degradable volatile solids excretion: [AN.EXC.6]
-        Manure N excretion: [AN.EXC.14]
-        Fecal N excretion: [AN.EXC.15]
-        Urine N excretion: [AN.EXC.16]
-        Manure total ammoniacal nitrogen: [AN.EXC.9]
-        Manure K excretion: [AN.EXC.17]
-
         Parameters
         ----------
         body_weight : float
@@ -167,6 +221,17 @@ class ManureExcretionCalculator:
         References
         ----------
         (ASABE, 2005; Nennich et al., 2005; Reed et al., 2015; Johnson et al., 2016; NASEM, 2021)
+        Urine excretion: [AN.EXC.10]
+        Total manure excretion: [AN.EXC.11]
+        Total solids excretion: [AN.EXC.12]
+        Total volatile solids excretion: [AN.EXC.13]
+        Degradable volatile solids excretion: [AN.EXC.5]
+        Non-degradable volatile solids excretion: [AN.EXC.6]
+        Manure N excretion: [AN.EXC.14]
+        Fecal N excretion: [AN.EXC.15]
+        Urine N excretion: [AN.EXC.16]
+        Manure total ammoniacal nitrogen: [AN.EXC.9]
+        Manure K excretion: [AN.EXC.17]
 
         """
         # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
@@ -270,11 +335,6 @@ class ManureExcretionCalculator:
         """
         Calculates the manure excretion values for a cow with information from the ration formulation.
 
-        Notes
-        -----
-        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
-        and nitrogen ("N") are all percentages of dry matter.
-
         Parameters
         ----------
         is_lactating: bool
@@ -296,12 +356,15 @@ class ManureExcretionCalculator:
 
         Returns
         -------
-        float
-            Total amount of phosphorus excreted by the given animal (g).
+        tuple : [float, AnimalManureExcretions]
+            A tuple of the total amount of phosphorus excreted by the given animal (g) and
+            a dictionary that contains the manure excretion values as specified in the
+            AnimalManureExcretions class definition.
 
-        AnimalManureExcretions
-            A dictionary that contains the manure excretion values as specified
-                in the AnimalManureExcretions class definition.
+        Notes
+        -----
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         if is_lactating:
@@ -334,25 +397,6 @@ class ManureExcretionCalculator:
         """
         Calculates the manure excretion values for a lactating cow with information from the ration formulation.
 
-        Notes
-        -----
-        Fecal water excretion: [AN.EXC.18]
-        Total solids/Fecal dry matter: [AN.EXC.19]
-        Urine excretion: [AN.EXC.20]
-        Total manure excretion: [AN.EXC.21]
-        Organic matter intake: [AN.EXC.22]
-        Degradable volatile solids: [AN.EXC.23]
-        Total volatile solids excretion: [AN.EXC.24]
-        Non-degradable volatile solids excretion: [AN.EXC.6]
-        Manure N excretion: [AN.EXC.25]
-        Fecal nitrogen: [AN.EXC.26]
-        Urinary nitrogen: [AN.EXC.16]
-        Manure total ammoniacal nitrogen: [AN.EXC.9]
-        Manure K excretion: [AN.EXC.27]
-
-        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
-        and nitrogen ("N") are all percentages of dry matter.
-
         Parameters
         ----------
         days_in_milk : int
@@ -378,12 +422,36 @@ class ManureExcretionCalculator:
             A dictionary that contains the manure excretion values as specified
                 in the AnimalManureExcretions class definition.
 
+        Notes
+        -----
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
+
         References
         ----------
         (Nennich et al., 2005; Appuhamy et al., 2014; Reed et al., 2015; Appuhamy et al., 2018)
+        Fecal water excretion: [AN.EXC.18]
+        Total solids/Fecal dry matter: [AN.EXC.19]
+        Urine excretion: [AN.EXC.20]
+        Total manure excretion: [AN.EXC.21]
+        Organic matter intake: [AN.EXC.22]
+        Degradable volatile solids: [AN.EXC.23]
+        Total volatile solids excretion: [AN.EXC.24]
+        Non-degradable volatile solids excretion: [AN.EXC.6]
+        Manure N excretion: [AN.EXC.25]
+        Fecal nitrogen: [AN.EXC.26]
+        Urinary nitrogen: [AN.EXC.16]
+        Manure total ammoniacal nitrogen: [AN.EXC.9]
+        Manure K excretion: [AN.EXC.27]
 
         """
-        dry_matter_intake = nutrient_amounts.dry_matter
+        dmi_predicted = nutrient_amounts.dry_matter
+        dry_matter_intake = dmi_predicted
+        dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
+        ManureExcretionCalculator._track_and_warn_dmi_threshold(
+            dmi_kind="lact",
+            dmi_effective=dry_matter_intake,
+        )
         ash_diet_content = nutrient_amounts.ash_supply
         dry_matter_concentration = nutrient_amounts.dry_matter_percentage
         acid_detergent_fiber_concentrations = nutrient_amounts.adf_percentage
@@ -418,7 +486,6 @@ class ManureExcretionCalculator:
             * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
-        dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
         fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
 
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
@@ -497,21 +564,6 @@ class ManureExcretionCalculator:
     ) -> Tuple[float, AnimalManureExcretions]:
         """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
 
-        Notes
-        -----
-        Urine excretion: [AN.EXC.28]
-        Total manure excretion: [AN.EXC.29]
-        Total solids excretion: [AN.EXC.12]
-        Organic matter intake: [AN.EXC.22]
-        Degradable volatile solids: [AN.EXC.23]
-        Total volatile solids excretion: [AN.EXC.24]
-        Non-degradable volatile solids excretion: [AN.EXC.6]
-        Manure N excretion: [AN.EXC.14]
-        Fecal nitrogen: [AN.EXC.15]
-        Urinary nitrogen: [AN.EXC.16]
-        Manure total ammoniacal nitrogen: [AN.EXC.9]
-        Manure K excretion: [AN.EXC.17]
-
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
 
@@ -542,12 +594,30 @@ class ManureExcretionCalculator:
         ----------
         (Wilkerson et al., 1997; Nennich et al., 2005; Appuhamy et al., 2014; Reed et al., 2015;
         Johnson et al., 2016; Appuhamy et al., 2018; NASEM, 2021)
+        Urine excretion: [AN.EXC.28]
+        Total manure excretion: [AN.EXC.29]
+        Total solids excretion: [AN.EXC.12]
+        Organic matter intake: [AN.EXC.22]
+        Degradable volatile solids: [AN.EXC.23]
+        Total volatile solids excretion: [AN.EXC.24]
+        Non-degradable volatile solids excretion: [AN.EXC.6]
+        Manure N excretion: [AN.EXC.14]
+        Fecal nitrogen: [AN.EXC.15]
+        Urinary nitrogen: [AN.EXC.16]
+        Manure total ammoniacal nitrogen: [AN.EXC.9]
+        Manure K excretion: [AN.EXC.17]
 
         """
         # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
         # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
         # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
-        dry_matter_intake = nutrient_amounts.dry_matter
+        dmi_predicted = nutrient_amounts.dry_matter
+        dry_matter_intake = dmi_predicted
+        dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
+        ManureExcretionCalculator._track_and_warn_dmi_threshold(
+            dmi_kind="dry",
+            dmi_effective=dry_matter_intake,
+        )
         crude_protein_concentration = nutrient_amounts.crude_protein_percentage
         potassium_concentration = nutrient_amounts.potassium_percentage
         ash_concentration = nutrient_amounts.ash_percentage
@@ -569,7 +639,6 @@ class ManureExcretionCalculator:
             total_manure_excreted, (total_solids / AnimalModuleConstants.MAXMIMUM_MANURE_DRY_MATTER_CONTENT)
         )
 
-        dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
         organic_matter_intake = (
             dry_matter_intake
             * (GeneralConstants.FRACTION_TO_PERCENTAGE - ash_concentration)
@@ -668,15 +737,6 @@ class ManureExcretionCalculator:
         """
         Calculates a set of phosphorus excretion values produced by a given animal.
 
-        Notes
-        -----
-        Total phosphorus fraction of feces: [AN.EXC.30]
-        Inorganic phosphorus fraction: [AN.EXC.31]
-        Organic phosphorus fraction: [AN.EXC.32]
-        Milk phosphorus: [AN.EXC.33]
-        Manure P excreted by a cow: [AN.EXC.34]
-        Total P excreted by a cow: [AN.EXC.35]
-
         Parameters
         ----------
         daily_milk_production : float
@@ -705,7 +765,12 @@ class ManureExcretionCalculator:
         References
         ----------
         (NRC, 2001; Vadas et al., 2007)
-
+        Total phosphorus fraction of feces: [AN.EXC.30]
+        Inorganic phosphorus fraction: [AN.EXC.31]
+        Organic phosphorus fraction: [AN.EXC.32]
+        Milk phosphorus: [AN.EXC.33]
+        Manure P excreted by a cow: [AN.EXC.34]
+        Total P excreted by a cow: [AN.EXC.35]
 
         """
         if total_manure_excreted > 0:

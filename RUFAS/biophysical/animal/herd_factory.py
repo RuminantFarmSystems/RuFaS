@@ -9,7 +9,7 @@ from tqdm import tqdm
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
@@ -35,6 +35,16 @@ CALF_BIRTH_WEIGHT_BY_BREED: dict[str, dict[str, float]] = {
 class HerdFactory:
     """
     Class to initialize herd for simulation.
+
+    Parameters
+    ----------
+    init_herd : bool, default=False
+        A flag to indicate whether to initialize through simulation or from input data.
+    save_animals : bool, default=False
+        Indicates whether to save the generated animals to JSON files.
+    save_animals_path : Path, default=Path("output/")
+        The directory path where the animal data JSON files will be saved if
+        save_animals is True.
 
     Attributes
     ----------
@@ -64,16 +74,6 @@ class HerdFactory:
     ) -> None:
         """
         Initializes HerdFactory.
-
-        Parameters
-        ----------
-        init_herd : bool, default=False
-            A flag to indicate whether to initialize through simulation or from input data.
-        save_animals : bool, default=False
-            Indicates whether to save the generated animals to JSON files.
-        save_animals_path : Path, default=Path("output/")
-            The directory path where the animal data JSON files will be saved if
-            save_animals is True.
         """
         self.im = InputManager()
         self.init_herd = init_herd
@@ -86,7 +86,6 @@ class HerdFactory:
         self.CI = self.im.get_data("animal.animal_config.farm_level.repro.calving_interval")
         self.initial_animal_num = self.im.get_data("animal.herd_initialization.initial_animal_num")
         self.simulation_days = self.im.get_data("animal.herd_initialization.simulation_days")
-        AnimalGenetics.initialize_class_variables()
 
         self.pre_animal_population = AnimalPopulation(
             calves=[],
@@ -107,10 +106,6 @@ class HerdFactory:
         ----------
         animal_population : AnimalPopulation
             An instance of AnimalPopulation that represents the updated animal population.
-
-        Returns
-        -------
-        None
 
         """
         cls.post_animal_population = animal_population
@@ -136,6 +131,12 @@ class HerdFactory:
 
         """
         if animal.animal_type not in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            om.add_error(
+                "Calf and Heifer_I update error",
+                f"Unexpected {animal.animal_type.value} type. "
+                f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._calf_and_heiferI_update.__name__},
+            )
             raise TypeError(
                 f"Unexpected {animal.animal_type.value} type. "
                 f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}."
@@ -171,6 +172,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type == AnimalType.HEIFER_II:
+            om.add_error(
+                "Heifer_II update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._heiferII_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
@@ -203,6 +209,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type == AnimalType.HEIFER_III:
+            om.add_error(
+                "Heifer_III update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.",
+                info_map={"class": self.__class__.__name__, "function": self._heiferIII_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
@@ -239,6 +250,11 @@ class HerdFactory:
 
         """
         if not animal.animal_type.is_cow:
+            om.add_error(
+                "Cow update error",
+                f"Unexpected {animal.animal_type.value} type. Expecting cow.",
+                info_map={"class": self.__class__.__name__, "function": self._cow_update.__name__},
+            )
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting cow.")
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
@@ -305,10 +321,6 @@ class HerdFactory:
         cow : Animal
             The cow that is giving birth.
 
-        Returns
-        -------
-        None
-
         """
         args = NewBornCalfValuesTypedDict(
             id=self.pre_animal_population.next_id(),
@@ -317,7 +329,6 @@ class HerdFactory:
             days_born=0,
             initial_phosphorus=cow.nutrients.phosphorus_for_gestation_required_for_calf,
             birth_weight=cow.reproduction.calf_birth_weight,
-            net_merit=0.0,
             animal_type=AnimalType.CALF.value,
         )
         cow.nutrients.total_phosphorus_in_animal = (
@@ -329,10 +340,9 @@ class HerdFactory:
         cow.nutrients.phosphorus_for_gestation_required_for_calf = 0.0
         cow.reproduction.calf_birth_weight = 0.0
 
-        calf = Animal(args)
+        calf = Animal(args, self.time)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
-            calf.net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(self.time, calf.breed, cow.net_merit)
 
     def _heiferIIIs_update(self, day: int) -> None:
         """
@@ -340,10 +350,10 @@ class HerdFactory:
 
         Notes
         -----
-        The use of `deepcopy()` is necessary here because the graduated `heiferIII`s are
-        subsequently mutated by `transition_heiferIII_to_cow()` and appended to `cows`,
-        so without it the snapshot saved to the `replacement` array would reflect the cow
-        state rather than the heiferIII state.
+        The use of `deepcopy()` is necessary here because the graduated `heiferIII`s are subsequently mutated by
+        `transition_heiferIII_to_cow()` and appended to `cows`, so without it the snapshot saved to the `replacement`
+        array would reflect the cow state rather than the heiferIII state.
+
         """
         remaining_heiferIIIs: list[Animal] = []
         for heiferIII in self.pre_animal_population.heiferIIIs:
@@ -386,20 +396,15 @@ class HerdFactory:
             args = NewBornCalfValuesTypedDict(
                 id=self.pre_animal_population.next_id(),
                 breed=self.breed.name,
-                birth_date="",
+                birth_date=self.time.current_date.strftime("%Y-%m-%d"),
                 days_born=0,
                 initial_phosphorus=0,
                 birth_weight=birth_weight,
-                net_merit=0.0,
                 animal_type=AnimalType.CALF.value,
             )
-            calf = Animal(args)
+            calf = Animal(args, self.time)
             if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
-                birth_date_str: str = self.time.current_date.strftime("%Y-%m-%d")
-                calf.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-                    birth_date_str, self.breed
-                )
 
         for day in tqdm(range(self.simulation_days)):
             self._cows_update()
@@ -411,8 +416,10 @@ class HerdFactory:
         return self.pre_animal_population
 
     def _backtrack_animal_birth_date(self, days_born: int, time: RufasTime) -> str:
-        """Function to backtrack the birthdate of an animal loaded from data by subtracting the age of the animal
-        from the simulation start date."""
+        """
+        Function to backtrack the birthdate of an animal loaded from data by subtracting the age of the animal
+        from the simulation start date.
+        """
         simulation_start_date = time.start_date
         birth_date: datetime.datetime = simulation_start_date - datetime.timedelta(days=days_born)
         return birth_date.strftime("%Y-%m-%d")
@@ -422,11 +429,7 @@ class HerdFactory:
         animal_data.update(id=self.pre_animal_population.next_id())
         if animal_type == "calf":
             animal_data.update(initial_phosphorus=0)
-        animal = Animal(animal_data)
-        animal_birth_date: str = self._backtrack_animal_birth_date(animal_data["days_born"], self.time)
-        animal.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-            birth_date=animal_birth_date, breed=animal.breed
-        )
+        animal = Animal(animal_data, self.time)
         return animal
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:
@@ -439,6 +442,7 @@ class HerdFactory:
                 herd_data["calves"],
             )
         )
+        self._update_genetic_values(calves)
         heiferIs = list(
             map(
                 self._init_animal_from_data,
@@ -446,6 +450,7 @@ class HerdFactory:
                 herd_data["heiferIs"],
             )
         )
+        self._update_genetic_values(heiferIs)
         heiferIIs = list(
             map(
                 self._init_animal_from_data,
@@ -453,6 +458,7 @@ class HerdFactory:
                 herd_data["heiferIIs"],
             )
         )
+        self._update_genetic_values(heiferIIs)
         heiferIIIs = list(
             map(
                 self._init_animal_from_data,
@@ -460,6 +466,7 @@ class HerdFactory:
                 herd_data["heiferIIIs"],
             )
         )
+        self._update_genetic_values(heiferIIIs)
         cows = list(
             map(
                 self._init_animal_from_data,
@@ -467,6 +474,7 @@ class HerdFactory:
                 herd_data["cows"],
             )
         )
+        self._update_genetic_values(cows)
         replacement = list(
             map(
                 self._init_animal_from_data,
@@ -474,6 +482,7 @@ class HerdFactory:
                 herd_data["replacement"],
             )
         )
+        self._update_genetic_values(replacement)
 
         return AnimalPopulation(
             calves=calves,
@@ -484,6 +493,22 @@ class HerdFactory:
             replacement=replacement,
             current_animal_id=self.pre_animal_population.current_animal_id,
         )
+
+    def _update_genetic_values(
+        self,
+        animals: list[Animal],
+    ) -> None:
+        """Function to update EBV and ranking index values of a specific group of animals."""
+        if not AnimalConfig.simulate_genetics:
+            return
+        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
+            [animal.genetics for animal in animals if animal.genetics is not None]
+        )
+        for animal in animals:
+            assert animal.genetics is not None
+            animal.genetics.calculate_ebv_and_ranking_index(
+                animal.animal_type, mean_tbv_fat, mean_tbv_protein, animal.calves
+            )
 
     def _random_sample_with_replacement(self) -> AnimalPopulation:
         """Function to randomly sample the herd with replacement"""
@@ -545,6 +570,7 @@ class HerdFactory:
         randomly selected multiple times, and without it all duplicate entries
         in `post_animals` would share the same object, meaning mutations to
         one would affect all others.
+
         """
         PRE_ANIMAL_DATA: dict[str, list[Animal]] = {
             "calf": self.pre_animal_population.calves,
@@ -640,9 +666,12 @@ class HerdFactory:
     def initialize_herd(self) -> None:
         """
         Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation.
-        This function also optionally saves the generated herd data into a JSON file.
-        The initialized herd with be randomly sampled with replacement,
-        and set as the class attribute `post_animal_population`.
+
+        Notes
+        -----
+        This function also optionally saves the generated herd data into a JSON file. The initialized herd with be
+        randomly sampled with replacement, and set as the class attribute `post_animal_population`.
+
         """
 
         AnimalConfig.initialize_animal_config()

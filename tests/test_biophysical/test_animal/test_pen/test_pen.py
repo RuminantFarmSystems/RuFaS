@@ -1,5 +1,4 @@
 from typing import Any
-from unittest import mock
 from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec
 
 import numpy as np
@@ -1103,7 +1102,7 @@ def test_calculate_total_pen_manure_stream(pen: Pen, mocker: MockerFixture) -> N
     methane_potential = 0.25
     surface_area = 150.0
 
-    mocker.patch.object(Pen, "total_manure_excretion", new_callable=mock.PropertyMock, return_value=excretions)
+    mocker.patch.object(Pen, "total_manure_excretion", new_callable=PropertyMock, return_value=excretions)
     mocker.patch.object(pen, "_calculate_methane_production_potential", return_value=methane_potential)
     mocker.patch.object(pen, "_calculate_manure_surface_area", return_value=surface_area)
 
@@ -1711,7 +1710,6 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
         temperature=25.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=1,
     )
 
@@ -1743,7 +1741,6 @@ def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen)
         temperature=25.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=2,
     )
 
@@ -1768,7 +1765,6 @@ def test_formulation_non_lac_cow_failure_no_previous_ration(mocker: MockerFixtur
             temperature=22.0,
             max_daily_feeds={},
             advance_purchase_allowance=MagicMock(),
-            total_inventory=MagicMock(),
             simulation_day=3,
         )
 
@@ -1790,7 +1786,6 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
         temperature=21.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=4,
     )
 
@@ -1843,7 +1838,6 @@ def test_formulation_lac_cow_user_defined_dmi_increase_triggers_retry(mocker: Mo
         temperature=25.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=10,
     )
 
@@ -1900,7 +1894,6 @@ def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(moc
         temperature=20.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=11,
     )
 
