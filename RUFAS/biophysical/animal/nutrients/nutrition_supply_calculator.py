@@ -17,7 +17,7 @@ from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstan
 @dataclass
 class FeedInRation:
     """
-    Defines the amount of feed in a ration (kg) and all the nutritive info associated with it, in a Feed instance.
+    Defines the amount of feed in a ration (kg) and all the nutritive info associated with it in a Feed instance.
     """
 
     amount: float
@@ -146,13 +146,10 @@ class NutritionSupplyCalculator:
         float
             Discount used to calculate the actual TDN and DE content of feeds in the ration.
 
-        Notes
-        -------
-        [AN.SUP.1.1], [AN.SUP.2.1], [AN.SUP.3.1], [AN.SUP.4.1]
-
         References
         ----------
-         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.1.1], [AN.SUP.2.1], [AN.SUP.3.1], [AN.SUP.4.1]
 
         """
         dry_matter_intake = sum([feed.amount for feed in feeds])
@@ -196,12 +193,10 @@ class NutritionSupplyCalculator:
         dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to the actual metabolizable energy content of the corresponding feed (Mcal / kg).
 
-        Notes
-        -------
-        [AN.SUP.5.1]
         References
         ----------
-         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.5.1]
 
         """
         actual_metabolizable_energy: dict[RUFAS_ID, float] = {}
@@ -238,12 +233,10 @@ class NutritionSupplyCalculator:
         float
             Total actual net energy available for maintenance in the ration (Mcal).
 
-        Notes
-        -------
-        [AN.SUP.7.1]
         References
         ----------
         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.7.1]
 
         """
         actual_maintenance_net_energy: dict[RUFAS_ID, float] = {}
@@ -273,8 +266,6 @@ class NutritionSupplyCalculator:
         """
         NASEM method to calculate digestible NDF.
 
-        Adjusts base NDF digestibility of a given feed to account for the effect of total dry matter and starch intake.
-
         Parameters
         ----------
         feed : FeedInRation
@@ -286,9 +277,14 @@ class NutritionSupplyCalculator:
         total_starch : float
             Total starch provided in given ration.
 
+        Notes
+        -----
+        Adjusts base NDF digestibility of a given feed to account for the effect of total dry matter and starch intake.
+
         References
         ----------
-        AN.SUP.2.2
+        [AN.SUP.2.2]
+
         """
 
         dNDFbase: float = (
@@ -304,8 +300,6 @@ class NutritionSupplyCalculator:
         """
         NASEM methodology used to calculate starch digestibility (dstarch) of a given feed.
 
-        Adjusts base digestibility.
-
         Parameters
         ----------
         feed : FeedInRation
@@ -320,9 +314,14 @@ class NutritionSupplyCalculator:
         float
             Digestible starch for a given feed, Mcal/kg.
 
+        Notes
+        -----
+        Adjusts base digestibility.
+
         References
         ----------
-        AN.SUP.3.2
+        [AN.SUP.3.2]
+
         """
         dstarch: float = feed.info.starch_digested * GeneralConstants.PERCENTAGE_TO_FRACTION - 1.0 * (
             (dry_matter_intake / body_weight) - 0.035
@@ -355,7 +354,7 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.1.2, AN.SUP.4.2, AN.SUP.5.2, and AN.SUP.6.2
+        [AN.SUP.1.2], [AN.SUP.4.2], [AN.SUP.5.2], [AN.SUP.6.2]
         """
 
         digestible_energy_NASEM_dict: dict[RUFAS_ID, float] = {}
@@ -415,9 +414,6 @@ class NutritionSupplyCalculator:
         """
         Method to calculate dietary metabolizable energy for a given ration.
 
-        Dietary metabolizable energy is calculated by subtracting the energy found in gaseous losses
-        (i.e. enteric methane) and the energy lost in urine from the total diet digestible energy.
-
         Parameters
         ----------
         feeds : list[FeedInRation]
@@ -438,9 +434,15 @@ class NutritionSupplyCalculator:
         float
             Metabolizable energy for a given ration, Mcal/kg.
 
+        Notes
+        -----
+        Dietary metabolizable energy is calculated by subtracting the energy found in gaseous losses
+        (i.e. enteric methane) and the energy lost in urine from the total diet digestible energy.
+
         References
         ----------
-        AN.SUP.7.2, AN.SUP.8.2, and AN.SUP.9.2
+        [AN.SUP.7.2], [AN.SUP.8.2], [AN.SUP.9.2]
+
         """
 
         NASEM_digestible_energy: float = cls.calculate_NASEM_digestible_energy(
@@ -457,8 +459,6 @@ class NutritionSupplyCalculator:
         """
         NASEM methodology used to calculate net energy.
 
-        Simple calculation using metabolizable energy and the efficiency of use.
-
         Parameters
         ----------
         total_metabolizable_energy : float
@@ -471,7 +471,8 @@ class NutritionSupplyCalculator:
 
         References
         ----------
-        AN.SUP.10.2
+        [AN.SUP.10.2]
+
         """
         net_energy: float = AnimalModuleConstants.EFF_OF_ME_USE * total_metabolizable_energy
         return net_energy
@@ -500,13 +501,10 @@ class NutritionSupplyCalculator:
         float
             Total actual net energy available for lactation in the ration (Mcal).
 
-        Notes
-        -------
-        [AN.SUP.6.1]
-
         References
         ----------
-         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.6.1]
 
         """
         actual_lactation_net_energy: dict[RUFAS_ID, float] = {}
@@ -548,13 +546,10 @@ class NutritionSupplyCalculator:
         float
             Total actual net energy available for growth in the ration (Mcal).
 
-        Notes
-        -------
-        [AN.SUP.8.1]
-
         References
         ----------
-         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.8.1]
 
         """
         actual_growth_net_energy: dict[RUFAS_ID, float] = {}
@@ -591,13 +586,11 @@ class NutritionSupplyCalculator:
         float
             Total digestible calcium supply in the ration (g).
 
-        Notes
-        -------
-        [AN.SUP.15]
-
         References
         ----------
-         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.15]
+
         """
         calcium_digestibility: dict[RUFAS_ID, float] = {}
 
@@ -627,20 +620,20 @@ class NutritionSupplyCalculator:
     @classmethod
     def calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
         """
-         Calculates the phosphorus supply in the ration.
+        Calculates the phosphorus supply in the ration.
 
-         Parameters
-         ----------
-         feeds : list[FeedInRation]
-             List of feeds in ration, including the amount and nutritive properties.
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
 
-         Returns
-         -------
-         float
-             Total digestible phosphorus supply in the ration (g).
+        Returns
+        -------
+        float
+            Total digestible phosphorus supply in the ration (g).
 
-         References
-         ----------
+        References
+        ----------
         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
 
         """
@@ -697,18 +690,16 @@ class NutritionSupplyCalculator:
             Total metabolizable protein in the ration (g).
 
         Notes
-        -------
-        [AN.SUP.9],[AN.SUP.10],[AN.SUP.11],[AN.SUP.12],[AN.SUP.13],[AN.SUP.14],
-         [AN.SUP.27], [AN.SUP.29], [AN.SUP.30]
+        -----
+        Endogenous metabolizable protein is calculated from the dry matter intake, but the units of the protein are
+        grams while the dry matter intake is in kilograms, see page 319 of [1].
+
         References
         ----------
         .. [1] National Research Council. 2001. Nutrient Requirements of Dairy Cattle: Seventh Revised Edition, 2001.
                Washington, DC: The National Academies Press. https://doi.org/10.17226/9825.
-
-        Notes
-        -----
-        Endogenous metabolizable protein is calculated from the dry matter intake, but the units of the protein are
-        grams while the dry matter intake is in kilograms, see page 319 of [1].
+        [AN.SUP.9],[AN.SUP.10],[AN.SUP.11],[AN.SUP.12],[AN.SUP.13],[AN.SUP.14],
+        [AN.SUP.27], [AN.SUP.29], [AN.SUP.30]
 
         """
         concentrate_percentage_of_ration = cls._calculate_percentage_of_concentrates(feeds, dry_matter_intake)
@@ -784,31 +775,28 @@ class NutritionSupplyCalculator:
         percentage_concentrates: float,
     ) -> dict[RUFAS_ID, float]:
         """
-         Calculates the protein passage rate of feeds in ration.
+        Calculates the protein passage rate of feeds in ration.
 
-         Parameters
-         ----------
-         feeds : list[FeedInRation]
-             List of feeds in ration, including the amount and nutritive properties.
-         dry_matter_intake : float
-             Total dry matter contained in the ration (kg).
-         body_weight : float
-             The body weight of an animal (kg).
-         percentage_concetrates : dict[RUFAS_ID, float]
-             Percentage of the ration's dry matter which is made up of concentrates.
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        dry_matter_intake : float
+            Total dry matter contained in the ration (kg).
+        body_weight : float
+            The body weight of an animal (kg).
+        percentage_concetrates : dict[RUFAS_ID, float]
+            Percentage of the ration's dry matter which is made up of concentrates.
 
-         Returns
-         -------
-         dict[RUFAS_ID, float]
-             Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
 
-         Notes
-         -------
-         [AN.SUP.25]
-
-         References
-         ----------
+        References
+        ----------
         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.25]
 
         """
         protein_passage_rates: dict[RUFAS_ID, float] = {}
@@ -837,27 +825,24 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], protein_passage_rates: dict[RUFAS_ID, float]
     ) -> dict[RUFAS_ID, float]:
         """
-         Calculates rumen degradable protein (RDP) percentages of feeds in ration.
+        Calculates rumen degradable protein (RDP) percentages of feeds in ration.
 
-         Parameters
-         ----------
-         feeds : list[FeedInRation]
-             List of feeds in ration, including the amount and nutritive properties.
-         protein_passage_rates : dict[RUFAS_ID, float]
-             Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        protein_passage_rates : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
 
-         Returns
-         -------
-         dict[RUFAS_ID, float]
-             Mapping of RuFaS Feed IDs to RDP percentages (percent).
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to RDP percentages (percent).
 
-         Notes
-         -------
-         [AN.SUP.26]
-
-         References
-         ----------
+        References
+        ----------
         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.26]
 
         """
         rdp_percentages: dict[RUFAS_ID, float] = {}
@@ -894,13 +879,10 @@ class NutritionSupplyCalculator:
         dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to RUP percentages (percent).
 
-        Notes
-        -------
-        [AN.SUP.28]
-
         References
         ----------
         [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        [AN.SUP.28]
 
         """
         rup_percentages: dict[RUFAS_ID, float] = {}
@@ -949,9 +931,10 @@ class NutritionSupplyCalculator:
         float
             Total supply of nutrient in a ration (Mcal).
 
-        Notes
-        ----
+        References
+        ----------
         [AN.SUP.4]
+
         """
         de_attribute = "DE_Base" if cls.nutrient_standard is NutrientStandard.NASEM else "DE"
         return sum([feed.amount * getattr(feed.info, de_attribute) for feed in feeds])

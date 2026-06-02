@@ -36,6 +36,16 @@ class HerdFactory:
     """
     Class to initialize herd for simulation.
 
+    Parameters
+    ----------
+    init_herd : bool, default=False
+        A flag to indicate whether to initialize through simulation or from input data.
+    save_animals : bool, default=False
+        Indicates whether to save the generated animals to JSON files.
+    save_animals_path : Path, default=Path("output/")
+        The directory path where the animal data JSON files will be saved if
+        save_animals is True.
+
     Attributes
     ----------
     breed : str
@@ -64,16 +74,6 @@ class HerdFactory:
     ) -> None:
         """
         Initializes HerdFactory.
-
-        Parameters
-        ----------
-        init_herd : bool, default=False
-            A flag to indicate whether to initialize through simulation or from input data.
-        save_animals : bool, default=False
-            Indicates whether to save the generated animals to JSON files.
-        save_animals_path : Path, default=Path("output/")
-            The directory path where the animal data JSON files will be saved if
-            save_animals is True.
         """
         self.im = InputManager()
         self.init_herd = init_herd
@@ -106,10 +106,6 @@ class HerdFactory:
         ----------
         animal_population : AnimalPopulation
             An instance of AnimalPopulation that represents the updated animal population.
-
-        Returns
-        -------
-        None
 
         """
         cls.post_animal_population = animal_population
@@ -325,10 +321,6 @@ class HerdFactory:
         cow : Animal
             The cow that is giving birth.
 
-        Returns
-        -------
-        None
-
         """
         args = NewBornCalfValuesTypedDict(
             id=self.pre_animal_population.next_id(),
@@ -358,10 +350,10 @@ class HerdFactory:
 
         Notes
         -----
-        The use of `deepcopy()` is necessary here because the graduated `heiferIII`s are
-        subsequently mutated by `transition_heiferIII_to_cow()` and appended to `cows`,
-        so without it the snapshot saved to the `replacement` array would reflect the cow
-        state rather than the heiferIII state.
+        The use of `deepcopy()` is necessary here because the graduated `heiferIII`s are subsequently mutated by
+        `transition_heiferIII_to_cow()` and appended to `cows`, so without it the snapshot saved to the `replacement`
+        array would reflect the cow state rather than the heiferIII state.
+
         """
         remaining_heiferIIIs: list[Animal] = []
         for heiferIII in self.pre_animal_population.heiferIIIs:
@@ -424,8 +416,10 @@ class HerdFactory:
         return self.pre_animal_population
 
     def _backtrack_animal_birth_date(self, days_born: int, time: RufasTime) -> str:
-        """Function to backtrack the birthdate of an animal loaded from data by subtracting the age of the animal
-        from the simulation start date."""
+        """
+        Function to backtrack the birthdate of an animal loaded from data by subtracting the age of the animal
+        from the simulation start date.
+        """
         simulation_start_date = time.start_date
         birth_date: datetime.datetime = simulation_start_date - datetime.timedelta(days=days_born)
         return birth_date.strftime("%Y-%m-%d")
@@ -576,6 +570,7 @@ class HerdFactory:
         randomly selected multiple times, and without it all duplicate entries
         in `post_animals` would share the same object, meaning mutations to
         one would affect all others.
+
         """
         PRE_ANIMAL_DATA: dict[str, list[Animal]] = {
             "calf": self.pre_animal_population.calves,
@@ -671,9 +666,12 @@ class HerdFactory:
     def initialize_herd(self) -> None:
         """
         Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation.
-        This function also optionally saves the generated herd data into a JSON file.
-        The initialized herd with be randomly sampled with replacement,
-        and set as the class attribute `post_animal_population`.
+
+        Notes
+        -----
+        This function also optionally saves the generated herd data into a JSON file. The initialized herd with be
+        randomly sampled with replacement, and set as the class attribute `post_animal_population`.
+
         """
 
         AnimalConfig.initialize_animal_config()
