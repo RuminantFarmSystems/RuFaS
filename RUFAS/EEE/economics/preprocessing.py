@@ -293,7 +293,6 @@ class EconomicPreprocessor:
             return values_by_scenario
         return {}
 
-
     def _collect_biophysical_wildcards(self, sim_paths: Iterable[str]) -> List[tuple[str, ...]]:
         """Collect wildcard values from matched biophysical variable names."""
 
@@ -340,7 +339,9 @@ class EconomicPreprocessor:
             replacement_values = groups[:wildcard_count]
             expanded = path
             for replacement in replacement_values:
-                mapped_replacement = wildcard_value_map.get(replacement, replacement) if wildcard_value_map else replacement
+                mapped_replacement = (
+                    wildcard_value_map.get(replacement, replacement) if wildcard_value_map else replacement
+                )
                 expanded = expanded.replace("*", mapped_replacement, 1)
 
             if expanded in seen:
@@ -614,9 +615,7 @@ class EconomicPreprocessor:
             return self._fetch_prices(economics_files)
 
         requested_values = (
-            list(input_match_values or [])
-            if source == "input_manager"
-            else list(biophysical_match_values or [])
+            list(input_match_values or []) if source == "input_manager" else list(biophysical_match_values or [])
         )
         requested = {str(value).lower() for value in requested_values if str(value).strip()}
         if not requested:

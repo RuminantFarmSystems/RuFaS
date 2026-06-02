@@ -49,9 +49,13 @@ def test_framework_exports_line_item_breakdown(monkeypatch):
 
     dummy_om = DummyOutputManager()
 
-    monkeypatch.setattr(framework, "InputManager", lambda: type("IM", (), {"get_data": lambda *_: pd.DataFrame({"Cost": []})})())
+    monkeypatch.setattr(
+        framework, "InputManager", lambda: type("IM", (), {"get_data": lambda *_: pd.DataFrame({"Cost": []})})()
+    )
     monkeypatch.setattr(framework, "OutputManager", lambda: dummy_om)
-    monkeypatch.setattr(framework, "EconomicPreprocessor", lambda: type("Pre", (), {"preprocess": lambda *_: preprocessed})())
+    monkeypatch.setattr(
+        framework, "EconomicPreprocessor", lambda: type("Pre", (), {"preprocess": lambda *_: preprocessed})()
+    )
     monkeypatch.setattr(framework, "PartialBudget", lambda: DummyPartialBudget())
 
     ef = framework.EconomicFramework()
