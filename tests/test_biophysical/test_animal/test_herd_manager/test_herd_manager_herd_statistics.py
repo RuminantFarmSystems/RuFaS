@@ -1082,8 +1082,12 @@ def test_calculate_heifer_average_daily_weight_gain_with_heifers_in_pen(
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["2"] == pytest.approx(2.0)
 
     # Assert — per-animal-type averages
-    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I] == pytest.approx(2.0)
-    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II] == pytest.approx(2.0)
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I] == pytest.approx(
+        2.0
+    )
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II] == pytest.approx(
+        2.0
+    )
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III] is None
 
 
@@ -1135,9 +1139,7 @@ def test_calculate_heifer_average_daily_weight_gain_new_pen_triggers_backfill(
     herd_manager.heiferIIIs = []
 
     mock_om_instance = MagicMock(spec=OutputManager)
-    mock_om_class = mocker.patch(
-        "RUFAS.biophysical.animal.herd_manager.OutputManager", return_value=mock_om_instance
-    )
+    mock_om_class = mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager", return_value=mock_om_instance)
 
     # Act — simulation_day=3 means backfill days 0, 1, 2
     herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=3)
