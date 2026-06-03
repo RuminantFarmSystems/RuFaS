@@ -56,7 +56,7 @@ class GeneralConstants:
     MCAL_TO_MJ : float
         Conversion factor from megacalories to megajoules (MJ/Mcal).
     G_CH4_TO_MJ_CH4 : float
-        Conversion factor from megajoules of methane to grams of methane (g CH₄/MJ CH₄).
+        Conversion factor from grams of methane to megajoules of methane (g CH₄/MJ CH₄).
     EARTH_ANGULAR_VELOCITY : float
         Earth's angular velocity (rad/h).
     CELSIUS_TO_KELVIN : float

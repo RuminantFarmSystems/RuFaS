@@ -12,6 +12,15 @@ class RufasTime:
     """
     This object is responsible for creating and tracking time in the simulation.
 
+    Parameters
+    ----------
+    start_date : datetime
+        The start date of the simulation.
+    end_date : datetime
+        The end date of the simulation.
+    current_date : datetime
+        The current date in the simulation.
+
     Attributes
     ----------
     om : OutputManager

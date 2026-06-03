@@ -13,6 +13,13 @@ class Weather:
     """
     The ``Weather`` class manages all weather data used to run a single simulation.
 
+    Parameters
+    ----------
+    weather_file : dict[str, list[int | float]]
+        The weather data file containing the weather data for the simulation.
+    time : RufasTime
+        The ``RufasTime`` instance containing time configuration information of the simulation.
+
     Attributes
     ----------
     weather_data : dict[datetime.datetime, CurrentDayConditions]
@@ -47,8 +54,8 @@ class Weather:
         self.amplitude: float = 0.0
 
         for i in range(len(weather_file["year"])):
-            year = weather_file["year"][i]
-            jday = weather_file["jday"][i]
+            year = int(weather_file["year"][i])
+            jday = int(weather_file["jday"][i])
             date_key = RufasTime.convert_year_jday_to_date(year, jday)
 
             # Only include dates within the simulation period to save on space
