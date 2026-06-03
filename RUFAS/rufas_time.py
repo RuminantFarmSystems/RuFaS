@@ -64,7 +64,7 @@ class RufasTime:
     @property
     def year_start_day(self) -> int:
         """
-        Returns the first Julian day of the current year in integer.
+        Returns the first Julian day of the current year.
 
         Returns
         -------
@@ -76,7 +76,7 @@ class RufasTime:
     @property
     def year_end_day(self) -> int:
         """
-        Returns the last Julian day of the current year in integer.
+        Returns the last Julian day of the current year.
 
         Returns
         -------
@@ -93,7 +93,7 @@ class RufasTime:
     @property
     def current_julian_day(self) -> int:
         """
-        Returns the current Julian day of the current year in integer.
+        Returns the current Julian day of the current year.
 
         Returns
         -------
@@ -104,7 +104,7 @@ class RufasTime:
     @property
     def current_month(self) -> int:
         """
-        Returns the current month in integer.
+        Returns the current month.
 
         Returns
         -------
@@ -116,7 +116,7 @@ class RufasTime:
     @property
     def current_simulation_year(self) -> int:
         """
-        Returns the current simulation year in integer.
+        Returns the current simulation year.
 
         Returns
         -------
@@ -127,7 +127,7 @@ class RufasTime:
     @property
     def current_calendar_year(self) -> int:
         """
-        Returns the current calendar year in integer.
+        Returns the current calendar year.
 
         Returns
         -------
@@ -139,7 +139,7 @@ class RufasTime:
     @property
     def simulation_day(self) -> int:
         """
-        Returns the current simulation day in integer.
+        Returns the current simulation day.
 
         Returns
         -------
