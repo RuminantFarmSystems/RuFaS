@@ -471,10 +471,6 @@ class Pen:
         animal_ids : List[int]
             List of animals that match the given ids to be removed from the pen.
 
-        Returns
-        -------
-        None
-
         """
         if not animal_ids:
             return
@@ -498,10 +494,6 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available formulate animals rations with.
 
-        Returns
-        -------
-        None
-
         """
         self._add_new_animals(new_animals, available_feeds)
         self.update_animal_combination(animal_combination)
@@ -517,10 +509,6 @@ class Pen:
             list of new animals to be added to the pen
         available_feeds : list[Feed]
             Nutrition information of feeds available formulate animals rations with.
-
-        Returns
-        -------
-        None
 
         """
         for animal in new_animals:
@@ -546,10 +534,6 @@ class Pen:
         ----------
         animals : list[Animal]
 
-        Returns
-        -------
-        None
-
         Notes
         -----
         This method only inserts a list of new animals in the animals_in_pen map, and updates the daily walking distance
@@ -572,10 +556,6 @@ class Pen:
         animal: Animal
             The animal to insert into pen.
 
-        Returns
-        -------
-        None
-
         Notes
         -----
         This method only inserts a new animal in the animals_in_pen map, and updates the daily walking distance if it is
@@ -594,11 +574,7 @@ class Pen:
         Parameters
         ----------
         animal_combination: AnimalCombination
-            the new AnimalCombination
-
-        Returns
-        -------
-        None
+            The new AnimalCombination.
 
         """
         self.animal_combination = animal_combination
@@ -606,10 +582,6 @@ class Pen:
     def update_daily_walking_distance(self) -> None:
         """
         Updates the daily walking distance for cows in the pen.
-
-        Returns
-        -------
-        None
 
         """
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
@@ -625,10 +597,6 @@ class Pen:
         All other attributes are kept the same so that if a pen becomes empty
         and animals are to be added to it, there are previous initial values
         that are non-zero.
-
-        Returns
-        -------
-        None
 
         """
         self.animals_in_pen = {}
@@ -1021,10 +989,6 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
 
-        Returns
-        -------
-        None
-
         """
         for animal in self.animals_in_pen.values():
             animal.set_nutrition_requirements(
@@ -1044,10 +1008,6 @@ class Pen:
             The list of feeds used to formulate the ration.
         ration_formulation : dict[RUFAS_ID, float]
             The formulated ration dictionary, mapping RuFaS Feed ID to mass of feed in ration per animal per day.
-
-        Returns
-        -------
-        None
 
         """
         for animal in self.animals_in_pen.values():
@@ -1408,10 +1368,6 @@ class Pen:
 
         If the animal is not a lactating cow, the outcomes of that animal are not affected and its nutrition
         requirements are not met.
-
-        Returns
-        -------
-        None
 
         """
         animal_combination = self.animal_combination
