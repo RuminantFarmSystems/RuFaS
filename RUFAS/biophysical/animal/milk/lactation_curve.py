@@ -26,9 +26,9 @@ N_ADJUSTMENT_SCALING_FACTOR = 1e-4
 
 
 """
-If user's input for parity 1, 2, and 3+ fractions of the milking herd are invalid (i.e. do not sum to 1), then the below
-defaults will be used. Note that these defaults are ONLY used to adjust the lactation curve parameters, they are not
-used at all to determine herd structure. These numbers are from Li et al, 2023.
+If users input for parity 1, 2, and 3+ fractions of the milking herd are invalid (i.e. do not sum to 1) then the below
+defaults will be used. Note that these defaults are ONLY used to adjust the lactation curve parameters. They are not
+used at all to determine herd structure.
 
 References
 ----------
@@ -194,10 +194,6 @@ class LactationCurve:
         """
         Computes Wood's Lactation Curve parameters adjusted for different factors.
 
-        Notes
-        -----
-        Parameter adjustments: [AN.MLK.1], [AN.MLK.2], [AN.MLK.3]
-
         Parameters
         ----------
         l_param : float
@@ -214,6 +210,10 @@ class LactationCurve:
         -------
         dict[str, float]
             Dictionary containing the adjusted Wood l, m, and n parameters.
+
+        Notes
+        -----
+        Parameter adjustments: [AN.MLK.1], [AN.MLK.2], [AN.MLK.3]
 
         """
         l_param += sum([adjustment["l"] for adjustment in adjustments])
@@ -306,11 +306,6 @@ class LactationCurve:
         """
         Calculates the 305-day milk yield for each lactation group based on total farm milk production.
 
-        Notes
-        -----
-        Herd average 305-day milk yield: [AN.MLK.4]
-        Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]
-
         Parameters
         ----------
         annual_milk_yield : float
@@ -333,6 +328,11 @@ class LactationCurve:
         dict[str, float]
             Mapping of the parity (1, 2, 3+) to the estimated 305 day milk production of an individual cow of that
             parity (kg).
+
+        References
+        ----------
+        Herd average 305-day milk yield: [AN.MLK.4]
+        Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]
 
         """
         milk_yield_305_day_all_cows = annual_milk_yield * (305 / GeneralConstants.YEAR_LENGTH)
@@ -389,10 +389,6 @@ class LactationCurve:
         """
         Modifies Wood's l parameter to best fit a given 305 day milk yield.
 
-        Notes
-        -----
-        [AN.MLK.8]
-
         Parameters
         ----------
         l_param : float
@@ -408,6 +404,10 @@ class LactationCurve:
         -------
         float
             Wood's l parameter adjusted to best fit the given milk yield.
+
+        References
+        ----------
+        [AN.MLK.8]
 
         """
 

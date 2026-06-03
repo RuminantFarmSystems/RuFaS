@@ -3064,8 +3064,8 @@ def test_calculate_nutrition_requirements_calf(mock_lactating_cow: Animal, mocke
         ),
     )
     AnimalConfig.wean_length = 5
-    mocker.patch.object(CalfRationManager, "calc_intake", return_value=dummy_intake)
-    mocker.patch.object(CalfRationManager, "calc_requirements", return_value=dummy_requirements)
+    mocker.patch.object(CalfRationManager, "calculate_intake", return_value=dummy_intake)
+    mocker.patch.object(CalfRationManager, "calculate_requirements", return_value=dummy_requirements)
     result = animal.calculate_nutrition_requirements("barn", 10.0, 20.0, [])
     assert result == expected
 
