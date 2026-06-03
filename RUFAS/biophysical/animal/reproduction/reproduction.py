@@ -414,11 +414,11 @@ class Reproduction:
             )
             if not reproduction_data_stream.is_pregnant:
                 self.repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
-                reproduction_data_stream.events.add_event(
-                    reproduction_data_stream.days_born,
-                    simulation_day,
-                    f"Current repro state(s): {self.repro_state_manager}",
-                )
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                f"Current repro state(s): {self.repro_state_manager}",
+            )
         return reproduction_data_stream
 
     def _execute_cow_reproduction_protocols(
@@ -1800,7 +1800,8 @@ class Reproduction:
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> tuple[bool, ReproductionDataStream]:
         """Determine if hormone delivery should be set up for presynch based on current status."""
-
+        if reproduction_data_stream.is_pregnant:
+            return False, reproduction_data_stream
         if self.cow_reproduction_program != CowReproductionProtocol.TAI:
             return False, reproduction_data_stream
 
@@ -1844,7 +1845,8 @@ class Reproduction:
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> tuple[bool, ReproductionDataStream]:
         """Determine if hormone delivery should be set up for OvSynch based on current status."""
-
+        if reproduction_data_stream.is_pregnant:
+            return False, reproduction_data_stream
         if self.hormone_schedule:
             return False, reproduction_data_stream
         if AnimalConfig.cow_ovsynch_method not in [
