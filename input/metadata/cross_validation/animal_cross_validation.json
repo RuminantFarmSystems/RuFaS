@@ -1099,7 +1099,7 @@
               "operands": ["preg_check_day_3"]
             }
           },
-          "relationship": "greater"
+          "relationship": "greater_or_equal_to"
         }
       ]
     },
