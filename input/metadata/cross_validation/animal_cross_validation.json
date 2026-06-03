@@ -1,0 +1,1518 @@
+{
+  "cross_validation": [
+    {
+      "description": "Sum of parity fractions must equal 1.0",
+      "aliases": {
+        "variables": {
+          "p1": "animal.herd_information.parity_fractions.1",
+          "p2": "animal.herd_information.parity_fractions.2",
+          "p3": "animal.herd_information.parity_fractions.3",
+          "p4": "animal.herd_information.parity_fractions.4",
+          "p5": "animal.herd_information.parity_fractions.5"
+        },
+        "constants": {
+          "one": 1.0
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "operands": ["p1", "p2", "p3", "p4", "p5"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["one"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "Dry-off must occur before calving: days_in_preg_when_dry < avg_gestation_len",
+      "aliases": {
+        "variables": {
+          "days_in_preg_when_dry": "animal.animal_config.management_decisions.days_in_preg_when_dry",
+          "avg_gestation_len": "animal.animal_config.farm_level.repro.avg_gestation_len"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["avg_gestation_len"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["days_in_preg_when_dry"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "Heifer culling must start after breeding: heifer_repro_cull_time > breeding_start_day_h",
+      "aliases": {
+        "variables": {
+          "heifer_repro_cull_time": "animal.animal_config.management_decisions.heifer_repro_cull_time",
+          "breeding_start_day_h": "animal.animal_config.management_decisions.breeding_start_day_h"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["heifer_repro_cull_time"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["breeding_start_day_h"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "When cow repro method is in ['ED', 'ED-TAI'], do_not_breed_time > voluntary_waiting_period",
+      "aliases": {
+        "variables": {
+          "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
+          "do_not_breed_time": "animal.animal_config.management_decisions.do_not_breed_time",
+          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period"
+        },
+        "constants": {
+          "ED": "ED",
+          "ED_TAI": "ED-TAI"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["cow_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ED", "ED_TAI"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["do_not_breed_time"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "Wean day must be before heifer breeding start: wean_day < breeding_start_day_h",
+      "aliases": {
+        "variables": {
+          "wean_day": "animal.animal_config.farm_level.calf.wean_day",
+          "breeding_start_day_h": "animal.animal_config.management_decisions.breeding_start_day_h"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["breeding_start_day_h"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["wean_day"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "prefresh_day must be shorter than both gestation length (avg_gestation_len) and the dry period duration (avg_gestation_len - days_in_preg_when_dry)",
+      "aliases": {
+        "variables": {
+          "prefresh_day": "animal.animal_config.farm_level.repro.prefresh_day",
+          "avg_gestation_len": "animal.animal_config.farm_level.repro.avg_gestation_len",
+          "days_in_preg_when_dry": "animal.animal_config.management_decisions.days_in_preg_when_dry"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["avg_gestation_len"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["prefresh_day"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "difference",
+              "operands": ["avg_gestation_len", "days_in_preg_when_dry"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["prefresh_day"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "Calving interval must exceed voluntary waiting period plus gestation length",
+      "aliases": {
+        "variables": {
+          "calving_interval": "animal.animal_config.farm_level.repro.calving_interval",
+          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period",
+          "avg_gestation_len": "animal.animal_config.farm_level.repro.avg_gestation_len"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["calving_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "operands": ["voluntary_waiting_period", "avg_gestation_len"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "When heifer repro method is ED, repro_sub_protocol must be NA",
+      "aliases": {
+        "variables": {
+          "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
+          "heifer_repro_sub_protocol": "animal.animal_config.farm_level.repro.heifers.repro_sub_protocol"
+        },
+        "constants": {
+          "ED": "ED",
+          "NA": "N/A"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["heifer_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ED"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["heifer_repro_sub_protocol"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["NA"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "When heifer repro method is TAI, repro_sub_protocol must be in ['5dCG2P', '5dCGP']",
+      "aliases": {
+        "variables": {
+          "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
+          "heifer_repro_sub_protocol": "animal.animal_config.farm_level.repro.heifers.repro_sub_protocol"
+        },
+        "constants": {
+          "TAI": "TAI",
+          "5dCG2P": "5dCG2P",
+          "5dCGP": "5dCGP"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["heifer_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["TAI"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["heifer_repro_sub_protocol"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["5dCG2P", "5dCGP"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ]
+    },
+    {
+      "description": "When heifer repro method is SynchED, repro_sub_protocol must be in ['2P', 'CP']",
+      "aliases": {
+        "variables": {
+          "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
+          "heifer_repro_sub_protocol": "animal.animal_config.farm_level.repro.heifers.repro_sub_protocol"
+        },
+        "constants": {
+          "SynchED": "SynchED",
+          "2P": "2P",
+          "CP": "CP"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["heifer_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["SynchED"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["heifer_repro_sub_protocol"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["2P", "CP"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ]
+    },
+    {
+      "description": "When cow repro method is ED: voluntary_waiting_period must be positive, presynch_program, presynch_program_start_day, and ovsynch_program_start_day must be null, and estrus_detection_rate and ED_conception_rate must be positive",
+      "aliases": {
+        "variables": {
+          "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
+          "presynch_program": "animal.animal_config.farm_level.repro.cows.presynch_program",
+          "ovsynch_program": "animal.animal_config.farm_level.repro.cows.ovsynch_program",
+          "resynch_program": "animal.animal_config.farm_level.repro.cows.resynch_program",
+          "estrus_detection_rate": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
+          "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
+          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+          "presynch_program_start_day": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day",
+          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period"
+        },
+        "constants": {
+          "ED": "ED",
+          "zero": 0,
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["cow_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ED"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["resynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["estrus_detection_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ED_conception_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "When cow repro method is TAI: ovsynch_program must be set, ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
+      "aliases": {
+        "variables": {
+          "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
+          "ovsynch_program": "animal.animal_config.farm_level.repro.cows.ovsynch_program",
+          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate",
+          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period"
+        },
+        "constants": {
+          "TAI": "TAI",
+          "zero": 0,
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["cow_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["TAI"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_conception_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "When cow repro method is TAI and resynch_program is in ['PGFatPD', 'none']: presynch_program must be set, presynch_program_start_day must be positive, and estrus_detection_rate and ED_conception_rate must be positive",
+      "aliases": {
+        "variables": {
+          "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
+          "resynch_program": "animal.animal_config.farm_level.repro.cows.resynch_program",
+          "presynch_program": "animal.animal_config.farm_level.repro.cows.presynch_program",
+          "presynch_program_start_day": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day",
+          "estrus_detection_rate": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
+          "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
+          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
+        },
+        "constants": {
+          "TAI": "TAI",
+          "zero": 0,
+          "true_constant": true,
+          "PGFatPD_or_none": ["PGFatPD", "none"],
+          "PGFatPD": "PGFatPD",
+          "none": "none"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["cow_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["TAI"]
+            }
+          },
+          "relationship": "equal"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["resynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["PGFatPD", "none"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["estrus_detection_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ED_conception_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "When cow repro method is ED-TAI: voluntary_waiting_period must be positive, estrus_detection_rate and ED_conception_rate must be positive, ovsynch_program must be set, and ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
+      "aliases": {
+        "variables": {
+          "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
+          "ovsynch_program": "animal.animal_config.farm_level.repro.cows.ovsynch_program",
+          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate",
+          "estrus_detection_rate": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
+          "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
+          "voluntary_waiting_period": "animal.animal_config.farm_level.repro.voluntary_waiting_period"
+        },
+        "constants": {
+          "ED_TAI": "ED-TAI",
+          "zero": 0,
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["cow_repro_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ED_TAI"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["estrus_detection_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ED_conception_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_conception_rate"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "Holstein birth weight std dev must be less than 20% of average: birth_weight_std_ho < 0.2 * birth_weight_avg_ho",
+      "aliases": {
+        "variables": {
+          "birth_weight_std_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_std_ho",
+          "birth_weight_avg_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_avg_ho"
+        },
+        "constants": {
+          "twenty_percent": 0.2
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "product",
+              "operands": ["twenty_percent", "birth_weight_avg_ho"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["birth_weight_std_ho"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "When presynch_program and ovsynch_program are both not null: ovsynch_program_start_day must exceed presynch_program_start_day",
+      "aliases": {
+        "variables": {
+          "presynch_program": "animal.animal_config.farm_level.repro.cows.presynch_program",
+          "ovsynch_program": "animal.animal_config.farm_level.repro.cows.ovsynch_program",
+          "ovsynch_program_start_day": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+          "presynch_program_start_day": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ovsynch_program_start_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["presynch_program_start_day"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "Target heifer pregnancy day must be after breeding start: target_heifer_preg_day > breeding_start_day_h",
+      "aliases": {
+        "variables": {
+          "target_heifer_preg_day": "animal.animal_config.farm_level.bodyweight.target_heifer_preg_day",
+          "breeding_start_day_h": "animal.animal_config.management_decisions.breeding_start_day_h"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["target_heifer_preg_day"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["breeding_start_day_h"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "Average Holstein birth weight must be less than average mature body weight: birth_weight_avg_ho < mature_body_weight_avg",
+      "aliases": {
+        "variables": {
+          "mature_body_weight_avg": "animal.animal_config.farm_level.bodyweight.mature_body_weight_avg",
+          "birth_weight_avg_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_avg_ho"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["mature_body_weight_avg"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["birth_weight_avg_ho"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "Pregnancy check days must be in ascending order, and last check must precede both calving and dry-off",
+      "aliases": {
+        "variables": {
+          "preg_check_day_1": "animal.animal_config.from_literature.repro.preg_check_day_1",
+          "preg_check_day_2": "animal.animal_config.from_literature.repro.preg_check_day_2",
+          "preg_check_day_3": "animal.animal_config.from_literature.repro.preg_check_day_3",
+          "avg_gestation_len": "animal.animal_config.farm_level.repro.avg_gestation_len",
+          "days_in_preg_when_dry": "animal.animal_config.management_decisions.days_in_preg_when_dry"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["preg_check_day_2"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["preg_check_day_1"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["preg_check_day_3"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["preg_check_day_2"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["avg_gestation_len"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["preg_check_day_3"]
+            }
+          },
+          "relationship": "greater"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["days_in_preg_when_dry"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["preg_check_day_3"]
+            }
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "Sum of all cull reason probabilities must equal 1.0",
+      "aliases": {
+        "variables": {
+          "feet_leg_prob": "animal.animal_config.from_literature.culling.feet_leg_cull.probability",
+          "injury_prob": "animal.animal_config.from_literature.culling.injury_cull.probability",
+          "mastitis_prob": "animal.animal_config.from_literature.culling.mastitis_cull.probability",
+          "disease_prob": "animal.animal_config.from_literature.culling.disease_cull.probability",
+          "udder_prob": "animal.animal_config.from_literature.culling.udder_cull.probability",
+          "unknown_prob": "animal.animal_config.from_literature.culling.unknown_cull.probability"
+        },
+        "constants": {
+          "one": 1.0
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "operands": [
+                "feet_leg_prob",
+                "injury_prob",
+                "mastitis_prob",
+                "disease_prob",
+                "udder_prob",
+                "unknown_prob"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["one"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All cull_day_prob and death_day_prob must have the same length as cull_day_count",
+      "aliases": {
+        "variables": {
+          "cull_day_count": "animal.animal_config.from_literature.culling.cull_day_count",
+          "feet_leg_cull_day_prob": "animal.animal_config.from_literature.culling.feet_leg_cull.cull_day_prob",
+          "injury_cull_day_prob": "animal.animal_config.from_literature.culling.injury_cull.cull_day_prob",
+          "mastitis_cull_day_prob": "animal.animal_config.from_literature.culling.mastitis_cull.cull_day_prob",
+          "disease_cull_day_prob": "animal.animal_config.from_literature.culling.disease_cull.cull_day_prob",
+          "udder_cull_day_prob": "animal.animal_config.from_literature.culling.udder_cull.cull_day_prob",
+          "unknown_cull_day_prob": "animal.animal_config.from_literature.culling.unknown_cull.cull_day_prob",
+          "death_day_prob": "animal.animal_config.from_literature.culling.death_day_prob"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["cull_day_count"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["feet_leg_cull_day_prob"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["cull_day_count"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["injury_cull_day_prob"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["cull_day_count"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["mastitis_cull_day_prob"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["cull_day_count"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["disease_cull_day_prob"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["cull_day_count"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["udder_cull_day_prob"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["cull_day_count"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["unknown_cull_day_prob"]
+            }
+          },
+          "relationship": "is_equal_length"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["cull_day_count"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["death_day_prob"]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "When methane mitigation method is None, additive amount must be 0",
+      "aliases": {
+        "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount"
+        },
+        "constants": {
+          "none_method": "None",
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["none_method"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_additive_amount"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "When methane mitigation method is 3-NOP, additive amount must equal 3-NOP additive amount",
+      "aliases": {
+        "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount",
+          "3nop_additive_amount": "animal.methane_mitigation.3-NOP_additive_amount"
+        },
+        "constants": {
+          "3nop_method": "3-NOP"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["3nop_method"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_additive_amount"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["3nop_additive_amount"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "When methane mitigation method is monensin, additive amount must equal monensin additive amount",
+      "aliases": {
+        "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount",
+          "monensin_amount": "animal.methane_mitigation.monensin_additive_amount"
+        },
+        "constants": {
+          "monensin_method": "monensin"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["monensin_method"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_additive_amount"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["monensin_amount"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "When methane mitigation method is essential_oils, additive amount must equal essential oils additive amount",
+      "aliases": {
+        "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount",
+          "essential_oils_amount": "animal.methane_mitigation.essential_oils_additive_amount"
+        },
+        "constants": {
+          "essential_oils_method": "essential_oils"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["essential_oils_method"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_additive_amount"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["essential_oils_amount"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "When methane mitigation method is seaweed_additive, additive amount must equal seaweed additive amount",
+      "aliases": {
+        "variables": {
+          "methane_mitigation_method": "animal.methane_mitigation.methane_mitigation_method",
+          "methane_mitigation_additive_amount": "animal.methane_mitigation.methane_mitigation_additive_amount",
+          "seaweed_amount": "animal.methane_mitigation.seaweed_additive_amount"
+        },
+        "constants": {
+          "seaweed_method": "seaweed_additive"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["seaweed_method"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["methane_mitigation_additive_amount"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["seaweed_amount"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    }
+  ]
+}
