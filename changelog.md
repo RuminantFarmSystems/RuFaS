@@ -93,6 +93,7 @@ v1.0.0
 - [3046](https://github.com/RuminantFarmSystems/RuFaS/pull/3046) - [minor change] [Feed Storage] [NoInputChange] [NoOutputChange] Updates and fixes docstrings to be more consistently formatted.
 - [3048](https://github.com/RuminantFarmSystems/RuFaS/pull/3048) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Updates and fixes the EEE module docstrings to be more consistently formatted.
 - [3052](https://github.com/RuminantFarmSystems/RuFaS/pull/3052) - [minor change] [e2e-testing] [NoInputChange] [NoOutputChange] Updates and e2e-testing filters.
+- [3041](https://github.com/RuminantFarmSystems/RuFaS/pull/3041) - [minor change] [NoInputChange] [NoOutputChange] [OutputManager] [GraphGenerator] [ReportGenerator] Updates docstrings in post-processing modules to follow NumPy-style format.
 
 ### v1.0.0
 
