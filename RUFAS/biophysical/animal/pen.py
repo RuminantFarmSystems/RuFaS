@@ -276,9 +276,8 @@ class Pen:
     @property
     def total_manure_excretion(self) -> AnimalManureExcretions:
         """
-        Calculates the total manure excretion of all animals in the pen
-        by summing up the individual manure excretions from the digestive
-        systems of each animal.
+        Calculates the total manure excretion of all animals in the pen by summing up the individual manure excretions
+        from the digestive systems of each animal.
 
         Returns
         -------
@@ -460,20 +459,16 @@ class Pen:
         """
         Removes animals from the pen by their ids.
 
-        Notes
-        -----
-        Because this method takes O(n) time, it is recommended that the caller of this method
-        should prepare a list of animal ids to be removed from the pen first, and then call this
-        method with that list once.
-
         Parameters
         ----------
         animal_ids : List[int]
             List of animals that match the given ids to be removed from the pen.
 
-        Returns
-        -------
-        None
+        Notes
+        -----
+        Because this method takes O(n) time, it is recommended that the caller of this method
+        should prepare a list of animal ids to be removed from the pen first, and then call this
+        method with that list once.
 
         """
         if not animal_ids:
@@ -498,10 +493,6 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available formulate animals rations with.
 
-        Returns
-        -------
-        None
-
         """
         self._add_new_animals(new_animals, available_feeds)
         self.update_animal_combination(animal_combination)
@@ -517,10 +508,6 @@ class Pen:
             list of new animals to be added to the pen
         available_feeds : list[Feed]
             Nutrition information of feeds available formulate animals rations with.
-
-        Returns
-        -------
-        None
 
         """
         for animal in new_animals:
@@ -546,10 +533,6 @@ class Pen:
         ----------
         animals : list[Animal]
 
-        Returns
-        -------
-        None
-
         Notes
         -----
         This method only inserts a list of new animals in the animals_in_pen map, and updates the daily walking distance
@@ -572,10 +555,6 @@ class Pen:
         animal: Animal
             The animal to insert into pen.
 
-        Returns
-        -------
-        None
-
         Notes
         -----
         This method only inserts a new animal in the animals_in_pen map, and updates the daily walking distance if it is
@@ -596,20 +575,12 @@ class Pen:
         animal_combination: AnimalCombination
             the new AnimalCombination
 
-        Returns
-        -------
-        None
-
         """
         self.animal_combination = animal_combination
 
     def update_daily_walking_distance(self) -> None:
         """
         Updates the daily walking distance for cows in the pen.
-
-        Returns
-        -------
-        None
 
         """
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
@@ -626,22 +597,13 @@ class Pen:
         and animals are to be added to it, there are previous initial values
         that are non-zero.
 
-        Returns
-        -------
-        None
-
         """
         self.animals_in_pen = {}
 
     def get_manure_streams(self) -> dict[str, ManureStream]:
         """
         Constructs and returns ManureStream objects based on total manure excreted in a pen and user-defined
-        stream splitting proportions. The ManureStream objects created here are representative of the total manure
-        produced by the animals in any given pen.
-
-        For pens with lactating cows, manure is partitioned between a parlor stream and general stream(s).
-        For all other animal combinations, manure is routed only to general stream(s). The split ratios
-        for general streams are user-defined and validated to sum to 1.0.
+        stream splitting proportions.
 
         Returns
         -------
@@ -650,6 +612,13 @@ class Pen:
 
         Notes
         -----
+        The ManureStream objects created here are representative of the total manure
+        produced by the animals in any given pen.
+
+        For pens with lactating cows, manure is partitioned between a parlor stream and general stream(s).
+        For all other animal combinations, manure is routed only to general stream(s). The split ratios
+        for general streams are user-defined and validated to sum to 1.0.
+
         - The function first constructs a `total_stream` representing the full manure excretion from a pen.
         - If the animal combination is `LAC_COW`, a portion of this stream is split to a parlor stream
         based on the `minutes_away_for_milking` ratio using the `split_stream` method. Parlor deposition
@@ -765,8 +734,6 @@ class Pen:
     def _handle_parlor_stream(self, total_stream: ManureStream) -> tuple[float, float | None, ManureStream | None]:
         """
         Handles the processing of the parlor stream based on the type of animal combination and the given total stream.
-        If the animal combination indicates lactating cows, the parlor stream is split from the total stream using the
-        specified milking time proportion.
 
         Parameters
         ----------
@@ -781,6 +748,12 @@ class Pen:
             - general_stream_proportion (float): The proportion of the general stream that remains.
             - parlor_stream_proportion (float or None): The proportion of the parlor stream, or None if not applicable.
             - parlor_stream (ManureStream or None): The resulting parlor stream, or None if not applicable.
+
+        Notes
+        -----
+        If the animal combination indicates lactating cows, the parlor stream is split from the total stream using the
+        specified milking time proportion.
+
         """
         parlor_stream_proportion = None
         parlor_stream = None
@@ -816,6 +789,7 @@ class Pen:
             The proportion of the parlor stream, or None if not applicable.
         parlor_stream : ManureStream | None
             The resulting parlor stream, or None if not applicable.
+
         """
         if parlor_stream_proportion is not None or general_stream_proportion < 1.0 or parlor_stream is not None:
             assert parlor_stream is not None, "Parlor stream should not be None if parlor stream proportion is not None"
@@ -831,6 +805,7 @@ class Pen:
         -------
         float
             The methane production potential for the animals in the pen.
+
         """
         if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
             total_animals_in_pen = len(self.animals_in_pen)
@@ -927,6 +902,17 @@ class Pen:
         """
         Get the exposed manure surface area based on the pen type and whether there are lactating cows in the pen.
 
+        Returns
+        -------
+        float
+            Exposed manure surface area (:math:`m^2`).
+
+        Raises
+        ------
+        ValueError
+            If the pen type is not one of the following: "freestall", "tiestall",
+            "bedded pack", or "open lot".
+
         Notes
         -----
         The exposed manure surface area is looked up from the following table:
@@ -943,16 +929,6 @@ class Pen:
         | Open Lot                  | 5.0               | 3.0               |
         +---------------------------+-------------------+-------------------+
 
-        Returns
-        -------
-        float
-            Exposed manure surface area (:math:`m^2`).
-
-        Raises
-        ------
-        ValueError
-            If the pen type is not one of the following: "freestall", "tiestall",
-            "bedded pack", or "open lot".
         """
 
         ExposedManureSurfaceArea = NamedTuple(
@@ -997,6 +973,7 @@ class Pen:
         ------
         ValueError
             If the sum of the proportions is not equal to 1.0.
+
         """
         total_proportion = sum(float(stream.get("stream_proportion", 0.0)) for stream in self.manure_streams)
         if not math.isclose(total_proportion, 1.0, abs_tol=1e-6):
@@ -1021,10 +998,6 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
 
-        Returns
-        -------
-        None
-
         """
         for animal in self.animals_in_pen.values():
             animal.set_nutrition_requirements(
@@ -1044,10 +1017,6 @@ class Pen:
             The list of feeds used to formulate the ration.
         ration_formulation : dict[RUFAS_ID, float]
             The formulated ration dictionary, mapping RuFaS Feed ID to mass of feed in ration per animal per day.
-
-        Returns
-        -------
-        None
 
         """
         for animal in self.animals_in_pen.values():
@@ -1320,6 +1289,7 @@ class Pen:
         ----------
         pen_feeds : list[Feed]
             Feeds available in a given pen.
+
         """
         self.ration = RationManager.get_user_defined_ration(
             self.animal_combination, self.average_nutrition_requirements
@@ -1366,6 +1336,7 @@ class Pen:
         -------
         bool
             True if ration formulation loop needs to be broken.
+
         """
         if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
             self.om.add_log(
@@ -1408,10 +1379,6 @@ class Pen:
 
         If the animal is not a lactating cow, the outcomes of that animal are not affected and its nutrition
         requirements are not met.
-
-        Returns
-        -------
-        None
 
         """
         animal_combination = self.animal_combination
