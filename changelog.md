@@ -92,6 +92,7 @@ v1.0.0
 - [3033](https://github.com/RuminantFarmSystems/RuFaS/pull/3033) - [minor change] [Tests] [pyproject.toml] [NoInputChange] [NoOutputChange] Bumps `pytest` from `==7.4.4` to `>=9.0.3`, swaps the unmaintained `pytest-lazy-fixture` for the maintained `pytest-lazy-fixtures` fork.
 - [3046](https://github.com/RuminantFarmSystems/RuFaS/pull/3046) - [minor change] [Feed Storage] [NoInputChange] [NoOutputChange] Updates and fixes docstrings to be more consistently formatted.
 - [3048](https://github.com/RuminantFarmSystems/RuFaS/pull/3048) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Updates and fixes the EEE module docstrings to be more consistently formatted.
+- [3041](https://github.com/RuminantFarmSystems/RuFaS/pull/3041) - [minor change] [NoInputChange] [NoOutputChange] [OutputManager] [GraphGenerator] [ReportGenerator] Updates docstrings in post-processing modules to follow NumPy-style format.
 - [3049](https://github.com/RuminantFarmSystems/RuFaS/pull/3049) - [minor change] [Utility] [NoInputChange] [NoOutputChange] Updates docstrings across 9 utility files to NumPy-style format.
 
 ### v1.0.0
