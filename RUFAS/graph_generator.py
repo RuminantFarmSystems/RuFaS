@@ -125,15 +125,18 @@ AXES_SETTERS: dict[str, FUNCTION_TYPE] = {
 
 class GraphGenerator:
     """
-    Graph Generator is used to generate graphs from the simulation results.
-    NOTE: This class is not multi-thread safe!!!
+    GraphGenerator is used to generate graphs from the simulation results.
 
     Attributes
     ----------
     metadata_prefix : str
         A string to prefix the metadata of the graph.
     time : RufasTime
-        A RufasTime object used to track the simulation time
+        A ``RufasTime`` object used to track the simulation time
+
+    Notes
+    -----
+    This class is not multi-thread safe!!!
     """
 
     def __init__(self, metadata_prefix: str = "", time=None) -> None:
@@ -147,9 +150,9 @@ class GraphGenerator:
         filter_file_name: str,
         graphics_dir: Path,
         produce_graphics: bool,
-    ) -> list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]:
+    ) -> list[dict[str, str | dict[str, str]]]:
         """
-        Generate a graph based on filtered data and graph details.
+        Generates a graph based on filtered data and graph details.
 
         Parameters
         ----------
@@ -157,18 +160,16 @@ class GraphGenerator:
             The result pool after filtering with the provided RegEx filters.
         graph_details: dict[str, str]
             A dictionary containing details/metadata about the graph.
-        save_path: Path
-            The base folder path to save the output.
         filter_file_name: str
             The name of the filter file.
         graphics_dir : Path
             The directory for saving graphics.
         produce_graphics: bool
-            Flag for whether or not the user wants to produce graphs at after the simulation.
+            Flag for whether the user wants to produce graphs at after the simulation.
 
         Returns
         -------
-        log_pool : list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]
+        log_pool : list[dict[str, str | dict[str, str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
         """
@@ -283,18 +284,19 @@ class GraphGenerator:
         graph_details: dict[str, str | list[str]],
         prepared_data: dict[str, list[Any]],
     ) -> dict[str, str | list[str]]:
-        """Sets the graph legend if there is no legend present in the graph details.
+        """
+        Sets the graph legend if there is no legend present in the graph details.
 
         Parameters
         ----------
-        graph_details : dict[str, str]
+        graph_details : dict[str, str | list[str]]
             A dictionary containing details/metadata about the graph.
         prepared_data: dict[str, list[Any]]
             The data to be graphed that's been prepared for graphing.
 
         Returns
         -------
-        dict[str, str]
+        dict[str, str | list[str]]
             A dictionary containing details/metadata about the graph with the legend field populated.
         """
         omit_legend_prefix = graph_details.get("omit_legend_prefix", False)
@@ -316,17 +318,23 @@ class GraphGenerator:
         filtered_pool: dict[str, dict[str, list[Any]]],
         graph_title: str | list[str],
     ) -> tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
-        """Adds variable units to variable name for graphing.
+        """
+        Adds variable units to variable names for graphing.
 
         Parameters
         ----------
         filtered_pool : dict[str, list[Any]]
             The data to be graphed.
+        graph_title : str | list[str]
+            The title of the graph.
 
         Returns
         -------
-        list[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]
-            The updated data with units added and logs if info_maps aren't found to get units.
+        tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]
+            1. dict[str, dict[str, list[Any]]]
+                The updated data with units added.
+            2. list[dict[str, str | dict[str, str]]]
+                Logs if ``info_maps`` aren't found to get units.
         """
         updated_data = {}
         info_map = {
@@ -371,12 +379,16 @@ class GraphGenerator:
         omit_legend_suffix: str | list[str] | bool = False,
     ) -> str:
         """
-        Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
+        Strip out the prefix and suffix (if exists) in the combined variable name and return the variable name.
 
         Parameters
         ----------
         combined_var_name: str
             The combined variable name to be processed.
+        omit_legend_prefix: str | list[str] | bool, default False
+            Whether to omit the prefix from the combined variable name.
+        omit_legend_suffix: str | list[str] | bool, default False
+            Whether to omit the suffix from the combined variable name.
 
         Returns
         -------
@@ -385,37 +397,37 @@ class GraphGenerator:
 
         Notes
         -----
-            This function identifies prefix and suffix according to the following logic:
-                prefix:
-                    All combined variable names are guaranteed to have a prefix of the following types:
-                        - a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)
-                        - default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)
-                        - special cases => variables from the RufasTime and Weather classes (e.g. RufasTime.day,
-                            Weather.rainfall)
-                    For the special cases of variables from the RufasTime and Weather classes, they do not have any
-                    suffixes, resulting in `len(combined_var_name_list) == 2`. Therefore, we can just return the second
-                    element after splitting the combined variable name by ".".
+        This function identifies prefix and suffix according to the following logic:
+            prefix:
+                All combined variable names are guaranteed to have a prefix of the following types:
+                    - a custom-defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)
+                    - default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)
+                    - special cases => variables from the ``RufasTime`` and ``Weather`` classes (e.g. ``RufasTime.day``,
+                        ``Weather.rainfall``)
+                For the special cases of variables from the ``RufasTime`` and ``Weather`` classes, they do not have any
+                suffixes, resulting in ``len(combined_var_name_list) == 2``. Therefore, we can just return the second
+                element after splitting the combined variable name by ".".
 
-                     We distinguish whether the prefix is a custom defined prefix or following the default pattern by
-                     string parsing:
-                     The class name in the default pattern prefixes follow the camel case pattern, a way to separate
-                     the words in a phrase by making the first letter of each word capitalized and not using spaces
-                     e.g. CamelCase. While the custom defined prefixes follow the snake case pattern, where each word is
-                     separated by underscores.
-                     Therefore, by checking if `combined_var_name_list[0]` follows the camel case pattern
-                     ("([A-Z][a-z0-9]+)+"), we are able to find out if the variable is using the default pattern.
+                 We distinguish whether the prefix is a custom-defined prefix or following the default pattern by
+                 string parsing:
+                 The class name in the default pattern prefixes follows the camel case pattern, a way to separate
+                 the words in a phrase by making the first letter of each word capitalized and not using spaces
+                 e.g., CamelCase. While the custom-defined prefixes follow the snake case pattern, where each word is
+                 separated by underscores.
+                 Therefore, by checking if ``combined_var_name_list[0]`` follows the camel case pattern
+                 ``("([A-Z][a-z0-9]+)+")``, we are able to find out if the variable is using the default pattern.
 
-                     * `if len(combined_var_name_list) == 1` this check is here just for error proofing, this condition
-                     is unlikely to appear.
+                 * ``if len(combined_var_name_list) == 1`` this check is here just for error proofing, this condition
+                 is unlikely to appear.
 
-                 suffix:
-                    Currently, only the Crop and Soil module is utilizing the suffix feature while reporting variables.
-                    After some investigation, we found that all suffixes from the Crop and Soil module follows the
-                    pattern of field='*', for example:
-                        - FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field='field'
-                        - FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field='field',layer='2'
-                    Therefore, by checking if hte last element in combined_var_name_list contains "=", we are able to
-                    check if the variable name has suffix.
+             suffix:
+                Currently, only the Crop and Soil module is using the suffix feature while reporting variables.
+                After some investigation, we found that all suffixes from the Crop and Soil module follow the
+                pattern of ``field='*'``, for example:
+                    - ``FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field='field'``
+                    - ``FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field='field',layer='2'``
+                Therefore, by checking if the last element in the ``combined_var_name_list`` contains "=", we are able
+                to check if the variable name has suffix.
         """
         combined_var_name_list: list[str] = combined_var_name.split(".")
         slice_start: int = 0
@@ -458,7 +470,7 @@ class GraphGenerator:
         Returns
         -------
         list[dict[str, str | dict[str, str]]]
-            A list of logs, warnings, and errors to be reported to OutputManager.
+            A list of logs, warnings, and errors to be reported to ``OutputManager``.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -511,7 +523,7 @@ class GraphGenerator:
         slice_end: int | None = None,
     ) -> None:
         """
-        Draw the graph based on the provided graph type and data.
+        Draws the graph based on the provided graph type and data.
 
         Parameters
         ----------
@@ -521,11 +533,11 @@ class GraphGenerator:
             The data to use for plotting.
         selected_variables : list[str]
             The variables selected to be plotted.
-        mask_values : bool, default False
-            Whether data that will be plotted with non-tuple based functions should be masked to remove None or NaN
-            values.
         ax : Axes
-            The matplotlib Axes object to plot the graph on.
+            The matplotlib ``Axes`` object to plot the graph on.
+        mask_values : bool, default False
+            Whether data that will be plotted with non-tuple-based functions should be masked to remove
+            ``None`` or ``NaN`` values.
         use_calendar_dates : bool, default False
             Whether to use calendar dates on the x-axis.
         date_format : str, default None
@@ -538,7 +550,7 @@ class GraphGenerator:
         Raises
         ------
         ValueError
-            if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.
+            if graph_type is not found in ``MATPLOTLIB_PLOT_FUNCTIONS``.
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Graph Generation error: Unsupported graph type: {graph_type}")
@@ -579,7 +591,7 @@ class GraphGenerator:
 
     def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
         """
-        Masks values to remove None and NaN values.
+        Masks values to remove ``None`` and ``NaN`` values.
 
         Parameters
         ----------
@@ -589,9 +601,10 @@ class GraphGenerator:
         Returns
         -------
         tuple[NDArray[Any], NDArray[np.float32]]
-            list of NumPy arrays, the first containing the indices of the masked data and the second containing the
-            actual masked data.
-
+            1. ``NDArray[Any]``
+                The indices of the masked data.
+            2. ``NDArray[np.float32]``
+                The actual masked data.
         """
         np_values = np.array(values)
         mask = ~np.isnan(np_values)
@@ -600,15 +613,14 @@ class GraphGenerator:
 
     def _customize_graph(self, fig: Figure, customization_details: dict[str, Any]) -> None:
         """
-        Apply customizations to the graph.
+        Applies customizations to the graph.
 
         Parameters
         ----------
         fig : Figure
-            The matplotlib Figure object to customize.
+            The matplotlib ``Figure`` object to customize.
         customization_details : dict[str, Any]
             A dictionary of customization details.
-
         """
         for attrib, value in customization_details.items():
             if attrib in FIGURE_SETTERS.keys():
@@ -627,7 +639,7 @@ class GraphGenerator:
         graphics_dir: Path,
     ) -> Path:
         """
-        Save the generated graph to a file.
+        Saves the generated graph to a file.
 
         Parameters
         ----------
@@ -635,21 +647,18 @@ class GraphGenerator:
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.
-        save_path : Path
-            The base folder path to save the output.
         graphics_dir : Path
             The directory for saving graphics.
 
         Returns
         -------
-        str
+        Path
             The path to the saved graph.
 
         Raises
         ------
         Exception
             Generic exception raised if saving the graph fails.
-
         """
         graph_path = self._generate_graph_path(graph_details, filter_file_name, graphics_dir)
         counter = 1
@@ -669,7 +678,7 @@ class GraphGenerator:
         graphics_dir: Path,
     ) -> Path:
         """
-        Generate the full path for the output graph and create parent folders if necessary.
+        Generates the full path for the output graph and create parent folder if necessary.
 
         Parameters
         ----------
@@ -684,7 +693,6 @@ class GraphGenerator:
         -------
         Path
             The full path to the output graph file.
-
         """
         timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
 
