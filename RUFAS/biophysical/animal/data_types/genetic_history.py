@@ -7,9 +7,6 @@ class GeneticHistory(TypedDict):
     """
     A class to represent the genetic history of an individual animal on a farm.
 
-    This class is used to track the genetic attributes of an animal over the course of a simulation.
-    It contains information about the simulation day, the age of the animal in days, and its genetic attributes.
-
     Attributes
     ----------
     start_day : int

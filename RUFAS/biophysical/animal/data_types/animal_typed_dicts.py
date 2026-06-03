@@ -7,7 +7,7 @@ from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 
 
 class CalfValuesTypedDict(TypedDict):
-    """List of expected keys for calf values dictionary"""
+    """List of expected keys for calf values dictionary."""
 
     id: int
     breed: str
@@ -26,7 +26,7 @@ class CalfValuesTypedDict(TypedDict):
 
 
 class NewBornCalfValuesTypedDict(TypedDict):
-    """List of expected keys for newborn calf values dictionary"""
+    """List of expected keys for newborn calf values dictionary."""
 
     id: NotRequired[int]
     breed: str
@@ -44,7 +44,7 @@ class NewBornCalfValuesTypedDict(TypedDict):
 
 
 class HeiferIValuesTypedDict(TypedDict):
-    """List of expected keys for heiferI values dictionary"""
+    """List of expected keys for heiferI values dictionary."""
 
     id: int
     breed: str
@@ -62,7 +62,7 @@ class HeiferIValuesTypedDict(TypedDict):
 
 
 class HeiferIIValuesTypedDict(TypedDict):
-    """List of expected keys for heiferII values dictionary"""
+    """List of expected keys for heiferII values dictionary."""
 
     id: int
     breed: str
@@ -96,7 +96,7 @@ class HeiferIIValuesTypedDict(TypedDict):
 
 
 class HeiferIIIValuesTypedDict(TypedDict):
-    """List of expected keys for heiferIII values dictionary"""
+    """List of expected keys for heiferIII values dictionary."""
 
     id: int
     breed: str
@@ -130,7 +130,7 @@ class HeiferIIIValuesTypedDict(TypedDict):
 
 
 class CowValuesTypedDict(TypedDict):
-    """List of expected keys for cow values dictionary"""
+    """List of expected keys for cow values dictionary."""
 
     id: int
     breed: str
@@ -173,7 +173,7 @@ class CowValuesTypedDict(TypedDict):
 
 
 class SoldAnimalTypedDict(TypedDict):
-    """List of expected keys for sold and died animals values dictionary"""
+    """List of expected keys for sold and died animals values dictionary."""
 
     id: int
     animal_type: str
@@ -186,7 +186,7 @@ class SoldAnimalTypedDict(TypedDict):
 
 
 class StillbornCalfTypedDict(TypedDict):
-    """List of expected keys for stillborn calves values dictionary"""
+    """List of expected keys for stillborn calves values dictionary."""
 
     id: int
     stillborn_day: int
