@@ -31,18 +31,7 @@ class RufasTime:
     """
 
     def __init__(self, start_date: datetime = None, end_date: datetime = None, current_date: datetime = None) -> None:
-        """
-        Initializes the ``RufasTime`` object.
-
-        Parameters
-        ----------
-        start_date : datetime, optional
-            The start date of the simulation.
-        end_date : datetime, optional
-            The end date of the simulation.
-        current_date : datetime, optional
-            The current date in the simulation.
-        """
+        """Initializes the ``RufasTime`` object."""
         self.om = OutputManager()
         self.im = InputManager()
 

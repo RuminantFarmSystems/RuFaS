@@ -21,16 +21,9 @@ class Weather:
         Mean of mean daily temperatures over all the weather data used by the simulation (°C).
     """
 
-    def __init__(self, weather_file: dict, time: RufasTime):
+    def __init__(self, weather_file: dict[str, list[int | float]], time: RufasTime):
         """
         Initializes the ``Weather`` instance using user-supplied weather data and overall simulation parameters.
-
-        Parameters
-        ----------
-        weather_file : dict
-            All the weather data available to be used by the simulation.
-        time : RufasTime
-            The ``RufasTime`` instance containing time configuration information of the simulation.
 
         Notes
         -----

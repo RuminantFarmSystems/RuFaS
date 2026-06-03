@@ -411,7 +411,6 @@ class Utility:
     def remove_items_from_list_by_indices(data: list[Any], indices_to_remove: list[int]) -> None:
         """
         Remove items from a list given a list of indices.
-        The operation is done in-place.
 
         Parameters
         ----------
@@ -422,6 +421,7 @@ class Utility:
 
         Notes
         -----
+        The operation is done in-place.
         Indices are sorted in reverse before removal to prevent index shifting from
         affecting later deletions.
         """
@@ -474,9 +474,6 @@ class Utility:
         """
         Makes the given object serializable.
 
-        The object can be a primitive type, a list, a tuple, a set, a dictionary,
-        or an instance of a custom class.
-
         A recursive algorithm is used to traverse the object and convert it into
         a serializable object. The maximum depth of recursion is specified by the
         parameter max_depth.
@@ -494,6 +491,10 @@ class Utility:
         -------
         object
             A serializable object.
+
+        Notes
+        -----
+        The object can be a primitive type, a list, a tuple, a set, a dictionary, or an instance of a custom class.
         """
         # If the object is a primitive type, return it directly
         if isinstance(obj, (int, float, str, bool, type(None))):
@@ -887,9 +888,6 @@ class Utility:
         """
         Flattens a nested dictionary to a single level by joining keys with a separator.
 
-        List-of-dict values are flattened by index, with each index appended to
-        the key as ``_{i}``.
-
         Parameters
         ----------
         input_dictionary : dict[str, Any]
@@ -903,6 +901,10 @@ class Utility:
         -------
         dict[str, Any]
             Flattened dictionary with all keys joined by the separator.
+
+        Notes
+        -----
+        List-of-dict values are flattened by index, with each index appended to the key as ``_{i}``.
         """
         items: list[tuple[str, Any]] = []
         for key, value in input_dictionary.items():

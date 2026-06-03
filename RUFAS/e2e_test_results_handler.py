@@ -119,7 +119,7 @@ class E2ETestResultsHandler:
         Raises
         ------
         KeyError
-            Raised if the conversion table CSV does not contain both ``Original`` and ``New`` columns.
+            Raised if the conversion table CSV does not contain both "Original" and "New" columns.
         ValueError
             Raised if the conversion table CSV contains duplicate mappings for original variable names.
 
@@ -127,7 +127,7 @@ class E2ETestResultsHandler:
         -----
         Reads a CSV file containing mappings of original variable names to new variable names and applies
         these mappings to the keys in the given dictionary ``expected_results``. The conversion table must
-        contain two columns: ``Original`` and ``New``. Ensures no duplicate mappings exist in the CSV and raises
+        contain two columns: "Original" and "New". Ensures no duplicate mappings exist in the CSV and raises
         appropriate errors otherwise. Returns a dictionary with updated keys while preserving their associated
         values.
         """

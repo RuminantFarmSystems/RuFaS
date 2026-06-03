@@ -493,10 +493,6 @@ class TaskManager:
         Expands a sensitivity analysis multi-run argument dict into a list of
         single-run argument dicts.
 
-        Samples the input variable space using the specified sampler, applies load
-        balancing to select a subset of samples, then builds one single-run dict per
-        sample with an ``input_patch`` containing the sampled variable values.
-
         Parameters
         ----------
         multi_run_args : dict[str, Any]
@@ -533,6 +529,10 @@ class TaskManager:
           to process (0.0–1.0).
         - ``output_prefix`` : str — base prefix for output file names, suffixed
           with the zero-padded run number.
+
+        Samples the input variable space using the specified sampler, applies load
+        balancing to select a subset of samples, then builds one single-run dict per
+        sample with an ``input_patch`` containing the sampled variable values.
         """
 
         SA_input_variables: list[dict[str, float | str]] = multi_run_args["SA_input_variables"]
@@ -614,8 +614,6 @@ class TaskManager:
         """
         Runs all single-run tasks, in parallel if a process pool is available.
 
-        Failed tasks are collected and reported as an error via the ``OutputManager``.
-
         Parameters
         ----------
         single_run_args : list[dict[str, Any]]
@@ -632,6 +630,10 @@ class TaskManager:
             Directory where task outputs will be written.
         verbosity : LogVerbosity or None
             Log verbosity level for each run.
+
+        Notes
+        -----
+        Failed tasks are collected and reported as an error via the ``OutputManager``.
         """
         task_with_args = partial(
             self.task,
