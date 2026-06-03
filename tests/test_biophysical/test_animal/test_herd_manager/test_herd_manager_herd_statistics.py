@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
@@ -1039,11 +1040,16 @@ def _make_mock_heifer(animal_type: AnimalType, daily_growth: float) -> MagicMock
     return heifer
 
 
-def _make_mock_pen(pen_id: int, animals: dict[int, MagicMock]) -> MagicMock:
-    """Creates a mock Pen with the given id and animals_in_pen dict."""
+def _make_mock_pen(
+    pen_id: int,
+    animals: dict[int, MagicMock],
+    animal_combination: AnimalCombination = AnimalCombination.GROWING,
+) -> MagicMock:
+    """Creates a mock Pen with the given id, animals_in_pen dict, and animal_combination."""
     pen = MagicMock(spec=Pen)
     pen.id = pen_id
     pen.animals_in_pen = animals
+    pen.animal_combination = animal_combination
     return pen
 
 
@@ -1103,7 +1109,7 @@ def test_calculate_heifer_average_daily_weight_gain_no_heifers_in_pen(
     mock_cow = MagicMock(spec=Animal)
     mock_cow.animal_type = AnimalType.LAC_COW
 
-    pen_cows_only = _make_mock_pen(pen_id=1, animals={0: mock_cow})
+    pen_cows_only = _make_mock_pen(pen_id=1, animals={0: mock_cow}, animal_combination=AnimalCombination.LAC_COW)
     herd_manager.all_pens = [pen_cows_only]
     herd_manager.heiferIs = []
     herd_manager.heiferIIs = []

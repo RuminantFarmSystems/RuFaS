@@ -677,26 +677,54 @@ class HerdManager:
         return herd_manager_output, animal_manure_excretions_by_pen, enteric_methane_emission_by_pen
 
     def _calculate_heifer_average_daily_weight_gain(self, simulation_day: int) -> None:
-        """Calculates the heifer average daily weight gain from all pens and animal types."""
+        """
+        Calculates average daily weight gain for heifers across all pens and
+        animal types.
+
+        Parameters
+        ----------
+        simulation_day : int
+            Current simulation day, used to backfill missing entries for newly
+            tracked pens.
+
+        Notes
+        -----
+        Only pens with ``AnimalCombination.GROWING`` or
+        ``AnimalCombination.GROWING_AND_CLOSE_UP`` are evaluated; all other pen
+        types are skipped. Note that the ``AnimalCombination.CLOSE_UP`` pens
+        which contains heiferIIIs and dry cows are not evaluated.
+
+        For each eligible pen, the average is computed over all animals whose
+        ``animal_type.is_heifer`` is ``True``. If no heifers are present, the
+        pen's value is set to ``None``. If heifers are present and the pen is
+        seen for the first time, all prior simulation days are backfilled with
+        ``None``.
+
+        Per-animal-type averages are also computed independently across the full
+        herd for Heifer I, II, and III groups. Groups with no animals are set
+        to ``None``.
+        """
         for pen in self.all_pens:
-            heifers_in_pen = [heifer for heifer in pen.animals_in_pen.values() if heifer.animal_type.is_heifer]
-            if len(heifers_in_pen) > 0:
-                average_daily_weight_gain = sum([heifer.growth.daily_growth for heifer in heifers_in_pen]) / len(
-                    heifers_in_pen
-                )
-                if str(pen.id) not in self.herd_statistics.heifer_average_daily_gain_by_pen:
-                    om = OutputManager()
-                    info_map = {
-                        "class": AnimalModuleReporter.__name__,
-                        "function": AnimalModuleReporter.report_herd_statistics_data.__name__,
-                        "units": MeasurementUnits.KILOGRAMS_PER_DAY,
-                    }
-                    om.add_variable_bulk(
-                        [
-                            ({"name": "", "value": None}, dict(info_map, **{"simulation_day": sim_day}))
-                            for sim_day in range(0, simulation_day)
-                        ]
+            if pen.animal_combination in [AnimalCombination.GROWING, AnimalCombination.GROWING_AND_CLOSE_UP]:
+                average_daily_weight_gain: float | None = None
+                heifers_in_pen = [heifer for heifer in pen.animals_in_pen.values() if heifer.animal_type.is_heifer]
+                if len(heifers_in_pen) > 0:
+                    average_daily_weight_gain = sum([heifer.growth.daily_growth for heifer in heifers_in_pen]) / len(
+                        heifers_in_pen
                     )
+                    if str(pen.id) not in self.herd_statistics.heifer_average_daily_gain_by_pen:
+                        om = OutputManager()
+                        info_map = {
+                            "class": AnimalModuleReporter.__name__,
+                            "function": AnimalModuleReporter.report_herd_statistics_data.__name__,
+                            "units": MeasurementUnits.KILOGRAMS_PER_DAY,
+                        }
+                        om.add_variable_bulk(
+                            [
+                                ({"name": "", "value": None}, dict(info_map, **{"simulation_day": sim_day}))
+                                for sim_day in range(0, simulation_day)
+                            ]
+                        )
                 self.herd_statistics.heifer_average_daily_gain_by_pen[str(pen.id)] = average_daily_weight_gain
 
         heifers_by_animal_type = {
