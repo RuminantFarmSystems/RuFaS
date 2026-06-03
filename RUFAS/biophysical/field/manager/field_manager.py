@@ -44,10 +44,13 @@ class FieldManager:
     om : OutputManager
         Instance of the OutputManager.
 
+    Parameters
+    ----------
+    field_data : dict[str, dict[str, Any]]
+        Mapping of field names to their configuration data.
     """
 
     def __init__(self, field_data: dict[str, dict[str, Any]]) -> None:
-        self.im = InputManager()
         self.om = OutputManager()
         self.fields: list[Field] = []
 
