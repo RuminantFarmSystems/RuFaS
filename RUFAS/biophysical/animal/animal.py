@@ -52,7 +52,8 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     CowReproductionProtocol,
     CowPreSynchSubProtocol,
     CowTAISubProtocol,
-    CowReSynchSubProtocol, ReproStateEnum,
+    CowReSynchSubProtocol,
+    ReproStateEnum,
 )
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
