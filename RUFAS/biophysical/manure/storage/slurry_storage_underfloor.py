@@ -29,6 +29,7 @@ class SlurryStorageUnderfloor(Storage):
         The volumetric capacity of the storage (m^3).
 
     """
+
     def __init__(
         self,
         name: str,

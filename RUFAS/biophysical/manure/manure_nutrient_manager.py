@@ -11,6 +11,7 @@ from RUFAS.data_structures.manure_types import ManureType
 
 class ManureNutrientManager:
     """Manages the nutrients in the manure pool."""
+
     def __init__(self) -> None:
         """Initialize the manure nutrient manager."""
         self.om = OutputManager()

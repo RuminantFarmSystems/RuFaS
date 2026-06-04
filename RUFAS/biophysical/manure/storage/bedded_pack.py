@@ -62,6 +62,7 @@ class BeddedPack(Storage):
         Indicator for if the bedded pack is regularly mixed to promote composting activity.
 
     """
+
     def __init__(
         self,
         name: str,

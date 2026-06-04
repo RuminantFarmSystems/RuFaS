@@ -28,6 +28,7 @@ class OpenLot(Storage):
         The type of cover used with the specified storage.
 
     """
+
     def __init__(
         self,
         name: str,
