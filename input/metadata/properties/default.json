@@ -4206,6 +4206,342 @@
         "type": "number",
         "minimum": 0.0
       }
+    },
+    "308": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "309": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "310": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "311": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "312": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "313": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "314": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "315": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "316": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "317": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "318": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "319": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "320": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "321": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "322": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "323": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "324": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "325": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "326": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "327": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "328": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "329": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "330": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "331": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "332": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "333": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "334": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "335": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "336": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "337": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "338": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "339": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "340": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "341": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "342": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    }, 
+    "343": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "344": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "345": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "346": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "347": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "348": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "349": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "350": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "351": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "352": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "353": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "354": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
+    },
+    "355": {
+      "type": "array",
+      "properties": {
+        "type": "number",
+        "minimum": 0.0
+      }
     }
   },
   "feed_properties": {
@@ -4223,7 +4559,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 306,
+        "maximum": 500,
         "default": 155
       }
     },
@@ -4233,7 +4569,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 306
+        "maximum": 500
       }
     },
     "close_up_feeds": {
@@ -4242,7 +4578,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 306
+        "maximum": 500
       }
     },
     "lac_cow_feeds": {
@@ -4251,7 +4587,7 @@
       "properties": {
         "type": "number",
         "minimum": 1,
-        "maximum": 306
+        "maximum": 500
       }
     },
     "purchased_feeds": {
@@ -4262,7 +4598,7 @@
         "purchased_feed": {
           "type": "number",
           "minimum": 1,
-          "maximum": 306
+          "maximum": 500
         },
         "purchased_feed_cost": {
           "type": "number",
@@ -4296,7 +4632,7 @@
             "type": "number",
             "description": "Calf Feed",
             "minimum": 1,
-            "maximum": 306,
+            "maximum": 500,
             "default": 155
           },
           "ration_percentage": {
@@ -4316,7 +4652,7 @@
             "type": "number",
             "description": "Growing Heifers Feed",
             "minimum": 1,
-            "maximum": 306,
+            "maximum": 500,
             "default": 1
           },
           "ration_percentage": {
@@ -4336,7 +4672,7 @@
             "type": "number",
             "description": "Close UP Feed",
             "minimum": 1,
-            "maximum": 306,
+            "maximum": 500,
             "default": 1
           },
           "ration_percentage": {
@@ -4356,7 +4692,7 @@
             "type": "number",
             "description": "Lactating Cow Feed",
             "minimum": 1,
-            "maximum": 306,
+            "maximum": 500,
             "default": 1
           },
           "ration_percentage": {
@@ -4395,7 +4731,7 @@
         "purchased_feed": {
           "type": "number",
           "minimum": 1,
-          "maximum": 306
+          "maximum": 500
         },
         "runtime_purchase_allowance": {
           "type": "number",

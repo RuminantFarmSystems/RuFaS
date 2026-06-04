@@ -1,0 +1,76 @@
+{
+    "available_fertilizer_mixes": [
+        {
+            "name": "32% UAN",
+            "N": 0.32,
+            "P": 0,
+            "K": 0,
+            "ammoniumFraction": 0.25
+        },
+        {
+            "name": "0-0-60",
+            "N": 0,
+            "P": 0,
+            "K": 1,
+            "ammoniumFraction": 0
+        }
+    ],
+    "mix_names": [
+        "0-0-60",
+        "0-0-60",
+        "32% UAN",
+        "32% UAN",
+        "32% UAN"
+    ],
+    "years": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+    ],
+    "days": [
+        233,
+        233,
+        194,
+        195,
+        194
+    ],
+    "nitrogen_masses": [
+        0,
+        0,
+        31751.465900000003,
+        31751.465900000003,
+        31751.465900000003
+    ],
+    "phosphorus_masses": [
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "potassium_masses": [
+        95254.3977,
+        95254.3977,
+        0,
+        0,
+        0
+    ],
+    "application_depths": [
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "surface_remainder_fractions": [
+        1,
+        1,
+        1,
+        1,
+        1
+    ],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}
