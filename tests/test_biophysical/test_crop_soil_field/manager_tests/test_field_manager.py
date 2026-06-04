@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, List
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, call
 
 import pytest
 from pytest_mock.plugin import MockerFixture
@@ -55,10 +55,11 @@ def input_manager_original_method_states(
 def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) -> None:
     """Tests that FieldManager init method runs correctly."""
     available_crop_configs = ["alfalfa", "corn", "oats"]
-    expected_field_setup_calls = [call(field_name, available_crop_configs) for field_name in field_blob_names]
-    data_keys_by_properties = mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=field_blob_names
-    )
+    mock_field_config = {"dummy": "config"}
+    field_data = {field_name: mock_field_config for field_name in field_blob_names}
+    expected_field_setup_calls = [
+        call(field_name, mock_field_config, available_crop_configs) for field_name in field_blob_names
+    ]
     field_setup = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)
     )
@@ -66,21 +67,17 @@ def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) 
     available_crop_configs = mocker.patch.object(
         CropDataFactory, "get_available_crop_configurations", return_value=available_crop_configs
     )
-    add_warning = mocker.patch.object(om, "add_warning")
 
-    field_manager = FieldManager()
+    field_manager = FieldManager(field_data)
 
     crop_config_setup.assert_called_once()
     available_crop_configs.assert_called_once()
     assert len(field_manager.fields) == len(field_blob_names)
     assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
-    data_keys_by_properties.assert_called_once()
     if len(field_blob_names) > 0:
         field_setup.assert_has_calls(expected_field_setup_calls)
-        add_warning.assert_not_called()
     else:
         field_setup.assert_not_called()
-        add_warning.assert_called_once()
 
 
 @pytest.fixture
@@ -139,64 +136,61 @@ def test_daily_update_routine(
     )
     mocker.patch.object(CropDataFactory, "setup_crop_configurations", return_value=None)
     mocker.patch.object(CropDataFactory, "get_available_crop_configurations", return_value=["alfalfa", "corn", "oats"])
-    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
-        fm = FieldManager()
-        mock_add_var = mocker.patch.object(fm.om, "add_variable")
+    fm = FieldManager({})
+    mock_add_var = mocker.patch.object(fm.om, "add_variable")
 
-        fm.fields = fields
-        mock_manage = mocker.patch.object(
-            Field,
-            "manage_field",
-            return_value=[
-                HarvestedCrop(
-                    config_name="test_crop",
-                    field_name="test_field",
-                    harvest_time=mocked_time,
-                    storage_time=mocked_time,
-                    dry_matter_mass=10.0,
-                    dry_matter_percentage=0.85,
-                    dry_matter_digestibility=0.65,
-                    crude_protein_percent=0.12,
-                    non_protein_nitrogen=0.02,
-                    starch=0.30,
-                    adf=0.15,
-                    ndf=0.35,
-                    lignin=0.05,
-                    sugar=0.10,
-                    ash=0.08,
-                    recorded_days=set(),
-                ),
-                HarvestedCrop(
-                    config_name="test_crop_2",
-                    field_name="test_field",
-                    harvest_time=mocked_time,
-                    storage_time=mocked_time,
-                    dry_matter_mass=10.0,
-                    dry_matter_percentage=0.85,
-                    dry_matter_digestibility=0.65,
-                    crude_protein_percent=0.12,
-                    non_protein_nitrogen=0.02,
-                    starch=0.30,
-                    adf=0.15,
-                    ndf=0.35,
-                    lignin=0.05,
-                    sugar=0.10,
-                    ash=0.08,
-                    recorded_days=set(),
-                ),
-            ],
-        )
+    fm.fields = fields
+    mock_manage = mocker.patch.object(
+        Field,
+        "manage_field",
+        return_value=[
+            HarvestedCrop(
+                config_name="test_crop",
+                field_name="test_field",
+                harvest_time=mocked_time,
+                storage_time=mocked_time,
+                dry_matter_mass=10.0,
+                dry_matter_percentage=0.85,
+                dry_matter_digestibility=0.65,
+                crude_protein_percent=0.12,
+                non_protein_nitrogen=0.02,
+                starch=0.30,
+                adf=0.15,
+                ndf=0.35,
+                lignin=0.05,
+                sugar=0.10,
+                ash=0.08,
+                recorded_days=set(),
+            ),
+            HarvestedCrop(
+                config_name="test_crop_2",
+                field_name="test_field",
+                harvest_time=mocked_time,
+                storage_time=mocked_time,
+                dry_matter_mass=10.0,
+                dry_matter_percentage=0.85,
+                dry_matter_digestibility=0.65,
+                crude_protein_percent=0.12,
+                non_protein_nitrogen=0.02,
+                starch=0.30,
+                adf=0.15,
+                ndf=0.35,
+                lignin=0.05,
+                sugar=0.10,
+                ash=0.08,
+                recorded_days=set(),
+            ),
+        ],
+    )
 
-        mock_send = mocker.patch.object(FieldDataReporter, "send_daily_variables")
-        actual = fm.daily_update_routine(
-            weather=mock_weather, time=mocked_time, manure_applications=manure_applications
-        )
+    mock_send = mocker.patch.object(FieldDataReporter, "send_daily_variables")
+    actual = fm.daily_update_routine(weather=mock_weather, time=mocked_time, manure_applications=manure_applications)
 
-        assert mock_manage.call_count == len(fields)
-        assert get_conditions.call_count == len(fields)
-        mock_send.assert_called_once()
-        assert mock_add_var.call_count == len(fields)
-        assert len(actual) == expected_harvests_count
+    assert mock_manage.call_count == len(fields)
+    assert get_conditions.call_count == len(fields)
+    mock_send.assert_called_once()
+    assert mock_add_var.call_count == len(fields)
+    assert len(actual) == expected_harvests_count
 
 
 @pytest.mark.parametrize(
@@ -221,15 +215,14 @@ def test_annual_update_routine(mocker: MockerFixture, fields: List[Field]) -> No
     mocker.patch.object(CropDataFactory, "setup_crop_configurations", return_value=None)
     mocker.patch.object(CropDataFactory, "get_available_crop_configurations", return_value=["alfalfa", "corn", "oats"])
     mock_reset = mocker.patch.object(Field, "perform_annual_reset")
-    with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
-        fm = FieldManager()
-        fm.fields = fields
-        mock_send_annual_variables = mocker.patch.object(fm.output_gatherer, "send_annual_variables")
+    fm = FieldManager({})
+    fm.fields = fields
+    mock_send_annual_variables = mocker.patch.object(fm.output_gatherer, "send_annual_variables")
 
-        fm.annual_update_routine()
+    fm.annual_update_routine()
 
-        assert mock_reset.call_count == len(fields)
-        mock_send_annual_variables.assert_called_once()
+    assert mock_reset.call_count == len(fields)
+    mock_send_annual_variables.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1955,8 +1948,6 @@ def test_setup_field(
     mocked_soil_profile = MagicMock(Soil)
     mocked_soil_data = MagicMock(SoilData)
     mocked_soil_profile.data = mocked_soil_data
-    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=field_config)
-
     mock_setup_soil_data = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_soil", return_value=mocked_soil_profile
     )
@@ -1977,7 +1968,7 @@ def test_setup_field(
         return_value=(mock_planting_events, mock_harvest_events),
     )
 
-    new_field = FieldManager._setup_field(field_name, crop_configs)
+    new_field = FieldManager._setup_field(field_name, field_config, crop_configs)
 
     assert new_field.field_data.name == field_name
     assert new_field.field_data.field_size == field_config.get("field_size")
@@ -1998,7 +1989,6 @@ def test_setup_field(
         "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0},
     }
 
-    mock_get_data.assert_called_once_with(field_name)
     mock_setup_fertilizer_events.assert_called_once_with(field_config.get("fertilizer_management_specification"))
     mock_setup_manure_events.assert_called_once_with(field_config.get("manure_management_specification"))
     mock_setup_tillage_events.assert_called_once_with(field_config.get("tillage_management_specification"))
@@ -2124,7 +2114,7 @@ def test_check_manure_schedules(mocker: MockerFixture) -> None:
     field.check_manure_application_schedule.return_value = expected_manure_requests
     mocker.patch.object(CropDataFactory, "setup_crop_configurations", return_value=None)
     mocker.patch.object(CropDataFactory, "get_available_crop_configurations", return_value=["alfalfa", "corn", "oats"])
-    field_manager = FieldManager()
+    field_manager = FieldManager({})
 
     # Act
     manure_requests = field_manager.check_manure_schedules(field, time)
