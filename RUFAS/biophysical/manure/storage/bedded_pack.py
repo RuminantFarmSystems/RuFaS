@@ -40,6 +40,28 @@ BEDDED_PACK_MCF_TABLE: dict[Mixing, dict[tuple[float, float], float]] = {
 
 
 class BeddedPack(Storage):
+    """
+    The BeddedPack storage class.
+
+    Parameters
+    ----------
+    name : str
+        The name of the bedded pack storage.
+    is_mixed : bool
+        Indicator for if the bedded pack is regularly mixed to promote composting activity.
+    storage_time_period : int, default=None
+        The length of time (days) manure is stored for between emptying events.
+    surface_area : float, deafult=inf
+        The surface area of the manure storage (m^2).
+    cover : StorageCover, default=StorageCover.NO_COVER
+        The type of cover used with the specified storage.
+
+    Attributes
+    ----------
+    is_mixed : bool
+        Indicator for if the bedded pack is regularly mixed to promote composting activity.
+
+    """
     def __init__(
         self,
         name: str,
@@ -71,7 +93,7 @@ class BeddedPack(Storage):
         Returns
         -------
         dict[str, ManureStream]
-            _The processed manure stream.
+            The processed manure stream.
 
         """
         original_received_manure = copy(self._received_manure)
@@ -177,6 +199,7 @@ class BeddedPack(Storage):
         ValueError
             If any of the dry matter loss calculations results in negative values for received-manure
             non-degradable volatile solids, degradable volatile solids, or total solids.
+
         """
         dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
@@ -243,6 +266,7 @@ class BeddedPack(Storage):
         ------
         ValueError
             If the total nitrogen losses are greater than the total received manure nitrogen.
+
         """
         received_manure_nitrogen_after_losses = (
             self._manure_to_process.nitrogen

@@ -35,6 +35,10 @@ class Storage(Processor):
 
     Parameters
     ----------
+    name : str
+        The name of the storage.
+    is_housing_emissions_calculator : bool
+        Flag indicating whether the storage is a housing emissions calculator.
     cover : str
         What the storage will be covered with, if anything.
     storage_time_period : int | None
@@ -168,16 +172,22 @@ class Storage(Processor):
             raise ValueError("No data for outdoor storage temperature calculations.")
 
     def _calculate_surface_area(self) -> None:
-        """
-        Calculates the surface area of the storage.
-        """
+        """Calculates the surface area of the storage."""
         cow_num = InputManager().get_data("animal.herd_information.cow_num")
         self._surface_area = (cow_num * MANURE_CONVERSION_CONSTANT * self._storage_time_period * FREEBOARD_CONSTANT) / (
             DEPTH_CONSTANT - PRECIPITATION_CONSTANT
         )
 
     def receive_manure(self, manure: ManureStream) -> None:
-        """Receives manure and puts it in storage to be processed."""
+        """
+        Receives manure and puts it in storage to be processed.
+
+        Parameters
+        ----------
+        manure : ManureStream
+            The manure to be received by the processor.
+
+        """
         is_compatible_manure = self.check_manure_stream_compatibility(manure)
         if not is_compatible_manure:
             info_map = {

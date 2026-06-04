@@ -10,6 +10,7 @@ from RUFAS.data_structures.manure_types import ManureType
 
 
 class ManureNutrientManager:
+    """Manages the nutrients in the manure pool."""
     def __init__(self) -> None:
         """Initialize the manure nutrient manager."""
         self.om = OutputManager()
@@ -82,9 +83,6 @@ class ManureNutrientManager:
     def handle_nutrient_request(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """
         Attempts to fulfill a nutrient request using available manure in the manager.
-        This method evaluates the given nutrient request (including nitrogen, phosphorus, and manure type)
-        and checks if the available nutrient pool can satisfy it. If the request can be met fully or partially,
-        the corresponding nutrients are removed from the manager and a result is returned.
 
         Parameters
         ----------
@@ -98,13 +96,19 @@ class ManureNutrientManager:
             manure would be needed to fulfill the request. If the request cannot be fulfilled at all, the first
             element of the tuple will be None.
 
+        Notes
+        -----
+        This method evaluates the given nutrient request (including nitrogen, phosphorus, and manure type)
+        and checks if the available nutrient pool can satisfy it. If the request can be met fully or partially,
+        the corresponding nutrients are removed from the manager and a result is returned.
+
         """
         eval_results, is_nutrient_request_fulfilled = self._evaluate_nutrient_request(request)
         return eval_results, is_nutrient_request_fulfilled
 
     def _evaluate_nutrient_request(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """
-        The method calculates the projected manure mass.
+        Calculates the projected manure mass.
 
         Parameters
         ----------
@@ -117,6 +121,7 @@ class ManureNutrientManager:
             A tuple containing the results of the nutrient request and a boolean indicating whether additional
             manure would be needed to fulfill the request. If the request cannot be fulfilled at all, the first
             element of the tuple will be None.
+
         """
         is_nutrient_request_fulfilled = False
         nitrogen_derived_manure_mass = self.calculate_projected_manure_mass(
@@ -164,9 +169,6 @@ class ManureNutrientManager:
         Calculate the projected manure mass based on the nutrient requested and the nutrient's composition
         in the manure.
 
-        The projected manure mass is calculated by dividing the nutrient request by the nutrient composition.
-        This represents the total manure mass needed to fulfill the nutrient request.
-
         Parameters
         ----------
         request_nutrient : float
@@ -185,6 +187,11 @@ class ManureNutrientManager:
         ValueError
             If the request for nutrient is negative.
             If the nutrient composition is not in the range [0, 1].
+
+        Notes
+        -----
+        The projected manure mass is calculated by dividing the nutrient request by the nutrient composition.
+        This represents the total manure mass needed to fulfill the nutrient request.
 
         """
         if request_nutrient < 0.0:
@@ -218,10 +225,6 @@ class ManureNutrientManager:
         """
         Select the smallest positive projected manure mass from the given list of projected manure masses.
 
-        This method works by first checking if any of the projected manure masses are negative and raises
-        a ValueError if this is the case. However, if all values are zero, it returns zero. Otherwise,
-        it returns the smallest positive value.
-
         Parameters
         ----------
         projected_manure_masses : list[float]
@@ -236,6 +239,12 @@ class ManureNutrientManager:
         ------
         ValueError
             If any of the projected manure masses is negative.
+
+        Notes
+        -----
+        This method works by first checking if any of the projected manure masses are negative and raises
+        a ValueError if this is the case. However, if all values are zero, it returns zero. Otherwise,
+        it returns the smallest positive value.
 
         """
         min_positive = math.inf
@@ -261,11 +270,6 @@ class ManureNutrientManager:
         """
         Create a NutrientRequestResults object based on the given projected manure mass and manure type.
 
-        Note that this method does not check if what is currently available in the manager is enough
-        to fulfill the projected manure mass. It simply creates a NutrientRequestResults object
-        based on the projected manure mass by multiplying the projected manure mass with the
-        nutrient compositions.
-
         Parameters
         ----------
         projected_manure_mass : float
@@ -280,6 +284,13 @@ class ManureNutrientManager:
         ------
         ValueError
             If the projected manure mass is negative.
+
+        Notes
+        -----
+        This method does not check if what is currently available in the manager is enough
+        to fulfill the projected manure mass. It simply creates a NutrientRequestResults object
+        based on the projected manure mass by multiplying the projected manure mass with the
+        nutrient compositions.
 
         """
         if projected_manure_mass < 0.0:
