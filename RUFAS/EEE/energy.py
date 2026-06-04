@@ -126,11 +126,14 @@ om = OutputManager()
 
 
 class EnergyEstimator:
-    """Class to estimate energy consumption for various operations on the farm"""
+    """Estimates energy consumption for the various field operations on the farm."""
 
     @staticmethod
     def estimate_all() -> None:
-        """Runs all estimation functions and performs pre/post processing for them."""
+        """
+        Runs the diesel consumption estimation for all field operations and reports the per-operation and total
+        results.
+        """
         base_info_map = {
             "class": EnergyEstimator.__name__,
             "function": EnergyEstimator.estimate_all.__name__,
@@ -193,7 +196,7 @@ class EnergyEstimator:
         tractor_size : TractorSize
             Size of the tractor used.
         diesel_consumption_tractor_implement_liter_per_ton : float
-            Diesel consumption per ton of implement.
+            Diesel consumption for the tractor-implement operation (l/ton).
         """
         base_info_map = {
             "class": EnergyEstimator.__name__,
@@ -264,7 +267,20 @@ class EnergyEstimator:
 
     def parse_inputs_for_diesel_consumption_calculation(self) -> list[dict[str, Any]]:
         """
-        Parses the OutputManager variables pool for diesel consumption calculation.
+        Parses the ``OutputManager`` variables pool into diesel consumption input data.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            A list of event data dictionaries, one per field operation event, each mapping EEE input keys to their
+            values along with the associated ``operation_event``.
+
+        Raises
+        ------
+        KeyError
+            If an expected variable key is missing from the filtered variables pool.
+        IndexError
+            If a variable's value list is shorter than expected while building the event data.
         """
         result: list[dict[str, Any]] = []
 
@@ -330,28 +346,31 @@ class EnergyEstimator:
     ) -> float:
         """
         General estimate of diesel fuel consumption for a given attachment type and tractor size.
-        Different practices use different types of tools/implements; the equation to estimate diesel fuel consumption
-        may be the same across practices, but different implements have different parameter values.
 
         Parameters
         ----------
-        crop_yield: float
-            Amount of crop yielded per hectares (metric ton/ha).
-        field_production_size: float
-            The filed area under production (ha).
-        tractor: Tractor
+        crop_yield : float
+            Amount of crop yielded per hectare (metric ton/ha).
+        field_production_size : float
+            The field area under production (ha).
+        tractor : Tractor
             The specifications of the tractor.
         clay_percent : float
             The clay percentage of the field under production (unitless).
-        application_mass : float | None = None
+        application_mass : float | None, optional
             The mass of a manure or fertilizer application (kg).
-        application_dm_content : float | None = None
+        application_dm_content : float | None, optional
             The dry matter content of a manure or fertilizer application (kg).
 
         Returns
         -------
         float
-            Diesel Consumption for Tractor-Implement (l/ha).
+            Diesel consumption for the tractor-implement (l/ha).
+
+        Notes
+        -----
+        Different practices use different types of tools/implements; the equation to estimate diesel fuel consumption
+        may be the same across practices, but different implements have different parameter values.
         """
         diesel_consumption_tractor_implement_liter_ha = 0.0
         for implement in tractor.implements:
@@ -391,7 +410,6 @@ class EnergyEstimator:
     ) -> float:
         """
         Calculates the total power needed to perform the field operation by the tractor and implement where applicable.
-        Implements Helper Function 412 in EEE Functions file.
 
         Parameters
         ----------
@@ -400,18 +418,22 @@ class EnergyEstimator:
         implement : TractorImplement
             The specifications of the implement.
         crop_yield_ton_per_ha : float
-            Amount of crop yielded per hectares (metric ton/ha)
+            Amount of crop yielded per hectare (metric ton/ha).
         field_production_size_ha : float
-            The filed area under production (ha)
+            The field area under production (ha).
         clay_percent : float
             The clay percentage of the field under production (unitless).
-        application_mass : float | None = None
+        application_mass : float | None, optional
             The mass of a manure or fertilizer application (kg).
 
         Returns
         -------
         float
-            The total power needed for the field operation (kW)
+            The total power needed for the field operation (kW).
+
+        References
+        ----------
+        Implements Helper Function 412 in the EEE Functions file.
         """
         tractor_axel_power = tractor.calculate_axel_power(implement)
         tractor_implement_drawbar_power = implement.calculate_drawbar_power(clay_percent)

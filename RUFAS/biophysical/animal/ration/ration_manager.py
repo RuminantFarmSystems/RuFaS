@@ -17,6 +17,8 @@ class RationManager:
 
     Attributes
     ----------
+    _om : OutputManager
+        A private instance of OutputManager for use in this class.
     user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
         A mapping of animal groupings to their respective ration formulations.
     ration_feeds : dict[AnimalCombination, list[RUFAS_ID]]
@@ -44,7 +46,7 @@ class RationManager:
 
         Parameters
         ----------
-        ration_config : dict[str, list[int]]
+        ration_config : dict[str, Any]
             Collection of animal requirements and feed supply information for ration formulation.
 
         """
@@ -103,7 +105,7 @@ class RationManager:
 
         Parameters
         ----------
-        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+        feed_config : dict[str, Any]
             Collection of animal requirements and feed supply information for ration formulation.
 
         """
@@ -116,7 +118,7 @@ class RationManager:
 
         Parameters
         ----------
-        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+        ration_config : dict[str, Any]
             Collection of animal requirements and feed supply information for ration formulation.
 
         Raises

@@ -31,16 +31,9 @@ class NutritionRequirementsCalculator:
         milk_production: float
             Daily milk yield (kg).
 
-        Notes
-        ------
-        [AN.NRC.27]
-        [AN.NRC.28]
-        [AN.NSM.21]
-        [AN.NSM.22]
-
         Returns
         -------
-        net_energy_lactation : float
+        float
             Net energy requirement for lactation (Mcal)
 
         References
@@ -49,6 +42,10 @@ class NutritionRequirementsCalculator:
             8th edition." National Academic Press, Chapter 3 "Energy", pp. 30, 2021.
         .. [2] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 2 "Energy", pp. 19, 2001.
+        [AN.NRC.27]
+        [AN.NRC.28]
+        [AN.NSM.21]
+        [AN.NSM.22]
 
         """
         if animal_type in [AnimalType.LAC_COW]:
