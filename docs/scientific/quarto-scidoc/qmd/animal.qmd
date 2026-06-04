@@ -2633,8 +2633,8 @@ manure nutrient composition. These outputs are consistently generated across ani
 #| tbl-cap: Expected outputs from the manure excretion calculator.
 import_table(
   "../resources/table_data/animal/tbl-an-manexc-outputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-
+  maxcolwidths = [12, 12, 20, None],
+  sep_lines_after = [5],
 )
 ```
 

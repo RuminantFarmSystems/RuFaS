@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Iterable, Any
 
 import pandas as pd
 import tabulate # required for pd._to_markdown
 from IPython.display import Markdown, display
+from pandas import DataFrame
+
 
 def read_tbl(path: str | Path, **kwargs) -> pd.DataFrame:
     """
@@ -61,7 +63,7 @@ def read_tbl(path: str | Path, **kwargs) -> pd.DataFrame:
         raise
 
 
-def display_md_tbl(tbl: pd.DataFrame, **kwargs) -> None:
+def display_md_tbl(tbl: pd.DataFrame, sep_lines_after: Iterable[int] | None = None, **kwargs) -> None:
     """
     Display a ``pandas.DataFrame`` as a Markdown table
 
@@ -69,6 +71,8 @@ def display_md_tbl(tbl: pd.DataFrame, **kwargs) -> None:
     ----------
     tbl: pandas.DataFrame
         the tabular data to display
+    sep_lines_after:
+        a list of rows after which separating lines should be added.
     kwargs:
         additional arguments passed to ``pandas.DataFrame.to_markdown`` (and ``tabulate.tabulate``, by extension)
 
@@ -114,11 +118,49 @@ def display_md_tbl(tbl: pd.DataFrame, **kwargs) -> None:
         # default to using the grid tables (with column alignment enabled)
         kwargs["tablefmt"] = "colon_grid"
 
+    tbl = _insert_lines(tbl, sep_lines_after)
+
     # Get the Markdown table
     md_tbl = tbl.to_markdown(**kwargs)
 
     # Return a display of the table
     display(Markdown(md_tbl))
+
+
+def _insert_lines(tbl: pd.DataFrame, lines_after: Iterable[int] | None) -> DataFrame | Any:
+    """
+    Add lines after specific rows in a table. Useful for displaying row-merged tables in markdown
+
+    Parameters
+    ----------
+    tbl: pandas.DataFrame
+        the table to insert lines into
+    lines_after: Iterable[int]
+        a list of the rows after which blank lines should be inserted
+
+
+    Returns
+    -------
+    The original pandas.DataFrame with blank lines (``tabulate.SEPARATING_LINE``) inserted.
+    """
+    if lines_after is not None:
+        start_split = 0
+        tbl_slices = []
+        blank_row = [tabulate.SEPARATING_LINE for i in range(tbl.shape[1])]
+        blank_row = pd.DataFrame([blank_row], columns=tbl.columns)
+        for split in lines_after:
+            this_slice = tbl[start_split:split + 1]
+            tbl_slices.append(this_slice)
+            start_split = split + 1
+        tbl_slices.append(tbl[start_split:])
+
+        new_tbl = tbl_slices[0]
+        for i in range(len(tbl_slices) - 1):
+            this_slice = pd.concat([blank_row, tbl_slices[i + 1]]).reset_index(drop=True)
+            new_tbl = pd.concat([new_tbl, this_slice]).reset_index(drop=True)
+        tbl = new_tbl
+    return tbl
+
 
 def import_table(path: str | Path, read_opts: dict | None = None, **display_opts):
     """
