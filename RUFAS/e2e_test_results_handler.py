@@ -25,7 +25,7 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def compare_actual_and_expected_test_results(
-        json_output_path: Path, convert_variable_table_path: str | None
+        json_output_path: Path, convert_variable_table_path: str | None, output_prefix: str
     ) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
@@ -37,6 +37,8 @@ class E2ETestResultsHandler:
         convert_variable_table_path : str | None
             String path to the csv look up table to convert the variable names in the expected results to match the
             variable names in the actual results.
+        output_prefix : str
+            The output prefix for the current e2e run.
 
         """
         om = OutputManager()
@@ -44,7 +46,7 @@ class E2ETestResultsHandler:
             "class": E2ETestResultsHandler.__class__.__name__,
             "function": E2ETestResultsHandler.compare_actual_and_expected_test_results.__name__,
         }
-        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths()
+        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
 
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
@@ -148,9 +150,12 @@ class E2ETestResultsHandler:
                 "The conversion table CSV should have both 'Original' and 'New' columns.",
                 info_map,
             )
-            raise KeyError("The conversion table CSV should have both 'Original' and 'New' columns.")
+            raise KeyError("E2E testing error: The conversion table CSV should have both 'Original' and 'New' columns.")
         if E2ETestResultsHandler._duplicate_mappings_exist(df_conversion_lookup_table):
-            raise ValueError("Duplicate Mapping Error: The conversion table CSV should not contain duplicate mappings.")
+            raise ValueError(
+                "E2E testing error: Duplicate Mapping Error: The conversion table CSV should not contain "
+                "duplicate mappings."
+            )
         conversion_lookup_table: dict[str, str] = df_conversion_lookup_table.set_index("Original")["New"].to_dict()
         for key, value in expected_results.items():
             if key in list(conversion_lookup_table.keys()):
@@ -245,10 +250,12 @@ class E2ETestResultsHandler:
         return len(duplicates_in_original_column) > 0 or len(duplicates_in_new_column) > 0
 
     @staticmethod
-    def _get_test_result_paths() -> list[ResultPathType]:
+    def _get_test_result_paths(output_prefix: str) -> list[ResultPathType]:
         """Retrieves the paths to test results and associated information from the InputManager."""
         im = InputManager()
-        result_paths: list[dict[str, str]] = im.get_data("end_to_end_testing_result_paths.end_to_end_test_result_paths")
+        result_paths: list[dict[str, str]] = im.get_data(
+            f"end_to_end_testing_result_paths.end_to_end_test_result_paths.{output_prefix}"
+        )
         test_result_paths: list[ResultPathType] = []
         for path_set in result_paths:
             test_result_paths.append(
@@ -262,7 +269,7 @@ class E2ETestResultsHandler:
         return test_result_paths
 
     @staticmethod
-    def is_significant(changes: dict[str, float | str], tolerance: float) -> bool:
+    def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
         """
         Determines if a numerical change is significant based if the change between the
         "old_value" and "new_value" exceeds the specified tolerance.
@@ -285,13 +292,33 @@ class E2ETestResultsHandler:
         relative to the "old_value". If the "old_value" is zero, a fallback reference value of 1 is used
         to ensure the tolerance comparison remains meaningful.
         """
-        if isinstance(changes, dict) and "old_value" in changes and "new_value" in changes:
-            old_value = changes["old_value"]
-            new_value = changes["new_value"]
-            if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
-                reference = abs(old_value) if abs(old_value) > 0 else 1
-                difference = abs(new_value - old_value)
-                return difference > tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+        if not (isinstance(changes, dict) and "old_value" in changes and "new_value" in changes):
+            return True
+
+        old_value = changes["old_value"]
+        new_value = changes["new_value"]
+
+        if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
+            reference = abs(old_value) if abs(old_value) > 0 else 1
+            difference = abs(new_value - old_value)
+            threshold = tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+            return difference > threshold
+
+        if isinstance(old_value, dict) and isinstance(new_value, dict):
+            for key in old_value.keys() | new_value.keys():
+                if key not in old_value or key not in new_value:
+                    return True
+
+                nested_change = {
+                    "old_value": old_value[key],
+                    "new_value": new_value[key],
+                }
+
+                if E2ETestResultsHandler.is_significant(nested_change, tolerance):
+                    return True
+
+            return False
+
         return True
 
     @staticmethod
@@ -343,10 +370,12 @@ class E2ETestResultsHandler:
         """
         values_changed = diff_result.get("values_changed", {})
         E2ETestResultsHandler.filter_nested(values_changed, tolerance)
+        if "values_changed" in diff_result and diff_result["values_changed"] == {}:
+            del diff_result["values_changed"]
         return diff_result
 
     @staticmethod
-    def update_expected_test_results(output_dir: Path) -> None:
+    def update_expected_test_results(output_dir: Path, output_prefix: str) -> None:
         """
         Compares the actual end-to-end testing results for various RuFaS domains and updates the expected
         results in the appropriate domain filter file if differences are found.
@@ -355,13 +384,15 @@ class E2ETestResultsHandler:
         ----------
         output_dir : str
             The directory to which the actual results are written to.
+        output_prefix : str
+            The prefix to give the output file names.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
             "class": E2ETestResultsHandler.__class__.__name__,
             "function": E2ETestResultsHandler.update_expected_test_results.__name__,
         }
-        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths()
+        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
             om.add_log(
@@ -415,14 +446,17 @@ class E2ETestResultsHandler:
                 expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
                 E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results)
             except (IOError, json.JSONDecodeError) as e:
+                error_message = (
+                    f"Failed to update expected results for {path_set.domain} domain. Error: {str(e)}."
+                    " Restoring backup."
+                )
                 om.add_error(
                     "End-to-end testing expected results update failure.",
-                    f"Failed to update expected results for {path_set.domain} domain. Error: {str(e)}."
-                    " Restoring backup.",
+                    error_message,
                     info_map,
                 )
                 shutil.move(backup_path, path_set.expected_results_path)
-                raise e
+                raise
             finally:
                 if backup_path.exists():
                     backup_path.unlink()
@@ -464,6 +498,11 @@ class E2ETestResultsHandler:
             The path to the JSON file.
         data : dict
             The data to write to the JSON file.
+
+        Raises
+        ------
+        ValueError
+            If the input data is missing required keys.
         """
         key_order = ORDERED_EXPECTED_RESULTS_FILE_KEYS
         missing_keys = [key for key in key_order if key not in data]
@@ -477,7 +516,7 @@ class E2ETestResultsHandler:
                     "function": E2ETestResultsHandler._write_formatted_json.__name__,
                 },
             )
-            raise ValueError(f"Missing required keys in data: {missing_keys}")
+            raise ValueError(f"E2E testing error: Missing required keys in data for JSON file: {missing_keys}")
 
         ordered_data = {key: data[key] for key in key_order}
         compact_expected_results = json.dumps(ordered_data["expected_results"], separators=(",", ":"))

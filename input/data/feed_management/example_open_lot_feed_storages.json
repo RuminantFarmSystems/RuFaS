@@ -1,0 +1,8 @@
+{
+    "feed_storages": [
+        "corn_silage_storage_1",
+        "triticale_silage_storage_1",
+        "corn_grain_storage_2",
+        "alfalfa_hay_storage_2"
+    ]
+}

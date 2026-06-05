@@ -11,7 +11,7 @@ from RUFAS.output_manager import OutputManager
 
 class DigestiveSystem:
     """
-    This class serves as an entry point for the animal digestive systems.
+    An entry point for the animal digestive systems.
     """
 
     manure_excretion: AnimalManureExcretions
@@ -21,7 +21,7 @@ class DigestiveSystem:
     def __init__(self) -> None:
         self.manure_excretion = AnimalManureExcretions()
         self.phosphorus_excreted = 0.0
-        self.enteric_methane_emission = 0.0
+        self.enteric_methane_emission: float = 0.0
 
     def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> None:
         """
@@ -39,6 +39,9 @@ class DigestiveSystem:
         TypeError
             If the animal type in digestive_system_inputs is not supported, a TypeError is raised
             with information about supported animal types.
+        RuntimeError
+            For any other unexpected errors related to processing digestion.
+
         """
         om = OutputManager()
         info_map = {
@@ -70,7 +73,7 @@ class DigestiveSystem:
         )
         if digestive_system_inputs.animal_type == AnimalType.CALF:
             methane_emission = EntericMethaneCalculator.calculate_calf_methane(
-                AnimalConfig.methane_model,
+                AnimalConfig.methane_model["calves"],
                 digestive_system_inputs.body_weight,
             )
             phosphorus, excretion = ManureExcretionCalculator.calculate_calf_manure(
@@ -82,11 +85,17 @@ class DigestiveSystem:
             self.enteric_methane_emission = methane_emission
             self.phosphorus_excreted = phosphorus
             self.manure_excretion = excretion
-            return
 
         elif digestive_system_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
+            if digestive_system_inputs.animal_type == AnimalType.HEIFER_I:
+                model_selection = "heiferIs"
+            elif digestive_system_inputs.animal_type == AnimalType.HEIFER_II:
+                model_selection = "heiferIIs"
+            else:
+                model_selection = "heiferIIIs"
+
             methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
-                AnimalConfig.methane_model,
+                AnimalConfig.methane_model[model_selection],
                 digestive_system_inputs.nutrients,
             )
 
@@ -99,7 +108,6 @@ class DigestiveSystem:
             self.enteric_methane_emission = methane_emission
             self.phosphorus_excreted = phosphorus
             self.manure_excretion = excretion
-            return
 
         elif digestive_system_inputs.animal_type.is_cow:
             methane_emission = EntericMethaneCalculator.calculate_cow_methane(
@@ -127,7 +135,6 @@ class DigestiveSystem:
             self.enteric_methane_emission = methane_emission
             self.phosphorus_excreted = phosphorus
             self.manure_excretion = excretion
-            return
 
         else:
             om.add_error(
@@ -174,6 +181,7 @@ class DigestiveSystem:
             A tuple containing two values:
             - The amount of phosphorus excreted in urine (g).
             - The amount of phosphorus excreted in feces (g).
+
         """
 
         # amount of P required for urine production (g) (A.1G.B.1)

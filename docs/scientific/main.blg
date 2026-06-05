@@ -1,0 +1,53 @@
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is 'main.blg'
+[135] biber-MSWIN64:340> INFO - === 
+[180] Biber.pm:419> INFO - Reading 'main.bcf'
+[329] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[332] Biber.pm:979> INFO - Found 29 citekeys in bib section 1
+[332] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[335] Biber.pm:979> INFO - Found 28 citekeys in bib section 2
+[336] Biber.pm:979> INFO - Found 6 citekeys in bib section 0
+[336] Biber.pm:979> INFO - Found 0 citekeys in bib section 3
+[336] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[336] Biber.pm:979> INFO - Found 2 citekeys in bib section 4
+[336] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[376] Biber.pm:4419> INFO - Processing section 0
+[391] Biber.pm:4610> INFO - Looking for bibtex file 'resources/animal.bib' for section 0
+[442] bibtex.pm:1713> INFO - LaTeX decoding ...
+[524] bibtex.pm:1519> INFO - Found BibTeX data source 'resources/animal.bib'
+[572] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[572] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[572] Biber.pm:4239> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[572] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[574] Biber.pm:4419> INFO - Processing section 1
+[574] Biber.pm:4610> INFO - Looking for bibtex file 'resources/animal.bib' for section 1
+[792] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[792] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[792] Biber.pm:4239> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[792] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[837] Biber.pm:4419> INFO - Processing section 2
+[838] Biber.pm:4610> INFO - Looking for bibtex file 'resources/animal.bib' for section 2
+[1031] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1031] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1031] Biber.pm:4239> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[1031] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[1066] Biber.pm:4419> INFO - Processing section 4
+[1067] Biber.pm:4610> INFO - Looking for bibtex file 'resources/animal.bib' for section 4
+[1119] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1119] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1119] Biber.pm:4239> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[1119] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[1122] bbl.pm:660> INFO - Writing 'main.bbl' with encoding 'UTF-8'
+[1183] bbl.pm:763> INFO - Output to main.bbl
+[1185] Biber.pm:131> WARN - I didn't find a database entry for 'hargreaves1985' (section 0)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'mu-extsoil' (section 0)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'hayes2020vindication' (section 0)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'parton1987analysis' (section 0)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'fan2016root' (section 0)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'gomez2010time' (section 2)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'espejo2007herd' (section 2)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'jewell2019prevalence' (section 2)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'meyer2019contract' (section 2)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'endres2007behavior' (section 2)
+[1186] Biber.pm:131> WARN - I didn't find a database entry for 'wallaceDMI' (section 2)
+[1186] Biber.pm:133> INFO - WARNINGS: 11

@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.biophysical.feed_storage.storage import HIGH_MOISTURE_LOSS_COEFFICIENT, Storage
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
@@ -27,7 +27,15 @@ def storage() -> Storage:
     Storage
         An instance of the Storage class.
     """
-    return Storage()
+    mock_storage_config: dict[str, str | float | list[str]] = {
+        "name": "Test Storage",
+        "field_names": ["Test Field"],
+        "crop_name": "corn_silage",
+        "rufas_id": 1,
+        "initial_storage_dry_matter": 50.0,
+        "capacity": 1_000_000.0,
+    }
+    return Storage(storage_config=mock_storage_config)
 
 
 @pytest.fixture
@@ -40,8 +48,7 @@ def harvested_crop() -> HarvestedCrop:
     HarvestedCrop
         An instance of the HarvestedCrop class.
     """
-    category = CropCategory.SMALL_GRAIN
-    return HarvestedCrop(category=category, **sample_crop_data)
+    return HarvestedCrop(**sample_crop_data)
 
 
 @pytest.fixture
@@ -65,15 +72,15 @@ def weather(mocker: MockerFixture, time: RufasTime) -> Weather:
 
 
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
-    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    """Tests the stored_mass property of Storage."""
     assert storage.stored_mass == 0.0  # Initially empty
     storage.receive_crop(harvested_crop, 15)
     storage.receive_crop(harvested_crop, 15)
-    assert storage.stored_mass == 200.0  # After adding a crop
+    assert storage.stored_mass == 400.0  # After adding a crop
 
 
 def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop) -> None:
-    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    """Tests that a crop is successfully received into storage."""
     storage.receive_crop(harvested_crop, 15)
     assert len(storage.stored) == 1
     assert storage.stored[0].fresh_mass == harvested_crop.fresh_mass
@@ -82,59 +89,40 @@ def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop
 
 
 def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: HarvestedCrop) -> None:
-    storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
+    """Tests that receiving a crop exceeding capacity raises an exception."""
     storage.capacity = 50.0  # Set a smaller capacity
     with pytest.raises(Exception) as excinfo:
         storage.receive_crop(harvested_crop, 15)
     assert "exceeds the storage capacity" in str(excinfo.value)
 
 
-def test_receive_unacceptable_crop(storage: Storage) -> None:
-    storage.acceptable_crops = [CropCategory.ALFALFA]
-    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, **sample_crop_data)
-    with pytest.raises(ValueError):
-        storage.receive_crop(incompatible_crop, 15)
-
-
-def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop: HarvestedCrop) -> None:
-    storage.acceptable_crops = []
-
-    with pytest.raises(NotImplementedError) as excinfo:
-        storage.receive_crop(harvested_crop, 15)
-    assert "Storage.acceptable_crops is not populated" in str(excinfo.value)
-
-
 def test_receive_crop_high_moisture_triggers_loss(storage: Storage, mocker: MockerFixture) -> None:
     """Ensure HIGH_MOISTURE crop triggers dry matter loss logic and records storage."""
-    storage.acceptable_crops = [CropCategory.CORN]
 
-    high_moisture_crop_data = {
-        "harvest_time": date(2025, 3, 7),
-        "storage_time": date(2025, 3, 7),
-        "config_name": "corn_high_moisture",
-        "rufas_ids": [1],
-        "fresh_mass": 100.0,
-        "dry_matter_percentage": 50.0,
-        "dry_matter_digestibility": 70.0,
-        "crude_protein_percent": 10.0,
-        "non_protein_nitrogen": 5.0,
-        "starch": 30.0,
-        "adf": 7.0,
-        "ndf": 15.0,
-        "lignin": 3.0,
-        "sugar": 20.0,
-        "ash": 6.0,
-    }
-
-    category = CropCategory.CORN
-    crop = HarvestedCrop(category=category, **high_moisture_crop_data)
+    crop = HarvestedCrop(
+        harvest_time=date(2025, 3, 7),
+        storage_time=date(2025, 3, 7),
+        field_name="Test Field",
+        config_name="corn_high_moisture",
+        dry_matter_mass=100.0,
+        dry_matter_percentage=50.0,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
 
     mock_remove_dm = mocker.spy(crop, "remove_dry_matter_mass")
     mock_record = mocker.patch.object(storage, "_record_stored_crops")
 
     storage.receive_crop(crop, simulation_day=20)
 
-    expected_dm_removed = 50.0 * HIGH_MOISTURE_LOSS_COEFFICIENT
+    expected_dm_removed = 100.0 * HIGH_MOISTURE_LOSS_COEFFICIENT
     mock_remove_dm.assert_called_once_with(expected_dm_removed)
     assert mock_record.call_count == 2
     assert crop in storage.stored
@@ -158,6 +146,7 @@ def test_process_degradations(
         "class": storage.__class__.__name__,
         "function": storage.process_degradations.__name__,
         "units": MeasurementUnits.KILOGRAMS,
+        "prefix": "Feed.object.Storage.Test Storage",
     }
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
@@ -180,7 +169,7 @@ def test_process_degradations(
     mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
     mock_add_var = mocker.patch.object(storage.om, "add_variable")
-    mass_values = {"fresh_mass": 5000.0, "dry_matter_percentage": 10.0}
+    mass_values = {"dry_matter_mass": 5000.0, "dry_matter_percentage": 10.0}
     mocker.patch.object(storage, "_calculate_mass_attributes_after_loss", return_value=mass_values)
     mock_record = mocker.patch.object(storage, "_record_stored_crops")
     mock_degradation = mocker.patch.object(
@@ -195,7 +184,7 @@ def test_process_degradations(
             "lignin": percentage,
             "ash": percentage,
             "last_time_degraded": time.current_date,
-            "fresh_mass": mass_values["fresh_mass"],
+            "dry_matter_mass": mass_values["dry_matter_mass"],
             "dry_matter_percentage": mass_values["dry_matter_percentage"],
         },
     )
@@ -209,7 +198,7 @@ def test_process_degradations(
             "ndf",
             "lignin",
             "ash",
-            "fresh_mass",
+            "dry_matter_mass",
             "dry_matter_percentage",
             "last_time_degraded",
         ]
@@ -237,7 +226,7 @@ def test_process_degradations(
         assert crop.ndf == percentage
         assert crop.lignin == percentage
         assert crop.ash == percentage
-        assert crop.fresh_mass == mass_values["fresh_mass"]
+        assert crop.dry_matter_mass == mass_values["dry_matter_mass"]
         assert crop.dry_matter_percentage == mass_values["dry_matter_percentage"]
         assert crop.last_time_degraded == time.current_date
 
@@ -251,7 +240,7 @@ def test_project_degradations(
     storage: Storage, harvested_crop: HarvestedCrop, time: RufasTime, weather: Weather, mocker: MockerFixture
 ) -> None:
     """Test that degradations are projected correctly, and GRAIN crops are skipped."""
-    loss_values = {
+    loss_values: dict[str, float] = {
         "gaseous_dry_matter_loss": 100.0,
         "crude_protein_percent": 2.0,
         "starch": 2.1,
@@ -259,11 +248,11 @@ def test_project_degradations(
         "ndf": 2.3,
         "lignin": 2.4,
         "ash": 2.5,
-        "fresh_mass": 900.0,
+        "dry_matter_mass": 900.0,
         "dry_matter_percentage": 33.0,
-        "last_time_degraded": date(2025, 3, 4),
+        "last_time_degraded": 25,
     }
-    expected_last_time_degraded = date(2025, 3, 4)
+    expected_last_time_degraded = 25
 
     degradable_crops = [replace(harvested_crop) for _ in range(2)]
     grain_crop = replace(harvested_crop)
@@ -282,7 +271,7 @@ def test_project_degradations(
             ndf=loss_values["ndf"],
             lignin=loss_values["lignin"],
             ash=loss_values["ash"],
-            fresh_mass=loss_values["fresh_mass"],
+            dry_matter_mass=loss_values["dry_matter_mass"],
             dry_matter_percentage=loss_values["dry_matter_percentage"],
         )
         for crop in degradable_crops
@@ -310,7 +299,7 @@ def test_remove_empty_crops(
     storage: Storage, harvested_crop: HarvestedCrop, masses: list[float], expected_crop_num: int
 ) -> None:
     """Tests that crops with no mass left are removed from a storage."""
-    storage.stored = [replace(harvested_crop, fresh_mass=mass) for mass in masses]
+    storage.stored = [replace(harvested_crop, dry_matter_mass=mass) for mass in masses]
 
     storage.remove_empty_crops()
 
@@ -338,12 +327,15 @@ def test_calculate_mass_attributes_after_loss(
     expected_percentage: float,
 ) -> None:
     """Test _calculate_mass_attributes_after_loss method of Storage class."""
-    harvested_crop.fresh_mass = fresh
+    harvested_crop.dry_matter_mass = fresh * percentage / 100
     harvested_crop.dry_matter_percentage = percentage
 
     actual = storage._calculate_mass_attributes_after_loss(harvested_crop, dry_loss, water_loss)
 
-    assert pytest.approx(actual) == {"fresh_mass": expected_fresh, "dry_matter_percentage": expected_percentage}
+    assert pytest.approx(actual) == {
+        "dry_matter_mass": fresh * percentage / 100 - dry_loss,
+        "dry_matter_percentage": expected_percentage,
+    }
 
 
 def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
@@ -382,33 +374,26 @@ def test_get_total_nutritive_amount(
 ) -> None:
     """Test _get_total_nutritive_amount in Storage class."""
     storage.stored = [harvested_crop] * len(percentages)
-    mock_dry_matter_mass = mocker.patch(
-        "RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.dry_matter_mass",
-        new_callable=mocker.PropertyMock,
-        return_value=dry_mass,
-    )
+    harvested_crop.dry_matter_mass = dry_mass
     mock_getattr = mocker.patch("RUFAS.biophysical.feed_storage.storage.getattr", side_effect=percentages)
     expected_getattr_calls = [call(crop, nutrient) for crop in storage.stored]
 
     actual = storage._get_total_nutritive_amount(nutrient)
 
     assert pytest.approx(actual) == expected
-    assert mock_dry_matter_mass.call_count == len(percentages)
     mock_getattr.assert_has_calls(expected_getattr_calls)
 
 
 @pytest.mark.parametrize(
-    "dry_matter,percentage,category,temps,expected",
+    "dry_matter,percentage,temps,expected",
     [
-        (100.0, 25.0, CropCategory.ALFALFA, [20.0] * 3, 0.1379672649553659),
-        (40.0, 20.0, CropCategory.ALFALFA, [6.0, 4.0, 6.0], 0.0208),
-        (150.0, 19.0, CropCategory.ALFALFA, [10.0] * 4, 0.0),
-        (200.0, 23.0, CropCategory.ALFALFA, [46.0, 44.0, 46.0], 0.09671999999999999),
-        (140.0, 15.0, CropCategory.CORN, [30.0, 28.0, 29.0], 0.04032),
-        (80.0, 17.0, CropCategory.CORN, [30.0] * 20, 0.44291418402941823),
-        (55.0, 66.0, CropCategory.GRASS, [25.0] * 2, 0.0),
-        (120.0, 4.0, CropCategory.SMALL_GRAIN, [15.0], 0.0),
-        (100.0, 24.0, CropCategory.GRASS, [], 0.0),
+        (100.0, 25.0, [20.0] * 3, 0.1379672649553659),
+        (40.0, 20.0, [6.0, 4.0, 6.0], 0.0208),
+        (150.0, 19.0, [10.0] * 4, 0.0),
+        (200.0, 23.0, [46.0, 44.0, 46.0], 0.09671999999999999),
+        (55.0, 66.0, [25.0] * 2, 0.0),
+        (120.0, 4.0, [15.0], 0.0),
+        (100.0, 24.0, [], 0.0),
     ],
 )
 def test_calculate_dry_matter_loss_to_gas(
@@ -417,18 +402,12 @@ def test_calculate_dry_matter_loss_to_gas(
     mocker: MockerFixture,
     dry_matter: float,
     percentage: float,
-    category: CropCategory,
     temps: list[float],
     expected: float,
 ) -> None:
     """Tests calculate_dry_matter_loss_to_gas in Storage."""
-    mocker.patch(
-        "RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.dry_matter_mass",
-        new_callable=mocker.PropertyMock,
-        return_value=dry_matter,
-    )
     harvested_crop.dry_matter_percentage = percentage
-    harvested_crop.category = category
+    harvested_crop.dry_matter_mass = dry_matter
     mock_time = mocker.MagicMock()
 
     mock_conditions = []
@@ -469,13 +448,13 @@ def test_get_conditions(
 
 
 @pytest.mark.parametrize(
-    "days,fresh_mass,moisture,expected_loss",
+    "days,dry_mass,moisture,expected_loss",
     [
-        (1, 1_000.0, 24.0, 4.0),
-        (3, 1_000.0, 24.0, 12.0),
-        (6, 20_000.0, 30.0, 720.0),
-        (40, 10_000.0, 80.0, 6_800.0),
-        (20, 6_000.0, 10.0, 0.0),
+        (1, 500.0, 24.0, 2.0),
+        (3, 500.0, 24.0, 6.0),
+        (6, 10_000.0, 30.0, 360.0),
+        (40, 5_000.0, 80.0, 3400.0),
+        (20, 3_000.0, 10.0, 0.0),
     ],
 )
 def test_process_moisture_loss(
@@ -484,7 +463,7 @@ def test_process_moisture_loss(
     time: RufasTime,
     mocker: MockerFixture,
     days: int,
-    fresh_mass: float,
+    dry_mass: float,
     moisture: float,
     expected_loss: float,
 ) -> None:
@@ -493,12 +472,13 @@ def test_process_moisture_loss(
         "class": storage.__class__.__name__,
         "function": storage._process_moisture_loss.__name__,
         "units": MeasurementUnits.KILOGRAMS,
+        "prefix": "Feed.object.Storage.Test Storage",
     }
     harvested_crop.initial_dry_matter_percentage = 100.0 - moisture
     harvested_crop.initial_dry_matter_mass = (
-        fresh_mass * harvested_crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        dry_mass * harvested_crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
     )
-    harvested_crop.fresh_mass = fresh_mass
+    harvested_crop.dry_matter_mass = dry_mass
     harvested_crop.storage_time = time.current_date.date()
     harvested_crop.last_time_degraded = time.current_date.date()
     time.current_date += timedelta(days=days)
@@ -508,7 +488,7 @@ def test_process_moisture_loss(
     storage._process_moisture_loss(time, 30, 12.0)
 
     mock_add_var.assert_called_once_with("total_moisture_loss", expected_loss, expected_info_map)
-    assert harvested_crop.fresh_mass == fresh_mass - expected_loss
+    assert pytest.approx(harvested_crop.fresh_mass) == dry_mass * 2 - expected_loss
 
 
 def test_project_moisture_loss(
@@ -518,7 +498,7 @@ def test_project_moisture_loss(
     mocker: MockerFixture,
 ) -> None:
     """Test that mooisture loss is projected correctly."""
-    moisture_loss_values = {"fresh_mass": 900.0, "dry_matter_percentage": 33.0, "moisture_loss": 20.0}
+    moisture_loss_values = {"dry_matter_mass": 900.0, "dry_matter_percentage": 33.0, "moisture_loss": 20.0}
     expected_moisture_loss: dict[str, float] = {
         "fresh_mass": 900.0,
         "dry_matter_percentage": 33.0,
@@ -527,13 +507,13 @@ def test_project_moisture_loss(
     crops_with_moisture_loss = [
         replace(
             crop,
-            fresh_mass=expected_moisture_loss["fresh_mass"],
+            dry_matter_mass=expected_moisture_loss["fresh_mass"],
             dry_matter_percentage=expected_moisture_loss["dry_matter_percentage"],
         )
         for crop in storage.stored
     ]
     for crop in crops_with_moisture_loss:
-        object.__setattr__(crop, "fresh_mass", expected_moisture_loss["fresh_mass"])
+        object.__setattr__(crop, "dry_matter_mass", expected_moisture_loss["fresh_mass"])
         object.__setattr__(crop, "dry_matter_percentage", expected_moisture_loss["dry_matter_percentage"])
     calculate_moisture_loss = mocker.patch.object(
         storage, "_calculate_values_after_moisture_loss", side_effect=[copy(moisture_loss_values) for _ in range(3)]
@@ -638,7 +618,7 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
         storage,
         "_calculate_mass_attributes_after_loss",
         return_value={
-            "fresh_mass": 900.0,
+            "dry_matter_mass": 900.0,
             "dry_matter_percentage": 32.0,
         },
     )
@@ -653,7 +633,7 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
         "ndf": 4.0,
         "lignin": 5.0,
         "ash": 6.0,
-        "fresh_mass": 900.0,
+        "dry_matter_mass": 900.0,
         "dry_matter_percentage": 32.0,
         "last_time_degraded": date(2025, 6, 10),
     }

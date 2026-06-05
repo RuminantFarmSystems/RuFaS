@@ -7,11 +7,13 @@ from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamH
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
-from RUFAS.biophysical.manure.storage.compost_bedded_pack_barn import CompostBeddedPackBarn
+from RUFAS.biophysical.manure.storage.bedded_pack import BeddedPack
 from RUFAS.biophysical.manure.storage.composting import Composting
+from RUFAS.biophysical.manure.storage.daily_spread import DailySpread
 from RUFAS.biophysical.manure.storage.open_lot import OpenLot
 from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurryStorageUnderfloor
+from RUFAS.output_manager import OutputManager
 
 
 class ProcessorType(Enum):
@@ -38,8 +40,10 @@ class ProcessorType(Enum):
     SlurryStorageUnderfloor = SlurryStorageUnderfloor
 
     Composting = Composting
-    CompostBeddedPackBarn = CompostBeddedPackBarn
+    BeddedPack = BeddedPack
     OpenLot = OpenLot
+
+    DailySpread = DailySpread
 
     @classmethod
     def get_processor_class(cls, processor_type: str) -> Type["Processor"]:
@@ -65,4 +69,9 @@ class ProcessorType(Enum):
             processor: Type["Processor"] = cls[processor_type].value
             return processor
         except KeyError:
-            raise ValueError(f"Unknown processor type: {processor_type}.")
+            OutputManager().add_error(
+                "Bad manure processor type",
+                f"Unknown processor type: {processor_type}.",
+                info_map={"class": ProcessorType.__name__, "function": ProcessorType.get_processor_class.__name__},
+            )
+            raise ValueError(f"Unknown manure processor type: {processor_type}.")

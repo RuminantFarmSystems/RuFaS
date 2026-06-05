@@ -2,6 +2,8 @@ import math
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
+from RUFAS.user_constants import UserConstants
 
 
 class SolidsStorageCalculator:
@@ -64,7 +66,7 @@ class SolidsStorageCalculator:
         ----------
         manure_temperature : float
             The manure temperature on the current day, Celsius.  In Composting, this value is equal to ambient
-            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            temperature on the current day. In Open Lot and Bedded Pack, this value is
             set to a default/constant value (30 C).
         non_degradable_volatile_solids : float
             The non-degradable volatile solids on the current day, kg.
@@ -98,7 +100,7 @@ class SolidsStorageCalculator:
         ----------
         manure_temperature : float
             The manure temperature on the current day, Celsius. In Composting, this value is equal to ambient
-            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            temperature on the current day. In Open Lot and Bedded Pack, this value is
             set to a default/constant value (30 C).
 
         Returns
@@ -155,7 +157,7 @@ class SolidsStorageCalculator:
         ----------
         manure_temperature : float
             The manure temperature on the current day, Celsius. In Composting, this value is equal to ambient
-            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            temperature on the current day. In Open Lot and Bedded Pack, this value is
             set to a default/constant value (30 C).
 
         Returns
@@ -205,6 +207,11 @@ class SolidsStorageCalculator:
         methane_production_potential : float
             Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
 
+        Raises
+        ------
+        ValueError
+            If manure_volatile_solids < 0.
+
         Returns
         -------
         float
@@ -212,11 +219,19 @@ class SolidsStorageCalculator:
 
         """
         if manure_volatile_solids < 0:
+            OutputManager().add_error(
+                "Negative manure solids error",
+                f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.",
+                info_map={
+                    "class": SolidsStorageCalculator.__name__,
+                    "function": SolidsStorageCalculator.calculate_ifsm_methane_emission.__name__,
+                },
+            )
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
         Bo = methane_production_potential
         methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temperature)
         methane_emissions_in_kg = (
-            manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor
+            manure_volatile_solids * Bo * UserConstants.METHANE_FACTOR * methane_conversion_factor
         ) / 100
         return methane_emissions_in_kg
 

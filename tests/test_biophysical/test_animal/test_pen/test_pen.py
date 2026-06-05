@@ -3,6 +3,10 @@ from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec
 
 import numpy as np
 import pytest
+from pytest import approx
+
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.general_constants import GeneralConstants
 from pytest_mock import MockerFixture
 from scipy.optimize import OptimizeResult
 
@@ -25,14 +29,10 @@ from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import Nutri
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
-from RUFAS.data_structures.feed_storage_to_animal_connection import (
-    RUFAS_ID,
-    RequestedFeed,
-    Feed,
-)
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed, NutrientStandard
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -126,6 +126,7 @@ def animals_in_pen() -> dict[int, Animal]:
 
 @pytest.fixture
 def pen(mocker: MockerFixture) -> Pen:
+    RationManager.maximum_ration_reformulation_attempts = 250
     im = InputManager()
     mocker.patch.object(
         im,
@@ -207,6 +208,54 @@ def test_is_populated(pen: Pen, animals_in_pen: dict[int, Animal], expected: boo
     """Tests the pen's population status."""
     pen.animals_in_pen = animals_in_pen
     assert pen.is_populated == expected
+
+
+def test_total_enteric_methane_sums_animal_emissions(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """total_enteric_methane should return the sum of enteric methane for all animals in the pen."""
+    pen.animals_in_pen = animals_in_pen
+
+    result = pen.total_enteric_methane
+
+    expected = 69.4 * len(animals_in_pen)
+
+    assert result == pytest.approx(expected)
+
+
+def test_total_enteric_methane_zero_when_no_animals(pen: Pen) -> None:
+    """total_enteric_methane should be 0.0 when there are no animals in the pen."""
+    pen.animals_in_pen = {}
+
+    result = pen.total_enteric_methane
+
+    assert result == 0.0
+
+
+def test_total_pen_ration_no_animals(pen: Pen) -> None:
+    """total_pen_ration should return an empty dict when no animals are housed in the pen."""
+    pen.animals_in_pen = {}
+    pen.ration = {RUFAS_ID(1): 5.0}
+
+    assert pen.total_pen_ration == {}
+
+
+def test_total_pen_ration_scales_ration_and_adds_totals(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """
+    Tests that total_pen_ration scales the ration by the number of animals and adds total dry matter
+    intake and byproducts.
+    """
+    pen.animals_in_pen = animals_in_pen
+    pen.ration = {RUFAS_ID(1): 5.0, RUFAS_ID(2): 3.0}
+
+    result = pen.total_pen_ration
+
+    expected = {
+        "1": 10.0,
+        "2": 6.0,
+        "dry_matter_intake_total": 16.0,
+        "byproducts_total": 40.0,
+    }
+
+    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -434,12 +483,6 @@ def test_average_milk_production_reduction_no_cows(
     assert pen.average_milk_production_reduction == 0
 
 
-def test_total_enteric_methane(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
-    """Tests the calculation of total enteric methane."""
-    pen.animals_in_pen = animals_in_pen
-    assert pen.total_enteric_methane == 138.8
-
-
 def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
     im = InputManager()
     mock_get_data = mocker.patch.object(
@@ -647,11 +690,16 @@ def test_update_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: Moc
 def test_add_new_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
     """Tests the function to adda list of animals into the pen."""
     mock_supply_1 = MagicMock(spec=NutritionSupply)
+    digestive_system = MagicMock(spec=DigestiveSystem)
+    digestive_system.configure_mock(
+        manure_excretion=AnimalManureExcretions(urine_nitrogen=15), enteric_methane_emission=69.4
+    )
     animal_3 = create_autospec(Animal)
     animal_3.configure_mock(
         id=3,
         animal_type=AnimalType.CALF,
         nutrition_supply=mock_supply_1,
+        digestive_system=digestive_system,
         feeds_used=[MagicMock(spec=Feed)],
         body_weight=10,
     )
@@ -660,6 +708,7 @@ def test_add_new_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: Mo
         id=3,
         animal_type=AnimalType.CALF,
         nutrition_supply=mock_supply_1,
+        digestive_system=digestive_system,
         feeds_used=[MagicMock(spec=Feed)],
         body_weight=10,
     )
@@ -783,6 +832,13 @@ def test_clear(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
             ],
             ["single_general_stream_GROWING_PEN_1"],
         ),
+        (
+            AnimalCombination.GROWING_AND_CLOSE_UP,
+            [
+                {"stream_name": "single_general_stream", "stream_proportion": 1.0, "bedding_name": "bedding_1"},
+            ],
+            ["single_general_stream_GROWING_AND_CLOSE_UP_PEN_1"],
+        ),
     ],
 )
 def test_get_manure_streams(
@@ -793,16 +849,21 @@ def test_get_manure_streams(
     pen: Pen,
     animals_in_pen: dict[int, Animal],
 ) -> None:
-    """Tests get_manure_streams() with both custom and fallback logic."""
+    """Verify get_manure_streams produces correct keys and calls split_stream with expected args."""
+
     pen.animals_in_pen = animals_in_pen
     pen.animal_combination = animal_combination
     pen.manure_streams = manure_streams
     pen.first_parlor_processor = "stream_a"
     pen.parlor_stream_name = "test_stream"
     pen.minutes_away_for_milking = 360
-    apply_bedding_side_effects = [MagicMock(auto_spec=ManureStream)] * len(manure_streams)
-    for i in range(len(manure_streams)):
-        apply_bedding_side_effects[i].name = manure_streams[i]["stream_name"]
+
+    if animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
+        first_animal = next(iter(animals_in_pen.values()))
+        second_animal = list(animals_in_pen.values())[1]
+        first_animal.animal_type = AnimalType.HEIFER_I
+        second_animal.animal_type = AnimalType.DRY_COW
+    apply_bedding_side_effects = [MagicMock(spec=ManureStream) for _ in manure_streams]
     mock_apply_bedding = mocker.patch.object(pen, "_apply_bedding", side_effect=apply_bedding_side_effects)
 
     mock_excretion = AnimalManureExcretions(
@@ -823,23 +884,502 @@ def test_get_manure_streams(
         phosphorus_fraction=0.0,
         potassium=0.5,
     )
-
     for animal in animals_in_pen.values():
         mocker.patch.object(animal.digestive_system, "manure_excretion", new=mock_excretion)
 
+    child_stream = MagicMock(spec=ManureStream)
+    child_stream.pen_manure_data = MagicMock(set_first_processor=MagicMock())
     mock_split = mocker.patch.object(
         ManureStream,
         "split_stream",
-        side_effect=lambda split_ratio, stream_type: MagicMock(
-            spec=ManureStream, pen_manure_data=MagicMock(set_first_processor=MagicMock())
-        ),
+        autospec=True,
+        return_value=child_stream,
     )
 
     result = pen.get_manure_streams()
 
-    assert mock_apply_bedding.call_count == len(manure_streams)
     assert list(result.keys()) == expected_result_keys
-    assert mock_split.call_count == len(expected_result_keys)
+    assert mock_apply_bedding.call_count == len(manure_streams)
+
+    expected_calls = (
+        (1 + len(manure_streams)) if animal_combination == AnimalCombination.LAC_COW else len(manure_streams)
+    )
+    assert mock_split.call_count == expected_calls
+
+    if animal_combination == AnimalCombination.LAC_COW:
+        parlor_call = mock_split.call_args_list[0]
+        assert pytest.approx(parlor_call.kwargs["split_ratio"]) == 0.25
+        assert parlor_call.kwargs["stream_type"] == StreamType.PARLOR
+        assert parlor_call.kwargs["manure_stream_deposition_split"] == 0.0
+
+        non_parlor = 1.0 - 0.25
+        for i, call in enumerate(mock_split.call_args_list[1:]):
+            prop = float(manure_streams[i]["stream_proportion"])
+            expected_split_ratio = prop * non_parlor
+            expected_deposition = prop
+
+            assert call.kwargs["stream_type"] == StreamType.GENERAL
+            assert pytest.approx(call.kwargs["split_ratio"]) == pytest.approx(expected_split_ratio)
+            assert pytest.approx(call.kwargs["manure_stream_deposition_split"]) == pytest.approx(expected_deposition)
+
+    else:
+        for i, call in enumerate(mock_split.call_args_list):
+            proportion = float(manure_streams[i]["stream_proportion"])
+            assert call.kwargs["stream_type"] == StreamType.GENERAL
+            assert pytest.approx(call.kwargs["split_ratio"]) == pytest.approx(proportion)
+            assert pytest.approx(call.kwargs["manure_stream_deposition_split"]) == pytest.approx(proportion)
+
+
+@pytest.mark.parametrize(
+    "general_stream_proportion, parlor_stream_proportion, stream_config, total_stream, expected_result",
+    [
+        (
+            1.0,
+            None,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=10.0,
+                phosphorus=10.0,
+                potassium=10.0,
+                ash=10.0,
+                non_degradable_volatile_solids=10.0,
+                degradable_volatile_solids=10.0,
+                total_solids=100.0,
+                volume=100.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10.0,
+            ),
+            ManureStream(
+                water=10.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=10.0,
+                phosphorus=10.0,
+                potassium=10.0,
+                ash=10.0,
+                non_degradable_volatile_solids=10.0,
+                degradable_volatile_solids=10.0,
+                total_solids=100.0,
+                volume=100.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10.0,
+            ),
+        ),
+        (
+            0.8,
+            0.2,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=10.0,
+                phosphorus=10.0,
+                potassium=10.0,
+                ash=10.0,
+                non_degradable_volatile_solids=10.0,
+                degradable_volatile_solids=10.0,
+                total_solids=100.0,
+                volume=100.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10.0,
+            ),
+            ManureStream(
+                water=8.0,
+                ammoniacal_nitrogen=8.0,
+                nitrogen=8.0,
+                phosphorus=8.0,
+                potassium=8.0,
+                ash=8.0,
+                non_degradable_volatile_solids=8.0,
+                degradable_volatile_solids=8.0,
+                total_solids=80.0,
+                volume=80.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=8.0,
+            ),
+        ),
+        (
+            0.3,
+            0.2,
+            {"stream_type": StreamType.GENERAL, "stream_proportion": 1.0},
+            ManureStream(
+                water=10.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=10.0,
+                phosphorus=10.0,
+                potassium=10.0,
+                ash=10.0,
+                non_degradable_volatile_solids=10.0,
+                degradable_volatile_solids=10.0,
+                total_solids=100.0,
+                volume=100.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10.0,
+            ),
+            ManureStream(
+                water=3.0,
+                ammoniacal_nitrogen=3.0,
+                nitrogen=3.0,
+                phosphorus=3.0,
+                potassium=3.0,
+                ash=3.0,
+                non_degradable_volatile_solids=3.0,
+                degradable_volatile_solids=3.0,
+                total_solids=30.0,
+                volume=30.0,
+                methane_production_potential=10.0,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=3.0,
+            ),
+        ),
+    ],
+)
+def test_split_general_manure_stream(
+    general_stream_proportion: float,
+    parlor_stream_proportion: Any | None,
+    stream_config: dict[str, str | float],
+    total_stream: ManureStream,
+    expected_result: ManureStream,
+    pen: Pen,
+    animals_in_pen: dict[int, Animal],
+) -> None:
+    """Tests the split_general_manure_stream method."""
+    result = pen._split_general_manure_stream(
+        general_stream_proportion,
+        parlor_stream_proportion,
+        stream_config,
+        total_stream,
+    )
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "general_stream_proportion, parlor_stream_proportion, parlor_stream, assertion_error_expected",
+    [
+        (1.0, None, None, False),
+        (0.5, None, None, True),
+        (1.0, 0.5, None, True),
+        (0.5, 0.5, None, True),
+        (0.5, None, MagicMock(spec=ManureStream), True),
+        (0.5, 0.5, MagicMock(spec=ManureStream), False),
+    ],
+)
+def test_validate_parlor_stream_proportion(
+    general_stream_proportion: float,
+    parlor_stream_proportion: Any | None,
+    parlor_stream: ManureStream,
+    assertion_error_expected: bool,
+    pen: Pen,
+) -> None:
+    """Tests the validate_parlor_stream_proportion method."""
+    if assertion_error_expected:
+        with pytest.raises(AssertionError):
+            pen._validate_parlor_stream_proportion(general_stream_proportion, parlor_stream, parlor_stream_proportion)
+    else:
+        pen._validate_parlor_stream_proportion(general_stream_proportion, parlor_stream, parlor_stream_proportion)
+
+
+def test_calculate_total_pen_manure_stream(pen: Pen, mocker: MockerFixture) -> None:
+    """Tests the calculation of total pen manure stream."""
+    excretions = AnimalManureExcretions(
+        urine=120.0,
+        manure_total_ammoniacal_nitrogen=3.5,
+        urine_nitrogen=2.0,
+        manure_nitrogen=4.0,
+        manure_mass=200.0,
+        total_solids=40.0,
+        degradable_volatile_solids=25.0,
+        non_degradable_volatile_solids=10.0,
+        phosphorus=500.0,
+        potassium=800.0,
+    )
+    methane_potential = 0.25
+    surface_area = 150.0
+
+    mocker.patch.object(Pen, "total_manure_excretion", new_callable=PropertyMock, return_value=excretions)
+    mocker.patch.object(pen, "_calculate_methane_production_potential", return_value=methane_potential)
+    mocker.patch.object(pen, "_calculate_manure_surface_area", return_value=surface_area)
+
+    stream = pen._calculate_total_pen_manure_stream()
+
+    assert isinstance(stream, ManureStream)
+    assert stream.water == approx(excretions.manure_mass - excretions.total_solids)  # 160.0
+    assert stream.ammoniacal_nitrogen == approx(excretions.manure_total_ammoniacal_nitrogen)  # 3.5
+    assert stream.nitrogen == approx(excretions.manure_nitrogen)  # 4.0
+    assert stream.phosphorus == approx(excretions.phosphorus * GeneralConstants.GRAMS_TO_KG)  # 0.5
+    assert stream.potassium == approx(excretions.potassium * GeneralConstants.GRAMS_TO_KG)  # 0.8
+    assert stream.ash == approx(0)
+    assert stream.non_degradable_volatile_solids == approx(excretions.non_degradable_volatile_solids)
+    assert stream.degradable_volatile_solids == approx(excretions.degradable_volatile_solids)
+    assert stream.total_solids == approx(excretions.total_solids)
+    assert stream.volume == approx(excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY)
+    assert stream.methane_production_potential == approx(methane_potential)
+    assert stream.bedding_non_degradable_volatile_solids == approx(0.0)
+
+    assert stream.pen_manure_data is not None
+    pmd = stream.pen_manure_data
+    assert pmd.num_animals == len(pen.animals_in_pen)
+    assert pmd.manure_deposition_surface_area == approx(surface_area)
+    assert pmd.animal_combination == pen.animal_combination
+    assert pmd.pen_type == pen.pen_type
+    assert pmd.manure_urine_mass == approx(excretions.urine)
+    assert pmd.manure_urine_nitrogen == approx(excretions.urine_nitrogen)
+    assert pmd.stream_type == StreamType.GENERAL
+
+
+def test_calculate_methane_production_potential_growing_and_close_up_mixed(pen: Pen, mocker: MockerFixture) -> None:
+    """Mixed GROWING_AND_CLOSE_UP pen: weighted average of 0.17 (growing) and 0.24 (close-up)."""
+    growing_animal = mocker.MagicMock(auto_spec=Animal)
+    growing_animal.animal_type = AnimalType.HEIFER_I
+
+    close_up_animal = mocker.MagicMock(auto_spec=Animal)
+    close_up_animal.animal_type = AnimalType.DRY_COW
+
+    pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.animals_in_pen = {1: growing_animal, 2: close_up_animal}
+
+    result = pen._calculate_methane_production_potential()
+
+    # 1 growing out of 2 total → 0.17 * 0.5 + 0.24 * 0.5
+    assert result == approx(0.17 * 0.5 + 0.24 * 0.5)
+
+
+def test_calculate_methane_production_potential_growing_and_close_up_empty(pen: Pen, mocker: MockerFixture) -> None:
+    """GROWING_AND_CLOSE_UP pen with no animals returns 0.0."""
+    pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.animals_in_pen = {}
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.0)
+
+
+def test_calculate_methane_production_potential_growing_and_close_up_all_growing(
+    pen: Pen, mocker: MockerFixture
+) -> None:
+    """GROWING_AND_CLOSE_UP pen with only growing animals (HeiferI, HeiferII) returns 0.17."""
+    heifer_i = mocker.MagicMock(auto_spec=Animal)
+    heifer_i.animal_type = AnimalType.HEIFER_I
+    heifer_ii = mocker.MagicMock(auto_spec=Animal)
+    heifer_ii.animal_type = AnimalType.HEIFER_II
+
+    pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.animals_in_pen = {1: heifer_i, 2: heifer_ii}
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.17)
+
+
+def test_calculate_methane_production_potential_growing_and_close_up_all_close_up(
+    pen: Pen, mocker: MockerFixture
+) -> None:
+    """GROWING_AND_CLOSE_UP pen with only close-up animals (HeiferIII, DryCow) returns 0.24."""
+    heifer_iii = mocker.MagicMock(auto_spec=Animal)
+    heifer_iii.animal_type = AnimalType.HEIFER_III
+    dry_cow = mocker.MagicMock(auto_spec=Animal)
+    dry_cow.animal_type = AnimalType.DRY_COW
+
+    pen.animal_combination = AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.animals_in_pen = {1: heifer_iii, 2: dry_cow}
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.24)
+
+
+def test_calculate_methane_production_potential_calf(pen: Pen, mocker: MockerFixture) -> None:
+    """CALF combination always returns 0.17."""
+    pen.animal_combination = AnimalCombination.CALF
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.17)
+
+
+def test_calculate_methane_production_potential_growing(pen: Pen, mocker: MockerFixture) -> None:
+    """GROWING combination always returns 0.17."""
+    pen.animal_combination = AnimalCombination.GROWING
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.17)
+
+
+@pytest.mark.parametrize("combination", [AnimalCombination.LAC_COW, AnimalCombination.CLOSE_UP])
+def test_calculate_methane_production_potential_other_combinations(
+    pen: Pen, mocker: MockerFixture, combination: AnimalCombination
+) -> None:
+    """LAC_COW and CLOSE_UP combinations return 0.24."""
+    pen.animal_combination = combination
+
+    result = pen._calculate_methane_production_potential()
+
+    assert result == approx(0.24)
+
+
+def test_handle_parlor_stream_lac_cow_splits_and_sets_processor(pen: Pen) -> None:
+    """
+    For a LAC_COW pen, the parlor stream is split using the milking-time proportion,
+    the remaining general stream proportion is 1 - parlor_proportion,
+    and first_processor is set on the parlor stream's pen_manure_data.
+    """
+    total_stream = ManureStream(
+        water=160.0,
+        ammoniacal_nitrogen=3.5,
+        nitrogen=4.0,
+        phosphorus=0.5,
+        potassium=0.8,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=25.0,
+        total_solids=40.0,
+        volume=0.2,
+        methane_production_potential=0.25,
+        bedding_non_degradable_volatile_solids=0.0,
+        pen_manure_data=PenManureData(
+            num_animals=5,
+            manure_deposition_surface_area=100.0,
+            animal_combination=AnimalCombination.LAC_COW,
+            pen_type="freestall",
+            manure_urine_mass=120.0,
+            manure_urine_nitrogen=2.0,
+            stream_type=StreamType.GENERAL,
+        ),
+    )
+
+    expected_parlor_proportion = 7 / 1440
+
+    general_proportion, parlor_proportion, parlor_stream = pen._handle_parlor_stream(total_stream)
+
+    assert parlor_proportion == approx(expected_parlor_proportion)
+    assert general_proportion == approx(1 - expected_parlor_proportion)
+
+    assert parlor_stream is not None
+    assert parlor_stream.water == approx(total_stream.water * expected_parlor_proportion)
+    assert parlor_stream.nitrogen == approx(total_stream.nitrogen * expected_parlor_proportion)
+    assert parlor_stream.volume == approx(total_stream.volume * expected_parlor_proportion)
+    assert parlor_stream.methane_production_potential == approx(total_stream.methane_production_potential)
+
+    assert parlor_stream.pen_manure_data is not None
+    assert parlor_stream.pen_manure_data.stream_type == StreamType.PARLOR
+    assert parlor_stream.pen_manure_data.first_processor == "stream_a"
+    assert parlor_stream.pen_manure_data.manure_deposition_surface_area == approx(0.0)
+
+
+def test_handle_parlor_stream_lac_cow_no_first_processor(pen: Pen, mocker: MockerFixture) -> None:
+    """
+    When first_parlor_processor is None the parlor stream is still split correctly
+    but first_processor is NOT set (remains None).
+    """
+    mocker.patch.object(pen, "first_parlor_processor", None)
+
+    total_stream = ManureStream(
+        water=160.0,
+        ammoniacal_nitrogen=3.5,
+        nitrogen=4.0,
+        phosphorus=0.5,
+        potassium=0.8,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=25.0,
+        total_solids=40.0,
+        volume=0.2,
+        methane_production_potential=0.25,
+        bedding_non_degradable_volatile_solids=0.0,
+        pen_manure_data=PenManureData(
+            num_animals=5,
+            manure_deposition_surface_area=100.0,
+            animal_combination=AnimalCombination.LAC_COW,
+            pen_type="freestall",
+            manure_urine_mass=120.0,
+            manure_urine_nitrogen=2.0,
+            stream_type=StreamType.GENERAL,
+        ),
+    )
+
+    _, _, parlor_stream = pen._handle_parlor_stream(total_stream)
+
+    assert parlor_stream is not None
+    assert parlor_stream.pen_manure_data is not None
+    assert parlor_stream.pen_manure_data.first_processor is None
+
+
+def test_handle_parlor_stream_lac_cow_no_pen_manure_data(pen: Pen) -> None:
+    """
+    When the total stream carries no pen_manure_data, the split still happens
+    but the parlor stream also has no pen_manure_data (set_first_processor is not called).
+    """
+    total_stream = ManureStream(
+        water=160.0,
+        ammoniacal_nitrogen=3.5,
+        nitrogen=4.0,
+        phosphorus=0.5,
+        potassium=0.8,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=25.0,
+        total_solids=40.0,
+        volume=0.2,
+        methane_production_potential=0.25,
+        bedding_non_degradable_volatile_solids=0.0,
+        pen_manure_data=None,
+    )
+
+    expected_parlor_proportion = 7 / 1440
+    general_proportion, parlor_proportion, parlor_stream = pen._handle_parlor_stream(total_stream)
+
+    assert parlor_proportion == approx(expected_parlor_proportion)
+    assert general_proportion == approx(1 - expected_parlor_proportion)
+    assert parlor_stream is not None
+    assert parlor_stream.pen_manure_data is None
+
+
+@pytest.mark.parametrize(
+    "combination",
+    [
+        AnimalCombination.CALF,
+        AnimalCombination.GROWING,
+        AnimalCombination.CLOSE_UP,
+        AnimalCombination.GROWING_AND_CLOSE_UP,
+    ],
+)
+def test_handle_parlor_stream_non_lac_cow_returns_no_split(
+    pen: Pen, mocker: MockerFixture, combination: AnimalCombination
+) -> None:
+    """
+    For any non-LAC_COW combination the stream is not split:
+    general_proportion == 1.0, parlor_proportion and parlor_stream are None.
+    """
+    pen.animal_combination = combination
+
+    total_stream = ManureStream(
+        water=160.0,
+        ammoniacal_nitrogen=3.5,
+        nitrogen=4.0,
+        phosphorus=0.5,
+        potassium=0.8,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=25.0,
+        total_solids=40.0,
+        volume=0.2,
+        methane_production_potential=0.25,
+        bedding_non_degradable_volatile_solids=0.0,
+        pen_manure_data=None,
+    )
+
+    general_proportion, parlor_proportion, parlor_stream = pen._handle_parlor_stream(total_stream)
+
+    assert general_proportion == approx(1.0)
+    assert parlor_proportion is None
+    assert parlor_stream is None
 
 
 @pytest.mark.parametrize(
@@ -867,6 +1407,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10,
             ),
             BeddingType.SAND,
             ManureStream(
@@ -890,6 +1431,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
         (
@@ -914,6 +1456,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10,
             ),
             BeddingType.NONE,
             ManureStream(
@@ -923,7 +1466,7 @@ def test_get_manure_streams(
                 phosphorus=35.68,
                 potassium=6.6,
                 ash=0.88,
-                non_degradable_volatile_solids=71.94,
+                non_degradable_volatile_solids=68.8,
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
@@ -937,6 +1480,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
         (
@@ -961,6 +1505,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10,
             ),
             BeddingType.CBPB_SAWDUST,
             ManureStream(
@@ -970,7 +1515,7 @@ def test_get_manure_streams(
                 phosphorus=35.68,
                 potassium=6.6,
                 ash=0.88,
-                non_degradable_volatile_solids=71.94,
+                non_degradable_volatile_solids=68.8,
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
                 volume=15.30,
@@ -984,6 +1529,7 @@ def test_get_manure_streams(
                     manure_urine_nitrogen=0.0,
                     stream_type=StreamType.GENERAL,
                 ),
+                bedding_non_degradable_volatile_solids=10,
             ),
         ),
     ],
@@ -1049,6 +1595,7 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         volume=12.80,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10,
     )
 
     with pytest.raises(ValueError):
@@ -1158,11 +1705,11 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
     mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
+        True,
         pen_available_feeds=_mock_feeds(),
         temperature=25.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=1,
     )
 
@@ -1171,6 +1718,8 @@ def test_formulation_lac_cow_success_first_attempt(mocker: MockerFixture, pen: P
 
 def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen) -> None:
     """LAC_COW: first attempt fails, second succeeds."""
+    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
+
     pen.animal_combination = AnimalCombination.LAC_COW
     pen.ration = {}
     pen.id = 3
@@ -1187,11 +1736,11 @@ def test_formulation_lac_cow_retry_then_success(mocker: MockerFixture, pen: Pen)
     mock_apply = mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
+        False,
         pen_available_feeds=_mock_feeds(),
         temperature=25.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=2,
     )
 
@@ -1211,11 +1760,11 @@ def test_formulation_non_lac_cow_failure_no_previous_ration(mocker: MockerFixtur
 
     with pytest.raises(ValueError, match="No previous ration available"):
         pen.formulate_optimized_ration(
+            False,
             pen_available_feeds=_mock_feeds(),
             temperature=22.0,
             max_daily_feeds={},
             advance_purchase_allowance=MagicMock(),
-            total_inventory=MagicMock(),
             simulation_day=3,
         )
 
@@ -1232,11 +1781,11 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
     mocker.patch.object(pen, "_apply_successful_solution")
 
     pen.formulate_optimized_ration(
+        False,
         pen_available_feeds=_mock_feeds(),
         temperature=21.0,
         max_daily_feeds={},
         advance_purchase_allowance=MagicMock(),
-        total_inventory=MagicMock(),
         simulation_day=4,
     )
 
@@ -1244,15 +1793,198 @@ def test_formulation_non_lac_cow_failure_with_previous_ration(mocker: MockerFixt
     pen.om.add_error.assert_not_called()
 
 
-def test_attempt_formulation(mocker: MockerFixture, pen: Pen) -> None:
+def test_formulation_lac_cow_user_defined_dmi_increase_triggers_retry(mocker: MockerFixture, pen: Pen) -> None:
+    """LAC_COW + user-defined ration: failed first attempt triggers DMI increase and retry."""
+    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
+
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.ration = {}
+    pen.id = 5
+    pen.om = MagicMock(spec=OutputManager)
+    avg_reqs = MagicMock()
+    avg_reqs.dry_matter = 100.0
+    avg_reqs.metabolizable_protein = 50.0
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+
+    mocker.patch.object(pen, "reset_milk_production_reduction")
+
+    failing_solution = _mock_solution(False)
+    succeeding_solution = _mock_solution(True)
+    mock_attempt = mocker.patch.object(
+        pen,
+        "_attempt_formulation",
+        side_effect=[(failing_solution, MagicMock()), (succeeding_solution, MagicMock())],
+    )
+
+    mocker.patch.object(
+        pen.ration_optimizer,
+        "handle_failed_constraints",
+        return_value=["NE_total_constraint"],
+    )
+
+    mock_reduce_user_defined = mocker.patch.object(pen, "_reduce_on_lactation_failure_user_defined")
+    mock_reduce_auto = mocker.patch.object(pen, "_reduce_on_lactation_failure")
+    mock_apply_success = mocker.patch.object(pen, "_apply_successful_solution")
+    mock_apply_user_defined = mocker.patch.object(pen, "_apply_user_defined_ration")
+
+    pen.formulate_optimized_ration(
+        True,
+        pen_available_feeds=_mock_feeds(),
+        temperature=25.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        simulation_day=10,
+    )
+
+    assert mock_attempt.call_count == 2
+    mock_apply_success.assert_called_once()
+
+    mock_reduce_user_defined.assert_not_called()
+    mock_reduce_auto.assert_not_called()
+    mock_apply_user_defined.assert_not_called()
+
+
+def test_formulation_lac_cow_user_defined_reduce_and_fallback_to_user_ration(mocker: MockerFixture, pen: Pen) -> None:
+    """
+    LAC_COW + user-defined ration: failed formulation triggers user-defined reduce handler,
+    then falls back to applying the user-defined ration and logs the event.
+    """
+    mocker.patch("RUFAS.biophysical.animal.pen.RationManager.tolerance", 0.0, create=True)
+
+    pen.animal_combination = AnimalCombination.LAC_COW
+    pen.ration = {}
+    pen.id = 6
+    pen.om = MagicMock(spec=OutputManager)
+
+    mocker.patch.object(pen, "reset_milk_production_reduction")
+
+    failing_solution = _mock_solution(False)
+    mocker.patch.object(
+        pen,
+        "_attempt_formulation",
+        return_value=(failing_solution, MagicMock()),
+    )
+
+    mocker.patch.object(
+        pen.ration_optimizer,
+        "handle_failed_constraints",
+        return_value=["some_other_constraint"],
+    )
+
+    mock_reduce_user_defined = mocker.patch.object(
+        pen,
+        "_reduce_on_lactation_failure_user_defined",
+        return_value=True,
+    )
+    mock_reduce_auto = mocker.patch.object(pen, "_reduce_on_lactation_failure")
+
+    mock_apply_success = mocker.patch.object(pen, "_apply_successful_solution")
+    mock_apply_user_defined = mocker.patch.object(pen, "_apply_user_defined_ration")
+
+    feeds = _mock_feeds()
+
+    pen.formulate_optimized_ration(
+        True,
+        pen_available_feeds=feeds,
+        temperature=20.0,
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(),
+        simulation_day=11,
+    )
+
+    mock_reduce_user_defined.assert_called_once()
+    mock_reduce_auto.assert_not_called()
+    mock_apply_success.assert_not_called()
+
+    mock_apply_user_defined.assert_called_once()
+    (called_feeds,), _ = mock_apply_user_defined.call_args
+    assert isinstance(called_feeds, list)
+    assert len(called_feeds) == len(feeds)
+
+    pen.om.add_log.assert_called_once()
+
+
+def test_attempt_formulation(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     """Tests the function _attempt_formulation"""
     mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
     mock_result = (MagicMock(spec=OptimizeResult), MagicMock(spec=RationConfig))
     mock_attempt = mocker.patch.object(RationOptimizer, "attempt_optimization", return_value=mock_result)
-    result = pen._attempt_formulation(_mock_feeds(), 25, None)
+    pen.animals_in_pen = animals_in_pen
+    pen.animals_in_pen[1].nutrient_standard = NutrientStandard.NRC
+    result = pen._attempt_formulation(
+        is_ration_defined_by_user=False,
+        pen_feeds=_mock_feeds(),
+        temperature=25,
+        previous_ration=None,
+        initial_dry_matter_requirement=1,
+        initial_protein_requirement=1,
+    )
     mock_set.assert_called_once()
     mock_attempt.assert_called_once()
     assert result == mock_result
+
+
+def test_attempt_formulation_user_defined_and_nasem(
+    mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]
+) -> None:
+    """Covers user-defined ration path and NASEM nutrient standard averaging."""
+    pen.animals_in_pen = animals_in_pen
+    for animal in pen.animals_in_pen.values():
+        animal.nutrient_standard = NutrientStandard.NASEM
+
+    user_defined_for_combo = {"feed1": 1.0, "feed2": 2.0}
+    mocker.patch.object(
+        RationManager,
+        "user_defined_rations",
+        {pen.animal_combination: user_defined_for_combo},
+        create=True,
+    )
+    mocker.patch.object(RationManager, "tolerance", 0.123, create=True)
+
+    avg_reqs = MagicMock()
+    avg_reqs.dry_matter = 100.0
+    avg_reqs.metabolizable_protein = 50.0
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+
+    mock_set = mocker.patch.object(pen, "set_animal_nutritional_requirements")
+    mock_result = (MagicMock(spec=OptimizeResult), MagicMock(spec=RationConfig))
+    mock_attempt = mocker.patch.object(
+        RationOptimizer,
+        "attempt_optimization",
+        return_value=mock_result,
+    )
+
+    feeds = _mock_feeds()
+
+    result = pen._attempt_formulation(
+        is_ration_defined_by_user=True,
+        pen_feeds=feeds,
+        temperature=25.0,
+        previous_ration={"prev": "ration"},
+        initial_dry_matter_requirement=1.5,
+        initial_protein_requirement=2.5,
+    )
+
+    mock_set.assert_called_once()
+    mock_attempt.assert_called_once()
+    assert result == mock_result
+
+    _, kwargs = mock_attempt.call_args
+
+    assert kwargs["user_defined_ration_dictionary"] == user_defined_for_combo
+    assert kwargs["user_defined_ration_tolerance"] == pytest.approx(0.123)
+    assert kwargs["pen_average_enteric_methane"] == pytest.approx(69.4)
+    assert kwargs["pen_average_urine_nitrogen"] == pytest.approx(15.0)
 
 
 def test_apply_successful_solution(mocker: MockerFixture, pen: Pen) -> None:
@@ -1295,6 +2027,60 @@ def test_apply_successful_solution_not_populated(mocker: MockerFixture, pen: Pen
 
     assert str(pen.average_nutrition_evaluation) == "empty"
     mock_empty.assert_called_once()
+
+
+@pytest.mark.parametrize("is_populated", [True, False])
+def test_apply_user_defined_ration_populated_flag_controls_evaluation(
+    mocker: MockerFixture, pen: Pen, is_populated: bool
+) -> None:
+    """_apply_user_defined_ration sets ration, supply, and evaluation depending on is_populated."""
+    avg_reqs = MagicMock()
+    avg_supply = MagicMock()
+
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_requirements",
+        new_callable=PropertyMock,
+        return_value=avg_reqs,
+    )
+    mocker.patch.object(
+        type(pen),
+        "average_nutrition_supply",
+        new_callable=PropertyMock,
+        return_value=avg_supply,
+    )
+
+    mocker.patch.object(type(pen), "is_populated", new_callable=PropertyMock, return_value=is_populated)
+
+    fake_ration = {1: 1.0, 2: 2.0}
+    mocker.patch.object(
+        RationManager,
+        "get_user_defined_ration",
+        return_value=fake_ration,
+        create=True,
+    )
+
+    mock_set_supply = mocker.patch.object(pen, "set_animal_nutritional_supply")
+
+    fake_eval = MagicMock()
+    mocker.patch.object(
+        NutritionEvaluator,
+        "evaluate_nutrition_supply",
+        return_value=("ignored", fake_eval),
+    )
+
+    feeds = _mock_feeds()
+
+    pen._apply_user_defined_ration(feeds)
+
+    assert pen.ration == fake_ration
+    mock_set_supply.assert_called_once_with(feeds_used=feeds, ration_formulation=fake_ration)
+
+    if is_populated:
+        assert pen.average_nutrition_evaluation is fake_eval
+    else:
+        empty_eval = NutritionEvaluationResults.make_empty_evaluation_results()
+        assert pen.average_nutrition_evaluation == empty_eval
 
 
 def test_reduce_on_lactation_failure_low_milk(mocker: MockerFixture, pen: Pen) -> None:
@@ -1352,6 +2138,54 @@ def test_reduce_on_lactation_failure_success(mocker: MockerFixture, pen: Pen) ->
 
 
 @pytest.mark.parametrize(
+    "avg_milk, reduce_return, expected_return, expected_log_calls",
+    [
+        # 1. Milk too low → immediate True, one log
+        (0.0, None, True, 1),
+        # 2. Milk okay but reduce_milk_production() fails → True, one log
+        (10.0, False, True, 1),
+        # 3. Milk okay + reduction works → False, no logs
+        (10.0, True, False, 0),
+    ],
+    ids=[
+        "milk_too_low",
+        "reduce_failed",
+        "reduce_succeeded",
+    ],
+)
+def test_reduce_on_lactation_failure_user_defined(
+    mocker: MockerFixture,
+    pen: Pen,
+    avg_milk: float,
+    reduce_return: bool | None,
+    expected_return: bool,
+    expected_log_calls: int,
+) -> None:
+    """Covers all branches of _reduce_on_lactation_failure_user_defined."""
+    mocker.patch(
+        "RUFAS.biophysical.animal.pen.AnimalModuleConstants.MINIMUM_AVG_PEN_MILK",
+        5.0,
+    )
+
+    mocker.patch.object(
+        type(pen),
+        "average_milk_production",
+        new_callable=PropertyMock,
+        return_value=avg_milk,
+    )
+    if reduce_return is not None:
+        mocker.patch.object(pen, "reduce_milk_production", return_value=reduce_return)
+
+    pen.om = MagicMock()
+    info_map = {"class": "Pen"}
+
+    result = pen._reduce_on_lactation_failure_user_defined(info_map)
+
+    assert result == expected_return
+    assert pen.om.add_log.call_count == expected_log_calls
+
+
+@pytest.mark.parametrize(
     "adequate, animal_combination, average_milk_production, reduce_milk_production",
     [
         (True, AnimalCombination.CALF, 0, False),
@@ -1386,9 +2220,7 @@ def test_use_user_defined_ration(
         Pen, "average_nutrition_supply", new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionSupply)
     )
     mock_reduce = mocker.patch.object(pen, "reduce_milk_production", return_value=reduce_milk_production)
-    mock_get_ration = mocker.patch.object(
-        UserDefinedRationManager, "get_user_defined_ration", return_value={1: 20.3, 2: 40.6}
-    )
+    mock_get_ration = mocker.patch.object(RationManager, "get_user_defined_ration", return_value={1: 20.3, 2: 40.6})
     mock_set_animal_requirements = mocker.patch.object(pen, "set_animal_nutritional_requirements")
     mock_set_animal_supplies = mocker.patch.object(pen, "set_animal_nutritional_supply")
 
@@ -1472,8 +2304,8 @@ def test_use_user_defined_ration(
         ("freestall", False, 2.5, False),
         ("tiestall", True, 1.2, False),
         ("tiestall", False, 1.0, False),
-        ("compost bedded pack barn", True, 5.0, False),
-        ("compost bedded pack barn", False, 3.0, False),
+        ("bedded pack", True, 5.0, False),
+        ("bedded pack", False, 3.0, False),
         ("open lot", True, 5.0, False),
         ("open lot", False, 3.0, False),
         ("dummy", True, None, True),

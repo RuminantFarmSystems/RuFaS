@@ -10,7 +10,7 @@ from RUFAS.biophysical.animal.animal import Animal
 @dataclass(kw_only=True)
 class AnimalPopulationStatistics:
     """
-    AnimalPopulationStatistics is a data container class for various statistical data for an animal population.
+    A data container class for various statistical data for an animal population.
 
     Attributes
     ----------
@@ -44,8 +44,8 @@ class AnimalPopulationStatistics:
         Total number of cows that have their fourth parity.
     number_of_parity_5_cows : int
         Total number of cows that have their fifth parity.
-    number_of_parity_4_and_more_cows : int
-        Total number of cows that have their third or higher parity.
+    number_of_parity_6_or_more_cows : int
+        Total number of cows that have their sixth or higher parity.
 
     average_calf_age : float
         Average age of calves in the population, (days).
@@ -112,7 +112,7 @@ class AnimalPopulationStatistics:
     number_of_parity_3_cows: int
     number_of_parity_4_cows: int
     number_of_parity_5_cows: int
-    number_of_parity_4_and_more_cows: int
+    number_of_parity_6_or_more_cows: int
 
     average_calf_age: float
     average_heiferI_age: float
@@ -144,7 +144,7 @@ class AnimalPopulationStatistics:
 @dataclass(kw_only=True)
 class AnimalPopulation:
     """
-    A data class representing the population of animals in a herd.
+    Represents the population of animals in a herd.
 
     Attributes
     ----------
@@ -262,12 +262,12 @@ class AnimalPopulation:
 
     def get_calves(self) -> list[Animal]:
         """
-        Retrieve a list of Calf instances.
+        Retrieve a list of ``Calf`` instances.
 
         Returns
         -------
         list[Animal]
-            A list of Calf instances.
+            A list of ``Calf`` instances.
         """
         if self.order_by_random:
             shuffle(self.calves)
@@ -275,12 +275,12 @@ class AnimalPopulation:
 
     def get_heiferIs(self) -> list[Animal]:
         """
-        Retrieve a list of HeiferI instances.
+        Retrieve a list of ``HeiferI`` instances.
 
         Returns
         -------
         list[Animal]
-            A list of HeiferI instances.
+            A list of ``HeiferI`` instances.
         """
         if self.order_by_random:
             shuffle(self.heiferIs)
@@ -289,12 +289,12 @@ class AnimalPopulation:
 
     def get_heiferIIs(self) -> list[Animal]:
         """
-        Retrieve a list of HeiferII instances.
+        Retrieve a list of ``HeiferII`` instances.
 
         Returns
         -------
         list[Animal]
-            A list of HeiferII instances.
+            A list of ``HeiferII`` instances.
         """
         if self.order_by_random:
             shuffle(self.heiferIIs)
@@ -303,12 +303,12 @@ class AnimalPopulation:
 
     def get_heiferIIIs(self) -> list[Animal]:
         """
-        Retrieve a list of HeiferIII instances.
+        Retrieve a list of ``HeiferIII`` instances.
 
         Returns
         -------
         list[Animal]
-            A list of HeiferIII instances.
+            A list of ``HeiferIII`` instances.
         """
         if self.order_by_random:
             shuffle(self.heiferIIIs)
@@ -316,12 +316,12 @@ class AnimalPopulation:
 
     def get_cows(self) -> list[Animal]:
         """
-        Retrieve a list of Cow instances.
+        Retrieve a list of ``Cow`` instances.
 
         Returns
         -------
         list[Animal]
-            A list of Cow instances.
+            A list of ``Cow`` instances.
         """
         if self.order_by_random:
             shuffle(self.cows)
@@ -329,12 +329,12 @@ class AnimalPopulation:
 
     def get_replacement_cows(self) -> list[Animal]:
         """
-        Retrieve a list of replacement Cow instances.
+        Retrieve a list of replacement ``Cow`` instances.
 
         Returns
         -------
         list[Animal]
-            A list of replacement Cow instances.
+            A list of replacement ``Cow`` instances.
         """
         if self.order_by_random:
             shuffle(self.replacement)
@@ -342,7 +342,8 @@ class AnimalPopulation:
 
     def filter_cow_status(self, parity: int, is_milking: bool, days_born: int = 0) -> list[Animal]:
         """
-        Get the list of cows with the provided parity and milking condition
+        Get the list of cows with the provided parity and milking condition.
+
         Parameters
         ----------
         parity : int
@@ -378,6 +379,7 @@ class AnimalPopulation:
         -------
         float
             The average of the given data, or 0 for an empty data list.
+
         """
         return sum(data) / len(data) if len(data) else 0
 
@@ -403,6 +405,7 @@ class AnimalPopulation:
             A tuple of:
             - float: The average of the data.
             - dict[str, int]: A dictionary containing the distribution of the data.
+
         """
         average = AnimalPopulation._average(data)
         n, bins, _ = plt.hist(data, bins=num_bins)
@@ -411,12 +414,13 @@ class AnimalPopulation:
 
     def get_herd_summary(self) -> AnimalPopulationStatistics:
         """
-        Returns a dictionary containing herd summary information
+        Builds a dictionary containing herd summary information.
 
         Returns
         -------
         AnimalPopulationStatistics
             An AnimalPopulationStatistics object which stores the summary of the herd population.
+
         """
         all_animals = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
         breed: set[str] = set([animal.breed.value for animal in all_animals])
@@ -427,7 +431,7 @@ class AnimalPopulation:
         parity_3_cows = [cow for cow in self.cows if cow.calves == 3]
         parity_4_cows = [cow for cow in self.cows if cow.calves == 4]
         parity_5_cows = [cow for cow in self.cows if cow.calves == 5]
-        parity_4_and_more_cows = [cow for cow in self.cows if cow.calves > 3]
+        parity_6_or_more_cows = [cow for cow in self.cows if cow.calves >= 6]
 
         num_calf = len(self.calves)
         num_heiferI = len(self.heiferIs)
@@ -442,7 +446,7 @@ class AnimalPopulation:
         num_parity_3_cow = len(parity_3_cows)
         num_parity_4_cow = len(parity_4_cows)
         num_parity_5_cow = len(parity_5_cows)
-        num_parity_4_and_more_cow = len(parity_4_and_more_cows)
+        num_parity_6_or_more_cow = len(parity_6_or_more_cows)
 
         avg_calf_age, calf_age_distributions = self.find_distribution(
             [calf.days_born for calf in self.calves], "calf_age"
@@ -488,7 +492,7 @@ class AnimalPopulation:
             number_of_parity_3_cows=num_parity_3_cow,
             number_of_parity_4_cows=num_parity_4_cow,
             number_of_parity_5_cows=num_parity_5_cow,
-            number_of_parity_4_and_more_cows=num_parity_4_and_more_cow,
+            number_of_parity_6_or_more_cows=num_parity_6_or_more_cow,
             average_calf_age=avg_calf_age,
             average_heiferI_age=avg_heiferI_age,
             average_heiferII_age=avg_heiferII_age,

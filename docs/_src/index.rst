@@ -33,6 +33,7 @@ Navigation
    :caption: Getting Started:
 
    _wiki/onboarding
+   _wiki/Onboarding-videos
 
 .. toctree::
    :maxdepth: 2
@@ -47,6 +48,7 @@ Navigation
    _wiki/Report-Generator
    _wiki/Graph-Generator
    _wiki/End‐to‐End-Testing
+   _wiki/Data-Collection-App
 
 Tools
 -----
@@ -67,6 +69,13 @@ Team Culture
    _wiki/RuFaS-Versioning-Policy
    _wiki/SCRUM-at-RuFaS
 
+Release Notes
+-------------
+.. toctree::
+   :maxdepth: 1
+   :caption: Release Notes:
+
+   _wiki/_release_notes/index
 
 Contributing to RuFaS
 ---------------------
@@ -86,12 +95,6 @@ Other Resources
 - `Unit Testing Reference <https://realpython.com/python-testing/>`_
 - `Doc String Reference <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 - `Doc String Guide <https://realpython.com/documenting-python-code/>`_
-
-.. toctree::
-   :maxdepth: 1
-
-   _wiki/Data-Collection-App
-
 
 Indices and tables
 ------------------

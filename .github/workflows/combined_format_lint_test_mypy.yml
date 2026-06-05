@@ -29,10 +29,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install dev dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e ".[dev]"
 
       - name: Get all added or modified files
         run: |
@@ -60,35 +60,72 @@ jobs:
         id: unauthorized_files
         run: |
           paths_to_protect=(
-            "input/data/tasks/default_task.json"
-            "input/metadata/default_metadata.json"
-            "input/data/animal/default_animal.json"
-            "input/data/config/default_config.json"
-            "input/data/crop/default_rotation.json"
+            "input/data/tasks/example_freestall_task.json"
+            "input/data/tasks/example_open_lot_task.json"
+            "input/data/tasks/example_field_and_feed_task.json"
+            "input/data/tasks/example_animals_only_task.json"
+            "input/metadata/example_freestall_dairy_metadata.json"
+            "input/metadata/example_open_lot_metadata.json"
+            "input/metadata/example_field_and_feed_metadata.json"
+            "input/metadata/example_animals_only_metadata.json"
+            "input/data/animal/example_freestall_animal.json"
+            "input/data/animal/example_open_lot_animal.json"
+            "input/data/config/example_freestall_config.json"
+            "input/data/config/example_open_lot_config.json"
+            "input/data/config/example_field_and_feed_config.json"
+            "input/data/config/example_animals_only_config.json"
+            "input/data/crop/example_alf_corn_silage_rotation.json"
+            "input/data/crop/example_alf_hay_corn_grain_rotation.json"
+            "input/data/crop/example_corn_silage_trit_cover_crop.json"
             "input/data/crop/no_crop.json"
             "input/data/EEE/default_costs.json"
             "input/data/EEE/default_emissions.json"
-            "input/data/feed/default_feed.json"
-            "input/data/feed/default_feed_2.json"
-            "input/data/feed_management/default_feed_management.json"
-            "input/data/fertilizer_schedule/default_fertilizer_schedule.json"
-            "input/data/field/default_field.json"
-            "input/data/manure_schedule/default_manure_schedule.json"
-            "input/data/soil/default_soil.json"
-            "input/data/soil/default_soil_2.json"
-            "input/data/tillage_schedule/default_tillage_schedule.json"
+            "input/data/feed/example_Intermountain_feed.json"
+            "input/data/feed/example_Midwest_feed.json"
+            "input/data/feed/example_Northeast_feed.json"
+            "input/data/feed/example_Southwest_feed.json"
+            "input/data/feed_management/example_feed_storage_configs.json"
+            "input/data/feed_management/example_freestall_feed_storages.json"
+            "input/data/feed_management/example_open_lot_feed_storages.json"
+            "input/data/feed_management/no_feed_storages.json"
+            "input/data/feed_management/no_feed_storage_configs.json"
+            "input/data/fertilizer_schedule/example_alf_corn_fertilizer.json"
+            "input/data/fertilizer_schedule/example_corn_silage_cover_crop_fert_app.json"
+            "input/data/fertilizer_schedule/example_sm_alf_corn_fertilizer.json"
+            "input/data/fertilizer_schedule/no_fertilizer.json"
+            "input/data/field/example_field_corn_alf_silage.json"
+            "input/data/field/example_field_corn_cover_crop.json"
+            "input/data/field/example_field_corn_grain_alf_hay.json"
+            "input/data/field/example_small_field_corn_alf_silage.json"
+            "input/data/field/example_small_field_corn_grain_alf_hay.json"
+            "input/data/field/no_field.json"
+            "input/data/manure_schedule/example_corn_alf_manure_schedule.json"
+            "input/data/manure_schedule/example_corn_silage_cover_crop_manure_app.json"
+            "input/data/manure_schedule/example_sm_corn_alf_manure_schedule.json"
+            "input/data/manure_schedule/example_sm_corn_silage_cover_crop_manure_app.json"
+            "input/data/manure_schedule/no_manure.json"
+            "input/data/manure/example_freestall_processor_configs.json"
+            "input/data/manure/example_freestall_processor_connections.json"
+            "input/data/manure/example_open_lot_processor_configs.json"
+            "input/data/manure/example_open_lot_processor_connections.json"
+            "input/data/manure/no_manure_processor_configs.json"
+            "input/data/manure/no_manure_processor_connections.json"
+            "input/data/soil/example_soil.json"
+            "input/data/soil/example_soil_2.json"
+            "input/data/soil/no_soil.json"
+            "input/data/tillage_schedule/example_corn_silage_cover_crop_tillage.json"
+            "input/data/tillage_schedule/no_till.json"
           )
           unauthorized_changes=false
           unauthorized_paths=""
-          
-          # Check if any of the protected paths have been changed
+
           for path in "${paths_to_protect[@]}"; do
             if echo "${ALL_CHANGED_FILES}" | grep -q "$path"; then
               unauthorized_changes=true
               unauthorized_paths+="$path, "
             fi
           done
-          
+
           if $unauthorized_changes; then
             echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
             echo "Review and remove these changes if they are not intended."
@@ -110,13 +147,13 @@ jobs:
           fi
 
       - name: Format code with Black and commit changes
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
           black ${{ env.FILES }}
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Apply Black Formatting" --allow-empty
           COMMIT_HASH=$(git rev-parse HEAD)
@@ -124,13 +161,19 @@ jobs:
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
-          echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
-        
+          echo "COMMIT_HASH=$COMMIT_HASH" >> "$GITHUB_ENV"
+
       - name: Capture the commit hash
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         id: capture_commit_sha
         run: |
           COMMIT_HASH=$(git rev-parse HEAD)
           echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
+
+      - name: Format code with Black for forked branches
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' && github.repository != 'RuminantFarmSystems/RuFaS' }}
+        run: |
+          echo $(black ${{ env.FILES }})
 
 
   lint_test_type_check:
@@ -154,18 +197,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install dev dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e ".[dev]"
 
       - name: Lint with flake8
         id: flake8
-        run: |
-          flake8 .
+        run: flake8 .
         continue-on-error: true
 
-      - name: Test coverage
+      - name: Run tests with coverage
         id: coverage
         run: |
           coverage run --rcfile=.github/.coveragerc
@@ -212,7 +254,7 @@ jobs:
         continue-on-error: true
 
       - name: Checkout current branch
-        if: github.ref != 'refs/heads/dev'
+        if: ${{ github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         run: git checkout ${{ github.head_ref }}
 
       - name: Set color and status for Flake8 badge
@@ -251,6 +293,7 @@ jobs:
           ./.github/workflows/update_coverage_mypy_badges.sh
 
       - name: Commit & Push Badge Updates
+        if: ${{ github.ref != 'refs/heads/dev' && github.repository == 'RuminantFarmSystems/RuFaS' }}
         uses: EndBug/add-and-commit@v9
         with:
           message: "Update badges on README"

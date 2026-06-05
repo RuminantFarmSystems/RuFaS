@@ -1,0 +1,21 @@
+{
+  "available_fertilizer_mixes": [
+      {
+          "name": "80_20_0",
+          "N": 0.80,
+          "P": 0.20,
+          "K": 0, 
+      "ammonium_fraction": 0.5
+      }
+  ],
+  "mix_names": ["80_20_0"],
+  "years": [2013],
+  "days": [135],
+  "nitrogen_masses": [1800],
+  "phosphorus_masses": [450],
+  "potassium_masses": [0],
+  "application_depths": [35],
+  "surface_remainder_fractions": [0.1],
+  "pattern_repeat": 7,
+  "pattern_skip": 0
+}

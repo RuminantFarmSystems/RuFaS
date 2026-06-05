@@ -59,20 +59,22 @@ class ManureNutrientManager:
         """
         current_pool_by_category = self.nutrients_by_manure_category[removal_details.get("manure_type")]
 
+        nitrogen_amount_after_renewal = current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0.0)
+        phosphorus_amount_after_renewal = current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0.0)
+        potassium_amount_after_renewal = current_pool_by_category.potassium - removal_details.get("potassium", 0.0)
+        total_manure_mass_after_renewal = (
+            current_pool_by_category.total_manure_mass
+            - removal_details.get("water", 0.0)
+            - removal_details.get("total_solids", 0.0)
+        )
+        dry_matter_after_renewal = current_pool_by_category.dry_matter - removal_details.get("total_solids", 0.0)
         category_amount_after_renewal = ManureNutrients(
             manure_type=current_pool_by_category.manure_type,
-            nitrogen=max(0.0, current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0)),
-            phosphorus=max(0.0, current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0)),
-            potassium=max(0.0, current_pool_by_category.potassium - removal_details.get("potassium", 0)),
-            total_manure_mass=max(
-                0.0,
-                (
-                    current_pool_by_category.total_manure_mass
-                    - removal_details.get("water", 0)
-                    - removal_details.get("total_solids", 0)
-                ),
-            ),
-            dry_matter=max(0.0, current_pool_by_category.dry_matter - removal_details.get("total_solids", 0)),
+            nitrogen=nitrogen_amount_after_renewal if nitrogen_amount_after_renewal > 1e-3 else 0.0,
+            phosphorus=phosphorus_amount_after_renewal if phosphorus_amount_after_renewal > 1e-3 else 0.0,
+            potassium=potassium_amount_after_renewal if potassium_amount_after_renewal > 1e-3 else 0.0,
+            total_manure_mass=total_manure_mass_after_renewal if total_manure_mass_after_renewal > 1e-3 else 0.0,
+            dry_matter=dry_matter_after_renewal if dry_matter_after_renewal > 1e-3 else 0.0,
         )
 
         self.nutrients_by_manure_category[current_pool_by_category.manure_type] = category_amount_after_renewal
@@ -129,7 +131,7 @@ class ManureNutrientManager:
             [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass]
         )
         info_map = {"class": self.__class__.__name__, "function": self._evaluate_nutrient_request.__name__}
-        if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-6):
+        if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-5):
             self.om.add_warning(
                 "Unable to fulfill request with on-farm manure", "Projected manure mass is zero kg.", info_map
             )
@@ -186,9 +188,25 @@ class ManureNutrientManager:
 
         """
         if request_nutrient < 0.0:
+            OutputManager().add_error(
+                "Manure nutrient request error.",
+                f"Request for nutrient cannot be negative: {request_nutrient}",
+                info_map={
+                    "class": ManureNutrientManager.__name__,
+                    "function": ManureNutrientManager.calculate_projected_manure_mass.__name__,
+                },
+            )
             raise ValueError(f"Request for nutrient cannot be negative: {request_nutrient}")
 
         if nutrient_composition < 0.0 or nutrient_composition > 1.0:
+            OutputManager().add_error(
+                "Manure nutrient request composition error.",
+                f"Nutrient composition must be between 0 and 1 (inclusive): {nutrient_composition}",
+                info_map={
+                    "class": ManureNutrientManager.__name__,
+                    "function": ManureNutrientManager.calculate_projected_manure_mass.__name__,
+                },
+            )
             raise ValueError(f"Nutrient composition must be between 0 and 1 (inclusive): {nutrient_composition}")
         elif nutrient_composition > 0.0:
             return request_nutrient / nutrient_composition
@@ -223,6 +241,14 @@ class ManureNutrientManager:
         min_positive = math.inf
         for mass in projected_manure_masses:
             if mass < 0:
+                OutputManager().add_error(
+                    "Manure request projected mass error",
+                    f"Projected manure mass cannot be negative: {mass}",
+                    info_map={
+                        "class": ManureNutrientManager.__name__,
+                        "function": ManureNutrientManager._select_projected_manure_mass.__name__,
+                    },
+                )
                 raise ValueError(f"Projected manure mass cannot be negative: {mass}")
             elif 0 < mass < min_positive:
                 min_positive = mass
@@ -257,6 +283,14 @@ class ManureNutrientManager:
 
         """
         if projected_manure_mass < 0.0:
+            OutputManager().add_error(
+                "Manure request projected mass error",
+                f"Projected manure mass cannot be negative: {projected_manure_mass}",
+                info_map={
+                    "class": ManureNutrientManager.__name__,
+                    "function": ManureNutrientManager._create_nutrient_request_results.__name__,
+                },
+            )
             raise ValueError(f"Projected manure mass cannot be negative: {projected_manure_mass}")
 
         return NutrientRequestResults(

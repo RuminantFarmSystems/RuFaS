@@ -98,7 +98,7 @@ customized to the user's needs.
      "tasks": [
        {
          "task_type": "SIMULATION_SINGLE_RUN",
-         "metadata_file_path": "input/metadata/default_metadata.json",
+         "metadata_file_path": "input/metadata/example_freestall_dairy_metadata",
          "output_prefix": "default",
          "log_verbosity": "warnings",
          "random_seed": 42,
@@ -120,7 +120,7 @@ dumped every time OM.add_variable() has been called 1000000 times.
      "tasks": [
        {
          "task_type": "SIMULATION_SINGLE_RUN",
-         "metadata_file_path": "input/metadata/default_metadata.json",
+         "metadata_file_path": "input/metadata/example_freestall_dairy_metadata",
          "output_prefix": "default",
          "log_verbosity": "warnings",
          "random_seed": 42,
@@ -144,7 +144,7 @@ equally among all the simulations.
      "tasks": [
        {
          "task_type": "SIMULATION_SINGLE_RUN",
-         "metadata_file_path": "input/metadata/default_metadata.json",
+         "metadata_file_path": "input/metadata/example_freestall_dairy_metadata",
          "output_prefix": "default",
          "log_verbosity": "warnings",
          "random_seed": 42,

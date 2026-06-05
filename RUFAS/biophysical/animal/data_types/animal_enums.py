@@ -22,3 +22,4 @@ class AnimalStatus(Enum):
     LIFE_STAGE_CHANGED = "life stage changed"
     DEAD = "dead"
     SOLD = "sold"
+    STILLBORN = "stillborn"

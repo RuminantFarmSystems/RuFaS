@@ -5,7 +5,6 @@ from numpy import exp, log
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, NutrientStandard, NASEMFeed, NRCFeed
 from RUFAS.general_constants import GeneralConstants
 
-
 """RuFaS IDs for supported calf feeds."""
 WHOLE_MILK_ID: RUFAS_ID = 202
 MILK_REPLACER_ID: RUFAS_ID = 203
@@ -41,7 +40,7 @@ class CalfRationManager:
         cls.milk_type = milk_type
 
     @classmethod
-    def calc_requirements(
+    def calculate_requirements(
         cls,
         days_born: int,
         body_weight: float,
@@ -86,7 +85,7 @@ class CalfRationManager:
         milk_proportion = animal_intake["milk_proportion"]
         starter_proportion = animal_intake["starter_proportion"]
 
-        t_factor = 0
+        t_factor = 0.0
         if days_born <= 60:
             if temp < -30:
                 t_factor = 1.34
@@ -144,7 +143,7 @@ class CalfRationManager:
         return nutrient_requirements
 
     @classmethod
-    def calc_intake(
+    def calculate_intake(
         cls,
         birth_weight: float,
         body_weight: float,

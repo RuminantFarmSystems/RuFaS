@@ -6,6 +6,8 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import Nutrit
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
+from RUFAS.user_constants import UserConstants
 
 
 def test_calculate_calf_manure(mocker: MockerFixture) -> None:
@@ -74,7 +76,7 @@ def test_calculate_heifer_manure(
     mocker.patch.object(GeneralConstants, "KG_TO_GRAMS", 1000.0)
     mocker.patch.object(GeneralConstants, "GRAMS_TO_KG", 0.001)
     mocker.patch.object(GeneralConstants, "PERCENTAGE_TO_FRACTION", 0.01)
-    mocker.patch.object(GeneralConstants, "PROTEIN_TO_NITROGEN", 0.16)
+    mocker.patch.object(UserConstants, "PROTEIN_TO_NITROGEN", 0.16)
 
     phosphorus_excreted, manure_excretion = ManureExcretionCalculator.calculate_heifer_manure(
         body_weight=body_weight,
@@ -186,7 +188,7 @@ def test_calculate_lactating_cow_manure(
     mocker.patch.object(GeneralConstants, "KG_TO_GRAMS", 1000.0)
     mocker.patch.object(GeneralConstants, "GRAMS_TO_KG", 0.001)
     mocker.patch.object(GeneralConstants, "PERCENTAGE_TO_FRACTION", 0.01)
-    mocker.patch.object(GeneralConstants, "PROTEIN_TO_NITROGEN", 0.16)
+    mocker.patch.object(UserConstants, "PROTEIN_TO_NITROGEN", 0.16)
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_LACT", 5.0)
 
     phosphorus_excreted, manure_excretion = ManureExcretionCalculator._calculate_lactating_cow_manure(
@@ -234,6 +236,7 @@ def test_calculate_dry_cow_manure(
     mock_nutrition.crude_protein_percentage = crude_protein
     mock_nutrition.potassium_percentage = potassium
     mock_nutrition.ash_percentage = ash_percentage
+    mock_nutrition.ndf_percentage = 1.0
 
     mock_phosphorus_values = (expected_phosphorus, 0.2, 0.3, 4.5, 0.5)
 
@@ -244,7 +247,7 @@ def test_calculate_dry_cow_manure(
     mocker.patch.object(GeneralConstants, "KG_TO_GRAMS", 1000.0)
     mocker.patch.object(GeneralConstants, "GRAMS_TO_KG", 0.001)
     mocker.patch.object(GeneralConstants, "PERCENTAGE_TO_FRACTION", 0.01)
-    mocker.patch.object(GeneralConstants, "PROTEIN_TO_NITROGEN", 0.16)
+    mocker.patch.object(UserConstants, "PROTEIN_TO_NITROGEN", 0.16)
     mocker.patch.object(GeneralConstants, "FRACTION_TO_PERCENTAGE", 100.0)
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_DRY", 5.0)
 
@@ -309,3 +312,62 @@ def test_calculate_phosphorus_excretion_values(
 
     for res, expected in zip(result, expected_values):
         assert pytest.approx(res, rel=1e-3) == expected
+
+
+def test_track_and_warn_dmi_threshold_tracks_below_min_counts(mocker: MockerFixture) -> None:
+    mocker.patch.object(
+        ManureExcretionCalculator,
+        "_dmi_below_min_stats",
+        {
+            "lact": {"n_total": 0, "n_below_min": 0},
+            "dry": {"n_total": 0, "n_below_min": 0},
+        },
+    )
+
+    mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_LACT_FOR_MANURE_VS", 7.1)
+    mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_DRY_FOR_MANURE_VS", 6.5)
+
+    ManureExcretionCalculator._track_and_warn_dmi_threshold(
+        dmi_kind="lact",
+        dmi_effective=6.0,
+    )
+    ManureExcretionCalculator._track_and_warn_dmi_threshold(
+        dmi_kind="lact",
+        dmi_effective=8.0,
+    )
+    ManureExcretionCalculator._track_and_warn_dmi_threshold(
+        dmi_kind="dry",
+        dmi_effective=6.0,
+    )
+
+    lact_stats = ManureExcretionCalculator._dmi_below_min_stats["lact"]
+    dry_stats = ManureExcretionCalculator._dmi_below_min_stats["dry"]
+
+    assert lact_stats["n_total"] == 2
+    assert lact_stats["n_below_min"] == 1
+    assert dry_stats["n_total"] == 1
+    assert dry_stats["n_below_min"] == 1
+
+
+def test_emit_dmi_below_min_summary_emits_only_when_below_min(mocker: MockerFixture) -> None:
+    mocker.patch.object(
+        ManureExcretionCalculator,
+        "_dmi_below_min_stats",
+        {
+            "lact": {"n_total": 10, "n_below_min": 2},
+            "dry": {"n_total": 5, "n_below_min": 0},
+        },
+    )
+
+    mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_LACT_FOR_MANURE_VS", 7.1)
+    mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_DRY_FOR_MANURE_VS", 6.5)
+
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    ManureExcretionCalculator.emit_dmi_below_min_summary({"class": "test", "function": "emit"})
+
+    add_warning.assert_called_once()
+    args, _kwargs = add_warning.call_args
+    assert args[0] == "DMI minimum summary (manure excretion)"
+    assert "2/10" in args[1]
+    assert "7.100" in args[1]

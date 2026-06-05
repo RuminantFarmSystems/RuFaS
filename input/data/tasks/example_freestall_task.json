@@ -1,0 +1,21 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
+      "output_prefix": "freestall",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "exclude_info_maps": false,
+      "cross_validation_file_paths": [
+        "input/metadata/cross_validation/example_cross_validation.json",
+        "input/metadata/cross_validation/weather_cross_validation.json",
+        "input/metadata/cross_validation/feed_storage_cross_validation.json",
+        "input/metadata/cross_validation/crop_and_soil_cross_validation.json",
+        "input/metadata/cross_validation/corn_alf_silage_cross_validation.json",
+        "input/metadata/cross_validation/corn_grain_alf_hay_cross_validation.json"
+      ]
+    }
+]
+}

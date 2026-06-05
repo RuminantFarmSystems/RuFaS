@@ -24,8 +24,9 @@ class ManureConstants:
     """
 
     DEFAULT_PH_FOR_HOUSING_AMMONIA: float = 7.7
-    """Default pH for manure on tiestall or freestall barn floors (unitless).
-     Default is set to 7.7."""
+    """
+    Default pH for manure on tiestall or freestall barn floors (unitless).
+    """
 
     MILKING_FRESH_WATER_USE_RATE: float = 30.0
     """
@@ -47,15 +48,14 @@ class ManureConstants:
     """Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
 
     # Liquid manure storage-related constants
-    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
+    VS_TO_METHANE_LOSS_RATIO: float = 6.665
     """
-    The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
-    ratio of 1:3 (methane : carbon dioxide).
+    Factor to determine kg of VS degraded per kg CH4 emitted from stored manure (kg VS / kg CH4).
     """
 
     METHANE_DESTRUCTION_EFFICIENCY = 81
     """
-    The percentage of methane destroyed in systems using a cap and flare
+    The percentage of methane destroyed in systems using a cap and flare (percent).
     """
 
     STORAGE_RESISTANCE = 4.1
@@ -84,7 +84,7 @@ class ManureConstants:
      minimum energy that must be available to microbes for methanogenesis to occur.
     """
 
-    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
+    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 30.7
     """Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
      manure (g methane / kg manure Volatile Solids / hour)."""
 
@@ -93,33 +93,33 @@ class ManureConstants:
     """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
 
     LEACHING_COEFFICIENT: float = 0.035
-    """Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack and open lot
+    """Leaching coefficient used in the calculation of leaching N loss in a bedded pack and open lot
     (unitless)."""
 
     DEFAULT_LAYER_TEMPERATURE: float = 30
-    """The default layer temperature for open lot and compost bedded pack barn."""
+    """The default layer temperature for open lot and bedded pack."""
 
     NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.07
     """
-    Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    Nitrous oxide coefficient used for calculating nitrogen loss in a bedded pack
     when the bedding is tilled (unitless).
     """
 
     NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.01
     """
-    Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    Nitrous oxide coefficient used for calculating nitrogen loss in a bedded pack
     when the bedding is not tilled (unitless).
     """
 
     AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.5
     """
-    Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    Ammonia emission coefficient used for calculating nitrogen loss in a bedded pack
     when the bedding is tilled (unitless).
     """
 
     AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.25
     """
-    Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    Ammonia emission coefficient used for calculating nitrogen loss in a bedded pack
     when the bedding is not tilled (unitless).
     """
 
@@ -162,7 +162,7 @@ class ManureConstants:
 
     DEFAULT_DAYS_SINCE_LAST_MIXING: int = 1
     """Default days since the previous mixing event (days). Default is set to 1. For Composting, this refers to compost
-    turning. For Open Lot, this refers to lot harrowing. For Compost Bedded Pack barn, this refers to pack tillage."""
+    turning. For Open Lot, this refers to lot harrowing. For Bedded Pack, this refers to pack tillage."""
 
     DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
     """
@@ -203,3 +203,24 @@ class ManureConstants:
 
     DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
     """The default mole fraction of oxygen in the air within the decomposing material layer."""
+
+    ANAEROBIC_LAGOON_MANURE_RETENTION: float = 0.1
+    """The manure retention proportion in the anaerobic lagoon (fraction)."""
+
+    MANURE_DAMPING_FACTOR: float = 0.65
+    """Unitless factor representing the reduction of the amplitude of manure temperature in the sin/cosin equation
+     compared to air temperature amplitude (unitless)."""
+
+    MANURE_TEMPERATURE_LAG: int = 30
+    """
+    Number of days that elapse between peak air temperature and manure temperature. Note that this constant is
+    subtracted in the equation for calculation daily air temperature; a positive value for this constant indicates
+    manure temperature peaks later than air temperature, whereas a negative value indicates manure temperature peaks
+    earlier than air temperature (days).
+    """
+
+    ANAEROBIC_LAGOON_MINIMUM_TEMPERATURE: float = 1.0
+    """The minimum temperature of manure stored in an anaerobic lagoon (°C)."""
+
+    SLURRY_OUTDOOR_MINIMUM_TEMPERATURE: float = -20.0
+    """The minimum temperature of manure stored in slurry storage outdoors (°C)."""

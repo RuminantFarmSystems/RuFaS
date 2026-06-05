@@ -20,12 +20,12 @@ from RUFAS.data_structures.animal_to_manure_connection import (
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     AdvancePurchaseAllowance,
-    TotalInventory,
+    NutrientStandard,
 )
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
-from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
@@ -261,9 +261,8 @@ class Pen:
     @property
     def total_manure_excretion(self) -> AnimalManureExcretions:
         """
-        Calculates the total manure excretion of all animals in the pen
-        by summing up the individual manure excretions from the digestive
-        systems of each animal.
+        Calculates the total manure excretion of all animals in the pen by summing up the individual manure excretions
+        from the digestive systems of each animal.
 
         Returns
         -------
@@ -363,6 +362,11 @@ class Pen:
         return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
     @property
+    def total_enteric_methane(self) -> float:
+        """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
+        return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
+
+    @property
     def average_milk_production_reduction(self) -> float:
         """
         Calculate the average milk production reduction for the cows in the pen.
@@ -378,9 +382,18 @@ class Pen:
         return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
     @property
-    def total_enteric_methane(self) -> float:
-        """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
-        return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
+    def total_pen_ration(self) -> dict[str, float]:
+        """Returns the total ration of the pen."""
+        if (number_of_animals_in_pen := len(self.animals_in_pen)) == 0:
+            return {}
+        current_pen_ration: dict[str, float] = {
+            str(rufas_id): amount * number_of_animals_in_pen for rufas_id, amount in self.ration.items()
+        }
+        current_pen_ration["dry_matter_intake_total"] = sum([total_feed for total_feed in current_pen_ration.values()])
+        current_pen_ration["byproducts_total"] = (
+            self.average_nutrition_supply.byproduct_supply * number_of_animals_in_pen
+        )
+        return current_pen_ration
 
     def _initialize_beddings(self) -> None:
         """Initialize all beddings for manure streams in the pen."""
@@ -431,20 +444,16 @@ class Pen:
         """
         Removes animals from the pen by their ids.
 
-        Notes
-        -----
-        Because this method takes O(n) time, it is recommended that the caller of this method
-        should prepare a list of animal ids to be removed from the pen first, and then call this
-        method with that list once.
-
         Parameters
         ----------
         animal_ids : List[int]
             List of animals that match the given ids to be removed from the pen.
 
-        Returns
-        -------
-        None
+        Notes
+        -----
+        Because this method takes O(n) time, it is recommended that the caller of this method
+        should prepare a list of animal ids to be removed from the pen first, and then call this
+        method with that list once.
 
         """
         if not animal_ids:
@@ -469,10 +478,6 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available formulate animals rations with.
 
-        Returns
-        -------
-        None
-
         """
         self._add_new_animals(new_animals, available_feeds)
         self.update_animal_combination(animal_combination)
@@ -489,16 +494,16 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available formulate animals rations with.
 
-        Returns
-        -------
-        None
-
         """
         for animal in new_animals:
             self.insert_single_animal_into_animals_in_pen_map(animal)
             animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0, available_feeds)
             nutrient_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                feeds_used=available_feeds, ration_formulation=self.ration, body_weight=animal.body_weight
+                feeds_used=available_feeds,
+                ration_formulation=self.ration,
+                body_weight=animal.body_weight,
+                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrition_supply = nutrient_supply
             animal.nutrients.set_dry_matter_intake(nutrient_supply.dry_matter)
@@ -512,10 +517,6 @@ class Pen:
         Parameters
         ----------
         animals : list[Animal]
-
-        Returns
-        -------
-        None
 
         Notes
         -----
@@ -539,10 +540,6 @@ class Pen:
         animal: Animal
             The animal to insert into pen.
 
-        Returns
-        -------
-        None
-
         Notes
         -----
         This method only inserts a new animal in the animals_in_pen map, and updates the daily walking distance if it is
@@ -563,20 +560,12 @@ class Pen:
         animal_combination: AnimalCombination
             the new AnimalCombination
 
-        Returns
-        -------
-        None
-
         """
         self.animal_combination = animal_combination
 
     def update_daily_walking_distance(self) -> None:
         """
         Updates the daily walking distance for cows in the pen.
-
-        Returns
-        -------
-        None
 
         """
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
@@ -593,34 +582,32 @@ class Pen:
         and animals are to be added to it, there are previous initial values
         that are non-zero.
 
-        Returns
-        -------
-        None
-
         """
         self.animals_in_pen = {}
 
     def get_manure_streams(self) -> dict[str, ManureStream]:
         """
         Constructs and returns ManureStream objects based on total manure excreted in a pen and user-defined
-        stream splitting proportions. The ManureStream objects created here are representative of the total manure
+        stream splitting proportions.
+
+        Returns
+        -------
+        dict[str, ManureStream]:
+            A dictionary mapping stream names to their corresponding ManureStream objects.
+
+        Notes
+        -----
+        The ManureStream objects created here are representative of the total manure
         produced by the animals in any given pen.
 
         For pens with lactating cows, manure is partitioned between a parlor stream and general stream(s).
         For all other animal combinations, manure is routed only to general stream(s). The split ratios
         for general streams are user-defined and validated to sum to 1.0.
 
-        Returns
-        -------
-        dict[str, ManureStream]:
-            A dictionary mapping a pen ID to a list of dictionaries. Each dictionary within this
-            list maps a stream name to a `ManureStream` object representing a portion of the pen's total manure.
-
-        Notes
-        -----
         - The function first constructs a `total_stream` representing the full manure excretion from a pen.
         - If the animal combination is `LAC_COW`, a portion of this stream is split to a parlor stream
-        based on the `minutes_away_for_milking` ratio using the `split_stream` method.
+        based on the `minutes_away_for_milking` ratio using the `split_stream` method. Parlor deposition
+        is set to 0.0, as manure deposition in the parlor is accounted for in source methodology (IFSM, 2023).
         - The remaining manure is split into one or more general streams according to the proportions
         specified in `self.manure_streams` and each assigned a `first_processor` directing it how to be routed once
         it reaches the manure module.
@@ -633,6 +620,178 @@ class Pen:
 
         """
         animal_manure_streams: dict[str, ManureStream] = {}
+        total_stream = self._calculate_total_pen_manure_stream()
+
+        general_stream_proportion, parlor_stream_proportion, parlor_stream = self._handle_parlor_stream(total_stream)
+        if parlor_stream_proportion is not None or general_stream_proportion < 1.0 or parlor_stream is not None:
+            base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
+            animal_manure_streams[f"{base_parlor_stream_name}_PEN_{self.id}"] = parlor_stream
+
+        self._validate_general_manure_stream_proportions()
+        for stream_config in self.manure_streams:
+            manure_stream = self._split_general_manure_stream(
+                general_stream_proportion, parlor_stream_proportion, stream_config, total_stream
+            )
+            if manure_stream.pen_manure_data is not None:
+                manure_stream.pen_manure_data.set_first_processor(str(stream_config.get("first_processor")))
+            manure_stream = self._apply_bedding(manure_stream, str(stream_config.get("bedding_name")))
+            stream_name = f"{str(stream_config.get('stream_name'))}_{self.animal_combination.name}_PEN_{self.id}"
+            animal_manure_streams[stream_name] = manure_stream
+
+        return animal_manure_streams
+
+    def _split_general_manure_stream(
+        self,
+        general_stream_proportion: float,
+        parlor_stream_proportion: Any | None,
+        stream_config: dict[str, str | float],
+        total_stream: ManureStream,
+    ) -> ManureStream:
+        """
+        Split the total manure stream by the given general stream proportion..
+
+        Parameters
+        ----------
+        general_stream_proportion : float
+            The proportion of the total manure stream to be assigned to the general stream.
+        parlor_stream_proportion : float | None
+            The proportion of the total manure stream to be assigned to the parlor stream.
+        stream_config : dict[str, str | float]
+            The config of the target stream to be split.
+        total_stream : ManureStream
+            The total manure stream to be split from.
+
+        Returns
+        -------
+        ManureStream
+            The split manure stream.
+
+        """
+        general_substream_proportion = float(stream_config.get("stream_proportion", 1.0))
+        split_ratio = general_substream_proportion * general_stream_proportion
+        manure_stream_deposit_split = (
+            general_substream_proportion if parlor_stream_proportion is not None else split_ratio
+        )
+        manure_stream = total_stream.split_stream(
+            split_ratio=split_ratio,
+            stream_type=StreamType.GENERAL,
+            manure_stream_deposition_split=manure_stream_deposit_split,
+        )
+        return manure_stream
+
+    def _calculate_total_pen_manure_stream(self) -> ManureStream:
+        """
+        Calculates and returns the total manure stream for the pen.
+
+        Returns
+        -------
+        ManureStream
+            The aggregate manure stream for the pen.
+        """
+        methane_production_potential = self._calculate_methane_production_potential()
+        pen_animal_excretions = self.total_manure_excretion
+        total_pen_manure_data = PenManureData(
+            num_animals=len(self.animals_in_pen),
+            manure_deposition_surface_area=self._calculate_manure_surface_area(),
+            animal_combination=self.animal_combination,
+            pen_type=self.pen_type,
+            manure_urine_mass=pen_animal_excretions.urine,
+            manure_urine_nitrogen=pen_animal_excretions.urine_nitrogen,
+            stream_type=StreamType.GENERAL,
+        )
+        total_stream = ManureStream(
+            water=pen_animal_excretions.manure_mass - pen_animal_excretions.total_solids,
+            ammoniacal_nitrogen=pen_animal_excretions.manure_total_ammoniacal_nitrogen,
+            nitrogen=pen_animal_excretions.manure_nitrogen,
+            phosphorus=pen_animal_excretions.phosphorus * GeneralConstants.GRAMS_TO_KG,
+            potassium=pen_animal_excretions.potassium * GeneralConstants.GRAMS_TO_KG,
+            ash=0,
+            non_degradable_volatile_solids=pen_animal_excretions.non_degradable_volatile_solids,
+            degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
+            total_solids=pen_animal_excretions.total_solids,
+            volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
+            methane_production_potential=methane_production_potential,
+            pen_manure_data=total_pen_manure_data,
+            bedding_non_degradable_volatile_solids=0.0,
+        )
+        return total_stream
+
+    def _handle_parlor_stream(self, total_stream: ManureStream) -> tuple[float, float | None, ManureStream | None]:
+        """
+        Handles the processing of the parlor stream based on the type of animal combination and the given total stream.
+
+        Parameters
+        ----------
+        total_stream : ManureStream
+            The complete manure stream that is available for processing. The function processes this stream to
+            derive the parlor stream proportion and data if applicable.
+
+        Returns
+        -------
+        tuple[float, float | None, ManureStream | None]
+            A tuple containing:
+            - general_stream_proportion (float): The proportion of the general stream that remains.
+            - parlor_stream_proportion (float or None): The proportion of the parlor stream, or None if not applicable.
+            - parlor_stream (ManureStream or None): The resulting parlor stream, or None if not applicable.
+
+        Notes
+        -----
+        If the animal combination indicates lactating cows, the parlor stream is split from the total stream using the
+        specified milking time proportion.
+
+        """
+        parlor_stream_proportion = None
+        parlor_stream = None
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            parlor_stream_proportion = self.minutes_away_for_milking / 1440
+            general_stream_proportion = 1 - parlor_stream_proportion
+            parlor_stream = total_stream.split_stream(
+                split_ratio=parlor_stream_proportion,
+                stream_type=StreamType.PARLOR,
+                manure_stream_deposition_split=0.0,
+            )
+            if parlor_stream.pen_manure_data is not None and self.first_parlor_processor is not None:
+                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_processor)
+        else:
+            general_stream_proportion = 1.0
+        self._validate_parlor_stream_proportion(general_stream_proportion, parlor_stream, parlor_stream_proportion)
+        return general_stream_proportion, parlor_stream_proportion, parlor_stream
+
+    def _validate_parlor_stream_proportion(
+        self,
+        general_stream_proportion: float,
+        parlor_stream: ManureStream | None,
+        parlor_stream_proportion: float | None,
+    ) -> None:
+        """
+        Validates that the parlor stream proportion is within the expected range.
+
+        Parameters
+        ----------
+        general_stream_proportion:  float
+            The proportion of the general stream that remains.
+        parlor_stream_proportion: float | None
+            The proportion of the parlor stream, or None if not applicable.
+        parlor_stream : ManureStream | None
+            The resulting parlor stream, or None if not applicable.
+
+        """
+        if parlor_stream_proportion is not None or general_stream_proportion < 1.0 or parlor_stream is not None:
+            assert parlor_stream is not None, "Parlor stream should not be None if parlor stream proportion is not None"
+            assert (
+                parlor_stream_proportion is not None
+            ), "Parlor stream proportion should not be None if parlor stream is not None"
+
+    def _calculate_methane_production_potential(self) -> float:
+        """
+        Calculates the methane production potential based on the combination and type of animals in the pen.
+
+        Returns
+        -------
+        float
+            The methane production potential for the animals in the pen.
+
+        """
         if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
             total_animals_in_pen = len(self.animals_in_pen)
             num_growing = len(
@@ -658,62 +817,7 @@ class Pen:
             methane_production_potential = (
                 0.17 if self.animal_combination in [AnimalCombination.CALF, AnimalCombination.GROWING] else 0.24
             )
-
-        pen_animal_excretions = self.total_manure_excretion
-        total_pen_manure_data = PenManureData(
-            num_animals=len(self.animals_in_pen),
-            manure_deposition_surface_area=self._calculate_manure_surface_area(),
-            animal_combination=self.animal_combination,
-            pen_type=self.pen_type,
-            manure_urine_mass=pen_animal_excretions.urine,
-            manure_urine_nitrogen=pen_animal_excretions.urine_nitrogen,
-            stream_type=StreamType.GENERAL,
-        )
-
-        total_stream = ManureStream(
-            water=pen_animal_excretions.manure_mass - pen_animal_excretions.total_solids,
-            ammoniacal_nitrogen=pen_animal_excretions.manure_total_ammoniacal_nitrogen,
-            nitrogen=pen_animal_excretions.manure_nitrogen,
-            phosphorus=pen_animal_excretions.phosphorus * GeneralConstants.GRAMS_TO_KG,
-            potassium=pen_animal_excretions.potassium * GeneralConstants.GRAMS_TO_KG,
-            ash=0,
-            non_degradable_volatile_solids=pen_animal_excretions.non_degradable_volatile_solids,
-            degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
-            total_solids=pen_animal_excretions.total_solids,
-            volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
-            methane_production_potential=methane_production_potential,
-            pen_manure_data=total_pen_manure_data,
-        )
-
-        if self.animal_combination == AnimalCombination.LAC_COW:
-            parlor_stream_proportion = self.minutes_away_for_milking / 1440
-            general_stream_proportion = 1 - parlor_stream_proportion
-            parlor_stream = total_stream.split_stream(
-                split_ratio=parlor_stream_proportion,
-                stream_type=StreamType.PARLOR,
-            )
-            if parlor_stream.pen_manure_data is not None and self.first_parlor_processor is not None:
-                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_processor)
-            base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
-            parlor_stream_name = f"{base_parlor_stream_name}_PEN_{self.id}"
-            animal_manure_streams[parlor_stream_name] = parlor_stream
-        else:
-            general_stream_proportion = 1.0
-
-        self._validate_general_manure_stream_proportions()
-        for stream in self.manure_streams:
-            general_substream_proportion = float(stream.get("stream_proportion", 1.0))
-            manure_stream = total_stream.split_stream(
-                split_ratio=general_substream_proportion * general_stream_proportion,
-                stream_type=StreamType.GENERAL,
-            )
-            if manure_stream.pen_manure_data is not None:
-                manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
-            manure_stream = self._apply_bedding(manure_stream, str(stream.get("bedding_name")))
-            stream_name = f"{str(stream.get('stream_name'))}_{self.animal_combination.name}_PEN_{self.id}"
-            animal_manure_streams[stream_name] = manure_stream
-
-        return animal_manure_streams
+        return methane_production_potential
 
     def _apply_bedding(self, manure_stream: ManureStream, bedding_name: str) -> ManureStream:
         """
@@ -731,9 +835,22 @@ class Pen:
         ManureStream
             A new ManureStream object with updated attributes reflecting the impact of the applied bedding.
 
+        Raises
+        ------
+        ValueError
+            If Pen's manure_stream has no pen_manure_data.
+
         """
         bedding = self.beddings[bedding_name]
         if manure_stream.pen_manure_data is None:
+            self.om.add_error(
+                "PenManureData not set",
+                f"Pen {self.id} had a manure_stream with no pen_manure_data.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._apply_bedding.__name__,
+                },
+            )
             raise ValueError(f"No PenManureData for pen {self.id}: pen_manure_data must be set to apply bedding.")
         num_animals = manure_stream.pen_manure_data.num_animals
         total_bedding_mass = bedding.calculate_total_bedding_mass(num_animals)
@@ -755,21 +872,31 @@ class Pen:
                 if bedding.bedding_type != BeddingType.SAND
                 else manure_stream.ash + total_bedding_dry_solids
             ),
-            non_degradable_volatile_solids=(
-                manure_stream.non_degradable_volatile_solids
-                if bedding.bedding_type == BeddingType.SAND
-                else manure_stream.non_degradable_volatile_solids + total_bedding_dry_solids
-            ),
+            non_degradable_volatile_solids=manure_stream.non_degradable_volatile_solids,
             degradable_volatile_solids=manure_stream.degradable_volatile_solids,
             total_solids=manure_stream.total_solids + total_bedding_dry_solids,
             volume=manure_stream.volume + total_bedding_volume,
             methane_production_potential=manure_stream.methane_production_potential,
             pen_manure_data=manure_stream.pen_manure_data,
+            bedding_non_degradable_volatile_solids=(
+                0 if bedding.bedding_type == BeddingType.SAND else total_bedding_dry_solids
+            ),
         )
 
     def _calculate_manure_surface_area(self) -> float:
         """
         Get the exposed manure surface area based on the pen type and whether there are lactating cows in the pen.
+
+        Returns
+        -------
+        float
+            Exposed manure surface area (:math:`m^2`).
+
+        Raises
+        ------
+        ValueError
+            If the pen type is not one of the following: "freestall", "tiestall",
+            "bedded pack", or "open lot".
 
         Notes
         -----
@@ -782,21 +909,11 @@ class Pen:
         +---------------------------+-------------------+-------------------+
         | Tiestall                  | 1.2               | 1.0               |
         +---------------------------+-------------------+-------------------+
-        | Compost Bedded Pack Barn  | 5.0               | 3.0               |
+        | Bedded Pack               | 5.0               | 3.0               |
         +---------------------------+-------------------+-------------------+
         | Open Lot                  | 5.0               | 3.0               |
         +---------------------------+-------------------+-------------------+
 
-        Returns
-        -------
-        float
-            Exposed manure surface area (:math:`m^2`).
-
-        Raises
-        ------
-        ValueError
-            If the pen type is not one of the following: "freestall", "tiestall",
-            "compost bedded pack barn", or "open lot".
         """
 
         ExposedManureSurfaceArea = NamedTuple(
@@ -810,11 +927,21 @@ class Pen:
         exposed_manure_surface_area_by_pen_type = {
             "freestall": freestall,
             "tiestall": tiestall,
-            "compost bedded pack barn": bedded_pack,
+            "bedded pack": bedded_pack,
             "open lot": open_lot,
         }
 
         if self.pen_type not in exposed_manure_surface_area_by_pen_type:
+            self.om.add_error(
+                "Invalid PenType Error.",
+                f"Invalid pen type: {self.pen_type}. "
+                "Cannot calculate manure surface area, pen_type must be in "
+                f"{exposed_manure_surface_area_by_pen_type.keys()}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._calculate_manure_surface_area.__name__,
+                },
+            )
             raise ValueError(f"Invalid pen type: {self.pen_type}")
 
         exposed_manure_surface_area = exposed_manure_surface_area_by_pen_type[self.pen_type]
@@ -831,6 +958,7 @@ class Pen:
         ------
         ValueError
             If the sum of the proportions is not equal to 1.0.
+
         """
         total_proportion = sum(float(stream.get("stream_proportion", 0.0)) for stream in self.manure_streams)
         if not math.isclose(total_proportion, 1.0, abs_tol=1e-6):
@@ -855,10 +983,6 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
 
-        Returns
-        -------
-        None
-
         """
         for animal in self.animals_in_pen.values():
             animal.set_nutrition_requirements(
@@ -879,26 +1003,26 @@ class Pen:
         ration_formulation : dict[RUFAS_ID, float]
             The formulated ration dictionary, mapping RuFaS Feed ID to mass of feed in ration per animal per day.
 
-        Returns
-        -------
-        None
-
         """
         for animal in self.animals_in_pen.values():
             animal.previous_nutrition_supply = animal.nutrition_supply
             animal.nutrition_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                feeds_used=feeds_used, ration_formulation=ration_formulation, body_weight=animal.body_weight
+                feeds_used=feeds_used,
+                ration_formulation=ration_formulation,
+                body_weight=animal.body_weight,
+                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrients.set_dry_matter_intake(animal.nutrition_supply.dry_matter)
             animal.nutrients.set_phosphorus_intake(animal.nutrition_supply.phosphorus)
 
     def formulate_optimized_ration(  # noqa: C901
         self,
+        is_ration_defined_by_user: bool,
         pen_available_feeds: list[Feed],
         temperature: float,
         max_daily_feeds: dict[RUFAS_ID, float],
         advance_purchase_allowance: AdvancePurchaseAllowance,
-        total_inventory: TotalInventory,
         simulation_day: int,
     ) -> None:
         """
@@ -906,20 +1030,21 @@ class Pen:
 
         Parameters
         ----------
+        is_ration_defined_by_user : bool
+            True if user defined ration methodology to be used.
         pen_available_feeds : list[Feed]
             List of feeds available to formulate a new ration with for a pen.
         max_daily_feeds : dict[RUFAS_ID, float]
             Maximum amounts of each feed type that may be fed per animal per day.
         advance_purchase_allowance : AdvancePurchaseAllowance
             Maximum amounts of each feed type that may be purchased at the beginning of a feed interval.
-        total_inventory : TotalInventory
-            Amounts of feeds currently held in storage.
         simulation_day : int
             Day of simulation.
 
-        Returns
-        -------
-        None
+        Raises
+        ------
+        ValueError
+            If no previous ration is available when needed.
 
         """
         info_map = {
@@ -928,16 +1053,28 @@ class Pen:
         }
         if self.animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
-
         previous_ration = getattr(self, "ration", None)
         num_attempts = 0
+        self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
+        initial_pen_average_nutrition_requirements = self.average_nutrition_requirements
+        initial_dry_matter_requirement = initial_pen_average_nutrition_requirements.dry_matter
+        initial_protein_requirement = initial_pen_average_nutrition_requirements.metabolizable_protein
+
+        initial_dry_matter_requirement_fixed = initial_dry_matter_requirement
 
         while True:
             num_attempts += 1
-            solution, ration_config = self._attempt_formulation(pen_available_feeds, temperature, previous_ration)
+            solution, ration_config = self._attempt_formulation(
+                is_ration_defined_by_user,
+                pen_available_feeds,
+                temperature,
+                previous_ration,
+                initial_dry_matter_requirement,
+                initial_protein_requirement,
+            )
 
             if not solution.success:
-                self.ration_optimizer.handle_failed_constraints(
+                constraints_failed_list = self.ration_optimizer.handle_failed_constraints(
                     num_attempts=num_attempts,
                     solution=solution,
                     ration_config=ration_config,
@@ -945,26 +1082,73 @@ class Pen:
                     pen_id=self.id,
                     pen_available_feeds=pen_available_feeds,
                     average_nutrient_requirements=self.average_nutrition_requirements,
+                    initial_dry_matter_requirement=initial_dry_matter_requirement,
+                    initial_protein_requirement=initial_protein_requirement,
                     sim_day=simulation_day,
                 )
 
             # Lac cow success exit and non lac cow one time run only exit
             if solution.success or (self.animal_combination is not AnimalCombination.LAC_COW):
                 break
+            if num_attempts > RationManager.maximum_ration_reformulation_attempts:
+                om.add_log(
+                    "Maximum ration reformulation attempts exceeded.",
+                    f"See output variable failed_constraint_summary_for_pen_{self.id} for more information.",
+                    info_map,
+                )
+                break
+            adjusted_dry_matter_lower = initial_dry_matter_requirement_fixed * (
+                1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + RationManager.tolerance
+            )
+            adjusted_dry_matter_upper = initial_dry_matter_requirement_fixed * (
+                1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - RationManager.tolerance
+            )
+            need_dry_matter_increase = bool(
+                set(
+                    [
+                        "NE_total_constraint",
+                        "NE_maintenance_and_activity_constraint",
+                        "NE_lactation_constraint",
+                        "NE_growth_constraint",
+                        "calcium_constraint",
+                        "phosphorus_constraint",
+                        "protein_constraint_lower",
+                        "DMI_constraint_lower",
+                    ]
+                )
+                & set(constraints_failed_list)
+            )
 
-            # For lac cow
-            self._reduce_on_lactation_failure(info_map=info_map)
+            if is_ration_defined_by_user and (
+                adjusted_dry_matter_lower < initial_dry_matter_requirement < adjusted_dry_matter_upper
+            ):
+                if need_dry_matter_increase:
+                    initial_dry_matter_requirement = initial_dry_matter_requirement * 1.1
+                    continue
+
+            if is_ration_defined_by_user:
+                if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
+                    break
+            else:
+                self._reduce_on_lactation_failure(info_map=info_map)
 
         if solution.success:
             self._apply_successful_solution(solution, pen_available_feeds)
+        elif is_ration_defined_by_user:
+            self._apply_user_defined_ration(pen_available_feeds)
+            self.om.add_log(
+                "User defined ration used for non lactating cow pen after failed formulation attempt.",
+                f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. ",
+                info_map,
+            )
         elif self.ration == {}:
             self.om.add_error(
-                "No previous ration available",
+                "No previous ration available.",
                 f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
                 f"Possible solution is to provide additional feed ingredients to {self.animal_combination.name}.",
                 info_map,
             )
-            raise ValueError("No previous ration available")
+            raise ValueError("No previous ration available.")
         else:
             self.om.add_log(
                 "Previous ration used because automated ration formulation failed for non lactating cow pen.",
@@ -976,21 +1160,77 @@ class Pen:
             )
 
     def _attempt_formulation(
-        self, pen_feeds: list[Feed], temperature: float, previous_ration: Any
+        self,
+        is_ration_defined_by_user: bool,
+        pen_feeds: list[Feed],
+        temperature: float,
+        previous_ration: Any,
+        initial_dry_matter_requirement: float,
+        initial_protein_requirement: float,
     ) -> tuple[OptimizeResult, RationConfig]:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
+        if is_ration_defined_by_user:
+            user_defined_ration_dictionary = RationManager.user_defined_rations[self.animal_combination]
+            tolerance = RationManager.tolerance
+        else:
+            user_defined_ration_dictionary = None
+            tolerance = None
+        nutrient_standard = list(self.animals_in_pen.values())[0].nutrient_standard
+
+        if nutrient_standard is NutrientStandard.NASEM:
+            enteric_methane_list = []
+            urine_nitrogen_list = []
+            for animal in self.animals_in_pen.values():
+                enteric_methane_list.append(animal.digestive_system.enteric_methane_emission)
+                urine_nitrogen_list.append(animal.digestive_system.manure_excretion.urine_nitrogen)
+            pen_average_enteric_methane = sum(enteric_methane_list) / len(enteric_methane_list)
+            pen_average_urine_nitrogen = sum(urine_nitrogen_list) / len(urine_nitrogen_list)
+        else:
+            pen_average_enteric_methane = None
+            pen_average_urine_nitrogen = None
+
         return self.ration_optimizer.attempt_optimization(
+            nutrient_standard=nutrient_standard,
             pen_average_body_weight=self.average_body_weight,
+            pen_average_enteric_methane=pen_average_enteric_methane,
+            pen_average_urine_nitrogen=pen_average_urine_nitrogen,
             requirements=self.average_nutrition_requirements,
+            initial_dry_matter_requirement=initial_dry_matter_requirement,
+            initial_protein_requirement=initial_protein_requirement,
             pen_available_feeds=pen_feeds,
             animal_combination=self.animal_combination,
             previous_ration=previous_ration,
+            user_defined_ration_dictionary=user_defined_ration_dictionary,
+            user_defined_ration_tolerance=tolerance,
         )
 
     def _apply_successful_solution(self, solution: OptimizeResult | None, pen_feeds: list[Feed]) -> None:
         """Applies the optimizer solution to the pen."""
         self.ration = self.ration_optimizer.make_ration_from_solution(pen_available_feeds=pen_feeds, solution=solution)
+        self.set_animal_nutritional_supply(feeds_used=pen_feeds, ration_formulation=self.ration)
+        _, evaluation = NutritionEvaluator.evaluate_nutrition_supply(
+            self.average_nutrition_requirements,
+            self.average_nutrition_supply,
+            self.animal_combination is AnimalCombination.LAC_COW,
+        )
+        self.average_nutrition_evaluation = (
+            evaluation if self.is_populated else NutritionEvaluationResults.make_empty_evaluation_results()
+        )
+
+    def _apply_user_defined_ration(self, pen_feeds: list[Feed]) -> None:
+        """
+        Generates and applies a user defined ration to a pen.
+
+        Parameters
+        ----------
+        pen_feeds : list[Feed]
+            Feeds available in a given pen.
+
+        """
+        self.ration = RationManager.get_user_defined_ration(
+            self.animal_combination, self.average_nutrition_requirements
+        )
         self.set_animal_nutritional_supply(feeds_used=pen_feeds, ration_formulation=self.ration)
         _, evaluation = NutritionEvaluator.evaluate_nutrition_supply(
             self.average_nutrition_requirements,
@@ -1019,6 +1259,40 @@ class Pen:
             )
             raise ValueError("Milk production reduction limit reached.")
 
+    def _reduce_on_lactation_failure_user_defined(self, info_map: dict[str, str]) -> bool:
+        """Processes failures and attempts milk reduction if needed for lactating cows.
+        Returns True if the ration formulation loop needs to be broken, modified for user defined ration logic,
+        returning True instead of raising errors, while logging said outcome.
+
+        Parameters
+        ----------
+        info_map : dict[str, Any]
+            The info map to be added to the output pool.
+
+        Returns
+        -------
+        bool
+            True if ration formulation loop needs to be broken.
+
+        """
+        if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+            self.om.add_log(
+                "Milk production too low",
+                f"Check failed_constraint_summary_for_pen_{self.id} to see cause.",
+                info_map,
+            )
+            return True
+
+        if not self.reduce_milk_production():
+            self.om.add_log(
+                "Milk production reduction limit reached.",
+                f"Check failed_constraint_summary_for_pen_{self.id} and consider adjusting input.",
+                info_map,
+            )
+            return True
+
+        return False
+
     def use_user_defined_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:
         """
         Calculate new ration for the pen based on the number of animals in the pen.
@@ -1043,18 +1317,12 @@ class Pen:
         If the animal is not a lactating cow, the outcomes of that animal are not affected and its nutrition
         requirements are not met.
 
-        Returns
-        -------
-        None
-
         """
         animal_combination = self.animal_combination
         if animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-        ration = UserDefinedRationManager.get_user_defined_ration(
-            animal_combination, self.average_nutrition_requirements.dry_matter
-        )
+        ration = RationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
         self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
 
         is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
@@ -1072,9 +1340,7 @@ class Pen:
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     break
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-                ration = UserDefinedRationManager.get_user_defined_ration(
-                    animal_combination, self.average_nutrition_requirements.dry_matter
-                )
+                ration = RationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
                 self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     self.average_nutrition_requirements,
@@ -1132,7 +1398,7 @@ class Pen:
             dry_matter_intake_requirement = 0.0
             for key in ration_per_calf:
                 dry_matter_intake_requirement += ration_per_calf[key]
-            ration_per_calf = UserDefinedRationManager.get_user_defined_ration(
+            ration_per_calf = RationManager.get_user_defined_ration(
                 animal_combination=self.animal_combination, dry_matter_intake_requirement=dry_matter_intake_requirement
             )
         # TODO deprecate method below if not used here

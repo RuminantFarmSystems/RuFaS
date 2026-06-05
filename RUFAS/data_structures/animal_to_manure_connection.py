@@ -30,21 +30,21 @@ class PenManureData:
     Attributes
     ----------
     num_animals : int
-        The number of animals in this pen that created the manure.
+        The number of animals in this pen that created the manure (animals).
     manure_deposition_surface_area : float
         The surface area of the manure deposition area in the pen (m^2).
     animal_combination : AnimalCombination
-        The combination of animals in the pen.
+        The combination of animals in the pen (unitless).
     pen_type : str | None
-        The type of pen.
+        The type of pen (unitless).
     manure_urine_mass : float
         The overall mass of urine in the manure stream (kg).
     manure_urine_nitrogen : float
         The mass of nitrogen in the urine in the manure stream (kg).
     stream_type : StreamType
-        The type of manure stream in the pen.
+        The type of manure stream in the pen (unitless).
     first_processor : str
-        The name of the first processor to handle the manure stream.
+        The name of the first processor to handle the manure stream (unitless).
     total_bedding_mass: float
         The total mass of the bedding applied to the manure stream (kg).
     total_bedding_volume: float
@@ -80,9 +80,11 @@ class PenManureData:
             raise ValueError("Manure from a non-lactating pen assigned to parlor manure stream.")
 
     def set_first_processor(self, processor_name: str) -> None:
+        """First-processor setter method."""
         self.first_processor = processor_name
 
     def set_bedding_mass_and_volume(self, bedding_mass: float, bedding_volume: float) -> None:
+        """Setter method for total_bedding_mass and total_bedding_volume."""
         self.total_bedding_mass = bedding_mass
         self.total_bedding_volume = bedding_volume
 
@@ -103,7 +105,9 @@ class PenManureData:
         Raises
         ------
         ValueError
-            If the stream type is ManureStreamType.GENERAL or if the animal combinations do not match.
+            - If the stream type is ManureStreamType.GENERAL.
+            - If the animal combinations do not match.
+            - If the first processors are different.
 
         """
         if self.stream_type == StreamType.GENERAL or other.stream_type == StreamType.GENERAL:
@@ -147,10 +151,12 @@ class ManureStream:
         Mass of potassium in the manure stream (kg).
     ash : float
         Mass of ash in the manure stream (kg).
-    non_degradable_volatile_solids : float
-        Mass of non-degradable volatile solids in the manure stream (kg).
     degradable_volatile_solids : float
         Mass of degradable volatile solids in the manure stream (kg).
+    non_degradable_volatile_solids : float
+        Mass of non-degradable volatile solids in the manure stream (kg).
+    bedding_non_degradable_volatile_solids : float
+        Amount of bedding non-degradable volatile solids (kg).
     total_solids : float
         Mass of total solids in the manure stream (kg).
     volume : float
@@ -158,12 +164,13 @@ class ManureStream:
     methane_production_potential : float
         Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
     pen_manure_data : PenManureData | None
-       Optional, more specific information about the manure and the pen or pens that produced it.
+       Optional, more specific information about the manure and the pen or pens that produced it (unitless).
 
     Class Attributes
     ----------------
     MANURE_STREAM_UNITS : dict[str, MeasurementUnits | None]
         A dictionary mapping manure stream attributes and properties to their respective measurement units.
+
     """
 
     water: float
@@ -172,8 +179,9 @@ class ManureStream:
     phosphorus: float
     potassium: float
     ash: float
-    non_degradable_volatile_solids: float
     degradable_volatile_solids: float
+    non_degradable_volatile_solids: float
+    bedding_non_degradable_volatile_solids: float
     total_solids: float
     volume: float
     methane_production_potential: float
@@ -186,8 +194,9 @@ class ManureStream:
         "phosphorus": MeasurementUnits.KILOGRAMS,
         "potassium": MeasurementUnits.KILOGRAMS,
         "ash": MeasurementUnits.KILOGRAMS,
-        "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
         "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "bedding_non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
         "total_solids": MeasurementUnits.KILOGRAMS,
         "volume": MeasurementUnits.CUBIC_METERS,
         "mass": MeasurementUnits.KILOGRAMS,
@@ -235,6 +244,8 @@ class ManureStream:
             pen_manure_data=(
                 self.pen_manure_data + other.pen_manure_data if self.pen_manure_data and other.pen_manure_data else None
             ),
+            bedding_non_degradable_volatile_solids=self.bedding_non_degradable_volatile_solids
+            + other.bedding_non_degradable_volatile_solids,
         )
 
     @property
@@ -256,13 +267,18 @@ class ManureStream:
                 self.degradable_volatile_solids,
                 self.total_solids,
                 self.volume,
+                self.bedding_non_degradable_volatile_solids,
             ]
         )
 
     @property
     def total_volatile_solids(self) -> float:
         """Amount of the total volatile solids (kg)."""
-        return self.non_degradable_volatile_solids + self.degradable_volatile_solids
+        return (
+            self.non_degradable_volatile_solids
+            + self.degradable_volatile_solids
+            + self.bedding_non_degradable_volatile_solids
+        )
 
     @property
     def mass(self) -> float:
@@ -275,7 +291,7 @@ class ManureStream:
 
     @classmethod
     def make_empty_manure_stream(cls) -> "ManureStream":
-        """Factory method for making empty ManureStreams."""
+        """Factory method for making an empty ManureStream."""
         return ManureStream(
             water=0.0,
             ammoniacal_nitrogen=0.0,
@@ -289,9 +305,15 @@ class ManureStream:
             volume=0.0,
             methane_production_potential=0.0,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=0.0,
         )
 
-    def split_stream(self, split_ratio: float, stream_type: StreamType | None = None) -> "ManureStream":
+    def split_stream(
+        self,
+        split_ratio: float,
+        stream_type: StreamType | None = None,
+        manure_stream_deposition_split: float | None = None,
+    ) -> "ManureStream":
         """
         Splits this manure stream using the specified ratio.
 
@@ -301,6 +323,9 @@ class ManureStream:
             Proportion of this stream to split into the new stream.
         stream_type : StreamType | None, default None
             Type to assign to the new manure stream's PenManureData, if applicable.
+        manure_stream_deposition_split : float | None, default None
+            Proportion of the manure deposition surface area to assign to the new stream's PenManureData,
+            if applicable. If None, the split_ratio will be used.
 
         Returns
         -------
@@ -309,7 +334,7 @@ class ManureStream:
 
         Raises
         ------
-        ValueErrorcov
+        ValueError
             If split_ratio is not between 0 and 1.
         """
         if not (0 < split_ratio <= 1):
@@ -321,13 +346,17 @@ class ManureStream:
                     "function": self.split_stream.__name__,
                 },
             )
-            raise ValueError("Split ratio must be greater than 0 and less than 1.")
+            raise ValueError("ManureStream split error: Split ratio must be greater than 0 and less than 1.")
 
         split_pen_manure_data = None
         if self.pen_manure_data is not None and stream_type is not None:
             split_pen_manure_data = PenManureData(
                 num_animals=self.pen_manure_data.num_animals,
-                manure_deposition_surface_area=self.pen_manure_data.manure_deposition_surface_area * split_ratio,
+                manure_deposition_surface_area=(
+                    self.pen_manure_data.manure_deposition_surface_area * manure_stream_deposition_split
+                    if manure_stream_deposition_split is not None
+                    else self.pen_manure_data.manure_deposition_surface_area * split_ratio
+                ),
                 animal_combination=self.pen_manure_data.animal_combination,
                 pen_type=self.pen_manure_data.pen_type,
                 manure_urine_mass=self.pen_manure_data.manure_urine_mass * split_ratio,
@@ -348,4 +377,5 @@ class ManureStream:
             volume=self.volume * split_ratio,
             methane_production_potential=self.methane_production_potential,
             pen_manure_data=split_pen_manure_data,
+            bedding_non_degradable_volatile_solids=self.bedding_non_degradable_volatile_solids * split_ratio,
         )

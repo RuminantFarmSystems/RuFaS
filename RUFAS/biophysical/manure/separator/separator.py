@@ -72,6 +72,7 @@ class Separator(Processor):
         ash_efficiency: float,
         volatile_solids_efficiency: float,
         total_solids_efficiency: float,
+        processor_type: str,
     ) -> None:
         """Initializes a new Separator."""
         super().__init__(name=name, is_housing_emissions_calculator=False)
@@ -84,9 +85,8 @@ class Separator(Processor):
         self.ash_efficiency: float = ash_efficiency
         self.volatile_solids_efficiency: float = volatile_solids_efficiency
         self.total_solids_efficiency: float = total_solids_efficiency
-        # TODO: replace '{"separator_type"}' with '{self.type.value}' once we implement the processor type enum.
-        #  Issue #2513
-        self._prefix = f"Manure.{self.__class__.__name__}.{"separator_type"}.{self.name}"
+        self.separator_type = processor_type
+        self._prefix = f"Manure.{self.__class__.__name__}.{self.separator_type}.{self.name}"
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -97,7 +97,30 @@ class Separator(Processor):
         manure : ManureStream
             The manure to be processed.
 
+        Raises
+        ------
+        ValueError
+            If the Separator is set as the first processor (indicated by the manure compatibility failure).
+
         """
+        is_received_manure_valid = self.check_manure_stream_compatibility(manure)
+        if not is_received_manure_valid:
+            error_message = (
+                f"Separator {self.name} was assigned as a first processor. "
+                "The first processor for each manure stream must be either a handler "
+                "or an appropriate storage (open lot, bedded pack, or daily spread)."
+            )
+
+            self._om.add_error(
+                "Received Manure Compatibility Error",
+                error_message,
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.process_manure.__name__,
+                    "prefix": self._prefix,
+                },
+            )
+            raise ValueError(error_message)
         if self.held_manure is None:
             self.held_manure = manure
         else:
@@ -113,6 +136,11 @@ class Separator(Processor):
             Current weather and environmental conditions that manure is being processed in.
         time : RufasTime
             RufasTime instance containing the simulations temporal information.
+
+        Raises
+        ------
+        ValueError
+            If the ManureStream's liquid_manure_water <= 0.0
 
         Returns
         -------
@@ -151,6 +179,8 @@ class Separator(Processor):
             volume=solid_manure_volume,
             methane_production_potential=self.held_manure.methane_production_potential,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=self.held_manure.bedding_non_degradable_volatile_solids
+            * self.volatile_solids_efficiency,
         )
         solid_stream_name = "SeparatedSolids"
         solid_manure_stream_dict = asdict(solid_manure_stream)
@@ -159,6 +189,19 @@ class Separator(Processor):
         self._report_manure_stream(solid_manure_stream, solid_stream_name, time.simulation_day)
 
         liquid_manure_water = self.held_manure.water - solid_manure_water
+        if liquid_manure_water <= 0.0:
+            self._om.add_error(
+                f"Liquid manure volume is {liquid_manure_water}",
+                f"Separator '{self.name}' attempted to separate more water into manure solids fraction than was "
+                "present in manure entering separator. The separated_solids_dry_matter "
+                f"value for separator '{self.name}' may need to be increased.",
+                {**info_map},
+            )
+            raise ValueError(
+                f"Separator '{self.name}' attempted to separate more water into manure solids fraction than was "
+                "present in manure entering separator. The separated_solids_dry_matter "
+                f"value for separator '{self.name}' may need to be increased."
+            )
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
             liquid_manure_water + liquid_manure_total_solids
@@ -178,6 +221,8 @@ class Separator(Processor):
             volume=liquid_manure_volume,
             methane_production_potential=self.held_manure.methane_production_potential,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=self.held_manure.bedding_non_degradable_volatile_solids
+            * (1 - self.volatile_solids_efficiency),
         )
         liquid_stream_name = "SeparatedLiquid"
         self._report_manure_stream(liquid_manure_stream, liquid_stream_name, time.simulation_day)

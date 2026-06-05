@@ -1,13 +1,14 @@
+from pathlib import Path
 from typing import Dict, Any, List, Union, Optional, Type
 
 import pytest
 from unittest.mock import call
 from pytest_mock import MockerFixture
 
-from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter
+from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter, CrossValidator, Modifiability
 
 
-def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]]:
+def mock_input_array_data_for_fix_data() -> dict[str | int, Any] | list[Any]:
     return {
         "element1": [1, 2, 3],
         "element2": [1, 2, 3, 4, 5],
@@ -40,7 +41,7 @@ def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]
 )
 def test_bool_type_validator(
     input_data_value: bool,
-    dummy_variable_properties: Dict[str, Any],
+    dummy_variable_properties: dict[str, Any],
     expected_result: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -48,10 +49,11 @@ def test_bool_type_validator(
     Unit test for function _bool_type_validator in file input_manager.py
     """
     # Arrange
+    input_path: Path = Path("path/to/input")
     var_path: list[str | int] = ["dummy_var_path"]
-    variable_properties: Dict[str, Any] = dummy_variable_properties
+    variable_properties: dict[str, Any] = dummy_variable_properties
     dummy_properties_key = "dummy_variable_properties"
-    dummy_input_data = {"a": 1, "b": 2}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=input_data_value)
@@ -69,10 +71,13 @@ def test_bool_type_validator(
         dummy_counter,
         unused_bool_input,
         {"string", "number", "bool"},
+        input_path,
     )
 
     # Assert
-    patch_extract.assert_called_once_with(dummy_input_data, var_path, variable_properties, unused_bool_input)
+    patch_extract.assert_called_once_with(
+        dummy_input_data, var_path, variable_properties, unused_bool_input, input_path
+    )
     if dummy_variable_properties.get("nullable", False) is False:
         patch_path_to_str.assert_called_once_with(var_path)
     if not expected_result:
@@ -88,7 +93,7 @@ def test_bool_type_validator(
             {
                 "warning": "Validation: bool variable is not a bool",
                 "message": (
-                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: '{input_data_value}', is type: "
                     f"'{type(input_data_value)}'. {properties_violation_message}"
                 ),
                 "info_map": info_map,
@@ -115,15 +120,16 @@ def test_bool_type_validator(
 )
 def test_number_type_validator(
     dummy_value: int,
-    dummy_variable_properties: Dict[str, int],
+    dummy_variable_properties: dict[str, int],
     expected_result: bool,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for function _number_type_validator in file input_manager.py"""
 
     # Arrange
+    input_path: Path = Path("path/to/input")
     dummy_var_path: list[str | int] = ["dummy_num"]
-    dummy_input_data = {"a": 1}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1}
     dummy_properties_key = "dummy_variable_properties"
     unused_bool_input = False
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
@@ -141,10 +147,11 @@ def test_number_type_validator(
         dummy_counter,
         unused_bool_input,
         {"string", "number", "bool"},
+        input_path,
     )
 
     patch_extract.assert_called_once_with(
-        dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input
+        dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input, input_path
     )
     if dummy_variable_properties.get("nullable", False) is False:
         patch_path_to_str.assert_called_once_with(dummy_var_path)
@@ -178,9 +185,10 @@ def test_string_type_validator(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _string_type_validator function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     var_path: list[str | int] = ["dummy_var_path"]
     dummy_properties_key = "dummy_variable_properties"
-    dummy_input_data = {"a": 1, "b": 2}
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=dummy_value)
@@ -197,9 +205,12 @@ def test_string_type_validator(
         dummy_counter,
         unused_bool_input,
         {"string", "number", "bool"},
+        input_path,
     )
 
-    patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_properties, unused_bool_input)
+    patch_extract.assert_called_once_with(
+        dummy_input_data, var_path, dummy_variable_properties, unused_bool_input, input_path
+    )
     if dummy_variable_properties.get("nullable", False) is False:
         patch_path_to_str.assert_called_once_with(var_path)
     assert result == expected_result
@@ -257,25 +268,27 @@ def test_string_type_validator(
     ],
 )
 def test_fix_array_type_fixable_data(
-    dummy_variable_properties: Dict[str, Any],
-    dummy_element_hierarchy: List[str],
-    expected_value: List[Any],
+    dummy_variable_properties: dict[str, Any],
+    dummy_element_hierarchy: list[str | int],
+    expected_value: list[Any],
     expected_result: bool,
-    mocker: MockerFixture,
 ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
-
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    input_path: Path = Path("path/to/input")
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key] if isinstance(key, str | int) else variable_parent[str(key)]
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    if type(variable_parent) is list:
-        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    if isinstance(variable_parent, list):
+        original_invalid_value = variable_parent[int(dummy_element_hierarchy[-1])]
     else:
         original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
     info_map = {
@@ -286,27 +299,27 @@ def test_fix_array_type_fixable_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     variable_to_check = dummy_input_data
     for key in dummy_element_hierarchy:
-        variable_to_check = variable_to_check[key]
+        if isinstance(variable_to_check, list):
+            variable_to_check = variable_to_check[int(key)]
+        else:
+            variable_to_check = variable_to_check[key]
     assert variable_to_check == expected_value
     assert result == expected_result
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' in '{input_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
@@ -357,23 +370,30 @@ def test_fix_array_type_fixable_data(
     ],
 )
 def test_fix_array_type_critical_data(
-    dummy_variable_properties: Dict[str, Any],
-    dummy_element_hierarchy: List[str],
+    dummy_variable_properties: dict[str, Any],
+    dummy_element_hierarchy: list[str | int],
     expected_result: bool,
-    mocker: MockerFixture,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    input_path: Path = Path("path/to/input")
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
-    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
+    invalid_value = (
+        variable_parent.get(dummy_element_hierarchy[-1], "missing required value")
+        if isinstance(variable_parent, dict)
+        else variable_parent[int(dummy_element_hierarchy[-1])]
+    )
     error_message = (
-        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f"Variable: '{dummy_element_hierarchy[-1]}' in '{input_path}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
@@ -384,10 +404,7 @@ def test_fix_array_type_critical_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     assert result == expected_result
@@ -467,23 +484,26 @@ def mock_input_string_data_for_fix_data() -> dict[str, str | dict[str, Any]]:
 )
 def test_fix_string_type_fixable_data(
     dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
+    dummy_element_hierarchy: list[str | int],
     expected_value: str,
     expected_result: bool,
-    mocker: MockerFixture,
 ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    input_path: Path = Path("path/to/input")
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    if type(variable_parent) is list:
-        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    if isinstance(variable_parent, list):
+        original_invalid_value = variable_parent[int(dummy_element_hierarchy[-1])]
     else:
         original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
     info_map = {
@@ -494,27 +514,27 @@ def test_fix_string_type_fixable_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
-    variable_to_check = dummy_input_data
+    variable_to_check: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy:
-        variable_to_check = variable_to_check[key]
-    assert variable_to_check == expected_value
+        if isinstance(variable_to_check, list):
+            variable_to_check = variable_to_check[int(key)]
+        else:
+            variable_to_check = variable_to_check[key]
+    assert str(variable_to_check) == expected_value
     assert result == expected_result
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' in '{input_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
@@ -525,10 +545,10 @@ def test_fix_string_type_fixable_data(
 
 def test_fix_string_type_csv_data() -> None:
     """Unit test for fixable number-type data from a csv array for _fix_data function in file input_manager.py"""
-
-    dummy_input_data = {"element1": [1, 2, 3, 4, 5]}
+    input_path: Path = Path("path/to/input")
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"element1": [1, 2, 3, 4, 5]}
     dummy_variable_properties = {"type": "number", "maximum": 4, "default": 3}
-    dummy_element_hierarchy = ["element1", 4]
+    dummy_element_hierarchy: list[str | int] = ["element1", 4]
     dummy_properties_key = "dummy_variable_properties"
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
     properties_violation_message = (
@@ -538,38 +558,42 @@ def test_fix_string_type_csv_data() -> None:
         "class": DataValidator.__name__,
         "function": DataValidator._fix_data.__name__,
     }
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
-    if type(variable_parent) is list:
-        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
+    if isinstance(variable_parent, list):
+        original_invalid_value = variable_parent[int(dummy_element_hierarchy[-1])]
     else:
-        original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
+        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
 
     dv: DataValidator = DataValidator()
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     fixed_variable = dummy_input_data
     for key in dummy_element_hierarchy:
-        fixed_variable = fixed_variable[key]
+        if isinstance(fixed_variable, list):
+            fixed_variable = fixed_variable[int(key)]
+        else:
+            fixed_variable = fixed_variable[key]
 
+    assert isinstance(fixed_variable, int)
     assert fixed_variable == 3
     assert result
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' in '{input_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
@@ -625,21 +649,26 @@ def test_fix_string_type_csv_data() -> None:
 )
 def test_fix_string_type_critical_data(
     dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
+    dummy_element_hierarchy: list[str | int],
     expected_result: bool,
 ) -> None:
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
+    input_path: Path = Path("path/to/input")
     dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
-    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
     variable_parent = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        variable_parent = variable_parent[key] if isinstance(variable_parent, dict) else variable_parent[int(key)]
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
+    invalid_value = (
+        variable_parent.get(str(dummy_element_hierarchy[-1]), "missing required value")
+        if isinstance(variable_parent, dict)
+        else variable_parent[int(dummy_element_hierarchy[-1])]
+    )
     error_message = (
-        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f"Variable: '{dummy_element_hierarchy[-1]}' in '{input_path}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
@@ -650,10 +679,7 @@ def test_fix_string_type_critical_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     assert result == expected_result
@@ -680,7 +706,7 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result",
     [
         (
             {
@@ -692,7 +718,6 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
             ["element1"],
             5,
             True,
-            2,
         ),
         (
             {
@@ -704,7 +729,6 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
             ["element2"],
             0,
             True,
-            2,
         ),
         (
             {
@@ -716,7 +740,6 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
             ["element3"],
             5,
             True,
-            2,
         ),
         (
             {
@@ -728,32 +751,33 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
             ["element4", "element5"],
             5,
             True,
-            2,
         ),
     ],
 )
 def test_fix_number_type_fixable_data(
     dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
-    expected_value: str,
+    dummy_element_hierarchy: list[str | int],
+    expected_value: int | float | str | bool | None,
     expected_result: bool,
-    expected_warning_call_count: int,
-    mocker: MockerFixture,
 ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    input_path: Path = Path("path/to/input")
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    if type(variable_parent) is list:
-        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    if isinstance(variable_parent, list):
+        original_invalid_value = variable_parent[int(dummy_element_hierarchy[-1])]
     else:
-        original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
+        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
     info_map = {
         "class": DataValidator.__name__,
         "function": DataValidator._fix_data.__name__,
@@ -762,27 +786,27 @@ def test_fix_number_type_fixable_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
-    variable_to_check = dummy_input_data
+    variable_to_check: Any = dummy_input_data
     for key in dummy_element_hierarchy:
-        variable_to_check = variable_to_check[key]
+        if isinstance(variable_to_check, list):
+            variable_to_check = variable_to_check[int(key)]
+        else:
+            variable_to_check = variable_to_check[key]
     assert variable_to_check == expected_value
     assert result == expected_result
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' in '{input_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
             "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
@@ -792,7 +816,7 @@ def test_fix_number_type_fixable_data(
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_result, " "expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_result,",
     [
         (
             {
@@ -802,7 +826,6 @@ def test_fix_number_type_fixable_data(
             },
             ["element6"],
             False,
-            0,
         ),
         (
             {
@@ -812,7 +835,6 @@ def test_fix_number_type_fixable_data(
             },
             ["element7"],
             False,
-            0,
         ),
         (
             {
@@ -822,7 +844,6 @@ def test_fix_number_type_fixable_data(
             },
             ["element8"],
             False,
-            0,
         ),
         (
             {
@@ -832,29 +853,34 @@ def test_fix_number_type_fixable_data(
             },
             ["element9", "element10"],
             False,
-            0,
         ),
     ],
 )
 def test_fix_number_type_critical_data(
     dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
+    dummy_element_hierarchy: list[str | int],
     expected_result: bool,
-    expected_warning_call_count: int,
-    mocker: MockerFixture,
 ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
-    dummy_input_data = mock_input_array_data_for_fix_data()
+    input_path: Path = Path("path/to/input")
+    dummy_input_data: dict[str | int, Any] | list[Any] = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
-    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
-    variable_parent = dummy_input_data
+    variable_parent: dict[str | int, Any] | list[Any] = dummy_input_data
     for key in dummy_element_hierarchy[:-1]:
-        variable_parent = variable_parent[key]
+        if isinstance(variable_parent, list):
+            variable_parent = variable_parent[int(key)]
+        else:
+            variable_parent = variable_parent[key]
     properties_violation_message = (
         f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
     )
+    invalid_value = (
+        variable_parent.get(dummy_element_hierarchy[-1], "missing required value")
+        if isinstance(variable_parent, dict)
+        else variable_parent[int(dummy_element_hierarchy[-1])]
+    )
     error_message = (
-        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f"Variable: '{dummy_element_hierarchy[-1]}' in '{input_path}' has invalid value: '{invalid_value}'"
         f", and cannot be changed to a default value. {properties_violation_message}"
     )
     info_map = {
@@ -865,10 +891,7 @@ def test_fix_number_type_critical_data(
     dv = DataValidator()
 
     result = dv._fix_data(
-        dummy_variable_properties,
-        dummy_element_hierarchy,
-        dummy_input_data,
-        dummy_properties_key,
+        dummy_variable_properties, dummy_element_hierarchy, dummy_input_data, dummy_properties_key, input_path
     )
 
     assert result == expected_result
@@ -918,8 +941,8 @@ def test_fix_number_type_critical_data(
     ],
 )
 def test_extract_value_by_key_list(
-    input_data: Union[List[Any], Dict[str, Any]],
-    variable_path: List[Union[str, int]],
+    input_data: dict[str | int, Any] | list[Any],
+    variable_path: list[Union[str, int]],
     expected: Optional[Any],
     expected_exception: Optional[Type[Exception]],
 ) -> None:
@@ -1011,9 +1034,9 @@ def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expe
 )
 def test_object_type_validator(
     mocker: MockerFixture,
-    variable_path: List[Union[str, int]],
-    variable_properties: Dict[str, Any],
-    input_data: Dict[str, Any],
+    variable_path: list[Union[str, int]],
+    variable_properties: dict[str, Any],
+    input_data: dict[str | int, Any] | list[Any],
     eager_termination: bool,
     properties_blob_key: str,
     expected_result: bool,
@@ -1025,6 +1048,7 @@ def test_object_type_validator(
     """
 
     # Arrange
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=patch_extract_return)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_validate_return)
     mock_elements_counter = mocker.MagicMock()
@@ -1040,6 +1064,7 @@ def test_object_type_validator(
         mock_elements_counter,
         True,
         {"string", "number", "bool"},
+        input_path,
     )
 
     # Assert
@@ -1058,6 +1083,7 @@ def test_object_type_validator_key_removal(
     mocker: MockerFixture, data: dict[str, Any], removed_keys: list[str]
 ) -> None:
     """Tests that extraneous keys are properly removed by the _object_type_validator in Input Manager."""
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=data)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
     mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy path")
@@ -1071,7 +1097,7 @@ def test_object_type_validator_key_removal(
         {
             "warning": "Validation: object contains extraneous data",
             "message": (
-                f"Variable: 'dummy path' contains data at key '{key}' "
+                f"Variable: 'dummy path' in '{input_path}' contains data at key '{key}' "
                 f"that is not specified in the metadata properties. {violation_msg}"
             ),
             "info_map": info_map,
@@ -1088,6 +1114,7 @@ def test_object_type_validator_key_removal(
         mock_elements_counter,
         True,
         {"string", "number", "bool"},
+        input_path,
     )
 
     assert result
@@ -1269,9 +1296,9 @@ def test_validate_array_container_properties(
 )
 def test_array_type_validator(
     mocker: MockerFixture,
-    variable_path: List[Union[str, int]],
-    variable_properties: Dict[str, Any],
-    input_data: Dict[str, Any],
+    variable_path: list[str | int],
+    variable_properties: dict[str, Any],
+    input_data: dict[str | int, Any] | list[Any],
     eager_termination: bool,
     properties_blob_key: str,
     patch_extract_return: Any,
@@ -1284,6 +1311,7 @@ def test_array_type_validator(
     """
 
     # Arrange
+    input_path: Path = Path("path/to/input")
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=patch_extract_return)
     mocker.patch.object(DataValidator, "_validate_array_container_properties", return_value=patch_container_valid)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_element_valid)
@@ -1301,6 +1329,7 @@ def test_array_type_validator(
         mock_elements_counter,
         True,
         {"string", "number", "bool"},
+        input_path,
     )
 
     # Assert
@@ -1353,9 +1382,10 @@ def test_validate_input_by_type(
     """
 
     # Arrange
+    input_path: Path = Path("path/to/input")
     variable_properties = {"type": data_type}
     variable_path: List[Union[str, int]] = ["path", "to", "variable"]
-    input_data = {"path": {"to": {"variable": input_value}}}
+    input_data: dict[str | int, Any] | list[Any] = {"path": {"to": {"variable": input_value}}}
     eager_termination = False
     properties_blob_key = "blobKey"
     elements_counter = mocker.MagicMock()
@@ -1376,6 +1406,7 @@ def test_validate_input_by_type(
         elements_counter,
         True,
         {"string", "number", "bool"},
+        input_path,
     )
 
     # Assert
@@ -1398,10 +1429,12 @@ def test_validate_input_by_type(
 
 
 def test_validate_input_by_type_key_error() -> None:
+    """Tests validate_data_by_type() method in DataValidator."""
+    input_path: Path = Path("path/to/input")
     variable_properties = {"a": "b"}
     variable_path: list[Union[str, int]] = ["valid_key"]
     properties_blob_key = "dummy_properties_blob_key"
-    input_data = {"valid_key": {"another_valid_key": "value"}}
+    input_data: dict[str | int, Any] | list[Any] = {"valid_key": {"another_valid_key": "value"}}
     eager_termination = False
     elements_counter = ElementsCounter()
     dv = DataValidator()
@@ -1417,6 +1450,7 @@ def test_validate_input_by_type_key_error() -> None:
             elements_counter,
             True,
             {"string", "number", "bool"},
+            input_path,
         )
 
 
@@ -1466,6 +1500,67 @@ def test_validate_input_by_type_key_error() -> None:
             {
                 "files": {
                     "file1": {
+                        "paths": ["valid/path/to/file1.json", "valid/path/to/file2.json"],
+                        "type": "json",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            False,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
+                        "paths": [],
+                        "type": "json",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            True,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {"paths": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}
+                }
+            },
+            True,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
+                        "paths": ["valid/path/to/file1.json", None],
+                        "type": "json",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            True,
+        ),
+        (
+            False,
+            {
+                "files": {
+                    "file1": {
+                        "paths": ["valid/path/to/file1.json", "valid/path/to/file2.json"],
+                        "type": "json",
+                        "properties": "some properties",
+                    }
+                }
+            },
+            True,
+        ),
+        (
+            True,
+            {
+                "files": {
+                    "file1": {
                         "path": "valid/path/to/file1.json",
                         "type": "json",
                         "properties": "",
@@ -1474,14 +1569,25 @@ def test_validate_input_by_type_key_error() -> None:
             },
             True,
         ),
+        (
+            True,
+            {"files": {"file1": {"path": "", "type": "json", "properties": "some properties"}}},
+            True,
+        ),
+        (
+            True,
+            {"files": {"file1": {"path": 123, "type": "json", "properties": "some properties"}}},
+            True,
+        ),
     ],
 )
 def test_validate_metadata(
     mocker: MockerFixture,
     does_file_exist: bool,
-    metadata: Dict[str, Any],
+    metadata: dict[str, Any],
     expected_exception: bool,
 ) -> None:
+    """Tests validate_metadata() function in InputManager. Helpful for testing integration of helper functions."""
     mocker.patch("os.path.isfile", return_value=does_file_exist)
     info_map = {
         "class": DataValidator.__name__,
@@ -1490,14 +1596,472 @@ def test_validate_metadata(
     dv = DataValidator()
 
     if expected_exception:
-        valid, message = dv.validate_metadata(metadata, {"json", "csv"}, "files")
+        valid, message = dv.validate_metadata(metadata, {"json", "csv"}, "files", Path(""))
         assert not valid
         assert dv.event_logs == [{"error": "Metadata Validation", "message": mocker.ANY, "info_map": info_map}]
     else:
-        dv.validate_metadata(metadata, {"json", "csv"}, "files")
+        dv.validate_metadata(metadata, {"json", "csv"}, "files", Path(""))
         assert dv.event_logs == [
             {"log": "Metadata Validation", "message": "Top level metadata is valid.", "info_map": info_map}
         ]
+
+
+def test_generate_fail_message() -> None:
+    """Tests the _generate_fail_message() function in InputManager."""
+    dv = DataValidator()
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator.validate_metadata.__name__,
+    }
+    status, message = dv._generate_fail_message(
+        message="test error",
+        info_map=info_map,
+    )
+    assert message == "test error"
+    assert not status
+    assert dv.event_logs == [
+        {
+            "error": "Metadata Validation",
+            "message": "test error",
+            "info_map": {"class": "DataValidator", "function": "validate_metadata"},
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    "data, required_keys, valid_keys, expected_message_substr",
+    [
+        # Missing required keys
+        (
+            {"type": "json"},  # missing "properties"
+            {"type", "properties"},
+            {"type", "properties", "title"},
+            "Missing required keys",
+        ),
+        # Invalid keys present
+        (
+            {"type": "json", "properties": {}, "bogus": 123},
+            {"type", "properties"},
+            {"type", "properties", "title"},
+            "Invalid keys",
+        ),
+    ],
+)
+def test_validate_metadata_keys_failure_calls_generate_fail_message(
+    data: dict[str, Any],
+    required_keys: set[str],
+    valid_keys: set[str],
+    expected_message_substr: str,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that _validate_metadata_keys() returns False and calls _generate_fail_message()
+    with the expected message when given invalid data."""
+    validator = DataValidator()
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_keys"}
+    key = "my_entry"
+
+    fail_msg = f"{expected_message_substr} in '{key}'"
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message", return_value=(False, fail_msg))
+
+    ok, msg = validator._validate_metadata_keys(
+        key=key,
+        data=data,
+        required_keys=required_keys,
+        valid_keys=valid_keys,
+        info_map=info_map,
+    )
+
+    assert ok is False
+    assert expected_message_substr in msg
+    generate_fail_spy.assert_called_once()
+    called_message, called_info_map = generate_fail_spy.call_args.args
+    assert expected_message_substr in called_message
+    assert f"'{key}'" in called_message
+    assert called_info_map is info_map
+
+
+def test_validate_metadata_keys_success_does_not_call_generate_fail_message(mocker: MockerFixture) -> None:
+    """Tests that _validate_metadata_keys() returns True and does not call _generate_fail_message()
+    when given valid data."""
+    validator = DataValidator()
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_keys"}
+    key = "my_entry"
+
+    required_keys = {"type", "properties"}
+    valid_keys = {"type", "properties", "title", "description", "path", "paths"}
+
+    data = {"type": "json", "properties": {}, "title": "Hello"}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    ok, msg = validator._validate_metadata_keys(
+        key=key,
+        data=data,
+        required_keys=required_keys,
+        valid_keys=valid_keys,
+        info_map=info_map,
+    )
+
+    assert ok is True
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+def test_validate_has_path_or_paths_fails_when_neither_key_present(mocker: MockerFixture) -> None:
+    """Tests that _validate_has_path_or_paths() returns False and calls _generate_fail_message()
+    with the expected message when neither 'path' nor 'paths' keys are present."""
+    validator = DataValidator()
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_has_path_or_paths"}
+    key = "my_entry"
+    data: dict[str, Any] = {"type": "json", "properties": {}}
+
+    expected_msg = f"'{key}' must define at least one of the keys 'path' or 'paths', but neither was found."
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_msg),
+    )
+
+    ok, msg = validator._validate_has_path_or_paths(key=key, data=data, info_map=info_map)
+
+    assert ok is False
+    assert msg == expected_msg
+    generate_fail_spy.assert_called_once_with(expected_msg, info_map)
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        ({"path": "a/b/c.json"}),
+        ({"paths": ["a/b/c.json", "d/e/f.json"]}),
+        ({"path": "a/b/c.json", "paths": ["d/e/f.json"]}),
+    ],
+)
+def test_validate_has_path_or_paths_success_when_either_key_present(
+    data: dict[str, Any], mocker: MockerFixture
+) -> None:
+    """Tests that _validate_has_path_or_paths() returns True and does not call _generate_fail_message()
+    when either 'path' or 'paths' key is present."""
+    validator = DataValidator()
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_has_path_or_paths"}
+    key = "my_entry"
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    ok, msg = validator._validate_has_path_or_paths(key=key, data=data, info_map=info_map)
+
+    assert ok is True
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "properties_value",
+    [
+        None,
+        "",
+    ],
+)
+def test_validate_metadata_properties_failure(
+    properties_value: Any,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid properties values trigger a failure."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_properties"}
+
+    data: dict[str, Any] = {"properties": properties_value}
+
+    expected_message = f"Properties section empty or None in '{key}'"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    ok, msg = validator._validate_metadata_properties(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert ok is False
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+def test_validate_metadata_properties_success(mocker: MockerFixture) -> None:
+    """Tests valid properties section passes validation."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_properties"}
+
+    data: dict[str, Any] = {"properties": {"a": 1}}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    ok, msg = validator._validate_metadata_properties(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert ok is True
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "type_value, valid_data_types",
+    [
+        ("csv", {"json", "yaml"}),
+        ("xml", {"csv", "json"}),
+    ],
+)
+def test_validate_metadata_type_failure(
+    type_value: str,
+    valid_data_types: set[str],
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid type values trigger a failure."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_type"}
+
+    data: dict[str, Any] = {"type": type_value}
+
+    expected_message = f"Invalid type '{type_value}' in '{key}'. Expected one option from {valid_data_types}"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    ok, msg = validator._validate_metadata_type(
+        key=key,
+        data=data,
+        valid_data_types=valid_data_types,
+        info_map=info_map,
+    )
+
+    assert ok is False
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+@pytest.mark.parametrize(
+    "type_value, valid_data_types",
+    [
+        ("json", {"json", "yaml"}),
+        ("csv", {"csv", "json"}),
+    ],
+)
+def test_validate_metadata_type_success(
+    type_value: str,
+    valid_data_types: set[str],
+    mocker: MockerFixture,
+) -> None:
+    """Tests that valid type value passes validation."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_validate_metadata_type"}
+
+    data: dict[str, Any] = {"type": type_value}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    ok, msg = validator._validate_metadata_type(
+        key=key,
+        data=data,
+        valid_data_types=valid_data_types,
+        info_map=info_map,
+    )
+
+    assert ok is True
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "path_value",
+    [
+        None,
+        "",
+        123,
+    ],
+)
+def test_get_paths_to_check_invalid_path(
+    path_value: Any,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid 'path' value in metadata triggers a failure in _get_paths_to_check()."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"path": path_value}
+
+    expected_message = f"Invalid path value '{path_value}' in '{key}'"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths is None
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+@pytest.mark.parametrize(
+    "paths_value",
+    [
+        None,
+        [],
+        "not-a-list",
+    ],
+)
+def test_get_paths_to_check_invalid_paths_container(
+    paths_value: Any,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid 'paths' values trigger a failure."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"paths": paths_value}
+
+    expected_message = f"Invalid paths value '{paths_value}' in '{key}'"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths is None
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+@pytest.mark.parametrize(
+    "paths_value",
+    [
+        [None],
+        [""],
+        ["valid", None],
+    ],
+)
+def test_get_paths_to_check_invalid_paths_entries(
+    paths_value: list[Any],
+    mocker: MockerFixture,
+) -> None:
+    """Tests that invalid entries within the 'paths' list trigger a failure."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"paths": paths_value}
+
+    expected_message = f"Invalid paths value '{paths_value}' in '{key}'"
+
+    generate_fail_spy = mocker.patch.object(
+        validator,
+        "_generate_fail_message",
+        return_value=(False, expected_message),
+    )
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths is None
+    assert msg == expected_message
+    generate_fail_spy.assert_called_once_with(expected_message, info_map)
+
+
+def test_get_paths_to_check_success_single_path(mocker: MockerFixture) -> None:
+    """Tests that when 'path' contains a single valid entry, _get_paths_to_check() returns the correct list of paths."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"path": "file.json"}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths == ["file.json"]
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+def test_get_paths_to_check_success_multiple_paths(mocker: MockerFixture) -> None:
+    """Tests that when 'paths' contains multiple valid entries, _get_paths_to_check() returns the correct
+    list of paths."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"paths": ["a.json", "b.json"]}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths == ["a.json", "b.json"]
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
+
+
+def test_get_paths_to_check_success_path_and_paths(mocker: MockerFixture) -> None:
+    """Tests that when both 'path' and 'paths' are present and valid, _get_paths_to_check() returns a combined list
+    of paths."""
+    validator = DataValidator()
+    key = "test_entry"
+    info_map: dict[str, Any] = {"class": "DataValidator", "function": "_get_paths_to_check"}
+
+    data: dict[str, Any] = {"path": "a.json", "paths": ["b.json", "c.json"]}
+
+    generate_fail_spy = mocker.patch.object(validator, "_generate_fail_message")
+
+    paths, msg = validator._get_paths_to_check(
+        key=key,
+        data=data,
+        info_map=info_map,
+    )
+
+    assert paths == ["a.json", "b.json", "c.json"]
+    assert msg == ""
+    generate_fail_spy.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -1554,7 +2118,6 @@ def test_validate_properties(
     expected_err_msg: str,
 ) -> None:
     """Tests _validate_properties() function in InputManager."""
-    # Initiated to avoid the call of add_log in __init__ to be recorded
     dv = DataValidator()
 
     info_map = {
@@ -1926,9 +2489,10 @@ def test_validate_metadata_properties_keys(
 
 def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
     """Unit tests for making sure data were extracted when no error"""
-    dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}
+    input_path: Path = Path("path/to/input")
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
     dummy_var_path: list[str | int] = ["dummy_var_path"]
-    dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
+    dummy_var_properties: dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
     dummy_value = 1
     patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", return_value=dummy_value)
     patch_log_missing_data = mocker.patch.object(DataValidator, "_log_missing_data")
@@ -1939,6 +2503,7 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=True,
+        input_path=input_path,
     )
 
     assert result == dummy_value
@@ -1949,10 +2514,13 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=False,
+        input_path=input_path,
     )
 
     assert result == dummy_value
-    patch_extract.assert_has_calls([call(dummy_input_data, dummy_var_path), call(dummy_input_data, dummy_var_path)])
+    patch_extract.assert_has_calls(
+        [call(dummy_input_data, dummy_var_path, input_path), call(dummy_input_data, dummy_var_path, input_path)]
+    )
     patch_log_missing_data.assert_not_called()
 
 
@@ -1975,8 +2543,9 @@ def test_extract_input_data_by_key_list_key_error(
     var_path: List[str | int], var_name: str, called_during_initialization: bool, mocker: MockerFixture
 ) -> None:
     """Unit tests for making sure data were extracted when error occurs"""
-    dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}
-    dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
+    input_path: Path = Path("path/to/input")
+    dummy_input_data: dict[str | int, Any] | list[Any] = {"a": 1, "b": 2}
+    dummy_var_properties: dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
     patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", side_effect=KeyError)
     patch_log_missing_data = mocker.patch.object(DataValidator, "_log_missing_data")
     dv = DataValidator()
@@ -1986,12 +2555,1598 @@ def test_extract_input_data_by_key_list_key_error(
         variable_path=var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=called_during_initialization,
+        input_path=input_path,
     )
 
     assert result is None
-    patch_extract.assert_called_once_with(dummy_input_data, var_path)
+    patch_extract.assert_called_once_with(dummy_input_data, var_path, input_path)
     patch_log_missing_data.assert_called_once_with(
         variable_properties=dummy_var_properties,
         var_name=var_name,
         called_during_initialization=called_during_initialization,
+        input_path=input_path,
     )
+
+
+@pytest.fixture
+def cv(mocker: MockerFixture) -> CrossValidator:
+    """Fixture to create a CrossValidator with mocked methods."""
+    cv = CrossValidator.__new__(CrossValidator)
+    mocker.patch.object(cv, "_target_and_save")
+    mocker.patch.object(cv, "_evaluate_condition_clause_array")
+    mocker.patch.object(cv, "_evaluate_condition")
+    return cv
+
+
+def test_early_exit_when_apply_when_fails_and_eager_true(mocker: MockerFixture, cv: CrossValidator) -> None:
+    """Test that cross_validate_data exits early when apply_when fails and eager_termination is True."""
+    cross_validation_block = {"apply_when": [{"foo": "bar"}], "rules": [{"r": 1}, {"r": 2}]}
+    mock_target_and_save = mocker.patch.object(cv, "_target_and_save")
+    mock_evaluate_condition = mocker.patch.object(cv, "_evaluate_condition")
+    mock_evaluate_condition_clause_array = mocker.patch.object(
+        cv, "_evaluate_condition_clause_array", return_value=False
+    )
+
+    result = cv.cross_validate_data({"x": 1}, cross_validation_block, eager_termination=True)
+
+    assert result is True
+    mock_target_and_save.assert_called_once_with({"x": 1})
+    mock_evaluate_condition_clause_array.assert_called_once_with([{"foo": "bar"}], True)
+    mock_evaluate_condition.assert_not_called()
+
+
+def test_evaluates_all_rules_when_eager_false_and_returns_last(mocker: MockerFixture, cv: CrossValidator) -> None:
+    """Test that cross_validate_data evaluates all rules when eager_termination is False and returns last result."""
+    mock_evaluate_condition_clause_array = mocker.patch.object(
+        cv, "_evaluate_condition_clause_array", return_value=True
+    )
+    mock_evaluate_condition = mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, False, True])
+    rules = [{"r": 1}, {"r": 2}, {"r": 3}]
+    cross_validation_block = {"apply_when": [], "rules": rules}
+
+    result = cv.cross_validate_data({"y": 2}, cross_validation_block, eager_termination=False)
+
+    assert result is True
+    assert mock_evaluate_condition.call_count == 3
+    mock_evaluate_condition.assert_has_calls(
+        [mocker.call(rules[0], False), mocker.call(rules[1], False), mocker.call(rules[2], False)]
+    )
+    mock_evaluate_condition_clause_array.assert_called_once_with([], False)
+
+
+def test_breaks_on_first_failed_rule_when_eager_true(mocker: MockerFixture, cv: CrossValidator) -> None:
+    """Test that cross_validate_data breaks on first failed rule when eager_termination is True."""
+    mock_evaluate_condition_clause_array = mocker.patch.object(
+        cv, "_evaluate_condition_clause_array", return_value=True
+    )
+    mock_evaluate_condition = mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, False, True])
+    rules = [{"r": 1}, {"r": 2}, {"r": 3}]
+    cross_validation_block = {"rules": rules}
+
+    result = cv.cross_validate_data({"z": 3}, cross_validation_block, eager_termination=True)
+
+    assert result is False
+
+    assert mock_evaluate_condition.call_count == 2
+    mock_evaluate_condition.assert_has_calls([mocker.call(rules[0], True), mocker.call(rules[1], True)])
+    mock_evaluate_condition_clause_array.assert_called_once_with([], True)
+
+
+@pytest.mark.parametrize(
+    "alias_name,value,expected_pool",
+    [("test1", 16.4, {"test1": 16.4}), ("test2", 924.6, {"test1": 13, "test2": 924.6})],
+)
+def test_save_to_alias_pool(alias_name: str, value: Any, expected_pool: dict[str, Any]) -> None:
+    """Test the function _save_to_alias_pool()"""
+    validator = CrossValidator()
+    validator._alias_pool = {"test1": 13}
+    validator._save_to_alias_pool(alias_name, value)
+    assert validator._alias_pool == expected_pool
+
+
+@pytest.mark.parametrize(
+    "pool,alias,expected",
+    [
+        ({"a": 1}, "a", 1),
+        ({"x": "Y", "z": 3.14}, "x", "Y"),
+    ],
+)
+def test_get_alias_value_returns(pool: dict[str, Any], alias: str, expected: Any) -> None:
+    """Test the function _get_alias_value()"""
+    v = CrossValidator()
+    v._alias_pool = dict(pool)
+    assert v._get_alias_value(alias, True, "sum") == expected
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_get_alias_value_raises_key_error_when_missing(eager_termination: bool) -> None:
+    """Test the function _get_alias_value() when getting unavailable keys names."""
+    v = CrossValidator()
+    v._alias_pool = {"exists": 10}
+
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Unknown alias name: missing"):
+            v._get_alias_value("missing", eager_termination=True, relationship="equal")
+        assert len(v._event_logs) == 1
+    else:
+        result = v._get_alias_value("missing", eager_termination=False, relationship="equal")
+        assert result is None
+        assert len(v._event_logs) == 1
+
+
+def test_target_and_save(mocker: MockerFixture) -> None:
+    """Test the function target_and_save()"""
+    v = CrossValidator()
+    mock_save = mocker.patch.object(v, "_save_to_alias_pool")
+    v._target_and_save({"a": 1, "b": 1, "c": "value"})
+
+    assert mock_save.call_count == 3
+
+
+@pytest.mark.parametrize(
+    "block",
+    [
+        ({"variables": {}, "constants": {}}),
+        ({"variables": {"x": "A1"}, "constants": {}}),
+        ({"variables": {}, "constants": {"k": "K1"}}),
+        ({}),
+    ],
+)
+def test_check_target_and_save_block_no_errors(block: dict[str, dict[str, Any]]) -> None:
+    """Should not append errors when only allowed keys are present."""
+    cv = CrossValidator()
+    cv.check_target_and_save_block(block, True)
+    assert len(cv._event_logs) == 0
+
+
+def test_check_target_and_save_block_message_contains_all_invalid_keys() -> None:
+    """Sanity check: when multiple invalid keys exist, logs each (not a single aggregated one)."""
+    cv = CrossValidator()
+    block: dict[str, Any] = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
+
+    cv.check_target_and_save_block(block, False)
+
+    assert len(cv._event_logs) == 3
+    assert all(any(f"Unsupported keys {k} provided." in e["message"] for e in cv._event_logs) for k in ("a", "b", "c"))
+
+
+def test_check_target_and_save_block_message_contains_all_invalid_keys_eager_termination() -> None:
+    """Sanity check: when multiple invalid keys exist with eager termination."""
+    cv = CrossValidator()
+    block: dict[str, Any] = {"variables": {}, "constants": {}, "a": {}, "b": {}, "c": {}}
+
+    with pytest.raises(ValueError):
+        cv.check_target_and_save_block(block, True)
+
+    assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "expression_block, eager_termination",
+    [
+        (
+            {"aggregation": {"operation": "add", "operands": ["alias_0", "alias_1"]}, "save_as": "alias_2"},
+            True,
+        ),
+        (
+            {
+                "aggregation": {"operation": "subtract", "operands": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            True,
+        ),
+        (
+            {
+                "aggregation": {"operation": "multiply", "operands": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            True,
+        ),
+        (
+            {"aggregation": {"operation": "add", "operands": ["alias_0", "alias_1"]}, "save_as": "alias_2"},
+            False,
+        ),
+        (
+            {
+                "aggregation": {"operation": "subtract", "operands": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            False,
+        ),
+        (
+            {
+                "aggregation": {"operation": "multiply", "operands": ["alias_0", "alias_1"]},
+                "save_as": "alias_2",
+            },
+            False,
+        ),
+    ],
+)
+def test_validate_expression_block_unknown_function(expression_block: dict[str, Any], eager_termination: bool) -> None:
+    """Unknown aggregation function detected by _validate_expression_block."""
+    cross_validator = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._validate_expression_block(expression_block, eager_termination)
+    else:
+        valid = cross_validator._validate_expression_block(expression_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "expression_block, eager_termination",
+    [
+        ({"aggregation": {"operation": "add"}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "subtract"}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "multiply", "operands": []}, "save_as": "alias_2"}, True),
+        ({"aggregation": {"operation": "add"}, "save_as": "alias_2"}, False),
+        ({"aggregation": {"operation": "subtract"}, "save_as": "alias_2"}, False),
+        ({"aggregation": {"operation": "multiply"}, "save_as": "alias_2"}, False),
+    ],
+)
+def test_validate_expression_block_missing_operands(expression_block: dict[str, Any], eager_termination: bool) -> None:
+    """Missing or empty operands detected by _validate_expression_block."""
+    cross_validator = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._validate_expression_block(expression_block, eager_termination)
+    else:
+        valid = cross_validator._validate_expression_block(expression_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, eager_termination",
+    [
+        ({"operation": "sum", "operands": ["alias_0", "alias_1"], "mode": "aggregate"}, [[], []], True),
+        ({"operation": "difference", "operands": ["alias_0", "alias_1"], "mode": "aggregate"}, [{}, {}], True),
+        (
+            {"operation": "average", "operands": ["alias_0", "alias_1"], "mode": "aggregate"},
+            [[1, 2, 3], {"a": 1, "b": 2}],
+            True,
+        ),
+        (
+            {"operation": "product", "operands": ["alias_0", "alias_1"], "mode": "aggregate"},
+            [[4, 5, 6], ["a", "b", "c"]],
+            False,
+        ),
+        (
+            {"operation": "division", "operands": ["alias_0", "alias_1"], "mode": "aggregate"},
+            [{"a": [], "b": []}, [{}, {}]],
+            False,
+        ),
+        ({"operation": "no_op", "operands": ["alias_0", "alias_1"], "mode": "aggregate"}, [[{}], []], False),
+    ],
+)
+def test_validate_expression_block_with_complex_variable_values_multiple_complex_variable(
+    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool
+) -> None:
+    """
+    Unit tests for _validate_expression_block_with_complex_variable_values() in CrossValidator when
+    multiple complex variables are selected
+    """
+    cross_validator = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._validate_expression_block_with_complex_variable_values(
+                expression_block, selected_variables, eager_termination
+            )
+    else:
+        result = cross_validator._validate_expression_block_with_complex_variable_values(
+            expression_block, selected_variables, eager_termination
+        )
+        assert result is False
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, eager_termination",
+    [
+        ({"operation": "sum", "operands": ["alias_0"]}, [[]], True),
+        ({"operation": "difference", "operands": ["alias_0"]}, [{}], True),
+        ({"operation": "average", "operands": ["alias_0"]}, [[1, 2, 3]], True),
+        ({"operation": "product", "operands": ["alias_0"]}, [{"a": 1, "b": 2, "c": 3}], False),
+        ({"operation": "division", "operands": ["alias_0"]}, [{"a": [], "b": []}], False),
+        ({"operation": "no_op", "operands": ["alias_0"]}, [[{}]], False),
+    ],
+)
+def test_validate_expression_block_with_complex_variable_values_no_mode(
+    expression_block: dict[str, Any], selected_variables: list[Any], eager_termination: bool, mocker: MockerFixture
+) -> None:
+    """
+    Unit tests for _validate_expression_block_with_complex_variable_values() in CrossValidator
+    when a complex variable is selected and the `mode` key is missing.
+    """
+    cross_validator = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._validate_expression_block_with_complex_variable_values(
+                expression_block, selected_variables, eager_termination
+            )
+    else:
+        result = cross_validator._validate_expression_block_with_complex_variable_values(
+            expression_block, selected_variables, eager_termination
+        )
+        assert result is False
+
+
+@pytest.mark.parametrize(
+    "aggregation_block, eager_termination",
+    [
+        ({"operation": "sum", "operands": ["alias_0"], "mode": "unknown"}, True),
+        ({"operation": "sum", "operands": ["alias_0"], "mode": "unknown"}, False),
+    ],
+)
+def test_validate_aggregation_block_structure_unknown_mode(
+    aggregation_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """Unknown mode value detected by _validate_aggregation_block_structure."""
+    cross_validator = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError):
+            cross_validator._validate_aggregation_block_structure(aggregation_block, eager_termination)
+    else:
+        valid = cross_validator._validate_aggregation_block_structure(aggregation_block, eager_termination)
+        assert valid is False
+    assert len(cross_validator._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, expected_result",
+    [
+        (
+            {"aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"}},
+            [[1, 2, 3]],
+            [1, 2, 3],
+        ),
+        ({"aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"}}, [[]], []),
+        (
+            {
+                "aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"},
+                "save_as": "abc",
+            },
+            [{"a": 1, "b": 2, "c": 3}],
+            [1, 2, 3],
+        ),
+        ({"aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"}}, [{}], []),
+        (
+            {
+                "aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"},
+                "save_as": "def",
+            },
+            [{"a": [], "b": []}],
+            [[], []],
+        ),
+        (
+            {"aggregation": {"operation": "no_op", "operands": ["alias_0"], "mode": "element_wise"}},
+            [[{}, {}, {}]],
+            [{}, {}, {}],
+        ),
+    ],
+)
+def test_evaluate_expression_element_wise_mode(
+    expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
+) -> None:
+    """
+    Unit tests for _evaluate_expression() in CrossValidator when a complex variable is selected
+    and `mode` is set to `element_wise`
+    """
+    cross_validator = CrossValidator()
+    mock_get_alias_value = mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
+    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
+
+    result, status = cross_validator._evaluate_expression(expression_block, False, relationship="equal")
+    assert result == expected_result
+    assert status is True
+    mock_get_alias_value.assert_called_once()
+    if "save_as" in expression_block:
+        mock_save_to_alias_pool.assert_called_once_with(alias_name=expression_block["save_as"], value=result)
+    else:
+        mock_save_to_alias_pool.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "expression_block, selected_variables, expected_result",
+    [
+        (
+            {"aggregation": {"operation": "sum", "operands": ["alias_0"], "mode": "aggregate"}},
+            [[1, 2, 3]],
+            [6],
+        ),
+        (
+            {"aggregation": {"operation": "difference", "operands": ["alias_0"], "mode": "aggregate"}},
+            [[]],
+            [None],
+        ),
+        (
+            {
+                "aggregation": {"operation": "product", "operands": ["alias_0"], "mode": "aggregate"},
+                "save_as": "abc",
+            },
+            [{"a": 1, "b": 2, "c": 3}],
+            [6],
+        ),
+        (
+            {"aggregation": {"operation": "division", "operands": ["alias_0"], "mode": "aggregate"}},
+            [{}],
+            [None],
+        ),
+        (
+            {"aggregation": {"operation": "no_op", "operands": ["a", "b", "c"]}, "save_as": "def"},
+            [2, 5, 8],
+            [2, 5, 8],
+        ),
+        (
+            {"aggregation": {"operation": "average", "operands": ["a", "b", "c", "d", "e", "f", "g", "h"]}},
+            [8, 7, 6, 5, 4, 3, 2, 1],
+            [4.5],
+        ),
+    ],
+)
+def test_evaluate_expression_aggregate_mode(
+    expression_block: dict[str, Any], selected_variables: list[Any], expected_result: Any, mocker: MockerFixture
+) -> None:
+    cross_validator = CrossValidator()
+    mocker.patch.object(cross_validator, "_get_alias_value", side_effect=selected_variables)
+    mock_save_to_alias_pool = mocker.patch.object(cross_validator, "_save_to_alias_pool")
+
+    result, status = cross_validator._evaluate_expression(expression_block, False, relationship="equal")
+    assert result == expected_result
+    assert status is True
+    if "save_as" in expression_block:
+        mock_save_to_alias_pool.assert_called_once_with(alias_name=expression_block["save_as"], value=result)
+    else:
+        mock_save_to_alias_pool.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "relationship",
+    ["equal", "greater", "greater_or_equal_to", "not_equal", "is_of_type", "regex", "is_equal_length"],
+)
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_validate_relationship_valid_values(relationship: str, eager_termination: bool) -> None:
+    """Valid relationship strings should pass with no event logs."""
+    cv = CrossValidator()
+
+    result = cv._validate_relationship(relationship, eager_termination)
+
+    assert result is True
+    assert len(cv._event_logs) == 0
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_validate_relationship_non_string(eager_termination: bool) -> None:
+    """Non-string relationship should log error; optionally raise in eager mode."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(
+            ValueError, match=r"Cross-validation error: Conditional clause relationship " r"must be a string\."
+        ):
+            cv._validate_relationship(123, eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        ok = cv._validate_relationship(123, eager_termination=False)
+        assert ok is False
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_validate_relationship_invalid_value(eager_termination: bool) -> None:
+    """Unknown relationship should log error; optionally raise in eager mode."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(
+            ValueError, match=r"Cross-validation error: Invalid conditional clause relationship " r"provided\."
+        ):
+            cv._validate_relationship("something_else", eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        ok = cv._validate_relationship("something_else", eager_termination=False)
+        assert ok is False
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "a,b,expected",
+    [
+        (1, 1, True),
+        (1, 2, False),
+        ("x", "x", True),
+        ("x", "y", False),
+        (True, True, True),
+        (True, False, False),
+    ],
+)
+def test_evaluate_equal_condition(a: Any, b: Any, expected: bool) -> None:
+    """_evaluate_equal_condition returns Python == semantics."""
+    cv = CrossValidator()
+    assert cv._evaluate_equal_condition(a, b) is expected
+
+
+@pytest.mark.parametrize(
+    "a,b,expected",
+    [
+        (2, 1, True),
+        (1, 2, False),
+        ("b", "a", True),
+        ("a", "b", False),
+    ],
+)
+def test_evaluate_greater_condition(a: Any, b: Any, expected: bool) -> None:
+    """_evaluate_greater_condition returns Python > semantics."""
+    cv = CrossValidator()
+    assert cv._evaluate_greater_condition(a, b) is expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ([None], True),
+        ([0], False),
+        ([[""]], False),
+        ([[]], False),
+    ],
+)
+def test_evaluate_is_null(value: Any, expected: bool) -> None:
+    """_evaluate_is_null checks identity to None."""
+    cv = CrossValidator()
+    assert cv._evaluate_is_null(value) is expected
+
+
+@pytest.mark.parametrize(
+    "data_type,left_value,expected",
+    [
+        (["string"], ["abc"], True),
+        (["string"], [123], False),
+        (["integer"], [7], True),
+        (["integer"], [True], False),
+        (["float"], [1.2], True),
+        (["float"], [7], False),
+        (["boolean"], [True], True),
+        (["boolean"], [0], False),
+        (["number"], [7], True),
+        (["number"], [1.2], True),
+        (["number"], [False], False),
+        (["string"], ["ok"], True),
+    ],
+)
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_is_type_supported_types(
+    data_type: str, left_value: Any, expected: bool, eager_termination: bool
+) -> None:
+    """Supported types honor bool/int nuances and case-insensitive type strings."""
+    cv = CrossValidator()
+    assert cv._evaluate_is_type(left_value, data_type, eager_termination) is expected
+    assert all(e["error"] != "Invalid data type expectation." for e in cv._event_logs)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_is_type_data_type_not_str(eager_termination: bool) -> None:
+    """Non-string data_type logs and optionally raises."""
+    cv = CrossValidator()
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Cross-validation error: Invalid type comparison\."):
+            cv._evaluate_is_type(["x"], [123], eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        valid = cv._evaluate_is_type(["x"], [123], eager_termination=False)
+        assert not valid
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_is_type_unsupported_type_string(eager_termination: bool) -> None:
+    """Unsupported type string logs and optionally raises."""
+    cv = CrossValidator()
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Cross-validation error: Unsupported data type: weird. Supported types:"):
+            cv._evaluate_is_type(["x"], ["weird"], eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        valid = cv._evaluate_is_type(["x"], ["weird"], eager_termination=False)
+        assert not valid
+        assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "text,pattern,expected",
+    [
+        ("abc", r"a.c", True),
+        ("abc", r"^a.*c$", True),
+        ("abc", r"^ab$", False),
+        ("", r"^$", True),
+    ],
+)
+def test_evaluate_regex_fullmatch(text: str, pattern: str, expected: bool) -> None:
+    """
+    Per docstring: left_hand_value is the string, right_hand_value is the regex pattern.
+    NOTE: If this test fails, check that _evaluate_regex calls re.fullmatch(pattern, text).
+    """
+    cv = CrossValidator()
+    assert cv._evaluate_regex(text, pattern) is expected
+
+
+@pytest.mark.parametrize(
+    "left,right,expected",
+    [
+        ([1, 2, 3, 4], [3, 2, 1, 4], True),  # longer lists
+        ([1, 2, 3, 4], [1, 1, 5], False),  # left longer than right
+        ([1, 1, 5], [1, 2, 3, 4], False),  # right longer than left
+        ([1], [2], True),
+        ([1, 2], [3], False),
+        ([], [], True),
+    ],
+)
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_equal_data_length_with_lists(
+    left: list[Any], right: list[Any], expected: bool, eager_termination: bool
+) -> None:
+    """List lengths are compared directly with no event log on valid inputs."""
+    cv = CrossValidator()
+
+    assert cv._evaluate_equal_data_length(left, right, eager_termination) is expected
+    assert cv._event_logs == []
+
+
+@pytest.mark.parametrize(
+    "left,right",
+    [
+        ("abc", [1, 2, 3]),
+        ([1, 2], {"a": 1}),
+        (1, 2),
+    ],
+)
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_equal_data_length_invalid_types(left: Any, right: Any, eager_termination: bool) -> None:
+    """Non-list inputs should log and optionally raise."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match=r"Cross-validation error: Invalid type comparison\."):
+            cv._evaluate_equal_data_length(left, right, eager_termination=True)
+        assert len(cv._event_logs) == 1
+    else:
+        assert cv._evaluate_equal_data_length(left, right, eager_termination=False) is False
+        assert len(cv._event_logs) == 1
+
+
+def test_evaluate_greater_condition_pairwise_lists() -> None:
+    """List comparisons should be elementwise rather than Python's lexicographic list comparison."""
+    cv = CrossValidator()
+
+    assert cv._evaluate_greater_condition([3, 5, 7], [1, 4, 6]) is True
+    assert cv._evaluate_greater_condition([3, 5, 7], [1, 8, 6]) is False
+
+
+def test_evaluate_equal_condition_pairwise_lists() -> None:
+    """Equal list comparisons should require each paired element to match."""
+    cv = CrossValidator()
+
+    assert cv._evaluate_equal_condition([1, 2, 3], [1, 2, 3]) is True
+    assert cv._evaluate_equal_condition([1, 2, 3], [1, 4, 3]) is False
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_equal_length_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_equal_length' should dispatch to _evaluate_equal_data_length with eager flag preserved."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[([1, 2], True), ([3, 4], True)])
+    mock_equal_length = mocker.patch.object(cv, "_evaluate_equal_data_length", return_value=True)
+
+    result = cv._evaluate_condition(
+        {"relationship": "is_equal_length", "left_hand": {}, "right_hand": {}}, eager_termination
+    )
+
+    assert result is True
+    mock_equal_length.assert_called_once_with([1, 2], [3, 4], eager_termination)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_short_circuits_when_validation_fails(
+    mocker: MockerFixture, eager_termination: bool
+) -> None:
+    """If _validate_condition_clause returns False, no expressions are evaluated and result is False."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=False)
+    mock_eval = mocker.patch.object(cv, "_evaluate_expression")
+
+    valid = cv._evaluate_condition({"relationship": "equal"}, eager_termination)
+
+    assert not valid
+    mock_eval.assert_not_called()
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_returns_false_when_side_not_evaluated(
+    mocker: MockerFixture, eager_termination: bool
+) -> None:
+    """If either side doesn't evaluate, the condition returns False."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("L", False), ("R", True)])
+
+    valid = cv._evaluate_condition({"relationship": "equal", "left_hand": {}, "right_hand": {}}, eager_termination)
+
+    assert not valid
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_equal_path(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Dispatch to _evaluate_equal_condition for 'equal'."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("A", True), ("B", True)])
+    mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=True)
+
+    valid = cv._evaluate_condition({"relationship": "equal", "left_hand": {}, "right_hand": {}}, eager_termination)
+
+    assert valid
+    mock_eq.assert_called_once_with("A", "B", eager_termination)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_greater_or_equal_path(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Dispatch to the dedicated greater-or-equal evaluator."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(5, True), (2, True)])
+    mock_ge = mocker.patch.object(cv, "_evaluate_greater_or_equal_condition", return_value=True)
+
+    valid = cv._evaluate_condition(
+        {"relationship": "greater_or_equal_to", "left_hand": {}, "right_hand": {}}, eager_termination
+    )
+
+    assert valid
+    mock_ge.assert_called_once_with(5, 2, eager_termination)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_greater_or_equal_condition(eager_termination: bool) -> None:
+    """Greater-or-equal should be true for both equal and greater scalar values."""
+    cv = CrossValidator()
+    assert cv._evaluate_greater_or_equal_condition(2, 2, eager_termination) is True
+    assert cv._evaluate_greater_or_equal_condition(3, 2, eager_termination) is True
+    assert cv._evaluate_greater_or_equal_condition(1, 2, eager_termination) is False
+
+
+def test_evaluate_greater_or_equal_condition_pairwise_lists() -> None:
+    """Greater-or-equal should compare lists elementwise."""
+    cv = CrossValidator()
+    assert cv._evaluate_greater_or_equal_condition([3, 5, 7], [3, 4, 7]) is True
+    assert cv._evaluate_greater_or_equal_condition([3, 5, 7], [3, 6, 7]) is False
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_not_equal_inverts_equality(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'not_equal' returns logical inversion of equality."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("foo", True), ("bar", True)])
+    mock_eq = mocker.patch.object(cv, "_evaluate_equal_condition", return_value=False)
+
+    valid = cv._evaluate_condition({"relationship": "not_equal", "left_hand": {}, "right_hand": {}}, eager_termination)
+
+    assert valid
+    mock_eq.assert_called_once_with("foo", "bar", eager_termination)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_is_of_type_passes_eager(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_of_type' should pass eager flag to _evaluate_is_type."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("text", True), ("string", True)])
+    mock_is_type = mocker.patch.object(cv, "_evaluate_is_type", return_value=True)
+
+    valid = cv._evaluate_condition({"relationship": "is_of_type", "left_hand": {}, "right_hand": {}}, eager_termination)
+
+    assert valid
+    mock_is_type.assert_called_once_with("text", "string", eager_termination)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_is_null_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_null' should evaluate only semantics of left-hand (we still provide right to enter branch)."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(None, True), ("ignored", True)])
+    mock_is_null = mocker.patch.object(cv, "_evaluate_is_null", return_value=True)
+
+    valid = cv._evaluate_condition({"relationship": "is_null", "left_hand": {}, "right_hand": {}}, eager_termination)
+
+    assert valid
+    mock_is_null.assert_called_once_with(None)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_regex_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Fallback (else) is regex."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[("abc", True), (r"a.c", True)])
+    mock_regex = mocker.patch.object(cv, "_evaluate_regex", return_value=True)
+
+    ok = cv._evaluate_condition({"relationship": "regex", "left_hand": {}, "right_hand": {}}, eager_termination)
+
+    assert ok is True
+    mock_regex.assert_called_once_with("abc", r"a.c")
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_clause_array_all_true(mocker: MockerFixture, eager_termination: bool) -> None:
+    """Array evaluation returns True when all clauses pass."""
+    cv = CrossValidator()
+    mock = mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, True, True])
+
+    valid = cv._evaluate_condition_clause_array([{}, {}, {}], eager_termination)
+
+    assert valid
+    assert mock.call_count == 3
+
+
+def test_validate_condition_clause_ok(mocker: MockerFixture) -> None:
+    """True when relationship valid, both sides present, and expression blocks pass."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    mocker.patch.object(v, "_validate_expression_block", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": {"aggregation": {}}, "right_hand": {"aggregation": {}}, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is True
+    log.assert_not_called()
+
+
+def test_validate_condition_clause_missing_both_no_eager(mocker: MockerFixture) -> None:
+    """False and logs both fields when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("left hand"), call("right hand")]
+
+
+def test_validate_condition_clause_missing_left_no_eager(mocker: MockerFixture) -> None:
+    """False and logs left when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"right_hand": 2, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("left hand")]
+
+
+def test_validate_condition_clause_missing_right_no_eager(mocker: MockerFixture) -> None:
+    """False and logs right when not eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": 1, "relationship": "equal"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    assert log.call_args_list == [call("right hand")]
+
+
+def test_validate_condition_clause_missing_both_eager_raises(mocker: MockerFixture) -> None:
+    """Raises KeyError and logs both when eager."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=True)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"relationship": "equal"}
+    with pytest.raises(KeyError):
+        v._validate_condition_clause(clause, eager_termination=True)
+    assert log.call_args_list == [call("left hand"), call("right hand")]
+
+
+def test_validate_condition_clause_invalid_relationship(mocker: MockerFixture) -> None:
+    """False when relationship validation fails."""
+    v = CrossValidator()
+    mocker.patch.object(v, "_validate_relationship", return_value=False)
+    log = mocker.patch.object(v, "_log_missing_condition_clause_field")
+    clause = {"left_hand": 1, "right_hand": 2, "relationship": "bogus"}
+    result = v._validate_condition_clause(clause, eager_termination=False)
+    assert result is False
+    log.assert_not_called()
+
+
+def test_log_missing_condition_clause_field_only() -> None:
+    """Appends one correctly shaped entry."""
+    v = CrossValidator()
+    v._event_logs = []
+    v._log_missing_condition_clause_field("left hand")
+    assert len(v._event_logs) == 1
+    e = v._event_logs[0]
+    assert e["error"] == "Missing required condition clause field"
+    assert e["message"] == "Missing the left hand field in condition clause."
+
+
+@pytest.mark.parametrize(
+    "iter_block, alias_values, expected_result",
+    [
+        # mode="filter": keep entries where field == compare_value
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+            },
+            [
+                [{"type": "A", "val": 1}, {"type": "B", "val": 2}, {"type": "A", "val": 3}],
+                "A",
+            ],
+            [{"type": "A", "val": 1}, {"type": "A", "val": 3}],
+        ),
+        # mode="filter": no entries match
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+            },
+            [
+                [{"type": "X"}, {"type": "Y"}],
+                "Z",
+            ],
+            [],
+        ),
+        # mode="enforce": all entries satisfy → [True]
+        (
+            {
+                "mode": "enforce",
+                "in": "items",
+                "field": "status",
+                "value_to_compare": "expected_status",
+                "relationship": "equal",
+            },
+            [
+                [{"status": "ok"}, {"status": "ok"}],
+                "ok",
+            ],
+            [True],
+        ),
+        # mode="enforce": not all entries satisfy → [False]
+        (
+            {
+                "mode": "enforce",
+                "in": "items",
+                "field": "status",
+                "value_to_compare": "expected_status",
+                "relationship": "equal",
+            },
+            [
+                [{"status": "ok"}, {"status": "fail"}],
+                "ok",
+            ],
+            [False],
+        ),
+    ],
+)
+def test_evaluate_for_each_block_success(
+    iter_block: dict[str, Any], alias_values: list[Any], expected_result: Any, mocker: MockerFixture
+) -> None:
+    """_evaluate_iterate_array_of_dicts returns correct filtered/enforced result."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_get_alias_value", side_effect=alias_values)
+
+    result, status = cv._evaluate_for_each_block(iter_block, eager_termination=False, outer_relationship="equal")
+    assert status is True
+    assert result == expected_result
+
+
+def test_validate_for_each_block_unknown_operator_no_eager() -> None:
+    """Unknown operator returns False and logs error when not eager."""
+    cv = CrossValidator()
+    for_each_block = {
+        "mode": "filter",
+        "in": "items",
+        "field": "x",
+        "value_to_compare": "cmp",
+        "relationship": "unknown_rel",
+    }
+    valid = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+    assert valid is False
+    assert len(cv._event_logs) == 1
+
+
+def test_validate_for_each_block_unknown_operator_eager() -> None:
+    """Unknown operator raises ValueError when eager."""
+    cv = CrossValidator()
+    for_each_block = {
+        "mode": "filter",
+        "in": "items",
+        "field": "x",
+        "value_to_compare": "cmp",
+        "relationship": "unknown_rel",
+    }
+    with pytest.raises(ValueError, match="Invalid relationship"):
+        cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
+
+
+def test_evaluate_expression_with_for_each_block_and_save_as(mocker: MockerFixture) -> None:
+    """save_as at the expression_block level is applied when using iterate_array_of_dicts."""
+    cv = CrossValidator()
+    expression_block = {
+        "for_each": {
+            "mode": "filter",
+            "in": "items",
+            "field": "type",
+            "value_to_compare": "cmp",
+            "relationship": "equal",
+        },
+        "save_as": "filtered_items",
+    }
+    array_data = [{"type": "A"}, {"type": "B"}]
+    mocker.patch.object(cv, "_get_alias_value", side_effect=[array_data, "A"])
+    mock_save = mocker.patch.object(cv, "_save_to_alias_pool")
+
+    result, status = cv._evaluate_expression(expression_block, eager_termination=False, relationship="equal")
+    assert status is True
+    assert result == [{"type": "A"}]
+    mock_save.assert_called_once_with(alias_name="filtered_items", value=[{"type": "A"}])
+
+
+def test_validate_properties_returns_early_when_type_validator_fails(mocker: MockerFixture) -> None:
+    """validate_properties propagates the invalid result from a type-specific validator."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "_metadata_number_validator", return_value=(False, "bad number property"))
+    metadata = {"properties": {"field_a": {"type": "number"}}}
+
+    valid, msg = dv.validate_properties(metadata, metadata_depth_limit=10)
+
+    assert valid is False
+    assert msg == "bad number property"
+
+
+def test_metadata_number_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_number_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad number keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_number_validator(["some_key"], {"type": "number", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad number keys"
+
+
+def test_metadata_string_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_string_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad string keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_string_validator(["some_key"], {"type": "string", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad string keys"
+
+
+def test_metadata_bool_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_bool_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad bool keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_bool_validator(["some_key"], {"type": "bool", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad bool keys"
+
+
+def test_metadata_array_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_array_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad array keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_array_validator(["some_key"], {"type": "array", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad array keys"
+
+
+def test_metadata_object_validator_returns_early_on_invalid_keys(mocker: MockerFixture) -> None:
+    """_metadata_object_validator returns the invalid result directly when key validation fails."""
+    mocker.patch(
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys",
+        return_value=(False, "bad object keys"),
+    )
+    dv = DataValidator()
+
+    valid, msg = dv._metadata_object_validator(["some_key"], {"type": "object", "extra_key": 1})
+
+    assert valid is False
+    assert msg == "bad object keys"
+
+
+def test_validate_metadata_returns_early_when_path_or_paths_missing(mocker: MockerFixture) -> None:
+    """validate_metadata propagates the invalid result when neither 'path' nor 'paths' is present."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "_validate_metadata_keys", return_value=(True, ""))
+    mocker.patch.object(dv, "_validate_has_path_or_paths", return_value=(False, "missing path"))
+
+    metadata = {"files": {"file_a": {"type": "json", "properties": {}}}}
+    valid, msg = dv.validate_metadata(
+        metadata,
+        valid_data_types={"json"},
+        address_to_data="files",
+        input_root=Path("."),
+    )
+
+    assert valid is False
+    assert msg == "missing path"
+
+
+def test_validate_data_by_type_raises_for_unsupported_type(mocker: MockerFixture) -> None:
+    """validate_data_by_type raises ValueError when the metadata type is not in the supported map."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "convert_variable_path_to_str", return_value="root.field")
+    input_path: Path = Path("path/to/input")
+
+    with pytest.raises(ValueError, match="is not valid"):
+        dv.validate_data_by_type(
+            variable_path=["root", "field"],
+            variable_properties={"type": "unsupported_type"},
+            data={"anything": []},
+            eager_termination=True,
+            properties_blob_key="blob",
+            elements_counter=mocker.MagicMock(autospec=ElementsCounter),
+            called_during_initialization=True,
+            fixable_data_types=set(),
+            input_path=input_path,
+        )
+
+
+def test_log_missing_data_raises_when_not_during_initialization() -> None:
+    """_log_missing_data raises KeyError immediately when called outside initialization."""
+    dv = DataValidator()
+
+    with pytest.raises(KeyError, match="required to update variable during runtime"):
+        dv._log_missing_data(
+            var_name="my_var",
+            variable_properties={},
+            called_during_initialization=False,
+            input_path=Path("path/to/input"),
+        )
+
+    assert any("Missing required data" in str(log) for log in dv.event_logs)
+
+
+def test_log_missing_data_raises_when_required_during_initialization(mocker: MockerFixture) -> None:
+    """_log_missing_data raises KeyError when called during initialization for a required variable."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "_is_data_required_upon_initialization", return_value=True)
+
+    with pytest.raises(KeyError, match="required for this variable upon program initialization"):
+        dv._log_missing_data(
+            var_name="my_var",
+            variable_properties={"modifiability": "required locked"},
+            called_during_initialization=True,
+            input_path=Path("path/to/input"),
+        )
+
+    assert any("Missing required data" in str(log) for log in dv.event_logs)
+
+
+def test_log_missing_data_logs_warning_when_not_required_during_initialization(mocker: MockerFixture) -> None:
+    """_log_missing_data logs a warning and does not raise when variable is optional at init."""
+    dv = DataValidator()
+    mocker.patch.object(dv, "_is_data_required_upon_initialization", return_value=False)
+
+    dv._log_missing_data(
+        var_name="my_var",
+        variable_properties={"modifiability": "unrequired unlocked"},
+        called_during_initialization=True,
+        input_path=Path("path/to/input"),
+    )
+
+    assert any("not required upon initialization" in str(log) for log in dv.event_logs)
+
+
+@pytest.mark.parametrize(
+    "modifiability, expected",
+    [
+        ("required locked", True),
+        ("required unlocked", True),
+        ("unrequired unlocked", False),
+    ],
+)
+def test_is_data_required_upon_initialization(modifiability: str, expected: bool) -> None:
+    """_is_data_required_upon_initialization returns True only for required modifiability values."""
+    dv = DataValidator()
+
+    result = dv._is_data_required_upon_initialization(
+        variable_name="my_var",
+        variable_properties={"modifiability": modifiability},
+    )
+
+    assert result is expected
+
+
+@pytest.mark.parametrize(
+    "modifiability_str, expected",
+    [
+        ("required locked", Modifiability.REQUIRED_LOCKED),
+        ("required unlocked", Modifiability.REQUIRED_UNLOCKED),
+        ("unrequired unlocked", Modifiability.UNREQUIRED_UNLOCKED),
+        ("REQUIRED LOCKED", Modifiability.REQUIRED_LOCKED),
+    ],
+)
+def test_get_variable_modifiability_valid_values(modifiability_str: str, expected: Modifiability) -> None:
+    """_get_variable_modifiability maps valid modifiability strings to the correct enum member."""
+    dv = DataValidator()
+
+    result = dv._get_variable_modifiability(
+        variable_name="my_var",
+        variable_properties={"modifiability": modifiability_str},
+    )
+
+    assert result == expected
+
+
+def test_get_variable_modifiability_invalid_value_falls_back_to_default() -> None:
+    """_get_variable_modifiability logs a warning and returns the default for unknown values."""
+    dv = DataValidator()
+
+    result = dv._get_variable_modifiability(
+        variable_name="my_var",
+        variable_properties={"modifiability": "totally invalid value"},
+    )
+
+    assert result == Modifiability.UNREQUIRED_UNLOCKED
+    assert any("Unknown modifiability entry" in str(log) for log in dv.event_logs)
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_expression_unknown_block_eager(eager_termination: bool) -> None:
+    """_evaluate_expression logs an error and raises/returns when block has no known key."""
+    cv = CrossValidator()
+    unknown_block = {"unknown_key": {"operands": ["a"]}}
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="Supported blocks are"):
+            cv._evaluate_expression(unknown_block, eager_termination=True, relationship="equal")
+    else:
+        result, evaluated = cv._evaluate_expression(unknown_block, eager_termination=False, relationship="equal")
+        assert result is None
+        assert evaluated is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_evaluate_aggregation_block_returns_none_false_when_complex_validation_fails(
+    mocker: MockerFixture,
+) -> None:
+    """_evaluate_aggregation_block returns (None, False) when complex variable validation fails."""
+    cv = CrossValidator()
+    cv._alias_pool = {"alias_a": [1, 2, 3]}
+    mocker.patch.object(cv, "_validate_expression_block_with_complex_variable_values", return_value=False)
+
+    aggregation_block = {"operation": "sum", "operands": ["alias_a"], "mode": "aggregate"}
+    result, evaluated = cv._evaluate_aggregation_block(aggregation_block, eager_termination=False, relationship="equal")
+
+    assert result is None
+    assert evaluated is False
+
+
+@pytest.mark.parametrize(
+    "alias_value, eager_termination",
+    [
+        (None, False),
+        ("not_a_list", False),
+        ([1, 2, 3], False),
+        (None, True),
+    ],
+)
+def test_resolve_for_each_source_invalid(alias_value: Any, eager_termination: bool, mocker: MockerFixture) -> None:
+    """_resolve_for_each_source returns None (or raises) when source is not a list of dicts."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_get_alias_value", return_value=alias_value)
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="must resolve to a list of dicts"):
+            cv._resolve_for_each_source("src", eager_termination=True, outer_relationship="equal")
+    else:
+        result = cv._resolve_for_each_source("src", eager_termination=False, outer_relationship="equal")
+        assert result is None
+
+    assert len(cv._event_logs) == 1
+
+
+def test_build_comparand_getter_returns_none_when_alias_unresolved(mocker: MockerFixture) -> None:
+    """_build_comparand_getter returns None when compare_value_alias cannot be resolved."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_get_alias_value", return_value=None)
+
+    result = cv._build_comparand_getter(
+        value_to_compare_alias="missing_alias",
+        field_to_compare=None,
+        eager_termination=False,
+        outer_relationship="equal",
+    )
+
+    assert result is None
+
+
+def test_build_comparand_getter_returns_callable_for_compare_field() -> None:
+    """_build_comparand_getter returns a callable extracting compare_field from each entry."""
+    cv = CrossValidator()
+
+    getter = cv._build_comparand_getter(
+        value_to_compare_alias=None,
+        field_to_compare="score",
+        eager_termination=False,
+        outer_relationship="equal",
+    )
+
+    assert getter is not None
+    assert getter({"score": 42, "other": 99}) == [42]
+    assert getter({"other": 99}) == [None]
+
+
+def test_evaluate_for_each_block_returns_none_false_when_source_fails(mocker: MockerFixture) -> None:
+    """_evaluate_for_each_block returns (None, False) when the source alias cannot be resolved."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_resolve_for_each_source", return_value=None)
+
+    iter_block = {"in": "src", "field": "x", "value_to_compare": "cmp", "relationship": "equal", "mode": "filter"}
+    result, evaluated = cv._evaluate_for_each_block(iter_block, eager_termination=False, outer_relationship="equal")
+
+    assert result is None
+    assert evaluated is False
+
+
+def test_evaluate_for_each_block_returns_none_false_when_comparand_fails(mocker: MockerFixture) -> None:
+    """_evaluate_for_each_block returns (None, False) when the comparand getter cannot be built."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_resolve_for_each_source", return_value=[{"x": 1}])
+    mocker.patch.object(cv, "_build_comparand_getter", return_value=None)
+
+    iter_block = {"in": "src", "field": "x", "value_to_compare": "cmp", "relationship": "equal", "mode": "filter"}
+    result, evaluated = cv._evaluate_for_each_block(iter_block, eager_termination=False, outer_relationship="equal")
+
+    assert result is None
+    assert evaluated is False
+
+
+@pytest.mark.parametrize(
+    "expression_block, eager_termination",
+    [
+        ({}, False),
+        ({"aggregation": {}, "for_each": {}}, False),
+        ({}, True),
+        ({"aggregation": {}, "for_each": {}}, True),
+    ],
+)
+def test_validate_expression_block_invalid_structure(expression_block: dict[str, Any], eager_termination: bool) -> None:
+    """_validate_expression_block logs an error and raises/returns False for invalid structure."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="either an 'aggregation' or a 'for_each'"):
+            cv._validate_expression_block(expression_block, eager_termination=True)
+    else:
+        result = cv._validate_expression_block(expression_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_validate_expression_block_dispatches_to_for_each_validator(mocker: MockerFixture) -> None:
+    """_validate_expression_block delegates to _validate_for_each_block_structure for for_each blocks."""
+    cv = CrossValidator()
+    mock_validate = mocker.patch.object(cv, "_validate_for_each_block_structure", return_value=True)
+
+    result = cv._validate_expression_block({"for_each": {"mode": "filter"}}, eager_termination=False)
+
+    assert result is True
+    mock_validate.assert_called_once_with({"mode": "filter"}, False)
+
+
+@pytest.mark.parametrize(
+    "aggregation_block, eager_termination",
+    [
+        ({"operands": ["a", "b"]}, False),
+        ({"operands": ["a", "b"], "operation": "no_op"}, False),
+        ({"operands": ["a", "b"]}, True),
+        ({"operands": ["a", "b"], "operation": "no_op"}, True),
+    ],
+)
+def test_validate_aggregation_block_structure_multi_operand_no_op(
+    aggregation_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """_validate_aggregation_block_structure rejects multi-operand blocks with no_op or missing function."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="cannot be 'no_op'"):
+            cv._validate_aggregation_block_structure(aggregation_block, eager_termination=True)
+    else:
+        result = cv._validate_aggregation_block_structure(aggregation_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_validate_aggregation_block_structure_returns_true_when_valid() -> None:
+    """_validate_aggregation_block_structure returns True for a well-formed aggregation block."""
+    cv = CrossValidator()
+
+    result = cv._validate_aggregation_block_structure(
+        {"operands": ["a", "b"], "operation": "sum"}, eager_termination=False
+    )
+
+    assert result is True
+    assert len(cv._event_logs) == 0
+
+
+@pytest.mark.parametrize(
+    "for_each_block, eager_termination",
+    [
+        ({"mode": "invalid"}, False),
+        ({"mode": None}, False),
+        ({}, False),
+        ({"mode": "invalid"}, True),
+    ],
+)
+def test_validate_for_each_block_structure_invalid_mode(
+    for_each_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """_validate_for_each_block_structure rejects blocks with an invalid or missing mode."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="'mode' must be"):
+            cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
+    else:
+        result = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "for_each_block, eager_termination",
+    [
+        ({"mode": "filter", "value_to_compare": "cmp", "relationship": "equal"}, False),
+        ({"mode": "filter", "in": "src", "value_to_compare": "cmp", "relationship": "equal"}, False),
+        ({"mode": "filter", "value_to_compare": "cmp", "relationship": "equal"}, True),
+    ],
+)
+def test_validate_for_each_block_structure_missing_required_keys(
+    for_each_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """_validate_for_each_block_structure rejects blocks missing 'in' or 'field'."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="Missing required key"):
+            cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
+    else:
+        result = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+@pytest.mark.parametrize(
+    "for_each_block, eager_termination",
+    [
+        ({"mode": "filter", "in": "src", "field": "x", "relationship": "equal"}, False),
+        (
+            {
+                "mode": "filter",
+                "in": "src",
+                "field": "x",
+                "value_to_compare": "cmp",
+                "field_to_compare": "y",
+                "relationship": "equal",
+            },
+            False,
+        ),
+        ({"mode": "filter", "in": "src", "field": "x", "relationship": "equal"}, True),
+    ],
+)
+def test_validate_for_each_block_structure_invalid_comparison_target(
+    for_each_block: dict[str, Any], eager_termination: bool
+) -> None:
+    """_validate_for_each_block_structure rejects blocks with both or neither comparison keys."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="Exactly one of"):
+            cv._validate_for_each_block_structure(for_each_block, eager_termination=True)
+    else:
+        result = cv._validate_for_each_block_structure(for_each_block, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_validate_for_each_block_structure_returns_true_when_valid() -> None:
+    """_validate_for_each_block_structure returns True for a well-formed for_each block."""
+    cv = CrossValidator()
+
+    result = cv._validate_for_each_block_structure(
+        {
+            "mode": "filter",
+            "in": "src",
+            "field": "x",
+            "value_to_compare": "cmp",
+            "relationship": "equal",
+        },
+        eager_termination=False,
+    )
+
+    assert result is True
+    assert len(cv._event_logs) == 0
+
+
+def test_validate_condition_clause_sets_valid_false_when_expression_block_invalid(
+    mocker: MockerFixture,
+) -> None:
+    """_validate_condition_clause returns False when an expression block is structurally invalid."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_relationship", return_value=True)
+    mocker.patch.object(cv, "_validate_expression_block", return_value=False)
+
+    condition_clause = {
+        "relationship": "equal",
+        "left_hand": {"aggregation": {"operands": ["a"]}},
+        "right_hand": {"aggregation": {"operands": ["b"]}},
+    }
+    result = cv._validate_condition_clause(condition_clause, eager_termination=False)
+
+    assert result is False
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_pairwise_condition_unequal_list_lengths(eager_termination: bool) -> None:
+    """_evaluate_pairwise_condition logs an error and raises/returns False for unequal length lists."""
+    cv = CrossValidator()
+
+    if eager_termination:
+        with pytest.raises(ValueError, match="equal length"):
+            cv._evaluate_pairwise_condition([1, 2, 3], [1, 2], lambda a, b: a == b, eager_termination=True)
+    else:
+        result = cv._evaluate_pairwise_condition([1, 2, 3], [1, 2], lambda a, b: a == b, eager_termination=False)
+        assert result is False
+
+    assert len(cv._event_logs) == 1
+
+
+def test_evaluate_condition_clause_array_returns_false_on_unsatisfied_clause(
+    mocker: MockerFixture,
+) -> None:
+    """_evaluate_condition_clause_array logs and returns False when a clause is not satisfied."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_evaluate_condition", side_effect=[True, False, True])
+
+    clauses = [{"relationship": "equal"}, {"relationship": "equal"}, {"relationship": "equal"}]
+    result = cv._evaluate_condition_clause_array(clauses, eager_termination=False)
+
+    assert result is False
+    assert any("Unsatisfied condition clause" in str(log) for log in cv._event_logs)

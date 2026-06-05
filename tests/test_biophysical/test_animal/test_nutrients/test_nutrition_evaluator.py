@@ -1,6 +1,6 @@
 from dataclasses import asdict
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf as lazy_fixture
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
@@ -344,6 +344,33 @@ def test_calculate_protein_supplied(
             ),
             21.6667,
         ),
+        # 0.0 DM case (returns 0.0)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=0.0,
+                wet_matter=15.0,
+                ndf_supply=8.0,
+                forage_ndf_supply=1.5,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            0.0,
+        ),
     ],
 )
 def test_calculate_neutral_detergent_fiber_supplied(
@@ -413,6 +440,33 @@ def test_calculate_neutral_detergent_fiber_supplied(
             ),
             10.0,
         ),
+        # 0.0 DM (returns 0.0)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=0.0,
+                wet_matter=15.0,
+                ndf_supply=3.0,
+                forage_ndf_supply=3.0,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            0.0,
+        ),
     ],
 )
 def test_calculate_forage_neutral_detergent_fiber_supplied(
@@ -429,7 +483,7 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (lazy_fixture("nutrition_supply_base"), 9.6667),
+        (lazy_fixture("nutrition_supply_base"), -9.6667),
         # Low fat case (fat supply is below the required amount)
         (
             NutritionSupply(
@@ -455,7 +509,7 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
                 starch_supply=2.0,
                 byproduct_supply=1.0,
             ),
-            -2.83333,
+            2.83333,
         ),
         # Sufficient fat case (meets the minimum requirement)
         (
@@ -482,7 +536,34 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
                 starch_supply=2.0,
                 byproduct_supply=1.0,
             ),
-            9.6667,
+            -9.6667,
+        ),
+        # 0.0 DM (0.0 returned)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=0.0,
+                wet_matter=15.0,
+                ndf_supply=3.0,
+                forage_ndf_supply=1.5,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            0.0,
         ),
     ],
 )
@@ -509,7 +590,7 @@ def test_calculate_fat_supplied(
                 metabolizable_protein=700.0,
                 calcium=120.0,
                 phosphorus=55.0,
-                dry_matter=7.0,
+                dry_matter=6.0,
                 wet_matter=15.0,
                 ndf_supply=3.0,
                 forage_ndf_supply=1.5,
@@ -551,7 +632,7 @@ def test_calculate_fat_supplied(
                 starch_supply=2.0,
                 byproduct_supply=1.0,
             ),
-            2.0,
+            1.0,
         ),
     ],
 )

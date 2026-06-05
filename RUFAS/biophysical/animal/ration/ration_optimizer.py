@@ -10,7 +10,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed, NutrientStandard
 
 from RUFAS.output_manager import OutputManager
 
@@ -20,12 +20,37 @@ class RationConfig:
     RationConfig provides a structured way to represent the collection of animal requirements and feed supply
     information for the ration formulation process.
 
+    Parameters
+    ----------
+    nutrient_standard : NutrientStandard
+        Nutrient standard used in supply and requirement calculations.
+    animal_requirements : NutritionRequirements
+        Nutrition requirements for pen, used in constraint methods.
+    pen_available_feeds : list[Feed], optional
+        List of available feeds in pen.
+    initial_dry_matter_requirement : float
+        Dry matter intake requirement at start of ration formulation.
+    initial_protein_requirement : float
+        Metabolizable protein requirement at start of ration formulation.
+    pen_average_body_weight : float
+        Average body weight in pen, used in constraint methods.
+    pen_average_enteric_methane : float, optional
+        Average enteric methane in the pen.
+    pen_average_urine_nitrogen : float, optional
+        Average urine nitrogen in the pen.
+
     Attributes
     ----------
+    nutrient_standard : NutrientStandard
+        Nutrient standard used in supply and requirement calculations.
     animal_requirements : NutritionRequirements
         Nutrition requirements for pen, used in constraint methods.
     pen_average_body_weight : float
         Average body weight in pen, used in constraint methods.
+    initial_dry_matter_requirement : float
+        Dry matter intake requirement at start of ration formulation.
+    initial_protein_requirement : float
+        Metabolizable protein requirement at start of ration formulation.
     feeds_used : list[Feed]
         List of Feeds used in ration formulation.
     price_list : list[float]
@@ -41,40 +66,32 @@ class RationConfig:
     EE_list : list[float]
         EE for each feed used in ration formulation.
 
-    Parameters
-    ----------
-    animal_requirements : NutritionRequirements
-        Nutrition requirements for pen, used in constraint methods.
-    pen_available_feeds : list[Feed], optional
-        List of available feeds in pen.
-    pen_average_body_weight : float
-        Average body weight in pen, used in constraint methods.
-
     """
 
     def __init__(
         self,
+        nutrient_standard: NutrientStandard,
         animal_requirements: NutritionRequirements,
         pen_available_feeds: Optional[list[Feed]],
+        initial_dry_matter_requirement: float,
+        initial_protein_requirement: float,
         pen_average_body_weight: float = 0,
+        pen_average_enteric_methane: float | None = None,
+        pen_average_urine_nitrogen: float | None = None,
     ) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
         is a list, it should have a length corresponding to the decision vector.
-
-        Parameters
-        ----------
-        animal_requirements : NutritionRequirements
-            Nutrition requirements for pen, used in constraint methods.
-        pen_available_feeds : list[Feed], optional
-            List of Feeds used in ration formulation.
-        pen_average_body_weight : float
-            Average body weight in pen, used in constraint methods.
         """
+        self.nutrient_standard = nutrient_standard
         if pen_available_feeds is None:
             pen_available_feeds = []
         self.animal_requirements = animal_requirements
         self.pen_average_body_weight = pen_average_body_weight
+        self.pen_average_enteric_methane = pen_average_enteric_methane
+        self.pen_average_urine_nitrogen = pen_average_urine_nitrogen
+        self.initial_dry_matter_requirement: float = initial_dry_matter_requirement
+        self.initial_protein_requirement: float = initial_protein_requirement
 
         self.feeds_used = pen_available_feeds
 
@@ -91,6 +108,8 @@ class RationOptimizer:
     Nonlinear programming methods to optimally formulate a ration by comparing feed supply and the requirements for
     animals in a given pen.
 
+    Notes
+    -----
     This class sets an objective, defines constraints, attempts optimization using scipy's minimize method, and
     reports unsuccessful optimization attempts to the user.
 
@@ -111,18 +130,18 @@ class RationOptimizer:
         self.cow_constraints: list[dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] | str] = []
         self.heifer_constraints: list[dict[str, Callable[[Any, Any], float] | tuple[RationConfig] | str] | str] = []
 
-    def set_constraints(self, arguments: tuple[RationConfig]) -> None:
+    def set_constraints(self, ration_config: RationConfig) -> None:
         """
         Defines lists of constraint methods to use for different pens.
 
         Parameters
         ----------
-        arguments : tuple[RationConfig]
+        ration_config : tuple[RationConfig]
             RationConfig used in constraint methods.
 
         """
 
-        self.constraint_functions = [
+        self.NRC_constraint_functions = [
             self.NE_total_constraint,
             self.NE_maintenance_and_activity_constraint,
             self.NE_lactation_constraint,
@@ -138,14 +157,35 @@ class RationOptimizer:
             self.DMI_constraint_upper,
             self.DMI_constraint_lower,
         ]
-
-        self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
-
-        self.heifer_constraints = [
-            cons
-            for cons in self.cow_constraints
-            if cons["fun"] not in [self.NE_total_constraint, self.NE_lactation_constraint]
+        self.NASEM_constraint_functions = [
+            self.calcium_constraint,
+            self.phosphorus_constraint,
+            self.protein_constraint_lower,
+            self.protein_constraint_upper,
+            self.NDF_constraint_lower,
+            self.NDF_constraint_upper,
+            self.forage_NDF_constraint,
+            self.fat_constraint,
+            self.DMI_constraint_upper,
+            self.DMI_constraint_lower,
+            self.NASEM_net_energy_constraint,
         ]
+
+        if ration_config.nutrient_standard is NutrientStandard.NRC:
+            self.cow_constraints = [
+                {"type": "ineq", "fun": func, "args": (ration_config,)} for func in self.NRC_constraint_functions
+            ]
+
+            self.heifer_constraints = [
+                constraint
+                for constraint in self.cow_constraints
+                if constraint["fun"] not in [self.NE_total_constraint, self.NE_lactation_constraint]
+            ]
+        elif ration_config.nutrient_standard is NutrientStandard.NASEM:
+            self.cow_constraints = [
+                {"type": "ineq", "fun": func, "args": (ration_config,)} for func in self.NASEM_constraint_functions
+            ]
+            self.heifer_constraints = self.cow_constraints
 
     @staticmethod
     def convert_decision_vec_to_feeds(
@@ -156,7 +196,7 @@ class RationOptimizer:
 
         Parameters
         ----------
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Stored information relevant to ration formulation.
         decision_vector : numpy.ndarray
             The decision vector used in scipy.minimize.
@@ -212,15 +252,12 @@ class RationOptimizer:
         """
         Constraint method for total net energy, as sum of net energy required for lactation, pregnancy, maintenance,
         growth, and activity. Only applicable to lactating cows.
-        Total energy supply here assumed to be the "largest" supply of net energy available for any individual
-        requirement.
-        This constraint is a simple check that the supply exceeds the requirement.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
@@ -228,6 +265,12 @@ class RationOptimizer:
         float
             The difference between supplied and required total net energy.
             Non-negative value indicates that supply meets or exceeds the requirement for total net energy.
+
+        Notes
+        -----
+        Total energy supply here assumed to be the "largest" supply of net energy available for any individual
+        requirement.
+        This constraint is a simple check that the supply exceeds the requirement.
 
         """
         feeds, _, actual_digestible_energy, actual_metabolizable_energy = RationOptimizer._calculate_NE_parameters(
@@ -258,8 +301,7 @@ class RationOptimizer:
         decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig
     ) -> float:
         """
-        Constraint method for maintenance and activity.
-        This constraint is a simple check that the supply exceeds the requirement.
+        Constraint method for maintenance and activity to check if the supply exceeds the requirement.
 
         Parameters
         ----------
@@ -298,7 +340,7 @@ class RationOptimizer:
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
@@ -324,16 +366,58 @@ class RationOptimizer:
         )
 
     @staticmethod
-    def NE_growth_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
+    def NASEM_net_energy_constraint(
+        decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig
+    ) -> float:
         """
-        Constraint method for net energy for growth.
-        This constraint is a simple check that the supply exceeds the requirement.
+        Constraint method for net energy for lactation to check if the supply exceeds the requirement.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
+            Collection of animal requirements and feed supply information for the ration formulation process.
+
+        Returns
+        -------
+        float
+            Non-negative value indicates that supply is greater than the requirements for lactation.
+
+        Notes
+        -----
+        Applicable to all animal classes, differing from NRC net energy calculations.
+
+        """
+        feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration, decision_vector)
+        dry_matter_intake = sum(decision_vector)
+        total_starch = sum([feed.amount * feed.info.starch * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
+
+        total_metabolizable_energy = NutritionSupplyCalculator.calculate_NASEM_metabolizable_energy(
+            feeds=feeds,
+            dry_matter_intake=dry_matter_intake,
+            body_weight=ration_configuration.pen_average_body_weight,
+            total_starch=total_starch,
+            enteric_methane=ration_configuration.pen_average_enteric_methane,
+            urinary_nitrogen=ration_configuration.pen_average_urine_nitrogen,
+        )
+        actual_lactation_net_energy_supply = NutritionSupplyCalculator.calculate_NASEM_net_energy(
+            total_metabolizable_energy=total_metabolizable_energy
+        )
+        actual_lactation_net_energy_requirement = ration_configuration.animal_requirements.total_energy_requirement
+
+        return actual_lactation_net_energy_supply - actual_lactation_net_energy_requirement
+
+    @staticmethod
+    def NE_growth_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
+        """
+        Constraint method for net energy for growth to check if the supply exceeds the requirement.
+
+        Parameters
+        ----------
+        decision_vector : numpy.ndarray
+            The decision vector used in the scipy minimize method.
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
@@ -364,14 +448,14 @@ class RationOptimizer:
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
         tuple[list[FeedInRation], float, dict[int, float], dict[int, float]]
-            List of Feeds for calculations.
-            Actual metabolizable energy.
+            - List of Feeds for calculations.
+            - Actual metabolizable energy.
 
         """
         feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration, decision_vector)
@@ -387,14 +471,13 @@ class RationOptimizer:
     @staticmethod
     def phosphorus_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for phosphorus.
-        This constraint is a simple check that the supply exceeds the requirement.
+        Constraint method for phosphorus to check if the supply exceeds the requirement.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
@@ -415,14 +498,13 @@ class RationOptimizer:
     @staticmethod
     def protein_constraint_lower(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for the lower bound of metabolizable protein.
-        This constraint is a simple check that the supply exceeds the requirement.
+        Constraint method for the lower bound of metabolizable protein to check if the supply exceeds the requirement.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
@@ -432,7 +514,9 @@ class RationOptimizer:
 
         """
         metabolizable_protein_supply, actual_metabolizable_protein_requirement = (
-            RationOptimizer._calculate_protein_constraint_parameters(decision_vector, ration_configuration)
+            RationOptimizer._calculate_protein_constraint_parameters(
+                decision_vector, ration_configuration, use_initial_requirement=False
+            )
         )
 
         return metabolizable_protein_supply - actual_metabolizable_protein_requirement
@@ -440,15 +524,13 @@ class RationOptimizer:
     @staticmethod
     def protein_constraint_upper(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for the upper bound of metabolizable protein.
-        This constraint is a simple check that the supply does not exceed the limit.
-        See the upper limit factor as defined in AnimalModuleConstants.
+        Constraint method for the upper bound of metabolizable protein to check if the supply does not exceed the limit.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
@@ -458,7 +540,9 @@ class RationOptimizer:
 
         """
         metabolizable_protein_supply, actual_metabolizable_protein_requirement = (
-            RationOptimizer._calculate_protein_constraint_parameters(decision_vector, ration_configuration)
+            RationOptimizer._calculate_protein_constraint_parameters(
+                decision_vector, ration_configuration, use_initial_requirement=True
+            )
         )
 
         return (
@@ -467,7 +551,7 @@ class RationOptimizer:
 
     @staticmethod
     def _calculate_protein_constraint_parameters(
-        decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig, use_initial_requirement: bool
     ) -> tuple[float, float]:
         """
         Calculates the necessary parameters for protein constraints.
@@ -476,14 +560,14 @@ class RationOptimizer:
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
         -------
         tuple[float, float]
-            Metabolizable protein supply.
-            Actual metabolizable protein requirement.
+            - Metabolizable protein supply.
+            - Actual metabolizable protein requirement.
 
         """
         feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration, decision_vector)
@@ -498,20 +582,22 @@ class RationOptimizer:
             actual_tdn_percentages=actual_tdn_percentages,
             body_weight=ration_configuration.pen_average_body_weight,
         )
-        actual_metabolizable_protein_requirement = ration_configuration.animal_requirements.metabolizable_protein
+        if use_initial_requirement:
+            actual_metabolizable_protein_requirement = ration_configuration.initial_protein_requirement
+        else:
+            actual_metabolizable_protein_requirement = ration_configuration.animal_requirements.metabolizable_protein
         return metabolizable_protein_supply, actual_metabolizable_protein_requirement
 
     @staticmethod
     def calcium_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for calcium.
-        This constraint is a simple check that the supply exceeds the requirement.
+        Constraint method for calcium to check if the supply exceeds the requirement.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
@@ -530,14 +616,14 @@ class RationOptimizer:
     @staticmethod
     def NDF_constraint_lower(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for the minimum amount of NDF in a ration.
-        This constraint is a simple check that the supply exceeds the amount of NDF desired for a formulated ration.
+        Constraint method for the minimum amount of NDF in a ration to check if the supply exceeds
+        the amount of NDF desired for a formulated ration.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_config: RationConfig object
+        ration_config: RationConfig
             Attributes are animal requirement and feed supply information required for optimization
 
         Returns
@@ -560,14 +646,14 @@ class RationOptimizer:
     @staticmethod
     def NDF_constraint_upper(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for the maximum amount of NDF in a ration.
-        This constraint is a simple check that the supply does not exceed the NDF desired for a formulated ration.
+        Constraint method for the maximum amount of NDF in a ration to check if the supply does not exceed
+        the NDF desired for a formulated ration.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_config: RationConfig object
+        ration_config: RationConfig
             Attributes are animal requirement and feed supply information required for optimization
 
         Returns
@@ -590,9 +676,8 @@ class RationOptimizer:
     @staticmethod
     def forage_NDF_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for the minimum amount of forage NDF in a ration.
-        This constraint is a simple check that the supply exceeds the amount of forage NDF desired
-        for a formulated ration.
+        Constraint method for the minimum amount of forage NDF in a ration to check that the supply exceeds
+        the amount of forage NDF desired for a formulated ration.
 
         Parameters
         ----------
@@ -620,15 +705,14 @@ class RationOptimizer:
     @staticmethod
     def fat_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for fat.
-        This constraint is a simple check that the supply does not exceed the percentage of fat desired for a
+        Constraint method for fat to check if the supply does not exceed the percentage of fat desired for a
         formulated ration.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
             The decision vector used in the scipy minimize method.
-        ration_configuration: RationConfig object
+        ration_configuration: RationConfig
             Collection of animal requirements and feed supply information for the ration formulation process.
 
         Returns
@@ -649,8 +733,8 @@ class RationOptimizer:
     @staticmethod
     def DMI_constraint_lower(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for the minimum amount of dry matter intake.
-        This constraint is a simple check that the formulated ration supplies enough dry matter.
+        Constraint method for the minimum amount of dry matter intake to check if the formulated ration supplies
+        enough dry matter.
 
         Parameters
         ----------
@@ -676,8 +760,8 @@ class RationOptimizer:
     @staticmethod
     def DMI_constraint_upper(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         """
-        Constraint method for the maximum amount of dry matter intake.
-        This constraint is a simple check that the formulated ration does not supply too much dry matter.
+        Constraint method for the maximum amount of dry matter intake to check that the formulated ration
+        does not supply too much dry matter.
 
         Parameters
         ----------
@@ -695,7 +779,7 @@ class RationOptimizer:
         return float(
             -(sum(decision_vector))
             + (
-                ration_configuration.animal_requirements.dry_matter
+                ration_configuration.initial_dry_matter_requirement
                 * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
             )
         )
@@ -704,12 +788,7 @@ class RationOptimizer:
     def objective(decision_vector: npt.NDArray[np.float64], ration_config: RationConfig) -> float:
         """
         Sets up the objective function in the optimize function for the non-linear
-        program. Whenever the paramert x is used, it refers to the "decision vetor
-        of the NLP" which means it is a list of solutions where each value in the
-        list corresponds to the amount of a given feed (kg) in the formulated diet.
-        The goal of this NLP is to minimize the cost of all feeds while satisfying
-        all "constraints", which just means the diet fulfills the average nutrient
-        requirements in the pen.
+        program.
 
         Parameters
         ----------
@@ -722,26 +801,45 @@ class RationOptimizer:
         -------
         float
 
+        Notes
+        -----
+        Whenever the paramert x is used, it refers to the "decision vetor of the NLP" which means it is a list of
+        solutions where each value in the list corresponds to the amount of a given feed (kg) in the formulated diet.
+        The goal of this NLP is to minimize the cost of all feeds while satisfying all "constraints", which means
+        the diet fulfills the average nutrient requirements in the pen.
+
         """
         return float(sum(np.multiply(decision_vector, ration_config.price_list)))
 
     def attempt_optimization(
         self,
+        nutrient_standard: NutrientStandard,
         pen_average_body_weight: float,
+        pen_average_enteric_methane: float | None,
+        pen_average_urine_nitrogen: float | None,
         requirements: NutritionRequirements,
+        initial_dry_matter_requirement: float,
+        initial_protein_requirement: float,
         pen_available_feeds: list[Feed],
         animal_combination: AnimalCombination,
         previous_ration: dict[RUFAS_ID | str, float | str] | None = None,
+        user_defined_ration_dictionary: dict[RUFAS_ID, float] | None = None,
+        user_defined_ration_tolerance: float | None = None,
     ) -> tuple[OptimizeResult, RationConfig]:
         """
-        Function that sets up the nutrients and requirements lists into structured
-        inputs for non-linear optimization.
+        Sets up the nutrients and requirements lists into structured inputs for non-linear optimization.
 
         Parameters
         ----------
+        nutrient_standard : NutrientStandard
+            Nutrient standard used in supply and requirement calculations.
         pen_average_body_weight : float
             Average body weight of animals in pen.
-        requirements : AnimalRequirements
+        pen_average_enteric_methane : float
+            Average enteric methane produced in pen, used in constraint methods, g.
+        pen_average_urine_nitrogen : float
+            Average urine nitrogen generated in pen, used in constraint methods, kg.
+        requirements : NutritionRequirements
             Summary of requirements for a group of animals.
         pen_available_feeds : list[Feed]
             A list of Feeds available during ration formulation.
@@ -749,13 +847,16 @@ class RationOptimizer:
             The animal combination to optimize the ration for.
         previous_ration : dict[RUFAS_ID, str | float] | None
             Ration from previous formulation interval, if available.
+        user_defined_ration_dictionary : dict[RUFAS_ID, float]
+            Dictionary of feed IDs and inclusion rate.
+        user_defined_ration_tolerance : float
+            Allowable tolerance of user defined ration inclusion rate.
 
         Returns
         -------
-        OptimizeResult
-            Scipy object with information regarding the minimization attempt.
-        RationConfig
-            RationCofig object.
+        tuple
+            - Scipy object with the result of the optimization.
+            - RationConfig object containing the optimized ration.
 
         Notes
         -----
@@ -763,16 +864,35 @@ class RationOptimizer:
         [AN.RAT.1]
 
         """
-        ration_config = RationConfig(requirements, pen_available_feeds, pen_average_body_weight)
+        sorted_pen_available_feeds = sorted(pen_available_feeds, key=lambda feed: feed.rufas_id)
+        ration_config = RationConfig(
+            nutrient_standard,
+            requirements,
+            sorted_pen_available_feeds,
+            initial_dry_matter_requirement,
+            initial_protein_requirement,
+            pen_average_body_weight,
+            pen_average_enteric_methane,
+            pen_average_urine_nitrogen,
+        )
+        sorted_previous_ration = dict(sorted(previous_ration.items())) if previous_ration else None
+        initial_decision_vector = np.array(
+            self._build_initial_value(sorted_previous_ration, ration_config), dtype=float
+        )
 
-        initial_decision_vector = np.array(self._build_initial_value(previous_ration, ration_config), dtype=float)
-
-        bounds = self._build_bounds(ration_config)
+        if user_defined_ration_dictionary:
+            sorted_user_defined_ration_dictionary = dict(sorted(user_defined_ration_dictionary.items()))
+            bounds = self._build_bounds_user_defined_ration(
+                ration_config=ration_config,
+                user_defined_ration_dictionary=sorted_user_defined_ration_dictionary,
+                user_defined_ration_tolerance=user_defined_ration_tolerance,
+            )
+        else:
+            bounds = self._build_bounds(ration_config)
 
         initial_decision_vector = self._check_initial_bounds(bounds, initial_decision_vector)
-        arguments = (ration_config,)
 
-        self.set_constraints(arguments=arguments)
+        self.set_constraints(ration_config=ration_config)
 
         constraints_to_use = self._select_constraints(animal_combination)
 
@@ -782,7 +902,7 @@ class RationOptimizer:
             method="SLSQP",
             bounds=bounds,
             constraints=constraints_to_use,
-            args=arguments,
+            args=ration_config,
         )
 
         return optimized_ration_attempt, ration_config
@@ -791,6 +911,7 @@ class RationOptimizer:
     def _check_initial_bounds(
         bounds: list[tuple[float, float]], initial_decision_vector: np.ndarray[tuple[int, ...], np.dtype]
     ) -> np.ndarray[tuple[int, ...], np.dtype]:
+        """Checks the initial bounds of the optimization attempt."""
         for i in range(0, len(initial_decision_vector)):
             if initial_decision_vector[i] < bounds[i][0] or initial_decision_vector[i] > bounds[i][1]:
                 initial_decision_vector[i] = np.clip(initial_decision_vector[i], bounds[i][0], bounds[i][1])
@@ -812,6 +933,54 @@ class RationOptimizer:
         """Zips min/max lists into solver bounds."""
         return list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
 
+    @staticmethod
+    def _build_bounds_user_defined_ration(
+        ration_config: RationConfig,
+        user_defined_ration_dictionary: dict[RUFAS_ID, float],
+        user_defined_ration_tolerance: float,
+    ) -> list[tuple[float, float]]:
+        """
+        Builds the initial decision vector (`x0`) for the optimizer for a user defined ration.
+
+        Parameters
+        ----------
+        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+            Collection of animal requirements and feed supply information for ration formulation.
+        user_defined_ration_dictionary : dict[RUFAS_ID, float]
+            Dictionary of feeds and their percentage of dry matter intake prediction for a ration.
+        user_defined_ration_tolerance : float
+            Allowable +/- variance in each of the defined ration inclusion percentage values.
+
+        Returns
+        -------
+        list[tuple[float, float]]
+            List of upper and lower bounds for each feed ingredient.
+        """
+        feed_bound_list = list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
+        user_defined_boundlist = []
+        udr_tolerance = user_defined_ration_tolerance
+        ration_key_list = sorted([int(key) for key in user_defined_ration_dictionary.keys()])
+        for key in ration_key_list:
+            target_lower = (
+                user_defined_ration_dictionary[key]
+                / 100
+                * (1 - udr_tolerance)
+                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_REQUIREMENT_BOOST)
+            )
+            target_upper = (
+                user_defined_ration_dictionary[key]
+                / 100
+                * (1 + udr_tolerance)
+                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_REQUIREMENT_BOOST)
+            )
+            targetbounds = (max(0.0, target_lower), target_upper)
+            user_defined_boundlist.append(targetbounds)
+
+        user_defined_boundlist_trimmed = [
+            (max(t1[0], t2[0]), min(t1[1], t2[1])) for t1, t2 in zip(feed_bound_list, user_defined_boundlist)
+        ]
+        return user_defined_boundlist_trimmed
+
     def _select_constraints(self, animal_combination: AnimalCombination) -> Sequence[dict[str, Any]]:
         """Returns the pre-computed constraint set based on animal type."""
         if animal_combination is AnimalCombination.LAC_COW:
@@ -822,6 +991,14 @@ class RationOptimizer:
             AnimalCombination.GROWING_AND_CLOSE_UP,
         ):
             return self.heifer_constraints
+        OutputManager().add_error(
+            "Ration Optimization Error",
+            f"Invalid animal combination: {animal_combination}",
+            info_map={
+                "class": self.__class__.__name__,
+                "function": self._select_constraints.__name__,
+            },
+        )
         raise ValueError(f"Invalid animal combination: {animal_combination}")
 
     @staticmethod
@@ -831,8 +1008,7 @@ class RationOptimizer:
         ration_config: RationConfig,
     ) -> bool:
         """
-        Helper function to check a solution dictionary to see if a given constraint
-            in a list of constraints was met.
+        Helper function to check a solution dictionary to see if a given constraint in a list of constraints was met.
 
         Parameters
         ----------
@@ -840,7 +1016,7 @@ class RationOptimizer:
             solution.x array from minimize function used in ration_NLP.py
         constraint: dict[str, Any]
             constraint function as defined in ration_NLP.py
-        ration_config : RationConfig object
+        ration_config : RationConfig
             Attributes are animal requirement and feed supply information required for optimization
 
         Returns
@@ -868,20 +1044,17 @@ class RationOptimizer:
         Parameters
         ----------
         solution_x: numpy nd array, e.g. npt.NDArray
-            solution.x is from minimize function used in ration_NLP.py,
-                solution obj itself is returned as  <dict class 'scipy.optimize._optimize.OptimizeResult'>
-
+            solution.x is from minimize function used in ration_NLP.py, solution obj itself is returned as
+            ``<dict class 'scipy.optimize._optimize.OptimizeResult'>``
         constraints: list[dict[str, Callable]]
             list of constraint functions as defined in ration_NLP.py
-
-        ration_config : RationConfig object
+        ration_config : RationConfig
             Attributes are animal requirement and feed supply information required for optimization
 
         Returns
         -------
-        list[dict[str,Callable]]
-            the same type of list as the constraints themselves
-                just filtered such that the ones that failed are returned
+        list[dict[str, Callable]]
+            the same type of list as the constraints themselves filtered such that the ones that failed are returned
         """
         return list(
             filter(
@@ -899,16 +1072,12 @@ class RationOptimizer:
         pen_id: RUFAS_ID,
         pen_available_feeds: Any,
         average_nutrient_requirements: NutritionRequirements,
+        initial_dry_matter_requirement: float,
+        initial_protein_requirement: float,
         sim_day: int,
-    ) -> None:
+    ) -> list[str]:
         """
         Handle and log failed constraints during the ration optimization process.
-
-        This method identifies and logs the constraints that failed during the optimization
-        process for a specific pen of animals. It gathers relevant information about the
-        failed attempt, including the simulation day, the number of attempts, the failed
-        constraints, the attempted ration, and the pen's nutrient requirements. This
-        information is then added to the output manager via a variable.
 
         Parameters:
         -----------
@@ -925,16 +1094,26 @@ class RationOptimizer:
         pen_available_feeds : AvailableFeedsTypedDict
             A dictionary of available feeds for ration formulation.
         average_nutrient_requirements : NutritionRequirements
-            The pen's average (or other summary statistic) requirements used in ration formulation.
+            The pen's average requirements used in ration formulation.
+        initial_dry_matter_requirement : float
+            Dry matter intake requirement at start of ration formulation.
+        initial_protein_requirement : float
+            Metabolizable protein requirement at start of ration formulation.
         sim_day : int
             Day of simulation.
-        info_map : dict[str, Any]
-            A dictionary containing additional information to be logged with the failed
-            constraints summary.
 
         Returns:
         --------
-        None
+        list[str]
+            List of which constraints were failed.
+
+        Notes
+        -----
+        This method identifies and logs the constraints that failed during the optimization process for a specific pen
+        of animals. It gathers relevant information about the failed attempt, including the simulation day, the number
+        of attempts, the failed constraints, the attempted ration, and the pen's nutrient requirements. This
+        information is then added to the output manager via a variable.
+
         """
         om = OutputManager()
 
@@ -957,6 +1136,8 @@ class RationOptimizer:
             "constraints_failed_dict": constraints_failed_list,
             "ration_attempted": self.make_ration_from_solution(pen_available_feeds, solution),
             "pen requirements": average_nutrient_requirements,
+            "initial_dry_matter_requirement": initial_dry_matter_requirement,
+            "initial_protein_requirement": initial_protein_requirement,
         }
         fail_summary_units = {
             "simulation day": MeasurementUnits.SIMULATION_DAY,
@@ -964,18 +1145,19 @@ class RationOptimizer:
             "constraints_failed_dict": MeasurementUnits.UNITLESS,
             "ration_attempted": MeasurementUnits.UNITLESS,
             "pen requirements": {
-                "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
-                "NEa_requirement": MeasurementUnits.MEGACALORIES,
-                "NEg_requirement": MeasurementUnits.MEGACALORIES,
-                "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
-                "NEl_requirement": MeasurementUnits.MEGACALORIES,
-                "MP_requirement": MeasurementUnits.GRAMS,
-                "Ca_requirement": MeasurementUnits.GRAMS,
-                "P_req": MeasurementUnits.GRAMS,
-                "DMIest_requirement": MeasurementUnits.KILOGRAMS,
-                "avg_BW": MeasurementUnits.KILOGRAMS,
-                "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS,
+                "maintenance_energy": MeasurementUnits.MEGACALORIES,
+                "growth_energy": MeasurementUnits.MEGACALORIES,
+                "pregnancy_energy": MeasurementUnits.MEGACALORIES,
+                "lactation_energy": MeasurementUnits.MEGACALORIES,
+                "metabolizable_protein": MeasurementUnits.GRAMS,
+                "calcium": MeasurementUnits.GRAMS,
+                "phosphorus": MeasurementUnits.GRAMS,
+                "process_based_phosphorus": MeasurementUnits.GRAMS,
+                "dry_matter": MeasurementUnits.KILOGRAMS,
+                "activity_energy": MeasurementUnits.MEGACALORIES,
             },
+            "initial_dry_matter_requirement": MeasurementUnits.KILOGRAMS,
+            "initial_protein_requirement": MeasurementUnits.GRAMS,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -987,3 +1169,5 @@ class RationOptimizer:
             fail_summary,
             dict(info_map, **{"units": fail_summary_units}),
         )
+
+        return constraints_failed_list

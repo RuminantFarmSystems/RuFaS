@@ -12,6 +12,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 @pytest.fixture
@@ -30,6 +31,7 @@ def stored_manure() -> ManureStream:
         volume=100.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -49,6 +51,7 @@ def received_manure() -> ManureStream:
         volume=10.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -140,7 +143,7 @@ def test_process_manure_cover_behaviors(
             dummy_conditions.precipitation * GeneralConstants.MM_TO_M * anaerobic_lagoon._surface_area
         )
         received_manure.volume += expected_precip_volume
-        received_manure.water += expected_precip_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+        received_manure.water += expected_precip_volume * UserConstants.WATER_DENSITY_KG_PER_M3
 
     result = anaerobic_lagoon.process_manure(dummy_conditions, dummy_time)
 
@@ -161,6 +164,13 @@ def test_process_manure_cover_behaviors(
     mock_report_processor_output.assert_has_calls(
         [
             call("storage_methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+            call(
+                "outdoor_storage_manure_temperature",
+                25.0,
+                "process_manure",
+                MeasurementUnits.DEGREES_CELSIUS,
+                dummy_time.simulation_day,
+            ),
             call(
                 "storage_methane_burned",
                 0.12 if expect_flare else 0.0,
@@ -220,6 +230,7 @@ def test_apply_methane_emissions_no_flare(
         volume=0.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10,
     )
     anaerobic_lagoon._manure_to_process = stored_manure
 
@@ -229,17 +240,15 @@ def test_apply_methane_emissions_no_flare(
 
     expected_total = expected_total
     expected_burned = expected_burned
-    mass_loss = expected_total * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+    mass_loss = expected_total * ManureConstants.VS_TO_METHANE_LOSS_RATIO
 
     assert total == expected_total
     assert burned == expected_burned
     assert stored_manure.total_solids == pytest.approx(35.0 - mass_loss, rel=1e-6)
     assert stored_manure.degradable_volatile_solids == pytest.approx(
-        20.0 - 2.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
+        20.0 - 2.0 * ManureConstants.VS_TO_METHANE_LOSS_RATIO, rel=1e-6
     )
-    assert stored_manure.non_degradable_volatile_solids == pytest.approx(
-        10.0 - 1.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
-    )
+    assert stored_manure.non_degradable_volatile_solids == 6.6675
 
 
 def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:
@@ -261,6 +270,7 @@ def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: Mock
         volume=5.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10,
     )
     anaerobic_lagoon._manure_to_process = stored_manure
     mock_calculate_ammonia_emissions = mocker.patch.object(

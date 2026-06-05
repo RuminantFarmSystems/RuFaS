@@ -1,10 +1,16 @@
 from typing import Any, cast
+from unittest.mock import MagicMock
+
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
+from RUFAS.biophysical.manure.storage.bedded_pack import BeddedPack
+from RUFAS.biophysical.manure.storage.storage import Storage
+from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
@@ -15,10 +21,116 @@ def test_processor_init_error() -> None:
         Processor(name="test processor", is_housing_emissions_calculator=True)  # type: ignore[abstract]
 
 
-# TODO: test with a Storage processor object. Issue #2515.
-def test_check_manure_stream_compatibility() -> None:
+@pytest.mark.parametrize(
+    "storage_processor, manure_stream, expected_result",
+    [
+        (
+            AnaerobicLagoon(
+                name="test_lagoon",
+                cover=StorageCover.NO_COVER,
+                storage_time_period=10,
+                surface_area=100,
+                capacity=1000,
+            ),
+            ManureStream(
+                water=1000.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=20.0,
+                phosphorus=5.0,
+                potassium=8.0,
+                ash=2.0,
+                non_degradable_volatile_solids=15.0,
+                degradable_volatile_solids=25.0,
+                total_solids=50.0,
+                volume=1.5,
+                methane_production_potential=0.24,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10,
+            ),
+            True,
+        ),
+        (
+            AnaerobicLagoon(
+                name="test_lagoon",
+                cover=StorageCover.NO_COVER,
+                storage_time_period=10,
+                surface_area=100,
+                capacity=1000,
+            ),
+            ManureStream(
+                water=1000.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=20.0,
+                phosphorus=5.0,
+                potassium=8.0,
+                ash=2.0,
+                non_degradable_volatile_solids=15.0,
+                degradable_volatile_solids=25.0,
+                total_solids=50.0,
+                volume=1.5,
+                methane_production_potential=0.24,
+                pen_manure_data=MagicMock(auto_spec=PenManureData),
+                bedding_non_degradable_volatile_solids=10,
+            ),
+            False,
+        ),
+        (
+            BeddedPack(
+                name="test_lagoon",
+                is_mixed=True,
+                storage_time_period=10,
+                surface_area=100,
+                cover=StorageCover.NO_COVER,
+            ),
+            ManureStream(
+                water=1000.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=20.0,
+                phosphorus=5.0,
+                potassium=8.0,
+                ash=2.0,
+                non_degradable_volatile_solids=15.0,
+                degradable_volatile_solids=25.0,
+                total_solids=50.0,
+                volume=1.5,
+                methane_production_potential=0.24,
+                pen_manure_data=None,
+                bedding_non_degradable_volatile_solids=10,
+            ),
+            False,
+        ),
+        (
+            BeddedPack(
+                name="test_lagoon",
+                is_mixed=True,
+                storage_time_period=10,
+                surface_area=100,
+                cover=StorageCover.NO_COVER,
+            ),
+            ManureStream(
+                water=1000.0,
+                ammoniacal_nitrogen=10.0,
+                nitrogen=20.0,
+                phosphorus=5.0,
+                potassium=8.0,
+                ash=2.0,
+                non_degradable_volatile_solids=15.0,
+                degradable_volatile_solids=25.0,
+                total_solids=50.0,
+                volume=1.5,
+                methane_production_potential=0.24,
+                pen_manure_data=MagicMock(auto_spec=PenManureData),
+                bedding_non_degradable_volatile_solids=10,
+            ),
+            True,
+        ),
+    ],
+)
+def test_check_manure_stream_compatibility(
+    storage_processor: Storage, manure_stream: ManureStream, expected_result: bool
+) -> None:
     """Tests that ManureStreams are correctly checked for compatibility."""
-    pass
+    assert storage_processor.check_manure_stream_compatibility(manure_stream) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -100,6 +212,7 @@ def mock_separator() -> Separator:
         ash_efficiency=0.3,
         volatile_solids_efficiency=0.2,
         total_solids_efficiency=0.1,
+        processor_type="ScrewPress",
     )
     return separator
 
@@ -120,6 +233,7 @@ def manure_stream() -> ManureStream:
         volume=1.5,
         methane_production_potential=0.24,
         pen_manure_data=None,
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -148,7 +262,7 @@ def test_report_manure_stream_via_process_manure(
         {
             "class": "Separator",
             "function": "_report_manure_stream",
-            "prefix": "Manure.Separator.separator_type.TestSeparator",
+            "prefix": "Manure.Separator.ScrewPress.TestSeparator",
             "simulation_day": 42,
             "units": MeasurementUnits.KILOGRAMS,
         },
@@ -172,6 +286,7 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: RufasT
         "total_volatile_solids": 40.0,
         "methane_production_potential": 0.24,
         "pen_manure_data": None,
+        "bedding_non_degradable_volatile_solids": 23,
     }
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
     mock_separator._report_manure_stream(manure_dict, "test_stream", time.simulation_day)
@@ -227,20 +342,6 @@ def test_report_manure_stream_mismatched_keys(
             "simulation_day": 42,
         },
     )
-
-
-@pytest.mark.parametrize("temp, expected", [(-10.0, 0.0), (0.0, 0.0), (15.0, 15.0), (35.0, 35.0), (45.0, 35.0)])
-def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> None:
-    """Test that the temperature of manure in outdoor storages is calculated correctly."""
-    actual = Processor._determine_outdoor_storage_temperature(temp)
-
-    assert actual == expected
-
-
-@pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])
-def test_determine_barn_temperature(air_temp: float, expected: float) -> None:
-    """Tests the adjustment of barn temperature."""
-    assert Processor._determine_barn_temperature(air_temp) == expected
 
 
 @pytest.mark.parametrize(

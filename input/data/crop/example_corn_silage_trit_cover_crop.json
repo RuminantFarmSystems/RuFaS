@@ -1,0 +1,30 @@
+{
+    "crop_schedules": [
+
+{
+            "crop_species": "corn_silage",
+            "planting_years": [2013],
+            "pattern_repeat": 7,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [135],
+            "harvest_years": [2013],
+            "harvest_days": [258],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled"
+
+        },
+        {
+            "crop_species": "triticale_silage",
+            "planting_years": [2013],
+            "pattern_repeat": 7,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [274],
+            "harvest_years": [2014],
+            "harvest_days": [106],
+            "harvest_operations": ["kill_only"],
+            "harvest_type": "scheduled"
+        }
+]
+}

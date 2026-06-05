@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 
@@ -19,6 +19,7 @@ from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import
     herd_manager,
     mock_animal,
     mock_sold_animal_typed_dict,
+    mock_stillborn_animal_typed_dict,
 )
 
 assert config_json is not None
@@ -28,6 +29,7 @@ assert mock_get_data_side_effect is not None
 assert mock_herd is not None
 assert herd_manager is not None
 assert mock_sold_animal_typed_dict is not None
+assert mock_stillborn_animal_typed_dict is not None
 
 
 def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[list[Animal], dict[str, float]]:
@@ -55,7 +57,7 @@ def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[li
         if calving_to_pregnancy_time > 0
     ]
     expected_average_calving_to_pregnancy_time = (
-        sum(calving_to_pregnancy_times) / number_of_cows if number_of_cows > 0 else 0
+        sum(calving_to_pregnancy_times) / len(calving_to_pregnancy_times) if len(calving_to_pregnancy_times) > 0 else 0
     )
 
     return cows, {
@@ -167,7 +169,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 0,
-                animal_constants.LOW_PROD_CULL: 0,
+                animal_constants.OVERSUPPLY_CULL: 0,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -178,7 +180,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             0,
             {
                 animal_constants.DEATH_CULL: 0.0,
-                animal_constants.LOW_PROD_CULL: 0.0,
+                animal_constants.OVERSUPPLY_CULL: 0.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -191,7 +193,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 5,
-                animal_constants.LOW_PROD_CULL: 0,
+                animal_constants.OVERSUPPLY_CULL: 0,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -202,7 +204,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             5,
             {
                 animal_constants.DEATH_CULL: 100.0,
-                animal_constants.LOW_PROD_CULL: 0.0,
+                animal_constants.OVERSUPPLY_CULL: 0.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -216,7 +218,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 5,
-                animal_constants.LOW_PROD_CULL: 5,
+                animal_constants.OVERSUPPLY_CULL: 5,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -227,7 +229,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             10,
             {
                 animal_constants.DEATH_CULL: 50.0,
-                animal_constants.LOW_PROD_CULL: 50.0,
+                animal_constants.OVERSUPPLY_CULL: 50.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -241,7 +243,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 3,
-                animal_constants.LOW_PROD_CULL: 2,
+                animal_constants.OVERSUPPLY_CULL: 2,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -252,7 +254,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             10,
             {
                 animal_constants.DEATH_CULL: 30.0,
-                animal_constants.LOW_PROD_CULL: 20.0,
+                animal_constants.OVERSUPPLY_CULL: 20.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -267,7 +269,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 2,
-                animal_constants.LOW_PROD_CULL: 0,
+                animal_constants.OVERSUPPLY_CULL: 0,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -278,7 +280,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             10,
             {
                 animal_constants.DEATH_CULL: 20.0,
-                animal_constants.LOW_PROD_CULL: 0.0,
+                animal_constants.OVERSUPPLY_CULL: 0.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -307,8 +309,8 @@ def test_calculate_cull_reason_stats_percent(
 
 @pytest.mark.parametrize(
     "number_of_parity_1_cows, number_of_parity_2_cows, number_of_parity_3_cows, "
-    "number_of_parity_4_cows, number_of_parity_5_cows",
-    [(0, 0, 0, 0, 0), (10, 8, 15, 10, 10)],
+    "number_of_parity_4_cows, number_of_parity_5_cows, number_of_parity_6_or_more_cows",
+    [(0, 0, 0, 0, 0, 0), (10, 8, 15, 10, 10, 8)],
 )
 def test_update_cow_parity_statistics(
     number_of_parity_1_cows: int,
@@ -316,6 +318,7 @@ def test_update_cow_parity_statistics(
     number_of_parity_3_cows: int,
     number_of_parity_4_cows: int,
     number_of_parity_5_cows: int,
+    number_of_parity_6_or_more_cows: int,
     herd_manager: HerdManager,
 ) -> None:
     """Unit test for _update_cow_parity_statistics()"""
@@ -325,13 +328,17 @@ def test_update_cow_parity_statistics(
         + number_of_parity_3_cows
         + number_of_parity_4_cows
         + number_of_parity_5_cows
+        + number_of_parity_6_or_more_cows
     )
-    number_of_parity_greater_than3_cows = number_of_parity_4_cows + number_of_parity_5_cows
+    number_of_parity_greater_than5_cows = number_of_parity_6_or_more_cows
     parity_1_cows, parity_1_stats = mock_cows_with_specific_parity(number_of_parity_1_cows, parity=1)
     parity_2_cows, parity_2_stats = mock_cows_with_specific_parity(number_of_parity_2_cows, parity=2)
     parity_3_cows, parity_3_stats = mock_cows_with_specific_parity(number_of_parity_3_cows, parity=3)
     parity_4_cows, parity_4_stats = mock_cows_with_specific_parity(number_of_parity_4_cows, parity=4)
     parity_5_cows, parity_5_stats = mock_cows_with_specific_parity(number_of_parity_5_cows, parity=5)
+    parity_6_or_more_cows, parity_6_or_more_stats = mock_cows_with_specific_parity(
+        number_of_parity_6_or_more_cows, parity=6
+    )
 
     expected_num_cow_for_parity = {
         "1": number_of_parity_1_cows,
@@ -339,7 +346,7 @@ def test_update_cow_parity_statistics(
         "3": number_of_parity_3_cows,
         "4": number_of_parity_4_cows,
         "5": number_of_parity_5_cows,
-        "greater_than_3": number_of_parity_greater_than3_cows,
+        "greater_than_5": number_of_parity_greater_than5_cows,
     }
     expected_parity_percent = {
         "1": number_of_parity_1_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
@@ -347,16 +354,17 @@ def test_update_cow_parity_statistics(
         "3": number_of_parity_3_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
         "4": number_of_parity_4_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
         "5": number_of_parity_5_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
-        "greater_than_3": (
-            number_of_parity_greater_than3_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0
+        "greater_than_5": (
+            number_of_parity_greater_than5_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0
         ),
     }
 
     herd_manager.herd_statistics.cow_num = total_number_of_cows
-    herd_manager.cows = parity_1_cows + parity_2_cows + parity_3_cows + parity_4_cows + parity_5_cows
+    herd_manager.cows = (
+        parity_1_cows + parity_2_cows + parity_3_cows + parity_4_cows + parity_5_cows + parity_6_or_more_cows
+    )
     herd_manager.herd_statistics.reset_parity()
     herd_manager._update_cow_parity_statistics()
-    parity_greater_than3_stats = {key: (parity_4_stats[key] + parity_5_stats[key]) / 2 for key in parity_4_stats}
 
     assert herd_manager.herd_statistics.num_cow_for_parity == expected_num_cow_for_parity
     assert herd_manager.herd_statistics.percent_cow_for_parity == expected_parity_percent
@@ -367,7 +375,7 @@ def test_update_cow_parity_statistics(
             "3": parity_3_stats["average_age"],
             "4": parity_4_stats["average_age"],
             "5": parity_5_stats["average_age"],
-            "greater_than_3": parity_greater_than3_stats["average_age"],
+            "greater_than_5": parity_6_or_more_stats["average_age"],
         }
     )
     assert herd_manager.herd_statistics.avg_age_for_calving == pytest.approx(
@@ -377,7 +385,7 @@ def test_update_cow_parity_statistics(
             "3": parity_3_stats["average_age_for_calving"],
             "4": parity_4_stats["average_age_for_calving"],
             "5": parity_5_stats["average_age_for_calving"],
-            "greater_than_3": parity_greater_than3_stats["average_age_for_calving"],
+            "greater_than_5": parity_6_or_more_stats["average_age_for_calving"],
         }
     )
     assert herd_manager.herd_statistics.avg_calving_to_preg_time == pytest.approx(
@@ -387,7 +395,7 @@ def test_update_cow_parity_statistics(
             "3": parity_3_stats["average_calving_to_pregnancy_time"],
             "4": parity_4_stats["average_calving_to_pregnancy_time"],
             "5": parity_5_stats["average_calving_to_pregnancy_time"],
-            "greater_than_3": parity_greater_than3_stats["average_calving_to_pregnancy_time"],
+            "greater_than_5": parity_6_or_more_stats["average_calving_to_pregnancy_time"],
         }
     )
 
@@ -525,7 +533,7 @@ def test_update_sold_and_died_cow_statistics(
 ) -> None:
     """Unit test for _update_sold_and_died_cow_statistics()"""
     cull_reasons = [
-        animal_constants.LOW_PROD_CULL,
+        animal_constants.OVERSUPPLY_CULL,
         animal_constants.LAMENESS_CULL,
         animal_constants.INJURY_CULL,
         animal_constants.MASTITIS_CULL,
@@ -590,13 +598,14 @@ def test_update_sold_and_died_cow_statistics(
             cull_reason=cow.cull_reason,
             days_in_milk=cow.days_in_milk,
             parity=cow.reproduction.calves,
+            genetic_history=str(cow.genetic_history),
         )
         for cow in sold_and_died_cows
     ]
 
     current_cull_reason_stats = {
         animal_constants.DEATH_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.LOW_PROD_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.OVERSUPPLY_CULL: randint(0, num_total_sold_and_died_cows),
         animal_constants.LAMENESS_CULL: randint(0, num_total_sold_and_died_cows),
         animal_constants.INJURY_CULL: randint(0, num_total_sold_and_died_cows),
         animal_constants.MASTITIS_CULL: randint(0, num_total_sold_and_died_cows),
@@ -608,8 +617,8 @@ def test_update_sold_and_died_cow_statistics(
     expected_cull_reason_stats = {
         animal_constants.DEATH_CULL: current_cull_reason_stats[animal_constants.DEATH_CULL]
         + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DEATH_CULL]),
-        animal_constants.LOW_PROD_CULL: current_cull_reason_stats[animal_constants.LOW_PROD_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PROD_CULL]),
+        animal_constants.OVERSUPPLY_CULL: current_cull_reason_stats[animal_constants.OVERSUPPLY_CULL]
+        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.OVERSUPPLY_CULL]),
         animal_constants.LAMENESS_CULL: current_cull_reason_stats[animal_constants.LAMENESS_CULL]
         + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LAMENESS_CULL]),
         animal_constants.INJURY_CULL: current_cull_reason_stats[animal_constants.INJURY_CULL]
@@ -639,6 +648,7 @@ def test_update_sold_and_died_cow_statistics(
             cull_reason=cow.cull_reason,
             days_in_milk=cow.days_in_milk,
             parity=cow.reproduction.calves,
+            genetic_history=str(cow.genetic_history),
         )
         for cow in sold_cows
     ]
@@ -647,13 +657,15 @@ def test_update_sold_and_died_cow_statistics(
         "1": randint(0, num_total_sold_and_died_cows),
         "2": randint(0, num_total_sold_and_died_cows),
         "3": randint(0, num_total_sold_and_died_cows),
-        "greater_than_3": randint(0, num_total_sold_and_died_cows),
+        "4": randint(0, num_total_sold_and_died_cows),
+        "5": randint(0, num_total_sold_and_died_cows),
+        "greater_than_5": randint(0, num_total_sold_and_died_cows),
     }
     herd_manager.herd_statistics.parity_culling_stats_range = current_parity_culling_stats_range
     expected_parity_culling_stats_range = current_parity_culling_stats_range.copy()
     for cow in sold_and_died_cows:
-        if cow.calves > 3:
-            expected_parity_culling_stats_range["greater_than_3"] += 1
+        if cow.calves > 5:
+            expected_parity_culling_stats_range["greater_than_5"] += 1
         else:
             expected_parity_culling_stats_range[str(cow.calves)] += 1
 
@@ -711,6 +723,7 @@ def test_update_sold_heiferII_statistics(
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history=str(heiferII.genetic_history),
         )
         for heiferII in sold_heiferIIs
     ]
@@ -754,6 +767,7 @@ def test_update_sold_newborn_calf_statistics(
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history=str(calf.genetic_history),
         )
         for calf in sold_calves
     ]
@@ -762,6 +776,34 @@ def test_update_sold_newborn_calf_statistics(
 
     assert herd_manager.herd_statistics.sold_calf_num == expected_sold_calf_num
     assert herd_manager.herd_statistics.sold_calves_info == expected_sold_calves_info
+
+
+def test_update_stillborn_calf_statistics(
+    mock_stillborn_animal_typed_dict: StillbornCalfTypedDict, herd_manager: HerdManager
+) -> None:
+    """Unit test for _update_stillborn_newborn_calf_statistics()"""
+    num_stillborn_calves = randint(0, 100)
+    stillborn_calves = [
+        mock_animal(animal_type=AnimalType.CALF, id=i, stillborn_day=randint(0, 200), body_weight=uniform(0.0, 350))
+        for i in range(num_stillborn_calves)
+    ]
+
+    current_stillborn_calf_num = randint(0, 500)
+    current_stillborn_calves_info = [mock_stillborn_animal_typed_dict for _ in range(current_stillborn_calf_num)]
+
+    herd_manager.herd_statistics.stillborn_calf_num = current_stillborn_calf_num
+    herd_manager.herd_statistics.stillborn_calf_info = current_stillborn_calves_info
+
+    expected_stillborn_calf_num = current_stillborn_calf_num + num_stillborn_calves
+    expected_stillborn_calves_info = current_stillborn_calves_info + [
+        StillbornCalfTypedDict(id=calf.id, birth_weight=calf.birth_weight, stillborn_day=calf.stillborn_day)
+        for calf in stillborn_calves
+    ]
+
+    herd_manager._update_stillborn_calf_statistics(stillborn_calves)
+
+    assert herd_manager.herd_statistics.stillborn_calf_num == expected_stillborn_calf_num
+    assert herd_manager.herd_statistics.stillborn_calf_info == expected_stillborn_calves_info
 
 
 def test_update_cow_reproduction_statistics(herd_manager: HerdManager) -> None:
@@ -947,3 +989,37 @@ def test_update_average_cow_parity(herd_manager: HerdManager) -> None:
     herd_manager._update_average_cow_parity()
 
     assert herd_manager.herd_statistics.avg_parity_num == pytest.approx(expected_average_cow_parity)
+
+
+def test_update_total_enteric_methane_merges_and_accumulates(herd_manager: HerdManager) -> None:
+    """_update_total_enteric_methane should merge and accumulate emissions by animal type and gas key."""
+    herd_manager.herd_statistics.total_enteric_methane = {AnimalType.LAC_COW: {"CH4": 10.0, "CO2": 5.0}}
+
+    digestive_outputs = [
+        {
+            AnimalType.LAC_COW: {
+                "CH4": 2.5,
+                "N2O": 1.0,
+            }
+        },
+        {
+            AnimalType.HEIFER_I: {
+                "CH4": 3.0,
+            }
+        },
+        {
+            AnimalType.LAC_COW: {
+                "CO2": 4.0,
+            }
+        },
+    ]
+
+    herd_manager._update_total_enteric_methane(digestive_outputs)
+
+    totals = herd_manager.herd_statistics.total_enteric_methane[AnimalType.LAC_COW]
+
+    assert totals["CH4"] == pytest.approx(12.5)
+    assert totals["CO2"] == pytest.approx(9.0)
+    assert totals["N2O"] == pytest.approx(1.0)
+
+    assert AnimalType.HEIFER_I not in herd_manager.herd_statistics.total_enteric_methane

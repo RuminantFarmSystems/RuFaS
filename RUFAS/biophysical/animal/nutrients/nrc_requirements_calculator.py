@@ -10,7 +10,7 @@ from .nutrition_requirements_calculator import NutritionRequirementsCalculator
 
 
 class NRCRequirementsCalculator(NutritionRequirementsCalculator):
-    """Animal requirements calculator class, based on NRC's methodology."""
+    """Animal requirements calculator class based on NRC's methodology."""
 
     @classmethod
     def calculate_requirements(
@@ -79,6 +79,8 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Number of days since birth (days).
         TDN_percentage : float
             Percentage of Total Digestible Nutrients in previously fed ration (%).
+        process_based_phosphorus_requirement : float
+            The phosphorus requirement (kg).
 
         Returns
         -------
@@ -201,6 +203,12 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        Energy requirements for activity are not included within calculations for maintenance.
+
+        References
+        ----------
+        .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        Chapter 2 "Energy",pp. 18-25, 2001.
         [AN.NRC.1]
         [AN.NRC.2]
         [AN.NRC.3]
@@ -208,12 +216,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         [AN.NRC.5]
         [AN.NRC.6]
         [AN.NRC.7]
-        Energy requirements for activity are not included within calculations for maintenance.
-
-        References
-        ----------
-        .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
-        Chapter 2 "Energy",pp. 18-25, 2001.
 
         """
         calf_birth_weight = mature_body_weight * 0.06275 if day_of_pregnancy else 0.0
@@ -263,10 +265,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         average_daily_gain_heifer : float
             Average daily gain (grams per day).
 
-        Notes
-        ------
-        [AN.NRC.13], [AN.NRC.14], [AN.NRC.15], [AN.NRC.16], [AN.NRC.17], [AN.NRC.18], [AN.NRC.19]
-        [AN.NRC.20], [AN.NRC.21], [AN.NRC.22], [AN.NRC.23], [AN.NRC.24]
         Returns
         -------
         tuple[float, float, float]
@@ -276,6 +274,8 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 11 "Growth", pp. 234-243, 2001.
+        [AN.NRC.13], [AN.NRC.14], [AN.NRC.15], [AN.NRC.16], [AN.NRC.17], [AN.NRC.18], [AN.NRC.19]
+        [AN.NRC.20], [AN.NRC.21], [AN.NRC.22], [AN.NRC.23], [AN.NRC.24]
 
         """
         mature_shrunk_body_weight = 0.96 * mature_body_weight
@@ -320,7 +320,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
-        [AN.NRC.25], [AN.NRC.26]
         Day_of_pregnancy are counted from 190 day_of_pregnancy once pregnancy is confirmed. Otherwise, this nutritional
         requirement is assumed to be zero.
 
@@ -328,6 +327,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
             National Academic Press, Chapter 2 "Energy", pp. 21-22, 2001.
+        [AN.NRC.25], [AN.NRC.26]
 
         """
         if day_of_pregnancy is None:
@@ -395,8 +395,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
-         [AN.NRC.29], [AN.NRC.31], [AN.NRC.32],[AN.NRC.33], [AN.NRC.34],[AN.NRC.35],
-         [AN.NRC.36], [AN.NRC.37],[AN.NRC.38]
         bacteria_estimate: Bacteria metabolizable protein production (g).
         TDN: Total digestible nutrients
         maintenance: Metabolizable protein requirement for maintenance (g).
@@ -410,6 +408,8 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
             National Academic Press, Chapter 5 "Protein and Amino acids",pp. 67-69. 2001;
+        [AN.NRC.29], [AN.NRC.31], [AN.NRC.32],[AN.NRC.33], [AN.NRC.34],[AN.NRC.35],
+        [AN.NRC.36], [AN.NRC.37],[AN.NRC.38]
 
         """
 
@@ -451,7 +451,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             metabolizable_protein_requirement = maintenance + metabolizable_growth + pregnancy + lactation
         elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
             metabolizable_protein_requirement = maintenance + metabolizable_growth + pregnancy
-        return metabolizable_protein_requirement
+        return float(metabolizable_protein_requirement)
 
     @classmethod
     def _calculate_calcium_requirement(
@@ -481,10 +481,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         milk_production: float
             Milk yield (kg/d).
 
-        Notes
-        ------
-        [AN.NRC.39],[AN.NRC.41], [AN.NRC.43], [AN.NRC.45],[AN.NRC.47], [AN.NRC.49]
-
         Returns
         -------
         float
@@ -494,6 +490,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 106-109. 2001.
+        [AN.NRC.39],[AN.NRC.41], [AN.NRC.43], [AN.NRC.45],[AN.NRC.47], [AN.NRC.49]
 
         """
         if animal_type in [AnimalType.LAC_COW]:
@@ -553,10 +550,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         dry_matter_intake_estimate : float
             Estimated dry matter intake (kg/d).
 
-        Notes
-        -------
-        [AN.NRC.42], [AN.NRC.44], [AN.NRC.46],[AN.NRC.48], [AN.NRC.50]
-
         Returns
         -------
         float
@@ -566,6 +559,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
+        [AN.NRC.42], [AN.NRC.44], [AN.NRC.46],[AN.NRC.48], [AN.NRC.50]
 
         """
         growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
@@ -630,7 +624,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
-        [AN.NRC.51], [AN.NRC.52], [AN.NRC.53], [AN.NRC.54], [AN.NRC.55]
         The sum of dry matter intake of each feed is assumed to be less than
         dry matter intake estimation (Sum of Feed < dry_matter_intake_estimate).
 
@@ -638,6 +631,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 1 "Dry Matter Intake", pp. 4; and pp. 325, 2001 (Equations 1 and 2), and pp. 326 for heifers
+        [AN.NRC.51], [AN.NRC.52], [AN.NRC.53], [AN.NRC.54], [AN.NRC.55]
 
         """
         if net_energy_diet_concentration < 1.0:
@@ -696,7 +690,6 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
-        [AN.NRC.8],[AN.NRC.9], [AN.NRC.10], [AN.NRC.11], [AN.NRC.12]
         Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance. Grazing
         system and hilly topography will cost additional energy. Grazing is not implemented yet in the current version
         of code.
@@ -705,6 +698,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         ----------
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
             8th edition." National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
+        [AN.NRC.8],[AN.NRC.9], [AN.NRC.10], [AN.NRC.11], [AN.NRC.12]
 
         """
         distance_km = distance * GeneralConstants.M_TO_KM

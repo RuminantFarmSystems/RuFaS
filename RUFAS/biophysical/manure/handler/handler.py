@@ -7,6 +7,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.user_constants import UserConstants
 
 
 class Handler(Processor):
@@ -64,6 +65,10 @@ class Handler(Processor):
         manure_stream : ManureStream
             The ManureStream instance being checked for compatibility.
 
+        Raises
+        ------
+        ValueError
+            If manure stream is not compatible.
         """
         info_map = {"class": self.__class__.__name__, "function": self.receive_manure.__name__}
         if not self.check_manure_stream_compatibility(manure_stream):
@@ -84,6 +89,11 @@ class Handler(Processor):
             Current weather and environmental conditions that manure is being processed in.
         time : RufasTime
             RufasTime instance containing the simulations temporal information.
+
+        Raises
+        ------
+        TypeError
+            If ManureStream is NoneType.
 
         Returns
         -------
@@ -155,7 +165,7 @@ class Handler(Processor):
         manure_water = self.determine_manure_water(self.manure_stream.water, total_cleaning_water_volume)
 
         manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - ammonia_emission)
-        nitrogen = self.manure_stream.nitrogen
+        manure_total_nitrogen = max(0.0, self.manure_stream.nitrogen - ammonia_emission)
         phosphorus = self.manure_stream.phosphorus
         potassium = self.manure_stream.potassium
         ash = self.manure_stream.ash
@@ -164,6 +174,7 @@ class Handler(Processor):
         volume = self.manure_stream.volume + total_cleaning_water_volume
         total_solids = self.manure_stream.total_solids
         methane_production_potential = self.manure_stream.methane_production_potential
+        bedding_non_degradable_volatile_solids = self.manure_stream.bedding_non_degradable_volatile_solids
 
         self.manure_stream = None
         self._report_processor_output(
@@ -176,7 +187,7 @@ class Handler(Processor):
         output_stream = ManureStream(
             water=manure_water,
             ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
-            nitrogen=nitrogen,
+            nitrogen=manure_total_nitrogen,
             phosphorus=phosphorus,
             potassium=potassium,
             ash=ash,
@@ -186,6 +197,7 @@ class Handler(Processor):
             total_solids=total_solids,
             methane_production_potential=methane_production_potential,
             pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=bedding_non_degradable_volatile_solids,
         )
         self._report_manure_stream(output_stream, "", time.simulation_day)
 
@@ -322,4 +334,4 @@ class Handler(Processor):
         The amount of manure water (KG).
 
         """
-        return manure_stream_water + (total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3)
+        return manure_stream_water + (total_cleaning_water_volume * UserConstants.WATER_DENSITY_KG_PER_M3)

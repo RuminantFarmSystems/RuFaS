@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
+from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
@@ -34,7 +35,7 @@ def test_milk_production_initialization(mocker: MockerFixture) -> None:
     assert milk_production.fat_content == 0.0
     assert milk_production.lactose_content == 0.0
     assert milk_production.milk_production_reduction == 0.0
-    assert milk_production.current_lactation_305_day_milk_produced == 0.0
+    assert milk_production.milk_305_day_yield == 0.0
     assert isinstance(milk_production.milk_production_history, list)
     assert len(milk_production.milk_production_history) == 0
 
@@ -167,6 +168,155 @@ def test_perform_daily_milking_update(
         mock_add_event.assert_not_called()
 
 
+@pytest.fixture
+def milk_production() -> MilkProduction:
+    """Create a MilkProduction instance with basic required attributes set."""
+    mp = MilkProduction()
+    mp.crude_protein_percent = 0.03
+    mp.true_protein_percent = 0.03
+    mp.fat_percent = 0.04
+    mp.lactose_percent = 0.05
+    mp.wood_l = 1.0
+    mp.wood_m = 2.0
+    mp.wood_n = 3.0
+    return mp
+
+
+def test_perform_daily_milking_update_without_history_not_milking(
+    milk_production: MilkProduction,
+) -> None:
+    """
+    If the animal is not milking (days_in_milk == 0), daily milk is set to 0 and
+    days_in_milk in the output is unchanged.
+    """
+    milk_production._daily_milk_produced = 10.0
+
+    inputs = MilkProductionInputs(
+        days_in_milk=0,
+        days_born=100,
+        days_in_pregnancy=50,
+    )
+
+    outputs = milk_production.perform_daily_milking_update_without_history(inputs)
+
+    assert outputs.days_in_milk == 0
+    assert milk_production._daily_milk_produced == 0.0
+
+
+def test_perform_daily_milking_update_without_history_dry_off_day(
+    milk_production: MilkProduction,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker: MockerFixture,
+) -> None:
+    """
+    If today is the dry-off day, all milk/nutrient contents are zeroed and no
+    further calculations are performed.
+    """
+    dry_off_day = 200
+    monkeypatch.setattr(AnimalConfig, "dry_off_day_of_pregnancy", dry_off_day)
+    milk_production._daily_milk_produced = 25.0
+    milk_production.crude_protein_content = 1.0
+    milk_production.true_protein_content = 1.0
+    milk_production.fat_content = 1.0
+    milk_production.lactose_content = 1.0
+
+    calc_daily_milk = mocker.patch.object(milk_production, "calculate_daily_milk_production")
+    calc_nutrient = mocker.patch.object(milk_production, "_calculate_nutrient_content")
+    rand_gen = mocker.patch.object(Utility, "generate_random_number")
+
+    inputs = MilkProductionInputs(
+        days_in_milk=50,
+        days_born=400,
+        days_in_pregnancy=dry_off_day,
+    )
+
+    outputs = milk_production.perform_daily_milking_update_without_history(inputs)
+
+    assert outputs.days_in_milk == 50
+
+    assert milk_production._daily_milk_produced == 0.0
+    assert milk_production.crude_protein_content == 0.0
+    assert milk_production.true_protein_content == 0.0
+    assert milk_production.fat_content == 0.0
+    assert milk_production.lactose_content == 0.0
+
+    calc_daily_milk.assert_not_called()
+    calc_nutrient.assert_not_called()
+    rand_gen.assert_not_called()
+
+
+def test_perform_daily_milking_update_without_history_normal_milking_day(
+    milk_production: MilkProduction,
+    mocker: MockerFixture,
+) -> None:
+    """
+    On a normal milking day (milking and not dry-off day), days_in_milk increments,
+    daily milk is calculated, and nutrient contents are updated via _calculate_nutrient_content.
+    """
+    if AnimalConfig.dry_off_day_of_pregnancy > 0:
+        days_in_pregnancy = AnimalConfig.dry_off_day_of_pregnancy - 1
+    else:
+        days_in_pregnancy = AnimalConfig.dry_off_day_of_pregnancy + 1
+
+    inputs = MilkProductionInputs(
+        days_in_milk=30,
+        days_born=400,
+        days_in_pregnancy=days_in_pregnancy,
+    )
+
+    mocker.patch.object(Utility, "generate_random_number", return_value=0.123)
+
+    mocked_daily_milk = 35.0
+    mock_calc_daily_milk = mocker.patch.object(
+        milk_production,
+        "calculate_daily_milk_production",
+        return_value=mocked_daily_milk,
+    )
+
+    previous_crude_protein_content = milk_production.crude_protein_content
+
+    mock_calc_nutrient = mocker.patch.object(
+        milk_production,
+        "_calculate_nutrient_content",
+        side_effect=[1.1, 2.2, 3.3, 4.4],
+    )
+
+    outputs = milk_production.perform_daily_milking_update_without_history(inputs)
+
+    assert outputs.days_in_milk == 31
+
+    assert milk_production._daily_milk_produced == mocked_daily_milk
+
+    assert milk_production.crude_protein_content == 1.1
+    assert milk_production.true_protein_content == 2.2
+    assert milk_production.fat_content == 3.3
+    assert milk_production.lactose_content == 4.4
+
+    mock_calc_daily_milk.assert_called_once_with(
+        inputs.days_in_milk,
+        milk_production.wood_l,
+        milk_production.wood_m,
+        milk_production.wood_n,
+    )
+    assert mock_calc_nutrient.call_count == 4
+
+    calls = mock_calc_nutrient.call_args_list
+
+    expected_daily_for_nutrients = milk_production.daily_milk_produced
+
+    assert calls[0].args[0] == pytest.approx(expected_daily_for_nutrients)
+    assert calls[0].args[1] == previous_crude_protein_content
+
+    assert calls[1].args[0] == pytest.approx(expected_daily_for_nutrients)
+    assert calls[1].args[1] == milk_production.true_protein_percent
+
+    assert calls[2].args[0] == pytest.approx(expected_daily_for_nutrients)
+    assert calls[2].args[1] == milk_production.fat_percent
+
+    assert calls[3].args[0] == pytest.approx(expected_daily_for_nutrients)
+    assert calls[3].args[1] == milk_production.lactose_percent
+
+
 @pytest.mark.parametrize(
     "days_in_milk, l_param, m_param, n_param, expected_output",
     [
@@ -186,7 +336,14 @@ def test_calculate_daily_milk_production(
     ----
     The function tested here uses the @njit decorator which obscures unit test coverage.
     """
-    result: float = MilkProduction.calculate_daily_milk_production(days_in_milk, l_param, m_param, n_param)
+    func = MilkProduction.calculate_daily_milk_production
+    try:
+        calc_func = func.py_func
+    except AttributeError:
+        calc_func = func
+
+    result_raw = calc_func(days_in_milk, l_param, m_param, n_param)
+    result = float(result_raw)
 
     assert isinstance(result, float)
     assert np.isclose(result, expected_output, rtol=1e-3)
@@ -200,9 +357,69 @@ def test_calculate_daily_milk_production(
         (0.3, 0.4, 0.5, quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(0.3, 0.4, 0.5))[0]),
     ],
 )
-def test_calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float, expected: float) -> None:
-    """Test the calc_305_day_milk_yield method of the MilkProduction class."""
-    assert MilkProduction.calc_305_day_milk_yield(l_param, m_param, n_param) == pytest.approx(expected, rel=1e-6)
+def test_calculate_predicted_305_day_milk_yield(
+    l_param: float, m_param: float, n_param: float, expected: float
+) -> None:
+    """The predicted method returns the pure Wood's-curve integral from day 1 to 305."""
+    assert MilkProduction.calculate_predicted_305_day_milk_yield(l_param, m_param, n_param) == pytest.approx(
+        expected, rel=1e-6
+    )
+
+
+def _make_milk_production(
+    l_param: float, m_param: float, n_param: float, history: list[MilkProductionRecord]
+) -> MilkProduction:
+    mp = MilkProduction()
+    mp.set_wood_parameters(l_param, m_param, n_param)
+    mp.milk_production_history = history
+    return mp
+
+
+def test_calculate_305_day_milk_yield_falls_back_to_prediction_with_no_history() -> None:
+    """A cow with no current-lactation history (e.g. dry cow at sim start) gets the pure
+    predicted yield."""
+    l_param, m_param, n_param = 0.1, 0.2, 0.3
+    expected = MilkProduction.calculate_predicted_305_day_milk_yield(l_param, m_param, n_param)
+    mp = _make_milk_production(l_param, m_param, n_param, [])
+
+    assert mp.calculate_305_day_milk_yield() == pytest.approx(expected, rel=1e-6)
+
+
+def test_calculate_305_day_milk_yield_uses_available_history() -> None:
+    """Partial 305-day milk yield estimates include recorded production history plus a
+    Wood's-curve fill for unobserved future DIMs."""
+    milk_production_history: list[MilkProductionRecord] = [
+        {"simulation_day": 1, "days_in_milk": 1, "milk_production": 100.0, "days_born": 1000},
+        {"simulation_day": 2, "days_in_milk": 2, "milk_production": 100.0, "days_born": 1001},
+        {"simulation_day": 3, "days_in_milk": 0, "milk_production": 0.0, "days_born": 1002},
+        {"simulation_day": 4, "days_in_milk": 1, "milk_production": 10.0, "days_born": 1003},
+        {"simulation_day": 5, "days_in_milk": 2, "milk_production": 20.0, "days_born": 1004},
+    ]
+    l_param, m_param, n_param = 0.1, 0.2, 0.3
+    expected_projected_yield = quad(
+        MilkProduction.calculate_daily_milk_production, 3, 305, args=(l_param, m_param, n_param)
+    )[0]
+
+    mp = _make_milk_production(l_param, m_param, n_param, milk_production_history)
+
+    assert mp.calculate_305_day_milk_yield() == pytest.approx(30.0 + expected_projected_yield, rel=1e-6)
+
+
+def test_calculate_305_day_milk_yield_fills_unobserved_early_dims() -> None:
+    """When the cow's history starts mid-lactation (e.g. mid-lactation at sim start),
+    Wood's curve fills in the unobserved early days so the metric is meaningful from day 1."""
+    milk_production_history: list[MilkProductionRecord] = [
+        {"simulation_day": 1, "days_in_milk": 100, "milk_production": 30.0, "days_born": 1000},
+        {"simulation_day": 2, "days_in_milk": 101, "milk_production": 30.0, "days_born": 1001},
+        {"simulation_day": 3, "days_in_milk": 102, "milk_production": 30.0, "days_born": 1002},
+    ]
+    l_param, m_param, n_param = 0.1, 0.2, 0.3
+    expected_early = quad(MilkProduction.calculate_daily_milk_production, 1, 100, args=(l_param, m_param, n_param))[0]
+    expected_late = quad(MilkProduction.calculate_daily_milk_production, 103, 305, args=(l_param, m_param, n_param))[0]
+
+    mp = _make_milk_production(l_param, m_param, n_param, milk_production_history)
+
+    assert mp.calculate_305_day_milk_yield() == pytest.approx(90.0 + expected_early + expected_late, rel=1e-6)
 
 
 @pytest.mark.parametrize(

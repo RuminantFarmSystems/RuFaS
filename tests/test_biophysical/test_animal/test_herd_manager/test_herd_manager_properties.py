@@ -1,3 +1,4 @@
+from unittest.mock import MagicMock
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -107,3 +108,72 @@ def test_phosphorus_concentration_by_animal_class(
     actual = herd_manager.phosphorus_concentration_by_animal_class
 
     assert actual == expected_phosphorus_concentration_by_animal_class
+
+
+def test_heiferII_events_by_id_returns_expected_mapping(herd_manager: HerdManager) -> None:
+    """heiferII_events_by_id should map 'HEIFER_II_<id>' -> events for each HeiferII."""
+    expected = {f"{heiferII.animal_type.name}_{heiferII.id}": heiferII.events for heiferII in herd_manager.heiferIIs}
+
+    result = herd_manager.heiferII_events_by_id
+
+    assert result == expected
+
+
+def test_heiferII_events_by_id_empty_when_no_heiferIIs(herd_manager: HerdManager) -> None:
+    """heiferII_events_by_id should return an empty dict when there are no HeiferII animals."""
+    herd_manager.heiferIIs = []
+
+    result = herd_manager.heiferII_events_by_id
+
+    assert result == {}
+
+
+def test_cow_events_by_id_returns_expected_mapping(herd_manager: HerdManager) -> None:
+    """cow_events_by_id should map 'COWTYPE_<id>' -> events for each cow."""
+
+    expected = {f"{cow.animal_type.name}_{cow.id}": cow.events for cow in herd_manager.cows}
+
+    result = herd_manager.cow_events_by_id
+
+    assert result == expected
+
+
+def test_cow_events_by_id_empty_when_no_cows(herd_manager: HerdManager) -> None:
+    """cow_events_by_id should return an empty dict when herd_manager.cows is empty."""
+
+    herd_manager.cows = []
+
+    result = herd_manager.cow_events_by_id
+
+    assert result == {}
+
+
+def test_average_305_day_milk_yield_by_lactation_group(herd_manager: HerdManager) -> None:
+    """Correctly returns average 305-day milk yield values for L1, L2, and L3+ cohorts."""
+    herd_manager.cows = []
+
+    cow1 = MagicMock()
+    cow1.reproduction.calves = 1
+    cow1.milk_production.milk_305_day_yield = 9000
+
+    cow2 = MagicMock()
+    cow2.reproduction.calves = 1
+    cow2.milk_production.milk_305_day_yield = 7000
+
+    cow3 = MagicMock()
+    cow3.reproduction.calves = 2
+    cow3.milk_production.milk_305_day_yield = 8500
+
+    cow4 = MagicMock()
+    cow4.reproduction.calves = 3
+    cow4.milk_production.milk_305_day_yield = 10000
+
+    cow5 = MagicMock()
+    cow5.reproduction.calves = 4
+    cow5.milk_production.milk_305_day_yield = 11000
+
+    herd_manager.cows.extend([cow1, cow2, cow3, cow4, cow5])
+
+    assert herd_manager.average_l1_305_day_milk_yield == 8000
+    assert herd_manager.average_l2_305_day_milk_yield == 8500
+    assert herd_manager.average_l3_plus_305_day_milk_yield == 10500

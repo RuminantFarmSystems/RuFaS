@@ -1,0 +1,423 @@
+\part{Feed Storage Module}
+% Global Table of Contents
+\thispagestyle{fancy}
+
+% Local TOC that includes only what’s inside THIS section
+\etocsettocstyle{\subsection*{Contents}}{} % heading for the local toc
+\etocsetnexttocdepth{subsection}           % or subsubsection
+\localtableofcontents
+\clearpage
+
+\section*{List of Figures}
+\locallistoffigures
+\newpage
+
+\section*{List of Tables}
+\locallistoftables
+\newpage
+
+\section{Module Introduction}
+\begin{refsection}
+    \par\noindent\justifying
+
+The Feed Module’s primary purpose is to serve as an inventory of purchased and farm-grown feed. Feed is added via purchase (Animal Module) and from on-farm harvest (Crop and Soil Module). Feed is removed when it is fed out in the Animal Module. In addition, stored feed quantity and quality changes are simulated over the duration of storage depending on crop type, crop quality, user-specified storage conditions, and ambient climate conditions. The feed storage module currently accepts Corn (silage, dry/high-moisture grain), Alfalfa, Grass, Triticale/Cereal, and Soybean. Forage and/or feed quality can also be user-specified, offering flexibility and modularity of user needs. Feed component values, proportions, digestibility, and availability subject to change during storage are: mass, DM content, CP, NPN, nNDF, ADF,  starch, and WSC. These changes must be tracked to accurately reflect the remaining feed and its qualities. Overall stored feed quality is assessed prior to consumption in the Animal Module.
+
+\subsection{Feed Quality Assessment} colorbox
+This section allocates farm grown feeds to be used for single or multiple animal classes and is illustrated in Figure 1. Priority is to reserve high-quality forage for lactating cows. Feeds are generally categorized into grains or forages. If the feed is a grain then it is available to all animal classes. The model assumes that grains can be purchased to supplement farm grown grain inventory. 
+
+If the feed is a forage, then some farms will assess the quality of the forage and preserve the high quality forage for the lactating cows. If they do not differentiate their forages based on quality, then the forage is available to all animals. 
+
+
+    \begin{figure}[H] % The 'p' option places the figure on a page by itself
+    \centering
+    \includegraphics[width=0.9\textwidth]{resources/feedallocation.png} % Replace with your image file
+    \caption{Farm grown feed allocation to cattle groups }
+    \end{figure}
+
+
+We currently represent the quality assessment for the feeds based on a single differentiating nutrient composition value. The differentiating nutrient and levels of the nutrient are given in the feed library.
+
+The feed library that includes both NRC and NASEM feeds does not have feed quality embedded in the feed IDs. Instead, a quality assessment should be made independent of the feed ID number and added as an additional attribute of the stored feed. 
+
+\section{Feed Storage Inputs}
+Farmgrown feeds have storage inputs that are described in depth below and consist of the following:
+\begin{itemize}
+    \item storage classification The class of storage: Grain, Hay, Silage, Baleage.
+    \item name  Each storage has a unique name. Ex. "alfalfa\_silage\_storage\_1"
+    \item crop\_name The name of the crop being stored.
+    \item field\_name    The name of the field the crop was grown in.
+    \item storage\_type  The sub-type of the storage class. Ex. "Dry" for grain storage
+    \item dm\_loss\_coefficient An input used for grain storages that specifies a loss of DM. Ex. "0.01",
+    \item initial\_storage\_dry\_matter The dry matter content upon receipt by the feed storage module.
+    \item post\_wilting\_moisture\_percentage The DM content of silage or baleage after wilting.
+    \item target\_dry\_matter The final DM content of hay.
+    \item additional\_dry\_matter\_loss\_coefficient An optional input to represent DM loss in excess of normal processes.
+    \item bale\_size An input used for baleage to specify the diameter of the bale in meters.
+    \item rufas\_id The RuFaS feed ID of the stored crop.
+    \item capacity 1e10 The maximum mass capacity of the storage.
+\end{itemize}
+
+\section{Storage Classifications}
+The agricultural production of harvested animal feed is dependent on season, climate, and farm management. In most cases, this means that feed is produced in large quantities when growing conditions are suitable and must be preserved to meet daily animal feed requirements. Microbial spoilage of wet feed products rapidly degrades their nutritional quality and can harm livestock that consume spoiled feed. Viable, cost-effective methods of preservation depend on the crop type and climate, but practically are limited to drying feed beyond the ability to support microbial growth and fermenting feed in the absence of oxygen to produce acid and reduce pH to inhibit spoilage. Feed Storage functions are primarily based on those in the \href{https://www.ars.usda.gov/northeast-area/up-pa/pswmru/docs/integrated-farm-system-model/}{Integrated Farm Systems Model} but modified to accommodate a daily time-step and remove explicit spatial components.
+
+
+
+\subsection{Grain} Grains (e.g., corn, rice, soybeans, and wheat) under 15\% moisture are considered dry grain. Higher moisture grains are considered high-moisture. Field harvested grains are not always sufficiently dry for safe storage (\(<\) 15\% moisture) and supplemental drying is often used to achieve target moisture content. Air-drying is a lower-energy drying method for drying grain to ambient levels that consists of passing ambient air through wet grains via fan. Heated-air drying is higher-energy and faster than air-drying, but can reduce moisture below ambient levels. In practice, DM loss from grains are small and are modeled as a fixed percentage loss of dry matter; 1\% for dry grain, 5\% for high-moisture grain.
+
+
+    \begin{center}
+        \(L\_\{gaseous\}  = M\_i\ cdot 0.01\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.GRN.1]}\par}
+            \vspace{0.5cm}
+
+    \begin{center}
+        \(L\_\{gaseous\}  = M\_i\ cdot 0.05\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.GRN.2]}\par}
+            \vspace{0.5cm}
+            
+High-moisture grain as a feed must be managed (fed, fermented, or dried) quickly for this to be accurate, but that is a well-understood requirement and is not explicitly modeled. Nutritional quality changes are variable, but proportional to DM loss. Nutrient values of finished grain not currently tracked are referenced from the most recent edition of NASEM for use in the Animal Module.
+
+\subsection{Hay} Hay is forage that has been dried with a safe preservation moisture content of 12-15\%. Bale storage conditions are separated into protected and unprotected storage with a total of four storage categories in order of decreasing protection from the elements: protected-indoor, protected-wrapped, protected-tarped, and unprotected-outdoor. Less protected hay storages experience additional losses as compared to the most protected storage (indoor) due to exposure to increased airflow and weather according to the following equation. Baled hay loses DM and quality as a function of storage conditions and its moisture content. Bale density plays a role, but is too complex to model directly and is instead estimated as a function of moisture content.
+
+    \begin{center}
+        \(L\_\{gaseous\}  = L\_\{base\} + L\_\{additional\}\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.HAY.1]}\par}
+            \vspace{0.5cm}
+
+
+\textbf{Where we know that}: \\ L\_\{base\} (kg) is the minimum loss expected from protected-indoor as the sum of DM lost in the first 30 days of storage (L\_\{first 30 days\}, kg) and that lost after 30 days (L\_\{post 30 days\}, kg) in order to capture the differing rates of DM loss before and after the forage has reached its target DM content.
+
+    \begin{center}
+        \(L\_\{base\}  =  L\_\{first\ 30\ days\} + L\_\{post\ 30\ days\}\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.HAY.2]}\par}
+            \vspace{0.5cm}
+
+\textbf{Where we know that}: \\ 
+    \begin{center}
+        \(L\_\{first\ 30\ days\} =  \frac{Q + 2433 \cdot [moisture - \frac{MF(1 - moisture)}{1 - MF}]}{(1 - moisture)(14206 - \frac{2433 \cdot MF}{1 - MF})} \cdot \frac{min(30, d)}{30} \ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.HAY.3]}\par}
+            \vspace{0.5cm}
+
+    \begin{center}
+        \(Q =  104 \cdot moisture^{2.18} \cdot {b_{density}}^{0.5} + 5.72(moisture^{1.23} \cdot {b_{density}}^{0.94})\ tag\)
+    \end{center}
+        \vspace{0.25cm}
+        \textit{Q is the sensible heat generated in the hay (kJ/kg) based on bale density}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.HAY.4]}\par}
+            \vspace{0.5cm}
+
+    \begin{center}
+        \(b\_\{density\} =  100 + 440 \cdot moisture\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.HAY.5]}\par}
+            \vspace{0.5cm}
+
+moisture is the fraction of water mass at time of storage (unitless), MF is the target final moisture percent of hay (percent) as defined by the user (default: 12), and d is the number of days the hay has been stored for. 
+\vspace{0.2cm}
+
+And
+\vspace{0.5cm}
+
+    \begin{center}
+        \(L\_\{post\ 30\ days\} =  0.0001 \cdot max(0, d - 30)\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.HAY.6]}\par}
+            \vspace{0.5cm}
+
+        \begin{center}
+        \(L\_\{additional\} =  \sum_{i=1}^{d} l \cdot rain_i \cdot max(0.0, \frac{high_i + low_i}{2}) \cdot \frac{1}{b_{density}} \cdot {b_{size}}^3\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.HAY.7]}\par}
+            \vspace{0.5cm}
+
+        \begin{itemize}
+            \item d is the number of days the hay has been stored for, 
+            \item i is the day of storage that dry matter loss is being calculated for, 
+            \item l is the loss coefficient (unitless) from Table 1; \textbf{[FS.HAY.7]}, 
+            \item{rain\_i} is the amount of rain on day i (cm), 
+            \item{high\_i} is the high temperature on day i (\(\circ C\)), 
+            \item{low\_i} is the low temperature on day (\(\circ C\)), 
+            \item{b\_density} is the bale density (kg/\(m^2\)) \textbf{[FS.HAY.5]}, and 
+            \item{b\_size} is the diameter of the hay bale (m)
+
+        \end{itemize}
+\vspace{0.5cm}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\caption{Hay storage types and associated fractional loss coefficients}
+
+\begin{tabular}{@{} C{5cm} C{4cm}  @{}}
+\toprule
+\textbf{Hay Storage Type} & \textbf{Fractional Loss Coefficient (i)}  \\
+\midrule
+Protected Wrapped & 0.0000216 \\ 
+Protected Tarped & 0.0000108 \\
+Unprotected Outdoor  & 0.00006 \\
+Protected Indoor  & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{1cm}
+
+        \textit{Cumulative water lost from forages stored as hay is determined by:}
+        \vspace{0.2cm}
+
+        \begin{center}
+        \(M =  F_i \cdot \frac{max(0.0, moisture - MF)}{100} \cdot \frac{min(30, d)}{30}\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.HAY.8]}\par}
+            \vspace{0.5cm}
+
+The lowest energy method for hay drying is passive drying in the field when conditions are suitable, but, similarly to grains, hay can receive supplemental drying via ambient or heated air.  DM loss from protected, baled hay is preferentially from starch and water soluble carbohydrates (60\%), and CP (40\%) which, over time, leads to a proportional increase in NDF and a minor increase in CP over time. Unprotected bales experience increased proportional CP loss (50\% of protected bale DM loss) due to leaching and an additional 17\% loss of NDF dry matter compared to protected bales. Fractional loss coefficients for hay are defined by Table 2:
+\vspace{0.5cm}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\caption{Protected and unprotected storage, nutrients, and associated fractional loss coefficients}
+
+\begin{tabular}{@{} L{5cm} L{4cm} L{3cm} @{}}
+\toprule
+\textbf{Hay Storage Type} & \textbf{Nutrient} & \textbf{Fractional Loss Coefficient}  \\
+\midrule
+
+\multirow{3}{*}{Unprotected Hay} & Acid Detergent Fiber & 0.0 \\
+                           & Neutral Detergent Fiber & 0.17 \\
+                           & Crude Protein & 0.4 \\
+\multirow{3}{*}{Protected or Indoor Hay} & Acid Detergent Fiber & 0.0 \\
+                           & Neutral Detergent Fiber & 0.0 \\
+                           & Crude Protein & 0.0 \\
+                           
+                           
+\bottomrule
+\end{tabular}
+\end{table}
+\vspace{1cm}
+
+
+\subsection{Silage} Silage is the product of anaerobic acidification of non-dry forage, a process called ensiling, and has traditionally been produced as a method of animal feed preservation viable in wet, cool climates where forage production cannot sustain livestock year-round and drying hay at the required scale is challenging \parencite{pahlow2003microbiology}. Typically, forage fermentation is the product of lactic acid bacteria (LAB) consuming WSC present in harvested forage and metabolizing it to a mix of organic products, including the desirable lactic and acetic acids, as well as \(CO_2\) and ethanol. A well-preserved silage relies on a rapid fermentation for retention of optimal feed quality because insufficient or slow acidification is associated with prolonged proteolytic activity, additional dry matter loss, and increased risk of spoilage. \parencite{pahlow2003microbiology, muck2013recent}.
+
+Fermented forages experience DM loss and nutrient changes post-harvest, during fermentation, and during storage. Wilting losses are not currently modeled.
+
+
+Alfalfa fermentation daily dry matter loss (fraction) is calculated with the equation:
+
+
+        \begin{center}
+        \(L\_{fermentation} = \sum_{i=1}^{d} drymass_{i-1} \cdot (0.00052 - 0.001213(dryfrac_{i-1} - 0.2))\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.1]}\par}
+        \vspace{0.5cm}
+
+        \begin{itemize}
+            \item d is the number of days the alfalfa has been ensiled for, 
+            \item i is the day since ensiling that dry matter loss is being calculated for, 
+            \item drymass\_{i-1} is the dry matter mass of ensiled alfalfa on day i-1,
+            \item dryfrac\_{i-1} is the fraction of ensiled alfalfa fresh mass that is dry matter on day i-1. 
+            \item When i is 1, drymass\_{i-1} is the initial amount of ensiled alfalfa dry mass and 
+            \item dryfrac\_{i-1} is the initial dry matter fraction of the ensiled alfalfa. This equation is only appropriate for use if dryfrac\_{i-1} is in the range [0.2, 0.6] and the average temperature on day 
+            \item i is in the range [5, 45] (\(\circ C\)).
+        \end{itemize}
+        \vspace{0.5cm}
+        
+Corn, grass, and small grain daily dry matter loss (fraction) is calculated with the equation:
+\vspace{0.2cm}
+
+        \begin{center}
+        \(L_{fermentation} = \sum_{i=1}^{d} drymass_{i-1} \cdot (0.000288 - 0.000643(dryfrac_{i-1} - 0.15))\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.2]}\par}
+        \vspace{0.5cm}
+
+        \begin{itemize}
+            \item d is the number of days the forage has been ensiled for, 
+            \item i is the day since ensiling that dry matter loss is being calculated for, 
+            \item drymass\_{i-1} is the dry matter mass of ensiled forage on day i-1,
+            \item dryfrac\_{i-1} is the fraction of ensiled forage fresh mass that is dry matter on day i-1. 
+            \item When i is 1, drymass\_{i-1} is the initial amount of ensiled forage dry mass and 
+            \item dryfrac\_{i-1} is the initial dry matter fraction of the ensiled forage. This equation is only appropriate for use if dryfrac\_{i-1} is in the range [0.15, 0.6] and the average temperature on day i is in the range [0, 40] (\(\circ C\)).
+        \end{itemize}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\caption{Silage and the fractional loss coefficients}
+
+\begin{tabular}{@{} L{5cm} L{4cm} L{3cm} @{}}
+\toprule
+\textbf{Nutrient} & \textbf{Fractional Loss Coefficient}  \\
+\midrule
+
+Acid Detergent Fiber & 0.0 \\
+Neutral Detergent Fiber & 0.0 \\
+Crude Protein & 0.0 \\
+                           
+                         
+\bottomrule
+\end{tabular}
+\end{table}
+\vspace{1CM}
+
+Ensiled crops may also lose dry matter through effluent efflux. Crops that are ensiled with a dry matter content less than 30\% lose both water and dry matter according to the following equations:
+\vspace{0.25CM}
+
+        \begin{center}
+        \(L_{effluent} = dryfrac\_\{effluent\} \cdot M\_\{effluent\} \cdot 0.1 \cdot max(10, d)\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.4]}\par}
+        \vspace{0.5cm}
+        
+\textbf{Where we know that}: \\ 
+\vspace{0.2cm}
+
+\(dryfrac_{effluent}\) is the fraction of dry matter in the effluent that is lost, \(M_{effluent}\) is the estimated maximum effluent (kg), and d is the number of days the crop has been ensiled for.
+\vspace{0.5cm}
+
+        \begin{center}
+        \(ML\_\{effluent\} = (1 - dryfrac_{effluent}) \cdot M_{effluent} \cdot 0.1 \cdot max(10, d) \ tag\)
+        \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.5]}\par}
+        \vspace{0.5cm}
+
+\textbf{Where we know that:} dryfrac\_{effluent} is the fraction of dry matter in the effluent that is lost,
+        \vspace{0.2cm}
+
+M\_{effluent} is the estimated maximum effluent (kg), and d is the number of days the crop has been ensiled for. The fraction of dry matter in effluent is a constant defined as: 
+\vspace{0.2cm}
+
+        \begin{center}
+        \(dryfrac_{effluent} = 0.1035\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.6]}\par}
+        \vspace{0.5cm}
+        
+        \begin{center}
+        \(M_{effluent} = mass_{fresh} \cdot ((1 - dryfrac) - 0.7) \ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.7]}\par}
+        \vspace{0.5cm}
+
+
+\textbf{Where we know that}: \\ \(mass_{fresh}\) is the fresh mass of the crop when it is ensiled (kg) and 
+\(dryfrac\) is the fraction of the crop’s fresh mass which is dry matter when it is ensiled.
+\vspace{0.2cm}
+
+Dry matter lost in effluent is preferentially from CP, water soluble carbohydrates, and non-protein nitrogen each of which is recalculated by the following equations:
+\vspace{0.2cm}
+
+Percent crude protein is calculated as:
+\vspace{0.2cm}
+        
+        \begin{center}
+        \(CP_{updated} = \frac{CP_{initial} \cdot 0.01 - 0.3 \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.8]}\par}
+        \vspace{0.5cm}
+
+\textbf{Where we know that}: \\ \(CP_{initial}\) is the percentage of dry matter mass that is crude protein in the ensiled crop before accounting for dry matter loss to effluent and \(DL_{fraction}\) is the fraction of dry matter mass lost to effluent. The percentage of crude protein is lower-bounded at 0.
+\vspace{0.2cm}
+
+The percentage of NPN is calculated with the equation:
+\vspace{0.2cm}
+
+        \begin{center}
+        \(NPN_{updated} = \frac{(NPN_{initial} \cdot 0.01) \cdot (CP_{initial} \cdot 0.01) - 0.3 \cdot DL_{fraction}}{(CP_{initial} \cdot 0.01) - DL_{fraction}} \cdot 100 \ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.9]}\par}
+        \vspace{0.5cm}
+
+
+\textbf{Where we know that}: \\ \(NPN_{initial}\) is percentage of dry matter mass that is non-protein nitrogen in the ensiled crop before accounting for dry matter loss to effluent, \(CP_{initial}\) is the percentage of dry matter mass that is crude protein before accounting for dry matter loss to effluent, and \(DL_{fraction}\) is the fraction of dry matter mass lost to effluent. The percentage of non-protein nitrogen is lower-bounded at 0. 
+\vspace{0.2cm}
+
+\(DL_{fraction}\) is calculated with the equation:
+        \begin{center}
+        \(DL_{fraction} = \frac{DM_{lost}}{DM_{initial}}\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.SIL.10]}\par}
+        \vspace{0.5cm}
+
+\textbf{Where we know that}: \\ DM\_lost is the amount of dry matter mass in the ensiled crop after accounting for dry matter lost to effluent, and DM\_initial is the amount of dry matter mass in the ensiled crop before accounting for dry matter lost to effluent.
+
+\subsection{Baleage}
+Baleage is an ensiled forage with a DM content between 50-65\% that is baled and wrapped to allow ensiling. The higher DM content of baleage lowers the amount of acid needed to achieve effective preservation and allows it to be consolidated into a bale. Fermentation DM losses for baleage are calculated by \textbf{[FS.SIL.1]} and \textbf{[FS.SIL.2]} with fractional nutrient loss coefficients from Table 3. Baleage does not experience effluent losses.
+
+\subsection{Nutrient Composition}
+Changes in dry matter and moisture of stored feed often alter their total and fractional nutrient composition. Recalculating nutrient fractions of stored feeds uses the following equation:
+\vspace{0.2cm}
+
+        \begin{center}
+        \(n_{updated} = \frac{max(0, \frac{n_{initial}}{100} - C) \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.NUT.1]}\par}
+        \vspace{0.5cm}
+
+\textbf{Where we know that}: \\ n\_updated is the percentage of the target nutrient in the stored crop’s dry matter mass after accounting for dry matter loss, n\_initial is the percentage of the target nutrient in the stored crop’s dry matter mass before accounting for dry matter loss, C is the fractional loss coefficient specific to the nutrient and storage type, and DL\_fraction is the fraction of dry matter lost.
+\vspace{0.2cm}
+
+        \begin{center}
+        \(DL_{fraction} = \frac{DM_{updated}}{DM_{initial}} \ tag\)
+    \end{center}
+        \vspace{0.5cm}
+    
+            {\raggedleft \textbf{[FS.NUT.2]}\par}
+        \vspace{0.5cm}
+
+
+
+
+
+
+
+\newpage
+\section{References}
+\printbibliography[heading=subbibliography,title={Feed Storage Module}]
+\end{refsection}

@@ -55,17 +55,29 @@ unexpected ways as changes are made to the code.
 How
 ~~~
 
-As of **02/01/2025**, E2E testing can only be run with a dedicated set
+As of **08/08/2025**, E2E testing can only be run with dedicated sets
 of inputs. Run E2E testing with the following command:
 
 .. code:: sh
 
    python main.py -p input/metadata/end_to_end_testing_tm_metadata.json
 
-E2E testing checks each domain (module) of RuFaS separately—for example,
-Feed Storage, Animal, Manure, etc. Each check generates a result
-(passing or failing), which is both written to an output file and
-logged.
+There are three sets of inputs set up:
+
+1. Free Stall Dairy
+    i. E2E testing is performed on the Crop&Soil, the Animal, and the Manure domain (module) of RuFaS.
+    ii. The simulation time period for the Free Stall E2E is cut short to only one year.
+
+2. Open Lot
+    i. E2E testing is performed on the Crop&Soil, the Animal, and the Manure domain (module) of RuFaS.
+    ii. The simulation time period for the Open Lot E2E is cut short to only one year.
+
+3. No Animals
+    i. No animals are simulated in this simulation. It is mainly used to verify the stand-alone C&S domain results.
+    ii. E2E testing is performed on the Crop&Soil and the Manure domain (module) of RuFaS.
+
+
+For Each E2E test run:
 
 - **A domain’s E2E test passes if there are no differences between the
   expected and actual results.**
@@ -97,14 +109,18 @@ Setting up E2E Testing
 Quick Setup
 ^^^^^^^^^^^
 
-**Note**: E2E Testing is already ready to running for multiple domains.
-This section is for setting up new testing for parts of the model that
-aren't yet covered.
+**Note**: E2E Testing is already ready to running on multiple domains for three sets of inputs.
+This section is for creating testing for a new sets of inputs,
+or setting up testing for an uncovered domain in an exisiting set of inputs.
+
+New Input Set Setup
+-------------------
 
 In the ``input/data/end_to_end_testing`` directory:
 
-1. **Create the 2 necessary E2E filter files** following these formats:
+1. **Create a folder** with its name being the name for the new input set.
 
+2. Go into the folder, and **create the 2 necessary E2E filter files** following these formats:
    - **E2E JSON Filter File**
 
      - File name format: ``e2e_json_{domain}_filter.json``.
@@ -119,10 +135,35 @@ In the ``input/data/end_to_end_testing`` directory:
      - File name format: ``e2e_comparison_{domain}_differences.json``.
      - See :ref:`E2E Comparison filter file <e2e-comparison-filter-file>` for reference.
 
-2. **Update the ``end_to_end_testing_results_paths.json`` file** in the
-   same directory:
+3. **Update the ``end_to_end_testing_task.json`` file** in the ``input/data/tasks`` directory:
+   - **Use the existing entries as examples.**, create a new object in the ``"tasks"`` array, specifying:
+     - "task_type": "END_TO_END_TESTING"
+     - "metadata_file_path": the file path to the new input set metadata.
+     - "output_prefix": a custom output prefix for the new set of inputs,
+       preferably following the patter ``{custom_name}_e2e``.
+       **Please NOTE DOWN this output prefix name, it will be referenced later.**
+     - "filters_directory": the directory path to the new directory conataining the two newly created filters.
+     - "log_verbosity": the desired verbosity, the suggested verbosity is "logs" for an E2E testing run.
+     - "exclude_info_maps": true. Please set this flag to true to exclude the info maps in the outputs,
+       so that we can decrease the output file size and speed up the comparison process.
+     - "random_seed": the choice of random seed, default is set to 42.
 
-   - Specify the domain you’re testing, the path to the expected
+4. **Update the ``update_end_to_end_testing_expected_results.json`` file** in the ``input/data/tasks`` directory:
+   - **Use the existing entries as examples.**, create a new object in the ``"tasks"`` array, specifying:
+     - "task_type": "UPDATE_E2E_TEST_RESULTS"
+     - "metadata_file_path": the file path to the new input set metadata.
+     - "output_prefix": the same output prefix from ``end_to_end_testing_task.json``.
+     - "filters_directory": the directory path to the new directory conataining the two newly created filters.
+     - "log_verbosity": the desired verbosity, the suggested verbosity is "logs" for a update E2E results run.
+     - "exclude_info_maps": true. Please set this flag to true to exclude the info maps in the outputs,
+       so that we can decrease the output file size and speed up the comparison process.
+     - "random_seed": the choice of random seed, default is set to 42.
+
+5. **Update the ``end_to_end_testing_results_paths.json`` file** in the ``input/data/end_to_end_testing`` directory:
+
+   - Create a new key-value pair in the "end_to_end_test_result_paths" dictionary.
+     The key should be the output prefix specified in step 3 and 4.
+   - Specify the domains you’re testing, the path to the expected
      outputs, and the pattern used to find the actual outputs for the
      domain module.
    - **Use the existing entries as examples.**
@@ -130,7 +171,16 @@ In the ``input/data/end_to_end_testing`` directory:
    - **Note:** *You will not create a new results paths file. Add your
      new domain's paths to the existing file.*
 
-3. **Run the following command:**
+6. **Update the ``default.json`` file** in the ``input/data/metadata/properties`` directory:
+
+   - Navigate to the **"end_to_end_test_result_paths"** block under the
+     **end_to_end_test_result_path_properties"** section.
+   - Create a new entry in the "end_to_end_test_result_paths" dictionary by copying and pasting one of the existing
+     input set, with the key being the output prefix specified in step 3 and 4.
+     For example, copy the entire "freestall_e2e" dictionary, paste it as a new entry, and change the key to the output
+     prefix.
+
+7. **Run the following command:**
 
    .. code:: sh
 
@@ -152,14 +202,29 @@ In the ``input/data/end_to_end_testing`` directory:
    - Contact a member of the dev team if you have questions or need
      assistance.
 
-4. Run the E2E testing command:
+8. Run the E2E testing command:
 
 .. code:: sh
 
    python main.py -p input/metadata/end_to_end_testing_tm_metadata.json
 
-5. Confirm your domain E2E test passes. If the test doesn't pass, review
-   steps 1–4 or contact a member of the dev team for help.
+9. Confirm your domain E2E test passes. If the test doesn't pass, review
+   steps 1–4 or contact a member of the RuFaS maintainer team for help.
+
+New Domain Setup
+-------------------
+
+1. Navigate to the corresponding folder for the input set you want to update in ``input/data/end_to_end_testing``
+   directory.**Create the 2 necessary E2E filter files** for the new domain by following step 2 from the
+   **New Input Set Setup** section.
+
+2. **Update the ``end_to_end_testing_results_paths.json`` file** in the ``input/data/end_to_end_testing`` directory:
+
+   - Navigate to the dictionary about the input set you want to update in the "end_to_end_test_result_paths" dictionary.
+   - **Use the existing entries as examples** to add the filter files of the new domain.
+
+3. Follow steps 7-9 from the **New Input Set Setup** section to update the expected E2E results and confirm all E2E
+   tests are successful.
 
 --------------
 
@@ -170,7 +235,7 @@ As noted in step 3 of the Quick Setup instructions, you can run this
 command
 ``python main.py -p input/metadata/update_end_to_end_testing_tm_metadata.json -c``
 to automatically update end-to-end-testing "expected results" for all
-domains. These expected results are the results against which end-to-end
+domains of all input sets. These expected results are the results against which end-to-end
 testing will be run.
 
 This is a powerful tool which removes some of the steps in updating the
@@ -180,7 +245,7 @@ unknowingly updated when this is run.
 
 How does it work?
 
-1. A simulation is run and output is filtered based on the filters in
+1. For each input set, a simulation is run and output is filtered based on the filters in
    the existing E2E testing filters files.
 2. For each domain, the filtered results generated from that simulation
    are checked against the existing expected results for that domain.
@@ -233,8 +298,8 @@ the file
 ``input/data/end_to_end_testing/end_to_end_testing_result_paths.json``.
 This file should contain:
 
-- a list of objects, each of which contains the name of the RuFaS domain
-  being tested.
+- a dictionay of a list of objects, each item in the dictionary represents an input set , and each object whitn the
+   list contains the name of the RuFaS domain being tested.
 - the path to the expected results (which is the path to the filter file
   for that domain located within the ``end_to_end_testing`` directory).
 - a pattern used to identify the actual results.
@@ -340,14 +405,16 @@ properly. This is accomplished in the
 .. code:: json
 
    {
-       "end_to_end_test_result_paths": [
-           {
-               "domain": "FeedStorage",
-               "expected_results_path": "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
-               "actual_results_path": "end-to-end-testing_saved_variables_e2e_feed_storage_",
-               "tolerance": 0.1
-           }
-       ]
+       "end_to_end_test_result_paths": {
+        "freestall_e2e": [
+               {
+                   "domain": "FeedStorage",
+                   "expected_results_path": "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
+                   "actual_results_path": "end-to-end-testing_saved_variables_e2e_feed_storage_",
+                   "tolerance": 0.1
+               }
+           ]
+        }
    }
 
 The "expected_results_path" points to the filter file which contains the

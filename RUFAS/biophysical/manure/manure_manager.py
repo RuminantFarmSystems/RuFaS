@@ -3,15 +3,15 @@ from copy import deepcopy
 from dataclasses import replace
 from typing import Any
 
-from RUFAS.biophysical.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
-from RUFAS.biophysical.manure.storage.compost_bedded_pack_barn import CompostBeddedPackBarn
+from RUFAS.biophysical.manure.storage.bedded_pack import BeddedPack
 from RUFAS.biophysical.manure.storage.composting import Composting
+from RUFAS.biophysical.manure.storage.daily_spread import DailySpread
 from RUFAS.biophysical.manure.storage.open_lot import OpenLot
 from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurryStorageUnderfloor
@@ -19,7 +19,11 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
-from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    FieldManureSupplier,
+    NutrientRequest,
+    NutrientRequestResults,
+)
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -32,9 +36,10 @@ STORAGE_CLASS_TO_TYPE: dict[type[Storage], ManureType] = {
     AnaerobicLagoon: ManureType.LIQUID,
     SlurryStorageOutdoor: ManureType.LIQUID,
     SlurryStorageUnderfloor: ManureType.LIQUID,
-    CompostBeddedPackBarn: ManureType.SOLID,
+    BeddedPack: ManureType.SOLID,
     Composting: ManureType.SOLID,
     OpenLot: ManureType.SOLID,
+    DailySpread: ManureType.SOLID,
 }
 
 
@@ -57,7 +62,7 @@ class ManureManager:
         A list defining the execution order of processors.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, intercept_mean_temp: float, phase_shift: float, amplitude: float) -> None:
         self._om = OutputManager()
         self._manure_nutrient_manager = ManureNutrientManager()
 
@@ -75,11 +80,13 @@ class ManureManager:
         processor_connections_by_name = self._validate_and_parse_processor_connections(
             processor_connections_input, processor_configs_by_name
         )
-        self._create_all_processors(processor_connections_by_name, processor_configs_by_name)
+        self._create_all_processors(
+            processor_connections_by_name, processor_configs_by_name, intercept_mean_temp, phase_shift, amplitude
+        )
         self._populate_adjacency_matrix(processor_connections_by_name)
 
         self._validate_adjacency_matrix()
-        self._processing_order = self._traverse_adjacency_matrix()  # noqa
+        self._processing_order = self._traverse_adjacency_matrix()
 
     def run_daily_update(
         self, manure_streams: dict[str, ManureStream], time: RufasTime, current_day_conditions: CurrentDayConditions
@@ -233,9 +240,19 @@ class ManureManager:
         """
         for origin, destinations in self._adjacency_matrix.items():
             if destinations[origin] != 0:
+                self._om.add_error(
+                    "Manure Processor Adjacency Matrix Error",
+                    f"The diagonal for origin {origin} is not 0.",
+                    info_map={"class": self.__class__.__name__, "function": self._validate_adjacency_matrix.__name__},
+                )
                 raise ValueError(f"The diagonal for origin {origin} is not 0.")
             column_sum = sum(destinations.values())
             if not math.isclose(column_sum, 0, abs_tol=1e-8) and not math.isclose(column_sum, 1, abs_tol=1e-8):
+                self._om.add_error(
+                    "Manure Processor Adjacency Matrix Error",
+                    f"Sum for {origin} column must be 0 or 1, but got {column_sum}",
+                    info_map={"class": self.__class__.__name__, "function": self._validate_adjacency_matrix.__name__},
+                )
                 raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
 
     def _traverse_adjacency_matrix(self) -> list[str]:
@@ -271,6 +288,11 @@ class ManureManager:
         sorted_order = self._perform_topological_sort(in_degree, start_nodes, matrix_to_traverse)
 
         if len(sorted_order) != len(all_nodes):
+            self._om.add_error(
+                "Manure Processor Adjacency Matrix Error",
+                "Cycle detected — topological sort not possible.",
+                info_map={"class": self.__class__.__name__, "function": self._traverse_adjacency_matrix.__name__},
+            )
             raise ValueError("Cycle detected — topological sort not possible.")
 
         return sorted_order
@@ -296,6 +318,10 @@ class ManureManager:
         ValueError
             If a destination receives output from both solid and liquid separator streams.
 
+        Notes
+        -----
+        The use of `deepcopy()` is necessary here because the method needs to modify the adjacency matrix
+        (merging and deleting rows/keys) without mutating the original `self._adjacency_matrix`.
         """
         matrix_to_return = deepcopy(self._adjacency_matrix)
         for separator_name in self._all_separators.keys():
@@ -311,6 +337,12 @@ class ManureManager:
                 liquid_value = liquid_row.get(destination, 0.0)
 
                 if solid_value > 0.0 and liquid_value > 0.0:
+                    self._om.add_error(
+                        "Manure Processor Adjacency Matrix Error",
+                        f"Invalid output split in '{separator_name}': destination '{destination}' "
+                        f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})",
+                        info_map={"class": self.__class__.__name__, "function": self._merge_separator_rows.__name__},
+                    )
                     raise ValueError(
                         f"Invalid output split in '{separator_name}': destination '{destination}' "
                         f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})"
@@ -507,6 +539,14 @@ class ManureManager:
                 unknown_processor_names.add(processor_name)
                 self._om.add_error("Unknown Processor Name.", f"No configuration found for {processor_name}.", info_map)
         if len(unknown_processor_names) > 0:
+            self._om.add_error(
+                "Manure Processor Setup Error",
+                f"Unknown Processor: no processor config found for {unknown_processor_names}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._check_for_unknown_processor_names.__name__,
+                },
+            )
             raise ValueError(f"Unknown Processor: no processor config found for {unknown_processor_names}.")
 
     def _check_for_processors_without_connection_definition(
@@ -543,6 +583,11 @@ class ManureManager:
                     info_map,
                 )
         if len(processors_without_connection_definition) > 0:
+            self._om.add_error(
+                "Undefined Routing Connections.",
+                f"Undefined Routing Connections for {processors_without_connection_definition}.",
+                info_map,
+            )
             raise ValueError(f"Undefined Routing Connections for {processors_without_connection_definition}.")
 
     def _find_all_processor_names_in_connection_map(self, processor_connections: list[dict[str, Any]]) -> set[str]:
@@ -670,6 +715,9 @@ class ManureManager:
         self,
         processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
         processor_configs_by_name: dict[str, dict[str, Any]],
+        intercept_mean_temp: float,
+        phase_shift: float,
+        amplitude: float,
     ) -> None:
         """
         Creates and initializes all processors based on their definitions.
@@ -681,15 +729,25 @@ class ManureManager:
         processor_configs_by_name : dict[str, dict[str, Any]]
             A dictionary that contains processor definitions, where each key is the processor name and
             the value is a dictionary with the processor's parameters and type.
+        intercept_mean_temp : float
+            The intercept mean temperature calculate from linest function.
+        phase_shift : float
+            Temperature phase shift of the weather data.
+        amplitude : float
+            The temperature amplitude of the weather data.
         """
         for processor_name in processor_connections_by_name:
             processor_config = processor_configs_by_name[processor_name]
             processor_type = processor_config["processor_type"]
 
             processor_initializer = ProcessorType.get_processor_class(processor_type)
-            if not issubclass(processor_initializer, Handler):
+            if not (issubclass(processor_initializer, Handler) or issubclass(processor_initializer, Separator)):
                 del processor_config["processor_type"]
             processor = processor_initializer(**processor_config)
+            if isinstance(processor, (AnaerobicLagoon, SlurryStorageOutdoor)):
+                processor.intercept_mean_temp = intercept_mean_temp
+                processor.phase_shift = phase_shift
+                processor.amplitude = amplitude
             self.all_processors[processor_name] = processor
 
             if isinstance(processor, Separator):
@@ -798,9 +856,7 @@ class ManureManager:
                 result_row_names.append(row_name)
         return result_row_names
 
-    def request_nutrients(
-        self, request: NutrientRequest, simulate_animals: bool, time: RufasTime
-    ) -> NutrientRequestResults:
+    def request_nutrients(self, request: NutrientRequest, time: RufasTime) -> NutrientRequestResults:
         """
         Handle the request for specific nutrients from the crop and soil module.
         This method evaluates the nutrient request made by considering both nitrogen and phosphorus
@@ -820,8 +876,6 @@ class ManureManager:
         ----------
         request : NutrientRequest
             The specific nutrient request, including quantities of nitrogen and phosphorus.
-        simulate_animals : bool
-            Indicates whether animals are being simulated.
         time : RufasTime
             The current time in the simulation.
 
@@ -834,28 +888,24 @@ class ManureManager:
             Returns None if the request cannot be fulfilled.
 
         """
-        if simulate_animals:
-            request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(
-                request
-            )
-            self._record_manure_request_results(request_result, "on_farm_manure", time)
-            if request_result is not None:
-                self._remove_nutrients_from_storage(request_result, request.manure_type)
+        request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(request)
+        self._record_manure_request_results(request_result, "on_farm_manure", time)
+        if request_result is not None:
+            self._remove_nutrients_from_storage(request_result, request.manure_type)
 
-            if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
-                self._om.add_log(
-                    "Supplemental manure needed",
-                    "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
-                    {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
-                )
-                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
-                supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
-                self._record_manure_request_results(supplemental_manure, "off_farm_manure")
-                combined_manure = request_result + supplemental_manure
-                return combined_manure
-            return request_result
-        else:
-            return FieldManureSupplier.request_nutrients(request)
+        if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
+            self._om.add_log(
+                "Supplemental manure needed",
+                "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
+                {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
+            )
+            amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
+            supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
+            self._record_manure_request_results(supplemental_manure, "off_farm_manure", time)
+            if request_result is None:
+                return supplemental_manure
+            return request_result + supplemental_manure
+        return request_result
 
     def _remove_nutrients_from_storage(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
         """
@@ -893,6 +943,7 @@ class ManureManager:
             "non_degradable_volatile_solids",
             "degradable_volatile_solids",
             "total_solids",
+            "bedding_non_degradable_volatile_solids",
         ]
 
         for name, processor in self.all_processors.items():
@@ -901,7 +952,7 @@ class ManureManager:
                     stored_manure=processor.stored_manure,
                     nutrient_removal_proportion=proportion_of_limiting_nutrient_to_remove,
                     is_nitrogen_limiting_nutrient=is_nitrogen_limiting_nutrient,
-                    non_limiting_fields=non_limiting_fields,
+                    non_limiting_fields=non_limiting_fields.copy(),
                 )
                 removal_details["manure_type"] = STORAGE_CLASS_TO_TYPE.get(type(processor))
                 self._manure_nutrient_manager.remove_nutrients(removal_details)
@@ -945,7 +996,10 @@ class ManureManager:
         removed: dict[str, Any] = {}
 
         original_limiting_nutrients_in_storage = getattr(stored_manure, limiting)
-        limiting_nutrients_to_remove = original_limiting_nutrients_in_storage * nutrient_removal_proportion
+        if math.isclose(nutrient_removal_proportion, 1.0, abs_tol=1e-5):
+            limiting_nutrients_to_remove = original_limiting_nutrients_in_storage
+        else:
+            limiting_nutrients_to_remove = original_limiting_nutrients_in_storage * nutrient_removal_proportion
         removed[limiting] = limiting_nutrients_to_remove
 
         updates: dict[str, float] = {limiting: original_limiting_nutrients_in_storage - limiting_nutrients_to_remove}
@@ -956,7 +1010,7 @@ class ManureManager:
                 nutrient_removal_proportion, original_amount
             )
             removed[field] = removal_amount
-            updates[field] = original_amount - removal_amount
+            updates[field] = round(original_amount - removal_amount, 5)
 
         new_stream = replace(stored_manure, **updates)
         return new_stream, removed
@@ -982,7 +1036,7 @@ class ManureManager:
             The amount of non-limiting nutrients to remove in each storage (kg).
 
         """
-        return limiting_nutrient_proportion_to_be_removed * non_limiting_nutrients_amount
+        return round(limiting_nutrient_proportion_to_be_removed * non_limiting_nutrients_amount, 5)
 
     @staticmethod
     def _determine_limiting_nutrient(
@@ -1043,7 +1097,10 @@ class ManureManager:
             The proportion of limiting nutrient to remove from each storage.
 
         """
-        return min(limiting_nutrient_requested_mass / limited_nutrient_available, 1)
+        if math.isclose(limited_nutrient_available, 0.0, abs_tol=1e-5):
+            return 0.0
+        else:
+            return min(limiting_nutrient_requested_mass / limited_nutrient_available, 1)
 
     def _record_manure_request_results(
         self, manure_request_results: NutrientRequestResults | None, manure_source: str, time: RufasTime
@@ -1139,8 +1196,8 @@ class ManureManager:
             0, nutrient_request.phosphorus - (on_farm_manure.phosphorus if on_farm_manure else 0)
         )
 
-        if math.isclose(remaining_nitrogen, 0.0, abs_tol=1e-6) and math.isclose(
-            remaining_phosphorus, 0.0, abs_tol=1e-6
+        if math.isclose(remaining_nitrogen, 0.0, abs_tol=1e-5) and math.isclose(
+            remaining_phosphorus, 0.0, abs_tol=1e-5
         ):
             return NutrientRequest(
                 nitrogen=0.0,

@@ -1,13 +1,12 @@
 from datetime import date
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from .storage import Storage
-from RUFAS.input_manager import InputManager
 
 """
 This final moisture percentage that expected to be contained in a hay crop. References Feed Storage Scientific
@@ -29,34 +28,40 @@ UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT = 0.000_06
 
 class Hay(Storage):
     """
-    Represents a Hay storage subclass of Storage.
+    Represents Hay storage, a subclass of ``Storage``.
+
+    Parameters
+    ----------
+    config : dict[str, str | float | list[str]]
+        Configuration dictionary for the hay storage.
 
     Attributes
     ----------
     bale_size : float
-        Diameter of the hay bale in meters.
+        Diameter of the hay bale (m).
+    target_dry_matter : float
+        The target dry matter content of hay after drying down in storage (unitless).
+    additional_dry_matter_loss_coefficient : float
+        Coefficient determining how much additional dry matter is lost in hayed crops (unitless).
 
-    Methods
-    -------
-    calculate_protein_loss():
-        Calculates the protein loss in the hay.
     """
 
-    def __init__(self, capacity: float = float("inf")) -> None:
-        im = InputManager()
-        self.bale_size: float = im.get_data("feed_management.hay_bale_diameter")
-        super().__init__(capacity)
-        self.acceptable_crops = [
-            CropCategory.ALFALFA,
-            CropCategory.GRASS,
-            CropCategory.SMALL_GRAIN,
-        ]
-        self.additional_dry_matter_loss_coefficient = 0.0
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
+        super().__init__(config)
+        bale_size = config["bale_size"]
+        assert isinstance(bale_size, (float, int))
+        self.bale_size: float = bale_size
+        target_dry_matter = config["target_dry_matter"]
+        assert isinstance(target_dry_matter, (float, int))
+        self.target_dry_matter: float = target_dry_matter
+        additional_dry_matter_loss_coefficient = config["additional_dry_matter_loss_coefficient"]
+        assert isinstance(additional_dry_matter_loss_coefficient, (float, int))
+        self.additional_dry_matter_loss_coefficient: float = additional_dry_matter_loss_coefficient
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the loss of moisture in hayed crops, and calls the base class's implementation of
-        `process_degradations` to process the loss of dry matter.
+        ``process_degradations`` to process the loss of dry matter.
 
         Parameters
         ----------
@@ -83,7 +88,7 @@ class Hay(Storage):
         Parameters
         ----------
         crops : list[HarvestedCrop]
-            List of HarvestedCrops to project degradations for.
+            List of ``HarvestedCrop`` objects to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
@@ -118,13 +123,12 @@ class Hay(Storage):
         Returns
         -------
         float
-            Mass of gaseous dry matter lost since from hayed crop since the last time it losses were processed for it
-            (kg).
+            Mass of gaseous dry matter lost from the hayed crop since the last time losses were processed for it (kg).
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equations FS.HAY.1, FS.HAY.2., FS.HAY.3, FS.HAY.4, FS.HAY.5,
-        FS.HAY.6, FS.HAY.7
+        Feed Storage Scientific Documentation, equations FS.HAY.1, FS.HAY.2, FS.HAY.3, FS.HAY.4, FS.HAY.5, FS.HAY.6,
+        FS.HAY.7.
 
         """
         days_stored = (time.current_date.date() - crop.storage_time).days
@@ -167,7 +171,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.HAY.3, FS.HAY.4, FS.HAY.5
+        Feed Storage Scientific Documentation, equations FS.HAY.3, FS.HAY.4, FS.HAY.5.
 
         """
         days_stored = (time - crop.storage_time).days
@@ -205,7 +209,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.HAY.6
+        Feed Storage Scientific Documentation, equation FS.HAY.6.
 
         """
         days_stored = (time - crop.storage_time).days
@@ -229,7 +233,7 @@ class Hay(Storage):
         Returns
         -------
         float
-            Loss of dry matter that occurred over the specified period of weather conditions in kg.
+            Loss of dry matter that occurred over the specified period of weather conditions (kg).
 
         Notes
         -----
@@ -238,7 +242,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scienitific Documentation, equation FS.HAY.7 and Table FS.HAY.8
+        Feed Storage Scientific Documentation, equation FS.HAY.7 and Table FS.HAY.8.
 
         """
         if self.additional_dry_matter_loss_coefficient == 0.0:
@@ -256,36 +260,31 @@ class Hay(Storage):
 
 
 class ProtectedIndoors(Hay):
-    """
-    Represents protected indoors hay storage, a subclass of Hay.
-    """
+    """Represents protected indoors hay storage, a subclass of ``Hay``."""
 
-    pass
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
+        super().__init__(config)
 
 
 class ProtectedWrapped(Hay):
-    """
-    Represents protected wrapped hay storage, a subclass of Hay.
-    """
+    """Represents protected wrapped hay storage, a subclass of ``Hay``."""
 
-    def __init__(self, capacity: float = float("inf")) -> None:
-        super().__init__(capacity)
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
+        super().__init__(config)
         self.additional_dry_matter_loss_coefficient = PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
 class ProtectedTarped(Hay):
-    """
-    Represents protected tarped hay storage, a subclass of Hay.
-    """
+    """Represents protected tarped hay storage, a subclass of ``Hay``."""
 
-    def __init__(self, capacity: float = float("inf")) -> None:
-        super().__init__(capacity)
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
+        super().__init__(config)
         self.additional_dry_matter_loss_coefficient = PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT
 
 
 class Unprotected(Hay):
     """
-    Represents unprotected hay storage, a subclass of Hay.
+    Represents unprotected hay storage, a subclass of ``Hay``.
 
     Notes
     -----
@@ -294,8 +293,8 @@ class Unprotected(Hay):
 
     """
 
-    def __init__(self, capacity: float = float("inf")) -> None:
-        super().__init__(capacity)
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
+        super().__init__(config)
         self.additional_dry_matter_loss_coefficient = UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
         self.ndf_loss_coefficient = 0.17
         self.crude_protein_loss_coefficient = 0.4
