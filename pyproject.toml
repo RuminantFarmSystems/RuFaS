@@ -46,6 +46,9 @@ dev = [
     "sphinxcontrib-mermaid>=2.0.1",
 ]
 
+[project.scripts]
+rufas = "RUFAS.main:main"
+
 [project.urls]
 Homepage = "https://rufas.org"
 Repository = "https://github.com/RuminantFarmSystems/RuFaS"
