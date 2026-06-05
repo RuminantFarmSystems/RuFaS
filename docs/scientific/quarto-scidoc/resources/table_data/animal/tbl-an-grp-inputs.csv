@@ -1,10 +1,10 @@
 ﻿Variable,Definition,Default,Min,Max
- id                            , The index of the pen                     , NA       , 0    , NA            
- pen_name                      , The name or identifier of a given pen    , NA       ,-,-
- animal_combination            , The valid combinations of animal types  that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE_UP = HeiferIII's and Dry Cows; LAC_COWS = Lactating Cows,-,-," CALF, GROWING, CLOSE_UP, LAC_COWS  "
- vertical_dist_to_milking_parlor, The elevation gain (in meters) between the pen and the milking parlor, 0.1      , 0    , NA            
- horizontal_dist_to_milking_parlor , The distance (in meters) between the pen  and the milking parlor, 10       , 0    , NA            
- number_of_stalls              , The number of stalls in the pen          , 1000     , 0    , NA            
- pen_type                      ," The type of pen (freestall, tiestall, open lot, compost bedded pack barn)", freestall,      ,"freestall,  tiestall,  open lot,  compost bedded,  pack barn"
- max_stocking_density          , The maximum ratio of the number of animals in the pen to the number of stalls in the pen, 1.2      , 0.5  , 5             
- manure_management_ scenario_id, The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema), 0        , 0    , NA            
+ id , The index of the pen  , -- , 0 , --
+ pen_name , The name or identifier of a given pen , -- ,--,--
+ animal_combination , The valid combinations of animal types  that can be in a pen. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE_UP = HeiferIII's and Dry Cows; LAC_COWS = Lactating Cows,--,--," CALF, GROWING, CLOSE_UP, LAC_COWS "
+ vertical_dist_to_milking_parlor, The elevation gain (in meters) between the pen and the milking parlor, 0.1 , 0 , --
+ horizontal_dist_to_milking_parlor , The distance (in meters) between the pen  and the milking parlor, 10  , 0 , --
+ number_of_stalls , The number of stalls in the pen , 1000  , 0  , --
+ pen_type ," The type of pen (freestall, tiestall, open lot, compost bedded pack barn)", freestall, -- ,"freestall,  tiestall,  open lot,  compost bedded,  pack barn"
+ max_stocking_density , The maximum ratio of the number of animals in the pen to the number of stalls in the pen, 1.2 , 0.5  , 5
+ manure_management_ scenario_id, The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema), 0 , 0 , --

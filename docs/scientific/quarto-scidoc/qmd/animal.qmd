@@ -39,7 +39,7 @@ is equal to the user-defined input for prefresh days (default 21)
 -  Cows cycle through lactating and non-lactating phases until they are removed from the herd due to a failure to 
 conceive or a user-provided probability for sale or death within each parity (lactation).
 
-When a HeiferIII or Cow reaches full gestation length, they start lactating and a new calf object is created. The calf 
+When a Heifer III or Cow reaches full gestation length, they start lactating and a new calf object is created. The calf 
 is assigned a birthweight according to a user-informed random distribution. All male calves are recorded and removed 
 from the farm on day 1 of their life. Female calves either remain on the farm or are sold on day 1, determined by an 
 event-based Monte Carlo method informed by the user-defined percent of female calves that are kept. 
@@ -59,8 +59,7 @@ In RuFaS code, the term “herd initialization” is used to refer to both the p
 Every simulation begins with a herd consisting of calves, heifers, and dry and lactating cows. This herd comes to be through a two-step process: 
 
 1. A population of animals is generated through simulation or loaded from data (`pre-animal-population`). The animals in that herd should reflect the attributes of animals in the herd to be modeled. 
-2. Animals are randomly selected with replacement from the pre-animal-population to be in the initial herd, based on group numbers and characteristics that reflect the distribution of animals within the herd being modeled. 
-  * Note that the animals in the herd on day one will have attributes of the pre-animal-population and may deviate from the desired herd to be modeled.  
+2. Animals are randomly selected with replacement from the pre-animal-population to be in the initial herd, based on group numbers and characteristics that reflect the distribution of animals within the herd being modeled. Note that the animals in the herd on day one will have attributes of the pre-animal-population and may deviate from the desired herd to be modeled.  
 
 For the rest of the simulation, animals enter the herd through birth as newborn calves or purchased replacements (`heiferIII`’s). 
 
@@ -71,7 +70,7 @@ For the rest of the simulation, animals enter the herd through birth as newborn 
 
 import_table(
     "../resources/table_data/animal/tbl-an-sim-outline.csv",
-    colalign=["left", "left", "right", "right", "right"]
+    colalign=["left", "left", "left"]
 )
 ```
 
@@ -81,7 +80,7 @@ import_table(
 #| tbl-cap: User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section.
 import_table(
   "../resources/table_data/animal/tbl-an-herd-inputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
+  colalign = ["left", "left", "center", "center", "center"]
 
 )
 ```
@@ -92,11 +91,12 @@ After the animals have been selected from the animal population to create the in
 (pre-selection pool, aka pre-animal-population) and of the Initial herd (selected animals, aka post-animal-population) 
 is provided to the output manager. 
 
-Class and function: AnimalModuleReporter.report_animal_population_statistics
+Class and function: `AnimalModuleReporter.report_animal_population_statistics`
 
 Output variables: 
-- `.population_{...}`
-- `.initial_{...}`
+
+* `.population_{...}`
+* `.initial_{...}`
 
 {...} includes: breed, number of animals of each class (calf, heiferI, heiferII, heiferIII, cow), number of cows by 
 parity and lactation status, average age of animals within each class, distribution of age of animals within each 
@@ -110,9 +110,10 @@ When a simulation begins, the HerdFactory class generates or loads the pre-anima
 compiles the post-animal-population with an appropriate distribution of animal ages and stages to serve as the starting 
 herd for simulation. 
 
-##### Designation of an Animal Population
+**Designation of an Animal Population**
 
-* **Option 1:** Creating a new Animal Population
+*Option 1: Creating a new Animal Population*
+
 An animal population can be generated as a stand-alone simulation task that creates and saves a pre-animal-population file  as the output based on the user Animal Module inputs. Or, the animal population can be generated as the first step of a regular simulation task which then uses that generated `pre-animal-population` to select from and create the `post-animal-population` to use for the subsequent herd simulation. See the documentation about `Task Manager` for more information about how to generate a new `pre-animal-population`. 
 
 The `_generate_animals()` method creates the `pre_animal_population`, with the option to save those animals to file at the end of the generation process. 
@@ -120,19 +121,20 @@ The `_generate_animals()` method creates the `pre_animal_population`, with the o
 Calves are created according to the number specified by the user (`initial_animal_num`), some are sold based on user inputs, and those remaining proceed through select daily updates (growth, reproduction, milk, and transition through the appropriate life stages) for the user-specified number of days (`simulation_days`). The simulation occurs similarly 
 to the regular life cycle simulation process, but with an extended period and large number of animals. There are a few notable distinctions:  
 
-  * After 3000 days of simulation (specified in `animal_constants`), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
+* After 3000 days of simulation (specified in `animal_constants`), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
+* If a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five). After the `simulation_days` number of days, the full herd contains a mixture of calves, heifers, cows, and replacements. The core status information and life history of each animal are either saved to file or passed for random sampling to create the `post-animal-population`. 
 
-  * If a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five). After the `simulation_days` number of days, the full herd contains a mixture of calves, heifers, cows, and replacements. The core status information and life history of each animal are either saved to file or passed for random sampling to create the `post-animal-population`. 
+*Option 2: Point to an existing Animal Population*
 
-* **Option 2:** Point to an existing Animal Population
 Alternatively, the `pre-animal-population` will be loaded from a specified Animal Population input file consisting of calf, heifer, cow, and replacement objects. 
 
-##### Herd Selection
+*Herd Selection*
+
 The `_random_sample_with_replacement()` method selects animals from each of the following groups: calf, heiferI, heiferII, heiferIII, replacement, lactating cows by parity for parities 1-5, and dry cows by parity for parities 1-5. 
 
 Animals are sampled randomly with replacement from the `pre-animal-population` according to the numbers, parity fractions, and milking cow fraction specified in the animal input file. The resulting list of animals is returned as the `post-animal-population` and summaries of the `pre-` and `post-animal-populations` are reported to the output manager.
 
-## Pens and Animal Grouping
+### Pens and Animal Grouping
 
 #### Introduction
 
@@ -141,11 +143,10 @@ All animals in RuFaS are assigned to a pen which is used to summarize nutrient r
 #### Required User Inputs
 ```{python}
 #| label: tbl-an-grp-inputs
-#| tbl-cap: User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for
-#|  each pen, key inputs are outlined here.
+#| tbl-cap: User inputs in the animal input file that influence pen grouping. The user must define at least 3 pens and for each pen, key inputs are outlined here.
 import_table(
   "../resources/table_data/animal/tbl-an-grp-inputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
+  colalign = ["left", "left", "center", "center", "center"]
 
 )
 ```
@@ -165,7 +166,8 @@ import_table(
 
 #### Methodology
 
-#### Animal Grouping
+**Animal Grouping**
+
 To translate from the `AnimalTypes` needed to track an animal’s life stages and the combinations of animals that are allowed to be grouped into a single pen, a new variable called `AnimalCombination` is created that combines some `AnimalTypes` to facilitate sorting into pens. The `AnimalCombination` class is defined in `enums.py` and includes the following mapping from `AnimalTypes` to `AnimalCombinations`:
 
 ```{python}
@@ -173,67 +175,83 @@ To translate from the `AnimalTypes` needed to track an animal’s life stages an
 #| tbl-cap: Summary of animal types and their grouping included in this module.
 import_table(
   "../resources/table_data/animal/tbl-an-def-grp.csv",
-  colalign = ["left", "left", "right", "right", "right"]
+  colalign = ["left", "left"]
 
 )
 ```
 Currently there are only two options for assigning AnimalCombinations to pens. 
 
-* **Option 1:** The first and most commonly used option for grouping animals is to assign one AnimalCombination to each pen such that there is at least one pen for the 4 AnimalCombinations: `CALF`, `GROWING`, `CLOSE_UP`, and `LAC_COW`. 
+* *Option 1:* The first and most commonly used option for grouping animals is to assign one AnimalCombination to each pen such that there is at least one pen for the 4 AnimalCombinations: `CALF`, `GROWING`, `CLOSE_UP`, and `LAC_COW`. 
 
-* **Option 2:** In some cases, and especially in very small farms, a user might wish to represent a scenario where all growing animals, pregnant heifers, and non-lactating cows are housed together. In this case, there is an option to have a pen that houses both `GROWING` and `CLOSE_UP` animals such that the there is at least one pen with each of the 3  AnimalCombination  inputs: `CALF`, `GROWING_AND_CLOSE_UP`, and `LAC_COW`. 
+* *Option 2:* In some cases, and especially in very small farms, a user might wish to represent a scenario where all growing animals, pregnant heifers, and non-lactating cows are housed together. In this case, there is an option to have a pen that houses both `GROWING` and `CLOSE_UP` animals such that the there is at least one pen with each of the 3  AnimalCombination  inputs: `CALF`, `GROWING_AND_CLOSE_UP`, and `LAC_COW`. 
 
 
-Pen Sizing: Due to oscillations in the exact number of animals in each animal type, it is strongly recommended that the stocking density is at least 120\% of the expected number of animals in each pen. 
+**Pen Sizing**
 
-Class: *Pens* are inare initiated from the Pen class by the HerdManager at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
+Due to oscillations in the exact number of animals in each animal type, it is strongly recommended that the stocking density is at least 120\% of the expected number of animals in each pen. 
+
+**Class** 
+
+Pens are initiated from the Pen class by the HerdManager at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
 
 ::: {.callout-note}
 `Remove_animals_by_ids` - This function is called when the `HerdManager` calls for: `remove_animal_from_pen_and_id_map`. 
 
 It is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen. 
 
-`_add_new_animals` - This function is called by `Pen.update_animals` which is in turn called by `HerdManager._add_animal_to_pen_and_id_map`. Thus, when `HerdManager` initiates addition of animals to each pen, this function executes the addition of those animals `_animal_nutritional_requirements`
+`_add_new_animals` - This function is called by `Pen.update_animals` which is in turn called by `HerdManager._add_animal_to_pen_and_id_map`. Thus, when `HerdManager` initiates addition of animals to each pen, this function executes the addition of those animals. 
 
 :::
 
-## Ration Formulation
-### Introduction
+### Ration Formulation
 
-The diet recipes in RuFaS are either formulated through least-cost formulation [@Li_2022] or provided by the user for each of 4 animal categories (calves, growing heifers, dry and close-up cows, and lactating cows). The composition of the available feeds are provided by a feed library that was adapted from the [@nrc_2021]. The amount of feed required by the farm is tracked by pen and multiple pens of each animal category can be simulated; however, at this time, the RuFaS model can only accept 1 user-defined diet per animal category even if there are multiple simulated pens for that animal category.  
+#### Introduction
 
-In practice, animal feeding on dairy farms is a constantly evolving process that responds to fluctuations in feed availability, animal requirements and responses, and management goals. Although the feed delivery algorithms will make small modifications to the diet recipe in response to animal nutrient requirements and adjust the total amount of feed delivered based on the number of animals and their requirements, the diversity and degree of fluctuation in 
-the diets is less than what is expected on a commercial dairy. The RuFaS feed library can also be modified or expanded on by changing the compositions of the existing feeds or by adding new feeds. 
+The diet recipes in RuFaS are either formulated through least-cost formulation [@Li_2022] or provided by the user for each of 4 animal categories 
+(calves, growing heifers, dry and close-up cows, and lactating cows). The composition of the available feeds are provided by a feed library that 
+was adapted from the @nrc_2021. The amount of feed required by the farm is tracked by pen and multiple pens of each animal category can be simulated; 
+however, at this time, the RuFaS model can only accept one user-defined diet per animal category even if there are multiple simulated pens for that animal category.  
 
-Regardless of whether or not a user chooses to provide their own ration or have RuFaS build and feed a ration optimized for least-cost, RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients and ingredients that are in both the NASEM and NRC libraries can be used. Users interested in feeding a ration that they define, need to provide a list of ingredients and their relative % dry 
-matter intake for each animal class (pre-weaned calves, growing heifers, close-up animals, and lactating cows). 
+In practice, animal feeding on dairy farms is a constantly evolving process that responds to fluctuations in feed availability, animal requirements 
+and responses, and management goals. Although the feed delivery algorithms will make small modifications to the diet recipe in response to animal 
+nutrient requirements and adjust the total amount of feed delivered based on the number of animals and their requirements, the diversity and degree 
+of fluctuation in the diets is less than what is expected on a commercial dairy. The RuFaS feed library can also be modified or expanded on by 
+changing the compositions of the existing feeds or by adding new feeds. 
 
+Regardless of whether or not a user chooses to provide their own ration or have RuFaS build and feed a ration optimized for least-cost, 
+RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients and ingredients that 
+are in both the NASEM and NRC libraries can be used. Users interested in feeding a ration that they define, need to provide a list of ingredients 
+and their relative % dry matter intake for each animal class (pre-weaned calves, growing heifers, close-up animals, and lactating cows). 
 
-If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, it is imperative that proper costs are inputted for each ingredient listed, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in kg/DM. RuFaS will then use all the ingredients available (based on costs and inventory available if the feed is homegrown) to create a ration that meets the nutritional requirements of the animal class and is cost-optimized. 
+If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, it is imperative that proper costs are inputted for each 
+ingredient listed, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in 
+kg/DM. RuFaS will then use all the ingredients available (based on costs and inventory available if the feed is homegrown) to create a ration that 
+meets the nutritional requirements of the animal class and is cost-optimized. 
 
 
 ::: {.callout-note}
 For the time being, only one set of feeds and ration formula can be provided for each animal class. 
 :::
 
-### Energy and Nutrition Requirements
-
-#### Nutrient Requirements of Dairy Cattle (NRC)
-
-Below are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by the NRC and more recently the NASEM @nrc_2001, @nrc_2021.
+Below are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by @nrc_2001 and more 
+recently the @nrc_2021.
 
 Calculations are included for the following requirement categories:
 
 * Energy (Maintenance, Activity, Growth, Pregnancy, Lactation)
 * Protein (Maintenance, Growth, Pregnancy, Lactation)
 * Minerals (Maintenance, Growth, Pregnancy, Lactation)
-* Dry Matter Intake
+* Dry Matter Intake (DMI)
 * Amino Acids (NASEM only) 
 
 Where appropriate, requirement calculations are differentiated by animal age and reproductive status.
 
+
+#### Nutrient Requirements of Dairy Cattle: NRC
+
+
 ##### Energy Requirements
-For details about the variables included in each calculation, please refer to tbl-energy-req for a full list.
+For details about the variables included in each calculation, please refer to #tbl-energy-req for a full list.
 
 **Maintenance** <br>
 The maintenance requirement is calculated based on metabolic body weight ($\text{body weight}^{0.75}$).
@@ -251,7 +269,7 @@ $$
 :::{#eq-an-nrc-2}
 [[**AN.NRC.2**]]{.aside .content-visible when-format="html"}
 $$
-\text{CW} = (18 + (\text{DOP} - 190) \times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
+\text{CW} = (18 + (\text{DOP} - 190) \times 0.665) \times \left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
 $$
 :::
 
@@ -264,7 +282,7 @@ $$
 $$
 :::
 
-* Heifers : The maintenance requirement is calculated based on metabolic body weight (body weight^0.75), body condition score, and the previous month's temperatures.
+* Heifers - The maintenance requirement is calculated based on metabolic body weight (body weight^0.75), body condition score, and the previous month's temperatures.
 
 :::{}
 [See [AN.NRC.1](#eq-an-nrc-1)]{.aside .content-visible when-format="html"}
@@ -277,7 +295,7 @@ $$
 :::{}
 [See [AN.NRC.2](#eq-an-nrc-2)]{.aside .content-visible when-format="html"}
 $$
-\text{CW} = (18 + (\text{DOP} - 190) \times 0.665)\left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
+\text{CW} = (18 + (\text{DOP} - 190) \times 0.665) \times \left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
 $$
 :::
 
@@ -305,7 +323,7 @@ Activity requirement is proportional to body weight and daily walking distance. 
 :::{#eq-an-nrc-8}
 [[**AN.NRC.8**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa1} = 0.0012\times \text{BW} 
+\text{NEa1} = 0.0012\times \text{BW} \qquad \text{if Housing = Grazing = 0}
 $$
 :::
 
@@ -913,7 +931,7 @@ import_table(
 ```
 
 
-##### Dry Matter Intake (DMI) Estimation
+##### DMI Estimation
 
 Estimations are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to the [DMI requirements key](#tbl-an-dmi-var). The sum of DMI of each feed is assumed to be less than the estimated DMI:
 
@@ -1044,7 +1062,7 @@ import_table(
 )
 ```
 
-#### NASEM Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition
+#### Nutrient Requirements of Dairy Cattle: NASEM
 
 ##### Energy Requirements
 The maintenance requirement is calculated based on metabolic body weight (MBW, body weight\(^{0.75}\)) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to the NASEM energy requirements key.
@@ -1973,8 +1991,8 @@ import_table(
 )
 ```
 
-#### NASEM Calculation Amino Acid Requirements
-The methods for estimating the amino acids requirements for lactating cows based on the \textcite{nrc2021}, into RuFaS are described below.
+##### Amino Acid Requirements
+The methods for estimating the amino acids requirements for lactating cows based on the @nrc2021, into RuFaS are described below.
 
 * Amino acids are divided into essential (EAA) and non-essential (NEAA).
 * This section will focus on calculating the requirements for the essential amino acids. The EAA and NEAA are listed in the next table.
@@ -1990,7 +2008,6 @@ import_table(
 )
 ```
 
-##### EEA Calculations
 The AA requirements for lactating cows are categorized into maintenance, growth, pregnancy, and lactation. Notice that the first variable from each equation comes from the outputs of the metabolizable protein equations that are already in the RuFaS model. The second variable corresponds to the composition of AA used or secreted for each metabolic state (maintenance, growth, pregnancy, and lactation) of the cow, we can find those values in Table 6-2 (page 79) of @nrc_2021. The subscript "i" in the equations represents each specific amino acid being calculated; for example, `TotalAArequirementsi_ii` refers to the total requirements for individual amino acids such as methionine, lysine, arginine, and others.
 
 
@@ -2145,141 +2162,174 @@ import_table(
 ```
 
 
-### Energy and Nutrition Supply (NRC)
+#### Energy and Nutrition Supply
 
-#### Total Digestible Nutrients (TDN)
+##### Energy Supply: NRC
 
-#### Digestible Energy (DE)
+<!-- TODO -->
 
-#### Metabolizable Energy (ME)
+**Total Digestible Nutrients (TDN)**
 
-#### Net Energy
+**Digestible Energy (DE)**
 
-**Maintenance** <br>
-**Lactation** <br>
-**Activity** <br>
+**Metabolizable Energy (ME)**
 
+**Net Energy**
 
-
-
-
-
-### Energy and Nutrition Supply (NASEM)
-
-#### Digestible Energy (DE) of a Feed
-
-#### Neutral Detergent Fiber Digestibility (dNDF)
-
-#### Starch Digestibility (dStarch)
-
-#### Fatty Acid Digestibility (dFA)
-
-#### Protein Digestibility (RUP and dRUP)
-
-#### Residual Organic Matter (ROM)
-
-#### Metabolizable Energy
-
-#### Gaseous Energy
-
-#### Urine Energy
-
-#### Net Energy
-
-
-
-
-
-
-### Protein Supply
-
-#### Microbial Protein Supply
-
-#### Rumen Undegradable Protein Supply
-
-#### Endogenous Protein Supply
-
-
-
-
-
-### Mineral Supply
-
-
-
-
-
-### AA Nurtient Supply
-
-#### Energy Supply
-
-**Total Digestible Nutrients** <br>
-**Digestible Energy** <br>
-**Metabolizable Energy** <br>
-**Net Energy** <br>
 * Maintenance
 * Lactation
-* Growth
-
-#### Protein Supply
-**Microbial Protein Supply** <br>
-**Rumen Undegradable Protein Supply** <br>
-**Endogenous Protein Supply** <br>
+* Activity
 
 
-#### Mineral Supply
+##### Energy Supply: NASEM
+
+**Digestible Energy (DE) of a Feed**
+
+* Neutral Detergent Fiber Digestibility (dNDF)
+
+* Starch Digestibility (dStarch)
+
+* Fatty Acid Digestibility (dFA)
+
+* Protein Digestibility (RUP and dRUP)
+
+* Residual Organic Matter (ROM)
+
+
+**Digestible Energy of the Diet**
+
+
+**Metabolizable Energy**
+
+* Gaseous Energy
+
+* Urine Energy
+
+
+**Net Energy**
 
 
 
+##### Protein Supply
 
-### Automated Ration Formulation
+**Microbial Protein Supply**
 
-#### Introduction
-#### Required User Inputs
-#### Relevant Outputs
+**Rumen Undegradable Protein Supply**
 
-#### Methodology
+**Endogenous Protein Supply**
+
+
+##### Mineral Supply
+
+
+#### Automated Ration Formulation
+
+##### Introduction
+
+Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs, but the primary Feed input file, and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
+
+##### Required User Inputs
+
+```{python}
+#| label: tbl-an-auto-ration-an-input
+#| tbl-cap: Key inputs found in the animal input file.
+import_table(
+  "../resources/table_data/animal/tbl-an-auto-ration-an-input.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+
+##### Relevant Outputs
+
+Average nutrient requirements, on a per animal basis, for each pen.
+
+* Class and function: `AnimalModuleReporter.report_ration_interval_data`
+* Output variable: `avg_rqmts_pen_pen.id_pen.animal_combination.name`
+
+Each formulation interval's mean animal ration, on a per animal basis, for each pen.
+
+* Class and function: `AnimalModuleReporter.report_ration_interval_data`
+* Output variable: `ration_per_animal_for_pen_pen.id_pen.animal_combination.name`
+
+Nutrient and energetic composition of ration, on a per animal basis, for each pen.
+
+* Class and function: `AnimalModuleReporter.report_ration_interval_data`
+* Output variable: `ration_nutrient_amount_pen_pen.id_pen.animal_combination.name`
+
+The total amount of Feeds, per pen.
+
+* Class and function: `AnimalModuleReporter.report_daily_ration`
+* Output variable: `ration_daily_feed_totals_for_pen_pen.id_pen.animal_combination.name`
+
+In cases of ration formulation failure, a summary of the constraints that failed, and the attempted ration and its supply will be supplied in a report.
+
+* Class and function: `RationOptimizer.handle_failed_constraints`
+* Output variable: `failed_constraint_summary_for_pen_pen_id`
+
+
+##### Methodology
+
+Ration formulation is carried out at the pen level on a user-defined formulation interval (Table RF1). The mean requirements for a given pen are calculated prior to first formulation, as described in [REF IV. Animal Nutrition and Feeding, A. Calculations of Animal Energy and Nutrient Requirement]. This process then proceeds to utilize a series of constraints methods (Table RF3) that compares the animal requirements against the supply of the optimizer’s ration attempt, as described in [REF IV. Animal Nutrition and Feeding, B. Calculations of Animal Energy and Nutrient Supply], all while abiding feed ingredient-specific inclusion rates, as defined in [REFERENCE TO NRC/NASEM LIBRARY]. If a ration cannot be formulated that meets the constraints given the pen-level requirements and limits to inclusion rates, then one of the following things will happen.
+
+**For lactacting cow pens**
+
+* Record failed constraints and formulation attempt to OutputManager.
+* Milk production will be reduced.
+  * If average milk production for the pen drops below the values defined in [REFERENCE TO 5. MILK PRODUCTION AND REDUCTION], then the simulation halts with an error.
+* Recalculation of the nutritional requirements for all animals in the pen.
+* Ration formulation reattempt (repeat).
+
+**For growing and close-up pens**
+
+* Record failed constraints and formulation attempt to OutputManager.
+* IF a successful ration from a prior formulation is available, said ration will be used.
+* IF no previously successful ration is available, the simulation will stop.
 
 ::: {.callout-note}
 Note: A graphical overview of this process can be found in Figure 4 in II Animal Management, C. Milk Production.
 :::
 
+The generalized equation for sequential quadratic programming is as follows and gi(x) is constraint i, which must be twice continuously differentiable with respect to all xj in x (@Li_2022).
 
-### User-Defined Ration Formulation
+
+
+#### User-Defined Ration Formulation
+
+<!-- TODO -->
+
+
+##### Introduction
+
+##### Required User Inputs
+
+##### Methodology
+
+
+
+
+
+### Herd Size Management
 
 #### Introduction
-#### Required User Inputs
-#### Relevant Outputs
 
+#### Herd Size Management: Heifer III Sales
 
+#### Reproductive Culls: Heifer II Sales
 
+#### Calf Sales
 
-
-## Herd Size Management
-
-
-
-
-
+#### Calf Losses (Death)
 
 
 
 
 ## Animal-level Process and Management
 
+
 ### RuFaS Bodyweight and Growth
 
-#### Introduction 
 
-#### Methodology
-
-### User-Defined Ration Formulation
-
-#### Introduction 
-
-#### Methodology
-
-## Herd Size Management
+#### Introduction
 
 An animal’s bodyweight is initialized at birth according to a user defined normal distribution.
 Depending on her life stage, her bodyweight is then updated daily by adding their daily growth (commonly referred to 
@@ -2315,7 +2365,7 @@ import_table(
 - `Pen_[pen ID]_[pen animal combination].avg_BW` (kg): the daily average bodyweight of all animals in each pen
 - `sold_weight` (kg)
 
-### Methodology
+#### Methodology
 
 Most methods determining the bodyweight of animals in RuFaS are implemented in growth.py. 
     
@@ -2333,7 +2383,7 @@ $$
 $$
 :::
 
-#### Calf Birth Weight
+##### Calf Birth Weight
 
 Calf birth weight is assigned in reproduction.py using a random draw from a truncated normal distribution 
 based on user inputs for the breed-specific average and standard deviation of the birthweight. The distribution is 
@@ -2347,7 +2397,7 @@ $$
 $$
 :::
 
-#### Calf Growth 
+##### Calf Growth 
 
 Calves are assumed to double their weight between birth and weaning based on recommendations 
 of the @nrc_2001. Thus the target average daily gain is estimated as:
@@ -2359,7 +2409,7 @@ $$
 $$
 :::
 
-#### Non Pregnant Heifer Growth
+##### Non Pregnant Heifer Growth
 
 The daily growth for non-pregnant heifers is estimated through an average daily 
 gain to reach 55% of their manure bodyweight by the time they are pregnant. Because the actual age at pregnancy 
@@ -2378,7 +2428,7 @@ $$
 
 Where MSBW is mature shrunk bodyweight (0.96 x mature bodyweight) and SBW is shrunk bodyweight (0.96 x bodyweight)
 
-#### Pregnant Heifer Growth
+##### Pregnant Heifer Growth
 
 Heifers are targeted to grow to 82% of their mature body weight by the time of their 
 first calving. A gestation length is set at conception. The ADG of pregnant heifers is calculated based on the target 
@@ -2393,14 +2443,14 @@ $$
 $$
 :::
 
-#### Parity 1 and 2 Cow Growth
+##### Parity 1 and 2 Cow Growth
 
 The daily growth of cows is calculated based on the target of reaching 92% of the 
 mature body weight by the end of the 1st lactation, and full mature body weight at the end of the 2nd lactation. Before 
 pregnancy, the daily growth is estimated based on the calving interval and during pregnancy the daily growth is 
 calculated based on days until calving. 
 
-##### Parity 1 Animals:
+###### Parity 1 Animals:
 
 If not pregnant:
 
@@ -2420,7 +2470,7 @@ $$
 $$
 :::
 
-##### Parity 2 Animals
+###### Parity 2 Animals
 
 If not pregnant:
 
@@ -2445,7 +2495,7 @@ is set either as the average herd calving interval or the animal’s own calving
 at her second calving minus her age at first calving as part of the daily_reproduction_update in animal.py.
 
 
-#### Conceptus Growth
+##### Conceptus Growth
 
 Conceptus growth is estimated the same way for both heifers and cows using a non-linear model for animals that are 
 greater than 50 days in pregnancy based on the methods developed by @Korver1985. 
@@ -2493,7 +2543,7 @@ $$
 $$
 :::
 
-#### Tissue Change Due to Lactation
+##### Tissue Change Due to Lactation
 
 Lactation related tissue changes are estimated by a non-linear model presented by @Galvao2013 that estimates the 
 daily tissue mobilized during lactation. 
@@ -2547,17 +2597,88 @@ $$
 
 <!-- TODO -->
 
+#### Introduction
+
+#### Required User Inputs
+
+#### Expected Outputs
+
+#### Methodology
+
+##### Heifer Breeding
+
+##### Cow Breeding
+
+##### Pregnancy Diagnosis (PD) and Pregnancy Loss
+
+
+
 ### Milk Production
 
 <!-- TODO -->
+
+#### Introduction 
+#### Required User Inputs
+#### Expected Outputs
+#### Methodology 
+##### Herd Level Lactation Curve Parameters
+
+**User Inputs and Constants**
+**Parameters and Equations**
+
+##### Cow Level Lactation Curve Parameters
+
+**User Inputs and Constants**
+**Parameters and Equations**
+
+##### Daily Milk Production
+
+**User Inputs and Constants**
+**Parameters and Equations**
+
+##### Daily Components Production
+
+**User Inputs and Constants**
+**Parameters and Equations**
+
+##### Milk Production and Reduction
+
+**User Inputs and Constants**
+**Parameters and Equations**
+
+##### Starting and Ending Lactation
+
 
 ### Lactation Curve: Parameters and Definitions
 
 <!-- TODO -->
 
+#### Introduction
+#### Required User Inputs
+#### Expected Outputs
+#### Methodology
+
+
 ### Culling
 
 <!-- TODO -->
+
+#### Introduction
+#### Required User Inputs
+#### Expected Outputs
+#### Methodology
+##### Cow Deaths
+**User Inputs and Constants**
+**Parameters and Equations**
+##### Cow Sales
+###### Disease Related
+**User Inputs and Constants**
+**Parameters and Equations**
+###### Production Related
+**User Inputs and Constants**
+**Parameters and Equations**
+
+
 
 ## Methane Emission and Manure Excretion
 
