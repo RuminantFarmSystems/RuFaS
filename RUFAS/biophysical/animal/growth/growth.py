@@ -23,6 +23,8 @@ class Growth:
         The body weight of the animal (kg).
     tissue_changed: float
         Body weight change due to tissue mobilization (kg).
+    body_weight_history : list[BodyWeightHistory]
+        A list of animal ``BodyWeightHistory`` objects.
     """
 
     daily_growth: float = 0.0
@@ -33,7 +35,7 @@ class Growth:
         self,
         daily_growth: float = 0.0,
         tissue_changed: float = 0.0,
-        body_weight_history: list[BodyWeightHistory] = None,
+        body_weight_history: list[BodyWeightHistory] | None = None,
     ) -> None:
         self.daily_growth = daily_growth if daily_growth else 0.0
         self.tissue_changed = tissue_changed if tissue_changed else 0.0
@@ -46,14 +48,6 @@ class Growth:
     ) -> GrowthOutputs:
         """
         Handles an animal's daily growth updates.
-
-        Notes
-        -----
-        Calf growth - [AN.BWT.1]
-        Non-preg heifer growth - [AN.BWT.2]
-        Preg heifer growth -  [AN.BWT.3]
-        1st & 2nd parity cow growth - [AN.BWT.4]
-        Parity 3+ cow growth - [AN.BWT.5]
 
         Parameters
         ----------
@@ -71,6 +65,22 @@ class Growth:
         tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]
             The updated animal growth properties, reproduction properties, and the general properties of the animal
             after the growth-related routines for the current day.
+
+        Raises
+        ------
+        ValueError
+            If unknown animal type encountered.
+        RuntimeError
+            For any other unexpected errors in body weight change evaluation process.
+
+        References
+        ----------
+        Calf growth : [AN.BWT.1]
+        Non-preg heifer growth : [AN.BWT.2]
+        Preg heifer growth : [AN.BWT.3]
+        1st & 2nd parity cow growth : [AN.BWT.4]
+        Parity 3+ cow growth : [AN.BWT.5]
+
         """
         growth_outputs = GrowthOutputs(
             body_weight=growth_inputs.body_weight,
@@ -157,11 +167,6 @@ class Growth:
         """
         Calculates the body weight change for calves.
 
-        Notes
-        ------
-        [AN.BWT.7]
-
-
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -171,17 +176,17 @@ class Growth:
         -------
         float
             The daily body weight growth for calves (kg).
+
+        References
+        ----------
+        [AN.BWT.7]
+
         """
         return growth_inputs.birth_weight / AnimalConfig.wean_day
 
     def calculate_non_pregnant_heifer_body_weight_change(self, growth_inputs: GrowthInputs) -> float:
         """
         Calculates the body weight change of heifers due to growth.
-
-        Notes
-        ------
-        [AN.BWT.8]
-        [AN.BWT.9]
 
         Parameters
         ----------
@@ -193,14 +198,17 @@ class Growth:
         float
             The daily body weight growth for non-pregnant heifers (kg).
 
-        References
-        ----------
-        Life cycle pseudocode @[A.1A.C.6] in pseudocode, which are from Fox et al. 1999 and NRC 2001.
-
         Notes
         -----
         For animals over 55% of their mature body weight, the equation results in a negative return.
         Therefore, when the result is negative, the minimum BW change constant is returned instead.
+
+        References
+        ----------
+        Life cycle pseudocode @[A.1A.C.6] in pseudocode, which are from Fox et al. 1999 and NRC 2001.
+        [AN.BWT.8]
+        [AN.BWT.9]
+
         """
         divisor = abs(AnimalConfig.target_heifer_pregnant_day - growth_inputs.days_born)
         if divisor == 0:
@@ -214,11 +222,6 @@ class Growth:
         """
         Calculates the body weight change for pregnant heifers.
 
-        Notes
-        -----
-        [AN.BWT.3]
-        [AN.BWT.9]
-
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -229,6 +232,10 @@ class Growth:
         tuple[float, float]
             The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).
 
+        References
+        ----------
+        [AN.BWT.3]
+        [AN.BWT.9]
 
         """
         target_average_daily_growth_pregnant_heifer = self._calculate_pregnant_heifer_target_daily_growth(growth_inputs)
@@ -244,11 +251,6 @@ class Growth:
         """
         Calculates the body weight change for cows.
 
-        Notes
-        -----
-        [AN.BWT.4]
-        [AN.BWT.5]
-
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -259,6 +261,11 @@ class Growth:
         tuple[float, float, float]
             The daily body weight growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
             tissue changed (kg).
+
+        References
+        ----------
+        [AN.BWT.4]
+        [AN.BWT.5]
 
         """
         conceptus_growth, updated_conceptus_weight, self.tissue_changed = self._calculate_cow_conceptus_growth(
@@ -279,14 +286,6 @@ class Growth:
         """
         Calculates the conceptus growth for pregnant heifers.
 
-        Notes
-        --------
-        Total conceptus weight - [AN.BWT.14]
-        conceptus parameter - [AN.BWT.15]
-        Conceptus growth - [AN.BWT.16]
-        Conceptus weight change at parturition - [AN.BWT.17]
-
-
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -296,6 +295,14 @@ class Growth:
         -------
         tuple[float, float]
             The conceptus growth for pregnant heifers (kg), and the updated conceptus weight (kg).
+
+        References
+        ----------
+        Total conceptus weight : [AN.BWT.14]
+        Conceptus parameter : [AN.BWT.15]
+        Conceptus growth : [AN.BWT.16]
+        Conceptus weight change at parturition : [AN.BWT.17]
+
         """
         updated_conceptus_weight = growth_inputs.conceptus_weight
         if growth_inputs.days_in_pregnancy == growth_inputs.gestation_length:
@@ -315,13 +322,6 @@ class Growth:
         """
         Calculates the conceptus growth for cows.
 
-        Notes
-        -------
-        Total conceptus weight - [AN.BWT.14]
-        conceptus parameter - [AN.BWT.15]
-        Conceptus growth - [AN.BWT.16]
-        Conceptus weight change at parturition - [AN.BWT.17]
-
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -332,6 +332,14 @@ class Growth:
         tuple[float, float, float]
             The conceptus growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
             tissue changed (kg).
+
+        Referemces
+        ----------
+        Total conceptus weight : [AN.BWT.14]
+        conceptus parameter : [AN.BWT.15]
+        Conceptus growth : [AN.BWT.16]
+        Conceptus weight change at parturition : [AN.BWT.17]
+
         """
         updated_tissue_change = (
             0.0 if growth_inputs.days_in_pregnancy == growth_inputs.gestation_length else self.tissue_changed
@@ -345,10 +353,6 @@ class Growth:
         """
         Calculates the target daily growth for pregnant heifers.
 
-        Notes
-        ----------
-        [AN.BWT.9]
-
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -358,6 +362,11 @@ class Growth:
         -------
         float
             The daily growth rate for pregnant heifers (kg).
+
+        References
+        ----------
+        [AN.BWT.9]
+
         """
         divisor = abs(growth_inputs.gestation_length - growth_inputs.days_in_pregnancy)
         if divisor == 0:
@@ -368,14 +377,6 @@ class Growth:
         """
         Calculates the target daily growth for cows.
 
-        Notes
-        ---------
-        [AN.BWT.10]
-        [AN.BWT.11]
-        [AN.BWT.12]
-        [AN.BWT.13]
-
-
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -385,6 +386,14 @@ class Growth:
         -------
         float
             The daily growth rate for cows (kg).
+
+        References
+        ----------
+        [AN.BWT.10]
+        [AN.BWT.11]
+        [AN.BWT.12]
+        [AN.BWT.13]
+
         """
         if growth_inputs.calves == 1:
             if growth_inputs.days_in_pregnancy < 1:
@@ -410,12 +419,6 @@ class Growth:
         """
         Calculates the body weight tissue growth for cows.
 
-        Notes
-        --------
-        [AN.BWT.18]
-        [AN.BWT.19]
-        [AN.BWT.20]
-
         Parameters
         ----------
         growth_inputs: GrowthInputs
@@ -425,6 +428,13 @@ class Growth:
         -------
         tuple[float, float]
             The body weight tissue growth for cows (kg), and the updated tissue changed (kg).
+
+        References
+        ----------
+        [AN.BWT.18]
+        [AN.BWT.19]
+        [AN.BWT.20]
+
         """
         updated_tissue_changed = self.tissue_changed
         if growth_inputs.is_milking:

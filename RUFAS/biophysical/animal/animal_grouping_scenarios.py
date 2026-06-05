@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Dict, List
 
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -9,13 +8,8 @@ from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombina
 class AnimalGroupingScenario(Enum):
     """
     The different scenarios for grouping animals on a farm.
-    Each scenario is a dictionary of the form: { AnimalCombination: [List of animal types/subtypes] }
-
-
+    Each scenario is a dictionary of the form: { AnimalCombination: [list of animal types/subtypes] }
     """
-
-    # TODO: Probably change the names of these scenarios to be more concise/descriptive. Add other scenarios as needed.
-    #  Issue #1205
 
     CALF__GROWING__CLOSE_UP__LACCOW = {
         AnimalCombination.CALF: [AnimalType.CALF],
@@ -35,25 +29,24 @@ class AnimalGroupingScenario(Enum):
         AnimalCombination.LAC_COW: [AnimalType.LAC_COW],
     }
 
-    def __init__(self, value: Dict[AnimalCombination, List[str]]):
+    def __init__(self, value: dict[AnimalCombination, list[str]]):
         """
         Initialize the AnimalGroupingScenario.
 
         Parameters
         ----------
-        value : Dict[AnimalCombination, List[str]]
+        value : dict[AnimalCombination, list[str]]
             The value of the AnimalGroupingScenario.
 
         """
 
         self._value_ = value
 
-        self._animal_combination_by_animal_type: Dict[AnimalType, AnimalCombination] = {}
+        self._animal_combination_by_animal_type: dict[AnimalType, AnimalCombination] = {}
         for animal_combination, animal_types in self.value.items():
             for animal_type in animal_types:
                 self._animal_combination_by_animal_type[animal_type] = animal_combination
 
-    # Currently, we don't have subtypes for calves, heiferIs, heiferIIs, and heiferIIIs.
     def _get_calf_type(self, calf: Animal) -> AnimalType:
         """
         Get the animal subtype of the given calf.

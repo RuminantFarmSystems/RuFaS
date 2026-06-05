@@ -1,9 +1,9 @@
 from math import exp
-from typing import List, Optional
 
 from RUFAS.biophysical.field.crop.crop_data import CropData
 from RUFAS.biophysical.field.crop.nutrient_uptake import NutrientUptake
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 class WaterUptake(NutrientUptake):
@@ -13,19 +13,19 @@ class WaterUptake(NutrientUptake):
     Parameters
     ----------
     crop_data : CropData, optional
-        An instance of `CropData` containing specific crop parameters and states. If not provided, a default
+        An instance of ``CropData`` containing specific crop parameters and states. If not provided, a default
         instance with generic crop parameters is created.
     water_distro_parameter : float, default 10
         Water-use distribution parameter governing water-uptake from the soil (unitless).
-    potential_water_uptakes : Optional[List[float]], default None
+    potential_water_uptakes : list[float], optional
         The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
     water_compensation_factor : float, default 0.01
         Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
         (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
         can be drawn from deeper layers.
-    unmet_water_demands : Optional[List[float]], default None
+    unmet_water_demands : list[float], optional
         Cumulative water demands not met by all previous layers (mm).
-    actual_water_uptakes : Optional[List[float]], default None
+    actual_water_uptakes : list[float], optional
         The actual amount of water to be removed from the soil (mm).
 
     Attributes
@@ -35,15 +35,15 @@ class WaterUptake(NutrientUptake):
         like root depth, growth rates, and environmental conditions affecting root expansion.
     water_distro_parameter : float
         Water-use distribution parameter governing water-uptake from the soil (unitless).
-    potential_water_uptakes : Optional[List[float]]
+    potential_water_uptakes : list[float] | None
         The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
     water_compensation_factor : float
         Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
         (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
         can be drawn from deeper layers.
-    unmet_water_demands : Optional[List[float]]
+    unmet_water_demands : list[float] | None
         Cumulative water demands not met by all previous layers (mm).
-    actual_water_uptakes : Optional[List[float]]
+    actual_water_uptakes : list[float] | None
         The actual amount of water to be removed from the soil (mm).
 
     References
@@ -54,12 +54,12 @@ class WaterUptake(NutrientUptake):
 
     def __init__(
         self,
-        crop_data: Optional[CropData] = None,
+        crop_data: CropData | None = None,
         water_distro_parameter: float = 10,
-        potential_water_uptakes: Optional[List[float]] = None,
+        potential_water_uptakes: list[float] | None = None,
         water_compensation_factor: float = 0.01,
-        unmet_water_demands: Optional[List[float]] = None,
-        actual_water_uptakes: Optional[List[float]] = None,
+        unmet_water_demands: list[float] | None = None,
+        actual_water_uptakes: list[float] | None = None,
     ):
         super().__init__(crop_data)
         self.water_distro_parameter = water_distro_parameter
@@ -128,7 +128,7 @@ class WaterUptake(NutrientUptake):
         Raises
         ------
         Exception
-            If the lengths of `soil_data.soil_layers` and `self.actual_water_uptakes` aren't equal.
+            If the lengths of ``soil_data.soil_layers`` and ``self.actual_water_uptakes`` aren't equal.
 
         Notes
         -----
@@ -138,6 +138,12 @@ class WaterUptake(NutrientUptake):
 
         """
         if len(soil_data.soil_layers) != len(self.actual_water_uptakes):
+            OutputManager().add_error(
+                "Soil water extraction error",
+                "actual_water_uptakes should be the same length as the number of soil layers but got "
+                f"{len(soil_data.soil_layers)} soil layers and {len(self.actual_water_uptakes)} water uptakes",
+                info_map={"class": self.__class__.__name__, "function": self.extract_water_from_soil.__name__},
+            )
             raise Exception("actual_water_uptakes should be the same length as the number of soil layers")
 
         available_water = soil_data.get_vectorized_layer_attribute("water_content")
@@ -151,22 +157,31 @@ class WaterUptake(NutrientUptake):
     @classmethod
     def _take_up_water(
         cls,
-        potential_uptakes: List[float],
-        water_availabilities: List[float],
-        wilting_points: List[float],
-    ) -> List[float]:
+        potential_uptakes: list[float],
+        water_availabilities: list[float],
+        wilting_points: list[float],
+    ) -> list[float]:
         """
         Calculates the actual water taken up by the plant for each soil layer.
+
+        Parameters
+        ----------
+        potential_uptakes : list[float]
+            The potential water uptake from each layer of soil (mm).
+        water_availabilities : list[float]
+            The water available for each layer of soil (mm).
+        wilting_points : list[float]
+            The wilting point of each layers of soil (mm).
 
         Returns
         -------
         uptakes: list[float]
-            the actual water uptake from each layer of soil (mm)
+            The actual water uptake from each layer of soil (mm).
 
         Raises
         ------
         Exception
-            If the lengths of `potential_uptakes`, `water_availabilities`, and `wilting_points` are not all equal.
+            If the lengths of ``potential_uptakes``, ``water_availabilities``, and ``wilting_points`` are not all equal.
 
         Notes
         -----
@@ -174,6 +189,13 @@ class WaterUptake(NutrientUptake):
 
         """
         if not len(potential_uptakes) == len(water_availabilities) == len(wilting_points):
+            OutputManager().add_error(
+                "Water take up error",
+                "potential_uptakes, water_availabilities, and wilting_points must be of equal length but got "
+                f"{len(potential_uptakes)} potential uptakes and {len(water_availabilities)} water availabilities "
+                f"and {len(wilting_points)} wilting points.",
+                info_map={"class": WaterUptake.__name__, "function": WaterUptake._take_up_water.__name__},
+            )
             raise Exception("potential_uptakes, water_availabilities, and wilting_points must be of equal length")
 
         zipped = zip(potential_uptakes, water_availabilities, wilting_points)
@@ -203,10 +225,10 @@ class WaterUptake(NutrientUptake):
 
     @staticmethod
     def _reduce_efficiency_of_uptake(
-        potential_uptakes: List[float],
-        water_availabilities: List[float],
-        available_capacities: List[float],
-    ) -> List[float]:
+        potential_uptakes: list[float],
+        water_availabilities: list[float],
+        available_capacities: list[float],
+    ) -> list[float]:
         """
         Returns the potential water uptake for each layer after correcting for availability-dependent uptake
         efficiency.
@@ -228,7 +250,7 @@ class WaterUptake(NutrientUptake):
         Raises
         ------
         Exception
-            If `potential_uptakes`, `water_availabilities`, and `available_capacities` are not all equal lengths.
+            If ``potential_uptakes``, ``water_availabilities``, and ``available_capacities`` are not all equal lengths.
 
         Notes
         -----
@@ -236,6 +258,13 @@ class WaterUptake(NutrientUptake):
 
         """
         if not len(potential_uptakes) == len(water_availabilities) == len(available_capacities):
+            OutputManager().add_error(
+                "Water uptake efficiency reduction error",
+                "potential_uptakes, water_availabilities, and available_capacities must be of equal length but got "
+                f"{len(potential_uptakes)} potential uptakes and {len(water_availabilities)} water availabilities "
+                f"and {len(available_capacities)} available capacities.",
+                info_map={"class": WaterUptake.__name__, "function": WaterUptake._reduce_efficiency_of_uptake.__name__},
+            )
             raise Exception("potential_uptakes, water_availabilities, and available_capacities must be of equal length")
 
         zipped = zip(potential_uptakes, water_availabilities, available_capacities)
@@ -276,10 +305,10 @@ class WaterUptake(NutrientUptake):
 
     @staticmethod
     def _adjust_water_uptakes(
-        potential_uptakes: List[float],
-        unmet_demands: List[float],
+        potential_uptakes: list[float],
+        unmet_demands: list[float],
         uptake_compensation: float,
-    ) -> List[float]:
+    ) -> list[float]:
         """
         Adjusts the potential water uptakes for each layer based on drawing from deeper layers when possible.
 
@@ -301,7 +330,7 @@ class WaterUptake(NutrientUptake):
         Raises
         ------
         Exception
-            If the lengths of `potential_uptakes` and `unmet_demands` are not equal.
+            If the lengths of ``potential_uptakes`` and ``unmet_demands`` are not equal.
 
         References
         ----------
@@ -309,6 +338,12 @@ class WaterUptake(NutrientUptake):
 
         """
         if not len(potential_uptakes) == len(unmet_demands):
+            OutputManager().add_error(
+                "Water uptake adjustment error",
+                "potential_uptakes and unmet_demands must be the same length but got "
+                f"{len(potential_uptakes)} potential uptakes and {len(unmet_demands)} unmet demands.",
+                info_map={"class": WaterUptake.__name__, "function": WaterUptake._adjust_water_uptakes.__name__},
+            )
             raise Exception("potential_uptakes and unmet_demands must be the same length.")
 
         adjusted = [uptake + (demand * uptake_compensation) for uptake, demand in zip(potential_uptakes, unmet_demands)]
@@ -320,9 +355,9 @@ class WaterUptake(NutrientUptake):
         root_depth: float,
         max_transpiration: float,
         water_distro_parameter: float,
-        upper_depths: List[float],
-        lower_depths: List[float],
-    ) -> List[float]:
+        upper_depths: list[float],
+        lower_depths: list[float],
+    ) -> list[float]:
         """
         Calculates the crop's maximum water uptake from each soil layer during the current day.
 
@@ -347,7 +382,7 @@ class WaterUptake(NutrientUptake):
         Raises
         ------
         Exception
-            If the lengths of `upper_depths` and `lower_depths` are not equal.
+            If the lengths of ``upper_depths`` and ``lower_depths`` are not equal.
 
         References
         ----------
@@ -355,6 +390,15 @@ class WaterUptake(NutrientUptake):
 
         """
         if len(upper_depths) != len(lower_depths):
+            OutputManager().add_error(
+                "Find stratified max water uptake error",
+                "upper_depths and lower_depths must be the same length but got "
+                f"{len(upper_depths)} upper depths and {len(lower_depths)} lower depths.",
+                info_map={
+                    "class": WaterUptake.__name__,
+                    "function": WaterUptake._find_stratified_max_water_uptakes.__name__,
+                },
+            )
             raise Exception("upper_depths and lower_depths must be the same length")
 
         potential_uptakes = []

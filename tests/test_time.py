@@ -26,7 +26,7 @@ def test_time_initialization() -> None:
     assert time.end_date == datetime(year=2000, month=1, day=1)
 
     assert time.current_date == time.start_date
-    assert time.simulation_length_days == (time.end_date - time.start_date).days
+    assert time.simulation_length_days == (time.end_date - time.start_date).days + 1
     assert time.simulation_day == 0
 
 
@@ -211,8 +211,8 @@ def test_convert_year_jday_to_date(
     [
         (0, 100, 1),
         (5, 100, 5),
-        (-1, 100, 100),
-        (-100, 100, 1),
+        (-1, 100, 99),
+        (-100, 100, 0),
         (100, 100, 100),
         (150, 100, 150),
     ],

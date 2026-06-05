@@ -1,5 +1,4 @@
 from math import exp, inf
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -23,7 +22,7 @@ class MineralizationDecomposition:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_and_decompose_nitrogen(self) -> None:
@@ -168,24 +167,21 @@ class MineralizationDecomposition:
         References
         ----------
         SWAT Theoretical documentation eqn. 3:1.2.8
+        Current return value is a temporary fix to replace the process based method for the effect of the soil C, N,
+         and P on the decomposition rate factor. # TODO: Check if the temporary solution is till intended = issue #2990
 
         Notes
         -----
         The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.
 
         """
-        nitrogen_term = (  # noqa: F841
-            MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
-                carbon_nitrogen_ratio, 25
-            )
+        nitrogen_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
+            carbon_nitrogen_ratio, 25
         )
-        phosphorus_term = (  # noqa: F841
-            MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
-                carbon_phosphorus_ratio, 200
-            )
+        phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
+            carbon_phosphorus_ratio, 200
         )
-        # temporary fix to replace the process based method for the effect of the soil C, N, and P on the decomposition
-        # rate factor
+        assert nitrogen_term is not None and phosphorus_term is not None
         return 1
 
     @staticmethod

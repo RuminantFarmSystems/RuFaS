@@ -1,30 +1,31 @@
-from typing import List, Any
+from typing import Any
 
 from RUFAS.data_structures.events import TillageEvent
 from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.biophysical.field.manager.schedule import Schedule
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
 class TillageSchedule(Schedule):
     """
-    A `Schedule` child class that defines when and how a field will be tilled.
+    A ``Schedule`` child class that defines when and how a field will be tilled.
 
     Parameters
     ----------
     name : str
         Name of this tillage schedule.
-    years : List[int]
+    years : list[int]
         Year(s) in which tillage will happen.
-    days : List[int]
+    days : list[int]
         Julian day(s) on which tillage will happen.
-    tillage_depths : List[float]
+    tillage_depths : list[float]
         The lowest depth(s) the tilling implement reaches (mm).
-    incorporation_fractions : List[float]
+    incorporation_fractions : list[float]
         Fraction(s) of soil surface pool incorporated into the soil profile (unitless).
-    mixing_fractions : List[float]
+    mixing_fractions : list[float]
         Fraction(s) of pool in each layer mixed and redistributed back into the soil profile (unitless).
-    implements : List[str]
+    implements : list[str]
         Implements that are used to execute the tillage applications in this schedule.
     pattern_skip : int, default=0
         Number of years to skip between tillage schedule repetitions.
@@ -33,16 +34,16 @@ class TillageSchedule(Schedule):
 
     Attributes
     ----------
-    tillage_depths : List[float]
+    tillage_depths : list[float]
         Elongated list of tillage depths to ensure a depth value for each application year, representing how deep the
         tilling implement will go.
-    incorporation_fractions : List[float]
+    incorporation_fractions : list[float]
         Elongated list of incorporation fractions to ensure an incorporation value for each application year, indicating
         how much of the surface soil is mixed into the profile.
-    mixing_fractions : List[float]
+    mixing_fractions : list[float]
         Elongated list of mixing fractions to ensure a mixing value for each application year, reflecting the degree of
         soil mixing during tillage.
-    implements : List[TillageImplement]
+    implements : list[TillageImplement]
         Elongated list of the tillage implements that will be used to execute the scheduled tillage operations.
 
     """
@@ -50,12 +51,12 @@ class TillageSchedule(Schedule):
     def __init__(
         self,
         name: str,
-        years: List[int],
-        days: List[int],
-        tillage_depths: List[float],
-        incorporation_fractions: List[float],
-        mixing_fractions: List[float],
-        implements: List[str],
+        years: list[int],
+        days: list[int],
+        tillage_depths: list[float],
+        incorporation_fractions: list[float],
+        mixing_fractions: list[float],
+        implements: list[str],
         pattern_skip: int = 0,
         pattern_repeat: int = 0,
     ):
@@ -77,12 +78,7 @@ class TillageSchedule(Schedule):
         Raises
         ------
         ValueError
-            If not all tilling years are valid.
-            If not all tilling days are valid.
-            If not all tillage depths are valid.
-            If not all incorporation fractions are valid.
-            If not all mixing fractions are valid.
-            If number of years, days, depths, and incorporation and mixing fractions are not equal.
+            If depths are not valid.
 
         """
         error_header = f"'{self.name}': "
@@ -94,6 +90,11 @@ class TillageSchedule(Schedule):
         self._validate_parameters([], fraction_parameters, self.years, self.days, self.name)
         valid_depths = self.validate_positive_values(self.tillage_depths)
         if not valid_depths:
+            OutputManager().add_error(
+                "invalid tillage depths",
+                f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'.",
+                info_map={"class": self.__class__.__name__, "function": self._validate_tillage_parameters.__name__},
+            )
             raise ValueError(
                 error_header + f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'."
             )
@@ -108,13 +109,13 @@ class TillageSchedule(Schedule):
             implements=self.implements,
         )
 
-    def generate_tillage_events(self) -> List[TillageEvent]:
+    def generate_tillage_events(self) -> list[TillageEvent]:
         """
         Generates a list of all tillage events that will happen over the full course of this TillageSchedule.
 
         Returns
         -------
-        List[TillageEvent]
+        list[TillageEvent]
             List of all tillage events that will happen over the course of this TillageSchedule.
 
         """

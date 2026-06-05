@@ -11,11 +11,11 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 """
-These constants define the upper and lower bounds of temperatures that allow fermentation (in degrees C), the upper and
+These constants define the upper and lower bounds of temperatures that allow fermentation (degrees C), the upper and
 lower fractions of dry matter that allow fermentation, and the constants that regulate how dry matter is lost to
 fermentation. These values are defined in the Feed Storage Scientific Documentation, section 1.3.
 
-Loss coeffecient and base loss fraction are defined as fractions per day, so they are divided by 30 to convert them to
+Loss coefficient and base loss fraction are defined as fractions per day, so they are divided by 30 to convert them to
 a daily basis.
 
 """
@@ -43,7 +43,7 @@ dry matter mass of the crop. These values are defined in the Feed Storage Scient
 
 References
 ----------
-.. [1] Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2
+Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2.
 
 """
 GRAIN_LOSS_COEFFICIENT: float = 0.01
@@ -54,14 +54,14 @@ HIGH_MOISTURE_CROPS = ["corn_high_moisture"]
 
 class Storage:
     """
-    Abstract class representing a general storage structure.
+    Abstract base class representing a general feed storage structure.
 
     Parameters
     ----------
-    storage_config : dict[str, str | float]
+    storage_config : dict[str, str | float | list[str]]
         Configuration dictionary for the storage, containing keys:
             - name: Name of the storage (str).
-            - field_name: Name of the field associated with the storage (str).
+            - field_names: Names of the fields associated with the storage (list[str]).
             - crop_name: Name of the crop associated with the storage (str).
             - rufas_id: RuFaS Feed ID associated with the storage (int).
             - initial_storage_dry_matter: Initial dry matter percentage of the crop when first stored (float).
@@ -70,55 +70,33 @@ class Storage:
     Attributes
     ----------
     capacity : float
-        The maximum capacity of the storage.
+        The maximum capacity of the storage (kg).
     stored : list[HarvestedCrop]
-        A list of HarvestedCrop objects representing the crops stored.
+        A list of ``HarvestedCrop`` objects representing the crops stored.
     storage_name : str
         Name of the storage.
-    field_names : str
+    field_names : list[str]
         Names of the fields associated with the storage.
     crop_name : str
         Name of the crop associated with the storage.
     rufas_feed_id : int
         RuFaS Feed ID associated with the storage.
     initial_storage_dry_matter : float
-        Initial dry matter percentage of the crop when first stored.
-    crude_protein_loss_coefficient : float, default 0.0
+        Initial dry matter percentage of the crop when first stored (unitless).
+    crude_protein_loss_coefficient : float, default=0.0
         Fractional coefficient used to adjust crude protein after dry matter loss.
-    starch_loss_coefficient : float, default 0.0
+    starch_loss_coefficient : float, default=0.0
         Fractional coefficient used to adjust starch after dry matter loss.
-    adf_loss_coefficient : float, default 0.0
+    adf_loss_coefficient : float, default=0.0
         Fractional coefficient used to adjust ADF after dry matter loss.
-    ndf_loss_coefficient : float, default 0.0
+    ndf_loss_coefficient : float, default=0.0
         Fractional coefficient used to adjust NDF after dry matter loss.
-    lignin_loss_coefficient : float, default 0.0
+    lignin_loss_coefficient : float, default=0.0
         Fractional coefficient used to adjust lignin after dry matter loss.
-    ash_loss_coefficient : float, default 0.0
+    ash_loss_coefficient : float, default=0.0
         Fractional coefficient used to adjust ash after dry matter loss.
-
-    Methods
-    -------
-    stored_mass()
-        The total mass (kg) of currently stored crops
-    receive_crop(crop: HarvestedCrop, time: RufasTime)
-        Receives a harvested crop and adds it to the storage.
-    process_degradations(current_conditions: CurrentDayConditions, time: RufasTime)
-        Processes the degradations and losses of the stored crops.
-    reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)
-        Resets mass related attributes after loss of dry matter and/or moisture.
-    _record_stored_crops(self, simulation_day: int)
-        Records information about total mass and nutrient content of the stored crops.
-    calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
-        Calculates the dry matter loss to gas.
-    calculate_bale_density(initial_dry_matter: float)
-        Calculates the density of a bale.
-    recalculate_nutrient_percentage(
-        initial_nutrient_percentage: float,
-        loss_coefficient: float,
-        dry_matter_loss: float,
-        initial_dry_matter: float
-    )
-        Recalculates a single nutrient percentage after dry matter loss.
+    om : OutputManager
+        The singleton output manager used for model outputs.
 
     """
 
@@ -150,7 +128,7 @@ class Storage:
 
     @property
     def stored_mass(self) -> float:
-        """The total mass (kg) of currently stored crops"""
+        """The total mass of currently stored crops (kg)."""
         return sum(crop.fresh_mass for crop in self.stored)
 
     def receive_crop(self, crop: HarvestedCrop, simulation_day: int) -> None:
@@ -164,25 +142,23 @@ class Storage:
         simulation_day : int
             The day of the simulation when the crop is being added.
 
-        References
-        ----------
-        .. [1] Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2
-
-        Returns
-        -------
-        None
-
         Raises
         ------
-        NotImplementedError
-            If the storage's acceptable crops is not populated.
-        ValueError
-            If the crop's category is not compatible with the storage.
         Exception
             If adding the crop exceeds the storage's capacity.
 
+        References
+        ----------
+        Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2.
+
         """
         if self.stored_mass + crop.fresh_mass > self.capacity:
+            self.om.add_error(
+                "Exceeds feed storage capacity error",
+                f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "
+                f"exceeds the storage capacity ({self.capacity})",
+                info_map={"class": self.__class__.__name__, "function": self.receive_crop.__name__},
+            )
             raise Exception(
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass}) "
                 f"exceeds the storage capacity ({self.capacity})"
@@ -252,7 +228,7 @@ class Storage:
         Parameters
         ----------
         crops : list[HarvestedCrop]
-            List of HarvestedCrops to project degradations for.
+            List of ``HarvestedCrop`` objects to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
@@ -293,7 +269,7 @@ class Storage:
         Returns
         -------
         dict[str, Any]
-            Mapping the attributes of the crop after degradation to their values.
+            Mapping of the attributes of the crop after degradation to their values.
 
         """
         weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
@@ -358,7 +334,7 @@ class Storage:
         Returns
         -------
         dict[str, float]
-            Fresh mass and dry matter percentage of the crop after loss (kg and percentage, respectively).
+            Dry matter mass and dry matter percentage of the crop after loss (kg and percentage, respectively).
 
         Notes
         -----
@@ -384,6 +360,7 @@ class Storage:
             The name of the field from which the crop was harvested.
         simulation_day : int
             The day on which the crop was received.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -415,22 +392,20 @@ class Storage:
         ----------
         simulation_day : int
             The current day of the simulation, used for recording purposes.
+
         """
         self._record_storage_totals(simulation_day)
         self._record_individual_crops(simulation_day)
 
     def _record_storage_totals(self, simulation_day: int) -> None:
         """
-        Records the total mass and nutrient content of the stored crops at the storage level.
+        Records the total mass and nutrient amounts held in storage.
 
         Parameters
         ----------
         simulation_day : int
             The current day of the simulation, used for recording purposes.
 
-        """
-        """
-        Records the total mass and nutrient amounts held in storage.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -529,12 +504,12 @@ class Storage:
 
     def _get_total_nutritive_amount(self, nutrient_name: str) -> float:
         """
-        Calculates the total amount of the specifed nutrient that is currently held in storage.
+        Calculates the total amount of the specified nutrient that is currently held in storage.
 
         Parameters
         ----------
         nutrient_name : str
-            The name of the target nutrient attribute in HarvestedCrop.
+            The name of the target nutrient attribute in ``HarvestedCrop``.
 
         Returns
         -------
@@ -570,10 +545,6 @@ class Storage:
         float
             The amount of dry matter lost to gas, specific to fermentation (kg).
 
-        References
-        ----------
-        .. [1] Feed Storage Scientific Documentation equations FS.SIL.1 and FS.SIL.2
-
         Notes
         -----
         If the ambient temperature or dry matter percentage of the crop do not fall within the acceptable ranges, then
@@ -581,7 +552,11 @@ class Storage:
         but the structure of the loss equation remains the same.
 
         Note that the current time is not needed for calculating the dry matter loss to fermentation, but it allows the
-        interface to remain uniform across all implementations of `calculate_dry_matter_loss_to_gas`.
+        interface to remain uniform across all implementations of ``calculate_dry_matter_loss_to_gas``.
+
+        References
+        ----------
+        Feed Storage Scientific Documentation, equations FS.SIL.1 and FS.SIL.2.
 
         """
         dry_matter_fraction = crop.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
@@ -623,6 +598,11 @@ class Storage:
             RufasTime instance containing the current time of the simulation.
         weather : Weather
             Weather instance containing all weather data for the simulation.
+
+        Returns
+        -------
+        list[CurrentDayConditions]
+            Weather conditions between the last degradation time and the current time.
 
         Notes
         -----
@@ -675,12 +655,12 @@ class Storage:
         self, crops: list[HarvestedCrop], time: RufasTime, loss_period: int, final_moisture_percentage: float
     ) -> list[HarvestedCrop]:
         """
-        Creates a HarvestedCrop with projected moisture loss accounted for.
+        Creates ``HarvestedCrop`` objects with projected moisture loss accounted for.
 
         Parameters
         ----------
-        crop : list[HarvestedCrop]
-            HarvestedCrops to project moisture loss for.
+        crops : list[HarvestedCrop]
+            ``HarvestedCrop`` objects to project moisture loss for.
         time : RufasTime
             RufasTime instance containing the time that loss should be processed up to.
         loss_period : int
@@ -748,7 +728,7 @@ class Storage:
         Parameters
         ----------
         crop : HarvestedCrop
-            The  crop to process moisture loss in.
+            The crop to process moisture loss in.
         time : date
             The date that loss should be processed up to.
         loss_period : int
@@ -763,7 +743,7 @@ class Storage:
 
         References
         ----------
-        .. Feed Storage Scientific Documentation, equation FS.HAY.3
+        Feed Storage Scientific Documentation, equation FS.HAY.3.
 
         """
         days_stored = (time - crop.storage_time).days
@@ -803,28 +783,27 @@ class Storage:
         loss_coefficient : float
             Fractional loss coefficient that regulates how quickly this nutrient is lost.
         dry_matter_loss : float
-            Amount of dry matter lost from stored crop in kg.
+            Amount of dry matter lost from stored crop (kg).
         initial_dry_matter : float
-            Amount of dry matter stored crop contained before loss in kg.
+            Amount of dry matter stored crop contained before loss (kg).
 
         Returns
         -------
         float
             The nutrient percentage after dry matter loss.
 
-        References
-        ----------
-        .. Feed Storage Scientific Documentation, equation FS.NUT.1
-
         Notes
         -----
         When stored crops lose dry matter, they do not always lose proportional amounts of the nutrients they are
         composed of. In this case, the concentration of the nutrient within the dry matter changes which is why it must
         be recalculated. If a negative nutrient percentage would be calculated after losing dry matter, the percentage
-        is calculated to be 0 and a warning is logged to the OuputManager. If a negative nutrient percentage would have
-        been calculated, a warning is logged to the Output Manager that the method is preventing this. If all dry matter
-        is lost from the stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a
-        division by zero error.
+        is calculated to be 0 and a warning is logged to the ``OutputManager``. If all dry matter is lost from the
+        stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a division by
+        zero error.
+
+        References
+        ----------
+        Feed Storage Scientific Documentation, equation FS.NUT.1.
 
         """
         dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter

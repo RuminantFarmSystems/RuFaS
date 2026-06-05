@@ -31,7 +31,6 @@ def test_init(mocker: MockerFixture, mock_get_data_side_effect: list[Any]) -> No
         mock_get_data_side_effect=mock_get_data_side_effect,
     )
 
-    assert herd_manager.simulate_animals is True
     assert herd_manager.calves == []
     assert herd_manager.heiferIs == []
     assert herd_manager.heiferIIs == []
@@ -91,24 +90,49 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     mocker.patch.object(HerdManager, "initialize_pens", return_value=None)
     mocker.patch.object(HerdManager, "allocate_animals_to_pens", return_value=None)
     mocker.patch.object(HerdManager, "initialize_nutrient_requirements", return_value=None)
-    mocker.patch.object(HerdManager, "_print_animal_num_warnings", return_value=None)
     mocker.patch.object(HerdManager, "set_milk_type_in_calf_ration_manager", return_value=None)
 
     config_data: dict[str, Any] = {
-        "simulate_animals": False,
+        "simulation_type": "field_and_feed",
         "nutrient_standard": {"dummy": "ns"},
     }
 
     animal_data: dict[str, Any] = {
-        "herd_information": {"herd_num": 123},
+        "herd_information": {
+            "herd_num": 123,
+            "herd_size_adjustment_period": 30,
+            "herd_size_sell_threshold": 101,
+            "herd_size_buy_threshold": 106,
+        },
         "housing": "barn",
         "pasture_concentrate": 0,
         "ration": {"formulation_interval": 7, "maximum_ration_reformulation_attempts": 250},
         "pen_information": [],
     }
 
-    feed_data = {"some": "feed-config"}
-    allowances_data = [{"purchased_feed": 1}, {"purchased_feed": 2}, {"purchased_feed": 3}]
+    feed_data = {
+        "feeds": [
+            {
+                "feed_type": 1,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 2,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+            {
+                "feed_type": 3,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+        ]
+    }
+    feeds_data = feed_data["feeds"]
 
     def get_data_side_effect(key: str) -> Any:
         if key == "config":
@@ -117,8 +141,8 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
             return animal_data
         if key == "feed":
             return feed_data
-        if key == "feed.allowances":
-            return allowances_data
+        if key == "feed.feeds":
+            return feeds_data
         raise KeyError(key)
 
     mock_im.get_data.side_effect = get_data_side_effect
@@ -128,7 +152,7 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     time.simulation_day = 0
     available_feeds: list[Any] = []
 
-    herd_manager = HerdManager(
+    HerdManager(
         weather=weather,
         time=time,
         is_ration_defined_by_user=False,
@@ -140,4 +164,3 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     mock_set_user_defined_ration_tolerance.assert_not_called()
 
     mock_nutrient_standard_cls.assert_called_once_with(config_data["nutrient_standard"])
-    assert herd_manager.simulate_animals is False
