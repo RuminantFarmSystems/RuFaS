@@ -12,7 +12,7 @@ from RUFAS.output_manager import LogVerbosity
 
 @pytest.fixture
 def mock_task_manager(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("main.TaskManager", autospec=True)
+    return mocker.patch("RUFAS.main.TaskManager", autospec=True)
 
 
 def test_main_success(
@@ -57,13 +57,13 @@ def test_main_exception_path(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixt
     """
     Forces an exception in TaskManager.start() to test main exception path.
     """
-    mock_tm_cls = mocker.patch("main.TaskManager")
+    mock_tm_cls = mocker.patch("RUFAS.main.TaskManager")
     mock_tm = mock_tm_cls.return_value
     mock_tm.start.side_effect = Exception("main error")
-    mock_om_cls = mocker.patch("main.OutputManager")
+    mock_om_cls = mocker.patch("RUFAS.main.OutputManager")
     mock_om = mock_om_cls.return_value
 
-    mocker.patch("main.traceback.format_exc", return_value="FAKE_TRACEBACK")
+    mocker.patch("RUFAS.main.traceback.format_exc", return_value="FAKE_TRACEBACK")
     monkeypatch.setattr(sys, "argv", ["prog", "-l", "err_logs", "-i"])
 
     with pytest.raises(RuntimeError) as excinfo:
@@ -96,7 +96,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     mock_parser = mocker.MagicMock(auto_spec=argparse.ArgumentParser)
     mock_add_argument = mocker.patch.object(mock_parser, "add_argument")
     mock_parse_args = mocker.patch.object(mock_parser, "parse_args", return_value="test_args")
-    mocker.patch("main.argparse.ArgumentParser", return_value=mock_parser)
+    mocker.patch("RUFAS.main.argparse.ArgumentParser", return_value=mock_parser)
 
     # Act
     actual_args = parse_gnu_args()
