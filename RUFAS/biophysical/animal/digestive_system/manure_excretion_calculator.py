@@ -194,6 +194,13 @@ class ManureExcretionCalculator:
         Calculates the manure excretion values for a growing and close-up heifer with information from the ration
         formulation.
 
+        Notes
+        -----
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
+
+        The minimum urine nitrogen is set to 17 g following Table 1 in Reed et al. 2015.
+
         Parameters
         ----------
         body_weight : float
@@ -212,11 +219,6 @@ class ManureExcretionCalculator:
         AnimalManureExcretions
             A dictionary that contains the manure excretion values as specified
                 in the AnimalManureExcretions class definition.
-
-        Notes
-        -----
-        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
-        and nitrogen ("N") are all percentages of dry matter.
 
         References
         ----------
@@ -271,7 +273,7 @@ class ManureExcretionCalculator:
             * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
-        urine_nitrogen = manure_nitrogen - fecal_nitrogen
+        urine_nitrogen = max(manure_nitrogen - fecal_nitrogen, 0.017)
 
         urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
 
@@ -443,6 +445,8 @@ class ManureExcretionCalculator:
         Urinary nitrogen: [AN.EXC.16]
         Manure total ammoniacal nitrogen: [AN.EXC.9]
         Manure K excretion: [AN.EXC.27]
+        
+        Minimum urine nitrogen set to 22 g following Table 1 in Reed et al. 2015.
 
         """
         dmi_predicted = nutrient_amounts.dry_matter
@@ -488,7 +492,7 @@ class ManureExcretionCalculator:
 
         fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
 
-        urine_nitrogen = manure_nitrogen - fecal_nitrogen
+        urine_nitrogen = max(manure_nitrogen - fecal_nitrogen, 0.022)
 
         organic_matter_intake = dry_matter_intake - ash_diet_content
 
@@ -566,6 +570,8 @@ class ManureExcretionCalculator:
 
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
+
+        Minimum urine nitrogen set to 17 g following Table 1 in Reed et al. 2015.
 
         Parameters
         ----------
@@ -677,7 +683,7 @@ class ManureExcretionCalculator:
             * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
-        urine_nitrogen = manure_nitrogen - fecal_nitrogen
+        urine_nitrogen = max(manure_nitrogen - fecal_nitrogen, 0.017)
 
         urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
 
