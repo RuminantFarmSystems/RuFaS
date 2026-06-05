@@ -1688,13 +1688,7 @@ class HerdManager:
             for animal in pen.animals_in_pen:
                 pen.animals_in_pen[animal].daily_milking_update_without_history()
         if pen.animal_combination == AnimalCombination.CALF:
-            if not self.is_ration_defined_by_user:
-                ration_fraction = 100 / len(pen_available_feeds)
-                RationManager.user_defined_rations = {}
-                RationManager.user_defined_rations[AnimalCombination.CALF] = {
-                    feed_id.rufas_id: ration_fraction for feed_id in pen_available_feeds
-                }
-            pen.use_user_defined_ration(pen_available_feeds, current_temperature)
+            pen.handle_calf_ration(self.is_ration_defined_by_user, pen_available_feeds, current_temperature)
         else:
             pen.formulate_optimized_ration(
                 self.is_ration_defined_by_user,
