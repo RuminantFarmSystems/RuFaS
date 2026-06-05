@@ -445,7 +445,7 @@ class ManureExcretionCalculator:
         Urinary nitrogen: [AN.EXC.16]
         Manure total ammoniacal nitrogen: [AN.EXC.9]
         Manure K excretion: [AN.EXC.27]
-        
+
         Minimum urine nitrogen set to 22 g following Table 1 in Reed et al. 2015.
 
         """
