@@ -31,11 +31,11 @@ instantiation. Probability distributions used for that purpose are Normal Gaussi
 Each animal within the RuFaS herd progresses through five main life stages (calf, Heifer I, Heifer II, Heifer III,
 and Cow) as illustrated in the figure below. 
 
--  Calves progress to Heifer I when their age reaches the user-defined input for weaning day
--  Heifer I progresses to Heifer II when their age reaches the user-defined input for breeding start day 
+-  Calves progress to Heifer I when their age reaches the user-defined input for weaning day.
+-  Heifer I progresses to Heifer II when their age reaches the user-defined input for breeding start day. 
 -  Heifer II animals that successfully conceive become Heifer III's when the number of days left in their pregnancy 
-is equal to the user-defined input for prefresh days (default 21)
--  When a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm
+is equal to the user-defined input for prefresh days (default 21).
+-  When a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm.
 -  Cows cycle through lactating and non-lactating phases until they are removed from the herd due to a failure to 
 conceive or a user-provided probability for sale or death within each parity (lactation).
 
@@ -2226,7 +2226,7 @@ import_table(
 
 ##### Introduction
 
-Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs, but the primary Feed input file, and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
+Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs (Table RF1), but the primary Feed input file (Table RF2), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
 
 ##### Required User Inputs
 
@@ -2236,6 +2236,15 @@ Automated ration formulation in RuFaS optimizes a ration for a single objective 
 import_table(
   "../resources/table_data/animal/tbl-an-auto-ration-an-input.csv",
   colalign = ["left", "left", "center", "center", "center"]
+)
+```
+
+```{python}
+#| label: tbl-an-auto-ration-feed-input
+#| tbl-cap: Key inputs found in the feed input file.
+import_table(
+  "../resources/table_data/animal/tbl-an-auto-ration-feed-input.csv",
+  colalign = ["left", "left", "left", "center", "center", "center"]
 )
 ```
 
@@ -2269,13 +2278,18 @@ In cases of ration formulation failure, a summary of the constraints that failed
 
 ##### Methodology
 
-Ration formulation is carried out at the pen level on a user-defined formulation interval (Table RF1). The mean requirements for a given pen are calculated prior to first formulation, as described in [REF IV. Animal Nutrition and Feeding, A. Calculations of Animal Energy and Nutrient Requirement]. This process then proceeds to utilize a series of constraints methods (Table RF3) that compares the animal requirements against the supply of the optimizer’s ration attempt, as described in [REF IV. Animal Nutrition and Feeding, B. Calculations of Animal Energy and Nutrient Supply], all while abiding feed ingredient-specific inclusion rates, as defined in [REFERENCE TO NRC/NASEM LIBRARY]. If a ration cannot be formulated that meets the constraints given the pen-level requirements and limits to inclusion rates, then one of the following things will happen.
+Ration formulation is carried out at the pen level on a user-defined formulation interval (Table RF1). The mean requirements for a given pen are 
+calculated prior to first formulation, as described in [REF IV. Animal Nutrition and Feeding, A. Calculations of Animal Energy and Nutrient Requirement]. 
+This process then proceeds to utilize a series of constraints methods (Table RF3) that compares the animal requirements against the supply of the 
+optimizer’s ration attempt, as described in [REF IV. Animal Nutrition and Feeding, B. Calculations of Animal Energy and Nutrient Supply], all while 
+abiding feed ingredient-specific inclusion rates, as defined in @nrc_2001 and @nrc_2021. If a ration cannot be formulated that meets the constraints given the pen-level 
+requirements and limits to inclusion rates, then one of the following things will happen.
 
 **For lactacting cow pens**
 
 * Record failed constraints and formulation attempt to OutputManager.
 * Milk production will be reduced.
-  * If average milk production for the pen drops below the values defined in [REFERENCE TO 5. MILK PRODUCTION AND REDUCTION], then the simulation halts with an error.
+  * If average milk production for the pen drops below the values defined in [REFERENCE TO 5. MILK PRODUCTION AND REDUCTION]{.mark}, then the simulation halts with an error.
 * Recalculation of the nutritional requirements for all animals in the pen.
 * Ration formulation reattempt (repeat).
 
@@ -2286,7 +2300,7 @@ Ration formulation is carried out at the pen level on a user-defined formulation
 * IF no previously successful ration is available, the simulation will stop.
 
 ::: {.callout-note}
-Note: A graphical overview of this process can be found in Figure 4 in II Animal Management, C. Milk Production.
+A graphical overview of this process can be found in Figure 4 in II Animal Management, C. Milk Production.
 :::
 
 The generalized equation for sequential quadratic programming is as follows and gi(x) is constraint i, which must be twice continuously differentiable with respect to all xj in x (@Li_2022).
@@ -2295,35 +2309,189 @@ The generalized equation for sequential quadratic programming is as follows and 
 
 #### User-Defined Ration Formulation
 
-<!-- TODO -->
-
-
 ##### Introduction
+
+The user-defined ration methodology follows the same process as described in the Automated ration formulation methodology, with the addition of the
+inputs found in this section, as described in the Methodology section below.
 
 ##### Required User Inputs
 
+```{python}
+#| label: tbl-an-user-ration-feed-input
+#| tbl-cap: Key inputs found in the feed input file specific to user defined ration methodology.
+import_table(
+  "../resources/table_data/animal/tbl-an-user-ration-feed-input.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+
 ##### Methodology
 
+The key difference in the methodology for the user-defined ration methodology is that the feed inclusion rates are bounded by the 
+`user_defined_ration_percentage` values defined for each feed item (Table RF4). Those percentage values become the minimum and maximum 
+inclusion value for each feed, with +/- the tolerance value (Table RF4) as a fraction of the percentage.
+
+The ration formulation will proceed as described in the Automated Methodology above, but when formulation fails, different outcomes will occur.
+
+**For lactating cow pens**
+
+* Record failed constraints and formulation attempt to OutputManager.
+* Milk production will be reduced.
+  * IF average milk production for the pen drops below the values defined in [REFERENCE TO 5. Milk Production and Reduction]{.mark}, then the simulation halts with an error.
+  * IF if the `milk_reduction_maximum` (Table RF4) is exceeded, then the simulation proceeds by using the user-defined ration percentages exactly.
+* Recalculation of the nutritional requirements for all animals in the pen.
+* Ration formulation reattempt (repeat).
+
+**For growing and close-up pens**
+
+* Record failed constraints and formulation attempt to OutputManager.
+* Recording of which constraints were unable to be met.
+* The simulation proceeds by using the user-defined ration percentages exactly.
 
 
-
-
-### Herd Size Management
+### Herd Size Management  
 
 #### Introduction
 
+If the number of close-up heifers is more than the herd needs, heifers in the Heifer III group are sold. If the number of close-up 
+is less than the herd needs, a replacement is bought from the market. This is evaluated daily by comparing the number of (cows + Heifer III) 
+to the herd num specified by the user. Details of this method are described in the Culling section of Animal-level processes and management. 
+
 #### Herd Size Management: Heifer III Sales
+
+If the number of the heifers is more than the herd needs, heifers in the Heifer III group are sold. If the number of Heifer III is less than the herd needs, 
+a replacement is bought from the market. This is evaluated daily by comparing the number of (cows + Heifer III) to the `herd_num` specified by the user. 
+
+**User Inputs and Constants**
+
+* `herd_num`: the target number of cows (dry + lactating) to maintain
+* `SELLING_THRESHOLD` = 1.03 – hard-coded value (animal constant) used to determine threshold above `herd_num` at which heiferIII’s should be sold. 
+* `BUYING_THRESHOLD` = 1.01 – hard-coded value used to determine threshold below `herd_num` at which heiferIII’s should be bought
+
+**Parameters and Equations**
+
+* `HerdManager._check_if_heifers_need_to_be_sold()` Evaluates if the current number of Heifer III and cows exceeds a specified threshold 
+(defined as 3% of the herd statistics’ target herd size). If the threshold is surpassed, Heifer IIIs are removed from the herd until herd size 
+falls within acceptable range. 
+  * Called by `HerdManager.daily_routines()`
+  * Returns a list of animals removed 
+  * Logic - While the number of (Heifer IIIs + cows) is greater than `herd_num` * `selling_threshold`: 
+      * The last heifer III is removed and is added to `animals_removed`
+      * Information about that heifer III is added to `sold_heiferIIIs_info`
+      * The number of heifer III’s is decremented by 1
+      * The number of `sold_heiferIII_oversupply_num` is incremented by 1
+  * This cycle iterates until the number of (Heifer IIIs + cows) is equal to `herd_num` * `selling_threshold`
+
+* `HerdManager._check_if_replacement_heifers_needed()` Determines whether additional Heifer IIIs need to be added to the herd based on the 
+current herd size, purchase thresholds, and the availability of heifers in the replacement market.
+  * Called by `HerdManager.daily_routines()`
+  * Returns a list of animals purchased 
+  * While the number of (Heifer IIIs + cows + bought\_heifer\_num) is less than `herd_num` * `buying_threshold`: 
+    * The first animal in the `replacement_market` enters the herd, assigned a phosphorus requirement and net merit value, and added to the `animals_added` list 
+    * The number of `bought_heifer_num` is incremented by 1 
+  * This cycle iterates until the number of (Heifer IIIs + cows + `bought_heifer_num`) is equal to `herd_num` * `buying_threshold` 
+
 
 #### Reproductive Culls: Heifer II Sales
 
+If the heifer does not have a successful conception or pregnancy and age (days born) exceeds heifer repro cull time, this heifer is culled
+
+**User Inputs and Constants**
+
+* `Heifer_repro_cull_time` Days old when a heifer would be culled for failure to become pregnant (Default: 500 d)
+
+**Parameters and Equations**
+
+* `Animal._evaluate_heiferII_for_culling()`
+   * Called by `Animal.daily_routines()` → `Animal.animal_life_stage_update()`
+   * This method determines whether a heifer should be culled based on its pregnancy status and age, returning *True* if the heifer is not pregnant and has surpassed the specified culling age.
+
+
 #### Calf Sales
+
+All live male calves are sold immediately after birth. Female calves are sold/kept according to a roll of the dice evaluated against the 
+user-defined rate of keeping female calves.
+
+**User Inputs and Constants**
+
+* `Keep_female_calf_rate` The percentage of female calves kept and raised on-farm (Default: 1)
+
+**Parameters and Equations**
+
+* `Animal._initialize_newborn_calf()` to `self.sold`
+   * Called by `HerdManager._create_newborn_calf()` in `_perform_daily_routines_for_animals()`
+      * Creates a newborn calf instance 
+      * Contains logic that determines whether a calf should be sold, returning *True* if the calf is a male or if a random draw generates a number higher than the `keep_female_calf_rate`
+      * If assigned to be sold, `sold_at_day` = `simulation_day` 
+
 
 #### Calf Losses (Death)
 
+**User Inputs and Constants**
+
+* `Still_birth_rate` Rate of stillbirths (percent, 0-1) (Default: 0.065)
+
+**Parameters and Equations**
+
+* `Animal._initialize_newborn_calf()` 
+   * Called by `HerdManager._create_newborn_calf()` in `_perform_daily_routines_for_animals()`
+      * Creates a newborn calf instance 
+   * If a random draw is less than the `still_birth_rate`, then `self.sold` = True and `STILL\_BIRTH` is added to `self.events`
+   * If assigned to be sold, `sold_at_day` = `simulation_day`
 
 
 
 ## Animal-level Process and Management
+
+The methods in the RuFaS model that simulate individual animals’ life events and the effects of herd management on individual animals are referred to as 
+the Animal Life Cycle Sub-module. This part of the model is driven by a Monte Carlo stochastic process that simulates the growth, production, reproduction, 
+and culling of individual dairy cattle animals and shares aggregated outcomes with the Herd Management Sub-Module to manage herd dynamics on a daily basis.
+
+The life cycle module represents the variation in animal performance through the use of Monte Carlo Simulation methods [@reuven_2017]. 
+Monte Carlo simulation relies on random draws from probability distributions rather than assigning fixed values. In this model, two main strategies are used: 
+
+* **Monte Carlo Simulation (Event Based):** Comparing a random draw from $(U(0,1) \rho Uniform)$ to the probability of an event occurring to simulate if that event occurs or did not (RandomUni in this document representing a random draw from $(U(0,1) \rho Uniform)$.
+* **Random Population Simulation:** Selecting a random draw from a known distribution of animal attributes and assigning that value to the instantiation of an individual animal. (Random ~ in this document representing a random draw from the following distribution) Probability distributions used are:
+   * Normal Gaussian: $N(\mu, \sigma)$ here $\mu$ is the distribution mean, and $\sigma$ is the standard deviation. 
+   * Empirical: $F(x)=\frac{1}{n}\sum_{i=1}^n 1_{\{x_i \leq x\}}$: where $x$ is the observations from the sample and an indicator function equal to 1 if $x_i\leq x$ and 0 otherwise.
+
+
+**Flow of Information**
+
+For each animal object, the daily updates are called according to the order described in the Day in the Life for Animal on a RuFaS Farm. This is:
+
+DigestiveSystem → NutrientInputs → MilkProduction → BodyweightChange → Reproduction → LifeStage Change → Parturition
+
+The processes that determine significant events in each animal’s life cycle occur in the 
+
+1. Reproduction, 
+2. LifeStage Change, and 
+3. Parturition updates.
+
+Within the Reproduction update methods, there are separate methods to simulate breeding management for heifers and cows. All of the Reproduction update methods use an event-based Monte Carlo model to stochastically simulate the probability that each animal will conceive, the date they conceive, and the success of the pregnancy. In addition to recording success and failures to conceive, the Reproduction update records hormone deliveries and number and success of pregnancy checks. All methods are based on protocols described by the CDCB and are described in more detail in the Reproduction Section. 
+
+Each animal within the RuFaS herd will progress through the 5 main life stages from calf, to Heifer I, to Heifer II, to Heifer III, to Cow followed by a cull stage as illustrated in @fig-ani_animal_class: 
+
+![5 life stages from calf to cow and a cull stage.](../resources/images/ani_animal_class.png){#fig-ani_animal_class}
+
+**Progression Between Life Stages**
+
+Calves progress to Heifer I when their age reaches the user-defined input for weaning day. Heifer I animals progress to Heifer II animals when 
+their age reaches the user-defined input for breeding start day. Heifer II animals that successfully conceive progress to the Heifer III stage 
+when they are close to calving. Specifically, Heifers II become Heifers III when the number of days left in their pregnancy is equal to the 
+user-defined input for the prefresh days. When a Heifer III animal calves for the first time, she becomes a Cow and will remain a cow for the 
+rest of her life on the RuFaS farm. 
+
+When a Heifer III calves for the first time and becomes a Cow, then that animal will cycle through lactating and non-lactating phases until they are removed 
+from the herd due to a failure to conceive or a user-provided probability for culling within each parity. The methods that determine when a cow will leave 
+the herd are described in detail in the Herd Exits section.
+
+**Parturition and New Calves** 
+
+When a Heifer III or Cow animal reaches the end of their pregnancy and starts lactating, a new calf animal object is created and 
+assigned a birthweight according to a user-informed random distribution. All male calves are recorded and removed from the farm on day 1 
+of their life. Female calves remain on the farm determined by an event-based Monte Carlo method informed by the user-defined percent of 
+female calves that are kept. 
 
 
 ### RuFaS Bodyweight and Growth
@@ -2346,7 +2514,7 @@ daily growth, an estimate for conceptus growth, and an estimate for body tissue 
 * Cows in parities 3 and above change their bodyweight according to estimates for conceptus growth and body tissue 
 changes that occur in lactation.
     
-These methods are further described by @Li2023
+These methods are further described by @Li2023.
 
 #### Required User Inputs
 
@@ -2355,7 +2523,7 @@ These methods are further described by @Li2023
 #| tbl-cap: Summary of the available inputs and their definitions.
 import_table(
   "../resources/table_data/animal/tbl-an-growth-req-inputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
+  colalign = ["left", "left", "center", "center", "center"]
 )
 ```
 
@@ -2367,14 +2535,14 @@ import_table(
 
 #### Methodology
 
-Most methods determining the bodyweight of animals in RuFaS are implemented in growth.py. 
+Most methods determining the bodyweight of animals in RuFaS are implemented in `growth.py`. 
     
-The function evaluate_body_weight_change in growth.py calls the appropriate bodyweight change functions for each animal 
+The function `evaluate_body_weight_change` in `growth.py` calls the appropriate bodyweight change functions for each animal 
 depending on their life stage and sums the appropriate changes into a single variable called `daily_growth.` 
 
-After setting the daily bodyweight change in the daily_growth variable, the evaluate_body_weight_change function 
+After setting the daily bodyweight change in the daily_growth variable, the `evaluate_body_weight_change` function 
 updates each animal's bodyweight by adding it to the current body_weight. Thus for all animals, the final updated 
-body_weight is set as:
+`body_weight` is set as:
 
 :::{#eq-an-bwt-5}
 [[**AN.BWT.5**]]{.aside .content-visible when-format="html"}
@@ -2413,8 +2581,8 @@ $$
 
 The daily growth for non-pregnant heifers is estimated through an average daily 
 gain to reach 55% of their manure bodyweight by the time they are pregnant. Because the actual age at pregnancy 
-is not known, a user input for the target_heifer_preg_day is used to estimate the target average daily growth or ADG. 
-A minimum daily growth rate of 0.5 kg/d is enforced so if the estimated daily_growth is less than 0.5 kg/d, the 
+is not known, a user input for the `target_heifer_preg_day` is used to estimate the target average daily growth (ADG). 
+A minimum daily growth rate of 0.5 kg/d is enforced so if the estimated `daily_growth` is less than 0.5 kg/d, the 
 minimum value is used. 
 
 :::{#eq-an-bwt-8}
@@ -2433,7 +2601,7 @@ Where MSBW is mature shrunk bodyweight (0.96 x mature bodyweight) and SBW is shr
 Heifers are targeted to grow to 82% of their mature body weight by the time of their 
 first calving. A gestation length is set at conception. The ADG of pregnant heifers is calculated based on the target 
 heifer's body weight, gestation length, and days in pregnancy. The gestation length for each animal is set at 
-conception by calculate_gestation_length in reproduction.py.
+conception by `calculate_gestation_length` in `reproduction.py`.
  
 :::{#eq-an-bwt-9}
 [[**AN.BWT.9**]]{.aside .content-visible when-format="html"}
@@ -2450,7 +2618,7 @@ mature body weight by the end of the 1st lactation, and full mature body weight 
 pregnancy, the daily growth is estimated based on the calving interval and during pregnancy the daily growth is 
 calculated based on days until calving. 
 
-###### Parity 1 Animals:
+**Parity 1 Animals**
 
 If not pregnant:
 
@@ -2470,7 +2638,7 @@ $$
 $$
 :::
 
-###### Parity 2 Animals
+**Parity 2 Animals**
 
 If not pregnant:
 
@@ -2492,7 +2660,7 @@ $$
     
 The gestation length for cows is estimated with the same methods that are used for heifers and the calving interval 
 is set either as the average herd calving interval or the animal’s own calving interval which is calculated as the age 
-at her second calving minus her age at first calving as part of the daily_reproduction_update in animal.py.
+at her second calving minus her age at first calving as part of the `daily_reproduction_update` in `animal.py`.
 
 
 ##### Conceptus Growth
@@ -2532,8 +2700,8 @@ $$
 $$
 :::
 
-When days_in_pregnancy = gestation_length and the animal calves, then conceptus growth is set to the negative value of 
-the current conceptus_weight such that the weight of the calf and placenta are subtracted from the cow’s bodyweight 
+When `days_in_pregnancy` = `gestation_length` and the animal calves, then conceptus growth is set to the negative value of 
+the current `conceptus_weight` such that the weight of the calf and placenta are subtracted from the cow’s bodyweight 
 when her bodyweight is updated.
 
 :::{#eq-an-bwt-17}
@@ -2564,7 +2732,8 @@ Where P1 and P2 are parameters with distinct values for primiparous and multipar
 #| label: tbl-an-growth-params
 #| tbl-cap: Summary of the available inputs that are available and their definitions.
 import_table(
-  "../resources/table_data/animal/tbl-an-growth-params.csv"
+  "../resources/table_data/animal/tbl-an-growth-params.csv",
+  colalign = ["center", "center", "center"]
 )
 ```
 
