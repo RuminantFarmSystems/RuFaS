@@ -2935,11 +2935,6 @@ def test_determine_future_death_date_with_death(mock_lactating_cow: Animal, mock
     assert result == 12
 
 
-# ---------------------------------------------------------------------------
-# Youngstock mortality scheduling: _setup_calf_mortality / _setup_heifer_mortality
-# ---------------------------------------------------------------------------
-
-
 def test_setup_calf_mortality_disabled_when_rate_zero(mock_calf: Animal, mocker: MockerFixture) -> None:
     """A zero calf_mortality_rate schedules no death and never touches the RNG."""
     animal = mock_calf
