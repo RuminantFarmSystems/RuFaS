@@ -458,14 +458,15 @@ class Animal:
         """
         Returns the future death date of the animal.
 
+        A future death date may be scheduled for any life stage: youngstock through the
+        calf/heifer mortality mechanism, and cows through parity-based death probability.
+
         Returns
         -------
         int
-            The future death date of the animal in integer form (sys.maxsize for non-cow animals).
+            The scheduled future death date, or sys.maxsize if no death is scheduled.
 
         """
-        if not self.animal_type.is_cow:
-            return sys.maxsize
         return self._future_death_date if self._future_death_date is not None else sys.maxsize
 
     @future_death_date.setter
@@ -478,19 +479,7 @@ class Animal:
         future_death_date : int
             The future death date to assign to the animal.
 
-        Raises
-        ------
-        TypeError
-            If the animal is not of type 'cow'.
-
         """
-        if not self.animal_type.is_cow:
-            self.om.add_error(
-                "Future death date setter error",
-                "The animal attempting to be assigned a future death date must be a cow.",
-                info_map={"class": self.__class__.__name__, "function": "future_death_date.setter"},
-            )
-            raise TypeError("The animal attempting to be assigned a future death date is not a cow.")
         self._future_death_date = future_death_date
 
     @property
@@ -1991,7 +1980,7 @@ class Animal:
         if self.days_born == self.future_cull_date:
             self.sold_at_day = time.simulation_day
             animal_status = AnimalStatus.SOLD
-        if self._future_death_date is not None and self.days_born == self._future_death_date:
+        if self.days_born == self.future_death_date:
             self.dead_at_day = time.simulation_day
             self.cull_reason = self._future_death_reason
             animal_status = AnimalStatus.DEAD
@@ -2078,97 +2067,79 @@ class Animal:
         """
         Roll for pre-wean mortality and schedule a death day if the calf is fated to die.
 
-        The cumulative probability of pre-wean death is :attr:`AnimalConfig.calf_mortality_rate`.
-        The death day is sampled uniformly across the pre-wean window ``[1, wean_day - 1]``.
-        If the sampled day falls on or before the calf's current age, the calf has already
-        survived past that day and no death is scheduled.
+        Notes
+        -----
+        The cumulative probability of pre-wean death is :attr:`AnimalConfig.calf_mortality_rate`
+        (e.g. 0.05 means 5% of live-born calves die before weaning); a value of 0 disables the
+        feature. Stillborn calves and calves removed from the herd at birth (male calves and
+        culled female calves) never enter the live-calf population and are not eligible.
 
-        Skipped for stillborn calves and for calves removed from the herd at birth
-        (male calves and culled female calves).
+        When a calf is fated to die, the death day is sampled uniformly across the pre-wean
+        window ``[1, wean_day - 1]``. The lower bound excludes the birth day (``days_born`` is 0
+        at birth) and the upper bound excludes the wean day itself, which triggers the
+        calf-to-HeiferI transition, so the death stays strictly inside the pre-wean stage. For a
+        calf loaded from the initial herd at a non-zero age, a drawn day that has already passed
+        means the calf survived that window and no death is scheduled; for newborns
+        (``days_born`` of 0) the drawn day is always in the future.
         """
-        # Stillborn calves and calves sold at birth (males, culled females) never
-        # enter the live-calf population, so they aren't eligible for pre-wean mortality.
         if self.stillborn_day is not None or self.sold_at_day is not None:
             return
 
-        # User-facing input: e.g. 0.05 means 5% of live-born calves die before weaning.
-        # Default is 0 (feature disabled), in which case we bail without touching the RNG.
-        rate = AnimalConfig.calf_mortality_rate
-        if rate <= 0:
+        calf_mortality_rate = AnimalConfig.calf_mortality_rate
+        if calf_mortality_rate <= 0:
             return
 
-        # First roll: does this individual calf die pre-wean?
-        # `random()` is a uniform draw in [0, 1); committing to die with probability = rate.
-        if random() >= rate:
+        survived_past_wean_day = random() >= calf_mortality_rate
+        if survived_past_wean_day:
             return
 
-        # Defensive: with the default wean_day=60 this is always false. Guards against
-        # a misconfigured wean_day of 0 or 1 (would break the day-draw below).
         if AnimalConfig.wean_day <= 1:
             return
 
-        # Sample the death day uniformly across the pre-wean window.
-        # Lower bound 1: a calf can't die on the day it's born (days_born=0 at birth).
-        # Upper bound wean_day-1: the wean day itself triggers the calf -> HeiferI
-        # transition, so we keep the death strictly inside the pre-wean stage.
         death_day = randint(1, AnimalConfig.wean_day - 1)
-
-        # For calves loaded from the initial herd at non-zero days_born, the drawn day
-        # may already have passed -- meaning this calf "survived" that window. Only
-        # commit the death when the drawn day is still in the future. For newborns
-        # (days_born = 0) this is always true.
         if death_day > self.days_born:
-            self._future_death_date = death_day
+            self.future_death_date = death_day
             self._future_death_reason = animal_constants.CALF_MORTALITY_CULL
 
     def _setup_heifer_mortality(self) -> None:
         """
         Roll for post-wean mortality and schedule a death day if the heifer is fated to die.
 
+        Notes
+        -----
         The cumulative probability of post-wean death is
-        :attr:`AnimalConfig.heifer_mortality_rate`. Of these deaths, a
-        :attr:`AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION` share are allocated
-        to the HeiferI window ``[wean_day + 1, heifer_breed_start_day - 1]`` and the remainder
-        to the HeiferII window ``[heifer_breed_start_day + 1, heifer_breed_start_day +
-        average_gestation_length - heifer_prefresh_day]``. The upper bound for HeiferII is
-        the typical entry day into HeiferIII (springer), keeping pre-springer mortality
-        cleanly within the youngstock window; any outlier that calves into the cow stage
-        before the drawn death day falls through to cow-stage death/cull logic.
+        :attr:`AnimalConfig.heifer_mortality_rate` (e.g. 0.05 means 5% of post-wean heifers die
+        before calving); a value of 0 disables the feature. When a heifer is fated to die, the
+        life stage of the death is chosen using
+        :attr:`AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION`: per SME guidance, 2/3 of
+        deaths fall in HeiferI and the remaining 1/3 in HeiferII. HeiferIII (springer) is
+        intentionally excluded, as those losses belong with prefresh / fresh-cow mortality rather
+        than youngstock mortality.
 
-        If the sampled day falls on or before the animal's current age, no death is
-        scheduled.
+        The death day is sampled uniformly within the selected stage's window: the HeiferI window
+        is ``[wean_day + 1, heifer_breed_start_day - 1]`` and the HeiferII window is
+        ``[heifer_breed_start_day + 1, heifer_breed_start_day + average_gestation_length -
+        heifer_prefresh_day]``. The HeiferII upper bound is the day a heifer of average gestation
+        length bred on ``heifer_breed_start_day`` would transition into HeiferIII, keeping
+        pre-springer deaths inside the youngstock window; the prefresh buffer absorbs most
+        gestation-length variation. A rare outlier that has already calved into the cow stage by
+        the drawn day falls through to the cow-stage death/cull logic. For a heifer loaded from
+        the initial herd mid-stage, a drawn day that has already passed means the heifer survived
+        that window and no death is scheduled.
         """
-        # User-facing input: e.g. 0.05 means 5% of post-wean heifers die before calving.
-        # Default is 0 (feature disabled), in which case we bail without touching the RNG.
-        rate = AnimalConfig.heifer_mortality_rate
-        if rate <= 0:
+        heifer_mortality_rate = AnimalConfig.heifer_mortality_rate
+        if heifer_mortality_rate <= 0:
             return
 
-        # First roll: does this individual heifer die before calving?
-        # Committing to die with probability = rate.
-        if random() >= rate:
+        survived_to_calving = random() >= heifer_mortality_rate
+        if survived_to_calving:
             return
 
-        # Second roll: which life stage does the death fall in?
-        # Per SME guidance, HEIFER_MORTALITY_HEIFERI_FRACTION (2/3) of post-wean heifer deaths
-        # happen in HeiferI (pre-breeding) and the rest in HeiferII (breeding through pregnancy,
-        # before springer entry). HeiferIII (springer) is intentionally excluded -- those losses
-        # belong with prefresh / fresh-cow mortality, not youngstock mortality.
-        if random() < AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION:
-            # HeiferI window: from the day after weaning up to the day before breeding starts.
-            # The +1/-1 boundaries keep the death strictly inside HeiferI; the wean day and
-            # breed-start day are themselves stage-transition days handled elsewhere.
+        dies_in_heiferI_stage = random() < AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION
+        if dies_in_heiferI_stage:
             lower = AnimalConfig.wean_day + 1
             upper = AnimalConfig.heifer_breed_start_day - 1
         else:
-            # HeiferII window: from the day after breeding starts up to the typical day a
-            # heifer would enter HeiferIII (springer status).
-            # The upper bound = breed_start + (avg_gestation - prefresh_day) is the day a
-            # heifer who bred immediately on day breed_start_day_h would have
-            # days_in_pregnancy = (avg_gestation - prefresh_day), which is when RuFaS
-            # transitions her into HeiferIII. By stopping at that day, all post-bred deaths
-            # land in HeiferII and the springer (HeiferIII) phase stays out of scope.
-            # The 21-day prefresh buffer absorbs gestation-length variation in outliers.
             lower = AnimalConfig.heifer_breed_start_day + 1
             upper = (
                 AnimalConfig.heifer_breed_start_day
@@ -2176,20 +2147,12 @@ class Animal:
                 - AnimalConfig.heifer_prefresh_day
             )
 
-        # Defensive: with normal config (wean_day < breed_start_day, gestation > prefresh)
-        # this never triggers. Guards against pathological configs that would invert the window.
         if upper < lower:
             return
 
-        # Sample the death day uniformly within the selected stage's window.
         death_day = randint(lower, upper)
-
-        # For heifers loaded from the initial herd mid-stage, the drawn day may already
-        # have passed -- meaning this heifer "survived" that window. Only commit when the
-        # drawn day is still in the future. For wean-transition entries (days_born = wean_day)
-        # this is always true for the HeiferII bucket and almost always for the HeiferI bucket.
         if death_day > self.days_born:
-            self._future_death_date = death_day
+            self.future_death_date = death_day
             self._future_death_reason = animal_constants.HEIFER_MORTALITY_CULL
 
     def _transition_heiferI_to_heiferII(self, time: RufasTime) -> None:
