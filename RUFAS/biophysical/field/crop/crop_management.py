@@ -474,8 +474,9 @@ class CropManagement:
 
         """
         surface_layer = soil_data.soil_layers[0]
-        surface_fraction = ((self.yield_residue - self.data.root_biomass) / self.yield_residue) \
-            if self.yield_residue > 0.0 else 0.0
+        surface_fraction = (
+            ((self.yield_residue - self.data.root_biomass) / self.yield_residue) if self.yield_residue > 0.0 else 0.0
+        )
         self._add_yield_residue_to_layer(
             layer=surface_layer,
             layer_fraction=surface_fraction,
