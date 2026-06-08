@@ -154,3 +154,8 @@ class AnimalModuleConstants:
 
     EFF_OF_ME_USE: float = 0.66
     """Efficiency of metabolizable energy use, e.g. conversion rate of metabolizable energy to net energy, unitless."""
+
+    HEIFER_MORTALITY_HEIFERI_FRACTION: float = 2 / 3
+    """Fraction of post-wean (heifer) mortality allocated to the HeiferI (pre-breeding) stage.
+    The remaining (1 - fraction) is allocated to the HeiferII (post-breeding) stage. Per SME
+    guidance, two-thirds of youngstock losses occur before breeding and one-third after, unitless."""
