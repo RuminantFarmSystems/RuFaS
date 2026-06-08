@@ -694,6 +694,7 @@ def test_initialize_heiferII_or_heiferIII(
     mock_reproduction_init = mocker.patch(
         "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None
     )
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
 
     expected_days_in_pregnancy = args.get("days_in_pregnancy", 0)
     expected_p_calf = args.get("phosphorus_for_gestation_required_for_calf", 0)
@@ -909,6 +910,7 @@ def test_initialize_cow(
         "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
     )
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     mocker.patch("RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve.get_wood_parameters")
 
     expected_days_in_milk = args.get("days_in_milk", 0)
@@ -959,6 +961,7 @@ def mock_heiferI(mock_time: RufasTime) -> Animal:
 @pytest.fixture
 def mock_heiferII(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     args = HeiferIIValuesTypedDict(
         id=1,
         breed="HO",
@@ -979,6 +982,7 @@ def mock_heiferII(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
 @pytest.fixture
 def mock_heiferIII(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     args = HeiferIIIValuesTypedDict(
         id=1,
         breed="HO",
@@ -999,6 +1003,7 @@ def mock_heiferIII(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
 @pytest.fixture
 def mock_lactating_cow(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     args = CowValuesTypedDict(
         id=1,
         breed="HO",
@@ -1024,6 +1029,7 @@ def mock_lactating_cow(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
 @pytest.fixture
 def mock_dry_cow(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     args = CowValuesTypedDict(
         id=1,
         breed="HO",
