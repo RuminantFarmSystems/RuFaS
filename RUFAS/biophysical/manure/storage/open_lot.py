@@ -13,6 +13,22 @@ from RUFAS.units import MeasurementUnits
 
 
 class OpenLot(Storage):
+    """
+    The open lot storage class.
+
+    Parameters
+    ----------
+    name : str
+        The name of the storage.
+    storage_time_period : int, default=1
+        The length of time (days) manure is stored for between emptying events.
+    surface_area : float, default=inf
+        The surface area of the manure storage (m^2).
+    cover : StorageCover, default=StorageCover.NO_COVER
+        The type of cover used with the specified storage.
+
+    """
+
     def __init__(
         self,
         name: str,
@@ -41,7 +57,7 @@ class OpenLot(Storage):
         Returns
         -------
         dict[str, ManureStream]
-            _The processed manure stream.
+            The processed manure stream.
 
         """
         original_received_manure = copy(self._received_manure)
@@ -99,7 +115,7 @@ class OpenLot(Storage):
 
     def _apply_dry_matter_loss(self, methane_emission: float, carbon_decomposition: float) -> None:
         """
-        This function calculates and then applies the dry matter loss to the received manure in place.
+        Calculates and then applies the dry matter loss to the received manure in place.
 
         Parameters
         ----------
@@ -113,6 +129,7 @@ class OpenLot(Storage):
         ValueError
             If any of the dry matter loss calculations results in negative values for received-manure
             non-degradable volatile solids, degradable volatile solids, or total solids.
+
         """
         dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
@@ -164,7 +181,7 @@ class OpenLot(Storage):
         self, storage_nitrous_oxide_N: float, storage_ammonia_N: float, storage_N_loss_from_leaching: float
     ) -> None:
         """
-        This function applies the nitrogen losses to the received manure nitrogen and ammoniacal nitrogen in place.
+        Applies the nitrogen losses to the received manure nitrogen and ammoniacal nitrogen in place.
 
         Parameters
         ----------
@@ -179,6 +196,7 @@ class OpenLot(Storage):
         ------
         ValueError
             If the total nitrogen losses are greater than the total received manure nitrogen.
+
         """
         received_manure_nitrogen_after_losses = (
             self._manure_to_process.nitrogen
@@ -204,6 +222,7 @@ class OpenLot(Storage):
     @staticmethod
     def _calculate_open_lot_ammonia_emissions(received_nitrogen: float) -> float:
         """
+        Calculates open lot ammonia emissions.
 
         Parameters
         ----------
