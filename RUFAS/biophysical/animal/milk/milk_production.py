@@ -48,6 +48,7 @@ class MilkProduction:
     milk_production_history: list[MilkProductionRecord]
 
     def __init__(self) -> None:
+        """Init method of MilkProduction class."""
         self._daily_milk_produced = 0.0
         self._milk_production_variance = Utility.generate_random_number(
             AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
@@ -62,6 +63,7 @@ class MilkProduction:
 
     @property
     def daily_milk_produced(self) -> float:
+        """Calculated property for the amount of daily milk produced."""
         adjusted_milk_production = max(
             self._daily_milk_produced + (self._milk_production_variance - self.milk_production_reduction), 0.0
         )
@@ -69,6 +71,7 @@ class MilkProduction:
 
     @daily_milk_produced.setter
     def daily_milk_produced(self, value: float) -> None:
+        """Setter method for ``daily_milk_produced``."""
         self._daily_milk_produced = value
 
     @classmethod
@@ -79,13 +82,14 @@ class MilkProduction:
         cls.lactose_percent = lactose_percent
 
     def set_wood_parameters(self, wood_l: float, wood_m: float, wood_n: float) -> None:
+        """Setter method for wood parameters."""
         self.wood_l = wood_l
         self.wood_m = wood_m
         self.wood_n = wood_n
 
     def _get_current_lactation_history(self) -> list[MilkProductionRecord]:
         """Returns milk production records since this cow's most recent dry-off marker
-        (the last record with ``days_in_milk == 0``), so prior lactations are excluded."""
+        (the last record with ``days_in_milk == 0``). Prior lactations are excluded."""
         current_lactation_history: list[MilkProductionRecord] = []
         for record in reversed(self.milk_production_history):
             if record["days_in_milk"] == 0:
@@ -105,15 +109,13 @@ class MilkProduction:
         ----------
         milking_properties : MilkProductionProperties
             Animal properties only used to determine milk production.
-        general_properties : GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
         time : RufasTime
             RufasTime instance containing the current time of the simulation.
 
         Returns
         -------
-        tuple[MilkingProperties, GeneralProperties]
-            Milking and general properties of the animal after milk production-related updates for the current day.
+        MilkingProperties
+            Milking properties of the animal after milk production-related updates for the current day.
 
         """
         milk_production_outputs = MilkProductionOutputs(
@@ -237,10 +239,6 @@ class MilkProduction:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
 
-        Notes
-        -----
-        [AN.MLK.9]
-
         Parameters
         ----------
         days_in_milk : int
@@ -261,6 +259,7 @@ class MilkProduction:
         ----------
         Li, M., et al. "Investigating the effect of temporal, geographic, and management factors on US Holstein
         lactation curve parameters." Journal of Dairy Science 105.9 (2022): 7525-7538.
+        [AN.MLK.9]
 
         """
         return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
@@ -271,14 +270,6 @@ class MilkProduction:
         Predicted 305-day milk yield from Wood's lactation curve alone — the integral of
         the daily-production curve from day 1 to 305, with no per-cow history involved.
 
-        This is the metric used when fitting Wood's l parameter to a target annual yield
-        at the start of the simulation, and is also the fallback when a cow has no
-        current-lactation history yet (e.g. dry cows at sim start).
-
-        Notes
-        -----
-        [AN.MLK.10]
-
         Parameters
         ----------
         l_param, m_param, n_param : float
@@ -288,6 +279,17 @@ class MilkProduction:
         -------
         float
             305-day milk yield from Wood's curve (kg).
+
+        Notes
+        -----
+        This is the metric used when fitting Wood's l parameter to a target annual yield
+        at the start of the simulation, and is also the fallback when a cow has no
+        current-lactation history yet (e.g. dry cows at sim start).
+
+        References
+        ----------
+        [AN.MLK.10]
+
         """
         result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
         return result
@@ -296,7 +298,16 @@ class MilkProduction:
         """
         Per-cow estimate of the cow's current-lactation 305-day milk yield, combining
         observed daily production with Wood's-curve predictions for any unobserved DIMs
-        in 1..305. This keeps the metric meaningful early in the simulation (or for cows
+        in 1..305.
+
+        Returns
+        -------
+        float
+            305-day milk yield estimate for the current lactation (kg).
+
+        Notes
+        -----
+        This keeps the metric meaningful early in the simulation (or for cows
         that were mid-lactation at sim start) when actual history doesn't yet span all
         305 days. Cows with no current-lactation history fall back to the pure predicted
         yield from ``calculate_predicted_305_day_milk_yield``.
@@ -305,10 +316,6 @@ class MilkProduction:
         parameters — that's the optimization hot path and doesn't need any of the
         per-cow logic here.
 
-        Returns
-        -------
-        float
-            305-day milk yield estimate for the current lactation (kg).
         """
         current_lactation_history = self._get_current_lactation_history()
         observed_records = [record for record in current_lactation_history if 1 <= record["days_in_milk"] <= 305]
@@ -345,17 +352,10 @@ class MilkProduction:
         """
         Randomly adjusts the milk production on a specific day.
 
-        Parameters
-        ----------
-        milking_properties : MilkProductionProperties
-            Animal properties only used to determine milk production.
-        general_properties : GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
-
         Returns
         -------
-        general_properties : GeneralProperties
-            Animal properties with the daily_milk_produced attribute updated.
+        float
+            The milk production adjustment (kg).
 
         """
         milk_production_variance = Utility.generate_random_number(

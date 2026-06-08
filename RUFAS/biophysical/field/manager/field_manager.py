@@ -44,22 +44,21 @@ class FieldManager:
     om : OutputManager
         Instance of the OutputManager.
 
+    Parameters
+    ----------
+    field_data : dict[str, dict[str, Any]]
+        Mapping of field names to their configuration data.
     """
 
-    def __init__(self) -> None:
-        info_map = {"class": self.__class__.__name__, "function": "__init__"}
-        self.im = InputManager()
+    def __init__(self, field_data: dict[str, dict[str, Any]]) -> None:
         self.om = OutputManager()
         self.fields: list[Field] = []
-        fields = self.im.get_data_keys_by_properties("field_properties")
-        if not fields:
-            self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
         CropDataFactory.setup_crop_configurations()
         available_crop_configs = CropDataFactory.get_available_crop_configurations()
 
-        for field in fields:
-            new_field = self._setup_field(field, available_crop_configs)
+        for field_name, field_configuration_data in field_data.items():
+            new_field = self._setup_field(field_name, field_configuration_data, available_crop_configs)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
@@ -148,13 +147,17 @@ class FieldManager:
         return next_harvest_dates
 
     @staticmethod
-    def _setup_field(field_name: str, available_crop_configs: list[str]) -> Field:
+    def _setup_field(
+        field_name: str, field_configuration_data: dict[str, Any], available_crop_configs: list[str]
+    ) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
+        field_configuration_data : dict[str, Any]
+            The configuration data for the field, including soil, crop rotation, and other parameters.
         available_crop_configs : list[str]
             A list of the names of the available crop configurations.
 
@@ -162,11 +165,7 @@ class FieldManager:
         -------
         Field
             A ``Field`` instance configured with the specified input data
-
         """
-        im = InputManager()
-        field_configuration_data: dict[str, Any] = im.get_data(field_name)
-
         field_data = FieldManager._setup_field_data(field_name, field_configuration_data)
 
         soil_profile = FieldManager._setup_soil(
