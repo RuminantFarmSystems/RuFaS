@@ -133,15 +133,15 @@ class ManureConstants:
     """The upper bound temperature for determining MCF for windrow composting (C)."""
 
     MCF_COMPOSTING_WINDROW_LOW: float = 0.005
-    """The MCF for windrow composting when the air temperature is below the lower bound temperature (C)."""
+    """The MCF for windrow composting when the air temperature is below the lower bound temperature (unitless)."""
 
     MCF_COMPOSTING_WINDROW_MEDIUM: float = 0.01
     """
-    The MCF for windrow composting when the air temperature is between the lower and upper bound temperature (C).
+    The MCF for windrow composting when the air temperature is between the lower and upper bound temperature (unitless).
     """
 
     MCF_COMPOSTING_WINDROW_HIGH: float = 0.015
-    """The MCF for windrow composting when the air temperature is above the upper bound temperature (C)."""
+    """The MCF for windrow composting when the air temperature is above the upper bound temperature (unitless)."""
 
     AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS: float = 0.36
     """Ammonia emission coefficient used for calculating nitrogen loss in an open lot (unitless)."""
