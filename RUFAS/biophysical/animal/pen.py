@@ -1322,7 +1322,9 @@ class Pen:
         if animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-        ration = RationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements.dry_matter)
+        ration = RationManager.get_user_defined_ration(
+            animal_combination, self.average_nutrition_requirements.dry_matter
+        )
         self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
 
         is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
@@ -1340,7 +1342,9 @@ class Pen:
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     break
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-                ration = RationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements.dry_matter)
+                ration = RationManager.get_user_defined_ration(
+                    animal_combination, self.average_nutrition_requirements.dry_matter
+                )
                 self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     self.average_nutrition_requirements,
