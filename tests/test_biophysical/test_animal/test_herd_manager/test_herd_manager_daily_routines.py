@@ -678,8 +678,15 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         ]
         pen.beddings = {"mock_bedding": MagicMock(auto_spec=Bedding)}
 
+    herd_manager.herd_reproduction_statistics = HerdReproductionStatistics(
+        total_num_ai_performed=7, heifer_num_ai_performed=3, cow_num_ai_performed=4
+    )
+
     herd_manager.execute_daily_routines([mock_feed], mock_time, mock_weather)
 
+    assert herd_manager.herd_reproduction_statistics.total_num_ai_performed == 7
+    assert herd_manager.herd_reproduction_statistics.heifer_num_ai_performed == 3
+    assert herd_manager.herd_reproduction_statistics.cow_num_ai_performed == 4
     mock_reset_daily_statistics.assert_called_once_with()
     assert mock_perform_daily_routines_for_animals.call_count == 5
     assert mock_perform_daily_routines_for_animals.call_args_list == [
