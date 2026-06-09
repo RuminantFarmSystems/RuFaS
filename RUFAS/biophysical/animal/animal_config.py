@@ -44,7 +44,15 @@ class AnimalConfig:
     male_calf_rate_sexed_semen : float
         Proportion of male calves when sexed semen is used, (unitless).
     keep_female_calf_rate : float
-        Rate at which female calves are kept, (unitless).
+        Rate at which female calves are kept, used when ``calf_retention_method`` is
+        ``"rate"`` (unitless).
+    calf_retention_method : str
+        Method used to decide female-calf retention: ``"rate"`` (keep each live female
+        calf with probability ``keep_female_calf_rate``) or ``"count"`` (keep a target
+        number of female calves per year, ``keep_female_calf_num_annual``).
+    keep_female_calf_num_annual : int
+        Target number of female calves to keep per year, used when
+        ``calf_retention_method`` is ``"count"``, (head/year).
     still_birth_rate : float
         Probability of stillbirth occurring during calving, (unitless).
     average_gestation_length : int
@@ -200,6 +208,8 @@ class AnimalConfig:
     male_calf_rate_conventional_semen: float = 0.53
     male_calf_rate_sexed_semen: float = 0.10
     keep_female_calf_rate: float = 1
+    calf_retention_method: str = "rate"
+    keep_female_calf_num_annual: int = 0
     still_birth_rate: float = 0.065
     average_gestation_length: int = 276
     std_gestation_length: float = 6
@@ -404,6 +414,10 @@ class AnimalConfig:
         ]
         cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
         cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
+        cls.calf_retention_method = animal_config_data["farm_level"]["calf"].get("calf_retention_method", "rate")
+        cls.keep_female_calf_num_annual = int(
+            animal_config_data["farm_level"]["calf"].get("keep_female_calf_num_annual", 0)
+        )
         cls.still_birth_rate = animal_config_data["from_literature"]["life_cycle"]["still_birth_rate"]
         cls.average_gestation_length = animal_config_data["farm_level"]["repro"]["avg_gestation_len"]
         cls.std_gestation_length = animal_config_data["farm_level"]["repro"]["std_gestation_len"]
