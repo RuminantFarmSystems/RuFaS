@@ -182,6 +182,8 @@ class HerdManager:
         self.adjustment_period = animal_config_data["herd_information"]["herd_size_adjustment_period"]
         self.selling_threshold = animal_config_data["herd_information"]["herd_size_sell_threshold"]
         self.buying_threshold = animal_config_data["herd_information"]["herd_size_buy_threshold"]
+        # Accumulates breeding/conception counts across the whole simulation; reported once at
+        # end-of-simulation. Not reset daily (issue #3029).
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
         self.housing = animal_config_data["housing"]
@@ -750,7 +752,8 @@ class HerdManager:
         statistics, and manure data collection.
 
         Daily Herd Routine Process:
-        1. Reset daily herd statistics and reproduction trackers.
+        1. Reset the daily herd statistics (the cumulative herd reproduction statistics persist
+           across the whole simulation and are not reset here).
         2. Run per-animal daily routines for calves, heifer groups, and cows.
         3. Collect herd-level updates from those routines, including graduations, removals, births, and sales.
         4. Update sold-animal and stillborn-calf statistics.
@@ -761,7 +764,11 @@ class HerdManager:
 
         """
         self._reset_daily_statistics()
-        self.herd_reproduction_statistics = HerdReproductionStatistics()
+        # NOTE: ``herd_reproduction_statistics`` intentionally accumulates over the entire
+        # simulation. It is initialized once in ``__init__`` and reported a single time at
+        # end-of-simulation (see ``AnimalModuleReporter.report_end_of_simulation``). Resetting it
+        # here would make the end-of-simulation breeding/conception totals reflect only the final
+        # day rather than the whole run (issue #3029).
 
         daily_herd_updates = self._process_daily_herd_updates(time)
         self.herd_statistics.born_calf_num = len(
