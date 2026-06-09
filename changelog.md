@@ -24,6 +24,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 v1.0.0
 
 ### Next Version Updates
+- [3078](https://github.com/RuminantFarmSystems/RuFaS/pull/3078) - [minor change] [Animal] [InputChange] [NoOutputChange] Add a count-based female calf retention option (calf_retention_method, keep_female_calf_num_annual) to keep a target number of female calves per year instead of a rate, and consolidate all retention logic into a single CalfRetentionPolicy. Default (rate) behavior is unchanged.
 - [2793](https://github.com/RuminantFarmSystems/RuFaS/pull/2793) - [minor change] [Animal] [OutputManager] [NoInputChange] [OutputChange] Track and summarize when effective DMI falls below the empirical domain of manure equations for lactating and dry cows at end of simulation.
 - [2865](https://github.com/RuminantFarmSystems/RuFaS/pull/2865) - [minor change] [NoInputChange] [NoOutputChange] Update to tables and formatting in scientific documentation.
 - [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
