@@ -24,6 +24,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 v1.0.0
 
 ### Next Version Updates
+- [<PR#>](https://github.com/RuminantFarmSystems/RuFaS/pull/<PR#>) - [minor change] [Animal] [NoInputChange] [OutputChange] Fix `herd_reproduction_statistics` being reset every simulation day, so the end-of-simulation breeding and conception outputs (e.g. `cow_total_num_ai_performed`, `heiferII_total_num_ai_performed`, and the conception rates) tally over the whole simulation instead of reflecting only the final day (issue #3029).
 - [2793](https://github.com/RuminantFarmSystems/RuFaS/pull/2793) - [minor change] [Animal] [OutputManager] [NoInputChange] [OutputChange] Track and summarize when effective DMI falls below the empirical domain of manure equations for lactating and dry cows at end of simulation.
 - [2865](https://github.com/RuminantFarmSystems/RuFaS/pull/2865) - [minor change] [NoInputChange] [NoOutputChange] Update to tables and formatting in scientific documentation.
 - [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
