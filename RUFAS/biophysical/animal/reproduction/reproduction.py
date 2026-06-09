@@ -414,11 +414,11 @@ class Reproduction:
             )
             if not reproduction_data_stream.is_pregnant:
                 self.repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
-                reproduction_data_stream.events.add_event(
-                    reproduction_data_stream.days_born,
-                    simulation_day,
-                    f"Current repro state(s): {self.repro_state_manager}",
-                )
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                f"Current repro state(s): {self.repro_state_manager}",
+            )
         return reproduction_data_stream
 
     def _execute_cow_reproduction_protocols(
@@ -1799,8 +1799,41 @@ class Reproduction:
     def _should_set_up_hormone_delivery_for_presynch(
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> tuple[bool, ReproductionDataStream]:
-        """Determine if hormone delivery should be set up for presynch based on current status."""
+        """
+        Determine whether hormone delivery should be set up for a cow in presynch.
 
+        Parameters
+        ----------
+        reproduction_data_stream : ReproductionDataStream
+            Current reproduction data for the cow.
+        simulation_day : int
+            Current simulation day, used when recording reproduction events.
+
+        Returns
+        -------
+        tuple[bool, ReproductionDataStream]
+            A tuple containing:
+            1. bool
+                Whether hormone delivery should be set up for presynch.
+            2. ReproductionDataStream
+                The updated reproduction data stream.
+
+        Notes
+        -----
+        The checks are ordered from broad exclusion criteria to presynch-entry criteria:
+
+        1. Pregnant cows are excluded because they should not begin presynch.
+        2. Cows not enrolled in a TAI reproduction program are excluded because presynch only applies to TAI.
+        3. Unsupported presynch subprotocols are excluded before checking animal state.
+        4. Cows with an existing hormone schedule are excluded to avoid overwriting or duplicating scheduled treatments.
+        5. Cows exactly on the configured presynch start day may enter presynch from FRESH or ENTER_HERD_FROM_INIT.
+        6. Cows already past the configured start day may enter presynch only from ENTER_HERD_FROM_INIT, which allows
+           initialized animals to catch up without reopening the normal FRESH transition window.
+
+        If the cow is already in the IN_PRESYNCH state, this method returns True even if no new state transition occurs.
+        """
+        if reproduction_data_stream.is_pregnant:
+            return False, reproduction_data_stream
         if self.cow_reproduction_program != CowReproductionProtocol.TAI:
             return False, reproduction_data_stream
 
@@ -1843,8 +1876,46 @@ class Reproduction:
     def _should_set_up_hormone_delivery_for_ovsynch(
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> tuple[bool, ReproductionDataStream]:
-        """Determine if hormone delivery should be set up for OvSynch based on current status."""
+        """
+        Determine whether hormone delivery should be set up for a cow in OvSynch.
 
+        Parameters
+        ----------
+        reproduction_data_stream : ReproductionDataStream
+            Current reproduction data for the cow.
+        simulation_day : int
+            Current simulation day, used when recording reproduction events.
+
+        Returns
+        -------
+        tuple[bool, ReproductionDataStream]
+            A tuple containing:
+            1. bool
+                Whether hormone delivery should be set up for OvSynch.
+            2. ReproductionDataStream
+                The updated reproduction data stream.
+
+        Notes
+        -----
+        The checks are ordered from broad exclusion criteria to OvSynch-entry criteria:
+
+        1. Pregnant cows are excluded because they should not begin OvSynch.
+        2. Cows with an existing hormone schedule are excluded to avoid overwriting
+           or duplicating scheduled treatments.
+        3. Unsupported OvSynch subprotocols are excluded before checking animal state.
+        4. Cows currently in presynch are excluded because they must complete presynch
+           before transitioning to OvSynch.
+        5. Cows exactly on the configured OvSynch start day may enter OvSynch from an
+           empty state, FRESH, ENTER_HERD_FROM_INIT, or HAS_DONE_PRESYNCH.
+        6. Cows already past the configured start day may enter OvSynch only from
+           HAS_DONE_PRESYNCH or ENTER_HERD_FROM_INIT, allowing initialized animals
+           and presynch-completed animals to catch up.
+
+        If the cow is already in the IN_OVSYNCH state, this method returns True even
+        if no new state transition occurs.
+        """
+        if reproduction_data_stream.is_pregnant:
+            return False, reproduction_data_stream
         if self.hormone_schedule:
             return False, reproduction_data_stream
         if AnimalConfig.cow_ovsynch_method not in [
