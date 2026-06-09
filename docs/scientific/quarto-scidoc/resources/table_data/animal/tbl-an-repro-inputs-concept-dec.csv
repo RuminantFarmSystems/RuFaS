@@ -1,0 +1,4 @@
+﻿Section , Variable , Definition , Default , Min , Max 
+farm_level, conception_rate_decrease, Percent decrease per breeding attempt after first, 0.026, 0.1, 0
+, decrease_conception_rate_in_rebreeding, Whether to decrease rate with rebreeding, FALSE, --, --
+, decrease_conception_rate_by_parity, Whether to decrease rate by parity, FALSE, --, --
