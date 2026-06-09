@@ -430,8 +430,9 @@ class AvailableFeedsBuilder:
         return sorted(available_feeds, key=lambda feed: feed.rufas_id)
 
     @staticmethod
-    def _validate_feed_config(feed_config: dict[str, Any], feed_library: dict[RUFAS_ID, dict[str, Any]],
-                              nutrient_standard: NutrientStandard) -> None:
+    def _validate_feed_config(
+        feed_config: dict[str, Any], feed_library: dict[RUFAS_ID, dict[str, Any]], nutrient_standard: NutrientStandard
+    ) -> None:
         """
         Validates the feed configuration prior to constructing available feeds.
 
