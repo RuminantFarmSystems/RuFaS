@@ -1,6 +1,10 @@
 from typing import Any
 
-from RUFAS.biophysical.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, VALID_HARVEST_OPERATIONS, HarvestOperation
+from RUFAS.biophysical.field.crop.harvest_operations import (
+    FINAL_HARVEST_OPERATIONS,
+    VALID_HARVEST_OPERATIONS,
+    HarvestOperation,
+)
 from RUFAS.data_structures.events import HarvestEvent, PlantingEvent
 from RUFAS.biophysical.field.manager.schedule import Schedule
 from RUFAS.output_manager import OutputManager
