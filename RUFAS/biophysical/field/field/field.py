@@ -1,6 +1,6 @@
 import math
 from math import exp
-from typing import Dict, List, Sequence, TypeVar
+from typing import Dict, List, Sequence, TypeVar, Any
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
@@ -107,6 +107,7 @@ class Field:
         fertilizer_events: List[FertilizerEvent] | None = None,
         fertilizer_mixes: Dict[str, Dict[str, float]] | None = None,
         manure_events: List[ManureEvent] | None = None,
+        daily_spread_settings: dict[str, Any] | None = None,
     ) -> None:
         # field-wide attributes
         self.om = OutputManager()
@@ -139,6 +140,7 @@ class Field:
         self.manure_applicator = ManureApplication(self.soil.data)
 
         self.manure_events: list[ManureEvent] = manure_events or []
+        self.daily_spread_settings = daily_spread_settings
 
     def manage_field(
         self,
@@ -1082,7 +1084,43 @@ class Field:
         for event in todays_manure_events:
             manure_request = self._create_manure_request(event)
             manure_requests.append(ManureEventNutrientRequest(self.field_data.name, event, manure_request))
+
+        daily_spread_event = self._create_daily_spread_event(time)
+        if daily_spread_event is not None:
+            manure_request = self._create_manure_request(daily_spread_event)
+            manure_requests.append(ManureEventNutrientRequest(self.field_data.name, daily_spread_event, manure_request))
         return manure_requests
+
+    def _create_daily_spread_event(self, time: RufasTime) -> ManureEvent | None:
+        """Creates a daily manure event from daily spread settings, if enabled."""
+        if not self.daily_spread_settings:
+            return None
+        if not self.daily_spread_settings.get("is_daily_spreading", False):
+            return None
+
+        manure_type = ManureType(self.daily_spread_settings.get("manure_type", ManureType.SOLID.value))
+        manure_supplement_method = ManureSupplementMethod(
+            self.daily_spread_settings.get(
+                "supplement_manure_nutrient_deficiencies",
+                ManureSupplementMethod.NONE.value,
+            )
+        )
+        nitrogen_spread_amount = self.daily_spread_settings.get("nitrogen_spread_amount", 0.0)
+        phosphorus_spread_amount = self.daily_spread_settings.get("phosphorus_spread_amount", 0.0)
+        spread_all_available_manure = bool(self.daily_spread_settings.get("spread_all_available_manure", False))
+        return ManureEvent(
+            nitrogen_mass=nitrogen_spread_amount,
+            phosphorus_mass=phosphorus_spread_amount,
+            manure_type=manure_type,
+            manure_supplement_method=manure_supplement_method,
+            field_coverage=self.daily_spread_settings.get("coverage_fraction", 1.0),
+            application_depth=self.daily_spread_settings.get("application_depth", 0.0),
+            surface_remainder_fraction=self.daily_spread_settings.get("surface_remainder_fraction", 1.0),
+            year=time.current_calendar_year,
+            day=time.current_julian_day,
+            is_daily_spread=True,
+            spread_all_available_manure=spread_all_available_manure,
+        )
 
     def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
         """
@@ -1107,12 +1145,13 @@ class Field:
             "year": event.year,
             "day": event.day,
         }
-        if event.nitrogen_mass == event.phosphorus_mass == 0.0:
+        spread_all_available_manure = bool(getattr(event, "spread_all_available_manure", False))
+        if not spread_all_available_manure and event.nitrogen_mass == event.phosphorus_mass == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             self.om.add_warning("Manure Application Warning", log_message, info_map)
             return None
 
-        use_supplemental_manure = event.manure_supplement_method in [
+        use_supplemental_manure = not spread_all_available_manure and event.manure_supplement_method in [
             ManureSupplementMethod.MANURE,
             ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
         ]
@@ -1122,6 +1161,8 @@ class Field:
             phosphorus=event.phosphorus_mass,
             manure_type=event.manure_type,
             use_supplemental_manure=use_supplemental_manure,
+            use_daily_spread_source=bool(getattr(event, "is_daily_spread", False)),
+            spread_all_available_manure=spread_all_available_manure,
         )
 
     def _check_crop_harvest_schedule(
@@ -1300,8 +1341,8 @@ class Field:
             "year": MeasurementUnits.CALENDAR_YEAR,
             "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
-            "average_clay_percent": MeasurementUnits.PERCENT,
             "field_name": MeasurementUnits.UNITLESS,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1315,8 +1356,8 @@ class Field:
             "year": year,
             "day": day,
             "field_size": self.field_data.field_size,
-            "average_clay_percent": self.soil.data.average_clay_percent,
             "field_name": self.field_data.name,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         self.om.add_variable("crop_planting", value, info_map)
 
