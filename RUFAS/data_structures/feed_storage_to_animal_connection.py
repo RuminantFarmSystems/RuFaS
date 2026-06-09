@@ -395,7 +395,7 @@ class AvailableFeedsBuilder:
 
         Parameters
         ----------
-        feed_config : list[dict[str, Any]]
+        feed_config : dict[str, list[Any]]
             Mapping of the feeds available for purchase to the prices of those feeds.
         nutrient_standard : NutrientStandard
             Indicates whether the NASEM or NRC nutrient standards is being used.
@@ -407,6 +407,7 @@ class AvailableFeedsBuilder:
 
         """
         feed_library = AvailableFeedsBuilder._process_feed_library(nutrient_standard)
+        AvailableFeedsBuilder._validate_feed_config(feed_config, feed_library, nutrient_standard)
 
         feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
         available_feeds: list[Feed] = []
@@ -415,10 +416,7 @@ class AvailableFeedsBuilder:
             rufas_id = feed["feed_type"]
             price = feed["purchased_feed_cost"]
             buffer = feed["buffer"]
-            try:
-                nutritive_properties = feed_library[rufas_id]
-            except KeyError:
-                raise KeyError(f"Feed with RUFAS ID '{rufas_id}' not found in the feed library.")
+            nutritive_properties = feed_library[rufas_id]
             new_feed = feed_representation(
                 rufas_id=rufas_id,
                 amount_available=0.0,
@@ -430,6 +428,89 @@ class AvailableFeedsBuilder:
             available_feeds.append(new_feed)
 
         return sorted(available_feeds, key=lambda feed: feed.rufas_id)
+
+    @staticmethod
+    def _validate_feed_config(feed_config: dict[str, Any], feed_library: dict[RUFAS_ID, dict[str, Any]],
+                              nutrient_standard: NutrientStandard) -> None:
+        """
+        Validates the feed configuration prior to constructing available feeds.
+
+        Parameters
+        ----------
+        feed_config : dict[str, Any]
+            Feed configuration input containing the top-level ``feeds`` and ``rations`` sections.
+        feed_library : dict[RUFAS_ID, dict[str, Any]]
+            Mapping of RuFaS feed IDs to the nutritional properties available in the selected feed library.
+        nutrient_standard : NutrientStandard
+            Indicates whether the NASEM or NRC nutrient standards is being used.
+
+        Raises
+        ------
+        ValueError
+            - If any configured feed type does not exist in the selected feed library.
+            - If duplicate feed types are present in the top-level ``feeds`` section.
+            - If duplicate feed types are present within an individual ration.
+            - If a ration references a feed type that is not defined in the top-level ``feeds`` section.
+
+        Notes
+        -----
+        These checks ensure that all ration feeds are uniquely defined, correspond to purchasable feeds configured for
+        the simulation, and can be successfully mapped to feed composition data from the selected feed library.
+
+        """
+        feeds_to_parse = feed_config["feeds"]
+        rations_to_parse = feed_config["rations"]
+
+        config_feed_ids = [feed["feed_type"] for feed in feeds_to_parse]
+
+        missing_feed_types = set(config_feed_ids) - set(feed_library)
+        if missing_feed_types:
+            raise ValueError(
+                f"The following feed_type values are not present in the selected {str(nutrient_standard.value)} "
+                f"feed library: {sorted(missing_feed_types)}."
+            )
+
+        repeated_feed_types = AvailableFeedsBuilder._find_feed_repeats(config_feed_ids)
+        if repeated_feed_types:
+            raise ValueError(
+                "The feed config contains repeated feed_type entries in the top-level "
+                f"'feeds' section: {sorted(repeated_feed_types)}."
+            )
+
+        configured_feed_type_set = set(config_feed_ids)
+
+        for ration in rations_to_parse:
+            animal_combination = ration["animal_combination"]
+            ration_feed_ids = [feed["feed_type"] for feed in ration["feeds"]]
+
+            repeated_ration_feed_types = AvailableFeedsBuilder._find_feed_repeats(ration_feed_ids)
+            if repeated_ration_feed_types:
+                raise ValueError(
+                    "The feed config contains repeated feed_type entries in the ration "
+                    f"for animal_combination '{animal_combination}': "
+                    f"{sorted(repeated_ration_feed_types)}."
+                )
+
+            missing_feed_types = set(ration_feed_ids) - configured_feed_type_set
+            if missing_feed_types:
+                raise ValueError(
+                    "The feed config contains ration feed_type entries that are not "
+                    "defined in the top-level 'feeds' section for animal_combination "
+                    f"'{animal_combination}': {sorted(missing_feed_types)}."
+                )
+
+    @staticmethod
+    def _find_feed_repeats(values: list[RUFAS_ID]) -> set[RUFAS_ID]:
+        """Finds values that occur more than once in a list."""
+        seen_feed_ids: set[RUFAS_ID] = set()
+        repeated_feed_ids: set[RUFAS_ID] = set()
+
+        for value in values:
+            if value in seen_feed_ids:
+                repeated_feed_ids.add(value)
+            seen_feed_ids.add(value)
+
+        return repeated_feed_ids
 
     @staticmethod
     def _process_feed_library(nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:

@@ -98,6 +98,7 @@ v1.0.0
 - [3054](https://github.com/RuminantFarmSystems/RuFaS/pull/3054) - [minor change] [Animal] [Reproduction] [NoInputChange] [NoOutputChange] Adds early-exit guard in presynch and OvSynch hormone schedule setup to skip already-pregnant cows.
 - [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [InputChange] [NoOutputChange] Removes `random_seed` field from all 6 config input files.
 - [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [InputChange] [NoOutputChange] Removes the `random_seed` field from all 6 config input files and from 3 config input files in helpful_scripts.
+- [3084](https://github.com/RuminantFarmSystems/RuFaS/pull/3084) - [minor change] [Feeds] [NoInputChange] [NoOutputChange] Adds feed config validation in-simulation.
 
 ### v1.0.0
 
