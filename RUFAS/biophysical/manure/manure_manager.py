@@ -759,7 +759,7 @@ class ManureManager:
             A dictionary that contains processor definitions, where each key is the processor name and
             the value is a dictionary with the processor's parameters and type.
         intercept_mean_temp : float
-            The intercept mean temperature calculate from linest function.
+            The intercept mean temperature calculated from linest function.
         phase_shift : float
             Temperature phase shift of the weather data.
         amplitude : float

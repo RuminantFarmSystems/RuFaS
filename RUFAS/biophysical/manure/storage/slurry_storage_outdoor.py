@@ -23,7 +23,7 @@ class SlurryStorageOutdoor(Storage):
         The name of the storage.
     cover : StorageCover
         The type of cover used with the specified storage.
-    storage_time_period : int, optional
+    storage_time_period : int | None
         The length of time (days) manure is stored for between emptying events.
     surface_area : float
         The surface area of the manure storage (m^2).

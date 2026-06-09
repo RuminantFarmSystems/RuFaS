@@ -49,9 +49,9 @@ class BeddedPack(Storage):
         The name of the bedded pack storage.
     is_mixed : bool
         Indicator for if the bedded pack is regularly mixed to promote composting activity.
-    storage_time_period : int, default=None
+    storage_time_period : int | None
         The length of time (days) manure is stored for between emptying events.
-    surface_area : float, deafult=inf
+    surface_area : float, default=inf
         The surface area of the manure storage (m^2).
     cover : StorageCover, default=StorageCover.NO_COVER
         The type of cover used with the specified storage.

@@ -20,7 +20,7 @@ class OpenLot(Storage):
     ----------
     name : str
         The name of the storage.
-    storage_time_period : int, default=1
+    storage_time_period : int | None
         The length of time (days) manure is stored for between emptying events.
     surface_area : float, default=inf
         The surface area of the manure storage (m^2).
