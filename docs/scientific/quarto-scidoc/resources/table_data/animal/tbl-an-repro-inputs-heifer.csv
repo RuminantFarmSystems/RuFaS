@@ -1,9 +1,9 @@
 ﻿Section , Variable , Definition , Default , Min , Max 
 management_decisions , breeding_start_day_h , Age when RuFaS initiates estrous protocol (days) , -- ,380,0
-, heifer_repro_method ," "" Timed AI (TAI)", Estrus Detection (ED)," Synchronized ED (Synch-ED) "" ", TAI 
+, heifer_repro_method ," Timed AI (TAI),  Estrus Detection (ED),  Synchronized ED (Synch-ED) ",TAI, --, --
 , heifer_repro_cull_time , Age when a heifer is culled if not pregnant (days) , -- ,500,0
 farm_level_heifers , estrus_detection_rate , Proportion of estrus detected in ED protocol ,0.9,0,1
 , estrus_conception_rate , Conception rate in ED protocol ,0.6,0,1
-, repro_sub_protocol ," "" Hormone protocol used; varies by method (e.g. 5dCG2P", CP," N/A) """, 5dCG2P 
+, repro_sub_protocol ,"Hormone protocol used; varies by method (e.g. 5dCG2P,  CP, None)", 5dCG2P ,--,--
 , conception_rate , Conception rate for sub-protocol,0.6,0,1
 , estrus_detection_rate , Detection rate in sub-protocol,0.6,0,1

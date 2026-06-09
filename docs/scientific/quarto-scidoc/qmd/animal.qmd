@@ -2226,7 +2226,7 @@ import_table(
 
 ##### Introduction
 
-Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs (Table RF1), but the primary Feed input file (Table RF2), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
+Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs (@tbl-an-auto-ration-an-input), but the primary Feed input file (@tbl-an-auto-ration-feed-input), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
 
 ##### Required User Inputs
 
@@ -2278,10 +2278,10 @@ In cases of ration formulation failure, a summary of the constraints that failed
 
 ##### Methodology
 
-Ration formulation is carried out at the pen level on a user-defined formulation interval (Table RF1). The mean requirements for a given pen are 
-calculated prior to first formulation, as described in [REF IV. Animal Nutrition and Feeding, A. Calculations of Animal Energy and Nutrient Requirement]. 
-This process then proceeds to utilize a series of constraints methods (Table RF3) that compares the animal requirements against the supply of the 
-optimizer’s ration attempt, as described in [REF IV. Animal Nutrition and Feeding, B. Calculations of Animal Energy and Nutrient Supply], all while 
+Ration formulation is carried out at the pen level on a user-defined formulation interval (@tbl-an-auto-ration-an-input). The mean requirements for a given pen are 
+calculated prior to first formulation, as described in [REF IV. Animal Nutrition and Feeding, A. Calculations of Animal Energy and Nutrient Requirement]{.mark}. 
+This process then proceeds to utilize a series of constraints methods (@tbl-an-ration-input-constr) that compares the animal requirements against the supply of the 
+optimizer’s ration attempt, as described in [REF IV. Animal Nutrition and Feeding, B. Calculations of Animal Energy and Nutrient Supply]{,mark}, all while 
 abiding feed ingredient-specific inclusion rates, as defined in @nrc_2001 and @nrc_2021. If a ration cannot be formulated that meets the constraints given the pen-level 
 requirements and limits to inclusion rates, then one of the following things will happen.
 
@@ -2335,8 +2335,8 @@ import_table(
 ##### Methodology
 
 The key difference in the methodology for the user-defined ration methodology is that the feed inclusion rates are bounded by the 
-`user_defined_ration_percentage` values defined for each feed item (Table RF4). Those percentage values become the minimum and maximum 
-inclusion value for each feed, with +/- the tolerance value (Table RF4) as a fraction of the percentage.
+`user_defined_ration_percentage` values defined for each feed item. Those percentage values become the minimum and maximum 
+inclusion value for each feed, with +/- the tolerance value as a fraction of the percentage.
 
 The ration formulation will proceed as described in the Automated Methodology above, but when formulation fails, different outcomes will occur.
 
@@ -2345,7 +2345,7 @@ The ration formulation will proceed as described in the Automated Methodology ab
 * Record failed constraints and formulation attempt to OutputManager.
 * Milk production will be reduced.
   * IF average milk production for the pen drops below the values defined in [REFERENCE TO 5. Milk Production and Reduction]{.mark}, then the simulation halts with an error.
-  * IF if the `milk_reduction_maximum` (Table RF4) is exceeded, then the simulation proceeds by using the user-defined ration percentages exactly.
+  * IF if the `milk_reduction_maximum` is exceeded, then the simulation proceeds by using the user-defined ration percentages exactly.
 * Recalculation of the nutritional requirements for all animals in the pen.
 * Ration formulation reattempt (repeat).
 
@@ -2786,11 +2786,11 @@ reproductive events.
 The simulation generates and tracks detailed reproductive performance metrics at the animal level. These outputs provide insights into estrus detection, 
 synchronization treatments, breeding efficiency, and pregnancy outcomes. The key recorded variables include:
 
-* Estrus Detection (ED) Metrics: Number of days an animal participates in the ED program `ED_days` and the total estrous events detected `estrus_count`
-* Hormonal Treatments: Counts of synchronization protocol injections, including GnRH `GnRH_injections`, PGF `PGF_injections`, and CIDR `CIDR_injections`
-* Breeding Interventions: Number of semen straws used `semen_number` and total AI procedures performed `AI_times`
-* Reproductive Efficiency: Time from first breeding attempt to pregnancy confirmation `breeding_to_pregnancy_time` and the interval from calving to confirmed pregnancy `calving_to_pregnancy_time`
-* Pregnancy Monitoring: Total number of pregnancy checks performed `pregnancy_diagnoses`
+* Estrus Detection (ED) Metrics: Number of days an animal participates in the ED program (`ED_days`) and the total estrous events detected (`estrus_count`)
+* Hormonal Treatments: Counts of synchronization protocol injections, including GnRH (`GnRH_injections`), PGF (`PGF_injections`), and CIDR (`CIDR_injections`)
+* Breeding Interventions: Number of semen straws used (`semen_number`) and total AI procedures performed (`AI_times`)
+* Reproductive Efficiency: Time from first breeding attempt to pregnancy confirmation (`breeding_to_pregnancy_time`) and the interval from calving to confirmed pregnancy (`calving_to_pregnancy_time`)
+* Pregnancy Monitoring: Total number of pregnancy checks performed (`pregnancy_diagnoses`)
 
 #### Required User Inputs
 
@@ -2858,16 +2858,15 @@ e.g., one month before calving), the animal either transitions to the Heifer III
 
 The first-service reproductive management strategy for a heifer follows one of three strategies and are described in more detail below: ED, Synch-ED, or TAI.
 
-
-* **ED `execute_heifer_ed_protocol`:** The ED strategy simulates spontaneous estrous cycles. Estrous cycle length is determined using a random draw from a 
-normal distribution (@devries2006). On the day of estrus predicted by the model, a random draw from a uniform distribution U(0,1) 
+* **ED (`execute_heifer_ed_protocol`):** The ED strategy simulates spontaneous estrous cycles. Estrous cycle length is determined using a random draw from a 
+normal distribution [@devries2006]. On the day of estrus predicted by the model, a random draw from a uniform distribution U(0,1) 
 is compared with the estrus detection rate (`estrus_detection_rate`). If the drawn value is lower than the detection rate, AI is scheduled on that day. 
 If estrus is not detected, the next estrus event is scheduled based on the normal estrous cycle. On the scheduled AI day, pregnancy success is 
 determined using a random draw from a uniform distribution U(0,1), which is compared against the conception rate (`conception_rate`).
-* **Synch-ED `execute_heifer_synch_ed_protocol`:** In the Synch-ED strategy, hormonal treatment dates are scheduled according to the assigned program
+* **Synch-ED (`execute_heifer_synch_ed_protocol`):** In the Synch-ED strategy, hormonal treatment dates are scheduled according to the assigned program
 (`repro_sub_protocol`, 2P or CP), and estrus is simulated based on a program-specific estrous cycle following the hormonal treatment. 
 Estrus detection and AI scheduling follow the same procedure as in the ED program. 
-* **TAI `execute_heifer_tai_protocol`:** The TAI strategy simulates hormonal treatments administered on scheduled days from the start of the synchronization protocol. 
+* **TAI (`execute_heifer_tai_protocol`):** The TAI strategy simulates hormonal treatments administered on scheduled days from the start of the synchronization protocol. 
 The timing of treatments and AI is modeled according to the assigned specific program (5dCGP or 5dCG2P) defined as a sub-protocol in the user inputs 
 (`repro_sub_protocol`). On the scheduled AI day, pregnancy success is determined using a random draw from a uniform distribution U(0,1), 
 which is compared against the conception rate (`conception_rate`).
@@ -2884,19 +2883,19 @@ determines the timing of insemination and the probability of pregnancy initiatio
 ![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_method.png){#fig-ani-repro-method}
 
 
-* **ED `execute_cow_ed_protocol`:** In the ED strategy, spontaneous estrous cycles are simulated. The first estrous cycle after calving is 
-determined on the calving date using a random draw from a normal distribution with user-specified mean and standard deviation (@kalantari2015using). 
+* **ED (`execute_cow_ed_protocol`):** In the ED strategy, spontaneous estrous cycles are simulated. The first estrous cycle after calving is 
+determined on the calving date using a random draw from a normal distribution with user-specified mean and standard deviation [@kalantari2015using]. 
 The subsequent estrous cycles are modeled similarly. If the scheduled estrus occurs before the VWP, the estrus is ignored. If the scheduled estrus occurs 
 after the VWP, estrus detection is simulated following the same procedure as in the heifer ED strategy - a random draw from a uniform distribution U(0,1) 
 is compared with the estrus detection rate (`estrus_detection_rate`). If the drawn value is lower than the detection rate, AI is scheduled on that day. 
 If estrus is not detected, the next estrus event is scheduled according to the estrous cycle length. On the scheduled AI day, pregnancy success is 
 determined using a random draw from a uniform distribution U(0,1), which is compared against the conception rate (`ED_conception_rate`). 
-* **TAI `execute_cow_tai_protocol`:** The TAI strategy simulates hormonal treatments administered on scheduled days according to the assigned 
+* **TAI (`execute_cow_tai_protocol`):** The TAI strategy simulates hormonal treatments administered on scheduled days according to the assigned 
 synchronization protocol after the start of the breeding date (`ovsynch_program_start_day`). The timing of treatments and AI follow the predefined 
 protocols (`ovsynch_program`, OvSynch-48, OvSynch-56, CoSynch-72, or 5d CoSynch). These protocols can be implemented alone or in combination with 
 presynchronization protocols (presynch\_program, PreSynch, Double OvSynch, or G6G). On the scheduled AI day, pregnancy success is determined using a 
 random draw from a uniform distribution U(0,1), compared against the conception rate.
-* **ED-TAI `execute_cow_ed_tai_protocol`:** The ED-TAI strategy integrates ED with TAI-based synchronization programs. Estrus detection is simulated 
+* **ED-TAI (`execute_cow_ed_tai_protocol`):** The ED-TAI strategy integrates ED with TAI-based synchronization programs. Estrus detection is simulated 
 before TAI begins. If estrus is detected after VWP (`voluntary_waiting_period`) and before the initiation of the TAI (`ovsynch_program_start_day`), 
 AI is scheduled according to the estrus detection protocol. If no estrus is detected, the cow follows the TAI protocol for insemination.
 
@@ -2919,11 +2918,11 @@ This program balances estrus detection with timed AI, allowing for natural breed
 ##### Pregnancy Diagnosis (PD) and Pregnancy Loss
 
 For both heifers and lactating cows (`heifer_pregnancy_update`, `cow_pregnancy_update`), pregnancy diagnoses are scheduled at three intervals 
-after AI: `preg\_check\_day\_1`, `preg_check_day_2`, `preg_check_day_3`. The default settings simulate the first at 32 d after insemination, 
-which, if confirmed positive for pregnancy, is followed at 60 d and then at 200 d (@wiltbank2016); however, the number and day of 
+after AI (`preg\_check\_day\_1`, `preg_check_day_2`, `preg_check_day_3`). The default settings simulate the first at 32 d after insemination, 
+which, if confirmed positive for pregnancy, is followed at 60 d and then at 200 d [@wiltbank2016]; however, the number and day of 
 pregnancy checks can be adjusted by the model user according to farm practices. Between AI and three pregnancy checks, pregnancy losses are 
 simulated to occur according to random draws from a U (0,1) compared with thresholds according to the expected pregnancy losses in each of those 
-periods: `preg_loss_rate_1`, `preg_loss_rate_2`, `preg_loss_rate_3`. The default values are 0.02, 0.096, and 0.017 (@wiltbank2016). 
+periods (`preg_loss_rate_1`, `preg_loss_rate_2`, `preg_loss_rate_3`). The default values are 0.02, 0.096, and 0.017 [@wiltbank2016]. 
 Users can adjust these numbers according to their herd performance.  
 
 ##### Reproductive Functions
@@ -2959,20 +2958,50 @@ requirements for the pen’s average cow) or reaching a threshold (floor) milk p
 
 #### Required User Inputs
 
+```{python}
+#| label: tbl-an-milk-inputs
+#| tbl-cap: Inputs used to estimate customized herd-level lactation curve parameters.
+import_table(
+  "../resources/table_data/animal/tbl-an-milk-inputs.csv",
+  colalign = ["left", "left", "left", "center", "center", "center" ]
+)
+```
+
+```{python}
+#| label: tbl-an-milk-fat-pro
+#| tbl-cap: Inputs used to determine milk fat and protein percentages for each lactating cow.
+import_table(
+  "../resources/table_data/animal/tbl-an-milk-fat-pro.csv",
+  colalign = ["left", "left", "left", "center", "center", "center" ]
+)
+```
+
+```{python}
+#| label: tbl-an-milk-red
+#| tbl-cap: Inputs used to constrain how much an average cow's daily milk production will be reduced due to an inadequate ration.
+import_table(
+  "../resources/table_data/animal/tbl-an-milk-red.csv",
+  colalign = ["left", "left", "left", "center", "center", "center" ]
+)
+```
+
+::: {.callout-note}
+The `tolerance` variable defaults to 0.0 and currently has no effect ude to no implementation of an automated ration optimizer. RuFaS is hard-coded to use the user defined ration at this time.
+:::
 
 #### Expected Outputs
 
-`report_life_cycle_manager_data`
-* Information added daily from herd statistics
-* `daily_milk_production`
-* `herd_milk_fat_percent`
-* `herd_milk_fat_kg`
-* `herd_milk_protein_percent`
-* `herd_milk_protein_kg` 
+* `report_life_cycle_manager_data`
+   * Information added daily from herd statistics
+   * `daily_milk_production`
+   * `herd_milk_fat_percent`
+   * `herd_milk_fat_kg`
+   * `herd_milk_protein_percent`
+   * `herd_milk_protein_kg` 
 
-`report_average_nutrient_requirements`
-* Reports the average ration per animal of each pen each time a new ration is formulated
-* `avg_milk_production_reduction_pen` (kg per animal)
+* `report_average_nutrient_requirements`
+   * Reports the average ration per animal of each pen each time a new ration is formulated
+   * `avg_milk_production_reduction_pen` (kg per animal)
 
 #### Methodology 
 
@@ -2985,27 +3014,25 @@ milk production of the farm being simulated.
 **User Inputs and Constants**
 
 The following inputs are used to generate the herd’s values for mean lactation curve parameters by parity. 
-            
 
-year: end\_date in the input config.json. Uses 2016 if the end year is 2016 or later.  
-region: assigns the appropriate region based on FIPS\_county\_code entered in the input config.json  
-milking frequency: cow\_times\_milk\_per\_day in input animal.json 
-parity distribution: parity\_fractions in input animal.json 
-annual milk yield (optional): annual\_milk\_yield in animal.json 
-item Milking\_cow\_fraction: 0.8356 default value 
-
-Is in lactation\_curve\_adjustment\_inputs.json 
-Fraction of lactating cows in adult cows, between 0 and 1. 
-Used to calculate adjusted lactation curve parameters to match a herd’s reported annual milk production 
+* Year: `end_date` in the input config.json. Uses 2016 if the end year is 2016 or later.  
+* Region: assigns the appropriate region based on `FIPS_county_code` entered in the input `config.json`  
+* Milking frequency: `cow_times_milk_per_day` in input `animal.json` 
+* Parity distribution: `parity_fractions` in input `animal.json` 
+* Annual milk yield (optional): `annual_milk_yield` in `animal.json` 
+* `Milking_cow_fraction`: 0.8356 default value 
+   * Is in `lactation_curve_adjustment_inputs.json` 
+   * Fraction of lactating cows in adult cows, between 0 and 1. 
+   * Used to calculate adjusted lactation curve parameters to match a herd’s reported annual milk production 
 
 **Parameters and Equations**
 
-These are comprehensively outlines in the Lactation Curve Parameters Determination Section.
+These are comprehensively outlined in the Lactation Curve Parameters Determination Section.
 
-LactationCurve.set\_lactation\_parameters() is called by:
+`LactationCurve.set_lactation_parameters()` is called by:
 
-erdFactory.initialize\_herd() to Animal.setup\_lactation\_curve\_parameters() 
-HerdManager.\_init\_() 
+* `HerdFactory.initialize_herd()` to `Animal.setup_lactation_curve_parameters()` 
+* `HerdManager._init_()` 
 
 ##### Cow Level Lactation Curve Parameters
 
@@ -3020,14 +3047,15 @@ No additional inputs to consider.
 
 **Parameters and Equations**
 
-LactationCurve.get\_wood\_parameters() is called by
+`LactationCurve.get_wood_parameters()` is called by
 
-Animal.\_initialize\_cow
-Animal.daily\_reproduction\_update
-Animal.transition\_heiferIII\_to\_cow
+* `Animal._initialize_cow`
+* `Animal.daily_reproduction_update`
+* `Animal.transition_heiferIII_to_cow`
 
 Parity groupings are as follows: 1, 2, and 3+ 
-Immediately followed in each case by self.milk\_production.set\_wood\_parameters() which assigns the l, m, and n values.
+
+Immediately followed in each case by `self.milk_production.set_wood_parameters()` which assigns the l, m, and n values.
 
 ##### Daily Milk Production
 
@@ -3036,72 +3064,63 @@ curve parameters and days in milk. The calculated production is then adjusted by
 
 **User Inputs and Constants**
 
-No additional inputs to consider but constants are below: 
+No additional inputs to consider, constants are below: 
 
-DAILY\_MILK\_VARIATION\_MEAN: 0 kg/d
-DAILY\_MILK\_VARIATION\_STD\_DEV: 1.0 kg/d 
+* `DAILY_MILK_VARIATION_MEAN`: 0 kg/d
+* `DAILY_MILK_VARIATION_STD_DEV`: 1.0 kg/d 
 
 **Parameters and Equations**
 
-(Calculated\ milk\ production = l*t^m *e^{[-nt]}\)
-    \end{center}
-        \vspace{0.5cm} 
-    
-            {\raggedleft \textbf{[AN.MLK.9]}\par}
-            \vspace{0.2cm}
+::: {#eq-an-mlk.9}
+[[**AN.MLK.9**]]{.aside .content-visible when-format="html"}
+$$
+\text{Calculated milk production} = l \times t^m \times e^{-nt} 
+$$
+:::
 
-        \begin{itemize}
-            \item l, m, n = lactation curve parameters
-            \item t = DIM
-
+* *l*, *m*, *n* = lactation curve parameters
+* *t* = DIM
 
 ::: {.callout-note}
 Adjusted milk production = maximum of (calculated milk production + milk production variance - milk production reduction) or 0.
 :::
 
- \item MilkProduction.calculate\_daily\_milk\_production()
-            \begin{itemize}
-                \item \textbf{Called by} HerdManager.daily\_routines() to Animal.daily\_routines() to MilkProduction.perform\_daily\_milking\_update()
-                \item \textbf{Parameters} 
-                \begin{itemize}
-                    \item Days\_in\_milk: Argument supplied from MilkProductionInputs (updated in Animal.daily\_routines)
-                    \item L\_param, m\_param, n\_param: Wood\_l, wood\_m, wood\_n supplied as arguments and assigned to individual on the day of calving via set\_wood\_parameters()
-                \end{itemize}
-                \item \textbf{Returns} calculated milk yield on the provided day in kg 
-            \end{itemize}
-            \item MilkProduction.daily\_milk\_produced()
-            \begin{itemize}
-                \item \textbf{Inputs}
-                \begin{itemize}
-                    \item \_Daily\_milk\_produced (calculated above) 
-                    \item Milk\_production\_variance is generated based on the mean and standard deviation for daily milk variation (stored as constants in AnimalModuleConstants)
-                    \item Milk\_production\_reduction 
-                \end{itemize}
-            \end{itemize}
-            \item \textbf{Returns} adjusted\_milk\_production (unless the milk yield calculated above was 0, in which case it returns 0)
+* `MilkProduction.calculate_daily_milk_production()`
+   * Called by `HerdManager.daily_routines()` to `Animal.daily_routines()` to `MilkProduction.perform_daily_milking_update()`
+   * Parameters 
+      * `Days_in_milk`: Argument supplied from `MilkProductionInputs` (updated in `Animal.daily_routines`)
+      * `L_param`, `m_param`, `n_param`: `Wood_l`, `wood_m`, `wood_n` supplied as arguments and assigned to individual on the day of calving via `set_wood_parameters()`
+   * Returns calculated milk yield on the provided day in kg 
+
+* `MilkProduction.daily_milk_produced()`
+   * Inputs
+      * `Daily_milk_produced` (calculated above) 
+      * `Milk_production_variance` is generated based on the mean and standard deviation for daily milk variation (stored as constants in `AnimalModuleConstants`)
+      * `Milk_production_reduction` 
+   * Returns `adjusted_milk_production` (unless the milk yield calculated above was 0, in which case it returns 0)
 
 ##### Daily Components Production
 
-        Milk components (true protein, fat, and lactose) are calculated daily based on that day’s milk production and percent of each component. 
+Milk components (true protein, fat, and lactose) are calculated daily based on that day’s milk production and percent of each component. 
 
 **User Inputs and Constants**
 
-milk\_fat\_percent – single constant value for all cows in the herd 
-             \item milk\_protein\_percent – single constant value for all cows in the herd 
-             \item AnimalModuleConstants.MILK\_LACTOSE, current value 4.85
+* `milk_fat_percent`: single constant value for all cows in the herd 
+* `milk_protein_percent`: single constant value for all cows in the herd 
+* `AnimalModuleConstants.MILK\_LACTOSE`: 4.85
 
 **Parameters and Equations**
 
-\(Daily\ nutrient\ amount\ in\ milk = milk\ production * nutrient\ percentage * 0.01\)
-            \item MilkProduction.\_calculate\_nutrient\_content()
-            \begin{itemize}
-                \item \textbf{Called by} HerdManager.daily\_routines() to Animal.daily\_routines() to MilkProduction.perform\_daily\_milking\_update()
-                \item \textbf{Parameters} 
-                \begin{itemize}
-                    \item Days\_milk\_produced as calculated in the Daily Milk Production section above
-                    \item Nutrient\_percentage: cow’s percent true protein, fat, or lactose for each of the respective calculations
-                \end{itemize}
-                \item \textbf{Returns} Amount of a given nutrient in milk in kg
+$$
+\text{Daily nutrient amount in milk} = \text{milk production} \times \text{nutrient percentage} \times 0.01
+$$
+
+* `MilkProduction._calculate_nutrient_content()`
+   * Called by `HerdManager.daily_routines()` to `Animal.daily_routines()` to `MilkProduction.perform_daily_milking_update()`
+   * Parameters 
+      * `Days_milk_produced` as calculated in the Daily Milk Production section above
+      * `Nutrient_percentage`: cow’s percent true protein, fat, or lactose for each of the respective calculations
+   * Returns: Amount of a given nutrient in milk in kg
 
 ::: {.callout-note}
 True protein is the only milk protein currently used by the model.
@@ -3109,60 +3128,64 @@ True protein is the only milk protein currently used by the model.
 
 ##### Milk Production and Reduction
 
-        Currently, the only source of milk reduction is if there is no possible ration using the feeds available that would support the baseline level of milk production. 
-Each time the ration is formulated, the nutrition requirements of the pen are calculated and used to determine the ration given to each animal. The ration is checked against the nutrition requirements of the pen. If the pen contains lactating cows and the ration does not meet the average cow’s requirements, then each cow’s milk production is reduced until one of three conditions is met: 
-        \begin{itemize}
-            \item The ration meets the animal’s requirement (i.e. no additional reduction).
-            \item The milk production of every animal is reduced by the maximum allowed (a user-defined value with default of 0.5 kg/head/d). Then the final ration and milk reduction values are used.
-            \item The average milk production of the pen falls below the minimum allowable average milk production. Then the final ration and milk reduction values are used.
-        \end{itemize}
+Currently, the only source of milk reduction is if there is no possible ration using the feeds available that would support the baseline level of milk production. 
+Each time the ration is formulated, the nutrition requirements of the pen are calculated and used to determine the ration given to each animal. 
+The ration is checked against the nutrition requirements of the pen. If the pen contains lactating cows and the ration does not meet the average cow’s requirements, 
+then each cow’s milk production is reduced until one of three conditions is met: 
+
+* The ration meets the animal’s requirement (i.e. no additional reduction).
+* The milk production of every animal is reduced by the maximum allowed (a user-defined value with default of 0.5 kg/head/d). Then the final ration and milk 
+reduction values are used.
+* The average milk production of the pen falls below the minimum allowable average milk production. Then the final ration and milk reduction values are used.
 
 ![Flow of milk reduction in ration formulation logic.](../resources/images/ani_nutr_req_feeding.png){#fig-ani-nutr-req-feeding}
 
 **User Inputs and Constants**
 
-Milk\_reduction\_maximum: Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements 
-             \item Tolerance: Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently has no effect due to no implementation of automatic ration optimizer. 
-            \item Milk\_reduction\_kg is set to 0.25 kg: Milk reduction amount for each failed ration attempt, kg. 
-            \item Minimum\_avg\_pen\_milk is set to 15 kg: Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal
+* `Milk_reduction_maximum`: Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements 
+* Tolerance: Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
+has no effect due to no implementation of automatic ration optimizer. 
+* `Milk_reduction_kg` is set to 0.25 kg: Milk reduction amount for each failed ration attempt, kg. 
+* `Minimum_avg_pen_milk` is set to 15 kg: Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal
 
 **Parameters and Equations**
 
-Pen.reduce\_milk\_production()
-            \begin{itemize}
-                \item \textbf{Called by} Pen.use\_user\_defined\_ration() when NutritionEvaluator determines that the ration is inadequate to support milk production
-                \item Attempts to reduce the milk production of all animals in the pen; returns False if all animals have already reached their maximum 
-            \end{itemize}
-            \item Animal.reduce\_milk\_production() 
-            \begin{itemize}
-                \item \textbf{Called by} Pen.reduce\_milk\_production for each animal in the pen 
-                \item Attempts to reduce milk production of an animal in a pen; returns True if reduction was successful and False otherwise. When reduction is successful, increments milk\_production\_reduction by the value 
-            \end{itemize}
-        \end{itemize}
+* `Pen.reduce_milk_production()`
+   * Called by `Pen.use_user_defined_ration()` when `NutritionEvaluator` determines that the ration is inadequate to support milk production
+   * Attempts to reduce the milk production of all animals in the pen; returns False if all animals have already reached their maximum 
+
+* `Animal.reduce_milk_production()` 
+   * Called by `Pen.reduce_milk_production` for each animal in the pen
+   * Attempts to reduce milk production of an animal in a pen; returns True if reduction was successful and False otherwise. When reduction is successful, 
+increments `milk_production_reduction` by the value 
 
 ::: {.callout-note}
-            Currently, all cows in a pen will have the same milk reduction amount. This function allows future flexibility if desired to have individual reductions rather than applying the average..
-
+Currently, all cows in a pen will have the same milk reduction amount. This function allows future flexibility if desired to have individual reductions rather 
+than applying the average.
 :::
 
 ##### Starting and Ending Lactation
 
-\textbf{Starting Lactation [Animal.transition\_heiferIII\_to\_cow]}: When a heifer reaches the point where her days pregnant is equal to gestation length, she is transitioned to a lactating cow and configuration data for a newborn calf is returned. 
-    
-    
-    \textbf{[Reproduction.cow\_give\_birth]} and \textbf{[Animal.daily\_reproduction\_update]} When a cow’s days pregnant is equal to gestation length, she gives birth and a newborn calf is born. Her parity is incremented plus one, her days in milk is reset to 1, and she is assigned new Wood’s curve parameters for the new lactation. 
-    \vspace{0.5cm}
+**Starting Lactation** 
 
+`Animal.transition_heiferIII_to_cow`: When a heifer reaches the point where her days pregnant is equal to gestation length, 
+she is transitioned to a lactating cow and configuration data for a newborn calf is returned. 
+    
+`Reproduction.cow_give_birth` and `Animal.daily_reproduction_update`: When a cow’s days pregnant is equal to gestation length, she gives birth 
+and a newborn calf is born. Her parity is incremented plus one, her days in milk is reset to 1, and she is assigned new Wood’s curve parameters for the new lactation. 
 
 ::: {.callout-note}
 For more information, refer to the Reproduction section of this document.
 :::
 
+**Ending Lactation**
 
-    \textbf{Ending Lactation [ MilkProduction.perform\_daily\_milking\_update]}: When a cow’s days pregnant is equal to her dry off days of pregnancy, her milk production and days in milk are set to 0 and remain there until completing her gestation. Cows with days\_in\_milk = 0 are considered not to be milking and do not have any milk production values calculated. 
+`MilkProduction.perform_daily_milking_update`: When a cow’s days pregnant is equal to her dry off days of pregnancy, her milk production and days in milk 
+are set to 0 and remain there until completing her gestation. Cows with `days_in_milk` = 0 are considered not to be milking and do not have any milk 
+production values calculated. 
 
 ::: {.callout-note}
- For more details on milk changes and reductions, go to the Milk Production and Reduction portion of this section.
+For more details on milk changes and reductions, go to the Milk Production and Reduction portion of this section.
 :::
 
 ### Lactation Curve: Parameters and Definitions
@@ -3180,9 +3203,30 @@ If there are any questions regarding calculations regarding calculations of main
 
 ### Culling
 
-<!-- TODO -->
-
 #### Introduction
+
+This section describes the processes of animals leaving the herd in RuFaS. Reasons for leaving the herd are death or sale. 
+
+
+Sale may occur of: 
+* Calves: all male calves; female calves based on `keep_female_calf_rate`
+* Heifer IIs: if the heifer does not have a successful conception or pregnancy and age (days born) exceeds `heifer_repro_cull_time`
+* Heifer IIIs: if cow herd does not have room for additional heifers
+* Cows (through two possible mechanisms): 
+   * Disease-related culling, determined by a statistical distribution of occurrence, or
+   * Production-related culling, which occurs when a cow has been labeled “Do Not Breed” due to reproductive failure past a designated 
+   number of days in milk and then her milk production drops below a designated threshold
+
+Deaths that may occur: 
+* Cows: determined by a statistical distribution of occurrence 
+* Stillborn calves 
+
+::: {.callout-note}
+Stillborn calves are currently combined with calves sold at birth and reported as “calves sold”, 
+:::
+
+Information about death and sale events are tracked and aggregated daily, including the day of death or sale, body weight, cull reason, days in milk, and parity. 
+
 #### Required User Inputs
 #### Expected Outputs
 #### Methodology

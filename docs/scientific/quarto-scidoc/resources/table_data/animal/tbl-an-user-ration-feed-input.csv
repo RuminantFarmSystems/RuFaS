@@ -1,4 +1,4 @@
 ﻿Variable Name , Definition , Default , Min , Max 
-calves or growing or close_up or lac_-cow.ration_percentage , "For each feed ID, amount of a ration that is a given feed (percentage)" , 0 , 100
-tolerance, Allowable +/- percentage variance in each of the defined ration inclusion percentage values (fraction) , 0.1 , 0 , 1
-milk_reduction_maximum , Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements , 15 , 0 , 50
+calves or growing or close_up or lac_-cow.ration_percentage ,"For each feed ID,  amount of a ration that is a given feed (percentage)",--,0,100
+tolerance, Allowable +/- percentage variance in each of the defined ration inclusion percentage values (fraction) ,0.1,0,1
+milk_reduction_maximum , Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements ,15,0,50

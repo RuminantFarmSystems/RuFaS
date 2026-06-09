@@ -1,12 +1,12 @@
 ﻿Section , Variable , Definition , Default , Min , Max 
-management_decisions , cow_repro_method , "TAI, ED, Synch-ED" , TAI , -- , --
-, do_not_breed_time , Days after calving to stop breeding if not pregnant , 185 , 0 , --
-farm_level, voluntary_waiting_period, Days before breeding starts for ED/ED-TAI; ignored by TAI, 50, 0, --
-, estrus_detection_protocol, " Estrus protocol typs (Double OvSynch, PreSynch, G6G, None) ", Double OvSynch, --, --
-farm_level_cows , estrus_conception_rate , Conception rate for ED/ED-TAI , 0.5 , 0 , --
-, presynch_program , " Presynch method used in TAI (OvSynch 48, OvSynch 56, CoSynch 72, 5d CoSynch, none) ", OvSynch 56, -- , -- 
-, presynch_program_start_day, Day of first hormone injection for presynch, 70, 0, --
-, ovsynch_program , " OvSynch method used in TAI or ED-TAI (TAIafterPD, TAIbeforePD, PGFatPD, none) ", TAIafterPD, -- , -- 
-, ovsynch_program_start_day, Start day for OvSynch protocol, 0.6, 0, 1
+management_decisions , cow_repro_method ,"TAI, ED, Synch-ED", TAI , -- , --
+, do_not_breed_time , Days after calving to stop breeding if not pregnant ,185,0, --
+farm_level, voluntary_waiting_period, Days before breeding starts for ED/ED-TAI; ignored by TAI,50,0, --
+, estrus_detection_protocol," Estrus protocol typs (Double OvSynch,  PreSynch,  G6G, None)", Double OvSynch, --, --
+farm_level_cows , estrus_conception_rate , Conception rate for ED/ED-TAI ,0.5,0, --
+, presynch_program ,"Presynch method used in TAI (OvSynch 48,  OvSynch 56,  CoSynch 72,  5d CoSynch, None", OvSynch 56, -- , -- 
+, presynch_program_start_day, Day of first hormone injection for presynch,70,0, --
+, ovsynch_program ," OvSynch method used in TAI or ED-TAI (TAIafterPD,  TAIbeforePD,  PGFatP, None)", TAIafterPD, -- , -- 
+, ovsynch_program_start_day, Start day for OvSynch protocol,0.6,0,1
 , ovsynch_program_conception_rate, Conception rate for OvSynch program, --, --, --
 , estrus_detection_rate, Resynch protocol around pregrancy check, --, --, --

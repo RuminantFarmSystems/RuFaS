@@ -6,4 +6,4 @@ birth_weight_std_je,Jersey birth weight standard deviation (kg/head),4.4,0,--
 mature_body_weight_avg,The average mature body weight of cows (kg/head),740.1,0,--
 mature_body_weight_std,The standard deviation of mature body weight of cows (kg/head),73.5,0,--
 wean_day,the days of age at which calves are fully weaned from milk or milk replacer (days),60,0,--
-target_heifer_preg_day,The target age (in days) for heifers to become pregnant â€“ adjusting for heifer body weight (days),420,--,--
+target_heifer_preg_day,The target age (in days) for heifers to become pregnant adjusting for heifer body weight (days),420,--,--
