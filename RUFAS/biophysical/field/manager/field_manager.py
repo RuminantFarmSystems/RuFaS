@@ -461,6 +461,7 @@ class FieldManager:
 
         for index, rotation in enumerate(crop_rotation_data):
             crop_species = rotation["crop_species"]
+            schedule_name = f"crop_schedule_{index}"
             if crop_species not in available_crop_configurations:
                 om = OutputManager()
                 info_map = {
@@ -474,6 +475,8 @@ class FieldManager:
                 err_msg = f"{crop_species=} in {crop_rotation=} not in {available_crop_configurations=}."
                 om.add_error(err_name, err_msg, info_map)
                 raise ValueError(f"{err_name} {err_msg}")
+
+            CropSchedule.validate_crop_schedule_event_order(rotation, schedule_name)
 
             if rotation["harvest_type"] == "scheduled":
                 heat_scheduled_harvest = False
