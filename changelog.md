@@ -96,6 +96,7 @@ v1.0.0
 - [3041](https://github.com/RuminantFarmSystems/RuFaS/pull/3041) - [minor change] [NoInputChange] [NoOutputChange] [OutputManager] [GraphGenerator] [ReportGenerator] Updates docstrings in post-processing modules to follow NumPy-style format.
 - [3050](https://github.com/RuminantFarmSystems/RuFaS/pull/3050) - [minor change] [FieldManager] [SimulationEngine] [NoInputChange] [NoOutputChange] Moves the field config data gathering out of `FieldManager.__init__()` into `SimulationEngine`, passing field data as a parameter instead.
 - [3054](https://github.com/RuminantFarmSystems/RuFaS/pull/3054) - [minor change] [Animal] [Reproduction] [NoInputChange] [NoOutputChange] Adds early-exit guard in presynch and OvSynch hormone schedule setup to skip already-pregnant cows.
+- [3077](https://github.com/RuminantFarmSystems/RuFaS/pull/3077) - [minor change] [Animal] [NoInputChange] [OutputChange] Fix `herd_reproduction_statistics` being reset every simulation day, so the end-of-simulation breeding and conception outputs tally over the whole simulation.
 
 ### v1.0.0
 
