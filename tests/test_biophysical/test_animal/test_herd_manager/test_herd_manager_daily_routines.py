@@ -678,10 +678,6 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         ]
         pen.beddings = {"mock_bedding": MagicMock(auto_spec=Bedding)}
 
-    # Regression guard for issue #3029: the cumulative herd reproduction statistics must persist
-    # across days and not be reset by the daily routine. ``_perform_daily_routines_for_animals``
-    # is mocked here (so nothing is accumulated), therefore the pre-set values must survive
-    # unchanged after running the daily routine.
     herd_manager.herd_reproduction_statistics = HerdReproductionStatistics(
         total_num_ai_performed=7, heifer_num_ai_performed=3, cow_num_ai_performed=4
     )
