@@ -183,6 +183,7 @@ class HerdManager:
         self.selling_threshold = animal_config_data["herd_information"]["herd_size_sell_threshold"]
         self.buying_threshold = animal_config_data["herd_information"]["herd_size_buy_threshold"]
         self.herd_reproduction_statistics = HerdReproductionStatistics()
+        self.daily_herd_reproduction_statistics = HerdReproductionStatistics()
 
         self.housing = animal_config_data["housing"]
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
@@ -525,6 +526,7 @@ class HerdManager:
         for animal in animals:
             animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
+            self.daily_herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
             if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
                 self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
             if animal_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
@@ -708,6 +710,9 @@ class HerdManager:
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_animal_population(self.herd_statistics, simulation_day)
         AnimalModuleReporter.report_herd_statistics_data(self.herd_statistics, simulation_day)
+        AnimalModuleReporter.report_daily_reproduction_statistics(
+            self.daily_herd_reproduction_statistics, simulation_day
+        )
         AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, simulation_day)
         AnimalModuleReporter.report_manure_streams(herd_manager_output, simulation_day)
         AnimalModuleReporter.report_milk(self.daily_milk_report, simulation_day)
@@ -762,6 +767,7 @@ class HerdManager:
 
         """
         self._reset_daily_statistics()
+        self.daily_herd_reproduction_statistics = HerdReproductionStatistics()
 
         daily_herd_updates = self._process_daily_herd_updates(time)
         self.herd_statistics.born_calf_num = len(
