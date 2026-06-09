@@ -45,13 +45,24 @@ STORAGE_CLASS_TO_TYPE: dict[type[Storage], ManureType] = {
 
 class ManureManager:
     """
-    Manages the manure processing system by handling processor definitions,
-    connections, adjacency matrix, and processing order.
+    Manages the manure processing system by handling processor definitions, connections, adjacency matrix,
+    and processing order.
+
+    Parameters
+    ----------
+    intercept_mean_temp : float
+        The intercept mean temperature calculate from linest function.
+    phase_shift : float
+        Temperature phase shift of the weather data.
+    amplitude : float
+        The temperature amplitude of the weather data.
 
     Attributes
     ----------
     _om : OutputManager
         An instance of OutputManager for logging errors and information.
+    _manure_nutrient_manager : ManureNutrientManager
+        An instance of the ManureNutrientManager.
     all_processors : dict[str, Processor]
         A dictionary mapping processor names to their instances.
     _all_separators : dict[str, Separator]
@@ -107,6 +118,7 @@ class ManureManager:
         ------
         ValueError
             If a first-processor name is not found in the list of all processors.
+
         """
         for stream in manure_streams.values():
             assert stream.pen_manure_data is not None
@@ -146,9 +158,7 @@ class ManureManager:
         self._build_nutrient_pools()
 
     def _build_nutrient_pools(self) -> None:
-        """
-        Build the pool for aggregated storage type.
-        """
+        """Build the pool for aggregated storage type."""
         for name, processor in self.all_processors.items():
             if isinstance(processor, Storage):
                 manure_type = STORAGE_CLASS_TO_TYPE.get(type(processor))
@@ -176,6 +186,7 @@ class ManureManager:
         -------
         str
             The normalized name of the destination processor.
+
         """
         if destination_name.endswith("_input"):
             base_name = destination_name[:-6]
@@ -203,6 +214,7 @@ class ManureManager:
         ------
         ValueError
             If the output key is not recognized or if it does not match the expected format.
+
         """
         if output_key == "manure":
             origin_key = processor_name
@@ -221,6 +233,13 @@ class ManureManager:
         """
         Validates the structure and content of the generated adjacency matrix.
 
+        Raises
+        ------
+        ValueError
+            If a self-loop is found or if an origin has outgoing proportions that do not sum to 0 or 1.
+
+        Notes
+        -----
         This method enforces two key invariants for the manure processor graph:
 
         1. Self-loops are not allowed — a processor cannot send output to itself. This is validated by ensuring that the
@@ -233,10 +252,6 @@ class ManureManager:
         These checks ensure the integrity of the processor network: no unintended feedback loops exist, and all flow
         proportions are either well-defined or explicitly zeroed.
 
-        Raises
-        ------
-        ValueError
-            If a self-loop is found or if an origin has outgoing proportions that do not sum to 0 or 1.
         """
         for origin, destinations in self._adjacency_matrix.items():
             if destinations[origin] != 0:
@@ -259,9 +274,6 @@ class ManureManager:
         """
         Determines a valid processing order of manure processors via topological sorting.
 
-        This method merges separator-related rows in the adjacency matrix, computes in-degrees for all processors,
-        and performs a topological sort to ensure upstream processors are handled before downstream ones.
-
         Returns
         -------
         list[str]
@@ -271,6 +283,12 @@ class ManureManager:
         ------
         ValueError
             If a cycle exists in the processor graph, making topological sort impossible.
+
+        Notes
+        -----
+        This method merges separator-related rows in the adjacency matrix, computes in-degrees for all processors,
+        and performs a topological sort to ensure upstream processors are handled before downstream ones.
+
         """
         matrix_to_traverse = self._merge_separator_rows()
 
@@ -301,14 +319,6 @@ class ManureManager:
         """
         Creates a version of the adjacency matrix with merged separator rows for graph traversal.
 
-        Each separator is originally represented by three separate rows:
-        - {separator}_input
-        - {separator}_solid_output
-        - {separator}_liquid_output
-
-        This function merges them into a single row keyed by the base separator name (e.g., 'separator1').
-        It also removes internal separator suffixes from destination references to simplify traversal.
-
         Returns
         -------
         dict[str, dict[str, float]]
@@ -322,6 +332,15 @@ class ManureManager:
         -----
         The use of `deepcopy()` is necessary here because the method needs to modify the adjacency matrix
         (merging and deleting rows/keys) without mutating the original `self._adjacency_matrix`.
+
+        Each separator is originally represented by three separate rows:
+        - {separator}_input
+        - {separator}_solid_output
+        - {separator}_liquid_output
+
+        This function merges them into a single row keyed by the base separator name (e.g., 'separator1').
+        It also removes internal separator suffixes from destination references to simplify traversal.
+
         """
         matrix_to_return = deepcopy(self._adjacency_matrix)
         for separator_name in self._all_separators.keys():
@@ -369,10 +388,6 @@ class ManureManager:
         """
         Performs topological sorting of the processors using Kahn's algorithm.
 
-        This method processes nodes in order of zero in-degree, removing each from the graph and
-        reducing the in-degree of its downstream neighbors. When a neighbor's in-degree becomes zero,
-        it is added to the processing queue.
-
         Parameters
         ----------
         in_degree : dict[str, int]
@@ -387,6 +402,12 @@ class ManureManager:
         -------
         list[str]
             A list of processor names in a valid topological order.
+
+        Notes
+        -----
+        This method processes nodes in order of zero in-degree, removing each from the graph and
+        reducing the in-degree of its downstream neighbors. When a neighbor's in-degree becomes zero,
+        it is added to the processing queue.
 
         """
         sorted_order = []
@@ -440,9 +461,6 @@ class ManureManager:
         """
         Checks for duplicate processor names in the provided list.
 
-        If duplicate processor names are found, this method logs an error message
-        and raises a ValueError indicating the duplicate names.
-
         Parameters
         ----------
         all_processor_names : list[str]
@@ -453,6 +471,12 @@ class ManureManager:
         ValueError
             If duplicate processor names are found, a ValueError is raised with
             the details of the duplicates.
+
+        Notes
+        -----
+        If duplicate processor names are found, this method logs an error message
+        and raises a ValueError indicating the duplicate names.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -493,6 +517,7 @@ class ManureManager:
         -------
         dict[str, dict[str, list[dict[str, Any]]]]
             A dictionary mapping processor names to their respective connection details.
+
         """
         all_processor_connections: list[dict[str, Any]] = (
             processor_connections_input["processor_connections"] + processor_connections_input["separator_connections"]
@@ -528,6 +553,7 @@ class ManureManager:
         ------
         ValueError
             If any referenced processor name does not exist in the processor configurations.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -568,6 +594,7 @@ class ManureManager:
         ------
         ValueError
             If any processors are found to be missing a routing configuration.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -605,6 +632,7 @@ class ManureManager:
         -------
         set[str]
             A set of all unique processor names (both as origin and as destination) referenced in the connections.
+
         """
         all_referenced_processor_names: set[str] = set()
         for origin in processor_connections:
@@ -683,6 +711,7 @@ class ManureManager:
                 "liquid_output_destinations": [{"name": "Storage2", "proportion": 1.0}],
             }
         }
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -730,11 +759,12 @@ class ManureManager:
             A dictionary that contains processor definitions, where each key is the processor name and
             the value is a dictionary with the processor's parameters and type.
         intercept_mean_temp : float
-            The intercept mean temperature calculate from linest function.
+            The intercept mean temperature calculated from linest function.
         phase_shift : float
             Temperature phase shift of the weather data.
         amplitude : float
             The temperature amplitude of the weather data.
+
         """
         for processor_name in processor_connections_by_name:
             processor_config = processor_configs_by_name[processor_name]
@@ -758,17 +788,21 @@ class ManureManager:
     ) -> None:
         """
         Builds the adjacency matrix using processor connection data.
-        This method iterates over the provided connection mappings, identifying whether each processor is a separator or
-        a standard processor. It then creates corresponding columns in the adjacency matrix and fills in output
-        proportions based on the processor type:
-        - For separators: handles both solid and liquid output destinations.
-        - For other processors: handles general destinations.
 
         Parameters
         ----------
         processor_connections_by_name : dict[str, dict[str, list[dict[str, Any]]]]
             A dictionary where the keys are processor names, and the values contain information about their
             connections to other processors.
+
+        Notes
+        -----
+        This method iterates over the provided connection mappings, identifying whether each processor is a separator or
+        a standard processor. It then creates corresponding columns in the adjacency matrix and fills in output
+        proportions based on the processor type:
+        - For separators: handles both solid and liquid output destinations.
+        - For other processors: handles general destinations.
+
         """
         row_names: list[str] = self._generate_adjacency_matrix_keys()
 
@@ -790,12 +824,6 @@ class ManureManager:
         """
         Add a column to the adjacency matrix for a given origin node.
 
-        This method modifies the adjacency matrix to include connections
-        from the specified origin node to a list of destination nodes.
-        For separators, it creates multiple columns representing distinct
-        output types (input, solid output, liquid output). For non-separators,
-        a single column is created.
-
         Parameters
         ----------
         origin_name : str
@@ -803,7 +831,14 @@ class ManureManager:
         row_names : list[str]
             The list of destination node names to initialize in the adjacency matrix.
         is_separator : bool
-            A flag indicating whether the origin node is a separator
+            A flag indicating whether the origin node is a separator.
+
+        Notes
+        -----
+        This method modifies the adjacency matrix to include connections from the specified origin node to a list of
+        destination nodes. For separators, it creates multiple columns representing distinct output types (input,
+        solid output, liquid output). For non-separators, a single column is created.
+
         """
         if is_separator:
             self._adjacency_matrix[f"{origin_name}_input"] = {destination_name: 0.0 for destination_name in row_names}
@@ -820,10 +855,6 @@ class ManureManager:
         """
         Populate the destination proportions for the given origin in the adjacency matrix.
 
-        This method updates the adjacency matrix to store the proportion of connections from the specified origin
-        to each destination. If the receiving processor name corresponds to an separator, its name is modified to
-        include the '_input' suffix before updating the matrix.
-
         Parameters
         ----------
         connections : list[dict[str, Any]]
@@ -831,6 +862,13 @@ class ManureManager:
             receiving processor name and the proportion of the connection.
         origin_name : str
             The name of the origin from which connections are originating.
+
+        Notes
+        -----
+        This method updates the adjacency matrix to store the proportion of connections from the specified origin
+        to each destination. If the receiving processor name corresponds to an separator, its name is modified to
+        include the '_input' suffix before updating the matrix.
+
         """
         for destination in connections:
             receiving_processor_name = destination["receiving_processor_name"]
@@ -859,18 +897,6 @@ class ManureManager:
     def request_nutrients(self, request: NutrientRequest, time: RufasTime) -> NutrientRequestResults:
         """
         Handle the request for specific nutrients from the crop and soil module.
-        This method evaluates the nutrient request made by considering both nitrogen and phosphorus
-        quantities desired. It calculates the projected manure mass that would satisfy the request
-        and checks against the nutrients available in the manager.
-
-        If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-        is subtracted from the manager's internal bookkeeping. The method then returns the results of
-        the nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
-        If the request cannot be fulfilled at all, the method will return None.
-
-        Notes
-        -----
-        This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.
 
         Parameters
         ----------
@@ -886,6 +912,18 @@ class ManureManager:
             the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that
             can be provided to fulfill the request.
             Returns None if the request cannot be fulfilled.
+
+        Notes
+        -----
+        This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.
+        This method evaluates the nutrient request made by considering both nitrogen and phosphorus
+        quantities desired. It calculates the projected manure mass that would satisfy the request
+        and checks against the nutrients available in the manager.
+
+        If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
+        is subtracted from the manager's internal bookkeeping. The method then returns the results of
+        the nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
+        If the request cannot be fulfilled at all, the method will return None.
 
         """
         request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.handle_nutrient_request(request)
@@ -965,8 +1003,7 @@ class ManureManager:
         non_limiting_fields: list[str],
     ) -> tuple[ManureStream, dict[str, Any]]:
         """
-        Returns a new ManureStream with removals applied,
-        plus a dict of how much was removed for each attribute.
+        Returns a new ManureStream with removals applied, plus a dict of how much was removed for each attribute.
 
         Parameters
         ----------
@@ -1190,6 +1227,7 @@ class ManureManager:
         -------
         NutrientRequest
             The request for supplemental manure needed to fulfill the original nutrient request.
+
         """
         remaining_nitrogen = max(0, nutrient_request.nitrogen - (on_farm_manure.nitrogen if on_farm_manure else 0))
         remaining_phosphorus = max(
