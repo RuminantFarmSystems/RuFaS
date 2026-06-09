@@ -53,6 +53,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     CowPreSynchSubProtocol,
     CowTAISubProtocol,
     CowReSynchSubProtocol,
+    ReproStateEnum,
 )
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -1445,6 +1446,10 @@ class Animal:
             gestation_length=args.get("gestation_length", 0),
             calf_birth_weight=args.get("calf_birth_weight", 0),
         )
+        if self.is_pregnant:
+            self.reproduction.repro_state_manager.enter(ReproStateEnum.PREGNANT)
+        else:
+            self.reproduction.repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
         self.nutrients.phosphorus_for_gestation_required_for_calf = args.get(
             "phosphorus_for_gestation_required_for_calf", 0
         )
