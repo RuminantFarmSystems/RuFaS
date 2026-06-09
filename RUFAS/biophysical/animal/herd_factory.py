@@ -12,6 +12,7 @@ from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
@@ -341,6 +342,9 @@ class HerdFactory:
         cow.reproduction.calf_birth_weight = 0.0
 
         calf = Animal(args, self.time)
+        # Herd initialization runs on a static clock, so count-based scheduling is not
+        # applicable here; stock the initial herd with rate-based retention (Option 1).
+        CalfRetentionPolicy.apply_rate_based(calf, self.time.simulation_day)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
 
@@ -403,6 +407,7 @@ class HerdFactory:
                 animal_type=AnimalType.CALF.value,
             )
             calf = Animal(args, self.time)
+            CalfRetentionPolicy.apply_rate_based(calf, self.time.simulation_day)
             if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
 
