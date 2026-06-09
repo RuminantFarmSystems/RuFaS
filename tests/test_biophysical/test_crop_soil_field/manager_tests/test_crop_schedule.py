@@ -1,6 +1,9 @@
 from typing import List, Any
+from unittest.mock import MagicMock
 
+from RUFAS.output_manager import OutputManager
 import pytest
+from pytest_mock.plugin import MockerFixture
 
 from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 from RUFAS.biophysical.field.manager.crop_schedule import CropSchedule
@@ -353,3 +356,108 @@ def test_generate_harvest_events(
     )
     actual = crop_sched.generate_harvest_events()
     assert expected == actual
+
+
+@pytest.mark.parametrize(
+    "rotation",
+    [
+        # Basic annual crop: plant -> harvest_only -> harvest_kill
+        {
+            "planting_years": [1],
+            "planting_days": [100],
+            "harvest_years": [1, 1],
+            "harvest_days": [180, 220],
+            "harvest_operations": [
+                HarvestOperation.HARVEST_ONLY.value,
+                HarvestOperation.HARVEST_KILL.value,
+            ],
+        },
+        # Overwintering crop: plant one year, harvest the next
+        {
+            "planting_years": [1],
+            "planting_days": [300],
+            "harvest_years": [2],
+            "harvest_days": [120],
+            "harvest_operations": [HarvestOperation.HARVEST_KILL.value],
+        },
+        # Re-established crop after termination
+        {
+            "planting_years": [1, 1],
+            "planting_days": [100, 230],
+            "harvest_years": [1, 1],
+            "harvest_days": [220, 260],
+            "harvest_operations": [
+                HarvestOperation.HARVEST_KILL.value,
+                HarvestOperation.KILL_ONLY.value,
+            ],
+        },
+        # Same-day planting and harvest should be allowed because planting sorts first
+        {
+            "planting_years": [1],
+            "planting_days": [100],
+            "harvest_years": [1],
+            "harvest_days": [100],
+            "harvest_operations": [HarvestOperation.HARVEST_ONLY.value],
+        },
+    ],
+)
+def test_validate_crop_schedule_event_order_valid(rotation: dict[str, object], mocker: MockerFixture) -> None:
+    """Valid crop schedule event orders do not raise an error."""
+    mock_add_error = mocker.patch("RUFAS.biophysical.field.manager.crop_schedule.OutputManager.add_error")
+    CropSchedule.validate_crop_schedule_event_order(rotation, "valid_schedule")
+    assert mock_add_error.call_count == 0
+
+
+@pytest.mark.parametrize(
+    "rotation, expected_message",
+    [
+        (
+            # Harvest before any planting
+            {
+                "planting_years": [1],
+                "planting_days": [100],
+                "harvest_years": [1],
+                "harvest_days": [90],
+                "harvest_operations": [HarvestOperation.HARVEST_ONLY.value],
+            },
+            "harvest_only on year 1, day 90 occurs before an active planting event",
+        ),
+        (
+            # Additional harvest after terminating harvest, without another planting
+            {
+                "planting_years": [1],
+                "planting_days": [100],
+                "harvest_years": [1, 1],
+                "harvest_days": [200, 220],
+                "harvest_operations": [
+                    HarvestOperation.HARVEST_KILL.value,
+                    HarvestOperation.HARVEST_ONLY.value,
+                ],
+            },
+            "harvest_only on year 1, day 220 occurs before an active planting event",
+        ),
+        (
+            # Kill before planting
+            {
+                "planting_years": [1],
+                "planting_days": [150],
+                "harvest_years": [1],
+                "harvest_days": [100],
+                "harvest_operations": [HarvestOperation.KILL_ONLY.value],
+            },
+            "kill_only on year 1, day 100 occurs before an active planting event",
+        ),
+    ],
+)
+def test_validate_crop_schedule_event_order_invalid(
+    rotation: dict[str, object],
+    expected_message: str,
+    mocker: MockerFixture,
+) -> None:
+    """Invalid crop schedule event orders raise and log an error."""
+    mock_add_error = mocker.patch("RUFAS.biophysical.field.manager.crop_schedule.OutputManager.add_error")
+
+    with pytest.raises(ValueError, match=expected_message):
+        CropSchedule.validate_crop_schedule_event_order(rotation, "bad_schedule")
+
+    assert mock_add_error.call_count == 1
