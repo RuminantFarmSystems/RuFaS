@@ -750,7 +750,8 @@ class HerdManager:
         statistics, and manure data collection.
 
         Daily Herd Routine Process:
-        1. Reset daily herd statistics and reproduction trackers.
+        1. Reset the daily herd statistics (the cumulative herd reproduction statistics persist
+           across the whole simulation and are not reset here).
         2. Run per-animal daily routines for calves, heifer groups, and cows.
         3. Collect herd-level updates from those routines, including graduations, removals, births, and sales.
         4. Update sold-animal and stillborn-calf statistics.
@@ -761,7 +762,6 @@ class HerdManager:
 
         """
         self._reset_daily_statistics()
-        self.herd_reproduction_statistics = HerdReproductionStatistics()
 
         daily_herd_updates = self._process_daily_herd_updates(time)
         self.herd_statistics.born_calf_num = len(
