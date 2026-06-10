@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
@@ -503,15 +503,7 @@ class AvailableFeedsBuilder:
     @staticmethod
     def _find_feed_repeats(values: list[RUFAS_ID]) -> set[RUFAS_ID]:
         """Finds values that occur more than once in a list."""
-        seen_feed_ids: set[RUFAS_ID] = set()
-        repeated_feed_ids: set[RUFAS_ID] = set()
-
-        for value in values:
-            if value in seen_feed_ids:
-                repeated_feed_ids.add(value)
-            seen_feed_ids.add(value)
-
-        return repeated_feed_ids
+        return {value for value, count in Counter(values).items() if count > 1}
 
     @staticmethod
     def _process_feed_library(nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
