@@ -374,7 +374,6 @@ def test_repr(
     )
 
     for cow in cows:
-        setattr(cow, "is_milking", True)
         cow.calves = 1
         cow.days_in_milk = 1
     expected = {
