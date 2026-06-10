@@ -227,7 +227,11 @@ class CropSchedule(Schedule):
 
         """
         events: list[tuple[int, int, str | HarvestOperation]] = []
-
+        om = OutputManager()
+        info_map = {
+            "class": CropSchedule.__name__,
+            "function": CropSchedule.validate_crop_schedule_event_order.__name__,
+        }
         for year, day in zip(rotation["planting_years"], rotation["planting_days"]):
             events.append((year, day, "planting"))
 
@@ -236,7 +240,18 @@ class CropSchedule(Schedule):
             rotation["harvest_days"],
             rotation["harvest_operations"],
         ):
-            events.append((year, day, HarvestOperation(operation)))
+            try:
+                harvest_operation = HarvestOperation(operation)
+            except ValueError as e:
+                valid_operations = [operation.value for operation in VALID_HARVEST_OPERATIONS]
+                err_msg = (
+                    f"Invalid crop schedule '{schedule_name}': harvest operation '{operation}' "
+                    f"on year {year}, day {day} is not supported. "
+                    f"Valid harvest operations are: {valid_operations}."
+                )
+                om.add_error("Invalid crop schedule harvest operation.", err_msg, info_map)
+                raise ValueError(err_msg) from e
+            events.append((year, day, harvest_operation))
 
         event_order = {
             "planting": 0,
@@ -262,11 +277,6 @@ class CropSchedule(Schedule):
                         "after a terminating operation another planting must occur before "
                         "additional harvest or kill operations."
                     )
-                    om = OutputManager()
-                    info_map = {
-                        "class": CropSchedule.__name__,
-                        "function": CropSchedule.validate_crop_schedule_event_order.__name__,
-                    }
                     om.add_error("Invalid crop schedule event order.", err_msg, info_map)
                     raise ValueError(err_msg)
 

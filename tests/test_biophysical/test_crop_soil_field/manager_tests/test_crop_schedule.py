@@ -458,3 +458,27 @@ def test_validate_crop_schedule_event_order_invalid(
         CropSchedule.validate_crop_schedule_event_order(rotation, "bad_schedule")
 
     assert mock_add_error.call_count == 1
+
+
+def test_validate_crop_schedule_event_order_invalid_harvest_operation(
+    mocker: MockerFixture,
+) -> None:
+    """Unsupported harvest operations raise and log an error."""
+    rotation = {
+        "planting_years": [1],
+        "planting_days": [100],
+        "harvest_years": [1],
+        "harvest_days": [150],
+        "harvest_operations": ["bad_operation"],
+    }
+    mock_add_error = mocker.patch("RUFAS.biophysical.field.manager.crop_schedule.OutputManager.add_error")
+
+    expected_message = (
+        "Invalid crop schedule 'bad_schedule': harvest operation 'bad_operation' "
+        "on year 1, day 150 is not supported."
+    )
+
+    with pytest.raises(ValueError, match=expected_message):
+        CropSchedule.validate_crop_schedule_event_order(rotation, "bad_schedule")
+
+    mock_add_error.assert_called_once()
