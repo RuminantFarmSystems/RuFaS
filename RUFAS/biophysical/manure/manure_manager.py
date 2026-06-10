@@ -856,7 +856,9 @@ class ManureManager:
                 result_row_names.append(row_name)
         return result_row_names
 
-    def request_nutrients(self, request: NutrientRequest, field_name: str, time: RufasTime) -> NutrientRequestResults:
+    def request_nutrients(
+        self, request: NutrientRequest, field_name: str, time: RufasTime
+    ) -> NutrientRequestResults | None:
         """
         Handle the request for specific nutrients from the crop and soil module.
         This method evaluates the nutrient request made by considering both nitrogen and phosphorus
@@ -1035,8 +1037,8 @@ class ManureManager:
 
     def _split_storages_by_daily_spread(self) -> tuple[list[Storage], list[Storage]]:
         """Split all storages into daily spread and non-daily spread groups."""
-        daily_spread_storages = []
-        non_daily_storages = []
+        daily_spread_storages: list[Storage] = []
+        non_daily_storages: list[Storage] = []
         for processor in self.all_processors.values():
             if not isinstance(processor, Storage):
                 continue

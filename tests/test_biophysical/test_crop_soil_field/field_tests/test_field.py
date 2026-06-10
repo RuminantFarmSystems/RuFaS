@@ -499,6 +499,7 @@ def test_check_manure_application_schedule_daily_spread_request_uses_amounts() -
     assert request.event.is_daily_spread is True
     assert request.event.nitrogen_mass == 6.0
     assert request.event.phosphorus_mass == 3.0
+    assert request.nutrient_request is not None
     assert request.nutrient_request.nitrogen == 6.0
     assert request.nutrient_request.phosphorus == 3.0
     assert request.nutrient_request.use_daily_spread_source is True

@@ -1080,15 +1080,16 @@ class Field:
             on the current day.
         """
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
+        field_name = self.field_data.name or ""
         manure_requests: list[ManureEventNutrientRequest] = []
         for event in todays_manure_events:
             manure_request = self._create_manure_request(event)
-            manure_requests.append(ManureEventNutrientRequest(self.field_data.name, event, manure_request))
+            manure_requests.append(ManureEventNutrientRequest(field_name, event, manure_request))
 
         daily_spread_event = self._create_daily_spread_event(time)
         if daily_spread_event is not None:
             manure_request = self._create_manure_request(daily_spread_event)
-            manure_requests.append(ManureEventNutrientRequest(self.field_data.name, daily_spread_event, manure_request))
+            manure_requests.append(ManureEventNutrientRequest(field_name, daily_spread_event, manure_request))
         return manure_requests
 
     def _create_daily_spread_event(self, time: RufasTime) -> ManureEvent | None:
