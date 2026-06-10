@@ -266,10 +266,6 @@ class CropSchedule(Schedule):
                     info_map = {
                         "class": CropSchedule.__name__,
                         "function": CropSchedule.validate_crop_schedule_event_order.__name__,
-                        "schedule_name": schedule_name,
-                        "year": year,
-                        "day": day,
-                        "event_type": event_type.value,
                     }
                     om.add_error("Invalid crop schedule event order.", err_msg, info_map)
                     raise ValueError(err_msg)
