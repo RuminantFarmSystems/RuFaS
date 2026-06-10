@@ -437,7 +437,9 @@ class SimulationEngine:
                 manure_request_results = None
                 if manure_request is not None:
                     if self.simulate_manure:
-                        manure_request_results = self.manure_manager.request_nutrients(manure_request, self.time)
+                        manure_request_results = self.manure_manager.request_nutrients(
+                            manure_request, field_name, self.time
+                        )
                     else:
                         manure_request_results = FieldManureSupplier.request_nutrients(manure_request)
                 manure_applications.append(ManureEventNutrientRequestResults(field_name, event, manure_request_results))
