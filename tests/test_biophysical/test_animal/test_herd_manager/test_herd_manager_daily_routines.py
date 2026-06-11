@@ -696,7 +696,7 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     assert mock_check_if_replacement_heifers_needed.call_count == 0
     assert mock_update_herd_structure.call_count == 1
     mock_record_pen_history.assert_called_once_with(mock_time.simulation_day)
-    mock_update_herd_statistics.assert_called_once_with()
+    mock_update_herd_statistics.assert_called_once_with(mock_time.simulation_day)
     mock_report_manure_streams.assert_called_once()
     mock_report_manure_excretions.assert_called_once()
     mock_report_milk.assert_called_once()
