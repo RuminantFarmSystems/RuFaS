@@ -318,7 +318,7 @@ def test_perform_daily_routines_accumulates_reproduction_statistics(
         total_num_successful_conceptions=4, cow_num_successful_conceptions=4
     )
 
-    animals = []
+    animals: list[Animal] = []
     for _ in range(2):
         animal = MagicMock(spec=Animal)
         animal.animal_type = AnimalType.LAC_COW
