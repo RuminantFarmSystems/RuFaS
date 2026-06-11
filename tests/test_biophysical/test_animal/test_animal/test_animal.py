@@ -2982,7 +2982,7 @@ def test_setup_calf_mortality_schedules_death(mock_calf: Animal, mocker: MockerF
 
     mock_randint.assert_called_once_with(1, 59)
     assert animal.future_death_date == 30
-    assert animal._future_death_reason == animal_constants.CALF_MORTALITY_CULL
+    assert animal._future_death_reason == animal_constants.CALF_MORTALITY_LOSS
 
 
 @pytest.mark.parametrize("stillborn_day, sold_at_day", [(5, None), (None, 0)])
@@ -3059,7 +3059,7 @@ def test_setup_heifer_mortality_schedules_in_heiferI_window(mock_heiferI: Animal
 
     mock_randint.assert_called_once_with(61, 379)
     assert animal.future_death_date == 200
-    assert animal._future_death_reason == animal_constants.HEIFER_MORTALITY_CULL
+    assert animal._future_death_reason == animal_constants.HEIFER_MORTALITY_LOSS
 
 
 def test_setup_heifer_mortality_schedules_in_heiferII_window(mock_heiferI: Animal, mocker: MockerFixture) -> None:
@@ -3080,7 +3080,7 @@ def test_setup_heifer_mortality_schedules_in_heiferII_window(mock_heiferI: Anima
 
     mock_randint.assert_called_once_with(381, 635)
     assert animal.future_death_date == 500
-    assert animal._future_death_reason == animal_constants.HEIFER_MORTALITY_CULL
+    assert animal._future_death_reason == animal_constants.HEIFER_MORTALITY_LOSS
 
 
 def test_setup_heifer_mortality_not_committed_when_day_already_passed(

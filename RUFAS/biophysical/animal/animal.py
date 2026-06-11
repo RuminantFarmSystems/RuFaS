@@ -2104,7 +2104,7 @@ class Animal:
         death_day = randint(1, AnimalConfig.wean_day - 1)
         if death_day > self.days_born:
             self.future_death_date = death_day
-            self._future_death_reason = animal_constants.CALF_MORTALITY_CULL
+            self._future_death_reason = animal_constants.CALF_MORTALITY_LOSS
 
     def _setup_heifer_mortality(self) -> None:
         """
@@ -2158,7 +2158,7 @@ class Animal:
         death_day = randint(lower, upper)
         if death_day > self.days_born:
             self.future_death_date = death_day
-            self._future_death_reason = animal_constants.HEIFER_MORTALITY_CULL
+            self._future_death_reason = animal_constants.HEIFER_MORTALITY_LOSS
 
     def _transition_heiferI_to_heiferII(self, time: RufasTime) -> None:
         """
