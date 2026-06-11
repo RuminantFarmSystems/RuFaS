@@ -14,7 +14,23 @@ from RUFAS.user_constants import UserConstants
 
 
 class SlurryStorageOutdoor(Storage):
-    """Representation of slurry storage outdoor and its associated processes."""
+    """
+    Representation of slurry storage outdoor and its associated processes.
+
+    Parameters
+    ----------
+    name : str
+        The name of the storage.
+    cover : StorageCover
+        The type of cover used with the specified storage.
+    storage_time_period : int | None
+        The length of time (days) manure is stored for between emptying events.
+    surface_area : float
+        The surface area of the manure storage (m^2).
+    capacity : float, default=inf
+        The volumetric capacity of the storage (m^3).
+
+    """
 
     def __init__(
         self,
@@ -188,8 +204,8 @@ class SlurryStorageOutdoor(Storage):
 
     def _apply_ammonia_emissions(self, manure_temperature: float) -> float:
         """
-        This method computes the ammonia emissions from stored manure, and accounts the nitrogen
-        and ammoniacal nitrogen loss due to ammonia emissions.
+        Computes the ammonia emissions from stored manure, and accounts the nitrogen and ammoniacal nitrogen loss due
+        to ammonia emissions.
 
         Parameters
         ----------
