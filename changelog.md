@@ -90,6 +90,16 @@ v1.0.0
 - [2999](https://github.com/RuminantFarmSystems/RuFaS/pull/2999) - [minor change] [Cross Validation] [Feed Storage] [NoInputChange] [NoOutputChange] Added cross validation rules for feed storage inputs.
 - [3024](https://github.com/RuminantFarmSystems/RuFaS/pull/3024) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Adds path to input to error/warning messages in `DataValidator` for easier invalid input fixing.
 - [3033](https://github.com/RuminantFarmSystems/RuFaS/pull/3033) - [minor change] [Tests] [pyproject.toml] [NoInputChange] [NoOutputChange] Bumps `pytest` from `==7.4.4` to `>=9.0.3`, swaps the unmaintained `pytest-lazy-fixture` for the maintained `pytest-lazy-fixtures` fork.
+- [3046](https://github.com/RuminantFarmSystems/RuFaS/pull/3046) - [minor change] [Feed Storage] [NoInputChange] [NoOutputChange] Updates and fixes docstrings to be more consistently formatted.
+- [3048](https://github.com/RuminantFarmSystems/RuFaS/pull/3048) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Updates and fixes the EEE module docstrings to be more consistently formatted.
+- [3052](https://github.com/RuminantFarmSystems/RuFaS/pull/3052) - [minor change] [e2e-testing] [NoInputChange] [NoOutputChange] Updates and e2e-testing filters.
+- [3041](https://github.com/RuminantFarmSystems/RuFaS/pull/3041) - [minor change] [NoInputChange] [NoOutputChange] [OutputManager] [GraphGenerator] [ReportGenerator] Updates docstrings in post-processing modules to follow NumPy-style format.
+- [3050](https://github.com/RuminantFarmSystems/RuFaS/pull/3050) - [minor change] [FieldManager] [SimulationEngine] [NoInputChange] [NoOutputChange] Moves the field config data gathering out of `FieldManager.__init__()` into `SimulationEngine`, passing field data as a parameter instead.
+- [3074](https://github.com/RuminantFarmSystems/RuFaS/pull/3074) - [minor change] [CropSchedule][NoInputChange] [NoOutputChange] Adds check for incompatibility between planting and harvesting schedules for crops.
+- [3072](https://github.com/RuminantFarmSystems/RuFaS/pull/3072) - [minor change] [main.py] [NoInputChange] [NoOutputChange] Moves `main.py` into `RUFAS/` for better packaging while maintaining legacy `main.py` script access.
+- [3054](https://github.com/RuminantFarmSystems/RuFaS/pull/3054) - [minor change] [Animal] [Reproduction] [NoInputChange] [NoOutputChange] Adds early-exit guard in presynch and OvSynch hormone schedule setup to skip already-pregnant cows.
+- [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [InputChange] [NoOutputChange] Removes `random_seed` field from all 6 config input files.
+- [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [InputChange] [NoOutputChange] Removes the `random_seed` field from all 6 config input files and from 3 config input files in helpful_scripts.
 - [3047](https://github.com/RuminantFarmSystems/RuFaS/pull/3047) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds heifer average daily gain (ADG) reporting by pen and by heifer animal type (Heifer I, II, III) to `HerdStatistics` and `AnimalModuleReporter`.
 
 ### v1.0.0
@@ -116,7 +126,7 @@ v1.0.0
 - [1945](https://github.com/RuminantFarmSystems/RuFaS/pull/1945) - [minor change] [Animal] Implements Animal Genetics submodule.
 - [2048](https://github.com/RuminantFarmSystems/RuFaS/pull/2048) - [minor change] [Animal][Testing] Adds end to end testing for Animal domain.
 - [1809](https://github.com/RuminantFarmSystems/RuFaS/pull/1809) - [minor change] [InputManager] Extract the validation methods from InputManager.
-- [2045](https://github.com/RuminantFarmSystems/RuFaS/pull/2045) - [minor change] [Documentation] Regenerates the Sphinx HTML documentation.
+- [2045](https://github.com/RuminantFarmSystems/RuFaS/pull/2045) - [minor change] [Documentation] Regenerates the Sphinx HTML documentation. f 
 - [2050](https://github.com/RuminantFarmSystems/RuFaS/pull/2050) - [minor change] [Crop & Soil][Feed Storage] Disentangle the Crop & Soil and Feed Storage modules.
 - [2061](https://github.com/RuminantFarmSystems/RuFaS/pull/2061) - [minor change] [DataValidator] Removed the usage of OutputManager in DataValidator.
 - [2057](https://github.com/RuminantFarmSystems/RuFaS/pull/2057) - [minor change] [Crop & Soil][Manure] Disentangle the Crop & Soil and Manure modules.
