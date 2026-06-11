@@ -5,7 +5,7 @@ This page describes the process that RuFaS Maintainers use to communicate
 and execute a version update.
 
 **Major** and **Minor** updates
-------------------------------
+-------------------------------
 
 In addition to the updated model and scientific documentation in the repository
 codebase, deliverables of this process for **Major** and **Minor**
@@ -19,7 +19,7 @@ updates are:
 
 
 Before Merging ``dev`` to ``test``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 1. RuFaS Maintainers meet to discuss what work **will and will not** be
@@ -39,7 +39,7 @@ Before Merging ``dev`` to ``test``
 
 
 After ``test`` is updated
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 - During the testing phase, SME Maintainers will evaluate integrated model performance.
 - When the model performance has been verified by at least one SME Maintainer per Module, the Scientific Director will prepare a Scientific Report summarizing the model performance and changes in scientific methodology. 
 - The Director of Software Engineering will lead preparation of a set of Release Notes to summarize model updates. 
@@ -47,7 +47,7 @@ After ``test`` is updated
 
 
 **Patch** Updates
-----------------
+---------------
 
 Patch updates do not require a sceintific review of the model functionality or an updated technical report. The release notes should include a brief summary of the fixes included in the updated. 
 
