@@ -1,7 +1,7 @@
 Maintainer Team Workflow and Communication during a Version Update
-===================================================================
+==================================================================
 
-This page describes the process that RuFaS Maintainers will use to communicate
+This page describes the process that RuFaS Maintainers use to communicate
 and execute a version update.
 
 **Major** and **Minor** updates
@@ -13,8 +13,9 @@ updates are:
 
 - A detailed technical report of the scientific review by SME Maintainers
 - A version release note that includes:
-  - A high-level summary of the outcomes of the SME Review
-  - A summary of the changelog
+
+  1. A high-level summary of the outcomes of the SME Review
+  2. A summary of the changelog
 
 
 Before Merging ``dev`` to ``test``
@@ -38,7 +39,7 @@ Before Merging ``dev`` to ``test``
 
 
 After ``test`` is updated
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 - During the testing phase, SME Maintainers will evaluate integrated model performance. (link to Scientific Evaluation Process). 
 - When the model performance has been verified by at least one SME Maintainer per Module, the Scientific Director will prepare a Scientific Report summarizing the model performance and changes in scientific methodology. 
 - The Director of Software Engineering will lead preparation of a set of Release Notes to summarize model updates. 
@@ -46,7 +47,7 @@ After ``test`` is updated
 
 
 **Patch** Updates
--------------------------
+-----------------
 
 Patch updates do not require a sceintific review of the model functionality or an updated technical report. The release notes should include a brief summary of the fixes included in the updated. 
 
