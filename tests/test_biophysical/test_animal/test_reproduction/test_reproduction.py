@@ -807,7 +807,7 @@ def test_update_cow_repro_program_and_log_repro_stats_if_needed(
         mock_enter_repro_state.assert_not_called()
     else:
         if days_in_pregnancy > 0:
-            assert mock_add_event.call_count == 5
+            assert mock_add_event.call_count == 6
             mock_enter_repro_state.assert_not_called()
         else:
             assert mock_add_event.call_count == 6

@@ -8,9 +8,8 @@ from RUFAS.user_constants import UserConstants
 
 class SolidsStorageCalculator:
     """
-    This class contains methods to calculate the carbon decomposition, methane emission,
-    nitrogen loss to leaching, and dry matter loss on the current day.
-    The methods are static and can be called without creating an instance of the class.
+    This class contains methods to calculate the carbon decomposition, methane emission, nitrogen loss to leaching,
+    and dry matter loss on the current day.
     """
 
     @staticmethod
@@ -18,7 +17,7 @@ class SolidsStorageCalculator:
         fraction_nitrogen_lost_to_leaching: float, received_manure_nitrogen: float
     ) -> float:
         """
-        This function calculates the amount of nitrogen leached out of the manure-bedding
+        Calculates the amount of nitrogen leached out of the manure-bedding
         mix on the current day.
 
         Parameters
@@ -32,6 +31,7 @@ class SolidsStorageCalculator:
         -------
         float
             The total nitrogen loss to leaching on the current day, kg.
+
         """
 
         return fraction_nitrogen_lost_to_leaching * received_manure_nitrogen
@@ -39,7 +39,7 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
         """
-        This function calculates the total dry matter loss on the current day.
+        Calculates the total dry matter loss on the current day.
 
         Parameters
         ----------
@@ -52,6 +52,7 @@ class SolidsStorageCalculator:
         -------
         float
             The total dry matter loss on the current day, kg/day.
+
         """
         return 2 * carbon_decomposition + methane_emission
 
@@ -60,7 +61,7 @@ class SolidsStorageCalculator:
         manure_temperature: float, non_degradable_volatile_solids: float, degradable_volatile_solids: float
     ) -> float:
         """
-        This function calculates the total carbon decomposition on the current day.
+        Calculates the total carbon decomposition on the current day.
 
         Parameters
         ----------
@@ -77,6 +78,7 @@ class SolidsStorageCalculator:
         -------
         float
             The total carbon decomposition on the current day, kg/day.
+
         """
         carbon_decomposition_rate = SolidsStorageCalculator.calculate_carbon_decomposition_rate(manure_temperature)
         anaerobic_coefficient = SolidsStorageCalculator.calculate_anaerobic_coefficient()
@@ -94,7 +96,7 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_carbon_decomposition_rate(manure_temperature: float) -> float:
         """
-        This function calculates the carbon decomposition rate on the current day.
+        Calculates the carbon decomposition rate on the current day.
 
         Parameters
         ----------
@@ -107,6 +109,7 @@ class SolidsStorageCalculator:
         -------
         float
             The carbon decomposition rate on the current day, per day.
+
         """
         max_microbial_decomposition_rate = SolidsStorageCalculator.calculate_max_microbial_decomposition_rate()
         slow_microbial_decomposition_rate = SolidsStorageCalculator.calculate_slow_fraction_decomposition_rate(
@@ -130,13 +133,17 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_max_microbial_decomposition_rate() -> float:
         """
-        This function calculates the max microbial decomposition rate.
-        This parameter is set to 0.04195 but the equation and set values are shown below for reference.
+        Calculates the max microbial decomposition rate.
 
         Returns
         -------
         float
             The max microbial decomposition rate on the current day, per day.
+
+        Notes
+        -----
+        This parameter is set to 0.04195 but the equation and set values are shown below for reference.
+
         """
 
         return float(
@@ -150,7 +157,7 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_slow_fraction_decomposition_rate(manure_temperature: float) -> float:
         """
-        This function calculates the microbial decomposition rate of the slowly-degrading fraction
+        Calculates the microbial decomposition rate of the slowly-degrading fraction
         in decomposing material on the current day.
 
         Parameters
@@ -164,6 +171,7 @@ class SolidsStorageCalculator:
         -------
         float
             The microbial decomposition rate of the slowly-degrading fraction on the current day.
+
         """
 
         return float(
@@ -174,13 +182,14 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_anaerobic_coefficient() -> float:
         """
-        This function calculates the anaerobic coefficient. The value of this parameter is equal to 0.96639,
+        Calculates the anaerobic coefficient. The value of this parameter is equal to 0.96639,
         but the equation and set values are included below for reference.
 
         Returns
         -------
         float
             The anaerobic coefficient, unitless.
+
         """
         return (
             ManureConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN
@@ -194,7 +203,8 @@ class SolidsStorageCalculator:
     def calculate_ifsm_methane_emission(
         manure_volatile_solids: float, manure_temperature: float, methane_production_potential: float
     ) -> float:
-        """Calculates emission of methane on the current day using an adaptation of the tier 2 approach
+        """
+        Calculates emission of methane on the current day using an adaptation of the tier 2 approach
         of the IPCC (2006), based on manure volatile solids addition to the open lot and a temperature-dependent
         methane conversion factor.
 
@@ -238,7 +248,7 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_methane_conversion_factor(manure_temperature: float) -> float:
         """
-        Calculate the Methane Conversion Factor (MCF) for the open lots treatment using the following function:
+        Calculates the Methane Conversion Factor (MCF) for the open lots treatment using the following function:
 
         Parameters
         ----------
