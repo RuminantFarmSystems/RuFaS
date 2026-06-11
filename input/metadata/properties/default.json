@@ -218,6 +218,20 @@
           "default": 500,
           "minimum": 0
         },
+        "calf_mortality_rate": {
+          "type": "number",
+          "description": "Calf Mortality Rate (decimal fraction) -- Cumulative probability that a live-born calf dies before weaning. Enter 0 to disable; e.g., 0.05 = 5%",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "heifer_mortality_rate": {
+          "type": "number",
+          "description": "Heifer Mortality Rate (decimal fraction) -- Cumulative probability that a post-wean heifer dies before calving. Deaths split 2/3 in HeiferI, 1/3 in HeiferII. Enter 0 to disable; e.g., 0.05 = 5%",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
         "do_not_breed_time": {
           "type": "number",
           "description": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant",

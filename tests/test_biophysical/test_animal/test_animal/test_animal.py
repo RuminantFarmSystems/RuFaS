@@ -1191,41 +1191,34 @@ def test_future_cull_date_setter(
 
 
 @pytest.mark.parametrize(
-    "is_cow, future_death_value, expected",
+    "animal_type, future_death_value, expected",
     [
-        (False, 1000, sys.maxsize),
-        (True, 1000, 1000),
+        # A future death date may be scheduled for any life stage (youngstock mortality or
+        # cow death). The getter returns the stored value, or sys.maxsize when none is set.
+        (AnimalType.CALF, None, sys.maxsize),
+        (AnimalType.CALF, 1000, 1000),
+        (AnimalType.HEIFER_I, 1000, 1000),
+        (AnimalType.LAC_COW, None, sys.maxsize),
+        (AnimalType.LAC_COW, 1000, 1000),
     ],
 )
 def test_future_death_date(
-    is_cow: bool, future_death_value: int, expected: int, mock_lactating_cow: Animal, mocker: MockerFixture
+    animal_type: AnimalType, future_death_value: int | None, expected: int, mock_lactating_cow: Animal
 ) -> None:
     animal = mock_lactating_cow
+    animal.animal_type = animal_type
     animal._future_death_date = future_death_value
-    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
     assert animal.future_death_date == expected
 
 
-@pytest.mark.parametrize(
-    "is_cow, setter_allowed",
-    [
-        (False, False),
-        (True, True),
-    ],
-)
-def test_future_death_date_setter(
-    is_cow: bool, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
-) -> None:
+@pytest.mark.parametrize("animal_type", [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.LAC_COW])
+def test_future_death_date_setter(animal_type: AnimalType, mock_lactating_cow: Animal) -> None:
+    # The setter accepts a future death date for any life stage (no longer cow-only).
     animal = mock_lactating_cow
-    animal._future_death_date = 999
-    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
-    if setter_allowed:
-        animal.future_death_date = 2000
-        assert animal._future_death_date == 2000
-        assert animal.future_death_date == 2000
-    else:
-        with pytest.raises(TypeError):
-            animal.future_death_date = 2000
+    animal.animal_type = animal_type
+    animal.future_death_date = 2000
+    assert animal._future_death_date == 2000
+    assert animal.future_death_date == 2000
 
 
 @pytest.mark.parametrize(
@@ -2947,6 +2940,166 @@ def test_determine_future_death_date_with_death(mock_lactating_cow: Animal, mock
     mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.0005)
     result = animal.determine_future_death_date()
     assert result == 12
+
+
+def test_setup_calf_mortality_disabled_when_rate_zero(mock_calf: Animal, mocker: MockerFixture) -> None:
+    """A zero calf_mortality_rate schedules no death and never touches the RNG."""
+    animal = mock_calf
+    animal._future_death_date = None
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.0)
+    mock_random = mocker.patch("RUFAS.biophysical.animal.animal.random")
+
+    animal._setup_calf_mortality()
+
+    assert animal._future_death_date is None
+    mock_random.assert_not_called()
+
+
+def test_setup_calf_mortality_survives_roll(mock_calf: Animal, mocker: MockerFixture) -> None:
+    """A roll of random() >= rate means the calf survives and no death is scheduled."""
+    animal = mock_calf
+    animal._future_death_date = None
+    animal.days_born = 10
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.9)
+
+    animal._setup_calf_mortality()
+
+    assert animal._future_death_date is None
+
+
+def test_setup_calf_mortality_schedules_death(mock_calf: Animal, mocker: MockerFixture) -> None:
+    """A roll of random() < rate schedules a death day in [1, wean_day - 1] with the calf tag."""
+    animal = mock_calf
+    animal._future_death_date = None
+    animal.days_born = 10
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.1)
+    mock_randint = mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=30)
+
+    animal._setup_calf_mortality()
+
+    mock_randint.assert_called_once_with(1, 59)
+    assert animal.future_death_date == 30
+    assert animal._future_death_reason == animal_constants.CALF_MORTALITY_LOSS
+
+
+@pytest.mark.parametrize("stillborn_day, sold_at_day", [(5, None), (None, 0)])
+def test_setup_calf_mortality_skips_non_eligible_calves(
+    stillborn_day: int | None, sold_at_day: int | None, mock_calf: Animal, mocker: MockerFixture
+) -> None:
+    """Stillborn calves and calves sold at birth are not eligible for pre-wean mortality."""
+    animal = mock_calf
+    animal._future_death_date = None
+    animal.stillborn_day = stillborn_day
+    animal.sold_at_day = sold_at_day
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.5)
+    mock_random = mocker.patch("RUFAS.biophysical.animal.animal.random")
+
+    animal._setup_calf_mortality()
+
+    assert animal._future_death_date is None
+    mock_random.assert_not_called()
+
+
+def test_setup_calf_mortality_not_committed_when_day_already_passed(mock_calf: Animal, mocker: MockerFixture) -> None:
+    """A calf loaded past the drawn death day has already survived it, so nothing is scheduled."""
+    animal = mock_calf
+    animal._future_death_date = None
+    animal.days_born = 40
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.1)
+    mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=30)
+
+    animal._setup_calf_mortality()
+
+    assert animal._future_death_date is None
+
+
+def test_setup_heifer_mortality_disabled_when_rate_zero(mock_heiferI: Animal, mocker: MockerFixture) -> None:
+    """A zero heifer_mortality_rate schedules no death and never touches the RNG."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.0)
+    mock_random = mocker.patch("RUFAS.biophysical.animal.animal.random")
+
+    animal._setup_heifer_mortality()
+
+    assert animal._future_death_date is None
+    mock_random.assert_not_called()
+
+
+def test_setup_heifer_mortality_survives_roll(mock_heiferI: Animal, mocker: MockerFixture) -> None:
+    """A roll of random() >= rate means the heifer survives and no death is scheduled."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.5)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.9)
+
+    animal._setup_heifer_mortality()
+
+    assert animal._future_death_date is None
+
+
+def test_setup_heifer_mortality_schedules_in_heiferI_window(mock_heiferI: Animal, mocker: MockerFixture) -> None:
+    """When the stage roll falls in the HeiferI fraction, the death day is drawn from the HeiferI window."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    animal.days_born = 10
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch.object(AnimalConfig, "heifer_breed_start_day", 380)
+    # First roll 0.1 (< 0.5 -> dies); second roll 0.5 (< 2/3 -> HeiferI bucket).
+    mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[0.1, 0.5])
+    mock_randint = mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=200)
+
+    animal._setup_heifer_mortality()
+
+    mock_randint.assert_called_once_with(61, 379)
+    assert animal.future_death_date == 200
+    assert animal._future_death_reason == animal_constants.HEIFER_MORTALITY_LOSS
+
+
+def test_setup_heifer_mortality_schedules_in_heiferII_window(mock_heiferI: Animal, mocker: MockerFixture) -> None:
+    """When the stage roll falls outside the HeiferI fraction, the death day is drawn from the HeiferII window."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    animal.days_born = 10
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch.object(AnimalConfig, "heifer_breed_start_day", 380)
+    mocker.patch.object(AnimalConfig, "average_gestation_length", 276)
+    mocker.patch.object(AnimalConfig, "heifer_prefresh_day", 21)
+    # First roll 0.1 (< 0.5 -> dies); second roll 0.9 (>= 2/3 -> HeiferII bucket).
+    mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[0.1, 0.9])
+    mock_randint = mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=500)
+
+    animal._setup_heifer_mortality()
+
+    mock_randint.assert_called_once_with(381, 635)
+    assert animal.future_death_date == 500
+    assert animal._future_death_reason == animal_constants.HEIFER_MORTALITY_LOSS
+
+
+def test_setup_heifer_mortality_not_committed_when_day_already_passed(
+    mock_heiferI: Animal, mocker: MockerFixture
+) -> None:
+    """A heifer loaded past the drawn death day has already survived it, so nothing is scheduled."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    animal.days_born = 400
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch.object(AnimalConfig, "heifer_breed_start_day", 380)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[0.1, 0.5])
+    mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=379)
+
+    animal._setup_heifer_mortality()
+
+    assert animal._future_death_date is None
 
 
 def patch_random_first_call(mocker: MockerFixture, first_value: float, second_value: float) -> None:
