@@ -698,7 +698,10 @@ class HerdManager:
         ``animal_type.is_heifer`` is ``True``. If no heifers are present, the
         pen's value is set to ``None``. If heifers are present and the pen is
         seen for the first time, all prior simulation days are backfilled with
-        ``None``.
+        ``None``. The backfill uses ``AnimalModuleReporter.report_herd_statistics_data``
+        as the class and function in the ``info_map`` so that backfilled entries
+        share the same variable name as values recorded during normal reporting.
+
 
         Per-animal-type averages are also computed independently across the full
         herd for Heifer I, II, and III groups. Groups with no animals are set
