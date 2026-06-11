@@ -1343,12 +1343,10 @@ class Animal:
             self.stillborn_day = simulation_day
             self.events.add_event(0, simulation_day, animal_constants.STILL_BIRTH)
 
-        is_sold = (
-            True
-            if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate or self.sold_at_day)
-            else False
-        )
-        self.sold_at_day = simulation_day if is_sold else None
+        # The keep/sell decision for female calves is owned by CalfRetentionPolicy and applied
+        # by HerdManager (live simulation) or HerdFactory (herd initialization) after the calf
+        # is created, so that all retention logic -- rate-based and count-based -- lives in one
+        # place with access to herd-level, per-year state. ``sold_at_day`` stays None here.
 
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("birth_weight", 0.0)

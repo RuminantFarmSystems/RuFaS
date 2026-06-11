@@ -10,6 +10,7 @@ from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
@@ -182,6 +183,7 @@ class HerdManager:
         self.adjustment_period = animal_config_data["herd_information"]["herd_size_adjustment_period"]
         self.selling_threshold = animal_config_data["herd_information"]["herd_size_sell_threshold"]
         self.buying_threshold = animal_config_data["herd_information"]["herd_size_buy_threshold"]
+        self.calf_retention_policy = CalfRetentionPolicy()
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
         self.housing = animal_config_data["housing"]
@@ -763,6 +765,10 @@ class HerdManager:
         self._reset_daily_statistics()
         self.herd_reproduction_statistics = HerdReproductionStatistics()
 
+        # Release today's female-calf keep tags (count-based retention) before births occur,
+        # so calves born today can fulfill them.
+        self.calf_retention_policy.begin_day(time)
+
         daily_herd_updates = self._process_daily_herd_updates(time)
         self.herd_statistics.born_calf_num = len(
             daily_herd_updates.stillborn_newborn_calves
@@ -785,6 +791,10 @@ class HerdManager:
             time,
             weather,
         )
+
+        # On the last day of the simulation year, warn if too few female calves were born to
+        # meet the count-based keep target (no-op under rate-based retention).
+        self.calf_retention_policy.finalize_day(time)
 
         self.record_pen_history(time.simulation_day)
         (
@@ -862,6 +872,7 @@ class HerdManager:
         """
         newborn_calf_config["id"] = AnimalPopulation.next_id()
         newborn_calf: Animal = Animal(args=newborn_calf_config, time=time)
+        self.calf_retention_policy.apply(newborn_calf, time.simulation_day)
         if AnimalConfig.simulate_genetics and newborn_calf.genetics is not None:
             mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
                 [animal.genetics for animal in self.calves if animal.genetics is not None]
