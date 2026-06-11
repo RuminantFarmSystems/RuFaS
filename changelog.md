@@ -96,6 +96,7 @@ v1.0.0
 - [3041](https://github.com/RuminantFarmSystems/RuFaS/pull/3041) - [minor change] [NoInputChange] [NoOutputChange] [OutputManager] [GraphGenerator] [ReportGenerator] Updates docstrings in post-processing modules to follow NumPy-style format.
 - [3071](https://github.com/RuminantFarmSystems/RuFaS/pull/3071) - [minor change] [NoInputChange] [NoOutputChange] [Manure] Updates `Manure` module docstrings.
 - [3050](https://github.com/RuminantFarmSystems/RuFaS/pull/3050) - [minor change] [FieldManager] [SimulationEngine] [NoInputChange] [NoOutputChange] Moves the field config data gathering out of `FieldManager.__init__()` into `SimulationEngine`, passing field data as a parameter instead.
+- [3074](https://github.com/RuminantFarmSystems/RuFaS/pull/3074) - [minor change] [CropSchedule][NoInputChange] [NoOutputChange] Adds check for incompatibility between planting and harvesting schedules for crops.
 - [3072](https://github.com/RuminantFarmSystems/RuFaS/pull/3072) - [minor change] [main.py] [NoInputChange] [NoOutputChange] Moves `main.py` into `RUFAS/` for better packaging while maintaining legacy `main.py` script access.
 - [3054](https://github.com/RuminantFarmSystems/RuFaS/pull/3054) - [minor change] [Animal] [Reproduction] [NoInputChange] [NoOutputChange] Adds early-exit guard in presynch and OvSynch hormone schedule setup to skip already-pregnant cows.
 - [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [InputChange] [NoOutputChange] Removes `random_seed` field from all 6 config input files.
