@@ -156,7 +156,10 @@ class HerdStatistics:
         Total quantity of milk protein in the herd's milk production, (kg).
     herd_milk_protein_percent : float
         Percentage of milk protein in the herd's milk production, (unitless).
-
+    heifer_average_daily_gain_by_pen: dict[str, float | None]
+        The average daily bodyweight gain for heifers in pens by pen id, (kg).
+    heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
+        The average daily bodyweight gain for heifers by animal type, (kg).
     """
 
     avg_calving_to_preg_time: dict[str, float]

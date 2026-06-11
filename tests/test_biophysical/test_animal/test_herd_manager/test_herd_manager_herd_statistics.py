@@ -1062,7 +1062,6 @@ def test_calculate_heifer_average_daily_weight_gain_with_heifers_in_pen(
 
     Verifies average daily gain per pen and per animal type are correctly computed.
     """
-    # Arrange
     heifer_i_a = _make_mock_heifer(AnimalType.HEIFER_I, daily_growth=1.0)
     heifer_i_b = _make_mock_heifer(AnimalType.HEIFER_I, daily_growth=3.0)
     heifer_ii = _make_mock_heifer(AnimalType.HEIFER_II, daily_growth=2.0)
@@ -1080,14 +1079,11 @@ def test_calculate_heifer_average_daily_weight_gain_with_heifers_in_pen(
 
     mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager")
 
-    # Act
     herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=5)
 
-    # Assert — pen averages (cow excluded from pen 1 average)
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["1"] == pytest.approx(2.0)
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["2"] == pytest.approx(2.0)
 
-    # Assert — per-animal-type averages
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I] == pytest.approx(
         2.0
     )
@@ -1105,7 +1101,6 @@ def test_calculate_heifer_average_daily_weight_gain_no_heifers_in_pen(
 
     Pen dict must not be updated; all animal-type entries must be None.
     """
-    # Arrange
     mock_cow = MagicMock(spec=Animal)
     mock_cow.animal_type = AnimalType.LAC_COW
 
@@ -1115,13 +1110,10 @@ def test_calculate_heifer_average_daily_weight_gain_no_heifers_in_pen(
     herd_manager.heiferIIs = []
     herd_manager.heiferIIIs = []
 
-    # Act
     herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=1)
 
-    # Assert — pen dict untouched
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen == {}
 
-    # Assert — all animal types None
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I] is None
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II] is None
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III] is None
@@ -1136,7 +1128,6 @@ def test_calculate_heifer_average_daily_weight_gain_new_pen_triggers_backfill(
 
     Verifies OutputManager.add_variable_bulk is called to backfill prior simulation days.
     """
-    # Arrange
     heifer = _make_mock_heifer(AnimalType.HEIFER_I, daily_growth=1.5)
     pen = _make_mock_pen(pen_id=99, animals={0: heifer})
     herd_manager.all_pens = [pen]
@@ -1147,15 +1138,12 @@ def test_calculate_heifer_average_daily_weight_gain_new_pen_triggers_backfill(
     mock_om_instance = MagicMock(spec=OutputManager)
     mock_om_class = mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager", return_value=mock_om_instance)
 
-    # Act — simulation_day=3 means backfill days 0, 1, 2
     herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=3)
 
-    # Assert — OutputManager instantiated and backfill called with 3 entries
     mock_om_class.assert_called_once()
     bulk_call_args = mock_om_instance.add_variable_bulk.call_args[0][0]
     assert len(bulk_call_args) == 3
 
-    # Assert — pen entry written after backfill
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["99"] == pytest.approx(1.5)
 
 
@@ -1176,16 +1164,12 @@ def test_calculate_heifer_average_daily_weight_gain_existing_pen_no_backfill(
     herd_manager.heiferIIs = []
     herd_manager.heiferIIIs = []
 
-    # Pre-populate pen in stats to simulate pen already tracked
     herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["5"] = 1.0
 
     mock_om_class = mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager")
 
-    # Act
     herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=10)
 
-    # Assert — no backfill triggered
     mock_om_class.assert_not_called()
 
-    # Assert — pen value updated to new average
     assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["5"] == pytest.approx(2.0)
