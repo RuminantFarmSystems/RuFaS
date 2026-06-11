@@ -6,11 +6,14 @@ Covers both retention methods that the policy consolidates:
   warning when too few female calves are born to meet it.
 """
 
+from collections.abc import Generator
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.calf_retention_policy import (
     CalfRetentionPolicy,
@@ -19,13 +22,14 @@ from RUFAS.biophysical.animal.calf_retention_policy import (
     UNFULFILLED_TAG_WARNING_FRACTION,
 )
 from RUFAS.biophysical.animal.data_types.animal_enums import Sex
+from RUFAS.rufas_time import RufasTime
 
 RANDOM_PATH = "RUFAS.biophysical.animal.calf_retention_policy.random"
 
 
-def _calf(sex: Sex = Sex.FEMALE, stillborn: bool = False) -> SimpleNamespace:
+def _calf(sex: Sex = Sex.FEMALE, stillborn: bool = False) -> Animal:
     """A minimal stand-in for an Animal carrying only the attributes the policy touches."""
-    return SimpleNamespace(sex=sex, stillborn=stillborn, sold_at_day=None)
+    return cast(Animal, SimpleNamespace(sex=sex, stillborn=stillborn, sold_at_day=None))
 
 
 def _time(
@@ -35,20 +39,23 @@ def _time(
     year_end_day: int = 365,
     calendar_year: int = 2023,
     simulation_day: int = 0,
-) -> SimpleNamespace:
+) -> RufasTime:
     """A minimal stand-in for RufasTime exposing only the properties the policy reads."""
-    return SimpleNamespace(
-        current_simulation_year=sim_year,
-        current_julian_day=julian_day,
-        year_start_day=year_start_day,
-        year_end_day=year_end_day,
-        current_calendar_year=calendar_year,
-        simulation_day=simulation_day,
+    return cast(
+        RufasTime,
+        SimpleNamespace(
+            current_simulation_year=sim_year,
+            current_julian_day=julian_day,
+            year_start_day=year_start_day,
+            year_end_day=year_end_day,
+            current_calendar_year=calendar_year,
+            simulation_day=simulation_day,
+        ),
     )
 
 
 @pytest.fixture(autouse=True)
-def restore_retention_config():
+def restore_retention_config() -> Generator[None, None, None]:
     """Snapshot and restore the AnimalConfig fields the policy reads (global class state)."""
     saved = (
         AnimalConfig.calf_retention_method,
@@ -231,63 +238,53 @@ def test_year_rollover_rebuilds_schedule_and_resets_ledger() -> None:
     assert policy._tags_fulfilled_this_year == 0  # fulfilled counter reset for the new year
 
 
-def test_finalize_day_warns_when_target_unmet() -> None:
+def test_finalize_day_warns_when_target_unmet(mocker: MockerFixture) -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
-    policy.om = SimpleNamespace(add_warning=_recording_warning())
+    mock_om = mocker.patch.object(policy, "om")
     policy._scheduled_year = 1
     policy._target_tags_this_year = 100
     policy._outstanding_tags = 20  # 20 > 5% of 100
 
     policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
 
-    assert policy.om.add_warning.calls, "expected a year-end warning for unfulfilled tags"
+    assert mock_om.add_warning.called, "expected a year-end warning for unfulfilled tags"
 
 
-def test_finalize_day_no_warning_when_target_met() -> None:
+def test_finalize_day_no_warning_when_target_met(mocker: MockerFixture) -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
-    policy.om = SimpleNamespace(add_warning=_recording_warning())
+    mock_om = mocker.patch.object(policy, "om")
     policy._scheduled_year = 1
     policy._target_tags_this_year = 100
     policy._outstanding_tags = int(100 * UNFULFILLED_TAG_WARNING_FRACTION)  # exactly at threshold, not above
 
     policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
 
-    assert not policy.om.add_warning.calls
+    assert not mock_om.add_warning.called
 
 
-def test_finalize_day_no_warning_before_year_end() -> None:
+def test_finalize_day_no_warning_before_year_end(mocker: MockerFixture) -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
-    policy.om = SimpleNamespace(add_warning=_recording_warning())
+    mock_om = mocker.patch.object(policy, "om")
     policy._target_tags_this_year = 100
     policy._outstanding_tags = 99
 
     policy.finalize_day(_time(sim_year=1, julian_day=200, year_end_day=365))
 
-    assert not policy.om.add_warning.calls
+    assert not mock_om.add_warning.called
 
 
-def test_hooks_are_noops_under_rate_method() -> None:
+def test_hooks_are_noops_under_rate_method(mocker: MockerFixture) -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
     AnimalConfig.keep_female_calf_num_annual = 365
     policy = CalfRetentionPolicy()
-    policy.om = SimpleNamespace(add_warning=_recording_warning())
+    mock_om = mocker.patch.object(policy, "om")
 
     policy.begin_day(_time(sim_year=1, julian_day=1, year_end_day=365))
     policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
 
     assert policy._outstanding_tags == 0
     assert policy._scheduled_year is None
-    assert not policy.om.add_warning.calls
-
-
-def _recording_warning():
-    """A tiny callable that records whether/how it was called (no MagicMock needed)."""
-
-    def _warn(*args, **kwargs):
-        _warn.calls.append((args, kwargs))
-
-    _warn.calls = []
-    return _warn
+    assert not mock_om.add_warning.called
