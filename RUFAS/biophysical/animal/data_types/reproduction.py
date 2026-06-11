@@ -62,7 +62,7 @@ class AnimalReproductionStatistics:
 
     Attributes
     ----------
-     ED_days: int
+    ED_days: int
         The number of days the animal has been in the ED program.
     estrus_count: int
         The number of estrus during the ED program.

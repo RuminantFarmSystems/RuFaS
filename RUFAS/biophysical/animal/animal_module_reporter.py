@@ -845,6 +845,48 @@ class AnimalModuleReporter:
         )
 
     @classmethod
+    def report_daily_reproduction_statistics(
+        cls, daily_herd_reproduction_statistics: HerdReproductionStatistics, simulation_day: int
+    ) -> None:
+        """
+        Adds daily herd reproduction statistics to OutputManager.
+
+        Reports the number of successful conceptions that occurred on the simulation day, at the
+        herd, heifer, and cow level. These daily values form a time series that can be summed over
+        any window (e.g. annually) for downstream analyses such as the economic layer. The
+        whole-simulation totals and conception rates are reported separately at end-of-simulation
+        (see ``report_end_of_simulation``).
+
+        Parameters
+        ----------
+        daily_herd_reproduction_statistics : HerdReproductionStatistics
+            Reproduction statistics accumulated over the current simulation day only.
+        simulation_day : int
+            Day of simulation.
+
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_reproduction_statistics.__name__,
+            "data_origin": [("HerdManager", "daily_update")],
+        }
+        om.add_variable(
+            "num_successful_conceptions",
+            daily_herd_reproduction_statistics.total_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions",
+            daily_herd_reproduction_statistics.heifer_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        om.add_variable(
+            "cow_num_successful_conceptions",
+            daily_herd_reproduction_statistics.cow_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+
+    @classmethod
     def report_daily_pen_total(
         cls, pen_id: str, pen_animal_name: str, number_of_animals_in_pen: int, simulation_day: int
     ) -> None:
