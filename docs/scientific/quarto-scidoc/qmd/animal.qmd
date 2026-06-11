@@ -153,13 +153,13 @@ import_table(
 
 #### Relevant Outputs
 
-- `number\_of_animals\_in\_pen\_[id]\_[AnimalCombination]` - reports the number of animals in each pen each day.
+- `number_of_animals_in_pen_[id]_[AnimalCombination]` - reports the number of animals in each pen each day.
 
-- `ration\_per\_animals\_for\_pen\_[id]\_[AnimalCombination]` - reports average dry matter intake of an animal in the pen at the time of the ration formulation.
+- `ration_per_animals_for_pen_[id]_[AnimalCombination]` - reports average dry matter intake of an animal in the pen at the time of the ration formulation.
 
-- `ration\_per\_animals\_for\_pen\_[id]\_[AnimalCombination].[RUFAS\_feed\_id]` - reports the amount of each feed that is delivered per animal in the pen.
+- `ration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id]` - reports the amount of each feed that is delivered per animal in the pen.
 
-- `ration\_nutrient\_amount\_for\_pen\_[AnimalCombination].[nutrient]` - is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated).
+- `ration_nutrient_amount_for\_pen_[AnimalCombination].[nutrient]` - is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated).
 
 
 
@@ -373,6 +373,7 @@ $$
 [See [AN.NRC.10](#eq-an-nrc-10)]{.aside .content-visible when-format="html"}
 
 **Growth** <br>
+
 * Lactating and Dry Cows - will continue to grow toward their mature body weight until the end of their second lactation.
 
 :::{#eq-an-nrc-13}
@@ -446,7 +447,6 @@ $$
 \dfrac{0.55 \times \text{MSBW} - \text{SBW}}
      {(\text{Age1stBred} - \text{Age}) \times 30.4},
 & \text{before breeding} \\[10pt]
-
 \dfrac{0.82 \times \text{MSBW} - \text{SBW}}
      {(\text{Age1st} - \text{Age}) \times 30.4},
 & \text{after breeding}
@@ -569,7 +569,6 @@ $$
 \text{NPg} =
 \begin{cases}
 0, & \text{if ADG = 0} \\[8pt]
-
 \text{ADG} \times
 \left(
 268 - 29.4 \times \frac{\text{NEg}}{\text{ADG}}
@@ -586,7 +585,6 @@ $$
 \begin{cases}
 \dfrac{83.4 - 0.114 \times \text{EQSBW}}{100},
 & \text{if EQSBW} \leq 478 \\[10pt]
-
 0.28908,
 & \text{otherwise}
 \end{cases}
@@ -608,7 +606,6 @@ $$
 \text{Npg} =
 \begin{cases}
 0, & \text{if ADG = 0} \\[8pt]
-
 \text{ADG} \times
 \left(
 268 - 29.4 \times \frac{\text{NEg}}{\text{ADG}}
@@ -625,7 +622,6 @@ $$
 \begin{cases}
 \dfrac{83.4 - 0.114 \times \text{EQSBW}}{100},
 & \text{if EQSBW} \leq 478 \\[10pt]
-
 0.28908,
 & \text{otherwise}
 \end{cases}
@@ -686,7 +682,6 @@ $$
 import_table(
   "../resources/table_data/animal/tbl-an-prot-req-var.csv",
   colalign = ["left", "left", "left"]
-
 )
 ```
 
@@ -752,6 +747,7 @@ $$
 :::
 
 *Phosphorus Equations*
+
 :::{#eq-an-nrc-42}
 [[**AN.NRC.42**]]{.aside .content-visible when-format="html"}
 $$
@@ -827,7 +823,6 @@ $$
 0.00007 \times (\text{DOP} - 1)^2
 \right),
 & \text{if DOP > 190} \\[10pt]
-
 0,
 & \text{otherwise}
 \end{cases}
@@ -856,7 +851,6 @@ $$
 0.000075 \times (\text{DOP} - 1)^2
 \right),
 & \text{if DOP > 190} \\[10pt]
-
 0,
 & \text{otherwise}
 \end{cases}
@@ -1792,7 +1786,6 @@ $$
 \right)
 \right.
 \\[6pt]
-
 \left.
 -
 0.02743
@@ -1808,7 +1801,6 @@ $$
 \right)
 \right),
 & \text{if DOP > 190} \\[12pt]
-
 0,
 & \text{otherwise}
 \end{cases}
@@ -1844,13 +1836,13 @@ $$
 \text{Milk}
 \times
 (0.496 + 0.13 \times \text{TPMilk}) \\[8pt]
-
 \text{Milk} \times 0.90
 \end{cases}
 $$
 :::
 
 **Total Requirements** <br>
+
 * Calcium Equations
 
 :::{#eq-an-nsm-48}
@@ -1992,7 +1984,8 @@ import_table(
 ```
 
 ##### Amino Acid Requirements
-The methods for estimating the amino acids requirements for lactating cows based on the @nrc2021, into RuFaS are described below.
+
+The methods for estimating the amino acids requirements for lactating cows based on the @nrc_2021, into RuFaS are described below.
 
 * Amino acids are divided into essential (EAA) and non-essential (NEAA).
 * This section will focus on calculating the requirements for the essential amino acids. The EAA and NEAA are listed in the next table.
@@ -2012,6 +2005,7 @@ The AA requirements for lactating cows are categorized into maintenance, growth,
 
 
 **Maintenance** <br>
+
 * Scurf Protein
 
 $$
@@ -2281,7 +2275,7 @@ In cases of ration formulation failure, a summary of the constraints that failed
 Ration formulation is carried out at the pen level on a user-defined formulation interval (@tbl-an-auto-ration-an-input). The mean requirements for a given pen are 
 calculated prior to first formulation, as described in [REF IV. Animal Nutrition and Feeding, A. Calculations of Animal Energy and Nutrient Requirement]{.mark}. 
 This process then proceeds to utilize a series of constraints methods (@tbl-an-ration-input-constr) that compares the animal requirements against the supply of the 
-optimizer’s ration attempt, as described in [REF IV. Animal Nutrition and Feeding, B. Calculations of Animal Energy and Nutrient Supply]{,mark}, all while 
+optimizer’s ration attempt, as described in [REF IV. Animal Nutrition and Feeding, B. Calculations of Animal Energy and Nutrient Supply]{.mark}, all while 
 abiding feed ingredient-specific inclusion rates, as defined in @nrc_2001 and @nrc_2021. If a ration cannot be formulated that meets the constraints given the pen-level 
 requirements and limits to inclusion rates, then one of the following things will happen.
 
@@ -3078,8 +3072,8 @@ $$
 $$
 :::
 
-* *l*, *m*, *n* = lactation curve parameters
-* *t* = DIM
+* l, m, n = lactation curve parameters
+* t = DIM
 
 ::: {.callout-note}
 Adjusted milk production = maximum of (calculated milk production + milk production variance - milk production reduction) or 0.
@@ -3190,15 +3184,201 @@ For more details on milk changes and reductions, go to the Milk Production and R
 
 ### Lactation Curve: Parameters and Definitions
 
-<!-- TODO -->
-
 #### Introduction
+
+The Lactation Curve Parameter Determination module calculates and adjusts Wood’s lactation curve parameters (l, m, n) based on farm-specific attributes such as
+geographic location, management practices, and production levels. These parameters shape the milk production curve for cows across different parities 
+(1st, 2nd, 3rd + lactations).
+    
+This module is part of the Animal Module and integrates with the Milk Production calculations. The outputs influence various downstream models, 
+including nutrient requirements, manure excretion, and greenhouse gas emission calculations.
+    
+The primary class in this module is:
+    
+`LactationCurve`: Manages and adjusts Wood’s lactation curve parameters.
+
 #### Required User Inputs
+
+The module retrieves input data from simulation configuration files and the Input Manager. These inputs are organized into groups based on their functional roles. 
+Each input is detailed by its parameter name, definition (including units where applicable), and any default values or constraints. 
+There are three categories on inputs that should be considered in this section: 
+
+* Wood's Lactation Curve Base Parameters [@Li_2022]
+* Adjustment Factors
+* Farm Specific 305 d Milk Production
+
+```{python}
+#| label: tbl-an-lac-woods
+#| tbl-cap: Wood's Lactation Curve base parameters, provide baseline values and variability.
+import_table(
+  "../resources/table_data/animal/tbl-an-lac-woods.csv",
+  colalign = ["left", "left", "center", "center"]
+
+)
+```
+
+```{python}
+#| label: tbl-an-lac-adjust
+#| tbl-cap: Adjustment factors based on geographical, temporal, and parity considerations.
+import_table(
+  "../resources/table_data/animal/tbl-an-lac-adjust.csv",
+  colalign = ["left", "left", "center", "center"]
+
+)
+```
+
+```{python}
+#| label: tbl-an-lac-milk-prod
+#| tbl-cap: Farm specific 305-day milk production, used to tailor the lactation curve to the farm's production targets and herd composition.
+import_table(
+  "../resources/table_data/animal/tbl-an-lac-milk-prod.csv",
+  colalign = ["left", "left", "center", "center"]
+
+)
+```
+
 #### Expected Outputs
+
+```{python}
+#| label: tbl-an-lac-outputs
+#| tbl-cap: Outputs for lactation curve.
+import_table(
+  "../resources/table_data/animal/tbl-an-lac-outputs.csv",
+  colalign = ["left", "left", "center"]
+
+)
+```
+
 #### Methodology
 
+**Determining Base Lactation Curve Parameters** (`set_lactation_parameters`) 
+
+The Wood’s lactation curve parameters are initialized with base values 
+retrieved from `lactation_inputs["parameter_mean_values"]` in `LACTATION_CURVE_ADJUSTMENT_INPUTS.json`.
+
+**Adjusting parameters** (`_calculate_adjusted_wood_parameters`) 
+
+Wood's lactation curve parameters are adjusted based on temporal, geographical, 
+and management factors [@Li_2022]. Each parameter (l, m, n) is adjusted using a series of modifications:
+
+::: {#eq-an-mlk.1}
+[[**AN.MLK.1**]]{.aside .content-visible when-format="html"}
+$$
+l_{adjusted} = l + \sum \text{adjustments} 
+$$
+:::
+
+::: {#eq-an-mlk.2}
+[[**AN.MLK.2**]]{.aside .content-visible when-format="html"}
+$$
+m_{adjusted} = m + scaling factor_m \times \sum \text{adjustments} 
+$$
+:::
+
+::: {#eq-an-mlk.3}
+[[**AN.MLK.3**]]{.aside .content-visible when-format="html"}
+$$
+n_{adjusted} = n + scaling factor_n \sum \text{adjustments} 
+$$
+:::
+
+Where:
+$$ 
+scaling factor_m = 10^{-2}
+$$
+
+$$
+scaling factor_n = 10^{-4}
+$$ 
+
+Adjustments are applied based on:
+
+* Region (using FIPS codes): `_get_region_adjustments` 
+* Year of simulation (adjusted for trends in milk production): `_get_year_adjustments`
+* Milking frequency (twice vs. thrice daily): `_get_milking_frequency_adjustments`
+* Parity (different lactation curves for different parities): `animal_parity`
+
+**Fitting Parameters to Target Milk Yield** (`_adjust_lactation_curve_to_milk_yield`) 
+
+If `annual_milk_yield` is provided, the l parameter is optimized to match the expected 305-day milk yield:
+
+* Estimate herd average 305-day milk yield:
+
+::: {#eq-an-mlk.4}
+[[**AN.MLK.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{Milk Yield}_{305} = \frac{\text{Annual Milk Yield}}{\text{Number of Milking Cows}} \times \frac{305}{\text{Days per year}}
+$$
+:::
+
+* Estimate parity specific 305-day milk yield: (`_estimate_305_day_milk_yield_by_parity`)
+
+::: {#eq-an-mlk.5}
+[[**AN.MLK.5**]]{.aside .content-visible when-format="html"}
+$$
+M305_{Herd} = (M305_{P1} \times P1\%) + (M305_{\text{P2}} \times P2\%) + (M305_{P3} times P3^+\%)
+$$
+:::
+
+::: {#eq-an-mlk.6}
+[[**AN.MLK.6**]]{.aside .content-visible when-format="html"}
+$$
+M305_{P2} = M305_{P1} \times 118\%
+$$
+:::
+
+::: {#eq-an-mlk.7}
+[[**AN.MLK.7**]]{.aside .content-visible when-format="html"}
+$$
+M305_{P3+} = M305_{P1} \times 125\%
+$$
+:::
+
 ::: {.callout-note}
-If there are any questions regarding calculations regarding calculations of maintenance AA requirements for Lactating Cows and/or Total AA requirement of Lactating or Late Gestation Cows and Heifers, please refer to Tables 6-2 and 6-4 in @nrc_2021.
+118% and 125% are assumptions made based on the work by @Li_2022.
+:::
+
+* Fit l Parameter Using Optimization: (`_fit_wood_l_param_to_milk_yield`). The error function is defined as: (`_calculate_305_day_milk_yield_error`)
+
+::: {#eq-an-mlk.8}
+[[**AN.MLK.8**]]{.aside .content-visible when-format="html"}
+$$
+\text{Error} = \text{Predicted MilkYield305} - \text{Target MilkYield305}
+$$
+:::
+
+Using Scipy's minimize function, the l parameter is iteratively adjusted to minimize this error.
+
+        
+* Final Lactation Curve Parameter Mapping. Once adjustments are made, parameters are stored in:
+
+`_parity_to_parameter_mapping` =   
+1: "l": ..., "m": ..., "n": ...,   
+2: "l": ..., "m": ..., "n": ...,   
+3: "l": ..., "m": ..., "n": ...  
+
+Equations below are not in the `LactationCurve` class, but they are useful to understanding the bigger picture of how lactation curve parameter estimates 
+are generated in RuFaS. Please see the Milk Production section for more details on these equations [@Wood1967].
+
+**Wood's Lactation Curve**
+
+[See [AN.MLK.9](#eq-an-mlk-9)]{.aside .content-visible when-format="html"}
+$$
+Y_t = l * t^{m} * e^{-nt}
+$$
+        
+Where:
+* Y(t): Daily milk yield
+* t: Time in days
+* l, m, n: Parameters adjusted for farm-specific conditions
+
+**305-Day Milk Yield**
+
+::: {#eq-an-mlk.10}
+[[**AN.MLK.10**]]{.aside .content-visible when-format="html"}
+$$
+\int_{l}^{305} lt^me^{-nt}dt
+$$
 :::
 
 ### Culling
@@ -3207,8 +3387,8 @@ If there are any questions regarding calculations regarding calculations of main
 
 This section describes the processes of animals leaving the herd in RuFaS. Reasons for leaving the herd are death or sale. 
 
+Sale may occur of:
 
-Sale may occur of: 
 * Calves: all male calves; female calves based on `keep_female_calf_rate`
 * Heifer IIs: if the heifer does not have a successful conception or pregnancy and age (days born) exceeds `heifer_repro_cull_time`
 * Heifer IIIs: if cow herd does not have room for additional heifers
@@ -3217,32 +3397,177 @@ Sale may occur of:
    * Production-related culling, which occurs when a cow has been labeled “Do Not Breed” due to reproductive failure past a designated 
    number of days in milk and then her milk production drops below a designated threshold
 
-Deaths that may occur: 
+Deaths that may occur:
+
 * Cows: determined by a statistical distribution of occurrence 
 * Stillborn calves 
 
 ::: {.callout-note}
-Stillborn calves are currently combined with calves sold at birth and reported as “calves sold”, 
+Stillborn calves are currently combined with calves sold at birth and reported as “calves sold”. 
 :::
 
 Information about death and sale events are tracked and aggregated daily, including the day of death or sale, body weight, cull reason, days in milk, and parity. 
 
 #### Required User Inputs
+
+```{python}
+#| label: tbl-an-cull-inputs
+#| tbl-cap: Inputs used to determine probability and timing of cow death and sales events.
+import_table(
+  "../resources/table_data/animal/tbl-an-cull-inputs.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+
+)
+```
+::: {.callout-note}
+Variables marked with * are commonly left at default values. Adjusting them changes the timing of cow exit from the herd but does not affect the total number of exits.
+:::
+
 #### Expected Outputs
+
+Information about death and sales events are tracked and aggregated daily by HerdManager, including the animal type, day of death or sale, body weight, cull reason, days in milk, and parity. 
+    
+All of the following are reported by AnimalModuleReporter: 
+
+* `Report_life_cycle_manager_data` - is reported on a daily basis for the numbers of calves, HeiferII, HeiferIII, and Cow sold (calves born deceased tracked as newborns sold). It also reports HeiferIII purchased and documents other cow culls (i.e. sold and died). Culling data is also reported here documenting the average age of cows and HeiferII culled and the reason (e.g. death, poor production, lameness, injury, mastitis, disease, udder, or unkown/other).
+* `Report_sold_animal_information` - this data is reported at the end of a simulation. It creates a list of all animals sold and reports their ID number, type, body weight, day sold (simulation day), cull reason, days in milk, and parity. 
+* `Report_sold_animal_information_sort_by_sell_day` - also reported at the end of a simulation to document the overall number and weight of animals sold on that simulation day. It reports zero's for days on which no animal of that type was sold. This enables using report filters to slice and summarize sales statistics by animal type for a specified time period (e.g., number and body weight of cows sold over the last 365 days of the simulation).
+
 #### Methodology
+
 ##### Cow Deaths
+
+At the beginning of each lactation, each cow “rolls the dice” to determine if +/- when she will die in the current lactation. 
+    
+Probability of death associated with each lactation (1, 2, 3, 4+) is specified at the beginning of the simulation as a user input. At the beginning of each lactation for each cow, it is determined whether she will die during that lactation with a random draw compared with the appropriate probability. Then, for individuals assigned to die during that lactation, an empirical Cumulative Distributive Function (CDF) is used to determine on which day the death will occur based on the probability of death occurring during each interval of the lactation. 
+
+The values for the CDF determining probability of death by day of lactation are located in the animal input json file (`death_day_prob`; @tbl-an-cull-cdf).
+
 **User Inputs and Constants**
-**Parameters and Equations**
-##### Cow Sales
-###### Disease Related
-**User Inputs and Constants**
-**Parameters and Equations**
-###### Production Related
-**User Inputs and Constants**
+
+* Parity death probability: `parity_death_prob` 
+   * Probability of death during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
+* Death day probability: `death_day_prob`
+   * Values to construct the CDF to determine future death day, given that death is going to occur (default values in @tbl-an-cull-cdf) 
+   * Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days” in the table below){.mark} 
+
 **Parameters and Equations**
 
+Determination of death date (once already determined that death will occur this lactation): 
+
+::: {#eq-an-anm.1}
+[[**AN.ANM.1**]]{.aside .content-visible when-format="html"}
+$$
+X = x_{\text{i-1}} + a_{\text{i}} \times (R - c_{\text{i-1}})
+$$
+:::
+
+Where:
+
+* R = random float number between 0-1
+* $c_{\text{i-1}},c_{\text{i}}$ = the upper and lower values around R in the death day prob CDF
+* $x_{\text{i-1}},x_{\text{i}}$ = days, corresponds to $c_{\text{i-1}},c_{\text{i}}$
+
+Empirical CDF: 
+$a_{\text{i}} = \frac{x_{\text{i-1}},x_{\text{i}}}{c_{\text{i-1}},c_{\text{i}}}$ 
+
+* `Animal.determine_future_death_date`
+  * Called by `Animal.daily_routines()` at the beginning of each new lactation (on the day a new calf is born).
+  * Returns calculated future death date in simulation days or `sys.maxsize` (effectively no death date).
+  * Logic: Draw random value between 0-1 and compare it to probability of death in that lactation group (`parity_death_probability`).
+    * If drawn value \(\leq \) `parity_death_probability`, then go on to select date that death will occur - draws another random value between 0-1.
+    * Compares random draw to the CDF defined by `death_day_prob` array to determine number of days into the future at which death will occur - adds that number of days to current days born to determine future death date.
+    * If drawn value \( > \) `parity_death_probability`, then future death date is assigned as `sys.maxsize` (a really really big number – effectively, she will never reach her assigned future death date).
+* `Animal.animal_life_stage_update()` 
+   * Called by `HerdManager.daily_routines()` → `Animal.daily_routines()`
+   * Updates the animal status to DEAD if days born = future death date
+
+##### Cow Sales
+
+###### Disease Related
+
+At the beginning of each lactation, each cow “rolls the dice” to determine if +/- when and for what attributed reason she will be sold for disease-related reasons (i.e., involuntary, not directly for production/reproduction reasons) in the current lactation.   
+        
+Probability of disease sales associated with each lactation (1, 2, 3, 4+) is specified at the beginning of the simulation as a user input. At the beginning of each lactation for each cow, it is determined whether she will be sold for disease during that lactation with a random draw compared with the appropriate probability. Then, for individuals assigned to be sold during that lactation, another random draw determines the reason for that sale from one of six possibilities (See Table 4){.mark}. Finally, an empirical CDF is used to determine the day of sale based on the probability of sale occurring during each interval of the lactation for that particular sale reason. 
+
+**User Inputs and Constants**
+
+* Parity cull probability: `parity_cull_prob` 
+   * Probability of sale for disease during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
+* PFor each of the six reasons:
+   * `Probability` - Conditional probability that a sold animal is removed due to each group of issues. This probability is used to determine the reason for sale after it has been decided that the animal will be sold during the current lactation. The sum of probabilities for the six culling reasons equals 1. See Table 2{.mark} below for default values used to construct the empirical PDF.
+  * `Cull_day_prob`: Values to construct the CDF to determine future sale day, given that disease-related sale is going to occur. Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days”; default values in Table 4{.mark}) 
+
+```{python}
+#| label: tbl-an-cull-cdf
+#| tbl-cap: Cumulative Distribution Function (CDF) values associaed. with the conditional probability that a sold animal is removed due to each group of issues and/or the conditional probability of death over time.
+import_table(
+  "../resources/table_data/animal/tbl-an-cull-cdf.csv",
+  colalign = ["left", "center", "center", "center", "center"]
+
+)
+```
+ Corresponds to the “probability” value for each cull reason in the animal input json file. The 'cull\_day\_count' array defines the segments of the CDF}
+
+**Parameters and Equations**
+
+Determination of sale date (once already determined that death will occur this lactation): 
+
+We compute the sale day of Cow X as follows
+
+::: {#eq-an-anm.2}
+[[**AN.ANM.2**]]{.aside .content-visible when-format="html"}
+$$
+X = x_{\text{i-1}} + a_{\text{i}} * (R - c_{\text{i-1}})
+$$
+:::
+
+Where:
+
+* R = random float number between 0-1  
+* $c_{\text{i-1}},c_{\text{i}}$ = the upper and lower values around R in the sale day prob CDF
+* $x_{\text{i-1}},x_{\text{i}}$ = days, corresponds to $c_{\text{i-1}},c_{\text{i}}$
+* Empirical CDF: $a_{\text{i}} = \frac{x_{\text{i-1}},x_{\text{i}}}{c_{\text{i-1}},c_{\text{i}}}$ 
+
+* `Animal.determine_future_cull_date()`
+   * Called by by `Animal.daily_routines()` at the beginning of each new lactation (on the day a new calf is born)
+   * Returns a tuple with future cull (sale) date in simulation days and reason for culling
+   * Logic: Draw random value between 0-1 and compare it to probability of death in that lactation group (`parity_death_probability`)
+      * If drawn value \(\leq \) p`arity_death_probability`, then go on to select date that death will occur - draws another random value between 0-1
+      * Compares random draw to the CDF defined by `death_day_prob` array to determine number of days into the future at which death will occur - adds that number of days to current days born to determine future death date 
+      * If drawn value \( > \) `parity_death_probability`, then future death date is assigned as `sys.maxsize` (a really really big number – effectively, she will never reach her assigned future death date)
+* `Animal.animal_life_stage_update()` 
+   * Called by `HerdManager.daily_routines()` → `Animal.daily_routines()`
+   * Updates the animal status to SOLD if days born = future cull date
+
+###### Production Related
+
+If a cow is not pregnant when she reaches the days in milk cutoff specified by the user, she will be marked as Do Not Breed and no longer participate in reproductive protocols. When her milk production drops below the production cutoff specified by the user, she is sold for the reason of low production. Note that the only cows who are sold for “low production” are those flagged as DNB for reproductive failure; no low-producing cow who is pregnant or has fewer DIM than the cutoff will be sold for low production. 
+
+**User Inputs and Constants**
+
+* `Do_not_breed_time`: The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant
+* `Cull_milk_production`: Milk production threshold at which 'do not breed' cows are culled if they fall below (in kg/d)
+
+**Parameters and Equations**
+
+* `Reproduction._check_do_not_breed_flag()`
+   * Checks if a cow should be marked as do-not-breed if not pregnant beyond the user-defined breeding window 
+   * Called by cow reproduction update() in Reproduction.py 
+   * If not pregnant and DIM \(>\) `do_not_breed_time` and not already `do_not_breed`:
+      * Updates `reproduction_data_stream` with do not breed event
+      * Updates `self.do_not_breed` to true
+* `Animal.life_stage_update()`
+   * Updates the life stage of an animal based on its type and current simulation time
+   * Called by `Animal.daily_routines()` 
+   * Includes the following logic: 
+      * If a cow is `do_not_breed` and daily milk produced is less than user-defined `cull_milk_production`: 
+         * `Sold_at_day` = `simulation_day` 
+         * `Cull_reason` = `low_prod_cull`
+         * `Animal_status` = sold 
+
 ::: {.callout-note}
-If there are any questions regarding calculations regarding calculations of maintenance AA requirements for Lactating Cows and/or Total AA requirement of Lactating or Late Gestation Cows and Heifers, please refer to Tables 6-2 and 6-4 in @nrc_2021.
+If a cow is not pregnant when she reaches the days in milk cutoff specified by the user, she will be marked as Do Not Breed and no longer participate in reproductive protocols. When her milk production drops below the production cutoff specified by the user, she is sold for the reason of low production. Note that the only cows who are sold for “low production” are those flagged as DNB for reproductive failure; no low-producing cow who is pregnant or has fewer DIM than the cutoff will be sold for low production.
 :::
 
 ## Methane Emission and Manure Excretion

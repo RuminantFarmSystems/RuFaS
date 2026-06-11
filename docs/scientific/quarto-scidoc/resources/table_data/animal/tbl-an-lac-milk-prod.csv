@@ -1,0 +1,4 @@
+﻿Variable , Definition , Units , Default
+parity_fractions, Fraction of cows by lactation parity , -- , Parity 1: 0.346; Parity 2: 0.272; Parity 3+: 0.379
+annual_milk_yield, Target annual milk yield to fit the lactation curve , kg , Null
+milking_cow_fraction, Fraction of cows that are milking, -- , 0.8365
