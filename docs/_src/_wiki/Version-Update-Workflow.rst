@@ -1,5 +1,5 @@
 Maintainer Team Workflow and Communication during a Version Update
-==================================================================
+=================================================================
 
 This page describes the process that RuFaS Maintainers use to communicate
 and execute a version update.
@@ -47,7 +47,7 @@ After ``test`` is updated
 
 
 **Patch** Updates
------------------
+----------------
 
 Patch updates do not require a sceintific review of the model functionality or an updated technical report. The release notes should include a brief summary of the fixes included in the updated. 
 
