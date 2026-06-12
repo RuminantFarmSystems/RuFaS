@@ -395,7 +395,7 @@ v1.0.0
 - [2744](https://github.com/RuminantFarmSystems/RuFaS/pull/2744) - [minor change] [NoInputChange] [NoOutputChange] Update the OM and RG wiki with new report filter options.
 - [2881](https://github.com/RuminantFarmSystems/RuFaS/pull/2881) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
 - [2964](https://github.com/RuminantFarmSystems/RuFaS/pull/2964) - [minor change] [NoInputChange] [NoOutputChange] Patched a missing comma in freestall task input
-
+- [3091](https://github.com/RuminantFarmSystems/RuFaS/pull/3091) - [minor change] [InputChange] [OutputChange] Fixes large seedbed conditioner entry in `tractor_dataset.csv` input.
 
 ### v0.9.2
 
