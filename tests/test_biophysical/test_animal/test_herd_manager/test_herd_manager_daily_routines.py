@@ -77,7 +77,9 @@ def test_update_sold_animal_statistics(
     sold_and_died_cows = mock_herd["lac_cows"]
 
     herd_manager._update_sold_animal_statistics(
-        sold_newborn_calves=sold_newborn_calves, sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
+        sold_newborn_calves=sold_newborn_calves,
+        sold_heiferIIs=sold_heiferIIs,
+        sold_and_died_cows=sold_and_died_cows,
     )
 
     mock_update_sold_newborn_calves.assert_called_once_with(sold_newborn_calves)
@@ -690,13 +692,15 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         call(mock_time, herd_manager.cows),
     ]
     mock_update_sold_animal_statistics.assert_called_once_with(
-        sold_newborn_calves=[], sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
+        sold_newborn_calves=[],
+        sold_heiferIIs=sold_heiferIIs,
+        sold_and_died_cows=sold_and_died_cows,
     )
     assert mock_check_if_cows_need_to_be_sold.call_count == 0
     assert mock_check_if_replacement_heifers_needed.call_count == 0
     assert mock_update_herd_structure.call_count == 1
     mock_record_pen_history.assert_called_once_with(mock_time.simulation_day)
-    mock_update_herd_statistics.assert_called_once_with()
+    mock_update_herd_statistics.assert_called_once_with(mock_time.simulation_day)
     mock_report_manure_streams.assert_called_once()
     mock_report_manure_excretions.assert_called_once()
     mock_report_milk.assert_called_once()
