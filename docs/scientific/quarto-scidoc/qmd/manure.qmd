@@ -9,17 +9,477 @@
 
 
 
-## Manure Handler
+## Manure Handler {#sec-ma-hdl}
 
-### Introduction 
+### Introduction
+
+Manure handling refers to the method of managing manure in animal living spaces. For some housing/pen types,
+such as freestalls and tiestalls, this involves removing the manure from barn alleyways, and is usually
+accomplished using some form of scraping or flushing with water. Flush systems utilize water to remove the manure
+from alleyways, whereas scrape systems use little or no water. For other housing types like open lots and
+compost bedded pack barns, tillage or harrowing are commonly used to instead incorporate the manure, urine,
+bedding (if applicable) and air into the pack and allow it to dry.
+
+The specific manure handler options in the RuFaS model are:
+
+* **Flushing**
+
+  Flushing involves using water to carry manure and soiled bedding away from housing areas. A series of pipes
+  and channels direct water to wash the manure into a collection pit. Flushing helps maintain a cleaner
+  environment for animals and reduces the buildup of manure on the floor. Flushing/recirculating may also be
+  used to "lubricate" transport/pumping of manure from under-floor collection pits to the next manure
+  management step. Flushing is commonly performed using recycled water from a solid liquid separator, liquid
+  manure storage, or other liquid collection area, rather than using fresh water.
+
+* **Manual Scraping**
+
+  Scraping involves physically removing the manure and soiled bedding using equipment like tractor-mounted
+  scrapers or skid steers, or the manual use of shovels/scrapers, etc. This method is typically used in barns
+  with slatted or solid floors. Regular scraping prevents manure accumulation and provides a clean area for
+  animals.
+
+* **Alley Scraper**
+
+  A scraper blade, typically pulled along by a chain or cable, moves slowly down a pen or alleyway on a set
+  schedule several times a day, pushing or pulling manure out of the pen/alley. The function and outcome is
+  similar to manual scraping, but alley scrapers are mechanized and typically operate automatically.
+
+* **Parlor Cleaning**
+
+  Parlor cleaning is a RuFaS-specific handler that represents cleaning of manure from milking units, parlor
+  stall floors, and other areas in the milking parlor that require the use of fresh, non-recycled water.
+  Parlor cleaning also can include an optional flush system capability, which functions in the same manner as
+  the flush system described above and is used to wash manure from holding area floors.
+
+Manure handlers in RuFaS have two primary functions: calculate and add cleaning water if used, and calculate
+indoor housing emissions of $\text{CH}_4$, $\text{CO}_2$, and $\text{NH}_3$ if applicable.
+
+The following are important assumptions made in the manure handler submodules, as well as context on how
+manure handlers are used in the larger manure management chain:
+
+1. All manure excreted and all bedding applied each day (if applicable) is assumed to be recovered by the
+manure handler.
+
+2. Manure handlers in RuFaS are intended to be utilized, at this time, with manure deposited in housing areas
+that is cleaned frequently (e.g., removed daily or every few days), such as indoor barn floors, or concrete
+feed alleys in open lot or compost bedded pack pens. Handlers should not be used in manure streams where
+manure resides for a long period of time, such as streams representing an open lot or bedded pack manure
+pack, that have a designated processor (i.e., Open Lot or Bedded Pack). Users can consider the manure
+handler functionality to be "built in" to these processors. Defining a handler prior to one of these types
+of processors will result in double-counting of housing emissions.
+
+3. If a manure handler is used, it must be defined first in the manure management chain. This prevents
+inappropriate calculation of housing emissions "downstream" when manure is no longer in the animal housing
+area. Handlers are meant to represent manure handling in animal living spaces; other manure
+handling/transport systems such as pumps, augers, belts, etc. are not explicitly modeled in RuFaS.
+
+#### Classes
+
+```{python}
+#| label: tbl-ma-hdl-classes
+#| tbl-cap: The classes of handlers that are used in this module.
+import_table(
+  "../resources/table_data/manure/tbl-ma-hdl-classes.csv",
+  colalign = ["left", "left"]
+)
+```
+
+#### Required User Inputs
+
+```{python}
+#| label: tbl-ma-hdl-inputs
+#| tbl-cap: "Required inputs for the Manure Handler (refreshed_manure_management.json)."
+import_table(
+  "../resources/table_data/manure/tbl-ma-hdl-inputs.csv",
+  colalign = ["left", "left", "left"]
+)
+```
+
+#### Other Inputs
+
+Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the
+manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg
+except for volume, $m^3$ and manure methane potential, $m^3/kgVS$):
+
+* water
+* ammoniacal_nitrogen
+* nitrogen
+* phosphorus
+* potassium
+* ash
+* manure_degradable_volatile_solids
+* manure_non_degradable_volatile_solids
+* bedding_non_degradable_volatile_solids
+* total_solids
+* mass (equal to sum of water and total solids)
+* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
+* volume
+* methane_production_potential
+
+Manure handlers also make use of information contained in the `PenManureData` subclass. This includes the
+following information specific to the pen from which the manure was generated:
+
+* `num_animals`: number of animals in the pen
+* `animal_combination`: type of animals in the pen (calves, growing post-weaning heifers through closeup period, closeup (cows and heifers within user-defined closeup period), or lactating cows)
+* Manure deposition surface area (m^2): surface area soiled with manure. See section below on determining soiled surface area
+* `pen_type`: the type of pen the manure was generated in (freestall, tiestall, open lot, or bedded pack barn)
+* `daily_urine` (kg): mass of urine in the manure
+* `urine_nitrogen` (kg): mass of urine N in the manure
+* `stream_type`: the type of manure stream the manure is in (parlor or general stream)
+
+::: {.callout-note}
+Note that `stream_type` is not a user input, it is automatically assigned. Parlor streams are created
+automatically and all other streams are assigned "general".
+:::
+
+#### Expected Outputs
+
+* All handler types:
+  * `ManureStream` variables
+  * `total_cleaning_water_volume` ($m^3$): total volume of fresh (non-recycled) cleaning water used for,
+  and ultimately added to, a single manure stream on a single simulation day by the manure handler
+  * `barn_temperature` (°C): ambient temperature in barn
+
+* Alley scraper, manual scraping, flush system:
+  * `housing_methane` (kg): daily $\text{CH}_4$ (kg) emitted from manure on barn floors
+  * `housing_ammonia_N_emissions` (kg): daily $\text{NH}_3$-N (kg) emitted from manure on barn floors
+  * `housing_carbon_dioxide` (kg): daily $\text{CO}_2$ (kg) emitted from manure on barn floors
 
 ### Methodology
 
-#### Relevant Inputs
+#### Calculate barn temperature
 
-#### Relevant Outputs
+`_determine_barn_temperature`
+
+Air temperature inside barns is, in general, slightly cooler than the outdoors during the day, and
+slightly-to-considerably warmer than the outdoor temperature overnight, depending on the season. With this,
+basic bounds were implemented in the determination of barn temperature. These bounds were suggested by manure
+SMEs and are supported by barn temperature ranges reported in @Bucklin2009 (Florida, upper limit). The lower
+bound (5°C) suggested by SMEs was based on general industry standards/conditions.
+
+* If ambient (outdoor) air temperature < 5°C, barn temperature = 5°C
+* If ambient (outdoor) air temperature > 5° & < 30°C, barn temperature = air temperature
+* If ambient (outdoor) air temperature > 30°C, barn temperature = 30°C
+
+#### Calculate cleaning/flushing fresh water addition
+
+`determine_handler_cleaning_water_volume`
+
+The following method calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately
+added to, a single manure stream on a single simulation day by the manure handler. This method is used in
+all handler types; however, for parlor cleaning handlers, this method is only utilized if `use_parlor_flush`
+is entered as true. If no water is used with the handler (user inputted cleaning water use rate = 0), the
+function will return 0.
+
+:::{#eq-ma-hdl-1}
+[[**MN.HDL.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{cleaning\_water (L)} = \text{num\_animals} \times \text{cleaning\_water\_use\_rate} \times (1 - \text{cleaning\_water\_recycle\_fraction})
+$$
+:::
+
+When:
+
+* `num_animals`: the number of animals in the pen assigned to the handler
+* `cleaning_water_use_rate` (L/animal/d): the user-provided cleaning water use rate for the handler
+* `cleaning_water_recycle_fraction`: the proportion of cleaning water that is from recycled, non-fresh sources
+
+Total fresh water added to manure (L) each day is calculated as follows:
+
+:::{#eq-ma-hdl-2}
+[[**MN.HDL.2**]]{.aside .content-visible when-format="html"}
+$$
+\text{total\_cleaning\_water (m}^3\text{)} = (\text{cleaning\_water (L)} + \text{fresh\_water\_volume\_used\_for\_milking (L)}) \times \text{LITERS\_TO\_CUBIC\_METERS}
+$$
+:::
+
+When:
+
+* `LITERS_TO_CUBIC_METERS`: a constant set to 0.997 kg/m$^3$
+
+#### Calculate milking parlor fresh water addition
+
+The following method calculates the volume of fresh water used for, and ultimately added to, a single manure
+stream on a single simulation day by the manure handler for parlor cleaning/sanitation purposes. This
+calculation occurs only in the parlor_cleaning handler and water added is considered to be 100% fresh,
+non-recycled water, as fresh water is required for cleaning of milking units, floors, etc. The function is
+implicit (occurs automatically with any manure stream assigned to the parlor cleaning handler type) and is
+based at this time on a default value fresh water use rate.
+
+:::{#eq-ma-hdl-3}
+[[**MN.HDL.3**]]{.aside .content-visible when-format="html"}
+$$
+\text{fresh\_water\_volume\_used\_for\_milking (L)} = \text{num\_animals} \times \text{MILKING\_FRESH\_WATER\_USE\_RATE}
+$$
+:::
+
+When:
+
+* `num_animals`: the number of animals in the pen assigned to the handler
+* `MILKING_FRESH_WATER_USE_RATE` (30.0 L/animal/d): the default fresh water use rate for cleaning equipment/floors in the milking parlor
+
+#### Calculate housing emissions
+
+The calculation of housing emissions according to the methods described below is applicable only to areas
+where manure resides for short periods of time, i.e., tiestall and freestall housing systems, or, in open
+lot or bedded pack pens, manure deposited in a feed alley, exercise lot, etc. Housing emissions from bedded
+packs and open lot manure packs, where manure accumulates over weeks or months, are determined according to
+alternative methods due to the longer-term residence of manure in these pen types; see respective bedded
+pack barn and open lot documentation files for further info.
+
+The methodology used to calculate housing emissions is adapted from the IFSM [@Rotz2023]. Of note is that
+the equations described here were determined based on emissions from tiestall and freestall housing systems.
+In RuFaS, these equations may also be applied to determine emissions from manure deposited in other concrete
+areas and retained for a short time, such as open lot or bedded pack feed alleys. These systems were not
+represented in the original datasets used to generate these equations, and results should be interpreted
+with caution; however, the portion of manure deposited in feed alleys or other areas is relatively small,
+and emissions from this area are expected to be a small contributor to total GHG and nutrient losses.
+
+Additionally, the following calculations are only utilized by the manual scraping, flush system, and alley
+scraper handler types. For the parlor cleaning handler type, manure in a parlor is assumed to be cleaned
+from floors/surfaces frequently and thus housing emissions should not be estimated.
+
+#### Calculate housing $\text{CH}_4$ emissions
+
+Manure deposited on barn floors or other housing areas is a small source of $\text{CH}_4$ emissions. The
+following method, from @Chianese2009a, is an empirically-derived equation consisting of a simple
+relationship between manure $\text{CH}_4$ emission rate, ambient temperature in the barn, and surface area
+covered by manure.
+
+::: {.callout-note}
+The soiled surface area (m^2) value is calculated in the Animal module, using pen-level information (number
+of stalls, number of cows, etc.) and the soiled surface area value is passed to the manure module directly.
+As no housing emissions are considered to be emitted in the milking parlor, the total soiled surface area
+for each pen is apportioned to the pen's general manure streams(s) based on the user-provided stream
+proportion value(s).
+:::
+
+The total surface area soiled with manure, based on the total number of animals, is as follows:
+
+:::{#eq-ma-hdl-4}
+[[**MN.HDL.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{soiled\_surface\_area (m}^2\text{)} = \text{num\_stalls} \times \text{surface\_area (m}^2/\text{animal)}
+$$
+:::
+
+When:
+
+* `num_stalls`: the number of stalls in the pen assigned to the handler
+* `surface_area` (m^2/animal): surface area per stall, provided in @tbl-ma-hdl-surface-area.
+
+```{python}
+#| label: tbl-ma-hdl-surface-area
+#| tbl-cap: The surface area per stall that is covered with manure is a function of the pen type and type of animal housed.
+import_table(
+  "../resources/table_data/manure/tbl-ma-hdl-surface-area.csv",
+  colalign = ["left", "center", "center"]
+)
+```
+
+We use this surface area value to determine $\text{CH}_4$ emissions (kg) each day:
+
+:::{#eq-ma-met-1}
+[[**MN.MET.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{housing\_CH}_4\text{ (kg)} = \max(0.0, 0.13 \times \text{barn\_temperature (C)}) \times \frac{\text{soiled\_surface\_area (m}^2\text{)}}{1000}
+$$
+:::
+
+When:
+
+* `barn_temperature` (°C): ambient air temperature in the barn. Note that the max notation ensures that the
+temperature scaling parameter cannot be less than 0.13.
+* `soiled_surface_area` (m^2): the total surface area soiled with manure
+
+#### Calculate housing $\text{CO}_2$ emissions
+
+Housing $\text{CO}_2$ emissions are estimated similarly to $\text{CH}_4$ emissions, using an empirical
+equation based on soiled surface area and barn air temperature.
+
+:::{#eq-ma-hdl-5}
+[[**MN.HDL.5**]]{.aside .content-visible when-format="html"}
+$$
+\text{housing\_CO}_2\text{ (kg)} = \max(0.0, 0.0065 + \text{barn\_temperature (C)}) \times \text{soiled\_surface\_area (m}^2\text{)}
+$$
+:::
+
+When:
+
+* `barn_temperature` (°C): ambient air temperature in the barn. Note that the max notation ensures that the
+temperature scaling parameter cannot be less than 0.13.
+* `soiled_surface_area` (m^2): the total surface area soiled with manure
+
+#### Calculate volatile solids losses
+
+The total quantity of VS loss through microbial degradation is estimated based on $\text{CH}_4$ emissions.
+
+:::{#eq-ma-hdl-6}
+[[**MN.HDL.6**]]{.aside .content-visible when-format="html"}
+$$
+\text{total\_VS\_loss (kg)} = \text{housing\_CH}_4\text{ (kg)} \times \text{VS\_TO\_METHANE\_LOSS\_RATIO}
+$$
+:::
+
+When:
+
+* `housing_CH4` (kg): daily emissions of $\text{CH}_4$ from manure on barn floors, calculated in [MN.MET.1](#eq-ma-met-1).
+* `VS_TO_METHANE_LOSS_RATIO` (kg): a constant set to 6.665 representing the kg of total VS degraded per kg
+of $\text{CH}_4$ emitted from manure. See the Slurry Storage section for more information on derivation of
+this constant.
+
+The fraction of volatile solids lost from the manure degradable (VSd) and non-degradable VS (VSnd) fractions
+is assumed to be equal to the proportion of these fractions in manure entering the processor. No VS losses
+are attributed to bedding VSnd in manure handlers.
+
+:::{#eq-ma-adg-7}
+[[**MN.ADG.7**]]{.aside .content-visible when-format="html"}
+$$
+\text{degradable\_VS\_frac} = \left(\frac{\text{degradable\_VS}}{\text{total\_VS}}\right)
+$$
+:::
+
+#### Calculate housing $\text{NH}_3$ emissions
+
+Ammonia N loss from manure is predicted using methods based on @Rotz2006. Here, estimated
+$\text{NH}_3$-N volatilized from the surface of manure is based on a function where the $\text{NH}_3$-N is
+transported to the free atmosphere through a pathway with a finite resistance. Daily $\text{NH}_3$-N loss
+depends primarily on pen type (which determines soiled surface area), manure TAN content, and barn air
+temperature. The same base equation for $\text{NH}_3$-N volatilization is utilized for estimation of both
+housing and storage $\text{NH}_3$-N emissions.
+
+In the original work of @Rotz2006, housing $\text{NH}_3$-N emissions are based only on urine (not manure)
+TAN concentration, rather than total manure (urine + feces) TAN. Within RuFaS, urine nutrients are not
+tracked separately from feces/manure. Therefore, the model assumes, for simplicity, that all TAN originates
+from urine and thus animal-excreted urine TAN = manure TAN. However, to maintain consistency with
+documentation, what would ordinarily in RuFaS be referred to as manure TAN within RuFaS is referred to here
+as urine TAN, though urine mass here (kg/d) is reflective of actual estimated manure mass, not manure
+(urine + feces) mass.
+
+* First, we need to derive the value of the equilibrium coefficient Q for the $\text{NH}_3$ gas in the air
+for a given concentration of TAN in stored slurry using Henry's law of distribution.
+
+::: {.callout-note}
+The concentration of $\text{NH}_3$ in the free atmosphere is assumed to be zero. Since Q is a function of
+the Henry's law coefficient $K_h$ and a dissociation of ammonium coefficient $K_a$, we will calculate those
+first.
+:::
+
+**Henry's law coefficient ($K_h$)**
+
+:::{#eq-ma-amm-1}
+[[**MN.AMM.1**]]{.aside .content-visible when-format="html"}
+$$
+K_h = 10^{\frac{1478}{\text{barn\_temperature} - 1.69}}
+$$
+:::
+
+When:
+
+* Barn temperature (K): ambient air temperature in the barn
+
+**Dissociation coefficient of ammonium ($K_a$)**
+
+:::{#eq-ma-amm-2}
+[[**MN.AMM.2**]]{.aside .content-visible when-format="html"}
+$$
+K_a = 1 + 10^{\left(0.09018 + \left(\frac{2729.9}{\text{barn\_temperature}} - \text{pH}\right)\right)}
+$$
+:::
+
+When:
+
+* Barn temperature (K): ambient air temperature in the barn
+* pH: the pH of the manure solution, set to 7.5 by default
+
+**Equilibrium coefficient (Q)**
+
+:::{#eq-ma-amm-3}
+[[**MN.AMM.3**]]{.aside .content-visible when-format="html"}
+$$
+Q = K_h \times K_a
+$$
+:::
+
+When:
+
+* $K_h$: Henry's law coefficient, calculated in [MN.AMM.1](#eq-ma-amm-1).
+* $K_a$: Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#eq-ma-amm-2).
+
+* Second, we determine the effective total resistance value of $\text{NH}_3$ transport from manure solution
+to the surface and from the manure surface to the atmosphere.
+
+:::{#eq-ma-amm-4}
+[[**MN.AMM.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{ammonia\_resistance} = \text{HOUSING\_SPECIFIC\_CONSTANT} \times (1 - 0.027 \times (20.0 - \text{barn\_temperature}))
+$$
+:::
+
+When:
+
+* `HOUSING_SPECIFIC_CONSTANT`: a housing-specific constant value, set to 260 s/m.
+* Barn temperature (°C): ambient air temperature in the barn.
+
+* Next, the rate of $\text{NH}_3$-N loss in kg N/m^2 from manure on the barn floor is calculated:
+
+:::{#eq-ma-amm-5}
+[[**MN.AMM.5**]]{.aside .content-visible when-format="html"}
+$$
+\text{NH}_3\text{N emission rate (kg N/m}^2\text{)} = \frac{\text{TAN} \times c \times y}{r \times M \times Q}
+$$
+:::
+
+When:
+
+* TAN (kg N/m^2): Mass of ammoniacal N in barn floor manure
+* c: time conversion constant (86400 s per d)
+* y: manure density, set to 990 kg/m^3
+* r: the resistance of $\text{NH}_3$ transfer from solution to manure surface, and from manure surface to
+atmosphere, determined in [MN.AMM.4](#eq-ma-amm-4)
+* M: urine mass (received from animal module)
+* Q: equilibrium coefficient, calculated in [MN.AMM.3](#eq-ma-amm-3)
+
+* Lastly, we calculate total $\text{NH}_3$-N emissions (kg), based on the emission rate we just calculated
+and the soiled surface area.
+
+:::{#eq-ma-amm-7}
+[[**MN.AMM.7**]]{.aside .content-visible when-format="html"}
+$$
+\text{NH}_3\text{N emissions (kg)} = \text{NH}_3\text{N\_rate} \times \text{soiled\_surface\_area}
+$$
+:::
+
+When:
+
+* $\text{NH}_3$N_rate (kg N/m^2): Rate of $\text{NH}_3$-N loss (kg/m^2) from manure, calculated in [MN.AMM.5](#eq-ma-amm-5)
+* `soiled_surface_area` (m^2): the total surface area soiled with manure
 
 ### Manure Composition Update
+
+Below is a summary of updates to `ManureStream` variables.
+
+::: {.callout-note}
+The formulas below may be a summarization of multiple steps detailed above, and are intended to provide an
+overview of what mass losses/gains are reflected in the value of each variable.
+:::
+
+Equations in the table below are in the format of "Output/exiting value" = "Entering processor value" +/-
+XYZ. "Entering" refers to the manure entering the processor (i.e., being loaded into the digester) and
+output variables reflect the manure leaving the processor (i.e., digestate leaving the digester). The
+Calculation column describes how the variable is updated in the processor.
+
+```{python}
+#| label: tbl-ma-hdl-manure-update
+#| tbl-cap: Calculated manure storage variables and their units.
+import_table(
+  "../resources/table_data/manure/tbl-ma-hdl-manure-update.csv",
+  colalign = ["left", "left", "left"]
+)
+```
+
+* `WATER_DENSITY_KG_PER_M3`: a constant with a value of 0.997 kg/m^3.
+* Note that for parlor cleaning handlers, the value of all housing emissions variables will be reported as 0.
 
 
 
