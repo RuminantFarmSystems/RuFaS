@@ -155,9 +155,9 @@ def test_simulate(
     # Arrange
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
     mock_run_simulation_main_loop = mocker.patch.object(simulation_engine, "_run_simulation_main_loop")
-    mock_post_loop_processing = mocker.patch.object(simulation_engine, "_post_loop_processing")
-    mock_post_loop_reporting = mocker.patch.object(simulation_engine, "_post_loop_reporting")
-    mock_post_loop_logging = mocker.patch.object(simulation_engine, "_post_loop_logging")
+    mock_post_loop_processing = mocker.patch.object(simulation_engine, "_post_simulation_processing")
+    mock_post_loop_reporting = mocker.patch.object(simulation_engine, "_post_simulation_reporting")
+    mock_post_loop_logging = mocker.patch.object(simulation_engine, "_post_simulation_logging")
 
     info_map = {
         "class": simulation_engine.__class__.__name__,
@@ -186,7 +186,7 @@ def test_post_loop_processing(
     mock_estimate_all = mocker.patch.object(EEEManager, "estimate_all")
 
     # Act
-    simulation_engine._post_loop_processing()
+    simulation_engine._post_simulation_processing()
 
     # Assert
     mock_estimate_all.assert_called_once_with()
@@ -216,7 +216,7 @@ def test_post_loop_reporting(
     )
 
     # Act
-    simulation_engine._post_loop_reporting()
+    simulation_engine._post_simulation_reporting()
 
     # Assert
     if expect_report_call:
@@ -260,7 +260,7 @@ def test_post_loop_logging(
     mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
 
     # Act
-    simulation_engine._post_loop_logging(total_simulation_time, info_map)
+    simulation_engine._post_simulation_logging(total_simulation_time, info_map)
 
     # Assert
     if expect_dmi_summary_call:

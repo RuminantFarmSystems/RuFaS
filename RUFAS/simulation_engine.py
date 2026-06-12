@@ -290,20 +290,20 @@ class SimulationEngine:
 
         self._run_simulation_main_loop()
 
-        self._post_loop_processing()
+        self._post_simulation_processing()
 
         t_end_sim = timer.time()
         total_simulation_time = t_end_sim - t_start_sim
 
-        self._post_loop_reporting()
+        self._post_simulation_reporting()
 
-        self._post_loop_logging(total_simulation_time, info_map)
+        self._post_simulation_logging(total_simulation_time, info_map)
 
-    def _post_loop_processing(self) -> None:
+    def _post_simulation_processing(self) -> None:
         """Runs end-of-simulation calculations for all active modules."""
         EEEManager.estimate_all()
 
-    def _post_loop_reporting(self) -> None:
+    def _post_simulation_reporting(self) -> None:
         """Runs end-of-simulation reporting for all active modules."""
         if self.simulate_animals:
             AnimalModuleReporter.report_end_of_simulation(
@@ -315,7 +315,7 @@ class SimulationEngine:
                 self.herd_manager.animal_genetic_history_by_id,
             )
 
-    def _post_loop_logging(self, total_simulation_time: float, info_map: dict[str, str]) -> None:
+    def _post_simulation_logging(self, total_simulation_time: float, info_map: dict[str, str]) -> None:
         """Logs end-of-simulation warnings and timing for all active modules."""
         if self.simulate_manure:
             ManureExcretionCalculator.emit_dmi_below_min_summary(info_map)
