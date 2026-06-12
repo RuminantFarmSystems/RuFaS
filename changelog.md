@@ -100,8 +100,10 @@ v1.0.0
 - [3074](https://github.com/RuminantFarmSystems/RuFaS/pull/3074) - [minor change] [CropSchedule][NoInputChange] [NoOutputChange] Adds check for incompatibility between planting and harvesting schedules for crops.
 - [3072](https://github.com/RuminantFarmSystems/RuFaS/pull/3072) - [minor change] [main.py] [NoInputChange] [NoOutputChange] Moves `main.py` into `RUFAS/` for better packaging while maintaining legacy `main.py` script access.
 - [3054](https://github.com/RuminantFarmSystems/RuFaS/pull/3054) - [minor change] [Animal] [Reproduction] [NoInputChange] [NoOutputChange] Adds early-exit guard in presynch and OvSynch hormone schedule setup to skip already-pregnant cows.
-- [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [InputChange] [NoOutputChange] Removes the `random_seed` field from all 6 config input files and from 3 config input files in helpful_scripts.
 - [3094](https://github.com/RuminantFarmSystems/RuFaS/pull/3094) - [minor change] [No InputChange] [NoOutputChange] Updates and aligns formatting and content of docstrings in InputManager and DataValidator classes.
+- [3047](https://github.com/RuminantFarmSystems/RuFaS/pull/3047) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds heifer average daily gain (ADG) reporting by pen and by heifer animal type (Heifer I, II, III) to `HerdStatistics` and `AnimalModuleReporter`.
+- [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [Config] [InputChange] [NoOutputChange] Removes the `random_seed` field from all 6 config input files and from 3 config input files in helpful_scripts.
+- [3087](https://github.com/RuminantFarmSystems/RuFaS/pull/3087) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Extracts post-loop logic from `SimulationEngine.simulate()` into `_post_loop_processing()`, `_post_loop_reporting()`, and `_post_loop_logging()`.
 
 ### v1.0.0
 
