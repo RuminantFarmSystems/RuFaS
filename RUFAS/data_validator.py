@@ -153,8 +153,8 @@ class Modifiability(Enum):
     """
     Enum class representing the modifiability status of a variable.
 
-    Members
-    -------
+    Attributes
+    ----------
     REQUIRED_LOCKED : str
         Indicates the variable must be initialized with a value and cannot be modified thereafter.
     REQUIRED_UNLOCKED : str

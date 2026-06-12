@@ -1042,8 +1042,8 @@ class InputManager:
         -----
         This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
         empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
-        correspond to any enum members, a KeyError is raised after logging the error. If 'modifiability' is absent or
-        its value is empty, the function defaults to Modifiability.UNREQUIRED_UNLOCKED.
+        correspond to any enum members. If 'modifiability' is absent or its value is empty, the function defaults
+        to Modifiability.UNREQUIRED_UNLOCKED.
 
         """
         info_map = {
@@ -1103,7 +1103,7 @@ class InputManager:
         This function determines the modifiability status of a variable using the ``_get_variable_modifiability``
         method. It assesses whether the variable, identified by ``variable_name`` and described by
         ``variable_properties``, is allowed to be modified after initialization. A variable is considered modifiable
-        during runtime if its modifiability status is either ``REQUIRED_UNLOCKED`` or ``REQUIRED_UNLOCKED``.
+        during runtime if its modifiability status is either ``REQUIRED_UNLOCKED`` or ``UNREQUIRED_UNLOCKED``.
 
         Parameters
         ----------
