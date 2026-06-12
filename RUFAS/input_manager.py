@@ -1087,7 +1087,7 @@ class InputManager:
         -----
         This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
         variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
-        modifiability status is either 'REQUIRED_AND_LOCKED' or 'REQUIRED_AND_UNLOCKED', indicating that the variable
+        modifiability status is either 'REQUIRED_LOCKED' or 'REQUIRED_UNLOCKED', indicating that the variable
         must be initialized with a value.
 
         """
@@ -1100,10 +1100,10 @@ class InputManager:
         """
         Checks if a variable can be modified during runtime based on its modifiability status.
 
-        This function determines the modifiability status of a variable using the '_get_variable_modifiability' method.
-        It assesses whether the variable, identified by 'variable_name' and described by 'variable_properties', is
-        allowed to be modified after initialization. A variable is considered modifiable during runtime if its
-        modifiability status is either 'REQUIRED_AND_UNLOCKED' or 'NOT_REQUIRED_AND_UNLOCKED'.
+        This function determines the modifiability status of a variable using the ``_get_variable_modifiability``
+        method. It assesses whether the variable, identified by ``variable_name`` and described by
+        ``variable_properties``, is allowed to be modified after initialization. A variable is considered modifiable
+        during runtime if its modifiability status is either ``REQUIRED_UNLOCKED`` or ``REQUIRED_UNLOCKED``.
 
         Parameters
         ----------

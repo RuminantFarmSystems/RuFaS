@@ -27,8 +27,8 @@ class ElementState(Enum):
     An enumeration of the states a data element can be in during validation. An element cannot
     be in more than one state at a time.
 
-    Members
-    -------
+    Attributes
+    ----------
     VALID : int
         The element is valid.
     INVALID : int
@@ -1949,9 +1949,9 @@ class DataValidator:
 
         Notes
         -----
-        This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
-        variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
-        modifiability status is either 'REQUIRED_LOCKED', 'REQUIRED_UNLOCKED', or 'UNREQUIRED_UNLOCKED'.
+        This function utilizes the ``_get_variable_modifiability`` method to ascertain the modifiability status of the
+        variable identified by ``variable_name`` and described by ``variable_properties``. It then checks if the
+        modifiability status is either ``REQUIRED_LOCKED`` or ``REQUIRED_UNLOCKED``.
 
         """
         variable_modifiability = self._get_variable_modifiability(
