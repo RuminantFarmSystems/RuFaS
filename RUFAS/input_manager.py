@@ -22,10 +22,25 @@ Set enumerating the input data formats the Input Manager can accept.
 """
 VALID_INPUT_TYPES: set[str] = {"json", "csv"}
 
+"""
+Top-level key to metadata blobs.
+"""
 ADDRESS_TO_INPUTS = "files"
 
+"""
+List of properties in metadata properties file that should be ignored during the validation process.
+"""
 VARIABLE_PROPERTIES_TO_IGNORE = ["type", "description", "modifiability", "data_collection_app_compatible"]
 
+"""
+Set of metadata blobs required to be able to run a simulation.
+
+Notes
+-----
+This helps ensure that all parts of the simulation inputs are accounted for. For parts of the model that
+are not being run during a particular simulation, there are nullable versions of those inputs that should
+be used to minimize the possibility of side-effects.
+"""
 REQUIRED_FILE_BLOBS: set[str] = {
     "config",
     "animal",
@@ -50,6 +65,10 @@ REQUIRED_FILE_BLOBS: set[str] = {
     "feed_storage_configurations",
     "feed_storage_instances",
 }
+
+"""
+The paths to the properties that define the inputs.
+"""
 PROPERTIES_FILE_PATHS: dict[str, Path] = {
     "default": Path("input/metadata/properties/default.json"),
     "tasks_properties": Path("input/metadata/properties/tasks_properties.json"),
@@ -59,7 +78,41 @@ PROPERTIES_FILE_PATHS: dict[str, Path] = {
 
 class InputManager:
     """
-    Input Manager class responsible for loading, validating, and providing access to input data.
+    Loads, validates, stores, and provides access to simulation input data.
+
+    Parameters
+    ----------
+    metadata_depth_limit : int | None, default=None
+        Maximum depth to traverse when processing metadata structures.
+        If ``None``, a default depth limit of ``7`` is used.
+
+    Attributes
+    ----------
+    om : OutputManager
+        Manager used to record warnings, errors, and log messages generated
+        during input processing.
+    elements_counter : ElementsCounter
+        Tracks the number and types of elements encountered during validation.
+    csv_report_generation_list : list[str]
+        Collection of input variables that should be included in generated CSV
+        validation reports.
+    data_validator : DataValidator
+        Validator responsible for checking individual input values against
+        their metadata definitions.
+    cross_validator : CrossValidator
+        Validator responsible for evaluating relationships between multiple
+        input variables.
+    metadata_depth_limit : int
+        Maximum metadata traversal depth used during metadata processing.
+
+    Notes
+    -----
+    The ``InputManager`` acts as a centralized repository for all input data
+    used during a simulation. It maintains a pool of loaded data, associated
+    metadata, validation utilities, and logging information used to track data
+    access and deletion events. The class is implemented as a singleton so that
+    all components of the simulation interact with the same input data source.
+
     """
 
     __instance = None
@@ -140,6 +193,7 @@ class InputManager:
         -------
         bool
             True if data is valid, otherwise False.
+
         """
         full_metadata_path = Path(input_root) / metadata_path
         self._load_metadata(full_metadata_path)
@@ -179,6 +233,7 @@ class InputManager:
         bool
             Returns True if all cross-validation rules pass. Returns False if one
             or more rules fail.
+
         """
         failing_cross_validation_blocks: list[str] = []
         cross_validation_rules = self._load_cross_validation(cross_validation_file_paths)
@@ -212,7 +267,22 @@ class InputManager:
         return True
 
     def _validate_required_file_blobs(self, metadata_file_names: set[str]) -> None:
-        """Validates that all required file blobs are present in the metadata."""
+        """
+        Validates that all required metadata file blobs are present.
+
+        Parameters
+        ----------
+        metadata_file_names : set[str]
+            Set of file blob names defined in the metadata document's
+            ``files`` section.
+
+        Raises
+        ------
+        ValueError
+            If one or more entries from ``REQUIRED_FILE_BLOBS`` are missing
+            from ``metadata_file_names``.
+
+        """
         info_map = {
             "class": InputManager.__name__,
             "function": InputManager._validate_required_file_blobs.__name__,
@@ -234,7 +304,8 @@ class InputManager:
             )
 
     def load_runtime_metadata(self, metadata_key: str, eager_termination: bool) -> bool:
-        """Load and validate a runtime metadata document before ingesting the referenced data.
+        """
+        Load and validate a runtime metadata document before ingesting the referenced data.
 
         Parameters
         ----------
@@ -249,6 +320,7 @@ class InputManager:
         bool
             ``True`` when all referenced datasets are validated and added to the pool, otherwise
             ``False`` when any failure is encountered.
+
         """
 
         info_map = {
@@ -300,12 +372,45 @@ class InputManager:
         return all(results) if results else True
 
     def _runtime_metadata_guard_failure(self, reason: str, info_map: dict[str, Any]) -> bool:
+        """Helper function to log an error related to runtime metadata."""
         self.om.add_error("Runtime metadata load failure", reason, info_map)
         return False
 
     def _resolve_runtime_metadata_files(
         self, runtime_metadata_map: dict[str, Any], metadata_key: str, info_map: dict[str, Any]
     ) -> dict[str, Any] | None:
+        """
+        Resolves and validates the input file definitions referenced by a runtime metadata entry.
+
+        Parameters
+        ----------
+        runtime_metadata_map : dict[str, Any]
+            Mapping of runtime metadata entries available for resolution.
+        metadata_key : str
+            Key identifying the runtime metadata entry to resolve.
+        info_map : dict[str, Any]
+            Context information used for logging and error reporting.
+
+        Returns
+        -------
+        dict[str, Any] | None
+            Mapping of input file definitions extracted from the resolved runtime
+            metadata document. Returns ``None`` if the runtime metadata entry
+            cannot be resolved, loaded, validated, or parsed.
+
+        Notes
+        -----
+        The resolution workflow performs the following steps:
+
+        1. Retrieves the runtime metadata reference associated with
+        ``metadata_key``.
+        2. Resolves the path to the runtime metadata document.
+        3. Loads the runtime metadata document from disk.
+        4. Validates the document structure and contents.
+        5. Extracts the input file definitions from the
+        ``ADDRESS_TO_INPUTS`` section.
+
+        """
         metadata_reference = self._get_runtime_metadata_reference(runtime_metadata_map, metadata_key, info_map)
         if metadata_reference is None:
             self._runtime_metadata_guard_failure(
@@ -348,6 +453,7 @@ class InputManager:
         return runtime_files
 
     def _is_metadata_loaded(self, info_map: dict[str, Any]) -> bool:
+        """Helper function to check if metadata is loaded."""
         if self.__metadata:
             return True
         self.om.add_error(
@@ -358,6 +464,7 @@ class InputManager:
         return False
 
     def _get_runtime_metadata_map(self, info_map: dict[str, Any]) -> dict[str, Any] | None:
+        """Helper function to get the runtime metadata."""
         try:
             return self.get_metadata("runtime_metadata")
         except KeyError:
@@ -371,6 +478,7 @@ class InputManager:
     def _get_runtime_metadata_reference(
         self, runtime_metadata_map: dict[str, Any], metadata_key: str, info_map: dict[str, Any]
     ) -> dict[str, Any] | None:
+        """Helper function to get the runtime metadata reference."""
         metadata_reference = runtime_metadata_map.get(metadata_key)
         if metadata_reference is None:
             self.om.add_error(
@@ -384,6 +492,7 @@ class InputManager:
     def _get_runtime_metadata_path(
         self, metadata_reference: dict[str, Any], metadata_key: str, info_map: dict[str, Any]
     ) -> Path | None:
+        """Helper function to get the runtime metadata path."""
         metadata_path_value = metadata_reference.get("path")
         if metadata_path_value is None:
             self.om.add_error(
@@ -395,6 +504,7 @@ class InputManager:
         return Path(metadata_path_value)
 
     def _load_runtime_metadata_contents(self, metadata_path: Path, info_map: dict[str, Any]) -> dict[str, Any] | None:
+        """Wrapper function for loading runtime metadata."""
         try:
             return self._load_runtime_metadata_document(metadata_path)
         except Exception as exc:
@@ -406,6 +516,7 @@ class InputManager:
             return None
 
     def _validate_runtime_metadata(self, runtime_metadata: dict[str, Any], info_map: dict[str, Any]) -> bool:
+        """Wrapper helper function to validate runtime metadata."""
         is_valid, message = self.data_validator.validate_metadata(
             runtime_metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS, self.input_root
         )
@@ -418,6 +529,7 @@ class InputManager:
     def _extract_runtime_files(
         self, runtime_metadata: dict[str, Any], metadata_path: Path, info_map: dict[str, Any]
     ) -> dict[str, Any] | None:
+        """Helper function to extract runtime metadata files."""
         runtime_files = runtime_metadata.get(ADDRESS_TO_INPUTS, {})
         if isinstance(runtime_files, dict):
             return runtime_files
@@ -430,6 +542,7 @@ class InputManager:
         return None
 
     def _runtime_data_loader_map(self) -> dict[str, Callable[[Path], dict[str, Any]]]:
+        """Helper function for runtime data mapping."""
         return {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
@@ -443,6 +556,45 @@ class InputManager:
         eager_termination: bool,
         info_map: dict[str, Any],
     ) -> bool:
+        """
+        Loads and registers a runtime metadata variable from a file definition.
+
+        Parameters
+        ----------
+        variable_name : str
+            Name of the runtime variable being processed.
+        file_details : dict[str, Any]
+            Runtime metadata definition for the variable. Expected to contain the
+            file type, file path, and properties reference required to load and
+            validate the data.
+        data_type_to_loader_map : dict[str, Callable[[Path], dict[str, Any]]]
+            Mapping of supported runtime metadata file types to the functions used
+            to load them.
+        eager_termination : bool
+            Whether validation failures encountered while adding the variable to
+            the input pool should immediately terminate processing.
+        info_map : dict[str, Any]
+            Context information used for logging and error reporting.
+
+        Returns
+        -------
+        bool
+            ``True`` if the runtime variable was successfully loaded and added to
+            the input pool. ``False`` if the runtime metadata definition is
+            invalid, the file cannot be loaded, or the variable cannot be added to
+            the pool.
+
+        Notes
+        -----
+        The processing workflow performs the following steps:
+
+        1. Verifies that a properties reference is defined.
+        2. Confirms that the referenced metadata properties exist.
+        3. Validates that the configured file type is supported.
+        4. Loads the referenced file using the appropriate loader.
+        5. Validates and adds the loaded data to the input pool.
+
+        """
         properties_blob_key = file_details.get("properties")
         if not properties_blob_key:
             self.om.add_error(
@@ -507,7 +659,7 @@ class InputManager:
 
     def _load_runtime_metadata_document(self, metadata_path: Path) -> dict[str, Any]:
         """
-        Load a runtime metadata document without disturbing the active metadata state.
+        Loads a runtime metadata document without disturbing the active metadata state.
 
         Parameters
         ----------
@@ -526,6 +678,7 @@ class InputManager:
         The use of `deepcopy()` here is necessary because `self.__metadata` is a mutable object,
         so a shallow assignment would only copy the reference, causing both snapshots to reflect
         the same underlying data.
+
         """
 
         original_metadata = deepcopy(self.__metadata)
@@ -602,6 +755,7 @@ class InputManager:
 
         Exception
             If an unexpected error occurs during the file loading process.
+
         """
         if cross_validation_paths is None:
             return None
@@ -638,11 +792,7 @@ class InputManager:
 
     def _load_properties(self) -> None:
         """
-        Loads properties data from a specified JSON file and updates the metadata.
-
-        This method reads the properties file path from the metadata, checks if the file exists, and then loads the
-        properties into the metadata. The original properties data in the metadata is first copied to a separate
-        attribute for future reference and then removed from the metadata files section.
+        Loads properties data from the specified PROPERTIES_FILE_PATHS and updates the metadata.
 
         Raises
         ------
@@ -652,6 +802,13 @@ class InputManager:
             If there is an error in decoding the JSON file.
         Exception
             For any other unexpected errors during properties loading.
+
+        Notes
+        -----
+        This method reads the properties file path from the metadata, checks if the file exists, and then loads the
+        properties into the metadata. The original properties data in the metadata is first copied to a separate
+        attribute for future reference and then removed from the metadata files section.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -869,13 +1026,6 @@ class InputManager:
         Determines the modifiability status of a variable based on its properties and returns the corresponding enum
         value.
 
-        Notes
-        -----
-        This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
-        empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
-        correspond to any enum members, a KeyError is raised after logging the error. If 'modifiability' is absent or
-        its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.
-
         Parameters
         ----------
         variable_name : str
@@ -888,18 +1038,20 @@ class InputManager:
         Modifiability
             An enum member representing the variable's modifiability status.
 
-        Raises
-        ------
-        KeyError
-            If 'modifiability' in `variable_properties` does not match any enum member in Modifiability. The error
-            message includes the invalid modifiability value and suggests valid values.
+        Notes
+        -----
+        This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
+        empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
+        correspond to any enum members. If 'modifiability' is absent or its value is empty, the function defaults
+        to Modifiability.UNREQUIRED_UNLOCKED.
+
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._get_variable_modifiability.__name__,
         }
 
-        default = "UNREQUIRED UNLOCKED"
+        default = "UNREQUIRED_UNLOCKED"
         modifiability = variable_properties.get("modifiability", default)
 
         try:
@@ -917,11 +1069,6 @@ class InputManager:
         """
         Determines whether a variable requires an input value upon initialization based on its modifiability status.
 
-        This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
-        variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
-        modifiability status is either 'REQUIRED_AND_LOCKED' or 'REQUIRED_AND_UNLOCKED', indicating that the variable
-        must be initialized with a value.
-
         Parameters
         ----------
         variable_name : str
@@ -935,6 +1082,14 @@ class InputManager:
         bool
             True if the variable's modifiability status necessitates an input value upon initialization,
             False otherwise.
+
+        Notes
+        -----
+        This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
+        variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
+        modifiability status is either 'REQUIRED_LOCKED' or 'REQUIRED_UNLOCKED', indicating that the variable
+        must be initialized with a value.
+
         """
         variable_modifiability = self._get_variable_modifiability(
             variable_name=variable_name, variable_properties=variable_properties
@@ -945,10 +1100,10 @@ class InputManager:
         """
         Checks if a variable can be modified during runtime based on its modifiability status.
 
-        This function determines the modifiability status of a variable using the '_get_variable_modifiability' method.
-        It assesses whether the variable, identified by 'variable_name' and described by 'variable_properties', is
-        allowed to be modified after initialization. A variable is considered modifiable during runtime if its
-        modifiability status is either 'REQUIRED_AND_UNLOCKED' or 'NOT_REQUIRED_AND_UNLOCKED'.
+        This function determines the modifiability status of a variable using the ``_get_variable_modifiability``
+        method. It assesses whether the variable, identified by ``variable_name`` and described by
+        ``variable_properties``, is allowed to be modified after initialization. A variable is considered modifiable
+        during runtime if its modifiability status is either ``REQUIRED_UNLOCKED`` or ``UNREQUIRED_UNLOCKED``.
 
         Parameters
         ----------
@@ -993,6 +1148,7 @@ class InputManager:
         This function determines if it's being called during the initialization phase and checks if the missing variable
         data is required at this stage using '_is_input_required_upon_initialization'. If required, it logs an error and
         raises a KeyError. If not, it logs a warning.
+
         """
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
@@ -1033,7 +1189,7 @@ class InputManager:
             The requested data if found. None otherwise.
 
         Examples
-        -------
+        --------
         The user can request as broad or narrow a selection of the input data pool as is needed.
 
         Input Manager must first be instantiated:
@@ -1066,6 +1222,7 @@ class InputManager:
         -----
         The use of `deepcopy()` is necessary here to prevent callers from accidentally
         mutating the internal pool data by modifying the returned value.
+
         """
 
         info_map = {
@@ -1111,6 +1268,7 @@ class InputManager:
         If the property does not exist, the method will return False:
         >>> input_manager.check_property_exists_in_pool('animal.herd_information.nonexistent_property')
         False
+
         """
         variable_path = data_address.split(".")
         try:
@@ -1140,7 +1298,7 @@ class InputManager:
             If the requested metadata is not found.
 
         Examples
-        -------
+        --------
         The user can request as broad or narrow a selection of the metadata as is needed.
 
         Input Manager must first be instantiated:
@@ -1168,6 +1326,7 @@ class InputManager:
         -----
         The use of `deepcopy()` is necessary here to prevent callers from accidentally
         mutating the internal metadata pool by modifying the returned value.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1265,19 +1424,25 @@ class InputManager:
 
     def __delete_input_and_metadata(self, data_address: str) -> tuple[bool, bool]:
         """
-        NOTE: **Please use extreme caution using this function as it will delete data and metadata from the pool.**
-
-        When given a valid address, this function removes the input data and its associated metadata.
+        Removes input data and its associated metadata from the pool.
 
         Parameters
         ----------
         data_address : str
-            The address of the input data to remove.
+            Address of the input data to remove.
 
         Returns
         -------
         tuple[bool, bool]
-            First value for indication of data removal, second value for indication of metadata removal.
+            Tuple containing:
+
+            - Whether the input data was removed.
+            - Whether the associated metadata was removed.
+
+        Notes
+        -----
+        This operation permanently removes data and metadata from the internal pools. Use extreme caution when calling
+        this method, as deleted entries may not be recoverable.
 
         """
         info_map = {
@@ -1315,9 +1480,7 @@ class InputManager:
         return removed_data, removed_metadata
 
     def flush_pool(self) -> None:
-        """
-        Clear the variable pool.
-        """
+        """Clears the variable pool."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.flush_pool.__name__,
@@ -1328,13 +1491,6 @@ class InputManager:
     def _metadata_properties_exist(self, variable_name: str, properties_blob_key: str) -> bool:
         """
         Checks if specific properties exist in the metadata for a given variable.
-
-        Notes
-        -----
-        This function is designed to verify the existence of specified properties
-        within the metadata of a particular variable. It returns a boolean indicating
-        the existence of the properties, and a KeyError in case of missing metadata
-        or properties.
 
         Parameters
         ----------
@@ -1349,11 +1505,19 @@ class InputManager:
             True if the properties exist, False otherwise.
 
         Raises
-        -------
+        ------
         ValueError
             If no metadata is loaded in InputManager.__metadata.
         KeyError
             If no metadata properties can be found with the given `properties_blob_key`.
+
+        Notes
+        -----
+        This function is designed to verify the existence of specified properties
+        within the metadata of a particular variable. It returns a boolean indicating
+        the existence of the properties, and a KeyError in case of missing metadata
+        or properties.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1392,14 +1556,6 @@ class InputManager:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
 
-        Notes
-        -----
-        This function processes and validates the input data for a variable based on its metadata properties,
-        attempting to fix any invalid elements. If all elements are valid or successfully fixed, the data is added
-        to a pool. The function supports eager termination, which can halt the process early if invalid data is
-        encountered or if a non-modifiable variable is attempted to be modified during runtime.
-
-
         Parameters
         ----------
         variable_name : str
@@ -1422,6 +1578,13 @@ class InputManager:
         -------
         ValueError
             If eager_termination is True and the variable failed validation.
+
+        Notes
+        -----
+        This function processes and validates the input data for a variable based on its metadata properties,
+        attempting to fix any invalid elements. If all elements are valid or successfully fixed, the data is added
+        to a pool. The function supports eager termination, which can halt the process early if invalid data is
+        encountered or if a non-modifiable variable is attempted to be modified during runtime.
 
         """
         info_map = {
@@ -1466,7 +1629,7 @@ class InputManager:
         self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         """
-        Prepare data and metadata properties for validation.
+        Prepares data and metadata properties for validation.
 
         Parameters
         ----------
@@ -1479,8 +1642,9 @@ class InputManager:
 
         Returns
         -------
-        tuple[list[str], dict[str, Any], dict[str, Any]]
-            Prepared element hierarchy, data, and metadata properties.
+        tuple[dict[str, Any], dict[str, Any]]
+            Tuple containing the prepared input data and the metadata properties used
+            to validate it.
 
         """
         element_hierarchy = variable_name.split(".")
@@ -1617,7 +1781,7 @@ class InputManager:
 
     def _add_to_pool(self, variable_name: str, validated_data: dict[str, Any]) -> None:
         """
-        Add validated data to the pool.
+        Adds validated data to the pool.
 
         Parameters
         ----------
@@ -1650,11 +1814,6 @@ class InputManager:
         """
         Adds a variable to the InputManager's pool after validating it against metadata.
 
-        Notes
-        -----
-        This function takes in a variable along with its name and a key to access its validation metadata.
-        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
-
         Parameters
         ----------
         variable_name: str
@@ -1678,7 +1837,19 @@ class InputManager:
         Raises
         ------
         TypeError
-            If `data` is not the expected type of dict[str, Any].
+            If ``data`` is not a dictionary.
+        ValueError
+            If required metadata is not loaded or validation fails during eager termination.
+        KeyError
+            If the referenced metadata properties cannot be found.
+        PermissionError
+            If the variable is not modifiable during runtime and eager termination is enabled.
+
+        Notes
+        -----
+        This function takes in a variable along with its name and a key to access its validation metadata.
+        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1728,7 +1899,7 @@ class InputManager:
 
     def dump_delete_data_logs(self, path: Path) -> None:
         """
-        Dumps the stored get data logs to a JSON file at the specified path.
+        Dumps the stored delete data logs to a JSON file at the specified path.
 
         Parameters
         ----------
@@ -1758,6 +1929,7 @@ class InputManager:
             If the user does not have permission to save the file at the specified path.
         OSError
             For any other unexpected error that occurs while trying to save the CSV.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1795,8 +1967,8 @@ class InputManager:
         self, data: dict[str, Any], prefix: str = "", sep: str = "_"
     ) -> list[dict[str, Any]]:
         """
-        Recursively traverse through the metadata properties dictionary
-        to flatten it by creating a record for each entry.
+        Recursively traverse through the metadata properties dictionary to flatten it by creating a record for each
+        entry.
 
         Parameters
         ----------
@@ -1811,6 +1983,7 @@ class InputManager:
         -------
         list[dict[str, Any]]
             A list of flattened data entries from the json file.
+
         """
         records = []
         for property_key, property_value in data.items():
@@ -1870,6 +2043,7 @@ class InputManager:
         -------
         dict[str, Any]
             A dictionary of the data entry converted to the record format.
+
         """
         properties_index = name.find("_properties") + len("_properties")
         properties_group = name[:properties_index]
@@ -1891,9 +2065,26 @@ class InputManager:
         """
         Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
 
+        Parameters
+        ----------
+        properties_file_path : Path
+            The path to the properties file.
+        comparison_properties_file_path : Path
+            The path to the comparison properties file.
+        output_directory : Path
+            The path to the output directory.
+
+        Raises
+        ------
+        PermissionError
+            If the user does not have proper permission to save the file to the provided path.
+        OSError
+            Any unexpected OSError encountered trying to save the file to the provided path.
+
         Notes
         -----
         The use of `deepcopy()` is necessary to avoid modifying the original data structures.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1955,14 +2146,15 @@ class InputManager:
 
     def export_pool_to_csv(self, output_prefix: str, output_path: Path) -> None:
         """
-        Flatten the interested input data and export the variables with their values into a CSV.
+        Flattens the interested input data and export the variables with their values into a CSV.
 
         Parameters
         ----------
-        output_prefix: str
+        output_prefix : str
             The output prefix for the current task.
-        output_path: Path
+        output_path : Path
             The folder to save the output CSV.
+
         """
         info_map = {
             "class": self.__class__.__name__,

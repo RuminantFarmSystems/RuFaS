@@ -8,6 +8,22 @@ from RUFAS.rufas_time import RufasTime
 
 
 class DailySpread(Storage):
+    """
+    The daily spread manure storage class.
+
+    Parameters
+    ----------
+    name : str
+        The name of the storage.
+    storage_time_period : int, default=1
+        The length of time (days) manure is stored for between emptying events.
+    surface_area : float, default=math.inf
+        The surface area of the manure storage (m^2).
+    cover : StorageCover, default=StorageCover.NO_COVER
+        The type of cover used with the specified storage.
+
+    """
+
     def __init__(
         self,
         name: str,
@@ -48,7 +64,7 @@ class DailySpread(Storage):
         Returns
         -------
         dict[str, ManureStream]
-            _The processed manure stream.
+            The processed manure stream.
 
         """
         self._report_manure_stream(self._received_manure, "received", time.simulation_day)
