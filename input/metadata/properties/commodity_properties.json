@@ -16159,7 +16159,7 @@
   },
   "_default_values_csv_properties": {
     "data_collection_app_compatible": false,
-    "Unnamed: 0": {
+    "commodity": {
       "type": "array",
       "properties": {
         "type": "string"
