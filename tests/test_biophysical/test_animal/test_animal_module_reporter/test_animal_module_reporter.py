@@ -951,6 +951,30 @@ def test_report_herd_statistics_data_with_pen_heifer_adg(mocker: MockerFixture) 
     assert reported["heifer_average_daily_gain_in_pen_7"] == pytest.approx(0.95)
 
 
+def test_report_daily_reproduction_statistics(mocker: MockerFixture) -> None:
+    """Unit test for report_daily_reproduction_statistics()"""
+    om = OutputManager()
+    mock_om_add_variable = mocker.patch.object(om, "add_variable")
+
+    daily_stats = HerdReproductionStatistics(
+        total_num_successful_conceptions=5,
+        heifer_num_successful_conceptions=2,
+        cow_num_successful_conceptions=3,
+    )
+    AnimalModuleReporter.report_daily_reproduction_statistics(daily_stats, 10)
+
+    info_map = {
+        "class": AnimalModuleReporter.__name__,
+        "function": AnimalModuleReporter.report_daily_reproduction_statistics.__name__,
+        "data_origin": [("HerdManager", "daily_update")],
+        "units": MeasurementUnits.CONCEPTIONS,
+    }
+    assert mock_om_add_variable.call_count == 3
+    mock_om_add_variable.assert_any_call("num_successful_conceptions", 5, info_map)
+    mock_om_add_variable.assert_any_call("heiferII_num_successful_conceptions", 2, info_map)
+    mock_om_add_variable.assert_any_call("cow_num_successful_conceptions", 3, info_map)
+
+
 def test_report_daily_pen_total(mocker: MockerFixture) -> None:
     """Unit test for report_daily_pen_total()"""
     om = OutputManager()
