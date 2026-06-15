@@ -246,7 +246,7 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
     actual = E2ETestResultsHandler._get_test_result_paths("dummy_prefix")
 
     assert actual == expected
-    get_data.assert_called_once_with("end_to_end_testing_result_paths.end_to_end_test_result_paths.dummy_prefix")
+    get_data.assert_called_once_with("end_to_end_testing_result_paths.end_to_end_test_result_paths.dummy_prefix", True)
 
 
 def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
