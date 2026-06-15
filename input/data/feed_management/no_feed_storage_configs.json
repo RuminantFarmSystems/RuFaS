@@ -1,6 +1,3 @@
 {
-    "grain_storage":[],
-    "silage_storage":[],
-    "baleage_storage":[],
-    "hay_storage":[]
+    "exclude_from_pool": true
 }
