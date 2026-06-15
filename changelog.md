@@ -106,6 +106,7 @@ v1.0.0
 - [3047](https://github.com/RuminantFarmSystems/RuFaS/pull/3047) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds heifer average daily gain (ADG) reporting by pen and by heifer animal type (Heifer I, II, III) to `HerdStatistics` and `AnimalModuleReporter`.
 - [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [Config] [InputChange] [NoOutputChange] Removes the `random_seed` field from all 6 config input files and from 3 config input files in helpful_scripts.
 - [3087](https://github.com/RuminantFarmSystems/RuFaS/pull/3087) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Extracts post-loop logic from `SimulationEngine.simulate()` into `_post_loop_processing()`, `_post_loop_reporting()`, and `_post_loop_logging()`.
+- [3049](https://github.com/RuminantFarmSystems/RuFaS/pull/3049) - [minor change] [Utility] [NoInputChange] [NoOutputChange] Updates docstrings across 9 utility files to NumPy-style format.
 
 ### v1.0.0
 
