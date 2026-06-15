@@ -3,6 +3,7 @@
 from enum import Enum
 import time as timer
 from datetime import date, timedelta
+from typing import Any
 
 from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.EEE.emissions import EmissionsEstimator
@@ -209,7 +210,8 @@ class SimulationEngine:
         self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
 
         if self.simulate_fields:
-            self.field_manager: FieldManager = FieldManager()
+            field_data = self._gather_field_data()
+            self.field_manager: FieldManager = FieldManager(field_data)
 
         if self.simulate_animals or self.simulate_feed:
             feeds_config = self.im.get_data("feed")
@@ -256,6 +258,27 @@ class SimulationEngine:
                 self.weather.intercept_mean_temp, self.weather.phase_shift, self.weather.amplitude
             )
 
+    def _gather_field_data(self) -> dict[str, dict[str, Any]]:
+        """
+        Gathers configuration data for all fields from the InputManager.
+
+        Logs a warning if no field input files are found.
+
+        Returns
+        -------
+        dict[str, dict[str, Any]]
+            Mapping of field names to their configuration data.
+        """
+        info_map = {"class": SimulationEngine.__name__, "function": SimulationEngine._gather_field_data.__name__}
+        field_names: list[str] = self.im.get_data_keys_by_properties("field_properties")
+        if not field_names:
+            self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
+        field_data: dict[str, dict[str, Any]] = {}
+        for field_name in field_names:
+            field_configuration_data: dict[str, Any] = self.im.get_data(field_name)
+            field_data[field_name] = field_configuration_data
+        return field_data
+
     def simulate(self) -> None:
         """Executes the simulation."""
 
@@ -267,6 +290,21 @@ class SimulationEngine:
 
         self._run_simulation_main_loop()
 
+        self._post_simulation_processing()
+
+        t_end_sim = timer.time()
+        total_simulation_time = t_end_sim - t_start_sim
+
+        self._post_simulation_reporting()
+
+        self._post_simulation_logging(total_simulation_time, info_map)
+
+    def _post_simulation_processing(self) -> None:
+        """Runs end-of-simulation calculations for all active modules."""
+        EEEManager.estimate_all()
+
+    def _post_simulation_reporting(self) -> None:
+        """Runs end-of-simulation reporting for all active modules."""
         if self.simulate_animals:
             AnimalModuleReporter.report_end_of_simulation(
                 self.herd_manager.herd_statistics,
@@ -277,14 +315,12 @@ class SimulationEngine:
                 self.herd_manager.animal_genetic_history_by_id,
             )
 
+    def _post_simulation_logging(self, total_simulation_time: float, info_map: dict[str, str]) -> None:
+        """Logs end-of-simulation warnings and timing for all active modules."""
         if self.simulate_manure:
             ManureExcretionCalculator.emit_dmi_below_min_summary(info_map)
 
-        EEEManager.estimate_all()
-        t_end_sim = timer.time()
-
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
-        total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 

@@ -154,44 +154,124 @@ def test_simulate(
     """
     # Arrange
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
-    mock_estimate_emissions = mocker.patch.object(EEEManager, "estimate_all")
     mock_run_simulation_main_loop = mocker.patch.object(simulation_engine, "_run_simulation_main_loop")
-    mock_report_end_of_simulation = mocker.patch(
-        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter" ".report_end_of_simulation"
-    )
-    mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
-    mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-
-    mock_time = MagicMock(auto_spec=RufasTime)
-    mock_time.simulation_day = 100
-    simulation_engine.time = mock_time
+    mock_post_loop_processing = mocker.patch.object(simulation_engine, "_post_simulation_processing")
+    mock_post_loop_reporting = mocker.patch.object(simulation_engine, "_post_simulation_reporting")
+    mock_post_loop_logging = mocker.patch.object(simulation_engine, "_post_simulation_logging")
 
     info_map = {
         "class": simulation_engine.__class__.__name__,
         "function": simulation_engine.simulate.__name__,
     }
     expected_simulation_time = end_time - start_time
-    expected_log_message = f"Total simulation time is: {expected_simulation_time}"
 
     # Act
     simulation_engine.simulate()
 
     # Assert
-    mock_run_simulation_main_loop.assert_called_once()
-    assert mock_om_add_log.call_args_list == [
-        call("Simulation complete", "Simulation Completed.", info_map),
-        call("total_simulation_time", expected_log_message, info_map),
-    ]
-    mock_report_end_of_simulation.assert_called_once_with(
-        simulation_engine.herd_manager.herd_statistics,
-        simulation_engine.herd_manager.herd_reproduction_statistics,
-        simulation_engine.time,
-        simulation_engine.herd_manager.heiferII_events_by_id,
-        simulation_engine.herd_manager.cow_events_by_id,
-        simulation_engine.herd_manager.animal_genetic_history_by_id,
+    mock_run_simulation_main_loop.assert_called_once_with()
+    mock_post_loop_processing.assert_called_once_with()
+    mock_post_loop_reporting.assert_called_once_with()
+    mock_post_loop_logging.assert_called_once_with(expected_simulation_time, info_map)
+
+
+def test_post_loop_processing(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _post_loop_processing in simulation_engine.py
+    """
+    # Arrange
+    mock_estimate_all = mocker.patch.object(EEEManager, "estimate_all")
+
+    # Act
+    simulation_engine._post_simulation_processing()
+
+    # Assert
+    mock_estimate_all.assert_called_once_with()
+
+
+@pytest.mark.parametrize(
+    "simulate_animals, expect_report_call",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_post_loop_reporting(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_animals: bool,
+    expect_report_call: bool,
+) -> None:
+    """
+    Unit test for function _post_loop_reporting in simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.simulate_animals = simulate_animals
+
+    mock_report_end_of_simulation = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation"
     )
 
-    mock_estimate_emissions.assert_called_once()
+    # Act
+    simulation_engine._post_simulation_reporting()
+
+    # Assert
+    if expect_report_call:
+        mock_report_end_of_simulation.assert_called_once_with(
+            simulation_engine.herd_manager.herd_statistics,
+            simulation_engine.herd_manager.herd_reproduction_statistics,
+            simulation_engine.time,
+            simulation_engine.herd_manager.heiferII_events_by_id,
+            simulation_engine.herd_manager.cow_events_by_id,
+            simulation_engine.herd_manager.animal_genetic_history_by_id,
+        )
+    else:
+        mock_report_end_of_simulation.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "simulate_manure, expect_dmi_summary_call",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_post_loop_logging(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_manure: bool,
+    expect_dmi_summary_call: bool,
+) -> None:
+    """
+    Unit test for function _post_loop_logging in simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.simulate_manure = simulate_manure
+    total_simulation_time = 42.5
+    info_map = {"class": "SimulationEngine", "function": "simulate"}
+
+    mock_emit_dmi_summary = mocker.patch(
+        "RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator"
+        ".ManureExcretionCalculator.emit_dmi_below_min_summary"
+    )
+    mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    # Act
+    simulation_engine._post_simulation_logging(total_simulation_time, info_map)
+
+    # Assert
+    if expect_dmi_summary_call:
+        mock_emit_dmi_summary.assert_called_once_with(info_map)
+    else:
+        mock_emit_dmi_summary.assert_not_called()
+
+    assert mock_om_add_log.call_args_list == [
+        call("Simulation complete", "Simulation Completed.", info_map),
+        call("total_simulation_time", f"Total simulation time is: {total_simulation_time}", info_map),
+    ]
 
 
 def test_execute_full_farm_daily_simulation(
@@ -1178,6 +1258,13 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
         return_value=mock_weather,
     )
 
+    mock_field_data = {"field_1": {"dummy": "field config"}}
+    mocker.patch.object(
+        SimulationEngine,
+        "_gather_field_data",
+        return_value=mock_field_data,
+    )
+
     mock_field_manager = MagicMock(autospec=FieldManager)
     mock_field_manager_init = mocker.patch(
         "RUFAS.simulation_engine.FieldManager",
@@ -1241,7 +1328,7 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
     mock_emissions_estimator_init.assert_called_once_with()
     assert simulation_engine.emissions_estimator == mock_emissions_estimator
 
-    mock_field_manager_init.assert_called_once_with()
+    mock_field_manager_init.assert_called_once_with(mock_field_data)
     assert simulation_engine.field_manager == mock_field_manager
 
     mock_nutrient_standard_init.assert_called_once_with(mock_config_nutrient_standard)
@@ -1411,3 +1498,62 @@ def test_run_simulation_main_loop(
 
     # Assert
     assert mock_annual_simulation.call_count == expected_iterations
+
+
+def test_gather_field_data_with_fields(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_field_data in simulation_engine.py when fields are present.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.FULL_FARM)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    field_names = ["field_1", "field_2"]
+    field_1_config = {"field_size": 10.0, "absolute_latitude": 42.5}
+    field_2_config = {"field_size": 20.0, "absolute_latitude": 43.0}
+
+    mock_input_manager.get_data_keys_by_properties.return_value = field_names
+    mock_input_manager.get_data.side_effect = [field_1_config, field_2_config]
+
+    # Act
+    result = simulation_engine._gather_field_data()
+
+    # Assert
+    assert result == {"field_1": field_1_config, "field_2": field_2_config}
+    mock_input_manager.get_data_keys_by_properties.assert_called_once_with("field_properties")
+    mock_input_manager.get_data.assert_any_call("field_1")
+    mock_input_manager.get_data.assert_any_call("field_2")
+    mock_output_manager.add_warning.assert_not_called()
+
+
+def test_gather_field_data_no_fields(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_field_data in simulation_engine.py when no fields are found.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.FULL_FARM)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    mock_input_manager.get_data_keys_by_properties.return_value = []
+
+    # Act
+    result = simulation_engine._gather_field_data()
+
+    # Assert
+    assert result == {}
+    mock_input_manager.get_data.assert_not_called()
+    mock_output_manager.add_warning.assert_called_once_with(
+        "No field input files.",
+        "No fields will be simulated.",
+        {"class": "SimulationEngine", "function": "_gather_field_data"},
+    )
