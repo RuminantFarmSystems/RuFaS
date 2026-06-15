@@ -20,7 +20,7 @@ class Growth:
     Attributes
     ----------
     daily_growth: float
-        The body weight of the animal (kg).
+        The body weight change of the animal (kg).
     tissue_changed: float
         Body weight change due to tissue mobilization (kg).
     body_weight_history : list[BodyWeightHistory]
