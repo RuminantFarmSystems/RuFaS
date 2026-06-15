@@ -1048,6 +1048,7 @@ class ManureManager:
             "non_degradable_volatile_solids",
             "degradable_volatile_solids",
             "total_solids",
+            "bedding_non_degradable_volatile_solids",
         ]
 
         for processor in storage_processors:
@@ -1119,13 +1120,6 @@ class ManureManager:
         subset_manager.reset_nutrient_pools()
         subset_manager.add_nutrients(nutrient_pool)
         return subset_manager.handle_nutrient_request(request)
-
-    def finalize_daily_spread_exports(self, time: RufasTime) -> None:
-        """Report and clear remaining daily spread manure available for field application."""
-        daily_spread_storages, _ = self._split_storages_by_daily_spread()
-        for processor in daily_spread_storages:
-            assert isinstance(processor, DailySpread)
-            processor.export_and_clear_remaining_available(time)
 
     def _handle_spread_all_available_manure(self) -> NutrientRequestResults | None:
         """

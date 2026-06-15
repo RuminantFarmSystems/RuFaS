@@ -76,8 +76,3 @@ class DailySpread(Storage):
     def set_available_for_field_application(self, stream: ManureStream) -> None:
         """Set remaining manure available for daily spread field application."""
         self.available_for_field_application = stream
-
-    def export_and_clear_remaining_available(self, time: RufasTime) -> None:
-        """Report and clear leftover daily spread manure at end of day."""
-        self._report_manure_stream(self.available_for_field_application, "exported_excess", time.simulation_day)
-        self.available_for_field_application = ManureStream.make_empty_manure_stream()
