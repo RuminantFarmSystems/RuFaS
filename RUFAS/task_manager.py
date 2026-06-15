@@ -55,7 +55,24 @@ class TaskType(Enum):
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
-        """Converts a string to a TaskType enum."""
+        """
+        Converts a string to a ``TaskType`` enum.
+
+        Parameters
+        ----------
+        input_str : str
+            The string to convert.
+
+        Returns
+        -------
+        TaskType
+            The corresponding ``TaskType`` enum.
+
+        Raises
+        ------
+        ValueError
+            When the input string is not a valid task type.
+        """
         normalized_input = "_".join(input_str.strip().upper().split())
         try:
             return TaskType[normalized_input]
@@ -63,7 +80,14 @@ class TaskType(Enum):
             raise ValueError(f"The string '{input_str}' is not a match with any acceptable TaskType.")
 
     def is_multi_run(self) -> bool:
-        """Checks if the task type involves multiple runs."""
+        """
+        Checks if the task type involves multiple runs.
+
+        Returns
+        -------
+        bool
+            Whether the task type involves multiple runs.
+        """
         return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS]
 
 
@@ -95,21 +119,21 @@ class TaskManager:
         metadata_path : Path
             Path to the metadata file that contains task management inputs.
         verbosity : LogVerbosity | None
-            Verbosity level for the simulation and TaskManager.
+            Verbosity level for the simulation and ``TaskManager``.
         exclude_info_maps : bool
             Flag to exclude information maps.
         output_directory : Path
             Path to the directory where outputs will be saved.
         logs_directory : Path
-            Path to the directory where logs from the Task Manager will be saved.
+            Path to the directory where logs from the ``TaskManager`` will be saved.
         clear_output_directory : bool
             Whether to clear the output directory.
         produce_graphics : bool
             Whether to produce graphics.
         suppress_log_files : bool
-            Whether to write logs from the Task Manager to output files.
+            Whether to write logs from the ``TaskManager`` to output files.
         metadata_depth_limit : int
-            Override value for maximum metadata properties depth set in Input Manager.
+            Override value for maximum metadata properties depth set in ``InputManager``.
 
         Raises
         ------
@@ -118,8 +142,8 @@ class TaskManager:
 
         Notes
         -----
-        We set maxtasksperchild=1 to maintain isolation between tasks and ensure no memory
-        leaks happens in IO Managers.
+        We set ``maxtasksperchild=1`` to maintain isolation between tasks and ensure no memory
+        leaks happen in IO Managers.
 
         """
         self.input_manager = InputManager(metadata_depth_limit)
@@ -239,7 +263,7 @@ class TaskManager:
         Returns
         -------
         str
-            Version of RUFAS or "Unknown" if the version of Python version earlier than 3.12.
+            Version string of RuFaS, or ``"Unknown"`` if the version cannot be read.
         """
         try:
             with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
@@ -264,8 +288,6 @@ class TaskManager:
         RuntimeError
             If a required dependency is not installed or does not meet the version requirements
             specified in pyproject.toml.
-        ImportError
-            If a required dependency is not installed.
         """
         import tomllib
 
@@ -312,7 +334,15 @@ class TaskManager:
 
     def check_python_version(self) -> None:
         """
-        Checks if the Python version meets version range set in pyproject.toml.
+        Checks if the Python version meets the version range set in ``pyproject.toml``.
+
+        Raises
+        ------
+        RuntimeError
+            - If the Python version does not meet the version range specified in ``pyproject.toml``.
+            - If ``pyproject.toml`` is not found.
+            - If the ``requires-python`` field is missing in ``pyproject.toml``.
+            - If an unexpected error occurs while checking the Python version.
         """
         user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
         try:
@@ -358,7 +388,10 @@ class TaskManager:
         Returns
         -------
         tuple[list[dict[str, Any]], list[dict[str, Any]]]
-            Parsed single run and multi-run task arguments.
+            1. list[dict[str, Any]]
+                Parsed single-run task arguments.
+            2. list[dict[str, Any]]
+                Parsed multi-run task arguments.
         """
         parsed_single_run_args: list[dict[str, Any]] = []
         parsed_multi_run_args: list[dict[str, Any]] = []
@@ -426,6 +459,25 @@ class TaskManager:
         return expanded_args
 
     def _expand_simulation_multi_run_args(self, multi_run_args: dict[str, Any]) -> list[dict[str, Any]]:
+        """
+        Expands a multi-run simulation argument dict into a list of single-run
+        argument dicts.
+
+        Each single-run dict is a copy of the original with ``task_type`` set to
+        ``TaskType.SIMULATION_SINGLE_RUN``, a unique random seed, and an output
+        prefix suffixed with the run index.
+
+        Parameters
+        ----------
+        multi_run_args : dict[str, Any]
+            Multi-run configuration dict. Must contain ``multi_run_counts`` and
+            ``output_prefix`` keys.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            List of single-run argument dicts, one per run.
+        """
         single_run_args = []
         for i in range(multi_run_args["multi_run_counts"]):
             new_args = multi_run_args.copy()
@@ -437,7 +489,51 @@ class TaskManager:
         return single_run_args
 
     def _expand_sensitivity_analysis_args(self, multi_run_args: dict[str, Any]) -> list[dict[str, Any]]:
-        """Expands sensitivity analysis multi-run tasks into single-run tasks."""
+        """
+        Expands a sensitivity analysis multi-run argument dict into a list of
+        single-run argument dicts.
+
+        Parameters
+        ----------
+        multi_run_args : dict[str, Any]
+            Sensitivity analysis configuration dict.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            List of single-run argument dicts, one per selected sample.
+
+        Raises
+        ------
+        ValueError
+            If the specified sampler is not one of ``"fractional_factorial"``,
+            ``"sobol"``, or ``"morris"``.
+
+        Notes
+        -----
+        Required keys in ``multi_run_args``:
+
+        - ``SA_input_variables`` : list[dict] — each entry must contain
+          ``variable_name``, ``lower_bound``, ``upper_bound``, and ``data_type``
+          (``"float"`` or ``"int"``).
+        - ``sampler`` : str — one of ``"fractional_factorial"``, ``"sobol"``,
+          or ``"morris"``.
+        - ``sampler_n`` : int — number of samples; required for ``"sobol"`` and
+          ``"morris"`` samplers.
+        - ``skip_values`` : int — number of initial Sobol sequence values to skip;
+          required for ``"sobol"`` sampler.
+        - ``random_seed`` : int — seed for the sampler.
+        - ``SA_load_balancing_start`` : float — fractional start of the sample
+          range to process (0.0–1.0).
+        - ``SA_load_balancing_stop`` : float — fractional end of the sample range
+          to process (0.0–1.0).
+        - ``output_prefix`` : str — base prefix for output file names, suffixed
+          with the zero-padded run number.
+
+        Samples the input variable space using the specified sampler, applies load
+        balancing to select a subset of samples, then builds one single-run dict per
+        sample with an ``input_patch`` containing the sampled variable values.
+        """
 
         SA_input_variables: list[dict[str, float | str]] = multi_run_args["SA_input_variables"]
 
@@ -515,7 +611,30 @@ class TaskManager:
         output_directory: Path,
         verbosity: LogVerbosity | None,
     ) -> None:
-        """Runs the tasks based on the provided arguments."""
+        """
+        Runs all single-run tasks, in parallel if a process pool is available.
+
+        Parameters
+        ----------
+        single_run_args : list[dict[str, Any]]
+            List of argument dicts, one per single-run task.
+        produce_graphics : bool
+            Whether to produce graphics output for each run.
+        metadata_depth_limit : int
+            Maximum allowed metadata nesting depth.
+        workers : int
+            Number of worker processes.
+        metadata_path : Path
+            Path to the metadata file.
+        output_directory : Path
+            Directory where task outputs will be written.
+        verbosity : LogVerbosity or None
+            Log verbosity level for each run.
+
+        Notes
+        -----
+        Failed tasks are collected and reported as an error via the ``OutputManager``.
+        """
         task_with_args = partial(
             self.task,
             produce_graphics=produce_graphics,
@@ -549,7 +668,26 @@ class TaskManager:
         produce_graphics: bool,
         should_flush_im_pool: bool,
     ) -> None:
-        """Wrapper function to call the function map with each of its arguments."""
+        """
+        Calls a task handler with the provided arguments.
+
+        Parameters
+        ----------
+        handler : Callable[..., None]
+            Task handler function to invoke.
+        args : dict[str, Any]
+            Task-specific arguments passed to the handler.
+        input_manager : InputManager
+            ``InputManager`` instance passed to the handler.
+        output_manager : OutputManager
+            ``OutputManager`` instance passed to the handler.
+        task_id : Any
+            Identifier of the current task.
+        produce_graphics : bool
+            Whether to produce graphics output.
+        should_flush_im_pool : bool
+            Whether the handler should flush the ``InputManager`` pool after execution.
+        """
         handler(args, input_manager, output_manager, task_id, produce_graphics, should_flush_im_pool)
 
     @staticmethod
@@ -562,7 +700,47 @@ class TaskManager:
         output_directory: Path,
         verbosity: LogVerbosity | None,
     ) -> str | None:
-        """Executes a single task with specified arguments."""
+        """
+        Executes a single task with the specified arguments.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
+            Task arguments. Must include ``task_id``, ``task_type``,
+            ``output_prefix``, ``log_verbosity``, ``exclude_info_maps``,
+            ``chunkification``, ``maximum_memory_usage_percent``,
+            ``maximum_memory_usage``, ``save_chunk_threshold_call_count``,
+            ``filters_directory``, ``random_seed``, and ``logs_directory``.
+        produce_graphics : bool
+            Whether to produce graphics output for the task.
+        workers : int
+            Total number of worker processes, used to partition memory limits.
+        metadata_depth_limit : int or None
+            Maximum allowed metadata nesting depth passed to the InputManager.
+        metadata_path : Path
+            Path to the metadata file.
+        output_directory : Path
+            Directory where task outputs will be written.
+        verbosity : LogVerbosity or None
+            Log verbosity override. If ``None``, the value from ``args`` is used.
+
+        Returns
+        -------
+        str or None
+            ``None`` on success. A string of the form
+            ``"{output_prefix} ({task_id})"`` if the task fails with an
+            unrecoverable exception.
+
+        Notes
+        -----
+        This function initializes the ``OutputManager`` and ``InputManager``, routes the task to the
+        appropriate handler based on task type, and returns a failure identifier
+        if an unrecoverable error occurs.
+
+        For simulation and analysis task types, input data is validated before
+        the handler is invoked. If validation fails, post-processing is run and
+        the task exits without executing the main handler.
+        """
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.task.__name__,
@@ -666,7 +844,17 @@ class TaskManager:
 
     @staticmethod
     def handle_herd_initialization(args: dict[str, Any], output_manager: OutputManager) -> None:
-        """Handles initialization of the herd based on specified arguments."""
+        """
+        Handles initialization of the herd based on the specified arguments.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
+            Task arguments. Must include ``init_herd``, ``save_animals``, and
+            ``save_animals_directory``.
+        output_manager : OutputManager
+            ``OutputManager`` instance used for logging.
+        """
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_herd_initialization.__name__,
@@ -679,7 +867,22 @@ class TaskManager:
 
     @staticmethod
     def handle_single_simulation_run(args: dict[str, Any], output_manager: OutputManager) -> None:
-        """Conducts a single simulation run based on provided arguments."""
+        """
+        Conducts a single simulation run based on the provided arguments.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
+            Simulation run arguments. Must contain ``simulation_type``, a string
+            identifying the type of simulation to run.
+        output_manager : OutputManager
+            ``OutputManager`` instance used for logging and error reporting.
+
+        Raises
+        ------
+        ValueError
+            If ``simulation_type`` is missing from ``args``.
+        """
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_single_simulation_run.__name__,
@@ -789,7 +992,29 @@ class TaskManager:
     def handle_input_data_audit(
         args: dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
     ) -> bool:
-        """Validates input data saves metadata properties to CSV."""
+        """
+        Validates input data and optionally saves metadata properties and exports
+        input data to CSV.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
+            Task arguments. Must include ``metadata_file_path``, ``input_root``,
+            ``task_id``, ``output_prefix``, ``logs_directory``,
+            ``suppress_log_files``, and ``export_input_data_to_csv``. Optionally
+            includes ``cross_validation_file_paths``.
+        input_manager : InputManager
+            ``InputManager`` instance used to process and validate input data.
+        output_manager : OutputManager
+            ``OutputManager`` instance used for logging.
+        eager_termination : bool
+            Whether to stop validation on the first error encountered.
+
+        Returns
+        -------
+        bool
+            ``True`` if input data is valid, ``False`` otherwise.
+        """
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.handle_input_data_audit.__name__,
@@ -852,13 +1077,10 @@ class TaskManager:
             Whether to save results after processing.
         load_pool_from_file : bool
             Whether to load data pool from file.
-        load_saved_output_pools : bool, optional
-            Whether to load multiple saved pools as defined by ``saved_output_pools`` before
-            continuing with post-processing.
         export_input_data_to_csv: bool
             Whether to export the input data to a CSV file.
         should_flush_im_pool: bool
-            Whether to flush the input manager pool.
+            Whether to flush the ``InputManager`` pool.
 
         Notes
         -----
@@ -932,7 +1154,19 @@ class TaskManager:
 
     @staticmethod
     def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:
-        """Sets the random seed for the task run."""
+        """
+        Sets the random seed for both the ``random`` and ``numpy.random`` modules.
+
+        If ``random_seed`` is ``0``, a random seed is generated within the valid
+        NumPy seed range before being applied.
+
+        Parameters
+        ----------
+        random_seed : int or None
+            Seed value to apply. If ``0``, a random seed is generated instead.
+        output_manager : OutputManager
+            ``OutputManager`` instance used for logging and recording the seed used.
+        """
         info_map: dict[str, str | MeasurementUnits] = {
             "class": TaskManager.__name__,
             "function": TaskManager.set_random_seed.__name__,
@@ -957,7 +1191,7 @@ class TaskManager:
         produce_grahics: bool,
         should_flush_im_pool: bool,
     ) -> None:
-        """Handler for all methods related to metadata property comparison."""
+        """Handler for input data audit tasks."""
         TaskManager.handle_input_data_audit(
             args=args, input_manager=input_manager, output_manager=output_manager, eager_termination=False
         )
