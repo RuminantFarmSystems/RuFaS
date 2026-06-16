@@ -204,7 +204,7 @@ class SimulationEngine:
         """
         Instantiates the requested biophysical modules based on simulation type.
         """
-        weather_data = self.im.get_data("weather")
+        weather_data: dict[str, list[int | float]] = self.im.get_data("weather")
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
