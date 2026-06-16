@@ -873,6 +873,38 @@ def test_populate_pool_raises_keyerror(
     )
 
 
+@pytest.mark.parametrize(
+    "input_data, expected",
+    [
+        ({}, False),
+        ({"exclude_from_pool": True}, True),
+        ({"exclude_from_pool": False}, False),
+        ({"exclude_from_pool": "true"}, True),
+        ({"exclude_from_pool": "True"}, True),
+        ({"exclude_from_pool": " TRUE "}, True),
+        ({"exclude_from_pool": "false"}, False),
+        ({"exclude_from_pool": "yes"}, False),
+        ({"exclude_from_pool": ""}, False),
+        ({"exclude_from_pool": [True]}, True),
+        ({"exclude_from_pool": [False]}, False),
+        ({"exclude_from_pool": ["true"]}, True),
+        ({"exclude_from_pool": ["false"]}, False),
+        ({"exclude_from_pool": []}, False),
+        ({"exclude_from_pool": 1}, False),
+        ({"exclude_from_pool": None}, False),
+    ],
+)
+def test_should_exclude_from_pool_population(
+    mock_input_manager: InputManager,
+    input_data: dict[str, object],
+    expected: bool
+) -> None:
+    """Test for helper function _should_exclude_from_pool_population() """
+    actual = mock_input_manager._should_exclude_from_pool_population(input_data)
+
+    assert actual is expected
+
+
 @pytest.fixture
 def mock_metadata_for_fix_data(mocker: MockerFixture) -> dict[str, dict[str, Any]]:
     return {
