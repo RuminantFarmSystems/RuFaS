@@ -997,7 +997,7 @@ class InputManager:
                     info_map={
                         "class": self.__class__.__name__,
                         "function": self._populate_pool.__name__,
-                    }
+                    },
                 )
                 continue
 
@@ -1005,9 +1005,7 @@ class InputManager:
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
             validated_data = {}
-            validation_properties = [
-                key for key in metadata_properties if key != "data_collection_app_compatible"
-            ]
+            validation_properties = [key for key in metadata_properties if key != "data_collection_app_compatible"]
             for metadata_property in validation_properties:
                 variable_properties = metadata_properties[metadata_property]
                 is_element_acceptable = self.data_validator.validate_data_by_type(

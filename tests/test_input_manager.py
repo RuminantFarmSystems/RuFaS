@@ -895,11 +895,9 @@ def test_populate_pool_raises_keyerror(
     ],
 )
 def test_should_exclude_from_pool_population(
-    mock_input_manager: InputManager,
-    input_data: dict[str, object],
-    expected: bool
+    mock_input_manager: InputManager, input_data: dict[str, object], expected: bool
 ) -> None:
-    """Test for helper function _should_exclude_from_pool_population() """
+    """Test for helper function _should_exclude_from_pool_population()"""
     actual = mock_input_manager._should_exclude_from_pool_population(input_data)
 
     assert actual is expected
