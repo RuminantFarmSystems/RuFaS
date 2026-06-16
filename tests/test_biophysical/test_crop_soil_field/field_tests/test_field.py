@@ -359,6 +359,9 @@ def test_check_manure_application_schedule_integration() -> None:
     setattr(manure_event_today, "nitrogen_mass", 10)
     setattr(manure_event_today, "phosphorus_mass", 5)
     setattr(manure_event_today, "manure_type", ManureType.LIQUID)
+    setattr(manure_event_today, "manure_supplement_method", ManureSupplementMethod.NONE)
+    setattr(manure_event_today, "is_daily_spread", False)
+    setattr(manure_event_today, "spread_all_available_manure", False)
     setattr(manure_event_today, "date_occurs", RufasTime.convert_year_jday_to_date(2024, 120).date())
     manure_event_today.occurs_today.return_value = True
 

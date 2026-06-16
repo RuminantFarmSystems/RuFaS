@@ -1134,7 +1134,7 @@ class Field:
         )
         nitrogen_spread_amount = self.daily_spread_settings.get("nitrogen_spread_amount", 0.0)
         phosphorus_spread_amount = self.daily_spread_settings.get("phosphorus_spread_amount", 0.0)
-        spread_all_available_manure = bool(self.daily_spread_settings.get("spread_all_available_manure", False))
+        spread_all_available_manure: bool = self.daily_spread_settings.get("spread_all_available_manure", False)
         return ManureEvent(
             nitrogen_mass=nitrogen_spread_amount,
             phosphorus_mass=phosphorus_spread_amount,
@@ -1172,7 +1172,7 @@ class Field:
             "year": event.year,
             "day": event.day,
         }
-        spread_all_available_manure = bool(getattr(event, "spread_all_available_manure", False))
+        spread_all_available_manure = event.spread_all_available_manure
         if not spread_all_available_manure and event.nitrogen_mass == event.phosphorus_mass == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             self.om.add_warning("Manure Application Warning", log_message, info_map)
@@ -1188,7 +1188,7 @@ class Field:
             phosphorus=event.phosphorus_mass,
             manure_type=event.manure_type,
             use_supplemental_manure=use_supplemental_manure,
-            use_daily_spread_source=bool(getattr(event, "is_daily_spread", False)),
+            use_daily_spread_source=event.is_daily_spread,
             spread_all_available_manure=spread_all_available_manure,
         )
 
