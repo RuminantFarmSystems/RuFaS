@@ -381,15 +381,7 @@ def test_setup_fertilizer_schedule(
     actual_available_mixes, actual_events = FieldManager._setup_fertilizer_events("test_fert_schedule")
     assert actual_available_mixes == expected_available_mixes
     assert actual_events == expected_events
-    mock_get_data.assert_called_once_with("test_fert_schedule")
-
-
-def test_setup_fertilizer_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test when no fertilizer schedule input."""
-    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
-
-    with pytest.raises(ValueError):
-        FieldManager._setup_fertilizer_events("test_fert_schedule")
+    mock_get_data.assert_called_once_with("test_fert_schedule", required=False)
 
 
 @pytest.mark.parametrize(
@@ -823,15 +815,7 @@ def test_setup_manure_schedule(
     expected_manure_events = expected_manure_schedule.generate_manure_events()
     actual_manure_events = FieldManager._setup_manure_events("test_manure_schedule")
     assert actual_manure_events == expected_manure_events
-    mock_get_data.assert_called_once_with("test_manure_schedule")
-
-
-def test_setup_manure_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test when no manure schedule input."""
-    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
-
-    with pytest.raises(ValueError):
-        FieldManager._setup_manure_events("test_manure_schedule")
+    mock_get_data.assert_called_once_with("test_manure_schedule", required=False)
 
 
 @pytest.mark.parametrize(
@@ -1246,15 +1230,7 @@ def test_setup_tillage_schedule(
 
     actual_tillage_events = FieldManager._setup_tillage_events("test_tillage_schedule")
     assert actual_tillage_events == expected_tillage_events
-    mock_get_data.assert_called_once_with("test_tillage_schedule")
-
-
-def test_setup_tillage_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test when no tillage input data available."""
-    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
-
-    with pytest.raises(ValueError):
-        FieldManager._setup_tillage_events("test_tillage_schedule")
+    mock_get_data.assert_called_once_with("test_tillage_schedule", required=False)
 
 
 @pytest.mark.parametrize(
