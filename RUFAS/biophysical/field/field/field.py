@@ -707,7 +707,8 @@ class Field:
         Returns
         -------
         tuple[float, float]
-            The validated application depth and surface remainder fraction.
+            - The validated application depth.
+            - The surface remainder fraction.
 
         Raises
         ------
@@ -1216,8 +1217,8 @@ class Field:
         Returns
         -------
         Tuple
-            A tuple containing the list of all Events that will occur in this field after the current day, and a list of
-            Events that will occur on the current day.
+            - The list of all Events that will occur in this field after the current day.
+            = A list of Events that will occur on the current day.
 
         Notes
         -----
