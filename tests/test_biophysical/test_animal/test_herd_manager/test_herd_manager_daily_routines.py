@@ -309,6 +309,43 @@ def test_perform_daily_routines_counts_deaths_and_handles_stillborn_newborns(
     assert sold_newborn_calves == []
 
 
+def test_perform_daily_routines_accumulates_reproduction_statistics(
+    herd_manager: HerdManager, mocker: MockerFixture
+) -> None:
+    """Reproduction statistics accumulate into both the whole-simulation and the daily accumulator (issue #3029)."""
+    herd_manager.herd_reproduction_statistics = HerdReproductionStatistics(
+        total_num_successful_conceptions=10, cow_num_successful_conceptions=10
+    )
+    herd_manager.daily_herd_reproduction_statistics = HerdReproductionStatistics(
+        total_num_successful_conceptions=4, cow_num_successful_conceptions=4
+    )
+
+    animals: list[Animal] = []
+    for _ in range(2):
+        animal = MagicMock(spec=Animal)
+        animal.animal_type = AnimalType.LAC_COW
+        mocker.patch.object(
+            animal,
+            "daily_routines",
+            return_value=DailyRoutinesOutput(
+                animal_status=AnimalStatus.REMAIN,
+                herd_reproduction_statistics=HerdReproductionStatistics(
+                    total_num_successful_conceptions=1, cow_num_successful_conceptions=1
+                ),
+            ),
+        )
+        animals.append(animal)
+
+    herd_manager._perform_daily_routines_for_animals(time=MagicMock(spec=RufasTime), animals=animals)
+
+    # Whole-simulation accumulator: 10 + 1 + 1 = 12
+    assert herd_manager.herd_reproduction_statistics.total_num_successful_conceptions == 12
+    assert herd_manager.herd_reproduction_statistics.cow_num_successful_conceptions == 12
+    # Daily accumulator: 4 + 1 + 1 = 6
+    assert herd_manager.daily_herd_reproduction_statistics.total_num_successful_conceptions == 6
+    assert herd_manager.daily_herd_reproduction_statistics.cow_num_successful_conceptions == 6
+
+
 def test_update_herd_structure(
     herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
@@ -566,6 +603,9 @@ def test_report_daily_routine_outputs(herd_manager: HerdManager, mocker: MockerF
     mock_report_herd_statistics_data = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_herd_statistics_data"
     )
+    mock_report_daily_reproduction_statistics = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reproduction_statistics"
+    )
     mock_report_manure_excretions = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_excretions"
     )
@@ -588,6 +628,9 @@ def test_report_daily_routine_outputs(herd_manager: HerdManager, mocker: MockerF
     mock_report_enteric_methane_emission.assert_called_once_with(enteric_methane_emission_by_pen)
     mock_report_daily_animal_population.assert_called_once_with(herd_manager.herd_statistics, 15)
     mock_report_herd_statistics_data.assert_called_once_with(herd_manager.herd_statistics, 15)
+    mock_report_daily_reproduction_statistics.assert_called_once_with(
+        herd_manager.daily_herd_reproduction_statistics, 15
+    )
     mock_report_manure_excretions.assert_called_once_with(animal_manure_excretions_by_pen, 15)
     mock_report_manure_streams.assert_called_once_with(herd_manager_output, 15)
     mock_report_milk.assert_called_once_with(herd_manager.daily_milk_report, 15)
@@ -680,8 +723,19 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         ]
         pen.beddings = {"mock_bedding": MagicMock(auto_spec=Bedding)}
 
+    herd_manager.herd_reproduction_statistics = HerdReproductionStatistics(
+        total_num_ai_performed=7, heifer_num_ai_performed=3, cow_num_ai_performed=4
+    )
+    herd_manager.daily_herd_reproduction_statistics = HerdReproductionStatistics(total_num_successful_conceptions=99)
+
     herd_manager.execute_daily_routines([mock_feed], mock_time, mock_weather)
 
+    # Whole-simulation accumulator persists across days (issue #3029, option B).
+    assert herd_manager.herd_reproduction_statistics.total_num_ai_performed == 7
+    assert herd_manager.herd_reproduction_statistics.heifer_num_ai_performed == 3
+    assert herd_manager.herd_reproduction_statistics.cow_num_ai_performed == 4
+    # Daily accumulator is reset at the start of each day (issue #3029, option A).
+    assert herd_manager.daily_herd_reproduction_statistics.total_num_successful_conceptions == 0
     mock_reset_daily_statistics.assert_called_once_with()
     assert mock_perform_daily_routines_for_animals.call_count == 5
     assert mock_perform_daily_routines_for_animals.call_args_list == [
