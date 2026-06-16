@@ -986,12 +986,32 @@ class ManureManager:
         update_nutrient_manager_pool: bool = True,
     ) -> None:
         """
-        Remove nutrients from the storage based on the results of a nutrient request by manure type.
+        Draw down on-farm storage to reflect the manure that was applied to fulfill a nutrient request.
+
+        The storages of the requested ``manure_type`` are aggregated into a single nutrient pool, the proportion
+        of the limiting nutrient (nitrogen or phosphorus) consumed by ``results`` is computed against that pool,
+        and then that same proportion is removed from each matching storage. For ``DailySpread`` storages the
+        ``available_for_field_application`` stream is drawn down; for all other storages the ``stored_manure``
+        stream is drawn down.
 
         Parameters
         ----------
         results : NutrientRequestResults
-            The results of a nutrient request. See :class:`NutrientsRequestResults` for details.
+            The results of the nutrient request that was fulfilled, i.e. the amount being applied to the field.
+            See :class:`NutrientRequestResults` for details.
+        manure_type : ManureType
+            Only storages of this manure type are drawn down; storages of other types are left untouched.
+        include_daily_spread : bool
+            If True, draw down the ``DailySpread`` storages (used for daily-spread requests); if False, draw down
+            the regular (non-daily-spread) storages.
+        update_nutrient_manager_pool : bool, default True
+            If True, also decrement the aggregated nutrient pool tracked by the ``ManureNutrientManager`` so the
+            farm-wide bookkeeping stays in sync. Passed as False for daily-spread requests, because ``DailySpread``
+            storages are excluded from that aggregated pool.
+
+        Notes
+        -----
+        If the matching storages hold effectively no manure, the method returns without making any changes.
 
         """
         daily_spread_storages, non_daily_storages = self._split_storages_by_daily_spread()

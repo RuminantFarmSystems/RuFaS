@@ -340,7 +340,10 @@ class FieldManager:
         Returns
         -------
         tuple[list[ManureEvent], dict[str, Any] | None]
-            A list of generated manure events and optional daily spread settings.
+            - list[ManureEvent]
+                A list of generated manure events
+            - dict[str, Any] | None
+                Optional daily spread settings.
 
         Raises
         ------
