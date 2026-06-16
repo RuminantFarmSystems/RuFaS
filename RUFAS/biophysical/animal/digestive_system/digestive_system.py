@@ -178,7 +178,6 @@ class DigestiveSystem:
         Returns
         -------
         tuple[float, float]
-            A tuple containing two values:
             - The amount of phosphorus excreted in urine (g).
             - The amount of phosphorus excreted in feces (g).
 

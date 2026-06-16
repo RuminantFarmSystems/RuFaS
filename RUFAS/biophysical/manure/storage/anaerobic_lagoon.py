@@ -148,7 +148,6 @@ class AnaerobicLagoon(Storage):
         Returns
         -------
         tuple[float, float]
-            A tuple containing:
             - The methane burned from manure storage on the current day, (kg).
             - The methane emitted from manure storage on the current day, (kg).
 

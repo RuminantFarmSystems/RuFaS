@@ -217,8 +217,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an error message describing the first failure encountered. The message is empty when
-            validation succeeds.
+            - Boolean representing validation status
+            - An error message describing the first failure encountered. The message is empty when validation succeeds.
 
         """
         info_map = {
@@ -319,10 +319,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata properties object is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails.
 
         Notes
         -----
@@ -406,10 +404,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata definition is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails.
 
         Notes
         -----
@@ -549,10 +545,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata definition is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails.
 
         Notes
         -----
@@ -666,10 +660,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata definition is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails.
 
         Notes
         -----
@@ -736,10 +728,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata definition is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails.
 
         Notes
         -----
@@ -850,8 +840,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message. The message is
-            empty when validation succeeds.
+            - A boolean representing validation status.
+            - An error message if validation fails.
 
         """
         info_map = {
@@ -958,10 +948,8 @@ class DataValidator:
         Returns
         -------
         tuple[list[str] | None, str]
-            Tuple containing the validated list of paths and an associated error message.
-
-            - ``(paths, "")`` if all configured path values are valid.
-            - ``(None, message)`` if a configured path value is missing, empty, or not a string.
+            - A validated list of the paths.
+            - An associated error message if a configured path value is missing, empty, or not a string.
 
         Notes
         -----
@@ -2310,8 +2298,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            Result of the expression evaluation and a boolean indicating whether
-            the expression was successfully evaluated.
+            - The result of the expression evaluation.
+            - A boolean indicating whether the expression was successfully evaluated.
 
         Raises
         ------
@@ -2377,7 +2365,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            Aggregated result and ``True`` on success, or ``(None, False)`` on error.
+            - The aggregated result.
+            - A boolean representing the success or failure of the aggregation.
 
         Raises
         ------
@@ -2538,7 +2527,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            ``(result, True)`` on success or ``(None, False)`` on error.
+            - The result of the evaluation.
+            - A boolean representing the success or failure of the evaluation.
 
         Notes
         -----
