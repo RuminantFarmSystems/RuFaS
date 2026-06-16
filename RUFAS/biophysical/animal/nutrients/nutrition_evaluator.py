@@ -32,8 +32,9 @@ class NutritionEvaluator:
         Returns
         -------
         tuple[bool, NutritionEvaluationResults]
-            Boolean indicating if the ration has an amount of energy and nutrients sufficient to meet the given
-            requirements, and an object containing a summary of all energy and nutrient surpluses and deficiencies.
+            - Boolean indicating if the ration has an amount of energy and nutrients sufficient to meet the given
+            requirements. 
+            - An object containing a summary of all energy and nutrient surpluses and deficiencies.
 
         """
         heifer_energy_nutrition_checkers = {
