@@ -1,6 +1,8 @@
 import pytest
+from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import ReproStateEnum
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
+from RUFAS.output_manager import OutputManager
 
 
 def test_repro_state_manager_init() -> None:
@@ -41,13 +43,16 @@ def test_enter_state(
 
 
 @pytest.mark.parametrize("state", [ReproStateEnum.PREGNANT, ReproStateEnum.FRESH])
-def test_enter_existing_state_raises_value_error(state: ReproStateEnum) -> None:
+def test_enter_existing_state_raises_value_error(state: ReproStateEnum, mocker: MockerFixture) -> None:
     """
     Test that re-entering an already active state raises ValueError.
     """
     manager = ReproStateManager({state})
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError, match=f"Attempting to re-enter the same state: {state}"):
         manager.enter(state, keep_existing=True)
+
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -70,15 +75,17 @@ def test_exit_state(
 
 
 @pytest.mark.parametrize("state", [ReproStateEnum.WAITING_FULL_ED_CYCLE, ReproStateEnum.IN_OVSYNCH])
-def test_exit_nonexistent_state_raises_value_error(state: ReproStateEnum) -> None:
+def test_exit_nonexistent_state_raises_value_error(state: ReproStateEnum, mocker: MockerFixture) -> None:
     """
     Test that exiting a non-existent state raises ValueError.
     """
     manager = ReproStateManager(initial_states={ReproStateEnum.PREGNANT, ReproStateEnum.FRESH})
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
 
     with pytest.raises(ValueError):
         manager.exit(state)
 
+    mock_add_error.assert_called_once()
 
 @pytest.mark.parametrize(
     "state, expected",
