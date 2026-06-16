@@ -9,10 +9,10 @@ removal from the herd. In addition to the dynamic Monte-Carlo models that determ
 throughout each animal’s life, the Animal Module uses process-based, dynamic models to simulate the following 
 processes:
 
-- Individual animal growth
-- Gestation and milk production
-- Estimation of nutrient requirements and feed intake
-- Enteric emission and manure excretion 
+* Individual animal growth
+* Gestation and milk production
+* Estimation of nutrient requirements and feed intake
+* Enteric emission and manure excretion 
 
 ### Animal Life Cycle
 The animal life cycle is driven by Monte Carlo stochastic processes that simulate the growth, production, reproduction, 
@@ -23,20 +23,20 @@ The life cycle module represents the variation in animal performance through the
 methods [@reuven_2017]. Monte Carlo simulation relies on random draws from probability distributions rather than 
 assigning fixed values. In this model, two main strategies are used:
 
-- Event-based, in which a random draw from a uniform distribution ($U(0,1)$) is compared to the probability of an 
+* Event-based, in which a random draw from a uniform distribution ($U(0,1)$) is compared to the probability of an 
 event occurring to simulate if that event occurs, and 
-- Population-based, in which a random draw from a known distribution of attribute values is assigned to an animal at
+* Population-based, in which a random draw from a known distribution of attribute values is assigned to an animal at
 instantiation. Probability distributions used for that purpose are Normal Gaussian or Empirical. 
 
 Each animal within the RuFaS herd progresses through five main life stages (calf, Heifer I, Heifer II, Heifer III,
 and Cow) as illustrated in the figure below. 
 
--  Calves progress to Heifer I when their age reaches the user-defined input for weaning day.
--  Heifer I progresses to Heifer II when their age reaches the user-defined input for breeding start day. 
--  Heifer II animals that successfully conceive become Heifer III's when the number of days left in their pregnancy 
+*  Calves progress to Heifer I when their age reaches the user-defined input for weaning day.
+*  Heifer I progresses to Heifer II when their age reaches the user-defined input for breeding start day. 
+*  Heifer II animals that successfully conceive become Heifer III's when the number of days left in their pregnancy 
 is equal to the user-defined input for prefresh days (default 21).
--  When a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm.
--  Cows cycle through lactating and non-lactating phases until they are removed from the herd due to a failure to 
+*  When a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm.
+*  Cows cycle through lactating and non-lactating phases until they are removed from the herd due to a failure to 
 conceive or a user-provided probability for sale or death within each parity (lactation).
 
 When a Heifer III or Cow reaches full gestation length, they start lactating and a new calf object is created. The calf 
@@ -49,9 +49,7 @@ event-based Monte Carlo method informed by the user-defined percent of female ca
 ### Herd Initialization
 
 ::: {.callout-note}
-
 In RuFaS code, the term “herd initialization” is used to refer to both the process of generating an animal population file and of selecting from that population to create a specific herd at the start of a simulation. In this doc, those two processes will be differentiated by calling them “Generation” and “Selection”, respectively. “Animal population” can refer to both groups of animals (the pool of animals generated, and the herd of animals selected). In the code, the population is sometimes referred to as `pre_animal_population` and `post_animal_population` to differentiate whether the specified group of animals exists before or after the random selection of individuals to create a herd.
-
 :::
 
 #### Introduction 
@@ -81,14 +79,13 @@ import_table(
 import_table(
   "../resources/table_data/animal/tbl-an-herd-inputs.csv",
   colalign = ["left", "left", "center", "center", "center"]
-
 )
 ```
 
 #### Relevant Outputs
 
 After the animals have been selected from the animal population to create the initial herd, a summary of the Population
-(pre-selection pool, aka pre-animal-population) and of the Initial herd (selected animals, aka post-animal-population) 
+(pre-selection pool, aka `pre-animal-population`) and of the Initial herd (selected animals, aka `post-animal-population`) 
 is provided to the output manager. 
 
 Class and function: `AnimalModuleReporter.report_animal_population_statistics`
@@ -147,22 +144,18 @@ All animals in RuFaS are assigned to a pen which is used to summarize nutrient r
 import_table(
   "../resources/table_data/animal/tbl-an-grp-inputs.csv",
   colalign = ["left", "left", "center", "center", "center"]
-
 )
 ```
 
 #### Relevant Outputs
 
-- `number_of_animals_in_pen_[id]_[AnimalCombination]` - reports the number of animals in each pen each day.
+- `number_of_animals_in_pen_[id]_[AnimalCombination]`: reports the number of animals in each pen each day.
 
-- `ration_per_animals_for_pen_[id]_[AnimalCombination]` - reports average dry matter intake of an animal in the pen at the time of the ration formulation.
+- `ration_per_animals_for_pen_[id]_[AnimalCombination]`: reports average dry matter intake of an animal in the pen at the time of the ration formulation.
 
-- `ration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id]` - reports the amount of each feed that is delivered per animal in the pen.
+- `ration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id]`: reports the amount of each feed that is delivered per animal in the pen.
 
-- `ration_nutrient_amount_for\_pen_[AnimalCombination].[nutrient]` - is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated).
-
-
-
+- `ration_nutrient_amount_for\_pen_[AnimalCombination].[nutrient]`: is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated).
 
 #### Methodology
 
@@ -176,14 +169,15 @@ To translate from the `AnimalTypes` needed to track an animal’s life stages an
 import_table(
   "../resources/table_data/animal/tbl-an-def-grp.csv",
   colalign = ["left", "left"]
-
 )
 ```
-Currently there are only two options for assigning AnimalCombinations to pens. 
 
-* *Option 1:* The first and most commonly used option for grouping animals is to assign one AnimalCombination to each pen such that there is at least one pen for the 4 AnimalCombinations: `CALF`, `GROWING`, `CLOSE_UP`, and `LAC_COW`. 
+Currently there are only two options for assigning `AnimalCombinations` to pens. 
 
-* *Option 2:* In some cases, and especially in very small farms, a user might wish to represent a scenario where all growing animals, pregnant heifers, and non-lactating cows are housed together. In this case, there is an option to have a pen that houses both `GROWING` and `CLOSE_UP` animals such that the there is at least one pen with each of the 3  AnimalCombination  inputs: `CALF`, `GROWING_AND_CLOSE_UP`, and `LAC_COW`. 
+* *Option 1:* The first and most commonly used option for grouping animals is to assign one `AnimalCombination` to each pen such that there is at least one pen for the 
+four AnimalCombinations: `CALF`, `GROWING`, `CLOSE_UP`, and `LAC_COW`. 
+
+* *Option 2:* In some cases, and especially in very small farms, a user might wish to represent a scenario where all growing animals, pregnant heifers, and non-lactating cows are housed together. In this case, there is an option to have a pen that houses both `GROWING` and `CLOSE_UP` animals such that the there is at least one pen with each of the three  AnimalCombination  inputs: `CALF`, `GROWING_AND_CLOSE_UP`, and `LAC_COW`. 
 
 
 **Pen Sizing**
@@ -192,14 +186,14 @@ Due to oscillations in the exact number of animals in each animal type, it is st
 
 **Class** 
 
-Pens are initiated from the Pen class by the HerdManager at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
+Pens are initiated from the Pen class by the `HerdManager` at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
 
 ::: {.callout-note}
-`Remove_animals_by_ids` - This function is called when the `HerdManager` calls for: `remove_animal_from_pen_and_id_map`. 
+`Remove_animals_by_ids`: This function is called when the `HerdManager` calls for: `remove_animal_from_pen_and_id_map`. 
 
 It is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen. 
 
-`_add_new_animals` - This function is called by `Pen.update_animals` which is in turn called by `HerdManager._add_animal_to_pen_and_id_map`. Thus, when `HerdManager` initiates addition of animals to each pen, this function executes the addition of those animals. 
+`_add_new_animals`: This function is called by `Pen.update_animals` which is in turn called by `HerdManager._add_animal_to_pen_and_id_map`. Thus, when `HerdManager` initiates addition of animals to each pen, this function executes the addition of those animals. 
 
 :::
 
@@ -251,7 +245,7 @@ Where appropriate, requirement calculations are differentiated by animal age and
 
 
 ##### Energy Requirements
-For details about the variables included in each calculation, please refer to #tbl-energy-req for a full list.
+For details about the variables included in each calculation, please refer to @tbl-an-energy-nrc for a full list.
 
 **Maintenance** <br>
 The maintenance requirement is calculated based on metabolic body weight ($\text{body weight}^{0.75}$).
@@ -282,7 +276,7 @@ $$
 $$
 :::
 
-* Heifers - The maintenance requirement is calculated based on metabolic body weight (body weight^0.75), body condition score, and the previous month's temperatures.
+* Heifers: The maintenance requirement is calculated based on metabolic body weight $(\text{body weight}^{0.75})$, body condition score, and the previous month's temperatures.
 
 :::{}
 [See [AN.NRC.1](#eq-an-nrc-1)]{.aside .content-visible when-format="html"}
@@ -311,7 +305,7 @@ $$
 :::{#eq-an-nrc-7}
 [[**AN.NRC.7**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEmaint} = (\text{BW} - \text{CW})^{0.75}\times (0.086\times (0.8 + (\text{BCS9} - 5)\times 0.05) + 0.0007 \times (20 - \text{PrevTemp})) 
+\text{NEmaint} = (\text{BW} - \text{CW})^{0.75}\times (0.086\times (0.8 + (\text{BCS9} - 1)\times 0.05) + 0.0007 \times (20 - \text{PrevTemp})) 
 $$
 :::
 
@@ -323,7 +317,7 @@ Activity requirement is proportional to body weight and daily walking distance. 
 :::{#eq-an-nrc-8}
 [[**AN.NRC.8**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa1} = 0.0012\times \text{BW} \qquad \text{if Housing = Grazing = 0}
+\text{NEa1} = 0.0012\times \text{BW}, \qquad \text{if Housing = Grazing = 0}
 $$
 :::
 
@@ -332,7 +326,7 @@ $$
 :::{#eq-an-nrc-9}
 [[**AN.NRC.9**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa2} = 0.006 \times \text{BW} \qquad \text{if Topography = Hilly}
+\text{NEa2} = 0.006 \times \text{BW}, \qquad \text{if Topography = Hilly}
 $$
 :::
 
@@ -341,7 +335,7 @@ $$
 :::{#eq-an-nrc-10}
 [[**AN.NRC.10**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa2} = 0.00045 \times \text{Distance} \times \text{BW} + \text{NEa1} + \text{NEa2}
+\text{NEa2} = (0.00045 \times \text{Distance} \times \text{BW}) + \text{NEa1} + \text{NEa2}
 $$
 :::
 
@@ -350,7 +344,7 @@ $$
 :::{#eq-an-nrc-11}
 [[**AN.NRC.11**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa1} = 0.0009 \times \text{BW} + 0.0016 \times \text{BW}
+\text{NEa1} = 0.0009 \times \text{BW} + 0.0016 \times \text{BW},
 \qquad \text{if Housing = Grazing}
 $$
 :::
@@ -360,7 +354,7 @@ $$
 :::{#eq-an-nrc-12}
 [[**AN.NRC.12**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa2} = 0.006 \times \text{BW}
+\text{NEa2} = 0.006 \times \text{BW},
 \qquad \text{if Topography = Hilly}
 $$
 :::
@@ -368,7 +362,7 @@ $$
 *Otherwise*
 
 $$
-\text{NEa2} = 0.00045 \times \text{Distance} \times \text{BW} + \text{NEa1} + \text{NEa2}
+\text{NEa2} = (0.00045 \times \text{Distance} \times \text{BW}) + \text{NEa1} + \text{NEa2}
 $$
 [See [AN.NRC.10](#eq-an-nrc-10)]{.aside .content-visible when-format="html"}
 
@@ -444,12 +438,8 @@ $$
 $$
 \text{ADG} =
 \begin{cases}
-\dfrac{0.55 \times \text{MSBW} - \text{SBW}}
-     {(\text{Age1stBred} - \text{Age}) \times 30.4},
-& \text{before breeding} \\[10pt]
-\dfrac{0.82 \times \text{MSBW} - \text{SBW}}
-     {(\text{Age1st} - \text{Age}) \times 30.4},
-& \text{after breeding}
+\dfrac{0.55 \times \text{MSBW} - \text{SBW}}{(\text{Age1stBred} - \text{Age}) \times 30.4}, & \text{before breeding} \\[10pt]
+\dfrac{0.82 \times \text{MSBW} - \text{SBW}}{(\text{Age1st} - \text{Age}) \times 30.4},& \text{after breeding}
 \end{cases}
 $$
 :::
@@ -480,15 +470,7 @@ $$
 :::{#eq-an-nrc-25}
 [[**AN.NRC.25**]]{.aside .content-visible when-format="html"}
 $$
-\text{MEpreg} =
-\left(
-2 \times 0.00159 \times \text{DOP} - 0.0352
-\right)
-\times
-\frac{\text{CBW}}{45}
-\times 0.14
-\qquad
-\text{if DOP > 190}
+\text{MEpreg} = (2 \times 0.00159 \times \text{DOP} - 0.0352) \times \frac{\text{CBW}}{45} \times 0.14, \qquad\text{if DOP > 190}
 $$
 :::
 
@@ -504,13 +486,7 @@ $$
 :::{#eq-an-nrc-27}
 [[**AN.NRC.27**]]{.aside .content-visible when-format="html"}
 $$
-\text{Milk}_{\text{Energy}}
-=
-0.0929 \times \text{Fat\_Milk}
-+
-\frac{0.0563}{0.93} \times \text{TP\_Milk}
-+
-0.0395 \times \text{Lactose\_Milk}
+\text{Milk}_{\text{Energy}} = (0.0929 \times \text{Fat\_Milk}) + (\frac{0.0563}{0.93} \times \text{TP\_Milk}) + (0.0395 \times \text{Lactose\_Milk})
 $$
 :::
 
@@ -524,7 +500,7 @@ $$
 ##### Protein Requirements
 
 **Total Protein** <br>
-Reporting of protein requirements is divided into 4 components: maintenance, growth, pregnancy, and lactation (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
+Reporting of protein requirements is divided into four components: maintenance, growth, pregnancy, and lactation (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
 
 :::{#eq-an-nrc-36}
 [[**AN.NRC.36**]]{.aside .content-visible when-format="html"}
@@ -540,22 +516,10 @@ $$
 :::{#eq-an-nrc-29}
 [[**AN.NRC.29**]]{.aside .content-visible when-format="html"}
 $$
-\text{MPm}
-=
-0.3 \times (\text{BW} - \text{CW})^{0.6}
-+
-4.1 \times (\text{BW} - \text{CW})^{0.5}
-+
-\left(
-\text{DMI} \times 1000 \times 0.03
--
-0.5 \times
-\left(
-\frac{\text{MPbact}}{0.8} - \text{MPbact}
-\right)
-\right)
-+
-0.4 \times 11.8 \times \frac{\text{DMI}}{0.67}
+\begin{aligned}
+\text{MPm} &= (0.3 \times (\text{BW} - \text{CW})^{0.6}) + (4.1 \times (\text{BW} - \text{CW})^{0.5}) + \\[8pt]
+& \qquad (\text{DMI} \times 1000 \times 0.03 - 0.5 \times (\frac{\text{MPbact}}{0.8} - \text{MPbact})) + (0.4 \times 11.8 \times \frac{\text{DMI}}{0.67})
+\end{aligned}
 $$
 :::
 
@@ -569,11 +533,7 @@ $$
 \text{NPg} =
 \begin{cases}
 0, & \text{if ADG = 0} \\[8pt]
-\text{ADG} \times
-\left(
-268 - 29.4 \times \frac{\text{NEg}}{\text{ADG}}
-\right),
-& \text{otherwise}
+\text{ADG} \times (268 - 29.4 \times \frac{\text{NEg}}{\text{ADG}}),& \text{otherwise}
 \end{cases}
 $$
 :::
@@ -583,10 +543,8 @@ $$
 $$
 \text{EffMP\_NPg} =
 \begin{cases}
-\dfrac{83.4 - 0.114 \times \text{EQSBW}}{100},
-& \text{if EQSBW} \leq 478 \\[10pt]
-0.28908,
-& \text{otherwise}
+\dfrac{83.4 - (0.114 \times \text{EQSBW})}{100},& \text{if EQSBW} \leq 478 \\[8pt]
+0.28908,& \text{otherwise}
 \end{cases}
 $$
 :::
@@ -606,11 +564,7 @@ $$
 \text{Npg} =
 \begin{cases}
 0, & \text{if ADG = 0} \\[8pt]
-\text{ADG} \times
-\left(
-268 - 29.4 \times \frac{\text{NEg}}{\text{ADG}}
-\right),
-& \text{otherwise}
+\text{ADG} \times (268 - 29.4 \times \frac{\text{NEg}}{\text{ADG}}),& \text{otherwise}
 \end{cases}
 $$
 :::
@@ -620,10 +574,8 @@ $$
 $$
 \text{EffMP\_NPg} =
 \begin{cases}
-\dfrac{83.4 - 0.114 \times \text{EQSBW}}{100},
-& \text{if EQSBW} \leq 478 \\[10pt]
-0.28908,
-& \text{otherwise}
+\frac{83.4 - (0.114 \times \text{EQSBW})}{100}, & \text{if EQSBW} \leq 478 \\[8pt]
+0.28908, & \text{otherwise}
 \end{cases}
 $$
 :::
@@ -649,15 +601,7 @@ $$
 :::{#eq-an-nrc-37}
 [[**AN.NRC.37**]]{.aside .content-visible when-format="html"}
 $$
-\text{MPpreg}
-=
-\left(
-0.69 \times \text{DOP} - 69.2
-\right)
-\times
-\frac{\text{CBW}}{45 \times 0.33}
-\qquad
-\text{if DOP > 190}
+\text{MPpreg} = (0.69 \times \text{DOP} - 69.2) \times \frac{\text{CBW}}{45 \times 0.33}, \qquad \text{if DOP > 190}
 $$
 :::
 
@@ -666,13 +610,7 @@ $$
 :::{#eq-an-nrc-38}
 [[**AN.NRC.38**]]{.aside .content-visible when-format="html"}
 $$
-\text{MPlact}
-=
-\text{Milk}
-\times
-\frac{\text{TP}_{\text{Milk}}}{100}
-\times
-\frac{1000}{0.67}
+\text{MPlact} = \text{Milk} \times \frac{\text{TP}_{\text{Milk}}}{100} \times \frac{1000}{0.67}
 $$
 :::
 
@@ -686,7 +624,7 @@ import_table(
 ```
 
 ##### Mineral Requirements
-Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the [mineral requirements key](#tbl-an-min-req-var).
+Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the @tbl-an-min-req-var.
 
 **Maintenance** <br>
 
@@ -699,14 +637,8 @@ Only calcium (Ca) and phosphorus (P) requirements are considered currently. For 
 $$
 \text{Ca}_{\text{main}} =
 \begin{cases}
-0.031 \times \text{BW}
-+
-0.08 \times \dfrac{\text{BW}}{100},
-& \text{for lactating cows} \\[10pt]
- 0.0154 \times \text{BW}
-+
-0.08 \times \dfrac{\text{BW}}{100},
-& \text{for dry cows}
+(0.031 \times \text{BW}) + (0.08 \times \dfrac{\text{BW}}{100}), & \text{for lactating cows} \\[8pt]
+(0.0154 \times \text{BW}) + (0.08 \times \dfrac{\text{BW}}{100}), & \text{for dry cows}
 \end{cases}
 $$
 :::
@@ -719,14 +651,8 @@ $$
 $$
 \text{P}_{\text{main}} =
 \begin{cases}
-1 \times \text{DMI}
-+
-0.002 \times \text{BW},
-& \text{for lactating cows} \\[10pt]
-0.8 \times \text{DMI}
-+
-0.002 \times \text{BW},
-& \text{for dry cows}
+(1 \times \text{DMI}) + (0.002 \times \text{BW}), & \text{for lactating cows} \\[8pt]
+(0.8 \times \text{DMI}) + (0.002 \times \text{BW}), & \text{for dry cows}
 \end{cases}
 $$
 :::
@@ -738,11 +664,7 @@ $$
 :::{#eq-an-nrc-41}
 [[**AN.NRC.41**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{main}}
-=
-0.0154 \times \text{BW}
-+
-0.08 \times \frac{\text{BW}}{100}
+\text{Ca}_{\text{main}} = (0.0154 \times \text{BW}) + (0.08 \times \frac{\text{BW}}{100})
 $$
 :::
 
@@ -751,11 +673,7 @@ $$
 :::{#eq-an-nrc-42}
 [[**AN.NRC.42**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{main}}
-=
-0.8 \times \text{DMI}
-+
-0.002 \times \text{BW}
+\text{P}_{\text{main}} = (0.8 \times \text{DMI}) + (0.002 \times \text{BW})
 $$
 :::
 
@@ -766,15 +684,7 @@ $$
 :::{#eq-an-nrc-43}
 [[**AN.NRC.43**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{growth}}
-=
-9.83
-\times
-\text{MW}^{0.22}
-\times
-\text{BW}^{-0.22}
-\times
-\frac{\text{ADG}}{0.96}
+\text{Ca}_{\text{growth}} = 9.83 \times \text{MW}^{0.22} \times \text{BW}^{-0.22} \times \frac{\text{ADG}}{0.96}
 $$
 :::
 
@@ -783,19 +693,7 @@ $$
 :::{#eq-an-nrc-44}
 [[**AN.NRC.44**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{growth}}
-=
-\left(
-1.2
-+
-4.635
-\times
-\text{MW}^{0.22}
-\times
-\text{BW}^{-0.22}
-\right)
-\times
-\frac{\text{ADG}}{0.96}
+\text{P}_{\text{growth}} = (1.2 + 4.635 \times \text{MW}^{0.22} \times \text{BW}^{-0.22}) \times \frac{\text{ADG}}{0.96}
 $$
 :::
 
@@ -806,25 +704,10 @@ $$
 :::{#eq-an-nrc-45}
 [[**AN.NRC.45**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{preg}}
-=
+\text{Ca}_{\text{preg}} =
 \begin{cases}
-0.02456 \times
-\exp\left(
-0.05581
--
-0.00007 \times \text{DOP}^2
-\right)
--
-0.02456 \times
-\exp\left(
-0.05581
--
-0.00007 \times (\text{DOP} - 1)^2
-\right),
-& \text{if DOP > 190} \\[10pt]
-0,
-& \text{otherwise}
+0.02456 \times e^{0.05581 - (0.00007 \times \text{DOP}^2)} - 0.02456 \times e^{0.05581 - (0.00007 \times \text{-DOP} - 1)}, & \text{if DOP > 190} \\[8pt]
+0, & \text{otherwise}
 \end{cases}
 $$
 :::
@@ -834,25 +717,9 @@ $$
 :::{#eq-an-nrc-46}
 [[**AN.NRC.46**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{preg}}
-=
-\begin{cases}
-0.02743 \times
-\exp\left(
-0.05527
--
-0.000075 \times \text{DOP}^2
-\right)
--
-0.02743 \times
-\exp\left(
-0.05527
--
-0.000075 \times (\text{DOP} - 1)^2
-\right),
-& \text{if DOP > 190} \\[10pt]
-0,
-& \text{otherwise}
+\text{P}_{\text{preg}} = \begin{cases} 
+0.02743 \times e^{(0.05527 - 0.000075 \times \text{DOP}^2)} - 0.02743 \times e^{(0.05527 - 0.000075 \times (\text{DOP} - 1)^2)},& \text{if DOP > 190} \\[8pt]
+0, & \text{otherwise}
 \end{cases}
 $$
 :::
@@ -884,15 +751,7 @@ $$
 :::{#eq-an-nrc-49}
 [[**AN.NRC.49**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{req}}
-=
-\text{Ca}_{\text{main}}
-+
-\text{Ca}_{\text{growth}}
-+
-\text{Ca}_{\text{preg}}
-+
-\text{Ca}_{\text{lact}}
+\text{Ca}_{\text{req}} = \text{Ca}_{\text{main}} + \text{Ca}_{\text{growth}} + \text{Ca}_{\text{preg}} + \text{Ca}_{\text{lact}}
 $$
 :::
 
@@ -901,18 +760,9 @@ $$
 :::{#eq-an-nrc-50}
 [[**AN.NRC.50**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{req}}
-=
-\text{P}_{\text{main}}
-+
-\text{P}_{\text{growth}}
-+
-\text{P}_{\text{preg}}
-+
-\text{P}_{\text{lact}}
+\text{P}_{\text{req}} = \text{P}_{\text{main}} + \text{P}_{\text{growth}} + \text{P}_{\text{preg}} + \text{P}_{\text{lact}}
 $$
 :::
-
 
 ```{python}
 #| label: tbl-an-min-req-var
@@ -920,14 +770,12 @@ $$
 import_table(
   "../resources/table_data/animal/tbl-an-min-req-var.csv",
   colalign = ["left", "left", "left"]
-
 )
 ```
 
-
 ##### DMI Estimation
 
-Estimations are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to the [DMI requirements key](#tbl-an-dmi-var). The sum of DMI of each feed is assumed to be less than the estimated DMI:
+Estimations are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-dmi-var. The sum of DMI of each feed is assumed to be less than the estimated DMI:
 
 $$
 \sum_{i} \text{Feed}_{i} < \text{DMIest}
@@ -938,35 +786,14 @@ $$
 :::{#eq-an-nrc-51}
 [[**AN.NRC.51**]]{.aside .content-visible when-format="html"}
 $$
-\text{FCM}
-=
-(0.4 \times \text{Milk})
-+
-\left(
-15 \times \text{Fat\_Milk} \times \frac{\text{Milk}}{100}
-\right)
+\text{FCM} = (0.4 \times \text{Milk}) + (15 \times \text{Fat\_Milk} \times \frac{\text{Milk}}{100})
 $$
 :::
-
-
 
 :::{#eq-an-nrc-52}
 [[**AN.NRC.52**]]{.aside .content-visible when-format="html"}
 $$
-\text{DMIest}
-=
-\left(
-0.372 \times \text{FCM}
-+
-0.0968 \times \text{BW}^{0.75}
-\right)
-\times
-\left(
-1 -
-\exp\left(
--0.192 \times \text{WOL} + 3.67
-\right)
-\right)
+\text{DMIest} = (0.372 \times \text{FCM} + 0.0968 \times \text{BW}^{0.75}) \times (1 - e^{(-0.192 \times \text{WOL} + 3.67)})
 $$
 :::
 
@@ -975,21 +802,7 @@ $$
 :::{#eq-an-nrc-53}
 [[**AN.NRC.53**]]{.aside .content-visible when-format="html"}
 $$
-\text{DMIest}
-=
-\left(
-\frac{
-1.97
--
-0.75 \times
-\exp\left(
-0.16 \times (\text{DOP} - 280)
-\right)
-}{
-100
-}
-\right)
-\times \text{BW}
+\text{DMIest} = (\frac{1.97 - 0.75 \times e^{0.16 \times (\text{DOP} - 280)}}{100}) \times \text{BW}
 $$
 :::
 
@@ -1000,23 +813,7 @@ $$
 :::{#eq-an-nrc-54}
 [[**AN.NRC.54**]]{.aside .content-visible when-format="html"}
 $$
-\text{DMIest}
-=
-\left(
-\text{BW}^{0.75}
-\times
-\frac{
-0.2435 \times \text{NEadj}
--
-0.0466 \times \text{NEadj}^{2}
--
-0.0869
-}{
-\text{NEadj}
-}
-\right)
--
-\text{PREGadj}
+\text{DMIest} = (\text{BW}^{0.75} \times \frac{(0.2435 \times \text{NEadj}) - (0.0466 \times \text{NEadj}^{2}) - 0.0869}{\text{NEadj}}) - \text{PREGadj}
 $$
 :::
 
@@ -1025,26 +822,9 @@ $$
 :::{#eq-an-nrc-55}
 [[**AN.NRC.55**]]{.aside .content-visible when-format="html"}
 $$
-\text{DMIest}
-=
-\left(
-\text{BW}^{0.75}
-\times
-\frac{
-0.2435 \times \text{NEadj}
--
-0.0466 \times \text{NEadj}^{2}
--
-0.1128
-}{
-\text{NEadj}
-}
-\right)
--
-\text{PREGadj}
+\text{DMIest} = (\text{BW}^{0.75} \times \frac{(0.2435 \times \text{NEadj}) - (0.0466 \times \text{NEadj}^{2}) - 0.1128}{\text{NEadj}}) - \text{PREGadj}
 $$
 :::
-
 
 ```{python}
 #| label: tbl-an-dmi-var
@@ -1052,66 +832,44 @@ $$
 import_table(
   "../resources/table_data/animal/tbl-an-dmi-var.csv",
   colalign = ["left", "left", "left"]
-
 )
 ```
 
 #### Nutrient Requirements of Dairy Cattle: NASEM
 
 ##### Energy Requirements
-The maintenance requirement is calculated based on metabolic body weight (MBW, body weight\(^{0.75}\)) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to the NASEM energy requirements key.
+The maintenance requirement is calculated based on metabolic body weight (MBW, body weight $^{0.75}$) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to @tbl-an-energy-nasem.
 
 **Maintenance** <br>
 
 * Lactating and Dry Cows
+
 For Lactating cows, the body weight is adjusted both for the gravid uterine tissues and the uterine tissues for normal activity in confinement conditions, otherwise include adjustments for activity requirements under grazing conditions. 
 
 :::{#eq-an-nsm-1}
 [[**AN.NSM.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEmaint}
-=
-0.10
-\times
-(\text{MBW} - \text{GrUterW} - \text{UterW})^{0.75}
+\text{NEmaint} = 0.10 \times (\text{MBW} - \text{GrUterW} - \text{UterW})^{0.75}
 $$
 :::
 
 :::{#eq-an-nsm-2}
 [[**AN.NSM.2**]]{.aside .content-visible when-format="html"}
 $$
-\text{GrUterW}
-=
-(\text{CBW} \times 1.825)
-\times
-\exp\left(
--
-(0.0243 - (0.0000245 \times \text{DOP}))
-\times
-(280 - \text{DOP})
-\right)
+\text{GrUterW} = (\text{CBW} \times 1.825) \times e^{-0.0243 - (0.0000245 \times \text{DOP})} \times (280 - \text{DOP}))
 $$
 :::
 
 :::{#eq-an-nsm-3}
 [[**AN.NSM.3**]]{.aside .content-visible when-format="html"}
 $$
-\text{UterW}
-=
-\left(
-(\text{CBW} \times 0.2288 - 0.204)
-\times
-\exp(-0.2 \times \text{DyLact})
-+
-0.204
-\right)
+\text{UterW} = (\text{CBW} \times 0.2288 - 0.204) \times e^{(-0.2 \times \text{DyLact})} + 0.204
 $$
 :::
 
 $$
 \text{CW} = \text{inputvariable}
 $$
-
 
 *Otherwise*
 
@@ -1123,16 +881,13 @@ $$
 :::
 
 * Heifers
+
 For heifers, the maintenance energy requirement is only adjusted for the gravid uterine weight:
 
 :::{#eq-an-nsm-5}
 [[**AN.NSM.5**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEmain}
-=
-0.10
-\times
-(\text{BW} - \text{GrUterW})^{0.75}
+\text{NEmain} = 0.10 \times (\text{BW} - \text{GrUterW})^{0.75}
 $$
 :::
 
@@ -1142,13 +897,10 @@ Activity requirement is proportional to body weight and daily walking distance. 
 :::{#eq-an-nsm-6}
 [[**AN.NSM.6**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa1}
-=
+\text{NEa1} =
 \begin{cases}
-0,
-& \text{if } \dfrac{\text{Dt\_PastIn}}{\text{DtDMIn}} < 0.005 \\[10pt]
-\dfrac{\text{Dt\_PastIn}}{\text{DtDMIn}},
-& \text{otherwise}
+0, & \text{if } \frac{\text{Dt\_PastIn}}{\text{DtDMIn}} < 0.005 \\[8pt]
+\frac{\text{Dt\_PastIn}}{\text{DtDMIn}}, & \text{otherwise}
 \end{cases}
 $$
 :::
@@ -1158,19 +910,10 @@ $$
 :::{#eq-an-nsm-7}
 [[**AN.NSM.7**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa1}
-=
+\text{NEa1} =
 \begin{cases}
-0.0075
-\times
-\text{BW}^{0.75}
-\times
-\left(
-\dfrac{600 - 12 \times \text{DtPastSupplIn}}{600}
-\right),
-& \text{if } \dfrac{\text{Dt\_PastIn}}{\text{DtDMIn}} \geq 0.005 \\[14pt]
-0,
-& \text{otherwise}
+0.0075 \times \text{BW}^{0.75} \times \frac{(600 - 12 \times \text{DtPastSupplIn})}{600},& \text{if } \frac{\text{Dt\_PastIn}}{\text{DtDMIn}} \geq 0.005 \\[8pt]
+0, & \text{otherwise}
 \end{cases}
 $$
 :::
@@ -1180,47 +923,26 @@ Energy requirements for walking to and from the milking parlor are estimated as 
 :::{#eq-an-nsm-8}
 [[**AN.NSM.8**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa2}
-=
-0.00035
-\times
-\frac{\text{DistParlor}}{1000}
-\times
-\text{TripParlor}
-\times
-\text{BW}
+\text{NEa2} = 0.00035 \times \frac{\text{DistParlor}}{1000} \times \text{TripParlor} \times \text{BW}
 $$
 :::
 
 :::{#eq-an-nsm-9}
 [[**AN.NSM.9**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa3}
-=
-0.0067
-\times
-\frac{\text{EnvTopoParlor}}{1000}
-\times
-\text{BW}
+\text{NEa3} = 0.0067 \times \frac{\text{EnvTopoParlor}}{1000} \times \text{BW}
 $$
 :::
 
 :::{#eq-an-nsm-10}
 [[**AN.NSM.10**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa}
-=
-\text{NEa1}
-+
-\text{NEa2}
-+
-\text{NEa3}
+\text{NEa} = \text{NEa1} + \text{NEa2} + \text{NEa3}
 $$
 :::
 
-
 **Growth** <br>
-In @nrc_2021, body frame gain (fat + protein) corresponds to the true growth and it is part of the calculation which is further partitioned into body reserves or condition gain (or loss), and pregnancy-associated gain (considered a pregnancy requirement). <br>
+In @nrc_2021, body frame gain (fat + protein) corresponds to the true growth and it is part of the calculation which is further partitioned into body reserves or condition gain (or loss), and pregnancy-associated gain (considered a pregnancy requirement).
 
 The value shown below was calculated but was never utilized in any further calculations in the model’s current version. Thus, it has been omitted from the model and remains solely as a reference to past versions of the model.
 
@@ -1241,80 +963,47 @@ $$
 :::{#eq-an-nsm-13}
 [[**AN.NSM.13**]]{.aside .content-visible when-format="html"}
 $$
-\text{FatADG}
-=
-\left(
-0.067
-+
-0.375 \times \frac{\text{BW}}{\text{MW}}
-\right)
-\times
-\frac{\text{EBG}}{\text{ADG}}
+\text{FatADG} = (0.067 + 0.375 \times \frac{\text{BW}}{\text{MW}}) \times \frac{\text{EBG}}{\text{ADG}}
 $$
 :::
 
 :::{#eq-an-nsm-14}
 [[**AN.NSM.14**]]{.aside .content-visible when-format="html"}
 $$
-\text{ProtADG}
-=
-\left(
-0.201
-+
-0.081 \times \frac{\text{BW}}{\text{MW}}
-\right)
-\times
-\frac{\text{EBG}}{\text{ADG}}
+\text{ProtADG} = (0.201 + 0.081 \times \frac{\text{BW}}{\text{MW}}) \times \frac{\text{EBG}}{\text{ADG}}
 $$
 :::
 
 :::{#eq-an-nsm-15}
 [[**AN.NSM.15**]]{.aside .content-visible when-format="html"}
 $$
-\text{REFADG}
-=
-9.4 \times \text{FatADG}
-+
-5.55 \times \text{ProtADG}
+\text{REFADG} = (9.4 \times \text{FatADG}) + (5.55 \times \text{ProtADG})
 $$
 :::
-
 
 :::{#eq-an-nsm-16}
 [[**AN.NSM.16**]]{.aside .content-visible when-format="html"}
 $$
-\text{MEFrameADG}
-=
-\frac{\text{REFADG}}{0.4}
+\text{MEFrameADG} = \frac{\text{REFADG}}{0.4}
 $$
 :::
 
 :::{#eq-an-nsm-17}
 [[**AN.NSM.17**]]{.aside .content-visible when-format="html"}
 $$
-\text{NElFrameADG}
-=
-\frac{\text{REFADG}}{0.61}
+\text{NElFrameADG} = \frac{\text{REFADG}}{0.61}
 $$
 :::
 
 **Pregnancy** <br>
-Daily rates of wet tissue deposition (kg/d) are derived from equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.3](#eq-an-nsm-3) as defined above.
+Daily rates of wet tissue deposition (kg/d) are derived from equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.2](#eq-an-nsm-3) as defined above.
 
 * During Gestation
 
 :::{#eq-an-nsm-18}
 [[**AN.NSM.18**]]{.aside .content-visible when-format="html"}
 $$
-\text{GrUterWGain}
-=
-\left(
-0.0243
--
-(0.0000245 \times \text{DayGest})
-\right)
-\times
-\text{GrUterW}
+\text{GrUterWGain} = (0.0243 - (0.0000245 \times \text{DayGest})) \times \text{GrUterW}
 $$
 :::
 
@@ -1323,20 +1012,10 @@ $$
 :::{#eq-an-nsm-19}
 [[**AN.NSM.19**]]{.aside .content-visible when-format="html"}
 $$
-\text{MEpreg}
-=
+\text{MEpreg} =
 \begin{cases}
-\left(
-2 \times 0.00159 \times \text{DOP}
-- 0.0352
-\right)
-\times
-\dfrac{\text{CBW}}{45}
-\times
-0.14,
-& \text{if DOP > 190} \\[10pt]
-0,
-& \text{otherwise}
+(2 \times 0.00159 \times \text{DOP} - 0.0352) \times \frac{\text{CBW}}{45} \times 0.14, & \text{if DOP > 190} \\[8pt]
+0, & \text{otherwise}
 \end{cases}
 $$
 :::
@@ -1355,13 +1034,7 @@ $$
 :::{#eq-an-nsm-21}
 [[**AN.NSM.21**]]{.aside .content-visible when-format="html"}
 $$
-\text{MilkEn}
-=
-0.0929 \times \text{Fat\_Milk}
-+
-0.0547 \times \text{Prot\_Milk}
-+
-0.0395 \times \text{Lact\_Milk}
+\text{MilkEn} = (0.0929 \times \text{Fat\_Milk}) + (0.0547 \times \text{Prot\_Milk}) + (0.0395 \times \text{Lact\_Milk})
 $$
 :::
 
@@ -1370,13 +1043,7 @@ If true protein, (`TP_Milk`) is measured, its energy content is adjusted to acco
 :::{#eq-an-nsm-22}
 [[**AN.NSM.22**]]{.aside .content-visible when-format="html"}
 $$
-\text{MilkEn}
-=
-0.0929 \times \text{Fat\_Milk}
-+
-0.0585 \times \text{TP\_Milk}
-+
-0.0395 \times \text{Lact\_Milk}
+\text{MilkEn} = (0.0929 \times \text{Fat\_Milk}) + (0.0585 \times \text{TP\_Milk}) + (0.0395 \times \text{Lact\_Milk})
 $$
 :::
 
@@ -1385,8 +1052,7 @@ These are divided into 4 components: maintenance, growth, pregnancy, and lactati
 
 Each physiological function is quantified in terms of TP (true protein), instead of CP (crude protein).
 
-To convert both net protein and net amino acid values to a metabolizable basis, net values have to be divided into the calculated efficiencies for each physiological function. Efficiencies can be either fixed or combined for lactating cows. For simplicity, requirements were included on a fixed basis. For details about the variables included in each calculation, please refer to the [protein requirements key](#tbl-an-nasem-prot-req-var).
-
+To convert both net protein and net amino acid values to a metabolizable basis, net values have to be divided into the calculated efficiencies for each physiological function. Efficiencies can be either fixed or combined for lactating cows. For simplicity, requirements were included on a fixed basis. For details about the variables included in each calculation, please refer to @tbl-an-nasem-prot-req-var.
 
 **Maintenance** <br>
 The protein requirements for non-productive functions (the quantification of protein secretion and accretion), include: scurf + endogenous urinary loss + metabolic fecal protein.
@@ -1396,24 +1062,14 @@ The protein requirements for non-productive functions (the quantification of pro
 :::{#eq-an-nsm-23}
 [[**AN.NSM.23**]]{.aside .content-visible when-format="html"}
 $$
-\text{NPscurf}
-=
-0.20
-\times
-\text{BW}^{0.60}
-\times
-0.85
+\text{NPscurf} = 0.20 \times \text{BW}^{0.60} \times 0.85
 $$
 :::
 
 :::{#eq-an-nsm-24}
 [[**AN.NSM.24**]]{.aside .content-visible when-format="html"}
 $$
-\text{NetAAscurf}
-=
-\text{NPscurf}
-\times
-\frac{\text{AACorrScurf}}{100}
+\text{NetAAscurf} = \text{NPscurf} \times \frac{\text{AACorrScurf}}{100}
 $$
 :::
 
@@ -1422,69 +1078,44 @@ $$
 :::{#eq-an-nsm-25}
 [[**AN.NSM.25**]]{.aside .content-visible when-format="html"}
 $$
-\text{NPEndUrin}
-=
-53
-\times
-6.25
-\times
-\text{BW}
-\times
-0.001
+\text{NPEndUrin} = 53 \times 6.25 \times \text{BW} \times 0.001
 $$
 :::
 
 :::{#eq-an-nsm-26}
 [[**AN.NSM.26**]]{.aside .content-visible when-format="html"}
 $$
-\text{NetAAEndUrin}
-=
-0.010
-\times
-6.25
-\times
-\text{BW}
-\times
-\frac{\text{AACorrWhEmpBody}}{100}
+\text{NetAAEndUrin} = 0.010 \times 6.25 \times \text{BW} \times \frac{\text{AACorrWhEmpBody}}{100}
 $$
 :::
 
-* Metabolic Fecal Protein -The daily loss of CP as metabolic fecal protein (MFP) is estimated using the following equation.
+* Metabolic Fecal Protein
+
+The daily loss of CP as metabolic fecal protein (MFP) is estimated using the following equation.
 
 :::{#eq-an-nsm-27}
 [[**AN.NSM.27**]]{.aside .content-visible when-format="html"}
 $$
-\text{CPMFP}
-=
-(11.62 + 0.134 \times \text{NDF})
-\times
-\text{DMI}
+\text{CPMFP} = (11.62 + 0.134 \times \text{NDF}) \times \text{DMI}
 $$
 :::
 
 :::{#eq-an-nsm-28}
 [[**AN.NSM.28**]]{.aside .content-visible when-format="html"}
 $$
-\text{NPMFP}
-=
-\text{CPMFP}
-\times
-0.73
+\text{NPMFP} = \text{CPMFP} \times 0.73
 $$
 :::
 
 :::{#eq-an-nsm-29}
 [[**AN.NSM.29**]]{.aside .content-visible when-format="html"}
 $$
-\text{NPAAMFP}
-=
-\text{NPMFP}
-\times
-\frac{\text{AACorrMFP}}{100}
+\text{NPAAMFP} = \text{NPMFP} \times \frac{\text{AACorrMFP}}{100}
 $$
 :::
 
-**Growth** <br>
+**Growth**
+
 There are two important concepts: frame growth and BW changes related to the mobilization of body reserves.
 
 The following are the protein requirements associated with growth associated with increased frame size:
@@ -1492,13 +1123,7 @@ The following are the protein requirements associated with growth associated wit
 :::{#eq-an-nsm-30}
 [[**AN.NSM.30**]]{.aside .content-visible when-format="html"}
 $$
-\text{NPGrowth}_{\text{Frame}}
-=
-\text{FrameWG}
-\times
-0.11
-\times
-0.86
+\text{NPGrowth}_{\text{Frame}} = \text{FrameWG} \times 0.11 \times 0.86
 $$
 :::
 
@@ -1507,13 +1132,7 @@ If the change in BW is not frame growth but rather a change in body reserves, th
 :::{#eq-an-nsm-31}
 [[**AN.NSM.31**]]{.aside .content-visible when-format="html"}
 $$
-\text{NPGrowth}_{\text{Tissue}}
-=
-\text{TissueWG}
-\times
-0.08
-\times
-0.86
+\text{NPGrowth}_{\text{Tissue}} = \text{TissueWG} \times 0.08 \times 0.86
 $$
 :::
 
@@ -1522,100 +1141,56 @@ The following equation is used to translate the protein requirement into the req
 :::{#eq-an-nsm-32}
 [[**AN.NSM.32**]]{.aside .content-visible when-format="html"}
 $$
-\text{NetAAGrowth}
-=
-\text{NPGrowth}
-\times
-\frac{\text{AACorrWEBW}}{100}
+\text{NetAAGrowth} = \text{NPGrowth} \times \frac{\text{AACorrWEBW}}{100}
 $$
 :::
 
-**Pregnancy** <br>
+**Pregnancy**
 
 :::{#eq-an-nsm-33}
 [[**AN.NSM.33**]]{.aside .content-visible when-format="html"}
 $$
-\text{NPGest}
-=
-\text{GainGrUter}
-\times
-125
+\text{NPGest} = \text{GainGrUter} \times 125
 $$
 :::
-
 
 :::{#eq-an-nsm-34}
 [[**AN.NSM.34**]]{.aside .content-visible when-format="html"}
 $$
-\text{NetAAGest}
-=
-\text{NPGest}
-\times
-\frac{\text{AACorrWEBW}}{100}
+\text{NetAAGest} = \text{NPGest} \times \frac{\text{AACorrWEBW}}{100}
 $$
 :::
 
-**Lactation** <br>
+**Lactation** 
 
 :::{#eq-an-nsm-35}
 [[**AN.NSM.35**]]{.aside .content-visible when-format="html"}
 $$
-\text{NetAAMilk}
-=
-\text{NPMilk}
-\times
-\frac{\text{AAcalcMilk}}{100}
+\text{NetAAMilk} = \text{NPMilk} \times \frac{\text{AAcalcMilk}}{100}
 $$
 :::
 
-**Total Requirements** <br>
+**Total Requirements**
+
 * Lactating Cows
 
 :::{#eq-an-nsm-36}
 [[**AN.NSM.36**]]{.aside .content-visible when-format="html"}
 $$
-\text{RecomMPSupply1}
-=
-\left[
-\frac{
-\text{NetAAScurf}
-+
-\text{NetAAMFP}
-+
-\text{NetAAMilk}
-+
-\text{NetAAGrowth}
-}{
-\text{TargetEffMP}
-}
-\right]
-+
-\frac{\text{NPGest}}{0.33}
-+
-\text{NPEndUrin}
+\begin{aligned}
+\text{RecomMPSupply1} &= \frac{\text{NetAAScurf} + \text{NetAAMFP} + \text{NetAAMilk} + \text{NetAAGrowth}}{\text{TargetEffMP}} \\[8pt]
+& \qquad + \frac{\text{NPGest}}{0.33} + \text{NPEndUrin}
+\end{aligned}
 $$
 :::
 
 :::{#eq-an-nsm-37}
 [[**AN.NSM.37**]]{.aside .content-visible when-format="html"}
 $$
-\text{RecomMPAASupply1}
-=
-\frac{
-\text{NPScurf}
-+
-\text{NPMFP}
-+
-\text{NPMilk}
-+
-\text{NPGrowth}
-}{
-\text{TargetEffAA}
-}
-+
-\frac{\text{NetAAGest}}{0.33}
-+
-\text{NetAAEndUrin}
+\begin{aligned}
+\text{RecomMPAASupply1} &= \frac{\text{NPScurf} + \text{NPMFP} + \text{NPMilk} + \text{NPGrowth}}{\text{TargetEffAA}} \\[8pt]
+& \qquad + \frac{\text{NetAAGest}}{0.33} + \text{NetAAEndUrin}
+\end{aligned}
 $$
 :::
 
@@ -1624,42 +1199,17 @@ $$
 :::{#eq-an-nsm-38}
 [[**AN.NSM.38**]]{.aside .content-visible when-format="html"}
 $$
-\text{RecomMPSupply2}
-=
-\frac{
-\text{NPScurf}
-+
-\text{NPMFP}
-}{
-\text{TargetEffMP}
-}
-+
-\frac{\text{NPGest}}{0.33}
-+
-\frac{\text{NPGrowth}}{0.4}
-+
-\text{NPEndUrin}
+\text{RecomMPSupply2} = \frac{text{NPScurf} + \text{NPMFP}}{\text{TargetEffMP}} + \frac{\text{NPGest}}{0.33} + \frac{\text{NPGrowth}}{0.4} + \text{NPEndUrin}
 $$
 :::
 
 :::{#eq-an-nsm-39}
 [[**AN.NSM.39**]]{.aside .content-visible when-format="html"}
 $$
-\text{RecomMPAASupply2}
-=
-\frac{
-\text{NetAAScurf}
-+
-\text{NetAAMFP}
-}{
-\text{NetAAMFP}
-}
-+
-\frac{\text{NetAAGest}}{0.33}
-+
-\frac{\text{NetAAGrowth}}{0.4}
-+
-\text{NPEndUrin}
+\begin{aligned}
+\text{RecomMPAASupply2} &= \frac{\text{NetAAScurf} + \text{NetAAMFP}}{\text{NetAAMFP}} + \frac{\text{NetAAGest}}{0.33} + \frac{\text{NetAAGrowth}}{0.4} \\[8pt]
+& \qquad + \text{NPEndUrin}
+\end{aligned}
 $$
 :::
 
@@ -1669,12 +1219,12 @@ $$
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-prot-req-var.csv",
   colalign = ["left", "left", "left"]
-
 )
 ```
+
 ::: {.callout-note}
-AA = Amino Acids; MFP= Metabolic Fecal Protein
-*Fixed values are establish by NASEM and are not user defined (@nrc_2021)
+AA = Amino Acids; MFP= Metabolic Fecal Protein  
+Fixed values are establish by NASEM and are not user defined (@nrc_2021)
 :::
 
 ##### Mineral Requirements
@@ -1682,88 +1232,56 @@ Only calcium and phosphorus requirements are included in the code at present. Fo
 
 **Maintenance** <br>
 
-* Calcium Equations
+* Calcium Equation
 
 :::{#eq-an-nsm-40}
 [[**AN.NSM.40**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{main}}
-=
-0.90 \times \text{DMI}
+\text{Ca}_{\text{main}} = 0.90 \times \text{DMI}
 $$
 :::
 
-* Phosphorus Equations
+* Phosphorus Equation
 
 :::{#eq-an-nsm-41}
 [[**AN.NSM.41**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{main}}
-=
-1.0 \times \text{DMI}
-+
-0.0006 \times \text{BW}
+\text{P}_{\text{main}} = 1.0 \times \text{DMI} + 0.0006 \times \text{BW}
 $$
 :::
 
 **Growth** <br>
 
-* Calcium Equations
+* Calcium Equation
 
 :::{#eq-an-nsm-42}
 [[**AN.NSM.42**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{growth}}
-=
-9.83
-\times
-\text{MW}^{-0.22}
-\times
-\text{BW}^{-0.22}
-\times
-\text{ADG}
+\text{Ca}_{\text{growth}} = 9.83 \times \text{MW}^{0.22} \times \text{BW}^{-0.22} \times \text{ADG}
 $$
 :::
 
-* Phosphorus Equations
+* Phosphorus Equation
 
 :::{#eq-an-nsm-43}
 [[**AN.NSM.43**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{growth}}
-=
-\left(
-1.2
-+
-4.635
-\times
-\text{MW}^{0.22}
-\times
-\text{BW}^{-0.22}
-+
-\text{ADG}
-\right)
+\text{P}_{\text{growth}} = 1.2 + (4.635 \times \text{MW}^{0.22} \times \text{BW}^{-0.22}) + \text{ADG}
 $$
 :::
 
 **Pregnancy** <br>
 
-* Calcium Equations
+* Calcium Equation
 
 :::{#eq-an-nsm-44}
 [[**AN.NSM.44**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{preg}}
-=
+\text{Ca}_{\text{preg}} =
 \begin{cases}
-0.02456 \times \exp\left((0.05581 - 0.00007 \times \text{DOP}) \times \text{DOP}\right)
--
-0.02456 \times \exp\left((0.05581 - 0.00007 \times (\text{DOP} - 1)) \times (\text{DOP} - 1)\right)
-\times
-\dfrac{\text{BW}}{715},
-& \text{if DOP > 190} \\[10pt]
-0,
-& \text{otherwise}
+(0.02456 \times e^{(0.05581 - 0.00007 \times \text{DOP}) \times \text{DOP}}) \\[8pt]
+\qquad - (0.02456 \times e^{0.05581 - (0.00007 \times (\text{DOP} - 1)) \times (\text{DOP} - 1)} \times \dfrac{\text{BW}}{715}), & \text{if DOP > 190} \\[8pt] 
+0, & \text{otherwise}
 \end{cases}
 $$
 :::
@@ -1773,111 +1291,56 @@ $$
 :::{#eq-an-nsm-45}
 [[**AN.NSM.45**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{preg}}
-=
+\text{P}_{\text{preg}} =
 \begin{cases}
-\left(
-0.02743
-\times
-\exp\left(
-(0.05527 - 0.000075 \times \text{DOP})
-\times
-\text{DOP}
-\right)
-\right.
-\\[6pt]
-\left.
--
-0.02743
-\times
-\exp\left(
-(0.05527 - 0.000075 \times (\text{DOP} - 1))
-\times
-(\text{DOP} - 1)
-\right)
-\times
-\left(
-\frac{\text{BW}}{715}
-\right)
-\right),
-& \text{if DOP > 190} \\[12pt]
-0,
-& \text{otherwise}
+(0.02743 \times e^{(0.05527 - 0.000075 \times \text{DOP}) \times \text{DOP}}) \\[8pt]
+\qquad - (0.02743 \times e^{(0.05527 - 0.000075 \times (\text{DOP} - 1)) \times (\text{DOP} - 1)} \times \frac{\text{BW}}{715}), & \text{if DOP > 190} \\[8pt]
+0, & \text{otherwise}
 \end{cases}
 $$
 :::
 
-The denominator, 715 kg, is the average cow weight in the study by @house1993; therefore, the pregnancy (gestation) requirement is scaled to that BW. For details see Page 107 in the Minerals chapter of (@nrc_2021). IF DOP $<$ 190; then it is assumed that Ca\_Preg is equal to zero.
+The denominator, 715 kg, is the average cow weight in the study by @house1993; therefore, the pregnancy (gestation) requirement is scaled to that BW. For details see Page 107 in the Minerals chapter of [@nrc_2021]. IF DOP $<$ 190; then it is assumed that `Ca_Preg` is equal to zero.
 
 **Lactation** <br>
 
-* Calcium Equations
+* Calcium Equation
 
 :::{#eq-an-nsm-46}
 [[**AN.NSM.46**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{lact}}
-=
-(0.295 + 0.239 \times \text{MilkTP})
-\times
-\text{Milk}
+\text{Ca}_{\text{lact}} = (0.295 + 0.239 \times \text{MilkTP}) \times \text{Milk}
 $$
 :::
-
 
 * Phosphorus Equations
 
 :::{#eq-an-nsm-47}
 [[**AN.NSM.47**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{lact}}
-=
-\begin{cases}
-\text{Milk}
-\times
-(0.496 + 0.13 \times \text{TPMilk}) \\[8pt]
-\text{Milk} \times 0.90
-\end{cases}
+\text{P}_{\text{lact}} = \text{Milk} \times (0.496 + 0.13 \times \text{TPMilk}); \text{Milk} \times 0.90
 $$
 :::
 
 **Total Requirements** <br>
 
-* Calcium Equations
+* Calcium Equation
 
 :::{#eq-an-nsm-48}
 [[**AN.NSM.48**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{req}}
-=
-\text{Ca}_{\text{main}}
-+
-\text{Ca}_{\text{growth}}
-+
-\text{Ca}_{\text{preg}}
-+
-\text{Ca}_{\text{lact}}
+\text{Ca}_{\text{req}} = \text{Ca}_{\text{main}} + \text{Ca}_{\text{growth}} + \text{Ca}_{\text{preg}} +\text{Ca}_{\text{lact}}
 $$
 :::
 
-* Phosphorus Equations
+* Phosphorus Equation
 
 :::{#eq-an-nsm-49}
 [[**AN.NSM.49**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{lact}}
-=
-\text{P}_{\text{main}}
-+
-\text{P}_{\text{growth}}
-+
-\text{P}_{\text{preg}}
-+
-\text{P}_{\text{lact}}
+\text{P}_{\text{lact}} = \text{P}_{\text{main}} + \text{P}_{\text{growth}} + \text{P}_{\text{preg}} + \text{P}_{\text{lact}}
 $$
 :::
-
-
 
 ```{python}
 #| label: tbl-an-nasem-min-req-var
@@ -1885,10 +1348,8 @@ $$
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-min-req-var.csv",
   colalign = ["left", "left", "left"]
-
 )
 ```
-
 
 ##### DMI Estimation
 Dry matter intake estimation is different for lactating cows and dry cows. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation For details about the variables included in each calculation, please refer to the DMI estimation key.
@@ -1897,79 +1358,28 @@ $$
 \sum_{i} \text{Feed}_{i} < \text{DMIest}
 $$
 
-**Lactating Cows** <br>
+**Lactating Cows** 
 
 :::{#eq-an-nsm-50}
 [[**AN.NSM.50**]]{.aside .content-visible when-format="html"}
 $$
-\text{DMIest}
-=
-\left(
-(3.7 + \text{Parity} \times 5.7)
-+
-0.305 \times \text{MilkE}
-+
-0.022 \times \text{BW}
-+
-(-0.689 - 1.87 \times \text{Parity}) \times \text{BCS}
-\right)
-\times
-\left(
-1
--
-(0.212 + \text{Parity} \times 0.136)
-\times
-\exp(-0.053 \times \text{DIM})
-\right)
+\begin{aligned}
+\text{DMIest} &= ((3.7 + \text{Parity} \times 5.7) + (0.305 \times \text{MilkE}) + (0.022 \times \text{BW}) \\[8pt]
+& \qquad + (-0.689 - 1.87 \times \text{Parity}) \times \text{BCS}) \\[8pt]
+& \qquad \times (1- (0.212 + \text{Parity} \times 0.136) \times e^{(-0.053 \times \text{DIM})})
+\end{aligned}
 $$
 :::
 
-**Dry Cows and Growing Heifers** <br>
+**Dry Cows and Growing Heifers** 
 
 :::{#eq-an-nsm-51}
 [[**AN.NSM.51**]]{.aside .content-visible when-format="html"}
 $$
-\text{DMIest}
-=
-\left(
-0.0226
-\times
-\text{MatBW}
-\times
-\left(
-1
--
-\exp\left(
--1.47
-\times
-\left(
-\frac{\text{BW}}{\text{MatBW}}
-\right)
-\right)
-\right)
-\right)
--
-\left(
-0.082
-\times
-\left(
-\text{NDF}
--
-\left(
-23.1
-+
-56
-\times
-\frac{\text{BW}}{\text{MatBW}}
--
-30.6
-\times
-\left(
-\frac{\text{BW}}{\text{MatBW}}
-\right)^2
-\right)
-\right)
-\right)
+\begin{aligned}
+\text{DMIest} &= (0.0226 \times \text{MatBW} \times(1 - e^{(-1.47 \times \frac{\text{BW}}{\text{MatBW}})}) \\[10pt]
+& \qquad - (0.082 \times (\text{NDF} - (23.1 + 56 \times \frac{\text{BW}}{\text{MatBW}} - 30.6 \times (\frac{\text{BW}}{\text{MatBW}})^2)))
+\end{aligned}
 $$
 :::
 
@@ -1979,13 +1389,12 @@ $$
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-dmi-var.csv",
   colalign = ["left", "left", "left"]
-
 )
 ```
 
 ##### Amino Acid Requirements
 
-The methods for estimating the amino acids requirements for lactating cows based on the @nrc_2021, into RuFaS are described below.
+The methods for estimating the amino acids requirements for lactating cows based on the @nrc_2021, in RuFaS are described below.
 
 * Amino acids are divided into essential (EAA) and non-essential (NEAA).
 * This section will focus on calculating the requirements for the essential amino acids. The EAA and NEAA are listed in the next table.
@@ -1997,80 +1406,52 @@ The methods for estimating the amino acids requirements for lactating cows based
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-eaaneaa-key.csv",
   colalign = ["left", "left", "left"]
-
 )
 ```
 
-The AA requirements for lactating cows are categorized into maintenance, growth, pregnancy, and lactation. Notice that the first variable from each equation comes from the outputs of the metabolizable protein equations that are already in the RuFaS model. The second variable corresponds to the composition of AA used or secreted for each metabolic state (maintenance, growth, pregnancy, and lactation) of the cow, we can find those values in Table 6-2 (page 79) of @nrc_2021. The subscript "i" in the equations represents each specific amino acid being calculated; for example, `TotalAArequirementsi_ii` refers to the total requirements for individual amino acids such as methionine, lysine, arginine, and others.
+The AA requirements for lactating cows are categorized into maintenance, growth, pregnancy, and lactation. Notice that the first variable from each equation comes from the outputs of the metabolizable protein equations that are already in the RuFaS model. The second variable corresponds to the composition of AA used or secreted for each metabolic state (maintenance, growth, pregnancy, and lactation) of the cow, we can find those values in Table 6-2 (page 79) of @nrc_2021. The subscript "i" in the equations represents each specific amino acid being calculated; for example, TotalAArequirementsi_ii refers to the total requirements for individual amino acids such as methionine, lysine, arginine, and others.
 
-
-**Maintenance** <br>
+**Maintenance** 
 
 * Scurf Protein
 
 $$
-\text{NetAAscurf}_{i}
-=
-\text{NPscurf}
-\times
-\frac{\text{AACorrScurf}_{i}}{100}
+\text{NetAAscurf}_{i} = \text{NPscurf} \times \frac{\text{AACorrScurf}_{i}}{100}
 $$
 
 * Endogenous Urinary Protein
 
 $$
-\text{NetAAEndUrine}_{i}
-=
-0.010
-\times
-6.25
-\times
-\text{BW}
-\times
-\frac{\text{AACorrWholeEmptyBody}_{i}}{100}
+\text{NetAAEndUrine}_{i} = 0.010 \times 6.25 \times \text{BW} \times \frac{\text{AACorrWholeEmptyBody}_{i}}{100}
 $$
 
 * Metabolic Fecal Protein
 
 $$
-\text{NetAAMFP}_{i}
-=
-\text{NPMFP}
-\times
-\frac{\text{AACorrMFP}_{i}}{100}
+\text{NetAAMFP}_{i} = \text{NPMFP} \times \frac{\text{AACorrMFP}_{i}}{100}
 $$
 
-**Growth** <br>
+**Growth** 
 
 $$
-\text{NetAAGrowth}_{i}
-=
-\text{NPGrowth}
-\times
-\frac{\text{AACorrWholeEmptyBody}_{i}}{100}
+\text{NetAAGrowth}_{i} = \text{NPGrowth} \times \frac{\text{AACorrWholeEmptyBody}_{i}}{100}
 $$
 
-**Pregnancy** <br>
-$$
-\text{NetAAGest}_{i}
-=
-\text{NPGest}
-\times
-\frac{\text{AACorrWholeEmptyBody}_{i}}{100}
-$$
-
-**Lactation** <br>
+**Pregnancy** 
 
 $$
-\text{NetAAMilk}_{i}
-=
-\text{NPMilk}
-\times
-\frac{\text{AAcalcMilk}_{i}}{100}
+\text{NetAAGest}_{i} = \text{NPGest} \times \frac{\text{AACorrWholeEmptyBody}_{i}}{100}
 $$
 
-**Total Requirements** <br>
-Here are the equations for calculating the total \(AA_{\text{i}}\) requirements for lactating cows, late-gestation cows, and heifers. 
+**Lactation** 
+
+$$
+\text{NetAAMilk}_{i} = \text{NPMilk} \times \frac{\text{AAcalcMilk}_{i}}{100}
+$$
+
+**Total Requirements**
+
+Here are the equations for calculating the total $\text{AA}_{\text{i}}$ requirements for lactating cows, late-gestation cows, and heifers. 
 
 The variables needed to calculate these equations come from the outputs generated in the AA requirements equations for scurf, endogenous urine, metabolic fecal protein, growth, gestation, and milk production (see formulas above). 
 
@@ -2079,67 +1460,20 @@ The $\text{TargetEfficiencyAA}_{i}$ variable, refers to the target efficiency re
 * Lactating Cows
 
 $$
-\text{TotalAArequirements}_{i}
-=
-\left(
-\frac{
-\text{NetAAscurf}_{i}
-+
-\text{NetAAMFP}_{i}
-+
-\text{NetAAGrowth}_{i}
-+
-\text{NetAAMilk}_{i}
-}{
-\text{TargetEfficiencyAA}_{i}
-}
-\right)
-+
-\left(
-\frac{
-\text{NetAAGest}_{i}
-}{
-\text{TargetEfficiencyGest}
-}
-\right)
-+
-\text{NetAAEndUrine}_{i}
+\begin{aligned}
+\text{TotalAArequirements}_{i} & = \frac{\text{NetAAscurf}_{i}+\text{NetAAMFP}_{i}+\text{NetAAGrowth}_{i}+\text{NetAAMilk}_{i}}{\text{TargetEfficiencyAA}_{i}} \\[10pt]
+& \qquad +\frac{\text{NetAAGest}_{i}}{\text{TargetEfficiencyGest}}+\text{NetAAEndUrine}_{i}
+\end{aligned}
 $$
 
 * Late Gestation Cows and Heifers
 
 $$
-\text{TotalAArequirements}_{i}
-=
-\left(
-\frac{
-\text{NetAAscurf}_{i}
-+
-\text{NetAAMFP}_{i}
-}{
-\text{TargetEfficiencyAA}_{i}
-}
-\right)
-+
-\left(
-\frac{
-\text{NetAAGrowth}_{i}
-}{
-\text{TargetEfficiencyGrowth}
-}
-\right)
-+
-\left(
-\frac{
-\text{NetAAGest}_{i}
-}{
-\text{TargetEfficiencyGest}
-}
-\right)
-+
-\text{NetAAEndUrine}_{i}
+\begin{aligned}
+\text{TotalAArequirements}_{i} &= \frac{\text{NetAAscurf}_{i}+\text{NetAAMFP}_{i}}{\text{TargetEfficiencyAA}_{i}} + \frac{\text{NetAAGrowth}_{i}}{\text{TargetEfficiencyGrowth}} \\[10pt]
+& + \frac{\text{NetAAGest}_{i}}{\text{TargetEfficiencyGest}} + \text{NetAAEndUrine}_{i}
+\end{aligned}
 $$
-
 
 ::: {.callout-note}
 If there are any questions regarding calculations regarding calculations of maintenance AA requirements for Lactating Cows and/or Total AA requirement of Lactating or Late Gestation Cows and Heifers, please refer to Tables 6-2 and 6-4 in @nrc_2021.
@@ -2151,70 +1485,349 @@ If there are any questions regarding calculations regarding calculations of main
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-aa-req-var.csv",
   colalign = ["left", "left", "left"]
-
 )
 ```
 
+::: {.callout-note}
+Variables marked with * are from @nrc_2021.
+:::
 
 #### Energy and Nutrition Supply
 
 ##### Energy Supply: NRC
 
-<!-- TODO -->
+Energy supply from the feed includes NEm, NEl, and NEg. NEm provides energy for maintenance and activity requirements, NEl provides energy for 
+lactation and pregnancy, and NEg provides energy for growth. Feed actual energy contents are corrected from standard values provided by @nrc_2001. 
+Minerals do not provide any energy.
+
+```{python}
+#| label: tbl-an-energy-nrc
+#| tbl-cap: Key variables used in calculation of net energy in NRC (2001).
+import_table(
+  "../resources/table_data/animal/tbl-an-energy-nrc.csv",
+  colalign = ["left", "left", "center"]
+)
+```
 
 **Total Digestible Nutrients (TDN)**
 
+:::{#eq-an-sup-1-1}
+[[**AN.SUP.1.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{TDNconc} = \frac{\text{TotalTDN}}{\text{DMI}} \times 100
+$$
+:::
+
+:::{#eq-an-sup-2-1}
+[[**AN.SUP.2.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMI\_to\_maint} = 1, if \text{TotalTDN} < 0.035 \times \text{BW}^{0.75}, \frac{\text{TotalTDN}}{0.035 \times \text{SBW}^{0.75}}
+$$
+:::
+
+Otherwise:
+
+:::{#eq-an-sup-3-1}
+[[**AN.SUP.3.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{Discount} = 1, \quad if \quad \text{TDNconc} < 60 \frac{\text{TDNconc} - (0.18 \times \text{TDNconc} - 10.3) \times (\text{DMI}_{\text{to,maint}} - 1)}{\text{TDNconc}}
+$$
+:::
+
+:::{#eq-an-sup-4-1}
+[[**AN.SUP.4.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{TDNact}_{\text{i}} = \text{TDN}_{\text{i}} \times \text{Discount}
+$$
+:::
+
 **Digestible Energy (DE)**
 
+:::{#eq-an-sup-4}
+[[**AN.SUP.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{DEact}_{\text{i}} = \text{DE}_{\text{i}} \times \text{Discount}
+$$
+:::
+
 **Metabolizable Energy (ME)**
+
+:::{#eq-an-sup-5-1}
+[[**AN.SUP.5.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{MEacti} =
+\begin{cases}
+(1.01 \times \text{DEacti}) + (0.0046 \times 0.0046 \times \text{EEi}) - 3,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
+(1.01 \times \text{DEacti}) - 0.45,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
+(1.01 \times \text{DEacti}),& \text{if feed type is fat}
+\end{cases}
+$$
+:::
 
 **Net Energy**
 
 * Maintenance
+
+:::{#eq-an-sup-7-1}
+[[**AN.SUP.7.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEmacti} =
+\begin{cases}
+(1.37 \times \text{MEacti}) - (0.138 \times \text{MEacti}^2) + (0.0105 \times \text{MEacti}^3) - 1.12 ,& \text{if feed type is not fat} \\[8pt]
+(0.8 \times \text{MEacti}) ,& \text{if feed type is fat} 
+\end{cases}
+$$
+:::
+
 * Lactation
+
+:::{#eq-an-sup-6-1}
+[[**AN.SUP.6.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{NElacti}=
+\begin{cases}
+(0.703 \times \text{MEacti}) - 0.019 + (0.097 \times \text{MEacti}) + (0.1997 \times \text{EEi}) - 3 ,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
+(0.703 \times \text{MEacti}) - 0.19 ,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
+(0.8 \times \text{0DEacti}) ,& \text{if feed type is fat}
+\end{cases}
+$$
+:::
+
 * Activity
 
+:::{#eq-an-sup-8-1}
+[[**AN.SUP.8.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEgacti}
+=
+\begin{cases}
+(1.42 \times \text{MEacti}) - (0.174 \times \text{MEacti}^2) + (0.0122 \times \text{MEacti}^3) - 1.65 ,& \text{if feed type is not fat} \\[8pt]
+(0.55 \times \text{MEacti}) ,& \text{if feed type is fat} 
+\end{cases}
+$$
+:::
 
 ##### Energy Supply: NASEM
+
+Energy supply in the updated 2021 Nutrient Requirement model [@nrc_2021] is estimated based only on the NEl and follows a simplified estimation method when compared 
+to the 2001 model [@nrc_2001].
+
+First, the digestible energy of each feed is estimated based on the nutrient content and the estimated digestibility of that nutrient.
+
+:::{#eq-an-sup-1-2}
+[[**AN.SUP.1.2**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+\text{DE}_i &= (0.042 \times \text{NDF}_{\text{i}} \times \text{dNDF}_{\text{i}}) + (0.0423 \times \text{Starch}_{\text{i}} \times \text{dStarch}_{\text{i}}) \\[8pt]
+& \qquad + (0.0940 \times \text{FA}_i \times \text{dFA}_{\text{i}}) + (0.0565 \times (\text{RDP}_{\text{i}} + (\text{RUP}_{\text{i}} \times \text{dRUP}_{\text{i}})- \text{NPN}_{\text{supp, i}})) \\[8pt]
+& \qquad  + (0.0089 \times \text{NPN}_{\text{supp, i}}) + (0.040 \times \text{ROM}_{\text{i}} \times \text{dROM}_{\text{i}}) - 0.318
+\end{aligned}
+$$
+:::
+    
+Parameter definitions and units are provided in @tbl-an-energy-nasem. 
+
+```{python}
+#| label: tbl-an-energy-nasem
+#| tbl-cap: Key variables used in calculation of net energy in NASEM (2021).
+import_table(
+  "../resources/table_data/animal/tbl-an-energy-nasem.csv",
+  colalign = ["left", "left", "center"]
+)
+```
+
+The nutrient compositions of each feed ($\text{NDF}_\text{i}$, $\text{Starch}_\text{i}$, $\text{EE}_\text{i}$, $\text{RUP}_\text{i}$) are provided in the feed library. 
+The digestibilities of each feed are estimated to account for the effects of intake and diet composition:
 
 **Digestible Energy (DE) of a Feed**
 
 * Neutral Detergent Fiber Digestibility (dNDF)
 
+The digestibility of NDF is adjusted from the base NDF digestibility of the feed to account for the effect of total DMI and starch intake. 
+
+$$
+\text{dNDF}_\text{i} = (\text{dNDF}_\text{base,i} - (0.0059 \times \text{Starch}_\text{Diet}) - 0.26)  - 1.1 \times (\frac{\text{DMI}}{\text{BodyWeight}} - 0.035)
+$$
+
+And the $\text{dNDF}_\text{base,i}$ is calculated based on the lignin and NDF content of the feed.
+
+:::{#eq-an-sup-2-2}
+[[**AN.SUP.2.2**]]{.aside .content-visible when-format="html"}    
+$$
+\text{dNDF}_\text{i} = \frac{0.75 \times (\text{NDF}_{\text i} - \text{Lignin}_{\text i}) \times (1-(\frac{\text{Lignin}_\text{i}}{\text{NDF}_{\text i}})^{0.667})}{\text{NDF}_\text{i}} 
+$$
+:::    
+
 * Starch Digestibility (dStarch)
+
+Similarly, the digestibility of starch is adjusted for the level of intake from a base digestibility: 
+
+:::{#eq-an-sup-3-2}
+[[**AN.SUP.3.2**]]{.aside .content-visible when-format="html"}    
+$$
+\text{dStarch}_\text{i} = \text{dStarch}_\text{base,i} - 1.0 \times (\frac{\text{DMI}}{\text{BW}} - 0.035) 
+$$
+:::  
+
+And the base starch digestibility, $\text{dStarch}_\text{base,i}$, is considered to be an innate property of the feed and is provided in the feed library.
 
 * Fatty Acid Digestibility (dFA)
 
+Fatty acids are assumed to have a digestibility of 0.73 $(\text{dFA}_\text{i} = 0.73)$ unless a digesibility specific to the fat supplement is provided by the manufacturer.
+
 * Protein Digestibility (RUP and dRUP)
+
+The rumen degradable protein (RDP) content of a feed is calculated as the proportion of crude protein (CP) that is not considered to be rumen undegradable (RUP). Thus: 
+
+:::{#eq-an-sup-4-2}
+[[**AN.SUP.4.2**]]{.aside .content-visible when-format="html"}    
+$$
+\begin{aligned}
+& \text{RDP}_\text{i} = \frac{1 - \text{RUP}_\text{CP,i}}{\text{CP}_\text{i}} \\[8pt]
+& \text{RDP}_\text{i} = \frac{\text{RUP}_\text{CP,i}}{\text{CP}_\text{i}} 
+\end{aligned}
+$$
+::: 
 
 * Residual Organic Matter (ROM)
 
+The Residual Organic Matter (ROM) fraction of a feed is calculated by difference as the following:
+
+:::{#eq-an-sup-5-2}
+[[**AN.SUP.5.2**]]{.aside .content-visible when-format="html"}    
+$$
+\text{ROM}_\text{i} = 1 - \frac{\text{FA}_\text{i}}{1.06} - \text{Ash}_\text{i} - \text{NDF}_\text{i} - \text{Starch}_\text{i} - (\text{CP}_\text{i} - 0.64 \times \text{NPN}_\text{supp,i})
+$$
+::: 
+
+The digestibility of ROM is assumed to be 0.96 $(\text{dROM}_\text{i} = 0.96)$ and $\text{NPN}_\text{supp,i}$ is the supplemented non-protein nitrogen fraction as a proportion of the total CP content. 
 
 **Digestible Energy of the Diet**
 
+:::{#eq-an-sup-6-2}
+[[**AN.SUP.6.2**]]{.aside .content-visible when-format="html"}    
+$$
+\text{DE}_\text{Diet} = \sum^{n}_{i=1} \text{DE}_\text{i} \times \text{PropFeed}_\text{i}
+$$
+::: 
 
 **Metabolizable Energy**
 
+The dietary ME is calculated by subtracting the energy found in gaseous losses (i.e. enteric methane) and the energy lost in urine from the total diet digestible energy. 
+
+:::{#eq-an-sup-7-2}
+[[**AN.SUP.7.2**]]{.aside .content-visible when-format="html"}    
+$$
+\text{ME}_\text{Diet} = \text{DE}_\text{Diet} - \text{GaseEnergy} - \text{UrineEnergy}
+$$
+::: 
+
 * Gaseous Energy
+
+:::{#eq-an-sup-8-2}
+[[**AN.SUP.8.2**]]{.aside .content-visible when-format="html"}    
+$$
+\text{GasEnergy} = 13.28 \times \text{EntericMethane}
+$$
+::: 
 
 * Urine Energy
 
+:::{#eq-an-sup-9-2}
+[[**AN.SUP.9.2**]]{.aside .content-visible when-format="html"}    
+$$
+\text{UrineEnergy} = 0.0146 \times \text{UrinaryNitrogen}
+$$
+::: 
+
+where GasEnergy and UrineEnergy are in units of Mcal/d, EntericMethane is in units of kg/d, and UrinaryNitrogen is in units of g/d.
 
 **Net Energy**
 
+Net energy is simply estimated as metabolizable energy used at an average efficiency of 0.66.
 
+:::{#eq-an-sup-10-2}
+[[**AN.SUP.10.2**]]{.aside .content-visible when-format="html"}    
+$$
+\text{NEl} = 0.66 \times \text{ME}
+$$
+::: 
 
 ##### Protein Supply
 
+Protein supply from the feed includes 3 parts: digestible RUP, digestible MCP, which is produced through RDP, and endogenous protein supply from sloughed cells and enzyme secretion into the gut lumen. MCP production requires a nitrogen source and an energy source, so MCP is either nitrogen-limited (when energy is sufficient) or energy-limited (when nitrogen is sufficient). Minerals do not provide any protein.
+
+:::{#eq-an-sup-14}
+[[**AN.SUP.14**]]{.aside .content-visible when-format="html"}    
+$$
+\text{MP}_\text{supply} = \text{MP}_\text{bac} + \text{RUP}_\text{diet} + \text{EndP}
+$$
+::: 
+
 **Microbial Protein Supply**
+
+:::{#eq-an-sup-9}
+[[**AN.SUP.9**]]{.aside .content-visible when-format="html"}
+$$
+\text{Kpi} =
+\begin{cases}
+2.904 + (1.375 \times \frac{\text{DMI}}{\text{BW}} \times 100) - (0.02 \times \text{PercentConc}) ,& \text{if feed is concentrate} \\[8pt]
+3.362 + (0.479 \times \frac{\text{DMI}}{\text{BW}} \times 100) - (0.17 \times \text{NDF}_\text{i}) - (0.007 \times \text{PercentConc}) ,& \text{if feed is forage} \\[8pt]
+3.054 + (0.614 \times \frac{\text{DMI}}{\text{BW}} \times 100) ,& \text{if feed is wet forage}
+\end{cases}
+$$
+:::
+
+:::{#eq-an-sup-10}
+[[**AN.SUP.10**]]{.aside .content-visible when-format="html"}
+$$
+\text{RDPi} =
+\begin{cases}
+(\frac{\text{Kdi}}{\text{Kdi + Kpi}} \times \frac{\text{NBi}}{100} \times \text{CPi}) + (\frac{\text{NAi}}{100} \times \text{CPi}) ,& \text{if Kpi + Kdi} > 0 \\[6pt]
+0 ,& \text{if Kpi + Kdi} \leq 0 \\
+\end{cases}
+$$
+:::
+
+:::{#eq-an-sup-11}
+[[**AN.SUP.11**]]{.aside .content-visible when-format="html"}    
+$$
+\text{MPbact} = 0.64 \times min(1000 \times 0.13 \times \text{TDNact}_\text{diet}, 1000 \times 0.85 \times \text{RDP}_\text{diet})
+$$
+:::
 
 **Rumen Undegradable Protein Supply**
 
+:::{#eq-an-sup-12}
+[[**AN.SUP.12**]]{.aside .content-visible when-format="html"}    
+$$
+\text{RUP}_\text{i} = \text{CP}_\text{i} - \text{RDP}_\text{i}
+$$
+:::
+
+:::{#eq-an-sup-13}
+[[**AN.SUP.13**]]{.aside .content-visible when-format="html"}    
+$$
+\text{RUP}_\text{i} = \sum_i\text{Feed}_\text{i} \times \text{RUP}_\text{i} - \text{dRDP}_\text{i}
+$$
+:::
+
 **Endogenous Protein Supply**
 
+$$
+\text{EndP} = 0.4 \times 11.8 \times \text{DMI}
+$$
 
 ##### Mineral Supply
 
+We will use calcium as an example, but phosphorus calculations will be similar.
+
+:::{#eq-an-sup-15}
+[[**AN.SUP.15**]]{.aside .content-visible when-format="html"}    
+$$
+\text{Ca}_\text{supply} = \sum_i\text{Feed}_\text{i} \times \text{Ca}_\text{i} \times \frac{\text{dCa}_\text{i}}{100}
+$$
+:::
 
 #### Automated Ration Formulation
 
@@ -2273,17 +1886,15 @@ In cases of ration formulation failure, a summary of the constraints that failed
 ##### Methodology
 
 Ration formulation is carried out at the pen level on a user-defined formulation interval (@tbl-an-auto-ration-an-input). The mean requirements for a given pen are 
-calculated prior to first formulation, as described in [REF IV. Animal Nutrition and Feeding, A. Calculations of Animal Energy and Nutrient Requirement]{.mark}. 
-This process then proceeds to utilize a series of constraints methods (@tbl-an-ration-input-constr) that compares the animal requirements against the supply of the 
-optimizer’s ration attempt, as described in [REF IV. Animal Nutrition and Feeding, B. Calculations of Animal Energy and Nutrient Supply]{.mark}, all while 
-abiding feed ingredient-specific inclusion rates, as defined in @nrc_2001 and @nrc_2021. If a ration cannot be formulated that meets the constraints given the pen-level 
-requirements and limits to inclusion rates, then one of the following things will happen.
+calculated prior to first formulation. This process then proceeds to utilize a series of constraints methods (@tbl-an-ration-input-constr) that compares the
+animal requirements against the supply of the optimizer’s ration attempt, all while abiding feed ingredient-specific inclusion rates, as defined in @nrc_2001 and @nrc_2021. 
+If a ration cannot be formulated  that meets the constraints given the pen-level requirements and limits to inclusion rates, then one of the following things will happen.
 
 **For lactacting cow pens**
 
 * Record failed constraints and formulation attempt to OutputManager.
 * Milk production will be reduced.
-  * If average milk production for the pen drops below the values defined in [REFERENCE TO 5. MILK PRODUCTION AND REDUCTION]{.mark}, then the simulation halts with an error.
+  * If average milk production for the pen drops below the values defined in the Milk Production Section (below), then the simulation halts with an error.
 * Recalculation of the nutritional requirements for all animals in the pen.
 * Ration formulation reattempt (repeat).
 
@@ -2294,7 +1905,7 @@ requirements and limits to inclusion rates, then one of the following things wil
 * IF no previously successful ration is available, the simulation will stop.
 
 ::: {.callout-note}
-A graphical overview of this process can be found in Figure 4 in II Animal Management, C. Milk Production.
+A graphical overview of this process can be found in @fig-ani-nutr-req-feeding.
 :::
 
 The generalized equation for sequential quadratic programming is as follows and gi(x) is constraint i, which must be twice continuously differentiable with respect to all xj in x (@Li_2022).
@@ -2356,7 +1967,7 @@ The ration formulation will proceed as described in the Automated Methodology ab
 
 If the number of close-up heifers is more than the herd needs, heifers in the Heifer III group are sold. If the number of close-up 
 is less than the herd needs, a replacement is bought from the market. This is evaluated daily by comparing the number of (cows + Heifer III) 
-to the herd num specified by the user. Details of this method are described in the Culling section of Animal-level processes and management. 
+to the herd num specified by the user. Details of this method are described in the Culling section{.mark} of Animal-level processes and management. 
 
 #### Herd Size Management: Heifer III Sales
 
@@ -2376,22 +1987,21 @@ a replacement is bought from the market. This is evaluated daily by comparing th
 falls within acceptable range. 
   * Called by `HerdManager.daily_routines()`
   * Returns a list of animals removed 
-  * Logic - While the number of (Heifer IIIs + cows) is greater than `herd_num` * `selling_threshold`: 
+  * Logic - While the number of (Heifer IIIs + cows) is greater than `herd_num` x `selling_threshold`: 
       * The last heifer III is removed and is added to `animals_removed`
       * Information about that heifer III is added to `sold_heiferIIIs_info`
       * The number of heifer III’s is decremented by 1
       * The number of `sold_heiferIII_oversupply_num` is incremented by 1
-  * This cycle iterates until the number of (Heifer IIIs + cows) is equal to `herd_num` * `selling_threshold`
+  * This cycle iterates until the number of (Heifer IIIs + cows) is equal to `herd_num` x `selling_threshold`
 
 * `HerdManager._check_if_replacement_heifers_needed()` Determines whether additional Heifer IIIs need to be added to the herd based on the 
 current herd size, purchase thresholds, and the availability of heifers in the replacement market.
   * Called by `HerdManager.daily_routines()`
   * Returns a list of animals purchased 
-  * While the number of (Heifer IIIs + cows + bought\_heifer\_num) is less than `herd_num` * `buying_threshold`: 
+  * While the number of (Heifer IIIs + cows + bought\_heifer\_num) is less than `herd_num` x `buying_threshold`: 
     * The first animal in the `replacement_market` enters the herd, assigned a phosphorus requirement and net merit value, and added to the `animals_added` list 
     * The number of `bought_heifer_num` is incremented by 1 
-  * This cycle iterates until the number of (Heifer IIIs + cows + `bought_heifer_num`) is equal to `herd_num` * `buying_threshold` 
-
+  * This cycle iterates until the number of (Heifer IIIs + cows + `bought_heifer_num`) is equal to `herd_num` x `buying_threshold` 
 
 #### Reproductive Culls: Heifer II Sales
 
@@ -2425,7 +2035,6 @@ user-defined rate of keeping female calves.
       * Contains logic that determines whether a calf should be sold, returning *True* if the calf is a male or if a random draw generates a number higher than the `keep_female_calf_rate`
       * If assigned to be sold, `sold_at_day` = `simulation_day` 
 
-
 #### Calf Losses (Death)
 
 **User Inputs and Constants**
@@ -2440,8 +2049,6 @@ user-defined rate of keeping female calves.
    * If a random draw is less than the `still_birth_rate`, then `self.sold` = True and `STILL\_BIRTH` is added to `self.events`
    * If assigned to be sold, `sold_at_day` = `simulation_day`
 
-
-
 ## Animal-level Process and Management
 
 The methods in the RuFaS model that simulate individual animals’ life events and the effects of herd management on individual animals are referred to as 
@@ -2455,7 +2062,6 @@ Monte Carlo simulation relies on random draws from probability distributions rat
 * **Random Population Simulation:** Selecting a random draw from a known distribution of animal attributes and assigning that value to the instantiation of an individual animal. (Random ~ in this document representing a random draw from the following distribution) Probability distributions used are:
    * Normal Gaussian: $N(\mu, \sigma)$ here $\mu$ is the distribution mean, and $\sigma$ is the standard deviation. 
    * Empirical: $F(x)=\frac{1}{n}\sum_{i=1}^n 1_{\{x_i \leq x\}}$: where $x$ is the observations from the sample and an indicator function equal to 1 if $x_i\leq x$ and 0 otherwise.
-
 
 **Flow of Information**
 
@@ -2494,9 +2100,7 @@ assigned a birthweight according to a user-informed random distribution. All mal
 of their life. Female calves remain on the farm determined by an event-based Monte Carlo method informed by the user-defined percent of 
 female calves that are kept. 
 
-
 ### RuFaS Bodyweight and Growth
-
 
 #### Introduction
 
@@ -2588,7 +2192,6 @@ minimum value is used.
 
 :::{#eq-an-bwt-8}
 [[**AN.BWT.8**]]{.aside .content-visible when-format="html"}
-
 $$    
 \text{target\_average\_daily\_gain} = \
   min \bigg(\frac{0.55×\text{MSBW}-\text{SBW}}{abs(\text{target heifer pregnant age}-\text{age})},0.5\bigg)
@@ -2668,16 +2271,13 @@ at her second calving minus her age at first calving as part of the `daily_repro
 
 Conceptus growth is estimated the same way for both heifers and cows using a non-linear model for animals that are 
 greater than 50 days in pregnancy based on the methods developed by @Korver1985. 
-
     
 If the heifer or cow days in pregnancy is greater than 50  and less than the gestation length:
-
 
 First the expected total conceptus weight is estimated using an empirical equation based on the calf birth weight and the gestation length:
 
 :::{#eq-an-bwt-14}
 [[**AN.BWT.14**]]{.aside .content-visible when-format="html"}
-
 $$     
 \text{conceptus\_total\_weight} = (0.0148 \times \text{gestation\_length}) × \text{calf\_birth\_weight}
 $$
@@ -2719,7 +2319,6 @@ daily tissue mobilized during lactation.
 
 :::{#eq-an-bwt-18}
 [[**AN.BWT.18**]]{.aside .content-visible when-format="html"}
-
 $$     
 \text{bodyweight\_tissue\_change} = \frac{\text{P1}}{\text{P2}} \times \
   exp\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg) + \
@@ -2743,17 +2342,10 @@ estimated on the last day of lactation as:
 
 :::{#eq-an-bwt-19}
 [[**AN.BWT.19**]]{.aside .content-visible when-format="html"}
-
 $$
-\text{tissue\_changed} = \text{P1} \times \frac{\text{DIMlast}}{\text{P2}} \times \
-  exp \bigg(1 - \frac{\text{DIMlast}}{\text{P2}}\bigg) + \
-  \text{DIM} \times exp \bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg)
+\text{tissue\_changed} = \text{P1} \times \frac{\text{DIMlast}}{\text{P2}} \times e^{(1 - \frac{\text{DIMlast}}{\text{P2}})} + \text{DIM} \times e^{(1 - \frac{\text{DIM}}{\text{P2}})}
 $$
 
-::::{.content-visible when-format="pdf"}
-\begin{flushright} [\textbf{AN.BWT.19}] \end{flushright}
-::::
-:::
 and 
 
 :::{#eq-an-bwt-20}
@@ -2876,7 +2468,6 @@ determines the timing of insemination and the probability of pregnancy initiatio
 
 ![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_method.png){#fig-ani-repro-method}
 
-
 * **ED (`execute_cow_ed_protocol`):** In the ED strategy, spontaneous estrous cycles are simulated. The first estrous cycle after calving is 
 determined on the calving date using a random draw from a normal distribution with user-specified mean and standard deviation [@kalantari2015using]. 
 The subsequent estrous cycles are modeled similarly. If the scheduled estrus occurs before the VWP, the estrus is ignored. If the scheduled estrus occurs 
@@ -2938,7 +2529,7 @@ This section describes how RuFaS determines the amount of milk and milk componen
     
 Milk yield is largely determined by lactation curve parameters. Wood’s curve is the only lactation model implemented in RuFaS currently, 
 but there is flexibility to potentially include other models as well. At the beginning of the simulation, the herd is assigned distributions 
-for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the Lactation Curve section). At the beginning of each new lactation, 
+for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the Lactation Curve section{.mark}). At the beginning of each new lactation, 
 each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
     
 When the cow starts lactating, she produces milk from the calving day until dry or culled according to the assigned lactation curve model. 
@@ -2979,10 +2570,6 @@ import_table(
 )
 ```
 
-::: {.callout-note}
-The `tolerance` variable defaults to 0.0 and currently has no effect ude to no implementation of an automated ration optimizer. RuFaS is hard-coded to use the user defined ration at this time.
-:::
-
 #### Expected Outputs
 
 * `report_life_cycle_manager_data`
@@ -3016,12 +2603,12 @@ The following inputs are used to generate the herd’s values for mean lactation
 * Annual milk yield (optional): `annual_milk_yield` in `animal.json` 
 * `Milking_cow_fraction`: 0.8356 default value 
    * Is in `lactation_curve_adjustment_inputs.json` 
-   * Fraction of lactating cows in adult cows, between 0 and 1. 
+   * Fraction of lactating cows in adult cows, between 0 and 1
    * Used to calculate adjusted lactation curve parameters to match a herd’s reported annual milk production 
 
 **Parameters and Equations**
 
-These are comprehensively outlined in the Lactation Curve Parameters Determination Section.
+These are comprehensively outlined in the Lactation Curve Parameters Determination Section{.mark}.
 
 `LactationCurve.set_lactation_parameters()` is called by:
 
@@ -3195,7 +2782,7 @@ including nutrient requirements, manure excretion, and greenhouse gas emission c
     
 The primary class in this module is:
     
-`LactationCurve`: Manages and adjusts Wood’s lactation curve parameters.
+* `LactationCurve`: Manages and adjusts Wood’s lactation curve parameters.
 
 #### Required User Inputs
 
@@ -3213,7 +2800,6 @@ There are three categories on inputs that should be considered in this section:
 import_table(
   "../resources/table_data/animal/tbl-an-lac-woods.csv",
   colalign = ["left", "left", "center", "center"]
-
 )
 ```
 
@@ -3223,7 +2809,6 @@ import_table(
 import_table(
   "../resources/table_data/animal/tbl-an-lac-adjust.csv",
   colalign = ["left", "left", "center", "center"]
-
 )
 ```
 
@@ -3233,7 +2818,6 @@ import_table(
 import_table(
   "../resources/table_data/animal/tbl-an-lac-milk-prod.csv",
   colalign = ["left", "left", "center", "center"]
-
 )
 ```
 
@@ -3245,7 +2829,6 @@ import_table(
 import_table(
   "../resources/table_data/animal/tbl-an-lac-outputs.csv",
   colalign = ["left", "left", "center"]
-
 )
 ```
 
@@ -3261,34 +2844,34 @@ retrieved from `lactation_inputs["parameter_mean_values"]` in `LACTATION_CURVE_A
 Wood's lactation curve parameters are adjusted based on temporal, geographical, 
 and management factors [@Li_2022]. Each parameter (l, m, n) is adjusted using a series of modifications:
 
-::: {#eq-an-mlk.1}
+::: {#eq-an-mlk-1}
 [[**AN.MLK.1**]]{.aside .content-visible when-format="html"}
 $$
-l_{adjusted} = l + \sum \text{adjustments} 
+\text{l}_\text{adjusted} = \text{l} + \sum \text{adjustments} 
 $$
 :::
 
-::: {#eq-an-mlk.2}
+::: {#eq-an-mlk-2}
 [[**AN.MLK.2**]]{.aside .content-visible when-format="html"}
 $$
-m_{adjusted} = m + scaling factor_m \times \sum \text{adjustments} 
+\text{m}_\text{adjusted} = \text{m} + \text{scaling factor}_\text{m} \times \sum \text{adjustments} 
 $$
 :::
 
-::: {#eq-an-mlk.3}
+::: {#eq-an-mlk-3}
 [[**AN.MLK.3**]]{.aside .content-visible when-format="html"}
 $$
-n_{adjusted} = n + scaling factor_n \sum \text{adjustments} 
+\text{n}_\text{adjusted} = \text{n} + \text{scaling factor}_\text{n} \times \sum \text{adjustments} 
 $$
 :::
 
 Where:
 $$ 
-scaling factor_m = 10^{-2}
+\text{scaling factor}_\text{m} = 10^{-2}
 $$
 
 $$
-scaling factor_n = 10^{-4}
+\text{scaling factor}_\text{m} = 10^{-4}
 $$ 
 
 Adjustments are applied based on:
@@ -3304,7 +2887,7 @@ If `annual_milk_yield` is provided, the l parameter is optimized to match the ex
 
 * Estimate herd average 305-day milk yield:
 
-::: {#eq-an-mlk.4}
+::: {#eq-an-mlk-4}
 [[**AN.MLK.4**]]{.aside .content-visible when-format="html"}
 $$
 \text{Milk Yield}_{305} = \frac{\text{Annual Milk Yield}}{\text{Number of Milking Cows}} \times \frac{305}{\text{Days per year}}
@@ -3313,24 +2896,24 @@ $$
 
 * Estimate parity specific 305-day milk yield: (`_estimate_305_day_milk_yield_by_parity`)
 
-::: {#eq-an-mlk.5}
+::: {#eq-an-mlk-5}
 [[**AN.MLK.5**]]{.aside .content-visible when-format="html"}
 $$
 M305_{Herd} = (M305_{P1} \times P1\%) + (M305_{\text{P2}} \times P2\%) + (M305_{P3} times P3^+\%)
 $$
 :::
 
-::: {#eq-an-mlk.6}
+::: {#eq-an-mlk-6}
 [[**AN.MLK.6**]]{.aside .content-visible when-format="html"}
 $$
 M305_{P2} = M305_{P1} \times 118\%
 $$
 :::
 
-::: {#eq-an-mlk.7}
+::: {#eq-an-mlk-7}
 [[**AN.MLK.7**]]{.aside .content-visible when-format="html"}
 $$
-M305_{P3+} = M305_{P1} \times 125\%
+M305_{P3^+} = M305_{P1} \times 125\%
 $$
 :::
 
@@ -3340,7 +2923,7 @@ $$
 
 * Fit l Parameter Using Optimization: (`_fit_wood_l_param_to_milk_yield`). The error function is defined as: (`_calculate_305_day_milk_yield_error`)
 
-::: {#eq-an-mlk.8}
+::: {#eq-an-mlk-8}
 [[**AN.MLK.8**]]{.aside .content-visible when-format="html"}
 $$
 \text{Error} = \text{Predicted MilkYield305} - \text{Target MilkYield305}
@@ -3348,7 +2931,6 @@ $$
 :::
 
 Using Scipy's minimize function, the l parameter is iteratively adjusted to minimize this error.
-
         
 * Final Lactation Curve Parameter Mapping. Once adjustments are made, parameters are stored in:
 
@@ -3362,7 +2944,7 @@ are generated in RuFaS. Please see the Milk Production section for more details 
 
 **Wood's Lactation Curve**
 
-[See [AN.MLK.9](#eq-an-mlk-9)]{.aside .content-visible when-format="html"}
+[See [AN.MLK-9](#eq-an-mlk-9)]{.aside .content-visible when-format="html"}
 $$
 Y_t = l * t^{m} * e^{-nt}
 $$
@@ -3374,7 +2956,7 @@ Where:
 
 **305-Day Milk Yield**
 
-::: {#eq-an-mlk.10}
+::: {#eq-an-mlk-10}
 [[**AN.MLK.10**]]{.aside .content-visible when-format="html"}
 $$
 \int_{l}^{305} lt^me^{-nt}dt
@@ -3416,7 +2998,6 @@ Information about death and sale events are tracked and aggregated daily, includ
 import_table(
   "../resources/table_data/animal/tbl-an-cull-inputs.csv",
   colalign = ["left", "left", "center", "center", "center"]
-
 )
 ```
 ::: {.callout-note}
@@ -3441,21 +3022,29 @@ At the beginning of each lactation, each cow “rolls the dice” to determine i
     
 Probability of death associated with each lactation (1, 2, 3, 4+) is specified at the beginning of the simulation as a user input. At the beginning of each lactation for each cow, it is determined whether she will die during that lactation with a random draw compared with the appropriate probability. Then, for individuals assigned to die during that lactation, an empirical Cumulative Distributive Function (CDF) is used to determine on which day the death will occur based on the probability of death occurring during each interval of the lactation. 
 
-The values for the CDF determining probability of death by day of lactation are located in the animal input json file (`death_day_prob`; @tbl-an-cull-cdf).
-
 **User Inputs and Constants**
 
 * Parity death probability: `parity_death_prob` 
    * Probability of death during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
 * Death day probability: `death_day_prob`
-   * Values to construct the CDF to determine future death day, given that death is going to occur (default values in @tbl-an-cull-cdf) 
-   * Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days” in the table below){.mark} 
+   * Values to construct the CDF to determine future death day, given that death is going to occur (default values are given in @tbl-an-cdf-cull-death)
+   * Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days” in @tbl-an-cull-cdf-death)
 
 **Parameters and Equations**
 
+The values for the CDF determining probability of death by day of lactation are located in the animal input json file (`death_day_prob`).
+
+```{python}
+#| label: tbl-an-cdf-cull-death
+#| tbl-cap: Cumulative Distribution Function (CDF) values associated with the conditional probability of death over time. The 'cull_day_count' array defines the segments of the CDF.
+import_table(
+  "../resources/table_data/animal/tbl-an-cull-cdf-death.csv",
+  colalign = ["left", "center", "center", "center", "center"]
+)
+```
 Determination of death date (once already determined that death will occur this lactation): 
 
-::: {#eq-an-anm.1}
+::: {#eq-an-anm-1}
 [[**AN.ANM.1**]]{.aside .content-visible when-format="html"}
 $$
 X = x_{\text{i-1}} + a_{\text{i}} \times (R - c_{\text{i-1}})
@@ -3495,27 +3084,33 @@ Probability of disease sales associated with each lactation (1, 2, 3, 4+) is spe
 * Parity cull probability: `parity_cull_prob` 
    * Probability of sale for disease during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
 * PFor each of the six reasons:
-   * `Probability` - Conditional probability that a sold animal is removed due to each group of issues. This probability is used to determine the reason for sale after it has been decided that the animal will be sold during the current lactation. The sum of probabilities for the six culling reasons equals 1. See Table 2{.mark} below for default values used to construct the empirical PDF.
-  * `Cull_day_prob`: Values to construct the CDF to determine future sale day, given that disease-related sale is going to occur. Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days”; default values in Table 4{.mark}) 
+   * `Probability` - Conditional probability that a sold animal is removed due to each group of issues. This probability is used to determine the reason for sale after it has been decided that the animal will be sold during the current lactation. The sum of probabilities for the six culling reasons equals 1. See @tbl-an-cull-reason below for default values used to construct the empirical PDF.
+  * `Cull_day_prob`: Values to construct the CDF to determine future sale day, given that disease-related sale is going to occur. Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days”; default values in @tbl-an-cull-cdf) 
 
-```{python}
-#| label: tbl-an-cull-cdf
-#| tbl-cap: Cumulative Distribution Function (CDF) values associaed. with the conditional probability that a sold animal is removed due to each group of issues and/or the conditional probability of death over time.
-import_table(
-  "../resources/table_data/animal/tbl-an-cull-cdf.csv",
-  colalign = ["left", "center", "center", "center", "center"]
-
-)
-```
- Corresponds to the “probability” value for each cull reason in the animal input json file. The 'cull\_day\_count' array defines the segments of the CDF}
 
 **Parameters and Equations**
 
+```{python}
+#| label: tbl-an-cull-reason
+#| tbl-cap: Cumulative Distribution Function (CDF) values associated with the conditional probability that a solud animal is removed due to each group of issues. Corresponds to the “probability” value for each cull reason in the animal input json file..
+import_table(
+  "../resources/table_data/animal/tbl-an-cull-reason.csv",
+  colalign = ["left", "center", "center", "center", "center"]
+)
+```
+
+```{python}
+#| label: tbl-an-cull-cdf
+#| tbl-cap: Cumulative Distribution Function (CDF) values associated with the likelihood over time of sales for each reason.
+import_table(
+  "../resources/table_data/animal/tbl-an-cull-cdf.csv",
+  colalign = ["left", "center", "center", "center", "center"]
+)
+```
+
 Determination of sale date (once already determined that death will occur this lactation): 
 
-We compute the sale day of Cow X as follows
-
-::: {#eq-an-anm.2}
+::: {#eq-an-anm-2}
 [[**AN.ANM.2**]]{.aside .content-visible when-format="html"}
 $$
 X = x_{\text{i-1}} + a_{\text{i}} * (R - c_{\text{i-1}})
@@ -3579,22 +3174,22 @@ growing heifers, lactating cows, and dry cows. It calculates the quantities of t
 manure. The implementation is designed for flexibility, enabling integration with other RuFaS modules for modeling 
 farm management scenarios. This module includes:
 
-- *Classes:* ManureExcretionCalculator
-- *Key Methods:*
-  - calculate_calf_manure
-  - calculate_heifer_manure
-  - calculate_cow_manure
-  - _calculate_lactating_cow_manure
-  - _calculate_dry_cow_manure
-  - _calculate_phosphorus_excretion_values
+* *Classes:* `ManureExcretionCalculator`
+* *Key Methods:*
+  * `calculate_calf_manure`
+  * `calculate_heifer_manure`
+  * `calculate_cow_manure`
+  * `_calculate_lactating_cow_manure`
+  * `_calculate_dry_cow_manure`
+  * `_calculate_phosphorus_excretion_values`
 
-This module integrates with the process_digestion method in the DigestiveSystem class to calculate manure excretion on 
+This module integrates with the process_digestion method in the `DigestiveSystem` class to calculate manure excretion on 
 a daily and per-animal basis. It plays a critical role in linking animal-level digestion processes with downstream 
 environmental and nutrient management models.
 
 The module takes inputs that include general animal properties (e.g., body weight, nutrient intake, and nutrient 
 compositions), milk production characteristics (e.g., fat and protein content), specific nutrient properties (e.g., 
-urine phosphorus requirements), and animal categories (e.g., CALF, HEIFER, COW). The outputs from this module are 
+urine phosphorus requirements), and animal categories (e.g., `CALF`, `HEIFER`, `COW`). The outputs from this module are 
 detailed manure excretion metrics, such as total manure mass, nutrient content, and volatile solids. In addition, an
 animal-class specific methane potential is assigned to manure upon excretion. These outputs are used by the Manure 
 Module for downstream calculations, including manure methane (CH<sub>4</sub>) emissions and nutrient balance tracking.
@@ -3609,18 +3204,16 @@ drawn from pen ration files and animal module constants. They are organized into
 #| tbl-cap: General animal and diet inputs used to calculate nutrient intake and manure production.
 import_table(
   "../resources/table_data/animal/tbl-an-gen-manexc-inputs.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-
+  colalign = ["left", "left", "center"]
 )
 ```
-
 
 ```{python}
 #| label: tbl-an-cow-input-manexc
 #| tbl-cap: Cow related inputs, particularly relevant for lactating animals.
 import_table(
   "../resources/table_data/animal/tbl-an-cow-input-manexc.csv",
-  colalign = ["left", "left", "right", "right", "right"]
+  colalign = ["left", "left", "center", "center"]
 )
 ```
 
@@ -3629,8 +3222,7 @@ import_table(
 #| tbl-cap: Phosphorus related inputs relevant to lactating cows.
 import_table(
   "../resources/table_data/animal/tbl-an-cow-phos-input-manexc.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -3651,8 +3243,7 @@ import_table(
 
 ### Methodology
 
-
-**1. Calf Manure Excretion (calculate_calf_manure)**
+#### Calf Manure Excretion (`calculate_calf_manure`)
 
 **Manure excretions**
 
@@ -3664,7 +3255,6 @@ $$
 \text{total\_manure\_excreted} = 3.45 \times \text{dry\_matter\_intake}
 $$
 :::
-
 
 Urine: amount of urine in kg, this is an assumption:
 
@@ -3706,7 +3296,6 @@ Non-degradable volatile solids excretion (kg/d):
 
 ::: {#eq-an-exc-6}
 [[**AN.EXC.6**]]{.aside .content-visible when-format="html"}
-
 $$
 \text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} 
 $$
@@ -3719,8 +3308,7 @@ Manure nitrogen excretion (kg/d):
 ::: {#eq-an-exc-7}
 [[**AN.EXC.7**]]{.aside .content-visible when-format="html"}
 $$
-\text{manure\_nitrogen} = \frac{\left(112.55 \times \text{dry\_matter\_intake} \times \
-\frac{\text{crude\_protein}}{100}\right)}{1000} 
+\text{manure\_nitrogen} = \frac{112.55 \times \text{dry\_matter\_intake} \times \frac{\text{crude\_protein}}{100}}{1000} 
 $$
 :::
 
@@ -3742,7 +3330,7 @@ $$
 $$
 :::
 
-**2. Heifer Manure Excretion (calculate_heifer_manure)**
+#### Heifer Manure Excretion (`calculate_heifer_manure`)
 
 **Manure excretions**
 
@@ -3805,7 +3393,6 @@ $$
 
 Non-degradable volatile solids excretion (kg/d):
 
-
 $$
 \text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids} 
 $$
@@ -3817,10 +3404,9 @@ Manure nitrogen excretion (kg/d):
 
 ::: {#eq-an-exc-14}
 [[**AN.EXC.14**]]{.aside .content-visible when-format="html"}
-
 $$
-\text{manure\_nitrogen} = 15.1 + 8.83 \times \frac{\left(\text{dry\_matter\_intake} \times 1000 \times \
-\frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}\right)}{1000}
+\text{manure\_nitrogen} = 15.1 + 8.83 \times \frac{\text{dry\_matter\_intake} \times 1000 \times 
+\frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}}{1000}
 $$
 :::
 
@@ -3828,10 +3414,9 @@ Fecal nitrogen excretion (kg/d):
 
 ::: {#eq-an-exc-15}
 [[**AN.EXC.15**]]{.aside .content-visible when-format="html"}
-
 $$
-\text{fecal\_nitrogen} = 0.345 + 0.317 \times \frac{\left(\text{dry\_matter\_intake} \times 1000 \times \
-\frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}\right)}{1000}
+\text{fecal\_nitrogen} = 0.345 + 0.317 \times \frac{\text{dry\_matter\_intake} \times 1000 \times 
+\frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}}{1000}
 $$
 :::
 
@@ -3851,7 +3436,6 @@ $$
 $$
 [See [AN.EXC.9](#eq-an-exc-9)]{.aside .content-visible when-format="html"}
 
-
 Manure potassium excretion (g/d):
 
 ::: {#eq-an-exc-17}
@@ -3861,38 +3445,34 @@ $$
 $$
 :::
 
+#### Lactating Cow Manure Excretion (`_calculate_lactating_cow_manure`)
 
-**3. Lactating Cow Manure Excretion (`_calculate_lactating_cow_manure`)**
-
-**Manure exretions**
+**Manure excretions**
 
 Fecal water (kg/d): Calculate the amount of fecal water excreted (kg/d):
 
-::: {#eq-an-exc-18"}
+::: {#eq-an-exc-18}
 [[**AN.EXC.18**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-  \text{fecal\_water} &= (1.987 \times \text{dry\_matter\_intake}) \
-  &\quad + (0.348 \times \text{acid\_detergent\_fiber\_concentrations}) \\
-  &\quad - (0.412 \times \text{crude\_protein\_concentration}) \\
-  &\quad - (0.074 \times \text{dry\_matter\_concentration}) \\
-  &\quad - (0.0057 \times \text{days\_in\_milk})
+\text{fecal\_water} &= (1.987 \times \text{dry\_matter\_intake}) + (0.348 \times \text{acid\_detergent\_fiber\_concentrations})\\
+& \qquad - (0.412 \times \text{crude\_protein\_concentration}) - (0.074 \times \text{dry\_matter\_concentration}) \\
+& \qquad - (0.0057 \times \text{days\_in\_milk})
 \end{aligned} 
 $$
 :::
 
-Total solids/Fecal dry matter (kg/d): <br>
-Calculate the amount of fecal dry matter excreted (kg/d). Fecal dry matter is 
-assumed to be equivalent to total solids:
+*Total solids/Fecal dry matter (kg/d)*
+
+Calculate the amount of fecal dry matter excreted (kg/d). Fecal dry matter is assumed to be equivalent to total solids:
 
 ::: {#eq-an-exc-19}
 [[**AN.EXC.19**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-  \text{fecal\_solids} &= 0.576 \\
-  &\quad + (0.370 \times \text{dry\_matter\_intake}) \\
-  &\quad - (0.075 \times \text{crude\_protein\_concentration}) \\
-  &\quad + (0.059 \times \text{acid\_detergent\_fiber\_concentrations})
+\text{fecal\_solids} &= 0.576 + (0.370 \times \text{dry\_matter\_intake})\\
+& \qquad - (0.075 \times \text{crude\_protein\_concentration}) \\
+& \qquad + (0.059 \times \text{acid\_detergent\_fiber\_concentrations})
 \end{aligned}
 $$
 :::
@@ -3903,10 +3483,8 @@ Urine (kg/d):
 [[**AN.EXC.20**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-  \text{urine} &= -7.742 \\
-  &\quad + (0.388 \times \text{dry\_matter\_intake}) \\
-  &\quad + (0.726 \times \text{crude\_protein\_concentration}) \\
-  &\quad + (2.066 \times \text{milk\_protein})
+\text{urine} &= -7.742 + (0.388 \times \text{dry\_matter\_intake}) \\
+& \qquad + (0.726 \times \text{crude\_protein\_concentration}) + (2.066 \times \text{milk\_protein})
 \end{aligned}
 $$
 :::
@@ -3935,10 +3513,9 @@ Degradable volatile solids (kg/d):
 [[**AN.EXC.23**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-  \text{degradable\_volatile\_solids} &= -1.017 \\
-  &\quad + (0.364 \times \text{organic\_matter\_intake}) \\
-  &\quad + (0.029 \times \text{neutral\_detergent\_fiber\_concentration}) \\
-  &\quad - (0.023 \times \text{crude\_protein\_concentration})
+\text{degradable\_volatile\_solids} &= -1.017 + (0.364 \times \text{organic\_matter\_intake}) \\
+& \qquad + (0.029 \times \text{neutral\_detergent\_fiber\_concentration}) \\
+& \qquad - (0.023 \times \text{crude\_protein\_concentration})
 \end{aligned}
 $$
 :::
@@ -3949,10 +3526,9 @@ Total volatile solids exreted by a lactating cow (kg/d):
 [[**AN.EXC.24**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{total\_volatile\_solids} &= -1.201 \\
-&\quad + (0.402 \times \text{organic\_matter\_intake}) \\
-&\quad + (0.036 \times \text{neutral\_detergent\_fiber\_concentration}) \\
-&\quad - (0.024 \times \text{crude\_protein\_concentration})
+\text{total\_volatile\_solids} &= -1.201 + (0.402 \times \text{organic\_matter\_intake}) \\
+& \qquad + (0.036 \times \text{neutral\_detergent\_fiber\_concentration}) \\
+& \qquad - (0.024 \times \text{crude\_protein\_concentration})
 \end{aligned}
 $$
 :::
@@ -3970,30 +3546,25 @@ Total manure nitrogen (kg/d):
 
 ::: {#eq-an-exc-25}
 [[**AN.EXC.25**]]{.aside .content-visible when-format="html"}
-
 $$
-\text{manure\_nitrogen} = 20.3 + 0.654 \times \frac{\left(\text{dry\_matter\_intake} \times 1000 \times \frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}\right)}{1000}
+\text{manure\_nitrogen} = 20.3 + 0.654 \times \frac{\text{dry\_matter\_intake} \times 1000 \times \frac{\frac{\text{crude\_protein\_concentration}}{6.25}}{100}}{1000}
 $$
 :::
 
 Fecal nitrogen (kg/d):
-
 ::: {#eq-an-exc-26}
 [[**AN.EXC.26**]]{.aside .content-visible when-format="html"}
 $$
-\text{fecal\_nitrogen} = \frac{\left(10.1 \times \text{dry\_matter\_intake} - 18.5 \right)}{1000}
+\text{fecal\_nitrogen} = \frac{(10.1 \times \text{dry\_matter\_intake} - 18.5)}{1000}
 $$
 :::
 
 Urine nitrogen excretion (kg/d):
 
- 
 $$
 \text{urine}_{\text{nitrogen}} = \text{manure}_{\text{nitrogen}} - \text{fecal}_{\text{nitrogen}}
 $$
 [See [AN.EXC.16](#eq-an-exc-16)]{.aside .content-visible when-format="html"}
-
-
 
 Manure total ammoniacal nitrogen (kg/d):
 
@@ -4006,13 +3577,12 @@ Manure potassium excretion (g/d):
 
 ::: {#eq-an-exc-27}
 [[**AN.EXC.27**]]{.aside .content-visible when-format="html"}
-
 $$
 \text{potassium} = \left(7.21 \times \text{dry\_matter\_intake}\right) + \left(15944 \times \frac{\text{potassium\_concentration}}{100}\right) - 164.5
 $$
 :::
 
-**4. Dry Cow Manure Excretion (\_calculate\_dry\_cow\_manure)**
+#### Dry Cow Manure Excretion (`_calculate_dry_cow_manure`)
 
 **Manure excretions**
 
@@ -4032,9 +3602,8 @@ Total manure excretion (kg/d): Amount of feces and urine excreted daily by dry c
 [[**AN.EXC.29**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{total\_manure\_excreted} &= (0.00711 \times \text{body\_weight}) \\
-&\quad + (0.324 \times \text{crude\_protein\_concentration}) \\
-&\quad + (0.259 \times \text{neutral\_detergent\_fiber\_concentration})
+\text{total\_manure\_excreted} &= (0.00711 \times \text{body\_weight}) + (0.324 \times \text{crude\_protein\_concentration}) \\
+&\qquad + (0.259 \times \text{neutral\_detergent\_fiber\_concentration})
 \end{aligned}
 $$
 :::
@@ -4068,10 +3637,8 @@ Degradable volatile solids (kg/d):
 
 $$
 \begin{aligned}
-\text{degradable\_volatile\_solids} &= -1.017 \\
-&\quad + (0.364 \times \text{organic\_matter\_intake}) \\
-&\quad + (0.029 \times \text{neutral\_detergent\_fiber\_concentration}) \\
-&\quad - (0.023 \times \text{crude\_protein\_concentration})
+\text{degradable\_volatile\_solids} &= -1.017 + (0.364 \times \text{organic\_matter\_intake}) \\
+&\qquad + (0.029 \times \text{neutral\_detergent\_fiber\_concentration}) - (0.023 \times \text{crude\_protein\_concentration})
 \end{aligned}
 $$
 [See [AN.EXC.23](#eq-an-exc-23)]{.aside .content-visible when-format="html"}
@@ -4080,10 +3647,8 @@ Total volatile solids excreted by a dry cow (kg/d):
 
 $$
 \begin{aligned}
-\text{total\_volatile\_solids} &= -1.201 \\
-&\quad + (0.402 \times \text{organic\_matter\_intake}) \\
-&\quad + (0.036 \times \text{neutral\_detergent\_fiber\_concentration}) \\
-&\quad - (0.024 \times \text{crude\_protein\_concentration})
+\text{total\_volatile\_solids} &= -1.201 + (0.402 \times \text{organic\_matter\_intake}) \\
+&\qquad + (0.036 \times \text{neutral\_detergent\_fiber\_concentration}) - (0.024 \times \text{crude\_protein\_concentration})
 \end{aligned}
 $$
 [See [AN.EXC.24](#eq-an-exc-24)]{.aside .content-visible when-format="html"}
@@ -4092,26 +3657,23 @@ Non-degradable volatile solids excretion (kg/d):
 
 :::{}
 [See [AN.EXC.6](#eq-an-exc-6)]{.aside .content-visible when-format="html"}
-
 $$
 \text{non\_degradable\_volatile\_solids} = \text{total\_volatile\_solids} - \text{degradable\_volatile\_solids}
 $$
 :::
 
-**5. Manure Phosporus Excretion (`_calculate_phosphorus_excretion_manure`)**
+#### Manure Phosporus Excretion (`_calculate_phosphorus_excretion_manure`)
 
 Total phosphorus fraction of feces:
 
 ::: {#eq-an-exc-30}
 [[**AN.EXC.30**]]{.aside .content-visible when-format="html"}
-
 $$
 \text{manure\_phosphorus\_fraction} = \frac{\text{fecal\_phosphorus} + \text{urine\_phosphorus\_required}}{\text{total\_manure\_excreted} \times 1000 g/kg}
 $$
 :::
 
 Inorganic phosphorus fraction:
-
 ::: {#eq-an-exc-31}
 [[**AN.EXC.31**]]{.aside .content-visible when-format="html"}
 $$
@@ -4156,50 +3718,46 @@ $$
 $$
 :::
 
-**6. Manure Methane Potential**
+#### Manure Methane Potential
 
 The methane potential of the manure volatile solids are set by the `get_manure_streams()` method based on the 
 Animal Combination of the pen. If the Animal Combination is `CALVES` or `GROWING`, the methan potential is set to 0.17. 
-If the Animal Combination is `LAC_COW` or `CLOSE_UP`, the methane potential is set to 0.24 (@Hanson2024).
+If the Animal Combination is `LAC_COW` or `CLOSE_UP`, the methane potential is set to 0.24 [@Hanson2024].
 
 ::: {.callout-note}
-All references may be found at the end of this document or are based on expert communication with V. Sempali from 2023 
-to 2024.
+All references may be found at the end of this document or are based on expert communication with V. Sempali in 2023 
+and 2024.
 ::: 
 
 ### Enteric Methane Emission Introduction
 
-
 The Enteric Methane Calculator module calculates daily enteric methane emissions for calves, heifers, lactating cows, 
 and dry cows. Methane emissions are estimated based on animal characteristics, dietary intake, and a variety of 
 animal category specific methane models. The IPCC model is available for all animal classes except 
-calves (@IPCC2006). The equation from @Mills2003 is also available for dry and lactating cows and the 
+calves [@IPCC2006]. The equation from @Mills2003 is also available for dry and lactating cows and the 
 @Niu2018 equation is available for lactating cows. <br>
 
-Finally, a separate equation published by @Pattanaik2003 is used for calves. Simulation of enteric methane mitigation via mitigation supplements 3-NOP or monensin are also available for lactating cows The module integrates with the DigestiveSystem class and supports methane mitigation strategies using feed additives.
+Finally, a separate equation published by @Pattanaik2003 is used for calves. Simulation of enteric methane mitigation via mitigation supplements 3-NOP or monensin are also available for lactating cows The module integrates with the `DigestiveSystem` class and supports methane mitigation strategies using feed additives.
 
-- *Classes:* EntericMethaneCalculator
-- *Key Methods:*
-   - calculate_calf_manure
-   - calculate_heifer_manure
-   - calculate_cow_methane (lactating and dry cow methods are called within this method)
-   - calculate_lactating_cow_manure
-   - calculate_dry_cow_manure
+* *Classes:* `EntericMethaneCalculator`
+* *Key Methods:*
+   * `calculate_calf_manure`
+   * `calculate_heifer_manure`
+   * `calculate_cow_methane` (lactating and dry cow methods are called within this method)
+   * `calculate_lactating_cow_manure`
+   * `calculate_dry_cow_manure`
 
 The calculated enteric methane emissions are directly output to the Output Manager to generate the final reports.
 
 #### Required User Inputs
-
 
 ```{python}
 #| label: tbl-an-gen-enteric-met
 #| tbl-cap: Animal and diet inputs used to calculate nutrient intake and manure production.
 import_table(
   "../resources/table_data/animal/tbl-an-gen-enteric-met.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-
+  colalign = ["left", "left", "center"]
 )
-
 ```
 
 ```{python}
@@ -4207,10 +3765,8 @@ import_table(
 #| tbl-cap: Cow specific inputs, particularly relevant for lactating animals.
 import_table(
   "../resources/table_data/animal/tbl-an-cow-enteric-met.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-
+  colalign = ["left", "left", "center", "center", "center"]
 )
-
 ```
 
 ```{python}
@@ -4218,30 +3774,22 @@ import_table(
 #| tbl-cap: Methane emissions model and mitigation strategy inputs.
 import_table(
   "../resources/table_data/animal/tbl-an-model-methane.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-
+  colalign = ["left", "left", "center"]
 )
-
 ```
 
 #### Expected Outputs
 
 This module predicts the daily enteric methane emissions for individual animals:
 
-
 ```{python}
 #| label: tbl-an-output-methane
 #| tbl-cap: Expected outputs of the methane model.
 import_table(
   "../resources/table_data/animal/tbl-an-output-methane.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-
+  colalign = ["left", "left", "left", "center"]
 )
-
 ```
-
-
-: Expected outputs. {#tbl-animal-enteric-methane-outputs}
 
 ### Methodology
 
@@ -4253,11 +3801,8 @@ Based on dry matter intake and gross energy concentration from nutrient composit
 [[**AN.MET.1**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{soluble\_residue} &= 100 \\
-&\quad - \text{ash\_concentration} \\
-&\quad - \text{neutral\_detergent\_fiber\_concentration} \\
-&\quad - \text{crude\_protein\_concentration} \\
-&\quad - \text{ethyl\_ester\_concentration}
+\text{soluble\_residue} &= 100 - \text{ash\_concentration} - \text{neutral\_detergent\_fiber\_concentration} \\
+&\qquad - \text{crude\_protein\_concentration} - \text{ethyl\_ester\_concentration}
 \end{aligned}
 $$
 :::
@@ -4266,18 +3811,15 @@ $$
 [[**AN.MET.2**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{gross\_energy\_concentration} &= 0.263 \\
-&\quad \times \left(\text{crude\_protein\_concentration} + 0.522\right) \\
-&\quad \times \left(\text{ethyl\_ester\_concentration} + 0.198\right) \\
-&\quad \times \left(\text{neutral\_detergent\_fiber\_concentration} + 0.160\right) \\
-&\quad \times \text{soluble\_residue}
+\text{gross\_energy\_concentration} &= 0.263 \times \left(\text{crude\_protein\_concentration} + 0.522\right) \\
+&\qquad \times \left(\text{ethyl\_ester\_concentration} + 0.198\right) \times \left(\text{neutral\_detergent\_fiber\_concentration} + 0.160\right) \\
+&\qquad \times \text{soluble\_residue}
 \end{aligned}
 $$
 :::
 
 ::: {#eq-an-met-3 style="font-size:80%;"}
 [[**AN.MET.3**]]{.aside .content-visible when-format="html"}
-
 $$
 \text{starch\_acid\_detergent\_fiber\_concentration\_ratio} = -0.0011 \times \
   \frac{\text{starch\_concentration}}{\text{acid\_detergent\_fiber\_concentrations}}
@@ -4293,7 +3835,7 @@ by calves are estimated from mean values observed in that study.
 ::: {#eq-an-met-4}
 [[**AN.MET.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{methane\_emission} = \frac{0.013 \times \text{body\_weight}^{0.75} \times 4.184 J/Mcal}{0.05565}
+\text{methane\_emission} = \frac{0.013 \times \text{body\_weight}^{0.75} \times 4.184 \text{J/Mcal}}{0.05565}
 $$
 :::
 
@@ -4301,7 +3843,6 @@ $$
 
 ::: {#eq-an-met-5}
 [[**AN.MET.5**]]{.aside .content-visible when-format="html"}
-
 $$
 \text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565}
 $$
@@ -4319,11 +3860,9 @@ For lactating cows, the Mutian, Mills, or IPCC model is applied
 [[**AN.MET.6**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{methane\_emission} &= -126 \\
-&\quad + (11.3 \times \text{dry\_matter\_intake}) \\
-&\quad + (2.30 \times \text{neutral\_detergent\_fiber\_concentration}) \\
-&\quad + (28.8 \times \text{milk\_fat}) \\
-&\quad + (0.148 \times \text{body\_weight})
+\text{methane\_emission} &= -126 + (11.3 \times \text{dry\_matter\_intake}) \\
+&\qquad + (2.30 \times \text{neutral\_detergent\_fiber\_concentration})   \\
+&\qquad + (28.8 \times \text{milk\_fat}) + (0.148 \times \text{body\_weight})
 \end{aligned}
 $$
 :::
@@ -4343,7 +3882,7 @@ emissions. The CNCPS and IFSM models use the Mitscherlich 3 equation.
 $$
 \begin{aligned}
   \text{methane\_emission} = \frac{ 45.98 \times \
-    e^{- \left( \text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio} + 0.0045 \right)} \
+    e^{- (\text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio} + 0.0045)} \
     \times \text{metabolizable\_energy\_intake} \times 4.184 }{ 0.05565 }
 \end{aligned}
 $$
@@ -4372,7 +3911,7 @@ This is previously described in the [lactating cow section](#sec-an-mills-model)
 $$
 \begin{aligned}
   \text{methane\_emission} = \frac{ 45.98 \times \
-    e^{- \left( \text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio} + 0.0045 \right)} \
+    e^{-( \text{starch\_to\_acid\_detergent\_fiber\_concentration\_ratio} + 0.0045)} \
     \times \text{metabolizable\_energy\_intake} \times 4.184 }{ 0.05565 }
 \end{aligned}
 $$
@@ -4405,8 +3944,8 @@ specific feed additives in animal diets. This module calculates methane mitigati
 considering dietary composition, feed additive dosage, and the selected mitigation strategy.
 Currently, the module supports the following mitigation strategies:
 
-- 3-NOP (3-Nitrooxypropanol)
-- Monensin
+* 3-NOP (3-Nitrooxypropanol)
+* Monensin
 
 Future updates will include additional strategies such as essential oils and seaweed. The mitigation effects are first
 calculated as a percentage reduction in methane yield (methane production / DMI). Then this module integrates with 
@@ -4423,9 +3962,7 @@ composition and the use of specific feed additives. The inputs are organized int
 import_table(
   "../resources/table_data/animal/tbl-an-enter-met-diet-mitigate.csv",
   colalign = ["left", "left", "right", "right", "right"]
-
 )
-
 ```
 
 ```{python}
@@ -4434,62 +3971,51 @@ import_table(
 import_table(
   "../resources/table_data/animal/tbl-an-enter-met-additive-type-dose.csv",
   colalign = ["left", "left", "right", "right", "right"]
-
 )
-
 ```
 #### Expected Outputs
 
-This module predicts the daily enteric methane emissions for individual animals: Below is the
-[previous table from the Emissions section](#tbl-an-output-methane).
-
-
-```{python}
-
-#| tbl-cap: Expected outputs of the methane model.
-import_table(
-  "../resources/table_data/animal/tbl-an-output-methane.csv",
-  colalign = ["left", "left", "right", "right", "right"]
-
-)
-
-```
-
-
+This module predicts the daily enteric methane emissions for individual animals. Outputs are described in @tbl-an-output-methane.
 
 ### Methodology
 
-**3-NOP Methane Yield Reduction** Reduction is modeled as a function of additive dosage, NDF, EE, and starch concentrations.
+**3-NOP Methane Yield Reduction** 
+
+Reduction is modeled as a function of additive dosage, NDF, EE, and starch concentrations.
 
 ::: {#eq-an-met-8}
 [[**AN.MET.8**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-  \text{methane\_yield\_reduction} &= -30.8 \\
-  &\quad - \left(0.226 \times \left(\text{methane\_mitigation\_additive\_amount} - 70.5 \right)\right) \\
-  &\quad + \left(0.906 \times \left(\text{neutral\_detergent\_fiber\_concentration} - 32.9 \right)\right) \\
-  &\quad + \left(3.871 \times \left(\text{ethyl\_ester\_concentration} - 4.2 \right)\right) \\
-  &\quad - \left(0.337 \times \left(\text{starch\_concentration} - 21.1 \right)\right)
+\text{methane\_yield\_reduction} &= -30.8 - (0.226 \times (\text{methane\_mitigation\_additive\_amount} - 70.5)) \\
+&\qquad + (0.906 \times (\text{neutral\_detergent\_fiber\_concentration} - 32.9 )) \\
+&\qquad + (3.871 \times (\text{ethyl\_ester\_concentration} - 4.2 )) \\
+&\qquad - (0.337 \times (\text{starch\_concentration} - 21.1 ))
 \end{aligned}
 $$
 :::
 
-**Monensin Methane Yield Reduction** Reduction is based on additive dosage and starch concentration.
+**Monensin Methane Yield Reduction** 
+
+Reduction is based on additive dosage and starch concentration.
 
 ::: {#eq-an-met-9}
 [[**AN.MET.9**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-  \text{methane\_yield\_reduction} &= 6.35 \\
-  &\quad - \left(0.277 \times \text{methane\_mitigation\_additive\_amount} \right) \\
-  &\quad - \left(0.182 \times \text{starch\_concentration}\right)
+\text{methane\_yield\_reduction} &= 6.35 - (0.277 \times \text{methane\_mitigation\_additive\_amount} ) \\
+&\qquad - (0.182 \times \text{starch\_concentration})
 \end{aligned}
 $$
 :::
 
-**Default Case** If no valid mitigation method is selected, the reduction defaults to 0%.
+**Default Case** 
 
-**Adjust the Initial Predicted Enteric Methane (EntericMethaneCalculator.calculate_-cow_methane)** First, the initially predicted methane yield of the basal diet is calculated
+If no valid mitigation method is selected, the reduction defaults to 0%.
+
+**Adjust the Initial Predicted Enteric Methane (`EntericMethaneCalculator.calculate_cow_methane`)** 
+
+First, the initially predicted methane yield of the basal diet is calculated
 
 ::: {#eq-an-met-10}
 [[**AN.MET.10**]]{.aside .content-visible when-format="html"}
@@ -4504,9 +4030,8 @@ Then the adjusted methane production is calculated based on methane yield reduct
 [[**AN.MET.11**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-  \text{adjusted\_methane\_emission} &= \text{methane\_yield} \\
-  &\quad \times \left( 1 + \frac{\text{methane\_yield\_reduction}}{100} \right) \\
-  &\quad \times \text{dry\_matter\_intake}
+\text{adjusted\_methane\_emission} &= \text{methane\_yield} \times \left( 1 + \frac{\text{methane\_yield\_reduction}}{100} \right) \\
+&\qquad \times \text{dry\_matter\_intake}
 \end{aligned}
 $$
 :::

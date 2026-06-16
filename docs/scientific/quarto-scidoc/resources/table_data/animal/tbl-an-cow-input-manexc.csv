@@ -1,8 +1,8 @@
 ﻿ Variable , Definition , Units , Default 
- is_lactating , Indicates the cow's lactating status , Boolean , NA 
- days_in_milk , Days post-parturition; for lactating cows only; Intermediate model output , days , NA 
+ is_lactating , Indicates the cow's lactating status , Boolean , --
+ days_in_milk , Days post-parturition; for lactating cows only; Intermediate model output , days , -- 
  milk_protein , Milk protein content; for lactating cows only , % ,3.2
- daily_milk_production , Daily milk production; for lactating cows only , kg , NA 
- body_weight , Body weight of the cow , kg , NA 
+ daily_milk_production , Daily milk production; for lactating cows only , kg , --
+ body_weight , Body weight of the cow , kg , --
  milk_fat , Milk fat content , % ,3.5
- metabolizable_energy_intake , Metabolizable energy intake per kg DM , Mcal/kg DM , NA 
+ metabolizable_energy_intake , Metabolizable energy intake per kg DM , Mcal/kg DM , --
