@@ -1101,47 +1101,23 @@ class Field:
 
     def _create_daily_spread_event(self, time: RufasTime) -> ManureEvent | None:
         """
-        Build the synthetic daily-spread manure event for the current day, if daily spreading is enabled.
+        Build the daily-spread manure event for the current day, if daily spreading is enabled.
 
-        Daily spreading models a farm that applies manure to the field every day as it is produced (a
-        scrape-and-haul operation), rather than only on the dates listed in the manure schedule. When enabled,
-        this generates one synthetic :class:`ManureEvent` for the current day, in addition to any scheduled
-        manure events that also occur that day.
-
-        The event is only created when ``daily_spread_settings`` is present and its ``is_daily_spreading`` flag
-        is true; otherwise ``None`` is returned and no daily spread occurs. The amount applied is driven by one
-        of two modes:
-
-        - Targeted (default): request ``nitrogen_spread_amount`` and ``phosphorus_spread_amount`` kg, fulfilled
-          from DailySpread manure storage.
-        - Spread-all (``spread_all_available_manure`` is true): ignore the nutrient amounts and apply all manure
-          currently available in DailySpread storage that day, regardless of nutrient content or manure type.
+        Daily spreading applies manure to the field every day as it is produced, in addition to any scheduled
+        manure events. The settings are read from the ``daily_spread`` block of the manure schedule; if it is
+        missing or ``is_daily_spreading`` is false, no event is created. Either a target amount
+        (``nitrogen_spread_amount`` / ``phosphorus_spread_amount``) is requested, or, when
+        ``spread_all_available_manure`` is true, all manure currently in DailySpread storage is applied.
 
         Parameters
         ----------
         time : RufasTime
-            The current simulation time; stamped onto the generated event.
+            The current simulation time, stamped onto the generated event.
 
         Returns
         -------
         ManureEvent | None
             The daily spread event for the current day, or ``None`` if daily spreading is disabled.
-
-        Notes
-        -----
-        Recognized keys in ``daily_spread_settings`` (all optional; defaults shown):
-
-        - ``is_daily_spreading`` (bool, default False): master switch; if false, no event is created.
-        - ``spread_all_available_manure`` (bool, default False): selects spread-all mode (see above).
-        - ``nitrogen_spread_amount`` / ``phosphorus_spread_amount`` (float kg, default 0.0): per-day nutrient
-          targets used in targeted mode.
-        - ``manure_type`` (str, default ``"solid"``): the manure type requested. Solid is the default because
-          daily spreading typically represents scrape-and-haul of solid/semi-solid manure.
-        - ``supplement_manure_nutrient_deficiencies`` (str, default ``"none"``): whether shortfalls may be
-          supplemented (ignored in spread-all mode).
-        - ``coverage_fraction`` (default 1.0), ``application_depth`` (default 0.0),
-          ``surface_remainder_fraction`` (default 1.0): application-method parameters, applied the same way as
-          for a scheduled manure event.
 
         """
         if not self.daily_spread_settings:
