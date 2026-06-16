@@ -1201,9 +1201,9 @@ class InputManager:
             info_map,
         )
 
-    def get_data(self, data_address: str, required: bool = True) -> Any:
+    def get_data(self, data_address: str, required: bool = True) -> Any | None:
         """
-        Get the requested data from the pool if it exists. If not, None is returned.
+        Gets the requested data from the pool if it exists. If the data is not found, None is returned.
 
         Parameters
         ----------
@@ -1253,9 +1253,6 @@ class InputManager:
         mutating the internal pool data by modifying the returned value.
 
         """
-        if not required:
-            return None
-
         info_map = {
             "class": self.__class__.__name__,
             "function": self.get_data.__name__,
@@ -1267,6 +1264,13 @@ class InputManager:
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
         except KeyError as key_error:
+            if not required:
+                self.om.add_log(
+                    "Optional data not found",
+                    f"Optional data at '{data_address}' was not found in the input pool.",
+                    info_map,
+                )
+                return None
             self.om.add_error("Validation: data not found", str(key_error), info_map)
 
         return None
