@@ -1735,11 +1735,7 @@ class HerdManager:
             self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, simulation_day)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
 
-        reduced_cows = [
-            cow
-            for cow in self.cows
-            if cow.milk_production.milk_production_reduction > 0
-        ]
+        reduced_cows = [cow for cow in self.cows if cow.milk_production.milk_production_reduction > 0]
         if reduced_cows:
             num_reduced = len(reduced_cows)
             avg_reduction = sum(cow.milk_production.milk_production_reduction for cow in reduced_cows) / num_reduced
