@@ -140,10 +140,9 @@ class MeasurementUnits(Enum):
         Returns
         -------
         tuple[dict[str, int], dict[str, int]]
-            1. dict[str, int]
-                Numerator units, mapping unit names to exponents.
-            2. dict[str, int]
-                Denominator units. Empty dict if no denominator or no units are found.
+            - Numerator units, mapping unit names to exponents.
+            - Denominator units. Empty dict if no denominator or no units are found.
+
         """
         match = re.search(r"\((.*?)\)", key)
         if match:
@@ -201,11 +200,9 @@ class MeasurementUnits(Enum):
         Returns
         -------
         tuple[dict[str, int], dict[str, int]]
-            A tuple containing two dictionaries:
-            1. dict[str, int]
-                The simplified numerator units with non-zero exponents.
-            2. dict[str, int]
-                The the simplified denominator units with non-zero exponents.
+            - The simplified numerator units with non-zero exponents.
+            - The the simplified denominator units with non-zero exponents.
+
         """
         combined_numerator = numerator.copy()
         combined_denominator = denominator.copy()
