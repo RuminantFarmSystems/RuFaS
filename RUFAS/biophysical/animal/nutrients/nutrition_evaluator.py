@@ -33,7 +33,7 @@ class NutritionEvaluator:
         -------
         tuple[bool, NutritionEvaluationResults]
             - Boolean indicating if the ration has an amount of energy and nutrients sufficient to meet the given
-            requirements. 
+            requirements.
             - An object containing a summary of all energy and nutrient surpluses and deficiencies.
 
         """
