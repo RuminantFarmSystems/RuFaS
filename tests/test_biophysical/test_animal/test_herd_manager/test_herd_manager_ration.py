@@ -347,6 +347,38 @@ def test_formulate_rations_empty_pen(herd_manager: HerdManager, mocker: MockerFi
         assert pen.ration == {}
 
 
+def test_formulate_rations_warns_on_milk_production_reduction(
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """Warning emitted when cows have nonzero milk_production_reduction after ration formulation."""
+    available_feeds, current_temperature, ration_interval_length = mock_available_feeds(), 30, 30
+
+    mocker.patch.object(herd_manager, "clear_pens")
+    mocker.patch.object(herd_manager, "allocate_animals_to_pens")
+    mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
+    mocker.patch.object(herd_manager, "_find_pen_available_feeds", return_value=available_feeds)
+    for pen in herd_manager.all_pens:
+        mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({}))
+    mocker.patch.object(RationManager, "get_ration_feeds", return_value=mocker.sentinel.feed_ids)
+    mocker.patch.object(RationManager, "get_user_defined_ration_feeds", return_value=mocker.sentinel.feed_ids)
+
+    for cow in herd_manager.cows:
+        cow.milk_production.milk_production_reduction = 5.0
+
+    mock_add_warning = mocker.patch.object(herd_manager.om, "add_warning")
+
+    herd_manager.is_ration_defined_by_user = False
+    herd_manager.formulate_rations(available_feeds, current_temperature, ration_interval_length, 15)
+
+    if herd_manager.cows:
+        mock_add_warning.assert_called_once()
+        call_args = mock_add_warning.call_args
+        assert "milk production reduced" in call_args[0][0].lower()
+    else:
+        mock_add_warning.assert_not_called()
+
+
 @pytest.mark.parametrize("use_user_defined_ration", [True, False])
 def test_reformulate_ration_single_pen(
     use_user_defined_ration: bool, herd_manager: HerdManager, mocker: MockerFixture
