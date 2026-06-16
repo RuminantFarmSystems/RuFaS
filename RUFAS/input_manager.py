@@ -1434,8 +1434,6 @@ class InputManager:
         Returns
         -------
         tuple[bool, bool]
-            Tuple containing:
-
             - Whether the input data was removed.
             - Whether the associated metadata was removed.
 
@@ -1643,8 +1641,8 @@ class InputManager:
         Returns
         -------
         tuple[dict[str, Any], dict[str, Any]]
-            Tuple containing the prepared input data and the metadata properties used
-            to validate it.
+            - The prepared input data.
+            - The metadata properties used to validate the input data.
 
         """
         element_hierarchy = variable_name.split(".")

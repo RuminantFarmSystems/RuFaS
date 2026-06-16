@@ -311,18 +311,15 @@ class ReportGenerator:
         Returns
         -------
         tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]
-            1. dict[str, dict[str, list[Any]]] | dict[str, list[Any]]
-                The aggregated report data.
+            - The aggregated report data.
                 - If no aggregation is specified, all the columns will be returned.
                 - If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
                     that is either ``hor_ver_agg`` or ``ver_hor_agg`` depending on the value of the
                     ``horizontal_first`` key in the filter content.
                 - If only horizontal aggregation is specified, the returned dictionary will have one key ``hor_agg``.
                 - If only vertical aggregation is specified, the returned dictionary will have one key ``ver_agg``.
-            2. list[dict[str, str | dict[str, str]]]
-                The event logs
-            3. bool
-                A boolean indicating whether the report data has been aggregated.
+            - The event logs
+            - A boolean indicating whether the report data has been aggregated.
 
         Raises
         ------
