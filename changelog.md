@@ -106,6 +106,7 @@ v1.0.0
 - [3070](https://github.com/RuminantFarmSystems/RuFaS/pull/3070) - [minor change] [Config] [InputChange] [NoOutputChange] Removes the `random_seed` field from all 6 config input files and from 3 config input files in helpful_scripts.
 - [3087](https://github.com/RuminantFarmSystems/RuFaS/pull/3087) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Extracts post-loop logic from `SimulationEngine.simulate()` into `_post_loop_processing()`, `_post_loop_reporting()`, and `_post_loop_logging()`.
 - [3049](https://github.com/RuminantFarmSystems/RuFaS/pull/3049) - [minor change] [Utility] [NoInputChange] [NoOutputChange] Updates docstrings across 9 utility files to NumPy-style format.
+- [3099](https://github.com/RuminantFarmSystems/RuFaS/pull/3099) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds warning in `HerdManager.formulate_rations()` when milk production is reduced due to ration formulation failure, reporting the number of affected cows and average reduction in kg.
 
 ### v1.0.0
 

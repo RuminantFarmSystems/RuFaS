@@ -1734,6 +1734,24 @@ class HerdManager:
             pen_available_feeds = self._find_pen_available_feeds(available_feeds, ration_feed_ids)
             self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, simulation_day)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
+
+        reduced_cows = [cow for cow in self.cows if cow.milk_production.milk_production_reduction > 0]
+        if reduced_cows:
+            num_reduced = len(reduced_cows)
+            avg_reduction = sum(cow.milk_production.milk_production_reduction for cow in reduced_cows) / num_reduced
+            self.om.add_warning(
+                "Milk production reduced due to ration formulation failure.",
+                f"{num_reduced} animal(s) had milk production reduced by an average of "
+                f"{avg_reduction:.2f} kg to allow ration formulation on simulation day {simulation_day}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.formulate_rations.__name__,
+                    "simulation_day": simulation_day,
+                    "num_animals_reduced": num_reduced,
+                    "avg_reduction_kg": avg_reduction,
+                },
+            )
+
         return total_requested_feed
 
     def _reformulate_ration_single_pen(
