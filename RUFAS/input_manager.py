@@ -1201,7 +1201,7 @@ class InputManager:
             info_map,
         )
 
-    def get_data(self, data_address: str, required: bool = True) -> Any | None:
+    def get_data(self, data_address: str, required: bool = True) -> Any:
         """
         Gets the requested data from the pool if it exists. If the data is not found, None is returned.
 
@@ -1210,7 +1210,9 @@ class InputManager:
         data_address : str
             The address of the requested data.
         required : bool, optional, default=True
-            Whether the data is required to run the simulation.
+            Whether the data being requested is required to run the simulation. If ``required`` is True,
+            missing data is logged as an error. If ``required`` is False, missing data is treated as
+            optional and None is returned.
 
         Returns
         -------
