@@ -402,9 +402,8 @@ class AnimalPopulation:
         Returns
         -------
         tuple[float, dict[str, int]]
-            A tuple of:
-            - float: The average of the data.
-            - dict[str, int]: A dictionary containing the distribution of the data.
+            - The average of the data.
+            - A dictionary containing the distribution of the data.
 
         """
         average = AnimalPopulation._average(data)

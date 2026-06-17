@@ -108,6 +108,7 @@ v1.0.0
 - [3087](https://github.com/RuminantFarmSystems/RuFaS/pull/3087) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Extracts post-loop logic from `SimulationEngine.simulate()` into `_post_loop_processing()`, `_post_loop_reporting()`, and `_post_loop_logging()`.
 - [3098](https://github.com/RuminantFarmSystems/RuFaS/pull/3098) - [minor change] [InputManager] [InputChange] [NoOutputChange] Adds actually nulled input blobs and logic to not silently load defaults into pool.
 - [3049](https://github.com/RuminantFarmSystems/RuFaS/pull/3049) - [minor change] [Utility] [NoInputChange] [NoOutputChange] Updates docstrings across 9 utility files to NumPy-style format.
+- [3100](https://github.com/RuminantFarmSystems/RuFaS/pull/3100) - [minor change] [Maintenance] [NoInputChange] [NoOutputChange] Aligns formatting on docstrings for `tuple` returns.
 - [3043](https://github.com/RuminantFarmSystems/RuFaS/pull/3043) - [minor change] [Animal] [Ration] [NoInputChange] [NoOutputChange] Refactor `Pen.formulate_optimized_ration` to remove the `# noqa: C901`; behavior unchanged.
 
 ### v1.0.0

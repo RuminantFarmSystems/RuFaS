@@ -199,7 +199,9 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Returns
         -------
         tuple[float, float, float]
-            Net energy requirement for maintenance (Mcal/day), conceptus weight (kg), and calf birth weight (kg).
+            - Net energy requirement for maintenance (Mcal/day).
+            - Conceptus weight (kg).
+            - Calf birth weight (kg).
 
         Notes
         -----
@@ -268,7 +270,9 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Returns
         -------
         tuple[float, float, float]
-            Net energy requirement for growth (Mcal/d), average daily gain (g/d), equivalent shrunk body weight (kg).
+            - Net energy requirement for growth (Mcal/d).
+            - Average daily gain (g/d).
+            - Equivalent shrunk body weight (kg).
 
         References
         ----------

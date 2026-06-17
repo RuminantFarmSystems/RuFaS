@@ -307,7 +307,9 @@ class Genetics:
         Returns
         -------
         tuple[float, float]
-            EBV for fat and EBV for protein, respectively.
+            - EBV for fat.
+            - EBV for protein.
+
         """
         parity_index = min(parity, 3) if animal_type.is_cow and parity is not None else 0
         fat_accuracy, protein_accuracy = FAT_ACCURACY_BY_PARITY[parity_index], PROTEIN_ACCURACY_BY_PARITY[parity_index]
