@@ -742,7 +742,6 @@ class Pen:
         Returns
         -------
         tuple[float, float | None, ManureStream | None]
-            A tuple containing:
             - general_stream_proportion (float): The proportion of the general stream that remains.
             - parlor_stream_proportion (float or None): The proportion of the parlor stream, or None if not applicable.
             - parlor_stream (ManureStream or None): The resulting parlor stream, or None if not applicable.

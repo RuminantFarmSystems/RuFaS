@@ -120,11 +120,8 @@ class ContinuousMix(Digester):
         Returns
         -------
         tuple[float, float]
-            A tuple containing:
-            - generated_carbon_dioxide_mass : float
-                The calculated mass of generated carbon dioxide.
-            - generated_carbon_dioxide_volume : float
-                The calculated volume of generated carbon dioxide.
+            - The calculated mass of generated carbon dioxide.
+            - The calculated volume of generated carbon dioxide.
 
         Notes
         -----
@@ -148,9 +145,8 @@ class ContinuousMix(Digester):
         Returns
         -------
         tuple[float, float]
-            A tuple containing:
-            - generated_methane_mass (float): The mass of generated methane.
-            - generated_methane_volume (float): The volume of generated methane.
+            - The mass of generated methane.
+            - The volume of generated methane.
 
         Notes
         -----
