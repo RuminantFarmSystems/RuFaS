@@ -894,7 +894,12 @@ class EmissionsEstimator:
             n2o_emissions_outputs = [
                 (
                     {f"direct_n2o_nitrogen_emissions_for_feed_{feed_id}": data_for_day["nitrous_oxide_emissions"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -903,7 +908,12 @@ class EmissionsEstimator:
             ammonia_emissions_outputs = [
                 (
                     {f"ammonia_nitrogen_emissions_for_feed_{feed_id}": data_for_day["ammonia_emissions"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -912,7 +922,12 @@ class EmissionsEstimator:
             fertilizer_N_outputs = [
                 (
                     {f"nitrogen_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_N"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -921,7 +936,12 @@ class EmissionsEstimator:
             fertilizer_P_outputs = [
                 (
                     {f"phosphorus_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_P"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -930,7 +950,12 @@ class EmissionsEstimator:
             fertilizer_K_outputs = [
                 (
                     {f"potassium_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_K"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -939,7 +964,12 @@ class EmissionsEstimator:
             manure_N_outputs = [
                 (
                     {f"manure_nitrogen_applied_for_feed_{feed_id}": data_for_day["manure_N"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -976,7 +1006,7 @@ class EmissionsEstimator:
                 lca_outputs = [
                     (
                         {f"lca_carbon_emissions_for_feed_{feed_id}": lca_emissions_for_day[feed_id]},
-                        {**info_map, "simulation_day": simulation_day},
+                        {**info_map, "simulation_day": simulation_day, "is_daily_variable": True},
                     )
                     for simulation_day, lca_emissions_for_day in lca_emissions_by_simulation_day.items()
                 ]
@@ -989,7 +1019,7 @@ class EmissionsEstimator:
                 luc_outputs = [
                     (
                         {f"lca_land_use_change_emissions_for_feed_{feed_id}": luc_emissions_for_day[feed_id]},
-                        {**info_map, "simulation_day": simulation_day},
+                        {**info_map, "simulation_day": simulation_day, "is_daily_variable": True},
                     )
                     for simulation_day, luc_emissions_for_day in luc_emissions_by_simulation_day.items()
                 ]
