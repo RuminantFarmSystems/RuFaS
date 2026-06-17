@@ -1120,9 +1120,7 @@ class Field:
             The daily spread event for the current day, or ``None`` if daily spreading is disabled.
 
         """
-        if not self.daily_spread_settings:
-            return None
-        if not self.daily_spread_settings.get("is_daily_spreading", False):
+        if not (self.daily_spread_settings and self.daily_spread_settings.get("is_daily_spreading", False)):
             return None
 
         manure_type = ManureType(self.daily_spread_settings.get("manure_type", ManureType.SOLID.value))
