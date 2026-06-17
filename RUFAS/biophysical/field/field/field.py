@@ -1216,9 +1216,9 @@ class Field:
 
         Returns
         -------
-        Tuple
+        tuple[list[FieldManagementEventT], list[FieldManagementEventT]]
             - The list of all Events that will occur in this field after the current day.
-            = A list of Events that will occur on the current day.
+            - A list of Events that will occur on the current day.
 
         Notes
         -----

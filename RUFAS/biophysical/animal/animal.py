@@ -1915,7 +1915,7 @@ class Animal:
         -------
         tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
             - The animal status and optional newborn calf data.
-            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
+            - Optional newborn calf data.
 
         """
         if self.evaluate_heiferIII_for_cow():
@@ -1963,7 +1963,7 @@ class Animal:
         -------
         tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
             - The updated animal status and, if applicable, configuration for a newborn calf.
-            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
+            - Optional newborn calf data.
 
         """
         ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP: dict[

@@ -320,7 +320,7 @@ class DataValidator:
         -------
         tuple[bool, str]
             - A boolean representing validation status.
-            - An error message if validation fails.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -405,7 +405,7 @@ class DataValidator:
         -------
         tuple[bool, str]
             - A boolean representing validation status.
-            - An error message if validation fails.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -546,7 +546,7 @@ class DataValidator:
         -------
         tuple[bool, str]
             - A boolean representing validation status.
-            - An error message if validation fails.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -661,7 +661,7 @@ class DataValidator:
         -------
         tuple[bool, str]
             - A boolean representing validation status.
-            - An error message if validation fails.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -729,7 +729,7 @@ class DataValidator:
         -------
         tuple[bool, str]
             - A boolean representing validation status.
-            - An error message if validation fails.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -841,7 +841,7 @@ class DataValidator:
         -------
         tuple[bool, str]
             - A boolean representing validation status.
-            - An error message if validation fails.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         """
         info_map = {
