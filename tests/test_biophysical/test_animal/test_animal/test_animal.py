@@ -58,6 +58,7 @@ from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequire
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 
 
@@ -1102,17 +1103,25 @@ def test_days_in_pregnancy(animal_type: AnimalType, expected_days: int, mock_lac
         (AnimalType.LAC_COW, True),
     ],
 )
-def test_days_in_pregnancy_setter(animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal) -> None:
+def test_days_in_pregnancy_setter(
+    animal_type: AnimalType,
+    setter_allowed: bool,
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture
+) -> None:
     animal = mock_lactating_cow
     animal._days_in_pregnancy = 15
     animal.animal_type = animal_type
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         mock_lactating_cow.days_in_pregnancy = 25
         assert mock_lactating_cow._days_in_pregnancy == 25
         assert mock_lactating_cow.days_in_pregnancy == 25
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             mock_lactating_cow.days_in_pregnancy = 25
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1180,13 +1189,16 @@ def test_future_cull_date_setter(
     animal = mock_lactating_cow
     animal._future_cull_date = 999
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.future_cull_date = 2000
         assert animal._future_cull_date == 2000
         assert animal.future_cull_date == 2000
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.future_cull_date = 2000
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
