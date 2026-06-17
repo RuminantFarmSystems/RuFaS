@@ -202,6 +202,36 @@ def test_calculate_newborn_calf_tbv_values(
     )
 
 
+def test_calculate_newborn_calf_tbv_values_key_error(
+    genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """Missing in-range semen data logs an error and re-raises the KeyError."""
+    AnimalConfig.top_listing_semen["estimated_fat"] = {
+        "2010-01": 50.0,
+        "2020-01": 80.0,
+    }
+    AnimalConfig.top_listing_semen["estimated_protein"] = {
+        "2010-01": 25.0,
+        "2020-01": 40.0,
+    }
+
+    mock_add_error = mocker.patch.object(genetics.om, "add_error")
+    mock_generate = mocker.patch.object(Utility, "generate_bivariate_random_numbers")
+
+    with pytest.raises(KeyError):
+        genetics._calculate_newborn_calf_tbv_values(10.0, 20.0, "2015-06")
+
+    mock_add_error.assert_called_once_with(
+        "Newborn calf tbv calculation key error.",
+        "'2015-06'",
+        {
+            "class": genetics.__class__.__name__,
+            "function": genetics._calculate_newborn_calf_tbv_values.__name__,
+        },
+    )
+    mock_generate.assert_not_called()
+
+
 def test_calculate_ep_values(genetics: Genetics, mocker: MockerFixture) -> None:
     """Unit test for _calculate_ep_values()"""
     mock_generate_bivariate_random_numbers = mocker.patch.object(
@@ -541,3 +571,31 @@ def test_calculate_phenotype_values_too_late(genetics: Genetics, mocker: MockerF
     assert fat == pytest.approx(500.0)
     assert protein == pytest.approx(400.0)
     mock_add_warning.assert_called_once()
+
+
+def test_calculate_phenotype_values_key_error(
+    genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """Missing in-range phenotype data logs an error and re-raises the KeyError."""
+    AnimalConfig.average_phenotype["fat_kg"] = {
+        2010: 50.0,
+        2020: 80.0,
+    }
+    AnimalConfig.average_phenotype["protein_kg"] = {
+        2010: 25.0,
+        2020: 40.0,
+    }
+
+    mock_add_error = mocker.patch.object(genetics.om, "add_error")
+
+    with pytest.raises(KeyError):
+        genetics._calculate_phenotype_values(2015)
+
+    mock_add_error.assert_called_once_with(
+        "Phenotype value calculation key error.",
+        "2015",
+        {
+            "class": genetics.__class__.__name__,
+            "function": genetics._calculate_phenotype_values.__name__,
+        },
+    )
