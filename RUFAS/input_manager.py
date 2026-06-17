@@ -989,13 +989,24 @@ class InputManager:
                     f"supported types are: {data_type_to_loader_map.keys()}"
                 )
 
+            if self._should_exclude_from_pool_population(input_data):
+                self.om.add_log(
+                    "Skipping Input Blob",
+                    f"Skipping population of input blob '{file_blob_key}' because "
+                    "'exclude_from_pool' is set to True.",
+                    info_map={
+                        "class": self.__class__.__name__,
+                        "function": self._populate_pool.__name__,
+                    },
+                )
+                continue
+
             properties_blob_key = file_details["properties"]
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
             validated_data = {}
-            for metadata_property in metadata_properties.keys():
-                if metadata_property == "data_collection_app_compatible":
-                    continue
+            validation_properties = [key for key in metadata_properties if key != "data_collection_app_compatible"]
+            for metadata_property in validation_properties:
                 variable_properties = metadata_properties[metadata_property]
                 is_element_acceptable = self.data_validator.validate_data_by_type(
                     variable_path=[metadata_property],
@@ -1020,6 +1031,22 @@ class InputManager:
                 self.__pool[file_blob_key] = validated_data
 
         return valid_data
+
+    @staticmethod
+    def _should_exclude_from_pool_population(input_data: dict[str, Any]) -> bool:
+        """Helper function to determine if a particular input should be excluded from the input pool."""
+        should_exclude = input_data.get("exclude_from_pool", False)
+
+        if isinstance(should_exclude, list):
+            should_exclude = should_exclude[0] if should_exclude else False
+
+        if isinstance(should_exclude, bool):
+            return should_exclude
+
+        if isinstance(should_exclude, str):
+            return should_exclude.strip().lower() == "true"
+
+        return False
 
     def _get_variable_modifiability(self, variable_name: str, variable_properties: dict[str, Any]) -> Modifiability:
         """
@@ -1174,14 +1201,18 @@ class InputManager:
             info_map,
         )
 
-    def get_data(self, data_address: str) -> Any:
+    def get_data(self, data_address: str, required: bool = True) -> Any:
         """
-        Get the requested data from the pool if it exists. If not, None is returned.
+        Gets the requested data from the pool if it exists. If the data is not found, None is returned.
 
         Parameters
         ----------
         data_address : str
             The address of the requested data.
+        required : bool, optional, default=True
+            Whether the data being requested is required to run the simulation. If ``required`` is True,
+            missing data is logged as an error. If ``required`` is False, missing data is treated as
+            optional and None is returned.
 
         Returns
         -------
@@ -1224,7 +1255,6 @@ class InputManager:
         mutating the internal pool data by modifying the returned value.
 
         """
-
         info_map = {
             "class": self.__class__.__name__,
             "function": self.get_data.__name__,
@@ -1236,6 +1266,13 @@ class InputManager:
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
         except KeyError as key_error:
+            if not required:
+                self.om.add_log(
+                    "Optional data not found",
+                    f"Optional data at '{data_address}' was not found in the input pool.",
+                    info_map,
+                )
+                return None
             self.om.add_error("Validation: data not found", str(key_error), info_map)
 
         return None
