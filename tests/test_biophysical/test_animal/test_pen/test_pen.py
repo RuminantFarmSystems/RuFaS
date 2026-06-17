@@ -2189,7 +2189,7 @@ def test_run_formulation_attempts_stops_after_max_attempts(mocker: MockerFixture
     )
 
     assert result is failing
-    # Two attempts performed before max-attempts check fires on the third pass.
+    # Three attempts performed before max-attempts check fires on the third pass.
     assert mock_attempt.call_count == 3
     mock_module_om.add_log.assert_called_once()
 
@@ -2338,25 +2338,25 @@ def _animal_with_nasem_values(enteric_methane: float, urine_nitrogen: float) -> 
     return animal
 
 
-def test_pen_nasem_averages_arithmetic_mean(pen: Pen) -> None:
-    """_pen_nasem_averages returns the arithmetic mean across all animals in the pen."""
+def test_calculate_pen_nasem_averages_arithmetic_mean(pen: Pen) -> None:
+    """_calculate_pen_nasem_averages returns the arithmetic mean across all animals in the pen."""
     pen.animals_in_pen = {
         1: _animal_with_nasem_values(enteric_methane=10.0, urine_nitrogen=4.0),
         2: _animal_with_nasem_values(enteric_methane=20.0, urine_nitrogen=8.0),
         3: _animal_with_nasem_values(enteric_methane=30.0, urine_nitrogen=12.0),
     }
 
-    avg_methane, avg_nitrogen = pen._pen_nasem_averages()
+    avg_methane, avg_nitrogen = pen._calculate_pen_nasem_averages()
 
     assert avg_methane == pytest.approx(20.0)
     assert avg_nitrogen == pytest.approx(8.0)
 
 
-def test_pen_nasem_averages_single_animal(pen: Pen) -> None:
+def test_calculate_pen_nasem_averages_single_animal(pen: Pen) -> None:
     """A single-animal pen returns that animal's values directly."""
     pen.animals_in_pen = {1: _animal_with_nasem_values(enteric_methane=42.0, urine_nitrogen=7.5)}
 
-    avg_methane, avg_nitrogen = pen._pen_nasem_averages()
+    avg_methane, avg_nitrogen = pen._calculate_pen_nasem_averages()
 
     assert avg_methane == pytest.approx(42.0)
     assert avg_nitrogen == pytest.approx(7.5)

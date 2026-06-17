@@ -123,8 +123,6 @@ class Pen:
             "DMI_constraint_lower",
         }
     )
-    # Multiplier applied to the dry matter intake when a lactating-cow ration retry is warranted.
-    _DMI_RETRY_INCREASE_FACTOR: float = 1.1
 
     def __init__(
         self,
@@ -1175,7 +1173,7 @@ class Pen:
             return None
         if not (self._DMI_INCREASE_CONSTRAINTS & set(constraints_failed_list)):
             return None
-        return current_dmi_requirement * self._DMI_RETRY_INCREASE_FACTOR
+        return current_dmi_requirement * AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR
 
     def _handle_lactation_failure_in_loop(
         self,
@@ -1243,7 +1241,7 @@ class Pen:
 
         nutrient_standard = next(iter(self.animals_in_pen.values())).nutrient_standard
         pen_average_enteric_methane, pen_average_urine_nitrogen = (
-            self._pen_nasem_averages() if nutrient_standard is NutrientStandard.NASEM else (None, None)
+            self._calculate_pen_nasem_averages() if nutrient_standard is NutrientStandard.NASEM else (None, None)
         )
 
         return self.ration_optimizer.attempt_optimization(
@@ -1261,7 +1259,7 @@ class Pen:
             user_defined_ration_tolerance=tolerance,
         )
 
-    def _pen_nasem_averages(self) -> tuple[float, float]:
+    def _calculate_pen_nasem_averages(self) -> tuple[float, float]:
         """Returns the pen-average enteric methane emission and urine nitrogen excretion (NASEM standard)."""
         animals = list(self.animals_in_pen.values())
         avg_enteric_methane = sum(a.digestive_system.enteric_methane_emission for a in animals) / len(animals)
