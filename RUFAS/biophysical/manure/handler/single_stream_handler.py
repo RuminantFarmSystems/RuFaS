@@ -232,9 +232,9 @@ class SingleStreamHandler(Handler):
         Returns
         -------
         tuple[float, float, float]
-            The updated amount of degradable volatile solids (kg).
-            The updated amount of non-degradable volatile solids (kg).
-            The updated amount of total solids (kg).
+            - The updated amount of degradable volatile solids (kg).
+            - The updated amount of non-degradable volatile solids (kg).
+            - The updated amount of total solids (kg).
 
         """
         if self.manure_stream:

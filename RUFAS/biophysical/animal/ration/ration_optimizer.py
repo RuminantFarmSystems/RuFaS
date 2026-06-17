@@ -854,7 +854,7 @@ class RationOptimizer:
 
         Returns
         -------
-        tuple
+        tuple[OptimizeResult, RationConfig]
             - Scipy object with the result of the optimization.
             - RationConfig object containing the optimized ration.
 

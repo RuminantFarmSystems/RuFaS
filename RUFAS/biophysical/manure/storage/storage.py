@@ -374,7 +374,8 @@ class Storage(Processor):
         Returns
         -------
         tuple[float, float]
-            The amount of storage methane burned and the adjusted methane loss (kg).
+            - The amount of storage methane burned (kg).
+            - The adjusted methane loss (kg).
 
         """
         storage_methane_burned = (
