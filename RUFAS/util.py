@@ -408,6 +408,28 @@ class Utility:
         return new_num_values, new_avg
 
     @staticmethod
+    def clamp(value: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
+        """
+        Constrain a value to the inclusive range [minimum, maximum].
+
+        Parameters
+        ----------
+        value : float
+            The value to constrain.
+        minimum : float, default 0.0
+            The lower bound of the range.
+        maximum : float, default 1.0
+            The upper bound of the range.
+
+        Returns
+        -------
+        float
+            ``value`` limited to the range, equivalent to ``max(minimum, min(maximum, value))``.
+
+        """
+        return max(minimum, min(maximum, value))
+
+    @staticmethod
     def remove_items_from_list_by_indices(data: list[Any], indices_to_remove: list[int]) -> None:
         """
         Remove items from a list given a list of indices.
