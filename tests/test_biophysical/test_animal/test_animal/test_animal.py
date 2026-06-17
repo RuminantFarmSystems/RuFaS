@@ -1104,10 +1104,7 @@ def test_days_in_pregnancy(animal_type: AnimalType, expected_days: int, mock_lac
     ],
 )
 def test_days_in_pregnancy_setter(
-    animal_type: AnimalType,
-    setter_allowed: bool,
-    mock_lactating_cow: Animal,
-    mocker: MockerFixture
+    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     animal = mock_lactating_cow
     animal._days_in_pregnancy = 15

@@ -87,6 +87,7 @@ def test_exit_nonexistent_state_raises_value_error(state: ReproStateEnum, mocker
 
     mock_add_error.assert_called_once()
 
+
 @pytest.mark.parametrize(
     "state, expected",
     [

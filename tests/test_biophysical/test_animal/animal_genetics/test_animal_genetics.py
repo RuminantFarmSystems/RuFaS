@@ -202,9 +202,7 @@ def test_calculate_newborn_calf_tbv_values(
     )
 
 
-def test_calculate_newborn_calf_tbv_values_key_error(
-    genetics: Genetics, mocker: MockerFixture
-) -> None:
+def test_calculate_newborn_calf_tbv_values_key_error(genetics: Genetics, mocker: MockerFixture) -> None:
     """Missing in-range semen data logs an error and re-raises the KeyError."""
     AnimalConfig.top_listing_semen["estimated_fat"] = {
         "2010-01": 50.0,
@@ -573,9 +571,7 @@ def test_calculate_phenotype_values_too_late(genetics: Genetics, mocker: MockerF
     mock_add_warning.assert_called_once()
 
 
-def test_calculate_phenotype_values_key_error(
-    genetics: Genetics, mocker: MockerFixture
-) -> None:
+def test_calculate_phenotype_values_key_error(genetics: Genetics, mocker: MockerFixture) -> None:
     """Missing in-range phenotype data logs an error and re-raises the KeyError."""
     AnimalConfig.average_phenotype["fat_kg"] = {
         2010: 50.0,

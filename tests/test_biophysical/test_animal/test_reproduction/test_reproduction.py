@@ -753,9 +753,7 @@ def test_cow_give_birth(calves: int, mocker: MockerFixture) -> None:
     ],
 )
 def test_validate_cow_reproduction_program(
-    repro_program: CowReproductionProtocol,
-    value_error_expected: bool,
-    mocker: MockerFixture
+    repro_program: CowReproductionProtocol, value_error_expected: bool, mocker: MockerFixture
 ) -> None:
     reproduction = Reproduction()
     reproduction.cow_reproduction_program = repro_program
