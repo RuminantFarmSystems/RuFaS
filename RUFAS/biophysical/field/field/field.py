@@ -1123,7 +1123,7 @@ class Field:
         if not (self.daily_spread_settings and self.daily_spread_settings.get("is_daily_spreading", False)):
             return None
 
-        manure_type = ManureType(self.daily_spread_settings.get("manure_type", ManureType.SOLID.value))
+        manure_type = ManureType(self.daily_spread_settings.get("manure_type"))
         manure_supplement_method = ManureSupplementMethod(
             self.daily_spread_settings.get(
                 "supplement_manure_nutrient_deficiencies",
