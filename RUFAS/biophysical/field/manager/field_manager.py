@@ -177,7 +177,9 @@ class FieldManager:
             field_configuration_data["fertilizer_management_specification"]
         )
 
-        manure_events = FieldManager._setup_manure_events(field_configuration_data["manure_management_specification"])
+        manure_events, daily_spread_settings = FieldManager._setup_manure_events(
+            field_configuration_data["manure_management_specification"]
+        )
 
         tillage_events = FieldManager._setup_tillage_events(
             field_configuration_data["tillage_management_specification"]
@@ -196,6 +198,7 @@ class FieldManager:
             fertilizer_events=fertilizer_events,
             fertilizer_mixes=available_fertilizer_mixes,
             manure_events=manure_events,
+            daily_spread_settings=daily_spread_settings,
         )
 
     @staticmethod
@@ -325,7 +328,7 @@ class FieldManager:
         return available_fertilizer_mixes, fertilizer_application_events
 
     @staticmethod
-    def _setup_manure_events(manure_schedule: str) -> list[ManureEvent]:
+    def _setup_manure_events(manure_schedule: str) -> tuple[list[ManureEvent], dict[str, Any] | None]:
         """
         Sets up a list of manure events from ManureSchedule.
 
@@ -336,8 +339,9 @@ class FieldManager:
 
         Returns
         -------
-        list[ManureEvent]
-            A list of generated manure events.
+        tuple[list[ManureEvent], dict[str, Any] | None]
+            - A list of generated manure events
+            - Optional daily spread settings.
 
         Raises
         ------
@@ -377,7 +381,8 @@ class FieldManager:
             pattern_repeat=manure_schedule_data["pattern_repeat"],
         )
         manure_events = manure_schedule_instance.generate_manure_events()
-        return manure_events
+        daily_spread_settings = manure_schedule_data.get("daily_spread")
+        return manure_events, daily_spread_settings
 
     @staticmethod
     def _setup_tillage_events(tillage_schedule: str) -> list[TillageEvent]:
