@@ -1283,6 +1283,7 @@ def test_daily_horizontal_distance_setter(
             animal.daily_horizontal_distance = new_distance
         mock_add_error.assert_called_once()
 
+
 @pytest.mark.parametrize(
     "is_cow, vertical_distance, expected",
     [
@@ -1306,6 +1307,7 @@ def test_daily_vertical_distance_typeerror(mock_lactating_cow: Animal, mocker: M
     with pytest.raises(TypeError):
         _ = animal.daily_vertical_distance
     mock_add_error.assert_called_once()
+
 
 @pytest.mark.parametrize(
     "is_cow, setter_allowed, new_distance, expected",
@@ -1426,6 +1428,7 @@ def test_reproduction_setter(
             animal.reproduction = reproduction_obj
         mock_add_error.assert_called_once()
 
+
 @pytest.mark.parametrize(
     "is_cow, reproduction_calves, expected",
     [
@@ -1523,6 +1526,7 @@ def test_calving_interval_setter(
             animal.calving_interval = 450
         mock_add_error.assert_called_once()
 
+
 @pytest.mark.parametrize(
     "animal_type, reproduction_conceptus_weight, expected",
     [
@@ -1584,7 +1588,7 @@ def test_gestation_length_setter(
     animal_type: AnimalType,
     setter_allowed: bool,
     mock_lactating_cow: Animal,
-    mocker: MockerFixture,    
+    mocker: MockerFixture,
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.gestation_length = 300
@@ -1634,7 +1638,7 @@ def test_calf_birth_weight_setter(
     animal_type: AnimalType,
     setter_allowed: bool,
     mock_lactating_cow: Animal,
-    mocker: MockerFixture,    
+    mocker: MockerFixture,
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.calf_birth_weight = 40.0
@@ -1710,6 +1714,7 @@ def test_heifer_reproduction_program_getter(
             _ = animal.heifer_reproduction_program
         mock_add_error.assert_called_once()
 
+
 @pytest.mark.parametrize(
     "animal_type, setter_allowed",
     [
@@ -1719,7 +1724,7 @@ def test_heifer_reproduction_program_getter(
     ],
 )
 def test_heifer_reproduction_program_setter(
-    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal
+    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.heifer_reproduction_program = HeiferReproductionProtocol.TAI
@@ -1727,12 +1732,15 @@ def test_heifer_reproduction_program_setter(
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
     new_program = HeiferReproductionProtocol.TAI
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.heifer_reproduction_program = new_program
         assert animal.reproduction.heifer_reproduction_program == new_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.heifer_reproduction_program = new_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1744,18 +1752,21 @@ def test_heifer_reproduction_program_setter(
     ],
 )
 def test_heifer_reproduction_sub_program_getter(
-    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal
+    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.heifer_reproduction_sub_program = HeiferTAISubProtocol.TAI_5dCG2P
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         assert animal.heifer_reproduction_sub_program == reproduction_obj.heifer_reproduction_sub_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.heifer_reproduction_sub_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1767,7 +1778,7 @@ def test_heifer_reproduction_sub_program_getter(
     ],
 )
 def test_heifer_reproduction_sub_program_setter(
-    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal
+    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.heifer_reproduction_sub_program = HeiferTAISubProtocol.SynchED_CP
@@ -1775,12 +1786,15 @@ def test_heifer_reproduction_sub_program_setter(
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
     new_sub_program = HeiferSynchEDSubProtocol.SynchED_2P
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.heifer_reproduction_sub_program = new_sub_program
         assert animal.reproduction.heifer_reproduction_sub_program == new_sub_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.heifer_reproduction_sub_program = new_sub_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1799,11 +1813,14 @@ def test_cow_reproduction_program_getter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         assert animal.cow_reproduction_program == cow_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.cow_reproduction_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1820,13 +1837,16 @@ def test_cow_reproduction_program_setter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     new_program = CowReproductionProtocol.TAI
     if allowed:
         animal.cow_reproduction_program = new_program
         assert animal.reproduction.cow_reproduction_program == new_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.cow_reproduction_program = new_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1845,11 +1865,14 @@ def test_cow_presynch_program_getter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         assert animal.cow_presynch_program == presynch_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.cow_presynch_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1866,13 +1889,16 @@ def test_cow_presynch_program_setter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     new_presynch = CowPreSynchSubProtocol.Presynch_PreSynch
     if allowed:
         animal.cow_presynch_program = new_presynch
         assert animal.reproduction.cow_presynch_program == new_presynch
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.cow_presynch_program = new_presynch
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1891,11 +1917,14 @@ def test_cow_ovsynch_program_getter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         assert animal.cow_ovsynch_program == ovsynch_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.cow_ovsynch_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1913,12 +1942,15 @@ def test_cow_ovsynch_program_setter(
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
     new_ovsynch = CowTAISubProtocol.TAI_OvSynch_48
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         animal.cow_ovsynch_program = new_ovsynch
         assert animal.reproduction.cow_ovsynch_program == new_ovsynch
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.cow_ovsynch_program = new_ovsynch
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1937,11 +1969,14 @@ def test_cow_resynch_program_getter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         assert animal.cow_resynch_program == cow_resynch
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.cow_resynch_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1959,12 +1994,15 @@ def test_cow_resynch_program_setter(
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
     new_program = CowReSynchSubProtocol.Resynch_TAIafterPD
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         animal.cow_resynch_program = new_program
         assert animal.reproduction.cow_resynch_program == new_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.cow_resynch_program = new_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -2012,10 +2050,12 @@ def test_dead_property(dead_at_day: int | None, expected: bool, mock_lactating_c
     assert animal.dead == expected
 
 
-def test_milk_statistics_raises_for_non_cow(mock_calf: Animal) -> None:
+def test_milk_statistics_raises_for_non_cow(mock_calf: Animal, mocker: MockerFixture) -> None:
     """milk_statistics should raise TypeError when called on a non-cow animal."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(TypeError):
         _ = mock_calf.milk_statistics
+    mock_add_error.assert_called_once()
 
 
 def test_milk_statistics_returns_expected_values_for_cow(mock_lactating_cow: Animal) -> None:
@@ -2256,15 +2296,17 @@ def test_determine_days_in_milk_valid(
     ],
 )
 def test_determine_days_in_milk_invalid(
-    current_days_in_milk: int, reproduction_output: int, mock_lactating_cow: Animal
+    current_days_in_milk: int, reproduction_output: int, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     animal = mock_lactating_cow
     animal.days_in_milk = current_days_in_milk
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         animal._determine_days_in_milk(reproduction_output)
+    mock_add_error.assert_called_once()
 
 
-def test_daily_reproduction_update_not_eligible(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+def test_daily_reproduction_update_not_eligible(mock_lactating_cow: Animal) -> None:
     mock_lactating_cow.animal_type = AnimalType.CALF
     result, _ = mock_lactating_cow.daily_reproduction_update(MagicMock(spec=RufasTime))
     assert result is None
@@ -2796,9 +2838,11 @@ def test_transition_heiferIII_to_cow_error(mock_lactating_cow: Animal, mocker: M
     mock_update = mocker.patch.object(
         Animal, "daily_reproduction_update", return_value=(None, HerdReproductionStatistics())
     )
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
 
     try:
         mock_lactating_cow.transition_heiferIII_to_cow(mock_time)
+        mock_add_error.assert_not_called()
         assert False
     except ValueError:
         assert mock_lactating_cow.animal_type == AnimalType.LAC_COW
@@ -2810,6 +2854,7 @@ def test_transition_heiferIII_to_cow_error(mock_lactating_cow: Animal, mocker: M
         mock_update.assert_called_once_with(mock_time)
         mock_wood_param.assert_not_called()
         mock_set.assert_not_called()
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -3550,8 +3595,10 @@ def test_set_daily_walking_distance_success(mock_lactating_cow: Animal) -> None:
 def test_set_daily_walking_distance_non_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         animal.set_daily_walking_distance(1.0, 2.0)
+    mock_add_error.assert_called_once()
 
 
 def test_initialize_newborn_calf_genetics_with_dam_tbv(mocker: MockerFixture) -> None:
