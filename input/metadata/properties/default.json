@@ -3014,19 +3014,19 @@
       },
       "nitrogen_spread_amount": {
         "type": "number",
-        "description": "Target nitrogen amount for this field's daily spread request. Units: kg.",
+        "description": "Target nitrogen amount for this field's daily spread request (kg).",
         "minimum": 0.0,
         "default": 0.0
       },
       "phosphorus_spread_amount": {
         "type": "number",
-        "description": "Target phosphorus amount for this field's daily spread request. Units: kg.",
+        "description": "Target phosphorus amount for this field's daily spread request (kg).",
         "minimum": 0.0,
         "default": 0.0
       },
       "potassium_spread_amount": {
         "type": "number",
-        "description": "Target potassium amount for this field's daily spread request. Units: kg.",
+        "description": "Target potassium amount for this field's daily spread request (kg).",
         "minimum": 0.0,
         "default": 0.0
       },
@@ -3039,7 +3039,7 @@
       },
       "application_depth": {
         "type": "number",
-        "description": "Depth of daily spread manure application. Units: mm.",
+        "description": "Depth of daily spread manure application (mm).",
         "minimum": 0.0,
         "default": 0.0
       },
