@@ -391,6 +391,7 @@ def test_create_daily_spread_event_uses_spread_amounts() -> None:
     field = Field(
         daily_spread_settings={
             "is_daily_spreading": True,
+            "spread_all_available_manure": False,
             "manure_type": "solid",
             "supplement_manure_nutrient_deficiencies": "none",
             "nitrogen_spread_amount": 12.0,
@@ -478,6 +479,7 @@ def test_check_manure_application_schedule_daily_spread_request_uses_amounts() -
         manure_events=[],
         daily_spread_settings={
             "is_daily_spreading": True,
+            "spread_all_available_manure": False,
             "manure_type": "liquid",
             "supplement_manure_nutrient_deficiencies": "none",
             "nitrogen_spread_amount": 6.0,

@@ -1124,16 +1124,16 @@ class Field:
         if not (self.daily_spread_settings and self.daily_spread_settings.get("is_daily_spreading", False)):
             return None
 
-        manure_type = ManureType(self.daily_spread_settings.get("manure_type"))
+        manure_type = ManureType(self.daily_spread_settings["manure_type"])
         manure_supplement_method = ManureSupplementMethod(
             self.daily_spread_settings.get(
                 "supplement_manure_nutrient_deficiencies",
                 ManureSupplementMethod.NONE.value,
             )
         )
-        nitrogen_spread_amount = self.daily_spread_settings.get("nitrogen_spread_amount", 0.0)
-        phosphorus_spread_amount = self.daily_spread_settings.get("phosphorus_spread_amount", 0.0)
-        spread_all_available_manure: bool = self.daily_spread_settings.get("spread_all_available_manure", False)
+        nitrogen_spread_amount = self.daily_spread_settings["nitrogen_spread_amount"]
+        phosphorus_spread_amount = self.daily_spread_settings["phosphorus_spread_amount"]
+        spread_all_available_manure: bool = self.daily_spread_settings["spread_all_available_manure"]
         return ManureEvent(
             nitrogen_mass=nitrogen_spread_amount,
             phosphorus_mass=phosphorus_spread_amount,
