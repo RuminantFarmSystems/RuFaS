@@ -1,0 +1,3 @@
+﻿Variable , Definition , Default , Min , Max 
+voluntary_waiting_period, Days before breeding starts for ED/ED-TAI; ignored by TAI,50,0, --
+estrus_detection_protocol," Estrus protocol typs (Double OvSynch,  PreSynch,  G6G, None)", Double OvSynch, --, --

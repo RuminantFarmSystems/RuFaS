@@ -1,0 +1,6 @@
+﻿Variable , Definition , Default , Min , Max 
+estrus_detection_rate , Proportion of estrus detected in ED protocol ,0.9,0,1
+Conception rate in ED protocol ,0.6,0,1
+"Hormone protocol used; varies by method (e.g. 5dCG2P,  CP, None)", 5dCG2P ,--,--
+Conception rate for sub-protocol,0.6,0,1
+Detection rate in sub-protocol,0.6,0,1

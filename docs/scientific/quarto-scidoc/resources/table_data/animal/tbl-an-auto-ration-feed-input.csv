@@ -1,7 +1,0 @@
-﻿Section , Variable Name , Definition , Default , Min , Max 
-purchased_feeds , calf_feeds or growing_feeds or close_up_feeds or lac_cow_feeds , Each section is comprised of a list of feeds (RuFaS Feed IDs) , -- , -- , --
-, purchased_feed , RuFaS Feed ID , -- , -- , --
-, purchased_feed_cost , Price per feed (dollars/kg DM) , -- , -- , --
-User_defined_-ration_percentages , calves/growing/close_up/lac_-cow.ration_percentage , For each feed ID< amount of a ration that is a given feed (percentage) , -- , 0 , 100
-, tolerance , Allowable +/- percentage variance in each of the defined ration inclusion percentage values (fraction) , 0.1 , 0 , 1
-, milk_reduction_maximum , Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements , 15 , 0 , 50

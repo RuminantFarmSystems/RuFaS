@@ -619,7 +619,7 @@ $$
 #| tbl-cap: Key variables used in protein requirement calculations.
 import_table(
   "../resources/table_data/animal/tbl-an-prot-req-var.csv",
-  colalign = ["left", "left", "left"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -769,7 +769,7 @@ $$
 #| tbl-cap: Key variables used in mineral requirement calculations.
 import_table(
   "../resources/table_data/animal/tbl-an-min-req-var.csv",
-  colalign = ["left", "left", "left"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -1218,7 +1218,7 @@ $$
 #| tbl-cap: Key variables used in protein requirement calculations.
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-prot-req-var.csv",
-  colalign = ["left", "left", "left"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -1228,7 +1228,7 @@ Fixed values are establish by NASEM and are not user defined (@nrc_2021)
 :::
 
 ##### Mineral Requirements
-Only calcium and phosphorus requirements are included in the code at present. For details about the variables included in each calculation, please refer to the mineral requirements key.
+Only calcium and phosphorus requirements are included in the code at present. For details about the variables included in each calculation, please refer to the @tbl-an-min-req-var.
 
 **Maintenance** <br>
 
@@ -1347,7 +1347,7 @@ $$
 #| tbl-cap: Key variables used in mineral requirement calculations.
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-min-req-var.csv",
-  colalign = ["left", "left", "left"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -1388,7 +1388,7 @@ $$
 #| tbl-cap: Key variables used in DMI estimation calculations.
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-dmi-var.csv",
-  colalign = ["left", "left", "left"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -1405,7 +1405,7 @@ The methods for estimating the amino acids requirements for lactating cows based
 #| tbl-cap: Essential and non-essential amino acids.
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-eaaneaa-key.csv",
-  colalign = ["left", "left", "left"]
+  colalign = ["center", "center"]
 )
 ```
 
@@ -1484,7 +1484,7 @@ If there are any questions regarding calculations regarding calculations of main
 #| tbl-cap: Key variables used in calculation of AA.
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-aa-req-var.csv",
-  colalign = ["left", "left", "left"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -1833,7 +1833,7 @@ $$
 
 ##### Introduction
 
-Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs (@tbl-an-auto-ration-an-input), but the primary Feed input file (@tbl-an-auto-ration-feed-input), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
+Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs (@tbl-an-auto-ration-an-input), but the primary Feed input file (@tbl-an-auto-ration-feed-input-purch and @tbl-an-auto-ration-feed-input-perc), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
 
 ##### Required User Inputs
 
@@ -1847,11 +1847,20 @@ import_table(
 ```
 
 ```{python}
-#| label: tbl-an-auto-ration-feed-input
-#| tbl-cap: Key inputs found in the feed input file.
+#| label: tbl-an-auto-ration-feed-input-purch
+#| tbl-cap: Key inputs found in the feed input file for `purchased_feeds`.
 import_table(
-  "../resources/table_data/animal/tbl-an-auto-ration-feed-input.csv",
-  colalign = ["left", "left", "left", "center", "center", "center"]
+  "../resources/table_data/animal/tbl-an-auto-ration-feed-input-purch.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+
+```{python}
+#| label: tbl-an-auto-ration-feed-input-perc
+#| tbl-cap: Key inputs found in the feed input file for 'User_defined_ration_percentages`.
+import_table(
+  "../resources/table_data/animal/tbl-an-auto-ration-feed-input-perc.csv",
+  colalign = ["left", "left", "center", "center", "center"]
 )
 ```
 
@@ -1949,7 +1958,7 @@ The ration formulation will proceed as described in the Automated Methodology ab
 
 * Record failed constraints and formulation attempt to OutputManager.
 * Milk production will be reduced.
-  * IF average milk production for the pen drops below the values defined in [REFERENCE TO 5. Milk Production and Reduction]{.mark}, then the simulation halts with an error.
+  * IF average milk production for the pen drops below the values defined in [Milk Production and Reduction](#sec-an-milk-prod-red), then the simulation halts with an error.
   * IF if the `milk_reduction_maximum` is exceeded, then the simulation proceeds by using the user-defined ration percentages exactly.
 * Recalculation of the nutritional requirements for all animals in the pen.
 * Ration formulation reattempt (repeat).
@@ -1967,7 +1976,7 @@ The ration formulation will proceed as described in the Automated Methodology ab
 
 If the number of close-up heifers is more than the herd needs, heifers in the Heifer III group are sold. If the number of close-up 
 is less than the herd needs, a replacement is bought from the market. This is evaluated daily by comparing the number of (cows + Heifer III) 
-to the herd num specified by the user. Details of this method are described in the Culling section{.mark} of Animal-level processes and management. 
+to the herd num specified by the user. Details of this method are described in the [Culling](#sec-an-cull) section of Animal-level processes and management. 
 
 #### Herd Size Management: Heifer III Sales
 
@@ -2381,20 +2390,45 @@ synchronization treatments, breeding efficiency, and pregnancy outcomes. The key
 #### Required User Inputs
 
 ```{python}
-#| label: tbl-an-repro_inputs-heifer
-#| tbl-cap: User inputs that determine the heifer reproductive breeding program and impact reproductive efficiency and age at first calving.
+#| label: tbl-an-repro_inputs-heifer-mgmt
+#| tbl-cap: User inputs in `management_decisions` that determine the heifer reproductive breeding program and impact reproductive efficiency and age at first calving.
 import_table(
-  "../resources/table_data/animal/tbl-an-repro-inputs-heifer.csv",
-  colalign = ["left", "left", "left", "center", "center", "center"]
+  "../resources/table_data/animal/tbl-an-repro-inputs-heifer-mgmt.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+
+```
+```{python}
+#| label: tbl-an-repro_inputs-heifer-farm
+#| tbl-cap: User inputs in `farm_level_heifers` that determine the heifer reproductive breeding program and impact reproductive efficiency and age at first calving.
+import_table(
+  "../resources/table_data/animal/tbl-an-repro-inputs-heifer-farm.csv",
+  colalign = ["left", "left", "center", "center", "center"]
 )
 ```
 
 ```{python}
-#| label: tbl-an-repro_inputs-cow
+#| label: tbl-an-repro_inputs-cow-mgmt
 #| tbl-cap: User inputs that determine reproductive efficiency of cows and influence culling, calving interval, and calf output.
 import_table(
-  "../resources/table_data/animal/tbl-an-repro-inputs-cow.csv",
-  colalign = ["left", "left", "left", "center", "center", "center"]
+  "../resources/table_data/animal/tbl-an-repro-inputs-cow-mgmt.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+```{python}
+#| label: tbl-an-repro_inputs-cow-farm
+#| tbl-cap: User inputs that determine reproductive efficiency of cows and influence culling, calving interval, and calf output.
+import_table(
+  "../resources/table_data/animal/tbl-an-repro-inputs-cow-farm.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+```{python}
+#| label: tbl-an-repro_inputs-cow-cow
+#| tbl-cap: User inputs that determine reproductive efficiency of cows and influence culling, calving interval, and calf output.
+import_table(
+  "../resources/table_data/animal/tbl-an-repro-inputs-cow-cow.csv",
+  colalign = ["left", "left", "center", "center", "center"]
 )
 ```
 
@@ -2404,10 +2438,10 @@ Anytime an insemination is performed after an OvSynch program, the conception ra
 
 ```{python}
 #| label: tbl-an-repro_inputs-concept-dec
-#| tbl-cap: Inputs that can be used to determin if there is a decrease in the conception rate with parity and rebreeding attempts.
+#| tbl-cap: Inputs that can be used to determine if there is a decrease in the conception rate with parity and rebreeding attempts (`farm_level` section).
 import_table(
   "../resources/table_data/animal/tbl-an-repro-inputs-concept-dec.csv",
-  colalign = ["left", "left", "left", "center", "center", "center"]
+  colalign = ["left", "left", "center", "center", "center", "center"]
 )
 ```
 
@@ -2529,7 +2563,7 @@ This section describes how RuFaS determines the amount of milk and milk componen
     
 Milk yield is largely determined by lactation curve parameters. Wood’s curve is the only lactation model implemented in RuFaS currently, 
 but there is flexibility to potentially include other models as well. At the beginning of the simulation, the herd is assigned distributions 
-for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the Lactation Curve section{.mark}). At the beginning of each new lactation, 
+for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the [Lactation Curve](#sec-an-lac-curve) section. At the beginning of each new lactation, 
 each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
     
 When the cow starts lactating, she produces milk from the calving day until dry or culled according to the assigned lactation curve model. 
@@ -2608,7 +2642,7 @@ The following inputs are used to generate the herd’s values for mean lactation
 
 **Parameters and Equations**
 
-These are comprehensively outlined in the Lactation Curve Parameters Determination Section{.mark}.
+These are comprehensively outlined in the [Lactation Curve Parameters Determination](@sec-an-lac-curve) Section.
 
 `LactationCurve.set_lactation_parameters()` is called by:
 
@@ -2707,7 +2741,9 @@ $$
 True protein is the only milk protein currently used by the model.
 :::
 
+:::{#sec-an-milk-prod-red}
 ##### Milk Production and Reduction
+:::
 
 Currently, the only source of milk reduction is if there is no possible ration using the feeds available that would support the baseline level of milk production. 
 Each time the ration is formulated, the nutrition requirements of the pen are calculated and used to determine the ration given to each animal. 
@@ -2769,7 +2805,9 @@ production values calculated.
 For more details on milk changes and reductions, go to the Milk Production and Reduction portion of this section.
 :::
 
+::: {#sec-an-lac-curve}
 ### Lactation Curve: Parameters and Definitions
+:::
 
 #### Introduction
 
@@ -2963,7 +3001,9 @@ $$
 $$
 :::
 
+::: {#sec-an-cull}
 ### Culling
+:::
 
 #### Introduction
 
@@ -3027,7 +3067,7 @@ Probability of death associated with each lactation (1, 2, 3, 4+) is specified a
 * Parity death probability: `parity_death_prob` 
    * Probability of death during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
 * Death day probability: `death_day_prob`
-   * Values to construct the CDF to determine future death day, given that death is going to occur (default values are given in @tbl-an-cdf-cull-death)
+   * Values to construct the CDF to determine future death day, given that death is going to occur (default values are given in @tbl-an-cull-cdf-death)
    * Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days” in @tbl-an-cull-cdf-death)
 
 **Parameters and Equations**
@@ -3039,9 +3079,10 @@ The values for the CDF determining probability of death by day of lactation are 
 #| tbl-cap: Cumulative Distribution Function (CDF) values associated with the conditional probability of death over time. The 'cull_day_count' array defines the segments of the CDF.
 import_table(
   "../resources/table_data/animal/tbl-an-cull-cdf-death.csv",
-  colalign = ["left", "center", "center", "center", "center"]
+    colalign = ["left", "center", "center", "center", "center"]
 )
 ```
+
 Determination of death date (once already determined that death will occur this lactation): 
 
 ::: {#eq-an-anm-1}
@@ -3077,7 +3118,7 @@ $a_{\text{i}} = \frac{x_{\text{i-1}},x_{\text{i}}}{c_{\text{i-1}},c_{\text{i}}}$
 
 At the beginning of each lactation, each cow “rolls the dice” to determine if +/- when and for what attributed reason she will be sold for disease-related reasons (i.e., involuntary, not directly for production/reproduction reasons) in the current lactation.   
         
-Probability of disease sales associated with each lactation (1, 2, 3, 4+) is specified at the beginning of the simulation as a user input. At the beginning of each lactation for each cow, it is determined whether she will be sold for disease during that lactation with a random draw compared with the appropriate probability. Then, for individuals assigned to be sold during that lactation, another random draw determines the reason for that sale from one of six possibilities (See Table 4){.mark}. Finally, an empirical CDF is used to determine the day of sale based on the probability of sale occurring during each interval of the lactation for that particular sale reason. 
+Probability of disease sales associated with each lactation (1, 2, 3, 4+) is specified at the beginning of the simulation as a user input. At the beginning of each lactation for each cow, it is determined whether she will be sold for disease during that lactation with a random draw compared with the appropriate probability. Then, for individuals assigned to be sold during that lactation, another random draw determines the reason for that sale from one of six possibilities (@tbl-an-cull-reason). Finally, an empirical CDF is used to determine the day of sale based on the probability of sale occurring during each interval of the lactation for that particular sale reason. 
 
 **User Inputs and Constants**
 
@@ -3232,12 +3273,20 @@ The outputs from the Manure Excretion Calculator are organized into two main cat
 manure nutrient composition. These outputs are consistently generated across animal categories.
 
 ```{python}
-#| label: tbl-an-manexc-outputs
-#| tbl-cap: Expected outputs from the manure excretion calculator.
+#| label: tbl-an-manexc-outputs-excre
+#| tbl-cap: Expected manure excretion outputs from the manure excretion calculator.
 import_table(
-  "../resources/table_data/animal/tbl-an-manexc-outputs.csv",
-  maxcolwidths = [12, 12, 20, None],
-  sep_lines_after = [5],
+  "../resources/table_data/animal/tbl-an-manexc-outputs-excre.csv",
+  colalign = ["left", "left", "center"]
+)
+```
+
+```{python}
+#| label: tbl-an-manexc-outputs-nutr
+#| tbl-cap: Expected manure nutrient composition outputs from the manure excretion calculator.
+import_table(
+  "../resources/table_data/animal/tbl-an-manexc-outputs-nutr.csv",
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -3961,7 +4010,7 @@ composition and the use of specific feed additives. The inputs are organized int
 #| tbl-cap: General dietary fiber and fat concentration inputs.
 import_table(
   "../resources/table_data/animal/tbl-an-enter-met-diet-mitigate.csv",
-  colalign = ["left", "left", "right", "right", "right"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -3970,7 +4019,7 @@ import_table(
 #| tbl-cap: Feed based mitigation strategies and dosing.
 import_table(
   "../resources/table_data/animal/tbl-an-enter-met-additive-type-dose.csv",
-  colalign = ["left", "left", "right", "right", "right"]
+  colalign = ["left", "left", "center"]
 )
 ```
 #### Expected Outputs
