@@ -276,6 +276,12 @@ class ManureEvent(BaseFieldManagementEvent):
         Depth that manure is injected into the soil at (mm).
     surface_remainder_fraction : float
         Fraction of manure applied that remains on the soil surface (unitless).
+    is_daily_spread : bool
+        Whether this manure event is from daily spread handling.
+    spread_all_available_manure : bool
+        If true, the event requests that all manure currently in DailySpread storages be spread, ignoring
+        nutrient targets, caps, manure type, and supplemental manure settings. Only meaningful when
+        ``is_daily_spread`` is also true.
 
     """
 
@@ -290,6 +296,8 @@ class ManureEvent(BaseFieldManagementEvent):
         surface_remainder_fraction: float,
         year: int,
         day: int,
+        is_daily_spread: bool = False,
+        spread_all_available_manure: bool = False,
     ):
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
@@ -299,6 +307,8 @@ class ManureEvent(BaseFieldManagementEvent):
         self.field_coverage = field_coverage
         self.application_depth = application_depth
         self.surface_remainder_fraction = surface_remainder_fraction
+        self.is_daily_spread = is_daily_spread
+        self.spread_all_available_manure = spread_all_available_manure
 
     def __eq__(self, other: object) -> bool:
         """Overrides the equality operator for ManureEvent objects."""
@@ -312,6 +322,8 @@ class ManureEvent(BaseFieldManagementEvent):
                 and other.application_depth == self.application_depth
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
                 and other.manure_supplement_method == self.manure_supplement_method
+                and other.is_daily_spread == self.is_daily_spread
+                and other.spread_all_available_manure == self.spread_all_available_manure
             )
         return False
 
@@ -327,6 +339,8 @@ class ManureEvent(BaseFieldManagementEvent):
                 self.field_coverage,
                 self.application_depth,
                 self.surface_remainder_fraction,
+                self.is_daily_spread,
+                self.spread_all_available_manure,
             )
         )
 
