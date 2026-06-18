@@ -56,7 +56,7 @@ class NutrientRequest:
     """Whether to use supplemental manure if the request cannot be fulfilled by on-farm manure."""
 
     use_daily_spread_source: bool = False
-    """Whether this request should first use DailySpread processors."""
+    """Whether this request should first use ``DailySpread`` processors."""
 
     spread_all_available_manure: bool = False
     """If true, take all manure currently available across DailySpread processors regardless of nutrient
