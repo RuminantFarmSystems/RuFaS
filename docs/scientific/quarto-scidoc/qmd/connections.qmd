@@ -1,0 +1,51 @@
+# Module Connections
+<!-- reuse code to import functions from "../scripts/": -->
+{{< include ../scripts/_import-from-scripts.qmd >}}
+
+## Animal and Manure Module Connection
+
+### Introduction
+
+**Implementation in RuFaS**
+
+**Classes**
+
+### Required User Inputs
+
+
+**Other Inputs**
+
+### Expected Outputs
+
+**Stream Formation**
+
+**Bedding**
+
+### Methodology
+
+**Stream Formation**
+
+**Stream Proportion Logic**
+
+**Recommended Defaults**
+
+
+
+
+## Manure Module and Soil and Crop Module Connection
+
+### Introduction
+
+**Implementation in RuFaS**
+
+### Methodology
+
+**Step 1: Determination of the Limiting Nutrient**
+
+**Step 2: Proportion of Limiting Nutrient Removed**
+
+**Step 3: Removal of Nutrients from Individual Storages**
+
+
+
+## References
