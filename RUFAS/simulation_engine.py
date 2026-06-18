@@ -582,10 +582,10 @@ class SimulationEngine:
         Returns
         -------
         tuple[dict[str, ManureStream] | None, dict[str, float]]
-            A tuple containing:
             - A dictionary mapping pens to their corresponding ManureStream objects generated
               from the daily routines. If animals are not being simulated, this will be None.
             - A dictionary mapping feed types to the amount of purchased feed fed to the herd.
+
         """
         all_manure_data = self.herd_manager.execute_daily_routines(
             self.available_feeds,

@@ -1203,8 +1203,8 @@ class ManureManager:
         Returns
         -------
         tuple[Manure Stream, dict[str, Any]]
-            The stream after removal.
-            The detail of the amount of nutrients removed.
+            - The stream after removal.
+            - The detail of the amount of nutrients removed.
 
         """
         if is_nitrogen_limiting_nutrient:

@@ -253,7 +253,6 @@ class FieldManager:
         Returns
         -------
         tuple[list[PlantingEvent], list[HarvestEvent]]
-            A tuple containing two lists:
             - List of all planting events required by the crop rotation schedule.
             - List of all harvest events corresponding to the planting events.
 
@@ -281,7 +280,8 @@ class FieldManager:
         Returns
         -------
         tuple[dict[str, dict[str, float], FertilizerSchedule]
-            Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
+            - Dictionary containing the specifications of the available fertilizer mixes.
+            - A FertilizerSchedule.
 
         Raises
         ------

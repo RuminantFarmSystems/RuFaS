@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Tuple
+from typing import Any
 
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
@@ -86,7 +86,7 @@ class ManureExcretionCalculator:
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
         nutrient_amounts: NutritionSupply,
-    ) -> Tuple[float, AnimalManureExcretions]:
+    ) -> tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a calf with information from the ration formulation.
 
@@ -103,11 +103,10 @@ class ManureExcretionCalculator:
 
         Returns
         -------
-        float
-            Total amount of phosphorus excreted by the given animal, g.
-        AnimalManureExcretions
-            A dictionary that contains the manure excretion values as specified
-                in the AnimalManureExcretions class definition.
+        tuple[float, AnimalManureExcretions]
+            - Total amount of phosphorus excreted by the given animal, g.
+            - A dictionary that contains the manure excretion values as specified in the AnimalManureExcretions class
+            definition.
 
         References
         ----------
@@ -189,7 +188,7 @@ class ManureExcretionCalculator:
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
         nutrient_amount: NutritionSupply,
-    ) -> Tuple[float, AnimalManureExcretions]:
+    ) -> tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a growing and close-up heifer with information from the ration
         formulation.
@@ -207,11 +206,10 @@ class ManureExcretionCalculator:
 
         Returns
         -------
-        float
-            Total amount of phosphorus excreted by the given animal, g.
-        AnimalManureExcretions
-            A dictionary that contains the manure excretion values as specified
-                in the AnimalManureExcretions class definition.
+        tuple[float, AnimalManureExcretions]
+            - Total amount of phosphorus excreted by the given animal, (g).
+            - A dictionary that contains the manure excretion values as specified in the AnimalManureExcretions class
+            definition.
 
         Notes
         -----
@@ -331,7 +329,7 @@ class ManureExcretionCalculator:
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
         nutrient_amounts: NutritionSupply,
-    ) -> Tuple[float, AnimalManureExcretions]:
+    ) -> tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a cow with information from the ration formulation.
 
@@ -356,10 +354,10 @@ class ManureExcretionCalculator:
 
         Returns
         -------
-        tuple : [float, AnimalManureExcretions]
-            A tuple of the total amount of phosphorus excreted by the given animal (g) and
-            a dictionary that contains the manure excretion values as specified in the
-            AnimalManureExcretions class definition.
+        tuple[float, AnimalManureExcretions]
+            - The total amount of phosphorus excreted by the given animal (g).
+            - A dictionary that contains the manure excretion values as specified in the AnimalManureExcretions class
+            definition.
 
         Notes
         -----
@@ -393,7 +391,7 @@ class ManureExcretionCalculator:
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
         nutrient_amounts: NutritionSupply,
-    ) -> Tuple[float, AnimalManureExcretions]:
+    ) -> tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a lactating cow with information from the ration formulation.
 
@@ -416,11 +414,10 @@ class ManureExcretionCalculator:
 
         Returns
         -------
-        float
-            Total amount of phosphorus excreted by the given animal, g.
-        AnimalManureExcretions
-            A dictionary that contains the manure excretion values as specified
-                in the AnimalManureExcretions class definition.
+        tuple[float, AnimalManureExcretions]
+            - Total amount of phosphorus excreted by the given animal, g.
+            - A dictionary that contains the manure excretion values as specified in the AnimalManureExcretions class
+            definition.
 
         Notes
         -----
@@ -561,7 +558,7 @@ class ManureExcretionCalculator:
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
         nutrient_amounts: NutritionSupply,
-    ) -> Tuple[float, AnimalManureExcretions]:
+    ) -> tuple[float, AnimalManureExcretions]:
         """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
 
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
@@ -584,11 +581,10 @@ class ManureExcretionCalculator:
 
         Returns
         -------
-        float
-            Total amount of phosphorus excreted by the given animal, g.
-        AnimalManureExcretions
-            A dictionary that contains the manure excretion values as specified
-                in the AnimalManureExcretions class definition.
+        tuple[float, AnimalManureExcretions]
+            - Total amount of phosphorus excreted by the given animal, (g).
+            - A dictionary that contains the manure excretion values as specified in the AnimalManureExcretions class
+            definition.
 
         References
         ----------
@@ -733,34 +729,30 @@ class ManureExcretionCalculator:
         total_manure_excreted: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-    ) -> Tuple[float, float, float, float, float]:
+    ) -> tuple[float, float, float, float, float]:
         """
         Calculates a set of phosphorus excretion values produced by a given animal.
 
         Parameters
         ----------
         daily_milk_production : float
-            Amount of daily milk produced by the animal, kg.
+            Amount of daily milk produced by the animal, (kg).
             This parameter should be set to 0 if this function is called for a non-cow animal.
         total_manure_excreted : float
-            Amount of manure excreted by the animal, kg.
+            Amount of manure excreted by the animal, (kg).
         fecal_phosphorus : float
-            Amount of fecal phosphorus excreted by the animal, g.
+            Amount of fecal phosphorus excreted by the animal, (g).
         urine_phosphorus_required : float
-            Amount of phosphorus required for urine production, g.
+            Amount of phosphorus required for urine production, (g).
 
         Returns
         -------
-        float
-            Total amount of phosphorus excreted by the animal, g.
-        float
-            Fraction of extractable inorganic phosphorus, unitless.
-        float
-            Fraction of water extractable organic phosphorus, unitless.
-        float
-            Amount of manure phosphorus excreted, g.
-        float
-            Fraction of phosphorus in the manure, unitless.
+        tuple[float, float, float, float, float]
+            - Total amount of phosphorus excreted by the animal, (g).
+            - Fraction of extractable inorganic phosphorus, (unitless).
+            - Fraction of water extractable organic phosphorus, (unitless).
+            - Amount of manure phosphorus excreted, (g).
+            - Fraction of phosphorus in the manure, (unitless).
 
         References
         ----------
