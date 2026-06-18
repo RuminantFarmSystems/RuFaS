@@ -280,11 +280,6 @@ class FieldManager:
             - Dictionary containing the specifications of the available fertilizer mixes.
             - A FertilizerSchedule.
 
-        Raises
-        ------
-        ValueError
-            If no fertilizer data sent.
-
         """
         im = InputManager()
         fertilizer_data: dict[str, Any] = im.get_data(fertilizer_schedule, required=False)
@@ -333,11 +328,6 @@ class FieldManager:
         list[ManureEvent]
             A list of generated manure events.
 
-        Raises
-        ------
-        ValueError
-            If no manure data provided.
-
         """
         im = InputManager()
         manure_schedule_data: dict[str, Any] = im.get_data(manure_schedule, required=False)
@@ -381,11 +371,6 @@ class FieldManager:
         -------
         list[TillageEvent]
             A list of generated tillage events.
-
-        Raises
-        ------
-        ValueError
-            If no tillage data provided.
 
         """
         im = InputManager()
