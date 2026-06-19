@@ -194,13 +194,6 @@ class ManureExcretionCalculator:
         Calculates the manure excretion values for a growing and close-up heifer with information from the ration
         formulation.
 
-        Notes
-        -----
-        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
-        and nitrogen ("N") are all percentages of dry matter.
-
-        The minimum urine nitrogen is set to 17 g following Table 1 in Reed et al. 2015.
-
         Parameters
         ----------
         body_weight : float
@@ -219,6 +212,13 @@ class ManureExcretionCalculator:
         AnimalManureExcretions
             A dictionary that contains the manure excretion values as specified
                 in the AnimalManureExcretions class definition.
+
+        Notes
+        -----
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
+
+        The minimum urine nitrogen is set to 17 g following Table 1 in Reed et al. 2015.
 
         References
         ----------
