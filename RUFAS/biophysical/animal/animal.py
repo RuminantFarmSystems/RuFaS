@@ -2444,6 +2444,10 @@ class Animal:
         -----
         Actual removal of open cows from the herd is deferred to Step 7 (PR-C); this method
         only sets cull_reason so the higher layer (herd_factory) can act.
+<<<<<<< HEAD
+=======
+        # TODO(beef-integration): report_cow_calf_performance belongs in herd_factory.py (Step 7).
+>>>>>>> a9e4401d4 (feat(animal): cow-calf PR-B — lifecycle init, seasonal reproduction (Steps 4-5))
 
         """
         if self.days_born >= AnimalModuleConstants.BEEF_COW_MAX_AGE_DAYS:
