@@ -797,6 +797,7 @@ class HerdFactory:
                 "days_born": animal_constants.DAYS_PER_YEAR * animal_constants.BEEF_COW_INITIAL_AGE_YEARS,
                 "body_weight": mature_bw,
                 "mature_body_weight": mature_bw,
+                "birth_weight": 0.0,
             }
             animals.append(Animal(cast(Any, cow_data), self.time))
 
@@ -809,6 +810,7 @@ class HerdFactory:
                 "days_born": animal_constants.DAYS_PER_YEAR * animal_constants.BEEF_HEIFER_INITIAL_AGE_YEARS,
                 "body_weight": mature_bw * animal_constants.BEEF_HEIFER_INITIAL_WEIGHT_PCT_MATURE,
                 "mature_body_weight": mature_bw,
+                "birth_weight": 0.0,
             }
             animals.append(Animal(cast(Any, heifer_data), self.time))
 
@@ -820,6 +822,7 @@ class HerdFactory:
                 "days_born": 1,
                 "body_weight": calf_birth_weight_kg,
                 "mature_body_weight": mature_bw,
+                "birth_weight": calf_birth_weight_kg,
             }
             animals.append(Animal(cast(Any, calf_data), self.time))
 
@@ -832,6 +835,7 @@ class HerdFactory:
                 "days_born": animal_constants.DAYS_PER_YEAR * animal_constants.BEEF_BULL_INITIAL_AGE_YEARS,
                 "body_weight": mature_bw * animal_constants.BEEF_BULL_INITIAL_WEIGHT_PCT_MATURE,
                 "mature_body_weight": mature_bw,
+                "birth_weight": 0.0,
             }
             animals.append(Animal(cast(Any, bull_data), self.time))
 

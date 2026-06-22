@@ -1623,7 +1623,13 @@ class Animal:
         passes these inputs to the `process_digestion` method of the `digestive_system`
         object, which simulates and calculates digestion-related processes for the day.
 
+        Beef cow-calf types (BEEF_COW, BEEF_HEIFER_REPLACEMENT, BEEF_CALF, BEEF_BULL)
+        are not handled by the dairy digestive system and are skipped here. A
+        beef-specific manure/digestion module is a future-PR candidate.
+
         """
+        if self.animal_type.is_beef_cow_calf:
+            return
         digestive_system_inputs = DigestiveSystemInputs(
             animal_type=self.animal_type,
             body_weight=self.body_weight,
@@ -1712,7 +1718,13 @@ class Animal:
         This method gathers the necessary animal attributes and performs the daily body weight update. It then updates
         attributes such as body weight, conceptual weight, and events of the animal accordingly.
 
+        Beef cow-calf types do not use the dairy growth model; their body weight is
+        updated via NRC 2016 beef-specific ADG equations (future PR). This guard
+        prevents a ValueError from the dairy Growth module.
+
         """
+        if self.animal_type.is_beef_cow_calf:
+            return
         growth_inputs = GrowthInputs(
             days_in_pregnancy=self.days_in_pregnancy,
             animal_type=self.animal_type,
