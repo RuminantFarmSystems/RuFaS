@@ -35,8 +35,6 @@ if TYPE_CHECKING:
 RETENTION_METHOD_RATE = "rate"
 RETENTION_METHOD_COUNT = "count"
 
-# Warn at year end when more than this fraction of the annual keep target went unfulfilled
-# (i.e. too few live female calves were born to meet the target).
 UNFULFILLED_TAG_WARNING_FRACTION = 0.05
 
 
@@ -51,6 +49,7 @@ class CalfRetentionPolicy:
     ----------
     om : OutputManager
         Used to emit the year-end "insufficient female calves" warning (count method).
+
     """
 
     def __init__(self) -> None:
@@ -67,18 +66,20 @@ class CalfRetentionPolicy:
         """Whether the count-based (Option 2) method is selected."""
         return AnimalConfig.calf_retention_method == RETENTION_METHOD_COUNT
 
-    # ----------------------------------------------------------------- per-day hooks
     def begin_day(self, time: RufasTime) -> None:
         """Release the keep tags scheduled for the current day (count method only).
-
-        Must be called once per simulation day *before* births are processed, so that
-        tags released today are available to calves born today.
 
         Parameters
         ----------
         time : RufasTime
             Current simulation time. Used to detect year rollovers and to look up the
             current Julian day in the annual schedule.
+
+        Notes
+        -----
+        Must be called once per simulation day *before* births are processed, so that
+        tags released today are available to calves born today.
+
         """
         if not self.is_count_based:
             return
@@ -87,22 +88,27 @@ class CalfRetentionPolicy:
         self._outstanding_tags += self._daily_tag_release.get(time.current_julian_day, 0)
 
     def finalize_day(self, time: RufasTime) -> None:
-        """Emit the year-end warning on the last day of a simulation year (count method).
+        """
+        Emit the year-end warning on the last day of a simulation year (count method).
 
-        Must be called once per simulation day *after* births are processed, so that
-        calves born on the final day have already had a chance to fulfill tags.
+
 
         Parameters
         ----------
         time : RufasTime
             Current simulation time.
+
+        Notes
+        -----
+        Must be called once per simulation day *after* births are processed, so that
+        calves born on the final day have already had a chance to fulfill tags.
+
         """
         if not self.is_count_based:
             return
         if time.current_julian_day == time.year_end_day:
             self._warn_if_target_unmet(time)
 
-    # ----------------------------------------------------------- decision application
     def apply(self, calf: "Animal", simulation_day: int) -> None:
         """Apply the configured retention decision to a newborn calf.
 
@@ -135,18 +141,22 @@ class CalfRetentionPolicy:
             The freshly created newborn calf.
         simulation_day : int
             The current simulation day, recorded as the sale day when the calf is sold.
+
         """
         if cls._is_sold_rate_based(calf):
             calf.sold_at_day = simulation_day
 
-    # --------------------------------------------------------------- decision internals
     @staticmethod
     def _is_sold_rate_based(calf: "Animal") -> bool:
-        """Option 1: sell males; keep each live female with probability keep_female_calf_rate.
+        """
+        Option 1: sell males; keep each live female with probability keep_female_calf_rate.
 
+        Notes
+        -----
         A ``random()`` draw is taken for every non-male calf, matching the original logic so
         the global RNG stream -- and therefore reproducibility of existing rate-based runs --
         is preserved.
+
         """
         return calf.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate
 
@@ -160,7 +170,6 @@ class CalfRetentionPolicy:
             return False
         return True
 
-    # ------------------------------------------------------------- count-mode scheduling
     def _start_new_year(self, time: RufasTime) -> None:
         """Rebuild the keep-tag schedule and reset the ledger for a new simulation year."""
         self._scheduled_year = time.current_simulation_year
@@ -185,6 +194,7 @@ class CalfRetentionPolicy:
         deterministic even spread is used instead for reproducibility and testability (the
         codebase has known PYTHONHASHSEED-sensitive behavior). The temporal distribution is
         equivalent in aggregate; this choice is flagged for SME review.
+
         """
         target_annual = AnimalConfig.keep_female_calf_num_annual
         start_day = time.year_start_day
@@ -208,7 +218,15 @@ class CalfRetentionPolicy:
         return schedule
 
     def _warn_if_target_unmet(self, time: RufasTime) -> None:
-        """Warn when too many keep tags went unfulfilled by year end."""
+        """
+        Warn when too many keep tags went unfulfilled by year end.
+
+        Parameters
+        ----------
+        time : RufasTime
+            Current simulation time.
+
+        """
         unfulfilled = self._outstanding_tags
         if unfulfilled > self._target_tags_this_year * UNFULFILLED_TAG_WARNING_FRACTION:
             self.om.add_warning(
