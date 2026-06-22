@@ -260,12 +260,12 @@ def test_combined_lactating_pregnant_sums_both_energy_components() -> None:
 @pytest.mark.unit
 def test_combined_state_dispatch_reaches_calculator_without_error(mocker: MockerFixture) -> None:
     """
-    A BEEF_COW in combined lactating+pregnant state must not raise AttributeError
-    or ValueError when animal.daily_routines(time) is called once.
+    A BEEF_COW in combined lactating+pregnant state must not raise when daily_routines is called.
 
-    Confirms the full dispatch chain (Animal → beef cow-calf daily update →
-    BeefCowCalfRequirementsCalculator) is wired correctly without requiring
-    the full SimulationEngine stack.
+    Smoke test for the combined lactating+pregnant state.  The beef daily update path
+    does not yet call BeefCowCalfRequirementsCalculator directly (that wiring is a
+    future-PR scope item); this test guards against AttributeError or ValueError
+    regressions from incorrect initialisation of the combined state attributes.
 
     Parameters
     ----------
