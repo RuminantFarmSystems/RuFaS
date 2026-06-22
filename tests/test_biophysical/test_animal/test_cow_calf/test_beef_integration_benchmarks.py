@@ -33,8 +33,8 @@ from RUFAS.rufas_time import RufasTime
 # ── Shared benchmark inputs ──────────────────────────────────────────────────
 
 _ANGUS_COW_MAINT_ONLY = CowCalfRequirementsInputs(
-    body_weight=520.0,
-    mature_body_weight=520.0,
+    body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
+    mature_body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
     animal_type=AnimalType.BEEF_COW,
     breed="Angus",
     sex="female",
@@ -50,8 +50,8 @@ _ANGUS_COW_MAINT_ONLY = CowCalfRequirementsInputs(
 )
 
 _ANGUS_COW_LACT_ONLY = CowCalfRequirementsInputs(
-    body_weight=520.0,
-    mature_body_weight=520.0,
+    body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
+    mature_body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
     animal_type=AnimalType.BEEF_COW,
     breed="Angus",
     sex="female",
@@ -67,13 +67,13 @@ _ANGUS_COW_LACT_ONLY = CowCalfRequirementsInputs(
 )
 
 _ANGUS_COW_GEST_ONLY = CowCalfRequirementsInputs(
-    body_weight=520.0,
-    mature_body_weight=520.0,
+    body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
+    mature_body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
     animal_type=AnimalType.BEEF_COW,
     breed="Angus",
     sex="female",
     body_condition_score=5.0,
-    days_pregnant=30,
+    days_pregnant=150,  # mid-gestation: materially nonzero gestation energy (NRC 2016 Eq.19-37)
     days_in_milk=None,
     parity=2,
     target_adg=0.0,
@@ -84,13 +84,13 @@ _ANGUS_COW_GEST_ONLY = CowCalfRequirementsInputs(
 )
 
 _ANGUS_COW_COMBINED = CowCalfRequirementsInputs(
-    body_weight=520.0,
-    mature_body_weight=520.0,
+    body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
+    mature_body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
     animal_type=AnimalType.BEEF_COW,
     breed="Angus",
     sex="female",
     body_condition_score=5.0,
-    days_pregnant=30,
+    days_pregnant=150,  # mid-gestation: matches _ANGUS_COW_GEST_ONLY for approx equality check
     days_in_milk=60,
     parity=2,
     target_adg=0.0,
@@ -217,20 +217,19 @@ def _set_beef_animal_config() -> None:
 @pytest.mark.unit
 def test_combined_lactating_pregnant_sums_both_energy_components() -> None:
     """
-    A BEEF_COW simultaneously lactating (DIM=60) and newly pregnant (DP=30)
+    A BEEF_COW simultaneously lactating (DIM=60) and at mid-gestation (DP=150)
     must receive BOTH lactation and gestation energy requirements — not one or the other.
 
     NRC 2016 Ch.13: these states overlap in the 63-day breeding season window following
     calving, and both requirements are active concurrently (they sum, not replace).
-    Assertions:
-    - lactation_energy > 0 AND pregnancy_energy > 0 (both active, neither zero).
-    - total maintenance + growth + pregnancy + lactation > maintenance-only for same cow.
-    - combined requirement is larger than either lactation-only or gestation-only separately.
+
+    The existing PR-A test (TestLactatingAndPregnantOverlap) confirms both terms are > 0
+    at DP=60/DIM=60. This test adds the cross-comparison assertion not in PR-A:
+    - pregnancy_energy in combined state == gestation-only at same DP (additive, not replaced).
+    - lactation_energy in combined state == lactation-only at same DIM (unaffected by pregnancy).
+    - total combined energy > maintenance-only (integration-level sanity check).
     """
     result_combined = BeefCowCalfRequirementsCalculator.calculate_requirements(_ANGUS_COW_COMBINED)
-
-    assert result_combined.lactation_energy > 0.0, "Lactation energy must be positive for DIM=60 cow"
-    assert result_combined.pregnancy_energy > 0.0, "Gestation energy must be positive for DP=30 cow"
 
     result_maint = BeefCowCalfRequirementsCalculator.calculate_requirements(_ANGUS_COW_MAINT_ONLY)
     total_combined = (
@@ -249,18 +248,10 @@ def test_combined_lactating_pregnant_sums_both_energy_components() -> None:
 
     assert result_combined.lactation_energy == pytest.approx(
         result_lact_only.lactation_energy, rel=0.001
-    ), "Combined-state lactation_energy must equal lactation-only at the same DIM"
+    ), "Combined-state lactation_energy must equal lactation-only at the same DIM (unaffected by pregnancy)"
     assert result_combined.pregnancy_energy == pytest.approx(
         result_gest_only.pregnancy_energy, rel=0.001
-    ), "Combined-state pregnancy_energy must equal gestation-only at the same DP"
-
-    combined_preg_lact = result_combined.pregnancy_energy + result_combined.lactation_energy
-    assert (
-        combined_preg_lact > result_lact_only.lactation_energy
-    ), "Summed preg+lact must exceed lactation-only (gestation adds positive energy)"
-    assert (
-        combined_preg_lact > result_gest_only.pregnancy_energy
-    ), "Summed preg+lact must exceed gestation-only (lactation adds positive energy)"
+    ), "Combined-state pregnancy_energy must equal gestation-only at the same DP (unaffected by lactation)"
 
 
 # ── Test 2: combined state dispatch through animal.daily_routines ─────────────
