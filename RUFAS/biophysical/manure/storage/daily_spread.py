@@ -69,9 +69,20 @@ class DailySpread(Storage):
 
         """
         self._report_manure_stream(self._received_manure, "received", time.simulation_day)
+        self._report_manure_stream(self.available_for_field_application, "emptied", time.simulation_day)
         output_streams = super().process_manure(current_day_conditions, time)
         self.available_for_field_application = output_streams.get("manure", ManureStream.make_empty_manure_stream())
         return {}
+
+    def _report_emptied(self, manure_stream: ManureStream, simulation_day: int) -> None:
+        """
+        Suppress the parent's full-throughput "emptied" report.
+
+        For daily spread, "emptied" represents only the manure that was not spread on the field (exported
+        off-farm). That quantity is the unspread remainder left in ``available_for_field_application`` after
+        field operations, which ``process_manure`` reports directly.
+        """
+        return
 
     def set_available_for_field_application(self, stream: ManureStream) -> None:
         """Set remaining manure available for daily spread field application."""

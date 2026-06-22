@@ -59,13 +59,16 @@ def test_daily_spread_init(mocker: MockerFixture) -> None:
 def test_process_manure(
     received_manure: ManureStream, daily_spread_instance: DailySpread, mocker: MockerFixture
 ) -> None:
-    """Tests the process_manure() function"""
+    """process_manure reports received, reports the unspread leftover as 'emptied', and refreshes availability."""
     mock_conditions = mocker.MagicMock(
         spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0, annual_mean_air_temperature=15
     )
     mock_time = mocker.MagicMock(spec=RufasTime)
     mock_time.simulation_day = 50
     daily_spread_instance._received_manure = received_manure
+    # The leftover already in availability is what was NOT spread on the field; it is reported as "emptied".
+    leftover_stream = received_manure.split_stream(0.25)
+    daily_spread_instance.available_for_field_application = leftover_stream
     mock_report = mocker.patch.object(Processor, "_report_manure_stream")
     available_stream = received_manure
     mock_process = mocker.patch.object(Storage, "process_manure", return_value={"manure": available_stream})
@@ -73,8 +76,20 @@ def test_process_manure(
     daily_spread_instance.process_manure(mock_conditions, mock_time)
 
     mock_report.assert_any_call(received_manure, "received", 50)
+    mock_report.assert_any_call(leftover_stream, "emptied", 50)
     mock_process.assert_called_once_with(mock_conditions, mock_time)
     assert daily_spread_instance.available_for_field_application == available_stream
+
+
+def test_report_emptied_suppresses_parent_report(
+    received_manure: ManureStream, daily_spread_instance: DailySpread, mocker: MockerFixture
+) -> None:
+    """DailySpread suppresses the parent storage's full-throughput 'emptied' report."""
+    mock_report = mocker.patch.object(Processor, "_report_manure_stream")
+
+    daily_spread_instance._report_emptied(received_manure, 50)
+
+    mock_report.assert_not_called()
 
 
 def test_receive_manure(received_manure: ManureStream, daily_spread_instance: DailySpread) -> None:
