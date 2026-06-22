@@ -89,6 +89,9 @@ class AnimalModuleConstants:
     """The fraction of the dry matter intake requirement used as the basis for
     the inclusion rate bounds in user defined ration formulation method."""
 
+    DMI_RETRY_INCREASE_FACTOR: float = 1.1
+    """Multiplier applied to the dry matter intake when a lactating-cow ration retry is warranted."""
+
     MINIMUM_DMI: float = 1.0
     """Minimum estimated DMI instituted for all animals, kg/day"""
 
