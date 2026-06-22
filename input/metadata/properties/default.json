@@ -4307,7 +4307,7 @@
       },
       "user_defined_ration_tolerance": {
         "type": "number",
-        "description": "Allowable +/- fractional variance for each defined ration inclusion percentage values.",
+        "description": "Allowable +/- fractional variance for each defined ration inclusion percentage values. As an example: a feed with a user defined ration percentage value of 20% and tolerance of 0.1 would correspond to an allowable range of 18% to 22%.",
         "minimum": 0,
         "maximum": 1,
         "default": 0.0
@@ -6187,7 +6187,7 @@
       "description": "The maximum throughput of the implement (tons dm/hour)",
       "properties": {
         "type": "number",
-        "default": 0
+        "default": 0.0
       }
     }
   },
