@@ -2,6 +2,7 @@ from typing import NamedTuple, Optional
 from dataclasses import dataclass, fields
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.util import Utility
 import math
 
 """Factor for converting dry matter mass of liquid manure to wet mass."""
@@ -54,6 +55,14 @@ class NutrientRequest:
     use_supplemental_manure: bool
     """Whether to use supplemental manure if the request cannot be fulfilled by on-farm manure."""
 
+    use_daily_spread_source: bool = False
+    """Whether this request should first use ``DailySpread`` processors."""
+
+    spread_all_available_manure: bool = False
+    """If true, take all manure currently available across DailySpread processors regardless of nutrient
+    targets, caps, manure type, and supplemental manure settings. ``nitrogen`` and ``phosphorus`` fields
+    are ignored when this is set."""
+
     def __post_init__(self) -> None:
         """
         Validate the dataclass fields.
@@ -62,24 +71,24 @@ class NutrientRequest:
         ------
         ValueError
             If any field is negative.
-            If no fields are positive.
+            If no fields are positive (unless ``spread_all_available_manure`` is set).
             If the manure type provided is not a valid ManureType.
 
         """
         for field in fields(self):
             value = getattr(self, field.name)
+            if isinstance(value, bool):
+                continue
             if field.name != "manure_type" and value < 0:
                 raise ValueError(f"NutrientRequest Error: Field {field.name} must be non-negative.")
             if field.name == "manure_type" and not isinstance(value, ManureType):
                 raise ValueError(f"NutrientRequest Error: Field {field.name} must be an instance of ManureType.")
 
-        if any(
-            isinstance(getattr(self, field.name), (int, float)) and getattr(self, field.name) > 0.0
-            for field in fields(self)
-        ):
+        if self.spread_all_available_manure or self.use_supplemental_manure or self.use_daily_spread_source:
             return
-        else:
-            raise ValueError("NutrientRequest Error: At least one nutrient must be requested and positive.")
+        if self.nitrogen > 0.0 or self.phosphorus > 0.0:
+            return
+        raise ValueError("NutrientRequest Error: At least one nutrient must be requested and positive.")
 
 
 @dataclass(frozen=True)
@@ -234,13 +243,13 @@ class NutrientRequestResults:
             nitrogen=combined_total_nitrogen,
             phosphorus=combined_total_phosphorus,
             total_manure_mass=combined_total_manure_mass,
-            organic_nitrogen_fraction=combined_organic_nitrogen_fraction,
-            inorganic_nitrogen_fraction=combined_inorganic_nitrogen_fraction,
-            ammonium_nitrogen_fraction=combined_ammonium_nitrogen_fraction,
-            organic_phosphorus_fraction=combined_organic_phosphorus_fraction,
-            inorganic_phosphorus_fraction=combined_inorganic_phosphorus_fraction,
+            organic_nitrogen_fraction=Utility.clamp(combined_organic_nitrogen_fraction),
+            inorganic_nitrogen_fraction=Utility.clamp(combined_inorganic_nitrogen_fraction),
+            ammonium_nitrogen_fraction=Utility.clamp(combined_ammonium_nitrogen_fraction),
+            organic_phosphorus_fraction=Utility.clamp(combined_organic_phosphorus_fraction),
+            inorganic_phosphorus_fraction=Utility.clamp(combined_inorganic_phosphorus_fraction),
             dry_matter=combined_total_dry_matter,
-            dry_matter_fraction=combined_dry_matter_fraction,
+            dry_matter_fraction=Utility.clamp(combined_dry_matter_fraction),
         )
 
 
