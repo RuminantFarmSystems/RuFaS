@@ -204,3 +204,10 @@ All NRC 2016 beef module reference data lives in `docs/beef_module/`:
 - `NRC2016_BeefCattle_FeedLibrary_Complete.xlsx` — Feed compositions
   (Table 18-1), Feed IDs 301–305
 - `RuFaS_Feedlot_Implementation_Plan.docx` — 8-step implementation plan
+
+Cow-calf system reference data lives in `docs/beef_module/cow_calf/`:
+
+- `RuFaS_CowCalf_Integration_Plan.md` — 11-step implementation plan with NRC 2016 equation
+  references (Chapters 6/11/12/13/19), lessons from PR #32 feedlot module, and named scope
+  boundaries
+- `README.md` — scope boundaries, known simplifications, and future-PR candidates
