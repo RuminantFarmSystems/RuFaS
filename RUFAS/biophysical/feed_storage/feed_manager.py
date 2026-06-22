@@ -452,9 +452,9 @@ class FeedManager:
         Returns
         -------
         tuple[bool, FeedFulfillmentResults]
-            A tuple where the first element is ``True`` if the feed request can be fulfilled (``False`` otherwise), and
-            the second element is a ``FeedFulfillmentResults`` object containing the amounts of feed deducted from
-            purchased and farm-grown sources.
+            - ``True`` if the feed request can be fulfilled (``False`` otherwise).
+            - A ``FeedFulfillmentResults`` object containing the amounts of feed deducted from purchased and farm-grown
+            sources.
 
         """
         current_feed_totals = self._query_available_feed_totals(list(requested_feed.requested_feed.keys()))
@@ -951,7 +951,6 @@ class FeedManager:
         Returns
         -------
         tuple[dict[RUFAS_ID, list[HarvestedCrop]], dict[RUFAS_ID, list[PurchasedFeed]]]
-            A tuple of:
             - ``farmgrown_by_id``: ``{feed_id: [HarvestedCrop]}``, sorted by ``storage_time`` oldest to newest.
             - ``purchased_by_id``: ``{feed_id: [PurchasedFeed]}``, storage time not considered.
 

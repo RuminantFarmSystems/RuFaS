@@ -523,6 +523,7 @@ class OutputManager(object):
         overwrite_simulation_day: bool, default False
             Passed to ``add_variable()``. If ``True``, any ``simulation_day`` value provided in the ``info_maps`` is
             overwritten.
+
         """
         for variable, info_map in variables:
             name, value = list(variable.items())[0]
@@ -1392,12 +1393,10 @@ class OutputManager(object):
         Returns
         -------
         tuple[list[dict[str, str|int]], str | None]
-            1. list[dict[str, str|int]]
-                A list of dictionaries, each containing the loaded filter content, with keys and values depending on the
-                file type.
-            2. str | None
-                A string representing the output CSV direction, either "portrait" or "landscape". If no direction is
-                specified, ``None`` is returned.
+            - A list of dictionaries, each containing the loaded filter content, with keys and values depending on the
+            file type.
+            - A string representing the output CSV direction, either "portrait" or "landscape". If no direction is
+            specified, ``None`` is returned.
 
         Raises
         ------
@@ -2355,6 +2354,7 @@ class OutputManager(object):
             An iterable of pool descriptors. Each descriptor must provide a pool name and the
             path to the JSON file containing the pool to load. When dicts are provided they
             must include ``"name"`` and ``"path"`` keys.
+
         """
         info_map_base = {
             "class": self.__class__.__name__,
@@ -2471,12 +2471,10 @@ class OutputManager(object):
         Returns
         -------
         tuple[int, int, int]
-            1. int
-                Total number of errors in the ``OutputManager``'s errors pool.
-            2. int
-                Total number of warnings in the ``OutputManager``'s warnings pool.
-            3. int
-                Total number of logs in the ``OutputManager``'s logs pool.
+            - Total number of errors in the ``OutputManager``'s errors pool.
+            - Total number of warnings in the ``OutputManager``'s warnings pool.
+            - Total number of logs in the ``OutputManager``'s logs pool.
+
         """
 
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])

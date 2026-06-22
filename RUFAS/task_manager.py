@@ -388,10 +388,9 @@ class TaskManager:
         Returns
         -------
         tuple[list[dict[str, Any]], list[dict[str, Any]]]
-            1. list[dict[str, Any]]
-                Parsed single-run task arguments.
-            2. list[dict[str, Any]]
-                Parsed multi-run task arguments.
+            - Parsed single-run task arguments.
+            - Parsed multi-run task arguments.
+
         """
         parsed_single_run_args: list[dict[str, Any]] = []
         parsed_multi_run_args: list[dict[str, Any]] = []
