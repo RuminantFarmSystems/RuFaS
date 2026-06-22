@@ -277,7 +277,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "conventional",
             Sex.MALE,
-            False
+            False,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -293,7 +293,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "sexed",
             Sex.MALE,
-            False
+            False,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -309,7 +309,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "random",
             Sex.MALE,
-            False
+            False,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -325,7 +325,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "conventional",
             Sex.FEMALE,
-            True
+            True,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -341,7 +341,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "sexed",
             Sex.FEMALE,
-            True
+            True,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -357,7 +357,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "conventional",
             Sex.MALE,
-            True
+            True,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -373,7 +373,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "sexed",
             Sex.MALE,
-            True
+            True,
         ),
     ],
 )
