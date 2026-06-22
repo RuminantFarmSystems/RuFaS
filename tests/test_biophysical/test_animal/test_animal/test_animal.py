@@ -229,7 +229,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
 
 
 @pytest.mark.parametrize(
-    "args, semen_type, sex, culled, _sold",
+    "args, semen_type, sex, culled",
     [
         (
             NewBornCalfValuesTypedDict(
@@ -246,7 +246,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "conventional",
             Sex.FEMALE,
             False,
-            False,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -263,7 +262,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "sexed",
             Sex.FEMALE,
             False,
-            False,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -279,8 +277,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "conventional",
             Sex.MALE,
-            False,
-            True,
+            False
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -296,8 +293,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "sexed",
             Sex.MALE,
-            False,
-            True,
+            False
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -313,8 +309,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "random",
             Sex.MALE,
-            False,
-            True,
+            False
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -330,8 +325,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "conventional",
             Sex.FEMALE,
-            True,
-            False,
+            True
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -347,8 +341,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "sexed",
             Sex.FEMALE,
-            True,
-            False,
+            True
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -364,8 +357,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "conventional",
             Sex.MALE,
-            True,
-            True,
+            True
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -381,8 +373,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "sexed",
             Sex.MALE,
-            True,
-            True,
+            True
         ),
     ],
 )
@@ -391,7 +382,6 @@ def test_initialize_newborn_calf(
     semen_type: str,
     sex: Sex,
     culled: bool,
-    _sold: bool,
     mocker: MockerFixture,
     mock_time: RufasTime,
 ) -> None:
@@ -411,15 +401,11 @@ def test_initialize_newborn_calf(
     sex_random_value = male_calf_rate + 0.01 if sex == Sex.FEMALE else male_calf_rate - 0.01
     culled_random_value = AnimalConfig.still_birth_rate - 0.01 if culled else AnimalConfig.still_birth_rate + 0.01
 
-    # The Animal constructor draws random() for sex and stillbirth only. The keep/sell
-    # decision (the former third draw) now lives in CalfRetentionPolicy and is applied by the
-    # herd manager / factory after construction -- see test_calf_retention_policy.py.
     mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[sex_random_value, culled_random_value])
     mock_rvs = mocker.patch("RUFAS.biophysical.animal.animal.truncnorm.rvs", return_value=600)
 
     animal = Animal(args, mock_time)
     assert animal.sex == sex
-    # The constructor no longer makes the retention decision, so a newborn is never marked sold here.
     assert animal.sold is False
     assert animal.birth_weight == args["birth_weight"]
     assert animal.body_weight == args["birth_weight"]
