@@ -15,12 +15,13 @@ Scope (Option B):
 """
 
 import datetime
-from typing import Any, Generator
+from typing import Generator
 
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
+from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
@@ -151,10 +152,10 @@ def _make_rufas_time(start: datetime.datetime) -> RufasTime:
 
 
 def _make_herd_manager(
-    beef_cows: list[Any],
-    beef_replacement_heifers: list[Any],
-    beef_calves: list[Any],
-    beef_bulls: list[Any],
+    beef_cows: list[Animal],
+    beef_replacement_heifers: list[Animal],
+    beef_calves: list[Animal],
+    beef_bulls: list[Animal],
 ) -> HerdManager:
     """
     Construct a HerdManager via __new__ and manually assign all required attributes.
@@ -195,7 +196,7 @@ def _make_herd_manager(
 # ── Helper: count CALF_WEANED events on a list of animals ────────────────────
 
 
-def _count_calf_weaned_events(animal: Any) -> int:
+def _count_calf_weaned_events(animal: Animal) -> int:
     """
     Count CALF_WEANED events recorded on a single animal.
 
@@ -334,7 +335,7 @@ def _assert_weaning_and_bcs(hm: HerdManager, weaned_calf_ids: set[int]) -> None:
     """
     for calf in hm.beef_calves:
         count = _count_calf_weaned_events(calf)
-        assert count <= 1, f"Calf {calf.id} in beef_calves has {count} CALF_WEANED events"
+        assert count == 0, f"Calf {calf.id} in beef_calves has {count} CALF_WEANED events (expected 0 — unweaned)"
     current_calf_ids = {c.id for c in hm.beef_calves}
     for calf_id in weaned_calf_ids:
         assert calf_id not in current_calf_ids, f"Weaned calf {calf_id} still in beef_calves"
@@ -355,13 +356,16 @@ def _assert_attr_access(hm: HerdManager) -> None:
     """
     all_beef = [*hm.beef_cows, *hm.beef_replacement_heifers, *hm.beef_calves, *hm.beef_bulls]
     for animal in all_beef:
+        # Assertion 7: dairy milk_production attr must be accessible without error
+        assert hasattr(
+            animal, "milk_production"
+        ), f"Beef animal {animal.id} ({animal.animal_type}) missing milk_production attribute"
+        # Assertion 8: feedlot attrs must not raise and must be zero (no feedlot path taken)
         try:
-            _ = animal.milk_production
-        except AttributeError as exc:
-            pytest.fail(f"Beef animal {animal.id} ({animal.animal_type}) AttributeError: {exc}")
-        try:
-            _ = animal.days_on_feed
-            _ = animal.entry_weight
+            assert animal.days_on_feed == 0, f"Beef animal {animal.id} days_on_feed={animal.days_on_feed} != 0"
+            assert animal.entry_weight == 0, f"Beef animal {animal.id} entry_weight={animal.entry_weight} != 0"
+            _ = animal.step_up_phase
+            _ = animal.receiving_stress
         except AttributeError as exc:
             pytest.fail(f"Beef animal {animal.id} AttributeError on feedlot attr: {exc}")
 
@@ -489,7 +493,12 @@ def test_beef_herd_730_day_lifecycle(mocker: MockerFixture) -> None:
 
         # Track weanings before removal (for Assertions 1, 3, 4)
         for animal in daily_updates.removed_animals:
-            if _count_calf_weaned_events(animal) > 0:
+            count = _count_calf_weaned_events(animal)
+            if count > 0:
+                assert count == 1, (
+                    f"Day {time.simulation_day}: Weaned calf {animal.id} has {count} "
+                    f"CALF_WEANED events (expected exactly 1)"
+                )
                 weaned_calf_ids.add(animal.id)
 
         # Assertion 4 (inline): weaned calves must not remain in beef_calves
