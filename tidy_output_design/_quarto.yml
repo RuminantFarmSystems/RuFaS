@@ -1,0 +1,53 @@
+# This is a quarto project file that provides (default) configurations for all qmd
+# files stored in this directory. For project basics see https://quarto.org/docs/projects/quarto-projects.html
+
+## ---- Project Options ----
+# see full list at https://quarto.org/docs/reference/projects/options.html
+project:
+  output-dir: _rendered # where rendered output should be stored (relative to root dir of this file)
+  execute-dir: project # root dir of code chunks (relative to project)
+  render: # specify which files to render
+    - "*.qmd" # all .qmd files (relative to the root dir)
+
+## ---- Global Options ----
+# always show full date in date fields
+date_format: long
+
+# don't include download links to the pdf versions
+format-links: false 
+
+# Prefer the knitr renderer by default (supports R and python)
+knitr: true
+
+# Code execution options
+execute:
+  echo: false # don't show code by default
+
+# use github flavored code highlighting
+syntax-highlighting: github 
+
+## ---- Format-specific options ----
+# format-specific options
+format:
+  # HTML: options found at https://quarto.org/docs/reference/formats/html.html
+  html: 
+    anchor-sections: true
+    html-math-method: katex # how to render equations
+    df-print: kable # how to print data frames (R)
+    embed-resources: true # make sure the html files are self-contained
+    respect-user-color-scheme: true # use user-preferred dark/light theme
+    toc: true # show table of contents
+    toc-depth: 3 # show up to 3rd level subheadings in TOC
+    toc-title: "Contents"
+    number-sections: false # don't use section numbers
+    code-fold: show # show code by default, but allow collapsing code blocks
+    code-overflow: scroll # if code lines are too long, use a scroll box 
+    code-copy: true # allow copy code icon for coder blocks
+    code-tools: true # adds drop down to "show all code", "hide all code" and "view source"
+    fig-format: png # use png figure encoding (R and matplotlib)
+    # theme options
+    theme: # allow dark/light toggle
+      dark: darkly # dark theme (defualt)
+      light: flatly # light theme
+  # PDF: optionds found at https://quarto.org/docs/reference/formats/pdf.html
+  # pdf: default

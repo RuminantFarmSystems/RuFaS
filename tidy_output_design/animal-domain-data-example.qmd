@@ -1,0 +1,155 @@
+---
+title: "Grouping animal data by domain"
+subtitle: "How to store and display tidy data measured at different scales"
+
+execute: 
+  warning: false
+  message: false
+  cache: false
+---
+
+## Introduction
+
+I will demonstrate how disparate data can be stored together and accessed in tidy tables.
+For this example, I'm using `R` data tables (`tibbles`) because they are most familiar to me,
+but all the same features are available in Python and can be utilized for RuFaS. 
+
+For this example, I have generated a fake data set with nonsense values, but whose structure is 
+illustrative. This dataset pertains to cows, their pens, and their feed rations. The most important
+aspect of these data is that they are measured across different observation units (cows, pens, and feed). 
+So, in order to differentiate them, they are grouped by `domain`. In this case the domains are:
+
+- `CowMeasurements`: measurements of individual cows through time.
+- `PenInfo`: data about the pens that the individual cows are housed in
+- `RationInfo`: data about ration formulations that are fed to the cow
+- `CowVariableLookup`: metadata about the different measurements taken from individual cows.
+
+```{r}
+library(tidyverse)
+grouped_data = readRDS("data/example_cow_dataset.rds")
+```
+
+@tbl-nested shows a compact representation of the storage object that contains these data, which is very 
+similar to how RuFaS' `OutputManager` (`OM`) currently stores data. The `OM` data is grouped by
+`info_map` variables, but here we only include `domain` for simplicity. Also, the `OM` currently 
+stores the groups of data as dictionaries, but here they are stored as tables (called "tibbles").
+
+```{r}
+#| label: tbl-nested
+#| tbl-cap: |
+#|   Nested data, grouped by domain. Each element of the data column is a sub-table, with their dimensions 
+#|   displayed as [rows x columns].
+#| cache: true
+grouped_data %>% print()
+```
+
+### Cow data
+
+With this grouping structure, we are able to easily extract and "tidy" data that belong together 
+(i.e., have the same observation units). So, if we wanted to look at the first few rows 
+(of about 1 million) of the `CowMeasurements` data set -- in a tidy format -- we can do so easily. 
+@tbl-cow-data shows the first 10 observations of a single cow. note that 10 variables were measured
+for each cow (in addition to grouping variables like `pen_id` and `ration_id`).
+
+```{r}
+#| label: tbl-cow-data
+#| tbl-cap: |
+#|   Individual cow data (first 10 observations)
+#| echo: true
+
+# extract the data
+cow_data <- grouped_data %>% 
+  filter(domain == "CowMeasurements") %>% # get only this domain
+  pull(data) %>% # extract the data column
+  bind_rows() %>% # stack into a data frame
+  mutate(across(c(var_1:var_10), ~round(.x, 2))) # round measurements to 2 decimals
+  
+# display the data
+cow_data %>% 
+  select(-c("domain")) %>% # drop the invariant "domain" column
+  arrange(pen_id, year, cow_id) %>% # sort by pen id, then year, then cow
+  head(n = 10) # show first 10 rows
+```
+
+and if we wanted a more digestible table, we could aggregate the cow data. @tbl-cow-aggregate demonstrates such an
+aggregation summary. For each individual cow, it shows how many years they were observed, the total number
+of times they were observed, and the average values for all measured variables across observations. 
+
+```{r}
+#| label: tbl-cow-aggregate
+#| tbl-cap: |
+#|   Aggregated cow data (first 10 individuals)
+#| echo: true
+
+# Summarize the measurements for each cow within a pen
+cow_data %>% 
+  group_by(pen_id, cow_id) %>% # aggregate by pen and cow
+  summarize(
+    n_years = length(unique(year)), # number of years observed
+    n_obs = n(), # count how many observations of this individual
+    across(c(var_1:var_10), ~round(mean(.x, na.rm = TRUE), 2)), # avg measured variables by group
+    .groups = "drop" # remove the grouping after
+  ) %>% 
+  head(n = 10) # only show first 10 cows
+```
+
+### Variable lookup (units)
+
+One of the `domain` groups of our data storage object is called `CowVariableLookup`. This group is metadata about
+the measurements we took from our cows. @tbl-var-lookup shows these metadata in full. Its purpose
+is to provide additional info about the variables from the `CowMeasurements` data (including `units`) of the
+variables. Importantly, the `var_name` column corresponds to the variable names in that data set.
+
+```{r}
+#| label: tbl-var-lookup
+#| tbl-cap: "Cow measurement variable lookup table and metadatas"
+#| echo: true
+
+# extract the data
+grouped_data %>% 
+  filter(domain == "CowVariableLookup") %>% # get only this domain
+  pull(data) %>% # extract the data column
+  bind_rows() # stack into a data frame
+```
+
+## Pen and Ration Data
+
+Similarly, the data in the `PenInfo` domain (@tbl-pen-info) pertain to data collected at the pen level. Note that
+the `pen_id` column contains the unique identifiers of each pen. The same values are referenced by the
+`CowMeasurements` data set. So if we ever need information about about the pen a cow was staying in, we can look it up
+or join the tables on this common `pen_id` column.
+
+```{r}
+#| label: tbl-pen-info
+#| tbl-cap: "Pen-specific data"
+#| echo: true
+
+# extract the pen data
+grouped_data %>% 
+  filter(domain == "PenInfo") %>% # get only this domain
+  pull(data) %>% # extract the data column
+  bind_rows()
+```
+
+Our last example domain is `RationInfo` (@tbl-ration-info), which contains information about the different rations 
+that cows were fed. As with the pen data, the `ration_id` column is referenced by the `CowMeasurements` dataset and
+can be used to join those data with the ration information.
+
+```{r}
+#| label: tbl-ration-info
+#| tbl-cap: "ration data"
+#| echo: true
+
+# extract the pen data
+grouped_data %>% 
+  filter(domain == "RationInfo") %>% # get only this domain
+  pull(data) %>% # extract the data column
+  bind_rows()
+```
+
+## Conclusions
+
+The solution outlined here, grouping data by `domain`, allows us to easily store, access, and display data
+taken from entirely different observational units and/or aspects of the farm. Each table produced during this
+example is reasonably compact, without being overly ragged (i.e., because they don't include variables that aren't 
+relevant to the respective observations) and while adhering to the tidy paradigm.
