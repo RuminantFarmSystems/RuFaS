@@ -310,7 +310,7 @@
 					"stream_name": "calf_lot",
 					"bedding_name": "straw",
 					"stream_proportion": 1.0,
-					"first_processor": "calf_manual_scraper"
+					"first_processor": "dailyspread"
 				}
 			]
 		},
@@ -329,7 +329,7 @@
 					"stream_name": "growing_BP",
 					"bedding_name": "straw",
 					"stream_proportion": 1.0,
-					"first_processor": "growing_compost_bedded_pack"
+					"first_processor": "dailyspread"
 				}
 			]
 		},
@@ -348,7 +348,7 @@
 					"stream_name": "dry_BP",
 					"bedding_name": "straw",
 					"stream_proportion": 1.0,
-					"first_processor": "dry_cow_compost_bedded_pack"
+					"first_processor": "dailyspread"
 				}
 			]
 		},
@@ -370,7 +370,7 @@
 					"stream_name": "lac_stall",
 					"bedding_name": "straw",
 					"stream_proportion": 1.0,
-					"first_processor": "lac_manual_scraper"
+					"first_processor": "dailyspread"
 				}
 			]
 		}
