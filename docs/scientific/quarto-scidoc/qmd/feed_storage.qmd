@@ -328,7 +328,7 @@ Where we know that:
 * n<sub>updated</sub> is the percentage of the target nutrient in the stored crop’s dry matter mass after accounting for dry matter loss 
 * n<sub>initial</sub> is the percentage of the target nutrient in the stored crop’s dry matter mass before accounting for dry matter loss 
 * C is the fractional loss coefficient specific to the nutrient and storage type
-* DL<sub>fraction</sub> is the fraction of dry matter lost:
+* DL<sub>fraction</sub> is the fraction of dry matter lost
 
 :::{#eq-fs-nut-2}
 [[**FS.NUT.2**]]{.aside .content-visible when-format="html"}    

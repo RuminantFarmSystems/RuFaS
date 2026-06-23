@@ -1,0 +1,12 @@
+﻿Variable, Units, Calculation 
+water, kg , stored manure water (kg) + received manure water (kg)
+total_ammoniacal_nitrogen, kg ," max(0,stored manure ammoniacal nitrogen (kg) + received ammoniacal nitrogen (kg) - NH$_3$N emissions (kg)) "
+nitrogen, kg , stored manure nitrogen (kg) + received manure nitrogen (kg) - NH$_3$N emissions (kg) - N$_2$O-N emissions (kg)
+phosphorus, kg , stored manure phosphorus (kg) + received manure phosphorus (kg)
+potassium, kg , stored manure potassium (kg) + received manure potassium (kg) 
+ash, kg , stored manure ash (kg) + received manure ash (kg)
+degradable_volatile_solids, -- , stored degradable VS (kg) + received degradable VS (kg) - VSd loss (kg)
+manure_non_degradable_volatile_solids, -- , stored manure non-degradable VS (kg) + received manure non-degradable VS (kg) - manure VSnd loss (kg) 
+bedding_non_degradable_volatile_solids, -- , stored bedding non-degradable VS (kg) + received bedding non-degradable VS (kg) - bedding VSnd loss (kg)
+total_solids, kg , stored total solids (kg) + received total solids (kg) - VSd loss (kg) - VSnd loss (kg)
+volume, m$^3$, stored volume (m$^3$) + Received volume (m$^3$)- $(\frac{\text{VSd loss (kg)}+\text{VSnd loss}}{\text{SLURRY\_MANURE\_DENSITY}$

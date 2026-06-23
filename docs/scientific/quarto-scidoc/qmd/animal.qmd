@@ -2058,6 +2058,8 @@ user-defined rate of keeping female calves.
    * If a random draw is less than the `still_birth_rate`, then `self.sold` = True and `STILL\_BIRTH` is added to `self.events`
    * If assigned to be sold, `sold_at_day` = `simulation_day`
 
+
+
 ## Animal-level Process and Management
 
 The methods in the RuFaS model that simulate individual animals’ life events and the effects of herd management on individual animals are referred to as 
@@ -2364,6 +2366,7 @@ $$
 $$
 :::
 
+
 ### Animal Reproduction
 
 #### Introduction
@@ -2555,6 +2558,7 @@ import_table(
 )
 ```
 
+
 ### Milk Production
 
 #### Introduction 
@@ -2563,8 +2567,7 @@ This section describes how RuFaS determines the amount of milk and milk componen
     
 Milk yield is largely determined by lactation curve parameters. Wood’s curve is the only lactation model implemented in RuFaS currently, 
 but there is flexibility to potentially include other models as well. At the beginning of the simulation, the herd is assigned distributions 
-for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the [Lactation Curve](#sec-an-lac-curve) section. At the beginning of each new lactation, 
-each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
+for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the [Lactation Curve](#sec-an-lac-curve) section). At the beginning of each new lactation, each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
     
 When the cow starts lactating, she produces milk from the calving day until dry or culled according to the assigned lactation curve model. 
 Each day, each cow’s milk production is calculated and recorded. Milk production is calculated from the Wood’s curve equation using the given 
@@ -2777,8 +2780,7 @@ has no effect due to no implementation of automatic ration optimizer.
 increments `milk_production_reduction` by the value 
 
 ::: {.callout-note}
-Currently, all cows in a pen will have the same milk reduction amount. This function allows future flexibility if desired to have individual reductions rather 
-than applying the average.
+Currently, all cows in a pen will have the same milk reduction amount. This function allows future flexibility if desired to have individual reductions rather than applying the average.
 :::
 
 ##### Starting and Ending Lactation
@@ -2805,9 +2807,9 @@ production values calculated.
 For more details on milk changes and reductions, go to the Milk Production and Reduction portion of this section.
 :::
 
-::: {#sec-an-lac-curve}
-### Lactation Curve: Parameters and Definitions
-:::
+
+### Lactation Curve: Parameters and Definitions{#sec-an-lac-curve}
+
 
 #### Introduction
 
@@ -3001,9 +3003,9 @@ $$
 $$
 :::
 
-::: {#sec-an-cull}
-### Culling
-:::
+ 
+
+### Culling{#sec-an-cull}
 
 #### Introduction
 
@@ -3067,8 +3069,8 @@ Probability of death associated with each lactation (1, 2, 3, 4+) is specified a
 * Parity death probability: `parity_death_prob` 
    * Probability of death during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
 * Death day probability: `death_day_prob`
-   * Values to construct the CDF to determine future death day, given that death is going to occur (default values are given in @tbl-an-cull-cdf-death)
-   * Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days” in @tbl-an-cull-cdf-death)
+   * Values to construct the CDF to determine future death day, given that death is going to occur 
+   * Values in the array correspond to the days in `cull_day_count`
 
 **Parameters and Equations**
 

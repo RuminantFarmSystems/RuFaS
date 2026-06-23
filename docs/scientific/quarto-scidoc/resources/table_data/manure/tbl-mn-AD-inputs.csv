@@ -1,0 +1,5 @@
+﻿Variable, Units, Description
+name , -- ,  Unique identifier of the specific anaerobic digester configuration used 
+hydraulic_retention_time , days ,  Number of days manure spends in the anaerobic digester. Note that this variable is not utilized directly by the module but is utilized by the Economics Emissions and Energy module.  
+anaerobic_digestion_temperature_set_point , $^\circ\text{C}$ ,  Temperature set point for the anaerobic digestion. This input is utilized in the conversion of $\text{CH}_4$ and $\text{CO}_2$ generation volume to mass; it does not directly influence $\text{CH}_4$ emissions 
+biogas_leakage_fraction , none ,  Fraction of biogas generated in the anaerobic digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system
