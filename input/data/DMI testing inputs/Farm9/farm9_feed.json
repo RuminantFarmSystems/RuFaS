@@ -76,7 +76,7 @@
   "ration_formulation_parameters": {
     "milk_reduction_maximum": 0.0,
     "max_daily_feed_recalculations_per_year": 4,
-    "user_defined_ration_tolerance": 0.1
+    "user_defined_ration_tolerance": 0.0
   },
   "rations": [
     {
