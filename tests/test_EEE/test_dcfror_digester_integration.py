@@ -5,14 +5,72 @@ from RUFAS.EEE.economics.dcfror import DCFRORCalculator
 from RUFAS.EEE.economics.digester_costs import DigesterCostCalculator
 
 
+class _PoolStub:
+    """Faithful stand-in for ``InputManager.get_data``.
+
+    Resolves a dotted data address against a nested dict and returns ``None``
+    on any missing segment -- exactly like the real ``InputManager``. Unlike
+    ``Mock(side_effect={...})``, this fails when the code queries the WRONG
+    address, so it catches data-address mistakes.
+
+    This matters for issue #3063: the bug was masked twice because the tests
+    mocked the exact (wrong) addresses the code used. The real input pool keeps
+    the digester config at ``manure_management.anaerobic_digester`` and the herd
+    at ``animal.herd_information.cow_num`` -- NOT ``manure_management_properties``
+    / ``animal_properties`` (those are schema references, not pool addresses).
+    """
+
+    def __init__(self, pool: dict) -> None:
+        self._pool = pool
+
+    def get_data(self, address: str):
+        node = self._pool
+        for part in address.split("."):
+            if not isinstance(node, dict) or part not in node:
+                return None
+            node = node[part]
+        return node
+
+
+def test_get_digester_config_reads_correct_address(mocker: MockerFixture) -> None:
+    """``_get_digester_config`` must read the real pool address for digesters.
+
+    Uses a faithful pool stub, so it fails if the code queries any address other
+    than ``manure_management.anaerobic_digester`` (the regression that caused the
+    fix for #3063 to silently no-op).
+    """
+
+    calc = DCFRORCalculator.__new__(DCFRORCalculator)
+    calc.im = _PoolStub(
+        {"manure_management": {"anaerobic_digester": [{"hydraulic_retention_time": 10}, {"hydraulic_retention_time": 25}]}}
+    )
+
+    config = calc._get_digester_config()
+
+    assert [d["hydraulic_retention_time"] for d in config] == [10, 25]
+
+
+def test_get_digester_config_empty_when_no_digesters(mocker: MockerFixture) -> None:
+    """A scenario with no digesters (e.g. ``no_manure``) yields an empty list."""
+
+    calc = DCFRORCalculator.__new__(DCFRORCalculator)
+    calc.im = _PoolStub({"manure_management": {"anaerobic_digester": []}})
+    assert calc._get_digester_config() == []
+
+    # Missing key entirely (get_data returns None) is also handled cleanly.
+    calc.im = _PoolStub({})
+    assert calc._get_digester_config() == []
+
+
 def test_prepare_costs_applies_digester_cost_curve(mocker: MockerFixture) -> None:
     calc = DCFRORCalculator.__new__(DCFRORCalculator)
     calc.om = mocker.Mock()
-    calc.im = mocker.Mock()
-    calc.im.get_data.side_effect = lambda key: {
-        "animal_properties.herd_information.cow_num": 1000.0,
-        "manure_management_properties.anaerobic_digester": [{"hydraulic_retention_time": 30.0}],
-    }[key]
+    calc.im = _PoolStub(
+        {
+            "animal": {"herd_information": {"cow_num": 1000.0}},
+            "manure_management": {"anaerobic_digester": [{"hydraulic_retention_time": 30.0}]},
+        }
+    )
     mocker.patch(
         "RUFAS.EEE.economics.dcfror.DigesterCostCalculator.calculate_digester_capital_cost",
         return_value=1000.0,
@@ -50,15 +108,15 @@ def test_prepare_costs_applies_digester_cost_curve(mocker: MockerFixture) -> Non
         }
     )
 
+    # base 10 - prior digester row (1.0) + computed capex (8000) = 8009
     assert prepared["capital_cost"] == pytest.approx(8009.0)
     assert prepared["operating_costs"].tolist() == pytest.approx([251.0, 251.0])
 
 
-def test_prepare_costs_without_digester_rows_unchanged(mocker: MockerFixture) -> None:
+def test_prepare_costs_without_digester_config_unchanged(mocker: MockerFixture) -> None:
     calc = DCFRORCalculator.__new__(DCFRORCalculator)
     calc.om = mocker.Mock()
-    calc.im = mocker.Mock()
-    calc.im.get_data.side_effect = KeyError
+    calc.im = _PoolStub({})  # no manure_management -> get_data returns None -> no digester costing
 
     prepared = calc._prepare_costs(
         {
@@ -84,20 +142,19 @@ def test_prepare_costs_uses_real_digester_costs_not_fallback(mocker: MockerFixtu
     """Regression test for issue #3063.
 
     With the capital-cost breakdown shipped in ``economic_inputs.json`` (a single
-    non-digester ``"Fallback capital cost"`` row of $15,000) and digesters
-    configured in the manure namespace, the real ``DigesterCostCalculator`` must
-    run so the capital cost reaching DCFROR reflects digester CAPEX rather than
-    the $15,000 fallback. Nothing here is mocked and no ``"digester"`` row is
-    injected into the breakdown, so this exercises the real data flow that the
-    other tests in this module bypass (they hand-inject a row and mock the
-    calculator). It fails on the pre-fix code, where the digester branch was
-    gated on a ``"digester"`` substring in the breakdown items and never fired
-    for the shipped inputs.
+    non-digester ``"Fallback capital cost"`` row of $15,000) and digesters present
+    in the manure config, the real ``DigesterCostCalculator`` must run so the
+    capital cost reaching DCFROR reflects digester CAPEX rather than the $15,000
+    fallback.
+
+    Nothing here mocks ``DigesterCostCalculator`` and no ``"digester"`` row is
+    injected into the breakdown, so it exercises the real costing path. The
+    faithful ``_PoolStub`` also makes the test fail if the digester / herd data
+    addresses are wrong (the second half of the #3063 fix).
     """
 
     cow_num = 1500.0
-    # Mirror input/data/manure/example_freestall_processor_configs.json, which
-    # configures two anaerobic digesters with different retention times.
+    # Mirror input/data/manure/example_freestall_processor_configs.json (two digesters).
     digester_config = [
         {"hydraulic_retention_time": 10},
         {"hydraulic_retention_time": 25},
@@ -107,11 +164,13 @@ def test_prepare_costs_uses_real_digester_costs_not_fallback(mocker: MockerFixtu
 
     calc = DCFRORCalculator.__new__(DCFRORCalculator)
     calc.om = mocker.Mock()
-    calc.im = mocker.Mock()
-    calc.im.get_data.side_effect = lambda key: {
-        "animal_properties.herd_information.cow_num": cow_num,
-        "manure_management_properties.anaerobic_digester": digester_config,
-    }[key]
+    # Real pool layout (verified against a live freestall load).
+    calc.im = _PoolStub(
+        {
+            "animal": {"herd_information": {"cow_num": cow_num}},
+            "manure_management": {"anaerobic_digester": digester_config},
+        }
+    )
 
     prepared = calc._prepare_costs(
         {
@@ -130,7 +189,7 @@ def test_prepare_costs_uses_real_digester_costs_not_fallback(mocker: MockerFixtu
         }
     )
 
-    # Independently recompute the expected digester CAPEX/OPEX with the real
+    # Independently recompute expected digester CAPEX/OPEX with the real
     # calculator, aggregated across BOTH configured digesters.
     crf = DigesterCostCalculator.capital_recovery_factor(loan_interest_rate, project_term)
     expected_capex = 0.0

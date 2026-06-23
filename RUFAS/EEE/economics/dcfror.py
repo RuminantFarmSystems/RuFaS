@@ -186,7 +186,7 @@ class DCFRORCalculator:
         # digester rather than only the first one.
         digester_config = self._get_digester_config()
         if digester_config:
-            cow_count = float(self.im.get_data("animal_properties.herd_information.cow_num"))
+            cow_count = float(self.im.get_data("animal.herd_information.cow_num"))
             discount_rate = float(input_dict["loan_interest_rate"])
             project_life_years = int(input_dict["project_term"])
             crf = DigesterCostCalculator.capital_recovery_factor(discount_rate, project_life_years)
@@ -262,7 +262,7 @@ class DCFRORCalculator:
         """
 
         try:
-            config = self.im.get_data("manure_management_properties.anaerobic_digester")
+            config = self.im.get_data("manure_management.anaerobic_digester")
         except Exception:
             return []
         if not config:
