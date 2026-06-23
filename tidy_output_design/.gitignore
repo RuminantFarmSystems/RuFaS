@@ -1,0 +1,10 @@
+# quarto files
+/.quarto/
+**/*.quarto_ipynb
+
+# intermediate files
+**/*_files/
+
+# cache data
+**/*_cache/
+
