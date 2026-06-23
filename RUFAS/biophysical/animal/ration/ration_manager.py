@@ -33,6 +33,16 @@ class RationManager:
 
     CALF_DRY_MATTER_INTAKE = 3
 
+    Growing_DMI = 10
+    Closeup_DMI = 20
+    Lac_DMI = 28
+
+    Lac_feed_per_milk = 0.69
+    Growing_feed_per_gain = 12.91
+
+    DMI_setting = "InputDMI"
+    """ Available settings: PredictDMI, InputDMI, InputFE"""
+
     _om = OutputManager()
     ration_feeds: dict[AnimalCombination, list[RUFAS_ID]] | None
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]] | None

@@ -6,6 +6,7 @@ from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstan
 from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.user_constants import UserConstants
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 
 from .nutrition_requirements_calculator import NutritionRequirementsCalculator
 
@@ -99,11 +100,13 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
         )
         dry_matter_intake = cls._calculate_dry_matter_intake(
+            animal_type,
             body_weight,
             mature_body_weight,
             days_in_milk,
-            lactating,
-            lactation_requirement,
+            milk_production,
+            average_daily_gain_heifer,
+            lactation_requirement, 
             parity,
             body_condition_score_5,
             ndf_percentage,
@@ -608,10 +611,12 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
     @classmethod
     def _calculate_dry_matter_intake(
         cls,
+        animal_type: AnimalType,
         body_weight: float,
         mature_body_weight: float,
         days_in_milk: int | None,
-        lactating: bool,
+        milk_production: float,
+        average_daily_gain_heifer: float,
         net_energy_lactation: float,
         parity: int,
         body_condition_score_5: float,
@@ -646,6 +651,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
+        [AN.NSM.50],[AN.NSM.51]
         The sum of dry matter intake of each feed is assumed to be less than
         dry matter intake estimation (Sum of Feed < DMIest).
         There are additional equation in NASEM (2021) book including neutral detergent concentrations in the diet
@@ -655,37 +661,115 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         ----------
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
             8th edition." National Academic Press, Chapter 2 "Dry matter intake" pp. 7-20, 2021.
-        [AN.NSM.50],[AN.NSM.51]
 
         """
-        if lactating:
-            parity_adjustment_factor = 1 if parity > 1 else 0
-            dry_matter_intake_estimate = (
-                (3.7 + parity_adjustment_factor * 5.7)
-                + 0.305 * net_energy_lactation
-                + 0.022 * body_weight
-                + (-0.689 - 1.87 * parity_adjustment_factor) * body_condition_score_5
-            ) * (1 - (0.212 + parity_adjustment_factor * 0.136) * exp(-0.053 * days_in_milk))
-        else:
-            dry_matter_intake_estimate = (
-                0.0226 * mature_body_weight * (1 - exp(-1.47 * (body_weight / mature_body_weight)))
-            ) - (
-                0.082
-                * (
-                    NDF_conc
-                    - (
-                        23.1
-                        + 56 * (body_weight / mature_body_weight)
-                        - 30.6 * (body_weight / mature_body_weight) ** 2.0
+
+        setting = RationManager.DMI_setting
+
+        if setting == "PredictDMI":
+            if animal_type == AnimalType.LAC_COW:
+                parity_adjustment_factor = 1 if parity > 1 else 0
+
+                dry_matter_intake_estimate = (
+                    (3.7 + parity_adjustment_factor * 5.7)
+                    + 0.305 * net_energy_lactation
+                    + 0.022 * body_weight
+                    + (-0.689 - 1.87 * parity_adjustment_factor) * body_condition_score_5
+                ) * (
+                    1
+                    - (0.212 + parity_adjustment_factor * 0.136)
+                    * exp(-0.053 * days_in_milk)
+                )
+
+            else:
+                dry_matter_intake_estimate = (
+                    0.0226
+                    * mature_body_weight
+                    * (1 - exp(-1.47 * (body_weight / mature_body_weight)))
+                ) - (
+                    0.082
+                    * (
+                        NDF_conc
+                        - (
+                            23.1
+                            + 56 * (body_weight / mature_body_weight)
+                            - 30.6 * (body_weight / mature_body_weight) ** 2.0
+                        )
                     )
                 )
-            )
-        return float(
-            max(
-                dry_matter_intake_estimate,
-                AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
-                AnimalModuleConstants.MINIMUM_DMI,
-            )
+        
+            """If inputted DMI is selected, DMI of all animal combinations is set"""
+        elif setting == "InputDMI":
+
+            if animal_type == "CALF":
+                dry_matter_intake_estimate = (
+                    RationManager.CALF_DRY_MATTER_INTAKE
+                )
+
+            elif animal_type in (
+                AnimalType.DRY_COW,
+                AnimalType.HEIFER_III,
+            ):
+                dry_matter_intake_estimate = (
+                    RationManager.Closeup_DMI
+                )
+
+            elif animal_type == AnimalType.LAC_COW:
+                dry_matter_intake_estimate = (
+                    RationManager.Lac_DMI
+                )
+
+            elif animal_type in (
+                AnimalType.HEIFER_I,
+                AnimalType.HEIFER_II,
+            ):
+                dry_matter_intake_estimate = (
+                    RationManager.Growing_DMI
+                )
+
+            else:
+                raise ValueError(f"Unknown animal class: {animal_type}")
+                
+            """If feed per X is selected, DMI of calf and closeup are still set"""
+        elif setting == "InputFE":
+
+            if animal_type == "CALF":
+                dry_matter_intake_estimate = (
+                    RationManager.CALF_DRY_MATTER_INTAKE
+                )
+
+            elif animal_type in (
+                AnimalType.DRY_COW,
+                AnimalType.HEIFER_III,
+            ):
+                dry_matter_intake_estimate = (
+                    RationManager.Closeup_DMI
+                )
+
+            elif animal_type == AnimalType.LAC_COW:
+                dry_matter_intake_estimate = (
+                    RationManager.Lac_feed_per_milk
+                    * max(0.0001, milk_production)
+                )
+
+            elif animal_type in (
+                AnimalType.HEIFER_I,
+                AnimalType.HEIFER_II,
+            ):
+                dry_matter_intake_estimate = (
+                    RationManager.Growing_feed_per_gain
+                    * max(0.0001, average_daily_gain_heifer)
+                )
+
+            else:
+                raise ValueError(f"Unknown animal class: {animal_type}")
+
+        else:
+            raise ValueError(f"Unknown DMI setting: {setting}")
+        return max(
+            dry_matter_intake_estimate,
+            AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
+            AnimalModuleConstants.MINIMUM_DMI,
         )
 
     @classmethod
