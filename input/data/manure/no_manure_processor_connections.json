@@ -1,4 +1,3 @@
 {
-    "processor_connections": [],
-    "separator_connections": []
+    "exclude_from_pool": true
 }

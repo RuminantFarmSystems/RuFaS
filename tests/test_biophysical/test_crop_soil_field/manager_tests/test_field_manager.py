@@ -381,15 +381,7 @@ def test_setup_fertilizer_schedule(
     actual_available_mixes, actual_events = FieldManager._setup_fertilizer_events("test_fert_schedule")
     assert actual_available_mixes == expected_available_mixes
     assert actual_events == expected_events
-    mock_get_data.assert_called_once_with("test_fert_schedule")
-
-
-def test_setup_fertilizer_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test when no fertilizer schedule input."""
-    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
-
-    with pytest.raises(ValueError):
-        FieldManager._setup_fertilizer_events("test_fert_schedule")
+    mock_get_data.assert_called_once_with("test_fert_schedule", required=False)
 
 
 @pytest.mark.parametrize(
@@ -821,17 +813,9 @@ def test_setup_manure_schedule(
     """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=manure_schedule_data)
     expected_manure_events = expected_manure_schedule.generate_manure_events()
-    actual_manure_events = FieldManager._setup_manure_events("test_manure_schedule")
+    actual_manure_events, actual_daily_spread_settings = FieldManager._setup_manure_events("test_manure_schedule")
     assert actual_manure_events == expected_manure_events
-    mock_get_data.assert_called_once_with("test_manure_schedule")
-
-
-def test_setup_manure_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test when no manure schedule input."""
-    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
-
-    with pytest.raises(ValueError):
-        FieldManager._setup_manure_events("test_manure_schedule")
+    mock_get_data.assert_called_once_with("test_manure_schedule", required=False)
 
 
 @pytest.mark.parametrize(
@@ -1246,15 +1230,7 @@ def test_setup_tillage_schedule(
 
     actual_tillage_events = FieldManager._setup_tillage_events("test_tillage_schedule")
     assert actual_tillage_events == expected_tillage_events
-    mock_get_data.assert_called_once_with("test_tillage_schedule")
-
-
-def test_setup_tillage_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test when no tillage input data available."""
-    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
-
-    with pytest.raises(ValueError):
-        FieldManager._setup_tillage_events("test_tillage_schedule")
+    mock_get_data.assert_called_once_with("test_tillage_schedule", required=False)
 
 
 @pytest.mark.parametrize(
@@ -1957,7 +1933,7 @@ def test_setup_field(
     )
     mock_setup_manure_events = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_manure_events",
-        return_value=mock_manure_events,
+        return_value=(mock_manure_events, {"is_daily_spreading": True}),
     )
     mock_setup_tillage_events = mocker.patch(
         "RUFAS.biophysical.field.manager.field_manager.FieldManager._setup_tillage_events",
@@ -1988,6 +1964,7 @@ def test_setup_field(
         "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0},
         "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0},
     }
+    assert new_field.daily_spread_settings == {"is_daily_spreading": True}
 
     mock_setup_fertilizer_events.assert_called_once_with(field_config.get("fertilizer_management_specification"))
     mock_setup_manure_events.assert_called_once_with(field_config.get("manure_management_specification"))
