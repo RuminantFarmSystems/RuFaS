@@ -21,14 +21,17 @@ A **changelog** is a structured record of changes made to the codebase over time
 
 ### Current version
 
-v1.0.0
+v1.0.2
 
-### Next Version Updates
+### v1.0.2
+
+- [3020](https://github.com/RuminantFarmSystems/RuFaS/pull/3020) - [minor change] [NoInputChange] [OutputChange] Corrected manure application ammonia composition calculation
+  
+### v1.0.1
 
 - [2994](https://github.com/RuminantFarmSystems/RuFaS/pull/2994) - [minor change] [NoInputChange] [OutputChange] Adds minimums to urine nitrogen equation.
 - [2997](https://github.com/RuminantFarmSystems/RuFaS/pull/2997) - [minor change] [NoInputChange] [OutputChange] Updates throughput in tractor dataset for combine headers.
 - [2998](https://github.com/RuminantFarmSystems/RuFaS/pull/2998) - [minor change] [NoInputChange] [OutputChange] Moved changelog entries to reflect what was in v1.0. Brought changes in 2994 and 2997 into one branch.
-- [3020](https://github.com/RuminantFarmSystems/RuFaS/pull/3020) - [minor change] [NoInputChange] [OutputChange] Corrected manure application ammonia composition calculation
 
 ### v1.0.0
 
