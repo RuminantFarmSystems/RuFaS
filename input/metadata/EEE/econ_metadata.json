@@ -360,28 +360,28 @@
     "commodity_prices_milk_all_dollar_per_liter": {
       "title": "Commodity prices",
       "description": "Milk",
-      "path": "input/data/EEE/econ/commodity_prices.milk_all.dollar_per_liter.csv",
+      "path": "input/data/EEE/econ/commodity_prices.milk_all.dollar_per_kilogram.csv",
       "type": "csv",
       "properties": "commodity_prices_milk_all_dollar_per_liter_csv_properties"
     },
     "commodity_prices_milk_class_2_dollar_per_liter": {
       "title": "Commodity prices",
       "description": "Class 2 Milk (Used for soft dairy products like yogurt, ice cream)",
-      "path": "input/data/EEE/econ/commodity_prices.milk_class_2.dollar_per_liter.csv",
+      "path": "input/data/EEE/econ/commodity_prices.milk_class_2.dollar_per_kilogram.csv",
       "type": "csv",
       "properties": "commodity_prices_milk_class_2_dollar_per_liter_csv_properties"
     },
     "commodity_prices_milk_class_3_dollar_per_liter": {
       "title": "Commodity prices",
       "description": "Class 3 Milk (Used for cheese production)",
-      "path": "input/data/EEE/econ/commodity_prices.milk_class_3.dollar_per_liter.csv",
+      "path": "input/data/EEE/econ/commodity_prices.milk_class_3.dollar_per_kilogram.csv",
       "type": "csv",
       "properties": "commodity_prices_milk_class_3_dollar_per_liter_csv_properties"
     },
     "commodity_prices_milk_class_4_dollar_per_liter": {
       "title": "Commodity prices",
       "description": "Class 4 Milk (Used for butter and nonfat dry milk)",
-      "path": "input/data/EEE/econ/commodity_prices.milk_class_4.dollar_per_liter.csv",
+      "path": "input/data/EEE/econ/commodity_prices.milk_class_4.dollar_per_kilogram.csv",
       "type": "csv",
       "properties": "commodity_prices_milk_class_4_dollar_per_liter_csv_properties"
     },
