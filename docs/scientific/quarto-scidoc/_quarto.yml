@@ -46,7 +46,7 @@ format:
     margin-right: 1in
     include-in-header: resources/templates/preamble.tex
     toc: true
-    toc-depth: 2
+    toc-depth: 3
     toc-title: "Contents"
     lof: true
     lot: true
