@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, Mapping
+from typing import Any, Dict, Mapping
 
 
 @dataclass(frozen=True)
@@ -50,131 +50,30 @@ class DigesterSystemCostProfile:
 class DigesterCostCalculator:
     """Collection of digester-related economic calculations."""
 
-    # Equation 1 from the economics documentation
-    #  A_FC_ij = EXP(alpha + R1*ln(A_j) + R2*ln(V_j) + psi1*F_j + psi2*G_j + psi3*C_j + psi4*S_j + epsilon_j)
-
     @staticmethod
-    def calculate_digester_capital_cost(
-        animal_units: float | None = None,
-        digester_volume: float | None = None,
-        farm_type_flag: float | None = None,
-        below_ground_flag: float | None = None,
-        concrete_flag: float | None = None,
-        steel_flag: float | None = None,
-        *,
-        alpha: float = 10.4,
-        r1: float = -0.413,
-        r2: float = -0.147,
-        psi1: float = -1.085,
-        psi2: float = -0.582,
-        psi3: float = 0.519,
-        psi4: float = -0.007,
-        epsilon: float = 0.35,
-        area: float | None = None,
-        volume: float | None = None,
-        f_j: float | None = None,
-        g_j: float | None = None,
-        c_j: float | None = None,
-        s_j: float | None = None,
-    ) -> float:
-        """Return the estimated digester capital cost using Equation 1."""
+    def get_digester_system_name(digester_config: Any) -> str:
+        """Return the digester cost-profile name from the manure-management config."""
 
-        if animal_units is None:
-            animal_units = float(area) if area is not None else None
-        if digester_volume is None:
-            digester_volume = float(volume) if volume is not None else None
-        if animal_units is None or digester_volume is None:
-            raise ValueError("animal_units and digester_volume are required inputs")
-        if animal_units <= 0 or digester_volume <= 0:
-            raise ValueError("animal_units and digester_volume must be positive")
+        config = digester_config[0] if isinstance(digester_config, list) else digester_config
 
-        if farm_type_flag is None:
-            farm_type_flag = float(f_j) if f_j is not None else 1.0
-        if below_ground_flag is None:
-            below_ground_flag = float(g_j) if g_j is not None else 1.0
-        if concrete_flag is None:
-            concrete_flag = float(c_j) if c_j is not None else 1.0
-        if steel_flag is None:
-            steel_flag = float(s_j) if s_j is not None else 0.0
+        digester_type = str(config["digester_type"]).lower()
+        biogas_use = str(config["biogas_use"]).lower()
 
-        return math.exp(
-            alpha
-            + r1 * math.log(animal_units)
-            + r2 * math.log(digester_volume)
-            + psi1 * farm_type_flag
-            + psi2 * below_ground_flag
-            + psi3 * concrete_flag
-            + psi4 * steel_flag
-            + epsilon
-        )
+        if "lagoon" in digester_type:
+            system_type = "Covered Lagoon"
+        elif "plug" in digester_type:
+            system_type = "Plug Flow"
+        else:
+            raise ValueError(f"Unsupported digester type for costing: {digester_type}")
 
-    # Equation 2 - Capital Recovery Factor
+        if "rng" in biogas_use:
+            use_case = "RNG"
+        elif "chp" in biogas_use:
+            use_case = "CHP"
+        else:
+            raise ValueError(f"Unsupported digester biogas use case for costing: {biogas_use}")
 
-    @staticmethod
-    def capital_recovery_factor(rate: float, periods: int) -> float:
-        """Compute the capital recovery factor (Equation 2)."""
-        if periods <= 0:
-            raise ValueError("periods must be positive")
-        if rate == 0:
-            return 1 / periods
-        numerator = rate * (1 + rate) ** periods
-        denominator = (1 + rate) ** periods - 1
-        return numerator / denominator
-
-    # Equation 5 - Generalized equipment scaling
-
-    @staticmethod
-    def scale_installed_cost(base_cost: float, volume: float, base_volume: float, install_factor: float) -> float:
-        """Scale equipment cost to a new volume using Equation 5."""
-        if base_volume <= 0:
-            raise ValueError("base_volume must be positive")
-        ratio = volume / base_volume
-        return base_cost * (ratio**install_factor)
-
-    # Equation 3 - Digester CAPEX derived from annual fixed cost and CRF
-
-    @staticmethod
-    def calculate_digester_capex(afc_ij: float, crf: float) -> float:
-        """Return the digester capital expenditure using Equation 3."""
-        if crf == 0:
-            raise ValueError("capital recovery factor cannot be zero")
-        return afc_ij / crf
-
-    # Equation 4 - Digester variable operational cost
-
-    @staticmethod
-    def calculate_digester_operational_cost(
-        use_cost_function: bool,
-        animal_units: float,
-        farm_type_flag: float,
-        below_ground_flag: float,
-        concrete_flag: float,
-        steel_flag: float,
-        *,
-        beta: float = 3.531,
-        omega1: float = -0.321,
-        phi1: float = -0.686,
-        phi2: float = -0.418,
-        phi3: float = 0.488,
-        phi4: float = -0.113,
-        epsilon: float = 0.237,
-    ) -> float:
-        """Return the variable operational cost using Equation 4."""
-
-        if not use_cost_function:
-            return 0.0
-        if animal_units <= 0:
-            raise ValueError("animal_units must be positive to evaluate the AVC function")
-
-        return math.exp(
-            beta
-            + omega1 * math.log(animal_units)
-            + phi1 * farm_type_flag
-            + phi2 * below_ground_flag
-            + phi3 * concrete_flag
-            + phi4 * steel_flag
-            + epsilon
-        )
+        return f"{system_type} - {use_case}"
 
     @staticmethod
     def _normalize_system_name(system: str) -> str:

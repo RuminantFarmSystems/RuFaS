@@ -15,6 +15,7 @@ validated using the ``economic_preprocessing_properties`` metadata.
 from __future__ import annotations
 
 import math
+from pathlib import Path
 import re
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Set
@@ -765,6 +766,7 @@ class EconomicPreprocessor:
             data=results,
             properties_blob_key="economic_preprocessing_properties",
             eager_termination=False,
+            input_path=Path("")
         )
         self.om.add_log(
             "Economic preprocessing",
