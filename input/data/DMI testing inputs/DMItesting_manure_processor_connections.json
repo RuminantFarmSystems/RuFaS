@@ -1,0 +1,14 @@
+{
+  "processor_connections": [
+    {
+      "processor_name": "dailyspread",
+      "destinations": []
+    },
+    {
+      "processor_name": "parlor_cleaning_handler",
+      "destinations": []
+    }
+  ],
+  "separator_connections": [
+  ]
+}
