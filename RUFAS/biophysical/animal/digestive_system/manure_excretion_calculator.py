@@ -216,6 +216,8 @@ class ManureExcretionCalculator:
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
 
+        The minimum urine nitrogen is set to 17 g following Table 1 in Reed et al. 2015.
+
         References
         ----------
         (ASABE, 2005; Nennich et al., 2005; Reed et al., 2015; Johnson et al., 2016; NASEM, 2021)
@@ -269,7 +271,7 @@ class ManureExcretionCalculator:
             * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
-        urine_nitrogen = manure_nitrogen - fecal_nitrogen
+        urine_nitrogen = max(manure_nitrogen - fecal_nitrogen, 0.017)
 
         urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
 
@@ -441,6 +443,8 @@ class ManureExcretionCalculator:
         Manure total ammoniacal nitrogen: [AN.EXC.9]
         Manure K excretion: [AN.EXC.27]
 
+        Minimum urine nitrogen set to 22 g following Table 1 in Reed et al. 2015.
+
         """
         dmi_predicted = nutrient_amounts.dry_matter
         dry_matter_intake = dmi_predicted
@@ -485,7 +489,7 @@ class ManureExcretionCalculator:
 
         fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
 
-        urine_nitrogen = manure_nitrogen - fecal_nitrogen
+        urine_nitrogen = max(manure_nitrogen - fecal_nitrogen, 0.022)
 
         organic_matter_intake = dry_matter_intake - ash_diet_content
 
@@ -563,6 +567,8 @@ class ManureExcretionCalculator:
 
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
+
+        Minimum urine nitrogen set to 17 g following Table 1 in Reed et al. 2015.
 
         Parameters
         ----------
@@ -673,7 +679,7 @@ class ManureExcretionCalculator:
             * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
-        urine_nitrogen = manure_nitrogen - fecal_nitrogen
+        urine_nitrogen = max(manure_nitrogen - fecal_nitrogen, 0.017)
 
         urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
 
