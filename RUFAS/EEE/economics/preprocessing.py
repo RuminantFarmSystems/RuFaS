@@ -17,7 +17,9 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Set
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Set, Tuple
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -633,6 +635,251 @@ class EconomicPreprocessor:
                 prices[option] = price_data
         return prices
 
+    _CROP_TO_SEED_KEY: Dict[str, str] = {
+        "corn_grain": "commodity_prices_corn_seed_dollar_per_square_meter",
+        "corn_silage": "commodity_prices_corn_seed_dollar_per_square_meter",
+        "soybean_grain": "commodity_prices_soybean_seed_dollar_per_square_meter",
+        "soybean_hay": "commodity_prices_soybean_seed_dollar_per_square_meter",
+        "winter_wheat_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+    }
+
+    _HA_TO_M2: float = 10_000.0
+
+    # Harvest operations that terminate a crop's life in the field.
+    _FINAL_HARVEST_OPS: frozenset[str] = frozenset({"harvest_kill", "kill_only"})
+
+    @staticmethod
+    def _expand_years_with_pattern(years: List[int], skip: int, repeat: int) -> List[int]:
+        """Expand a year list by repeating its spacing pattern, mirroring Schedule.repeat_pattern."""
+        if not years or repeat <= 0:
+            return list(years)
+        differences = [skip + 1]
+        for i in range(1, len(years)):
+            differences.append(years[i] - years[i - 1])
+        full = list(years)
+        diff_idx = 0
+        for _ in range(repeat * len(years)):
+            full.append(full[-1] + differences[diff_idx])
+            diff_idx = (diff_idx + 1) % len(years)
+        return full
+
+    @staticmethod
+    def _elongate(lst: List[Any], target_len: int) -> List[Any]:
+        """Repeat a single-element list to match target_len, otherwise return as-is."""
+        if len(lst) == 1 and target_len > 1:
+            return lst * target_len
+        return list(lst)
+
+    def _growing_periods(
+        self, schedule: Dict[str, Any]
+    ) -> List[Tuple[datetime, datetime]]:
+        """Return (planting_date, kill_date) pairs for one crop schedule entry.
+
+        Pairs each planting event with its corresponding final harvest
+        (``harvest_kill`` or ``kill_only``).  Intermediate ``harvest_only``
+        operations are ignored.  Pattern expansion (``pattern_repeat``,
+        ``planting_skip``, ``harvesting_skip``) is applied before pairing.
+        """
+        pattern_repeat = int(schedule.get("pattern_repeat") or 0)
+        planting_skip = int(schedule.get("planting_skip") or 0)
+        harvesting_skip = int(schedule.get("harvesting_skip") or 0)
+
+        raw_p_years: List[int] = list(schedule.get("planting_years") or [])
+        raw_p_days: List[int] = list(schedule.get("planting_days") or [])
+        raw_h_years: List[int] = list(schedule.get("harvest_years") or [])
+        raw_h_days: List[int] = list(schedule.get("harvest_days") or [])
+        raw_h_ops: List[str] = list(schedule.get("harvest_operations") or [])
+
+        if not raw_p_years or not raw_h_years:
+            return []
+
+        p_years = self._expand_years_with_pattern(raw_p_years, planting_skip, pattern_repeat)
+        p_days = self._elongate(raw_p_days * (pattern_repeat + 1), len(p_years))
+        h_years = self._expand_years_with_pattern(raw_h_years, harvesting_skip, pattern_repeat)
+        h_days = self._elongate(raw_h_days * (pattern_repeat + 1), len(h_years))
+        h_ops = self._elongate(raw_h_ops * (pattern_repeat + 1), len(h_years))
+
+        events: List[Tuple[datetime, str]] = []
+        for y, d in zip(p_years, p_days):
+            events.append((datetime.strptime(f"{y}:{d}", "%Y:%j"), "plant"))
+        for y, d, op in zip(h_years, h_days, h_ops):
+            events.append((datetime.strptime(f"{y}:{d}", "%Y:%j"), op))
+        events.sort(key=lambda e: e[0])
+
+        periods: List[Tuple[datetime, datetime]] = []
+        plant_date: datetime | None = None
+        for date, op in events:
+            if op == "plant":
+                plant_date = date
+            elif op in self._FINAL_HARVEST_OPS and plant_date is not None:
+                periods.append((plant_date, date))
+                plant_date = None
+        return periods
+
+    def _preprocess_seed_costs(self) -> Dict[str, List[float]]:
+        """Build a daily time-series of responsible field area (m²) per seed key.
+
+        For each field, each crop's planting-to-kill periods are located within
+        the simulation window.  The field's area in m² is spread evenly over
+        each growing period (``field_size_m² / period_duration``), then
+        accumulated into a per-simulation-day array keyed by seed commodity.
+
+        Returns
+        -------
+        dict[str, list[float]]
+            Keys are seed commodity price keys; values are lists of length
+            ``total_sim_days`` where each element is the total m² for that
+            seed on that simulation day.
+        """
+        info_map = {"class": self.__class__.__name__, "function": "_preprocess_seed_costs"}
+
+        try:
+            start_date = datetime.strptime(
+                str(self.im.get_data("config.start_date")), "%Y:%j"
+            )
+            end_date = datetime.strptime(
+                str(self.im.get_data("config.end_date")), "%Y:%j"
+            )
+        except Exception:
+            self.om.add_warning(
+                "MissingConfigDates",
+                "Could not parse simulation start/end dates for seed cost preprocessing",
+                info_map,
+            )
+            return {}
+
+        total_sim_days: int = (end_date - start_date).days + 1
+
+        try:
+            field_keys = self.im.get_data_keys_by_properties("field_properties")
+        except Exception:
+            self.om.add_warning(
+                "MissingFieldData",
+                "Could not retrieve field keys for seed cost preprocessing",
+                info_map,
+            )
+            return {}
+
+        daily_area_by_seed: Dict[str, List[float]] = {}
+
+        for field_key in field_keys:
+            field_data = self.im.get_data(field_key)
+            if not isinstance(field_data, dict):
+                continue
+            crop_spec = field_data.get("crop_specification")
+            field_size_ha = field_data.get("field_size")
+            if crop_spec is None or field_size_ha is None:
+                continue
+            try:
+                field_size_m2 = float(field_size_ha) * self._HA_TO_M2
+            except (TypeError, ValueError):
+                continue
+
+            crop_schedules = self.im.get_data(f"{crop_spec}.crop_schedules")
+            if not isinstance(crop_schedules, list) or not crop_schedules:
+                self.om.add_warning(
+                    "MissingCropSchedule",
+                    f"No crop schedules found for '{crop_spec}' in field '{field_key}'",
+                    info_map,
+                )
+                continue
+
+            for schedule in crop_schedules:
+                if not isinstance(schedule, dict):
+                    continue
+                crop_species = schedule.get("crop_species")
+                if not isinstance(crop_species, str):
+                    continue
+                seed_key = self._CROP_TO_SEED_KEY.get(crop_species)
+                if seed_key is None:
+                    continue
+
+                if seed_key not in daily_area_by_seed:
+                    daily_area_by_seed[seed_key] = [0.0] * total_sim_days
+
+                arr = daily_area_by_seed[seed_key]
+                for plant_date, kill_date in self._growing_periods(schedule):
+                    plant_idx = (plant_date - start_date).days
+                    kill_idx = (kill_date - start_date).days
+
+                    # Clip to simulation window.
+                    clipped_start = max(plant_idx, 0)
+                    clipped_end = min(kill_idx, total_sim_days)
+                    if clipped_start >= clipped_end:
+                        continue
+
+                    duration = kill_idx - plant_idx
+                    daily_value = field_size_m2 / duration
+                    for i in range(clipped_start, clipped_end):
+                        arr[i] += daily_value
+
+        return daily_area_by_seed
+
+    def _process_seed_costs_item(self) -> Dict[str, Any]:
+        """Build the full preprocessing result entry for the Seeds costs line item."""
+
+        info_map = {"class": self.__class__.__name__, "function": "_process_seed_costs_item"}
+
+        daily_area_by_seed = self._preprocess_seed_costs()
+
+        # biophysical_values: concatenation of all per-seed daily arrays.
+        biophysical_values: List[float] = []
+        price_values: List[float] = []
+        total_seed_cost = 0.0
+
+        for seed_key, daily_area in daily_area_by_seed.items():
+            price_data = self._get_data_with_handling(seed_key, info_map)
+            if price_data is None:
+                self.om.add_warning(
+                    "MissingEconomicsFile",
+                    f"Seed commodity pricing '{seed_key}' not found in InputManager",
+                    info_map,
+                )
+                continue
+
+            extracted_prices = self._extract_price_values(price_data)
+            if not extracted_prices:
+                continue
+
+            avg_price = self._aggregate(extracted_prices, "average")
+            if avg_price is None:
+                continue
+
+            biophysical_values.extend(daily_area)
+            price_values.extend(extracted_prices)
+            total_seed_cost += sum(daily_area) * avg_price
+
+        if not daily_area_by_seed:
+            self.om.add_warning(
+                "MissingBiophysicalData",
+                "No field data found for seed cost preprocessing",
+                info_map,
+            )
+
+        bio_total = sum(biophysical_values) if biophysical_values else None
+        return {
+            "biophysical_values": biophysical_values,
+            "biophysical_aggregate": bio_total,
+            "biophysical_values_by_scenario": {"baseline": biophysical_values},
+            "biophysical_aggregate_by_scenario": {"baseline": bio_total},
+            "price_data": {},
+            "price_values": price_values,
+            "price_aggregate": self._aggregate(price_values, "average") if price_values else None,
+            "line_item_values_by_scenario": {"baseline": total_seed_cost},
+            "flow_type": "cost",
+        }
+
     def _aggregate(self, values: List[float], desc: str) -> float | None:
         """Aggregate values according to a textual description."""
         if not values:
@@ -664,6 +911,10 @@ class EconomicPreprocessor:
         for item in self.mapping:
             section_data = results.setdefault(item.section, {})
             category_data = section_data.setdefault(item.category, {})
+
+            # if item.section == "Soil_and_crop" and item.name == "Seeds costs":
+            #     category_data[item.name] = self._process_seed_costs_item()
+            #     continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
             wildcard_values = self._collect_biophysical_wildcards(item.biophysical_simulation)
@@ -765,6 +1016,7 @@ class EconomicPreprocessor:
             data=results,
             properties_blob_key="economic_preprocessing_properties",
             eager_termination=False,
+            input_path=Path()
         )
         self.om.add_log(
             "Economic preprocessing",
