@@ -516,8 +516,9 @@ class Pen:
                 ration_formulation=self.ration,
                 body_weight=animal.body_weight,
                 enteric_methane=(
-                    animal.digestive_system.enteric_methane_for_energy if animal.animal_type.is_cow else \
-                    animal.digestive_system.enteric_methane_emission
+                    animal.digestive_system.enteric_methane_for_energy
+                    if animal.animal_type.is_cow
+                    else animal.digestive_system.enteric_methane_emission
                 ),
                 urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
@@ -1026,8 +1027,9 @@ class Pen:
                 ration_formulation=ration_formulation,
                 body_weight=animal.body_weight,
                 enteric_methane=(
-                    animal.digestive_system.enteric_methane_for_energy if animal.animal_type.is_cow else \
-                    animal.digestive_system.enteric_methane_emission
+                    animal.digestive_system.enteric_methane_for_energy
+                    if animal.animal_type.is_cow
+                    else animal.digestive_system.enteric_methane_emission
                 ),
                 urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )

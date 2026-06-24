@@ -22,7 +22,7 @@ class DigestiveSystem:
     enteric_methane_emission : float
         The CH₄ used for GHG reporting and downstream emissions calculations.
         Represents mitigated enteric methane for cows.
-    enteric_methane_for_energy : float 
+    enteric_methane_for_energy : float
         The unmitigated CH₄ used in NASEM ME and ration optimization for cows.
         Remains at 0.0 for other animals.
 
