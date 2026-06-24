@@ -226,7 +226,7 @@ class Storage:
         }
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
-            if crop.config_name in GRAIN_CROPS:
+            if crop.config_name in GRAIN_CROPS or crop.dry_matter_mass <= 0.0:
                 continue
             degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
             total_gaseous_dry_matter_loss += degraded_crop_values["gaseous_dry_matter_loss"]
@@ -268,6 +268,8 @@ class Storage:
         for crop in crops:
             if crop.config_name in GRAIN_CROPS:
                 continue
+            if  crop.dry_matter_mass <= 0.0:
+                continue
             degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
             last_time_degraded = degraded_crop_values["last_time_degraded"]
             del degraded_crop_values["gaseous_dry_matter_loss"]
@@ -298,6 +300,11 @@ class Storage:
         """
         weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
         gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions, time)
+
+        if isinstance(gaseous_dry_matter_loss, complex):
+            print("gaseous dm loss ",gaseous_dry_matter_loss)
+        if crop.dry_matter_mass < 0:
+            print(self.crop_name, " DM mass: ", crop.dry_matter_mass)
         crude_protein_percent = self.recalculate_nutrient_percentage(
             crop.crude_protein_percent,
             self.crude_protein_loss_coefficient,
@@ -366,9 +373,15 @@ class Storage:
         these two attributes have been set, the dry matter percentage is recalculated and set.
 
         """
-        new_dry_matter_mass = crop.dry_matter_mass - dry_matter_loss
-        new_fresh_mass = crop.fresh_mass - (dry_matter_loss + moisture_loss)
-        if new_fresh_mass == 0.0:
+        new_dry_matter_mass = max(crop.dry_matter_mass - dry_matter_loss, 0.0)
+
+        if new_dry_matter_mass > 0.0:
+            new_fresh_mass = crop.fresh_mass - (dry_matter_loss + moisture_loss)
+        else:
+            new_fresh_mass = 0.0
+
+
+        if new_fresh_mass == 0.0 or new_dry_matter_mass <= 0.0:
             dry_matter_percentage = 0.0
         else:
             dry_matter_percentage = new_dry_matter_mass / new_fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
@@ -834,6 +847,11 @@ class Storage:
             return 0.0
 
         fraction_of_nutrient_in_lost_dry_matter = loss_coefficient * dry_matter_loss_fraction
+        if isinstance(initial_nutrient_fraction, complex) :
+            print(initial_nutrient_fraction)
+        if isinstance(fraction_of_nutrient_in_lost_dry_matter, complex) :
+            print(fraction_of_nutrient_in_lost_dry_matter)
+
         if initial_nutrient_fraction < fraction_of_nutrient_in_lost_dry_matter:
             info_map = {
                 "class": self.__class__.__name__,
