@@ -1,0 +1,12 @@
+﻿Variable, Units, Calculation 
+water, kg ,  Stored manure water kg + received manure water kg  
+total_ammoniacal_nitrogen, kg ,"  max (0, stored manure ammoniacal N + received ammoniacal N - NH$_3$-N emissions)  "
+nitrogen, kg ,  Stored nitrogen + received nitrogen - NH$_3$-N - N$_2$O-N emissions  
+phosphorus, kg ,  Stored phosphorus + received phosphorus 
+potassium, kg ,  Stored potassium + received potassium 
+ash, kg ,  Stored ash + received ash  
+degradable_volatile_solids, kg ,  stored degradable VS + received degradable VS - VSd loss  
+manure_non_degradable_volatile_solids, kg ,  stored manure non-degradable VS + received manure non-degradable VS - VSnd loss   
+bedding_non_degradable_volatile_solids, kg ,  stored bedding non-degradable VS + received bedding non-degradable VS   
+total_solids, kg ,  Stored TS + received TS - VS loss  
+volume, m$^3$ ,  Stored volume + received volume - \frac{\text{VS_loss}}{\text{SOLID\_MANURE\_DENSITY}}  
