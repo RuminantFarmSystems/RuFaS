@@ -1,10 +1,12 @@
 from typing import List
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.data_structures.events import TillageEvent
 from RUFAS.biophysical.field.manager.tillage_schedule import TillageSchedule
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -86,11 +88,14 @@ def test_validate_tillage_parameters(
     mix_fracs: List[float],
     implements: List[str],
     expected: str,
+    mocker: MockerFixture
 ) -> None:
     """Tests that errors are raised correctly when invalid input is passed."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as e:
         TillageSchedule(name, years, days, depths, incorp_fracs, mix_fracs, implements, 1, 1)
     assert str(e.value) == expected
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

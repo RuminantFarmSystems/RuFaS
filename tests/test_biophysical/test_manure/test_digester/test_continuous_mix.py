@@ -86,13 +86,15 @@ def test_receive_manure(digester: ContinuousMix, manure_stream: ManureStream) ->
     assert digester._manure_in_digester == manure_stream
 
 
-def test_receive_manure_error(digester: ContinuousMix, manure_stream: ManureStream) -> None:
+def test_receive_manure_error(digester: ContinuousMix, manure_stream: ManureStream, mocker: MockerFixture) -> None:
     """Test that Anaerobic Digester raises an error when incompatible manure is passed."""
     manure_stream.pen_manure_data = PenManureData(
         100, 500.0, AnimalCombination.LAC_COW, "open lot", 1000.0, 50.0, StreamType.GENERAL
     )
+    mock_add_error = mocker.patch.object(digester._om, "add_error")
     with pytest.raises(ValueError):
         digester.receive_manure(manure_stream)
+    mock_add_error.assert_called_once()
 
 
 def test_process_manure(

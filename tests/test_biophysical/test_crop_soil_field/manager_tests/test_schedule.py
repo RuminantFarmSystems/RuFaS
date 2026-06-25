@@ -154,6 +154,7 @@ def test_prepare_events() -> None:
         (2, 4, 2025, 200),
     ]
 
+
 @pytest.mark.parametrize(
     "non_negative_parameters, fraction_parameters, years, days, name, expected_error_title, expected_message",
     [

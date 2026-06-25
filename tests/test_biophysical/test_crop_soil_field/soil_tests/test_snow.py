@@ -2,6 +2,7 @@ import math
 from unittest.mock import MagicMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
@@ -328,13 +329,16 @@ def test_melt_factor(soil_data: SoilData, day: int):
         ),
     ],
 )
-def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int):
+def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int,
+                     mocker: MockerFixture):
     snow = Snow(soil_data=soil_data)
 
     if soil_data.snow_content < 0.0:
+        mock_add_error = mocker.patch.object(OutputManager, "add_error")
         with pytest.raises(ValueError) as value_error:
             snow.update_snow(current_day_conditions=current_day_conditions, day=day)
         assert str(value_error.value) == "Snow Content should not be a negative number."
+        mock_add_error.assert_called_once()
 
     elif soil_data.snow_content + current_day_conditions.snowfall == 0.0:
         snow.update_snow(current_day_conditions=current_day_conditions, day=day)
