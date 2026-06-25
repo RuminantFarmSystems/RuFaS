@@ -31,8 +31,8 @@ def test_get_storage_class_returns_enum_value(member: StorageType) -> None:
         ("HighMoisture", HighMoisture),
         ("Bunker", Bunker),
         ("Pile", Pile),
-        ("Bag", Bag)
-    ]
+        ("Bag", Bag),
+    ],
 )
 def test_get_storage_class_valid(input_str: str, expected_class: Type["Storage"]) -> None:
     assert StorageType.get_storage_class(input_str) is expected_class

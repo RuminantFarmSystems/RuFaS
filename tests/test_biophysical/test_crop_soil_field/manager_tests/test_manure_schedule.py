@@ -145,7 +145,7 @@ def test_validate_manure_parameters(
     depths: list[float],
     remainder_fracs: list[float],
     expected: str,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that invalid input is caught and raised with the correct error message in the init function."""
     with pytest.raises(ValueError) as e:

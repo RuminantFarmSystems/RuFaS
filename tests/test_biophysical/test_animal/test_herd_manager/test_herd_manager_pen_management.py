@@ -169,7 +169,7 @@ def test_execute_allocation_plan(
     animal_type_to_allocate: AnimalType,
     value_error_expected: bool,
     herd_manager: HerdManager,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _execute_allocation_plan()"""
     animals: list[Animal] = []

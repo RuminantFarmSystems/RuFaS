@@ -73,7 +73,10 @@ def test_uptake_water(mock_crop_data: CropData, max_trans: float) -> None:
     ],
 )
 def test_extract_water_from_soil(
-    mock_crop_data: CropData, layers: list[LayerData], uptakes: list[LayerData], should_fail: bool,
+    mock_crop_data: CropData,
+    layers: list[LayerData],
+    uptakes: list[LayerData],
+    should_fail: bool,
     mocker: MockerFixture,
 ) -> None:
     """This method only tests for edge cases, other parts of the method already have coverage"""
@@ -190,7 +193,7 @@ def test_find_stratified_max_water_uptakes(
     lower_depths: list[float],
     should_fail: bool,
     expected: list[float],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the stratified max water uptakes are calculated correctly when there's no error in input"""
     mock_add_error = mocker.patch.object(OutputManager, "add_error")
@@ -253,7 +256,7 @@ def test_take_up_water(
     water_availabilities: List[float],
     wilting_points: List[float],
     should_fail: bool,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the the correct output _take_up_water of were calculated when there's no error in input"""
     mock_add_error = mocker.patch.object(OutputManager, "add_error")

@@ -167,7 +167,11 @@ def test_calculate_ammonia_emissions(
     ],
 )
 def test_calculate_ammonia_emissions_error(
-    total_ammoniacal: float, volume: float, density: float, area: float, mocker: MockerFixture,
+    total_ammoniacal: float,
+    volume: float,
+    density: float,
+    area: float,
+    mocker: MockerFixture,
 ) -> None:
     """Test that ammonia emissions calculations raise an error when passed an invalid value."""
     mock_add_error = mocker.patch.object(OutputManager, "add_error")

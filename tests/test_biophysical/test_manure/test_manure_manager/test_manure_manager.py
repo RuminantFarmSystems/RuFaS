@@ -698,7 +698,8 @@ def test_merge_separator_rows_valid(
 
 
 def test_merge_invalid_separator_rows(
-    invalid_separator_adjacency_matrix: dict[str, dict[str, float]], manure_manager: ManureManager,
+    invalid_separator_adjacency_matrix: dict[str, dict[str, float]],
+    manure_manager: ManureManager,
     mocker: MockerFixture,
 ) -> None:
     """Tests _merge_separator_rows() with invalid separator outputs."""

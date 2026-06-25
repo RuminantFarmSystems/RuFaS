@@ -153,7 +153,10 @@ def test_determine_senescent_leaf_area_index(heatfrac: float, senheatfrac: float
 
 @pytest.mark.parametrize("heatfrac,senheatfrac,optareafrac", [(1.1, 1, 0.9), (1.1, 1.9, 0.9)])
 def test_error_determine_senescent_leaf_area_index(
-    heatfrac: float, senheatfrac: float, optareafrac: float, mocker: MockerFixture,
+    heatfrac: float,
+    senheatfrac: float,
+    optareafrac: float,
+    mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(Exception) as e:

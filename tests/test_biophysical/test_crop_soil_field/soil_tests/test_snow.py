@@ -329,8 +329,9 @@ def test_melt_factor(soil_data: SoilData, day: int):
         ),
     ],
 )
-def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int,
-                     mocker: MockerFixture):
+def test_update_snow(
+    soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int, mocker: MockerFixture
+):
     snow = Snow(soil_data=soil_data)
 
     if soil_data.snow_content < 0.0:

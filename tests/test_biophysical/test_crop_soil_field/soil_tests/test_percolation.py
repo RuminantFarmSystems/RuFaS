@@ -37,8 +37,12 @@ def test_determine_percolation_travel_time(saturation, field_capacity, hydraulic
         (4.5, 4.1, -1.32),
     ],
 )
-def test_error_determine_percolation_travel_time(saturation: float, field_capacity: float,
-                                                 hydraulic_conductivity: float, mocker: MockerFixture,):
+def test_error_determine_percolation_travel_time(
+    saturation: float,
+    field_capacity: float,
+    hydraulic_conductivity: float,
+    mocker: MockerFixture,
+):
     """test that _determine_percolation_travel_time() correctly raises errors when invalid input is passed"""
     mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(Exception):

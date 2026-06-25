@@ -117,8 +117,7 @@ def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(ani
 
 @pytest.mark.parametrize("animal_type", ["CaTTLE", "PORK", "fish"])
 def test_error_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(
-    animal_type: str,
-    mocker: MockerFixture
+    animal_type: str, mocker: MockerFixture
 ) -> None:
     """Tests that errors caused by unsupported animal types are handled appropriately."""
     mock_add_error = mocker.patch.object(OutputManager, "add_error")

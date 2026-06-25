@@ -1243,7 +1243,10 @@ def test_execute_fertilizer_application(
     ],
 )
 def test_execute_fertilizer_application_error(
-    field_name: str, mix_name: str, available_mixes: dict[str, dict[str, float]], mocker: MockerFixture,
+    field_name: str,
+    mix_name: str,
+    available_mixes: dict[str, dict[str, float]],
+    mocker: MockerFixture,
 ) -> None:
     """
     Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available mixes.

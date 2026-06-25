@@ -248,7 +248,11 @@ def test_manage_harvest(
     ],
 )
 def test_cut_crop(
-    mock_crop_data: CropData, efficiency: float, harvest: float, override: bool, should_fail: bool,
+    mock_crop_data: CropData,
+    efficiency: float,
+    harvest: float,
+    override: bool,
+    should_fail: bool,
     mocker: MockerFixture,
 ) -> None:
     """Ensure that the crop cutting routines are properly executed and that errors are raised properly."""

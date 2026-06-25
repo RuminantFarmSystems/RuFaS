@@ -53,7 +53,7 @@ def manure_stream() -> ManureStream:
         volume=500.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -178,8 +178,11 @@ def test_calculate_generated_methane(digester: ContinuousMix, mocker: MockerFixt
 @pytest.mark.parametrize(
     "bedding_non_degradable, degradable, non_degradable, destroyed, expected_degradable, expected_non_degradable,"
     " expected_error_count",
-    [(50, 100.0, 100.0, 50.0, 80.0, 80.0, 0), (50, 900.0, 100.0, 100.0, 814.2857142857143, 90.47619047619048, 0),
-     (1, 50.0, 20.0, 75.0, 0.0, 0.0, 1)],
+    [
+        (50, 100.0, 100.0, 50.0, 80.0, 80.0, 0),
+        (50, 900.0, 100.0, 100.0, 814.2857142857143, 90.47619047619048, 0),
+        (1, 50.0, 20.0, 75.0, 0.0, 0.0, 1),
+    ],
 )
 def test_destroy_volatile_solids(
     digester: ContinuousMix,
