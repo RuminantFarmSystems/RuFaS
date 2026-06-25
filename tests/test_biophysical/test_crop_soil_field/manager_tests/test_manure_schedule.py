@@ -1,11 +1,13 @@
 from typing import List
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.biophysical.field.manager.manure_schedule import ManureSchedule
 from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -144,8 +146,10 @@ def test_validate_manure_parameters(
     depths: list[float],
     remainder_fracs: list[float],
     expected: str,
+    mocker: MockerFixture
 ) -> None:
     """Tests that invalid input is caught and raised with the correct error message in the init function."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as e:
         ManureSchedule(
             name,
@@ -162,6 +166,7 @@ def test_validate_manure_parameters(
             1,
         )
     assert str(e.value) == expected
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
