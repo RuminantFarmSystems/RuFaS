@@ -1698,7 +1698,10 @@ def test_calving_interval_history_getter_type_error(
     ],
 )
 def test_heifer_reproduction_program_getter(
-    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture,
+    animal_type: AnimalType,
+    setter_allowed: bool,
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.heifer_reproduction_program = HeiferReproductionProtocol.TAI
