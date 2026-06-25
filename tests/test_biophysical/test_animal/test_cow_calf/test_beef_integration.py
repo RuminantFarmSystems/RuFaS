@@ -25,6 +25,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.biophysical.animal.data_types.animal_enums import BeefPostWeaningDestination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
@@ -457,7 +458,7 @@ def test_beef_herd_730_day_lifecycle(mocker: MockerFixture) -> None:
     AnimalConfig.beef_breeding_season_length = AnimalModuleConstants.BEEF_DEFAULT_BREEDING_SEASON_LENGTH_DAYS
     AnimalConfig.beef_weaning_age_days = AnimalModuleConstants.BEEF_DEFAULT_WEANING_AGE_DAYS
     AnimalConfig.beef_weaning_weight_kg = None
-    AnimalConfig.beef_post_weaning_destination = "sell"
+    AnimalConfig.beef_post_weaning_destination = BeefPostWeaningDestination.SELL
     AnimalConfig.beef_mature_cow_weight_kg = 520.0
     AnimalConfig.beef_cow_cull_rate_annual = AnimalModuleConstants.BEEF_ANNUAL_CULL_RATE
 

@@ -20,6 +20,7 @@ from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import BeefCowCalfValuesTypedDict
+from RUFAS.biophysical.animal.data_types.animal_enums import BeefPostWeaningDestination, Sex
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -37,7 +38,7 @@ _ANGUS_COW_MAINT_ONLY = CowCalfRequirementsInputs(
     mature_body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
     animal_type=AnimalType.BEEF_COW,
     breed="Angus",
-    sex="female",
+    sex=Sex.FEMALE,
     body_condition_score=5.0,
     days_pregnant=None,
     days_in_milk=None,
@@ -54,7 +55,7 @@ _ANGUS_COW_LACT_ONLY = CowCalfRequirementsInputs(
     mature_body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
     animal_type=AnimalType.BEEF_COW,
     breed="Angus",
-    sex="female",
+    sex=Sex.FEMALE,
     body_condition_score=5.0,
     days_pregnant=None,
     days_in_milk=60,
@@ -71,7 +72,7 @@ _ANGUS_COW_GEST_ONLY = CowCalfRequirementsInputs(
     mature_body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
     animal_type=AnimalType.BEEF_COW,
     breed="Angus",
-    sex="female",
+    sex=Sex.FEMALE,
     body_condition_score=5.0,
     days_pregnant=150,  # mid-gestation: materially nonzero gestation energy (NRC 2016 Eq.19-37)
     days_in_milk=None,
@@ -88,7 +89,7 @@ _ANGUS_COW_COMBINED = CowCalfRequirementsInputs(
     mature_body_weight=AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
     animal_type=AnimalType.BEEF_COW,
     breed="Angus",
-    sex="female",
+    sex=Sex.FEMALE,
     body_condition_score=5.0,
     days_pregnant=150,  # mid-gestation: matches _ANGUS_COW_GEST_ONLY for approx equality check
     days_in_milk=60,
@@ -206,7 +207,7 @@ def _set_beef_animal_config() -> None:
     AnimalConfig.beef_breeding_season_length = AnimalModuleConstants.BEEF_DEFAULT_BREEDING_SEASON_LENGTH_DAYS
     AnimalConfig.beef_weaning_age_days = AnimalModuleConstants.BEEF_DEFAULT_WEANING_AGE_DAYS
     AnimalConfig.beef_weaning_weight_kg = None
-    AnimalConfig.beef_post_weaning_destination = "sell"
+    AnimalConfig.beef_post_weaning_destination = BeefPostWeaningDestination.SELL
     AnimalConfig.beef_mature_cow_weight_kg = AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG
     AnimalConfig.beef_cow_cull_rate_annual = AnimalModuleConstants.BEEF_ANNUAL_CULL_RATE
 
