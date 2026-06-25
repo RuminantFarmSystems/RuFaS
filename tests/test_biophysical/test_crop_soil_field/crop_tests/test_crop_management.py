@@ -248,7 +248,7 @@ def test_manage_harvest(
     ],
 )
 def test_cut_crop(
-    mock_crop_data: CropData, efficiency: float, harvest: float, override: bool, should_fail: bool
+    mock_crop_data: CropData, efficiency: float, harvest: float, override: bool, should_fail: bool, mocker: MockerFixture,
 ) -> None:
     """Ensure that the crop cutting routines are properly executed and that errors are raised properly."""
     # setup
@@ -267,11 +267,13 @@ def test_cut_crop(
 
     # act
     if should_fail:
+        mock_add_error = mocker.patch.object(crop.om, "add_error")
         try:
             crop.cut_crop(efficiency)
         except ValueError as e:
             assert str(e) == f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{efficiency}'."
         crop._recalculate_biomass_distribution.assert_not_called()
+        mock_add_error.assert_called_once()
     else:
         crop.cut_crop(efficiency)
         if harvest > 1:

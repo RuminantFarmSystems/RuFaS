@@ -1,11 +1,13 @@
 from typing import Type
 import pytest
+from pytest_mock import MockerFixture
 from RUFAS.biophysical.feed_storage.baleage import Baleage
 from RUFAS.biophysical.feed_storage.grain import Dry, HighMoisture
 from RUFAS.biophysical.feed_storage.hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from RUFAS.biophysical.feed_storage.silage import Bag, Bunker, Pile
 from RUFAS.biophysical.feed_storage.storage import Storage
 from RUFAS.biophysical.feed_storage.feed_storage_enum import StorageType
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize("member", list(StorageType))
@@ -37,8 +39,10 @@ def test_get_storage_class_valid(input_str: str, expected_class: Type["Storage"]
 
 
 @pytest.mark.parametrize("bad_name", ["Unknown", "pile", "BUNKER", "", "Hay "])
-def test_get_storage_class_raises_for_unknown(bad_name: str) -> None:
+def test_get_storage_class_raises_for_unknown(bad_name: str, mocker: MockerFixture) -> None:
     """Invalid or case-mismatched names raise ValueError."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as exc:
         StorageType.get_storage_class(bad_name)
+    mock_add_error.assert_called_once()
     assert f"Unknown storage type: {bad_name}." in str(exc.value)
