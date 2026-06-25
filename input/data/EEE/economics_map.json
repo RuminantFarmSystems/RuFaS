@@ -25,15 +25,24 @@
       },
       "Bedding requirements": {
         "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
+        "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
+        "dedicated_processor": "bedding",
+        "bedding_configs_path": "animal.bedding_configs",
+        "bedding_type_to_file_key": {
+          "sand": "sand",
+          "sawdust": "sawdust",
+          "straw": "straw",
+          "CBPB sawdust": "CBPB",
+          "manure solids": "manure_solids"
+        },
         "economics_files": {
-          "input_manager_location": "animal.pen_information..*.manure_streams.0.bedding_name",
           "sand": "commodity_prices.bedding_sand.dollar_per_head.csv",
-          "staw": "commodity_prices.bedding_straw.dollar_per_head.csv",
+          "straw": "commodity_prices.bedding_straw.dollar_per_head.csv",
           "sawdust": "commodity_prices.bedding_sawdust.dollar_per_head.csv",
           "manure_solids": "commodity_prices.bedding_manure_solids.dollar_per_head.csv",
           "CBPB": "commodity_prices.bedding_compost_bedded_pack.dollar_per_head.csv"
         },
-        "preprocessing": "dollar per head is reported on an annual basis, Map bedding price to number of animals for each bedding type, depending on their pen."
+        "preprocessing": "Per pen: resolve the pen's bedding_name to a bedding_type, select the matching dollar-per-head price file, then bill (average head present per year) * (that year's price), summed across pens and years. Pens with bedding_type 'none' incur no cost."
       },
       "Animal - Labor hours": {
         "input_manager": [
