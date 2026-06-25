@@ -109,6 +109,7 @@ v1.0.0
 - [3049](https://github.com/RuminantFarmSystems/RuFaS/pull/3049) - [minor change] [Utility] [NoInputChange] [NoOutputChange] Updates docstrings across 9 utility files to NumPy-style format.
 - [3100](https://github.com/RuminantFarmSystems/RuFaS/pull/3100) - [minor change] [Maintenance] [NoInputChange] [NoOutputChange] Aligns formatting on docstrings for `tuple` returns.
 - [3043](https://github.com/RuminantFarmSystems/RuFaS/pull/3043) - [minor change] [Animal] [Ration] [NoInputChange] [NoOutputChange] Refactor `Pen.formulate_optimized_ration` to remove the `# noqa: C901`; behavior unchanged.
+- [3104](https://github.com/RuminantFarmSystems/RuFaS/pull/3104) - [minor change] [Testing] [NoInputChange] [NoOutputChange] Updates unit testing coverage for add_error calls added in PR 3000.
 
 ### v1.0.0
 
