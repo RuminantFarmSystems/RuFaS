@@ -580,9 +580,7 @@ def test_preprocess_seed_costs_daily_array_shape_and_values(monkeypatch: pytest.
         data={
             "field_a": {"crop_specification": "RotA", "field_size": 1.0},
             "RotA.crop_schedules": [_corn_schedule(100, 200)],
-            "commodity_prices_corn_seed_dollar_per_square_meter": {
-                "corn_seed": {"fips": [1001], "2020": [0.01]}
-            },
+            "commodity_prices_corn_seed_dollar_per_square_meter": {"fips": [1001], "2020": [0.01]},
         },
         field_keys=["field_a"],
     )
@@ -642,9 +640,7 @@ def test_preprocess_seed_costs_computes_total_cost(monkeypatch: pytest.MonkeyPat
                     "harvesting_skip": 0,
                 },
             ],
-            "commodity_prices_corn_seed_dollar_per_square_meter": {
-                "corn_seed": {"fips": [1001], "2020": [0.01]}
-            },
+            "commodity_prices_corn_seed_dollar_per_square_meter": {"fips": [1001], "2020": [0.01]},
         },
         field_keys=["field_a", "field_b"],
     )

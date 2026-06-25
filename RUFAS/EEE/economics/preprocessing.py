@@ -839,8 +839,8 @@ class EconomicPreprocessor:
         total_seed_cost = 0.0
 
         for seed_key, daily_area in daily_area_by_seed.items():
-            price_data = self._get_data_with_handling(seed_key, info_map)
-            if price_data is None:
+            raw_price = self._get_data_with_handling(seed_key, info_map)
+            if raw_price is None:
                 self.om.add_warning(
                     "MissingEconomicsFile",
                     f"Seed commodity pricing '{seed_key}' not found in InputManager",
@@ -848,7 +848,7 @@ class EconomicPreprocessor:
                 )
                 continue
 
-            extracted_prices = self._extract_price_values(price_data)
+            extracted_prices = self._extract_price_values({seed_key: raw_price})
             if not extracted_prices:
                 continue
 
@@ -912,9 +912,9 @@ class EconomicPreprocessor:
             section_data = results.setdefault(item.section, {})
             category_data = section_data.setdefault(item.category, {})
 
-            # if item.section == "Soil_and_crop" and item.name == "Seeds costs":
-            #     category_data[item.name] = self._process_seed_costs_item()
-            #     continue
+            if item.section == "Soil_and_crop" and item.name == "Seeds costs":
+                category_data[item.name] = self._process_seed_costs_item()
+                continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
             wildcard_values = self._collect_biophysical_wildcards(item.biophysical_simulation)
