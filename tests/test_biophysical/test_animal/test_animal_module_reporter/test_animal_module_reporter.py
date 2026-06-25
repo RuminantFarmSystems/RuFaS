@@ -609,6 +609,7 @@ def test_report_manure_streams_no_pen_manure(mocker: MockerFixture) -> None:
     """Unit test for report_manure_streams() when the input has no pen manure data."""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
+    mock_om_add_error = mocker.patch.object(om, "add_error")
 
     manure_stream = ManureStream(
         water=1.1,
@@ -632,6 +633,7 @@ def test_report_manure_streams_no_pen_manure(mocker: MockerFixture) -> None:
     with pytest.raises(ValueError):
         AnimalModuleReporter.report_manure_streams(manure_streams, 10)
         mock_om_add_variable.assert_not_called()
+        mock_om_add_error.assert_called_once()
 
 
 def test_report_manure_streams(mocker: MockerFixture) -> None:

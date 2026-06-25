@@ -11,11 +11,12 @@ from RUFAS.biophysical.manure.storage.bedded_pack import BeddedPack
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
-def test_processor_init_error() -> None:
+def test_processor_init_error(mocker: MockerFixture) -> None:
     """Test that base Processor class throws appropriate error when initialized."""
     with pytest.raises(TypeError):
         Processor(name="test processor", is_housing_emissions_calculator=True)  # type: ignore[abstract]
@@ -165,10 +166,18 @@ def test_calculate_ammonia_emissions(
         (1_000.0, 3_000.0, 44.0, -500.0),
     ],
 )
-def test_calculate_ammonia_emissions_error(total_ammoniacal: float, volume: float, density: float, area: float) -> None:
+def test_calculate_ammonia_emissions_error(
+    total_ammoniacal: float,
+    volume: float,
+    density: float,
+    area: float,
+    mocker: MockerFixture,
+) -> None:
     """Test that ammonia emissions calculations raise an error when passed an invalid value."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         Processor._calculate_ammonia_emissions(total_ammoniacal, volume, density, 4.1, 20.0, area, 6.0)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

@@ -1243,7 +1243,10 @@ def test_execute_fertilizer_application(
     ],
 )
 def test_execute_fertilizer_application_error(
-    field_name: str, mix_name: str, available_mixes: dict[str, dict[str, float]]
+    field_name: str,
+    mix_name: str,
+    available_mixes: dict[str, dict[str, float]],
+    mocker: MockerFixture,
 ) -> None:
     """
     Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available mixes.
@@ -1252,8 +1255,10 @@ def test_execute_fertilizer_application_error(
         field_data=FieldData(name=field_name),
         fertilizer_mixes=available_mixes,
     )
+    mock_add_error = mocker.patch.object(field.om, "add_error")
     with pytest.raises(KeyError):
         field._execute_fertilizer_application(mix_name, 10.0, 10.0, 10.0, 0.0, 1.0, 1994, 120)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -2013,24 +2018,27 @@ def test_validate_application_depth_and_fraction(
         mock_record_nutrient_application_error.assert_not_called()
 
 
-def test_validate_application_depth_and_fraction_raises_for_missing_soil_layers() -> None:
+def test_validate_application_depth_and_fraction_raises_for_missing_soil_layers(mocker: MockerFixture) -> None:
     field = Field(field_data=MagicMock(name="test", field_size=1.2))
     field.soil = MagicMock()
     field.soil.data.soil_layers = None
-
+    mock_add_error = mocker.patch.object(field.om, "add_error")
     with pytest.raises(ValueError, match="soil_layers is not initialized"):
         field._validate_application_depth_and_fraction(50.0, 0.5, 2025, 101)
+    mock_add_error.assert_called_once()
 
 
-def test_validate_application_depth_and_fraction_raises_for_missing_bottom_depth() -> None:
+def test_validate_application_depth_and_fraction_raises_for_missing_bottom_depth(mocker: MockerFixture) -> None:
     field = Field(field_data=MagicMock(name="test", field_size=1.2))
     field.soil = MagicMock()
     mock_layer = MagicMock()
     mock_layer.bottom_depth = None
     field.soil.data.soil_layers = [mock_layer]
+    mock_add_error = mocker.patch.object(field.om, "add_error")
 
     with pytest.raises(ValueError, match="bottom_depth is not set for the last soil layer"):
         field._validate_application_depth_and_fraction(50.0, 0.5, 2025, 101)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -3353,10 +3361,12 @@ def test_field_data_initialization(
 
 
 @pytest.mark.parametrize("watering_amount,interval", [(-1300, 13), (2000, -3)])
-def test_error_field_data_initialization(watering_amount: float, interval: int) -> None:
+def test_error_field_data_initialization(watering_amount: float, interval: int, mocker: MockerFixture) -> None:
     """Tests that errors are correctly raised when FieldData is initialized with invalid values."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(Exception) as e:
         FieldData(watering_amount_in_liters=watering_amount, watering_interval=interval)
+    mock_add_error.assert_called_once()
     if watering_amount < 0:
         assert f"Expected watering amount to be >= 0, received '{watering_amount}'." == str(e.value)
     elif interval < 0:
