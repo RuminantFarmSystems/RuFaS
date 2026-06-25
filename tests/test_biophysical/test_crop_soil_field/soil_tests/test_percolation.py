@@ -23,8 +23,9 @@ from RUFAS.output_manager import OutputManager
         (6.78, 4.56, 8.9607),
     ],
 )
-def test_determine_percolation_travel_time(saturation: float, field_capacity: float, hydraulic_conductivity: float
-                                           ) -> None:
+def test_determine_percolation_travel_time(
+    saturation: float, field_capacity: float, hydraulic_conductivity: float
+) -> None:
     """tests _determine_percolation_travel_time() in percolation.py"""
     observe = Percolation._determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity)
     expect = (saturation / hydraulic_conductivity) - (field_capacity / hydraulic_conductivity)

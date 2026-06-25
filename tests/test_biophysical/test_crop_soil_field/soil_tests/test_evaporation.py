@@ -43,8 +43,9 @@ def test_determine_depth_evaporative_demand(max_soil_water_evap: float, depth: f
         (2.1, 0, 15, 2.3),
     ],
 )
-def test_determine_layer_evaporative_demand(max_soil_water_evap: float, top_depth: float, bottom_depth: float,
-                                            compensation: float) -> None:
+def test_determine_layer_evaporative_demand(
+    max_soil_water_evap: float, top_depth: float, bottom_depth: float, compensation: float
+) -> None:
     observe = Evaporation._determine_layer_evaporative_demand(
         max_soil_water_evap, top_depth, bottom_depth, compensation
     )
@@ -84,8 +85,9 @@ def test_determine_layer_evaporative_demand_error(
         (1.1, 2.3, 2.5, 0.3),
     ],
 )
-def test_determine_evaporative_demand_reduced(evap_demand: float, soil_water: float, field_water: float,
-                                              wilting_water: float) -> None:
+def test_determine_evaporative_demand_reduced(
+    evap_demand: float, soil_water: float, field_water: float, wilting_water: float
+) -> None:
     observe = Evaporation._determine_evaporative_demand_reduced(evap_demand, soil_water, field_water, wilting_water)
     if soil_water < field_water:
         expect = evap_demand * exp((2.5 * (soil_water - field_water)) / (field_water - wilting_water))
@@ -103,8 +105,7 @@ def test_determine_evaporative_demand_reduced(evap_demand: float, soil_water: fl
         (1.1, 2.3, 0.3),
     ],
 )
-def test_determine_amount_water_removed(reduced_evap_demand: float, soil_water: float, wilting_water: float
-                                        ) -> None:
+def test_determine_amount_water_removed(reduced_evap_demand: float, soil_water: float, wilting_water: float) -> None:
     observe = Evaporation._determine_amount_water_removed(reduced_evap_demand, soil_water, wilting_water)
     expect = min(reduced_evap_demand, 0.8 * (soil_water - wilting_water))
     assert expect == observe
