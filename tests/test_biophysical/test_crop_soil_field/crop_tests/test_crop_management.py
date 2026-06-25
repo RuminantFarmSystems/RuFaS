@@ -248,7 +248,8 @@ def test_manage_harvest(
     ],
 )
 def test_cut_crop(
-    mock_crop_data: CropData, efficiency: float, harvest: float, override: bool, should_fail: bool, mocker: MockerFixture,
+    mock_crop_data: CropData, efficiency: float, harvest: float, override: bool, should_fail: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Ensure that the crop cutting routines are properly executed and that errors are raised properly."""
     # setup
@@ -264,10 +265,9 @@ def test_cut_crop(
         mock_crop_data.user_harvest_index = harvest
     crop = CropManagement(mock_crop_data, harvest_index=harvest)
     crop._recalculate_biomass_distribution = MagicMock()
-
+    mock_add_error = mocker.patch.object(crop.om, "add_error")
     # act
     if should_fail:
-        mock_add_error = mocker.patch.object(crop.om, "add_error")
         try:
             crop.cut_crop(efficiency)
         except ValueError as e:
@@ -303,6 +303,7 @@ def test_cut_crop(
             assert crop.yield_phosphorus == collected_dry_matter_yield * 0.0092
             assert crop.residue_nitrogen == residue * 0.12
             assert crop.residue_phosphorus == residue * 0.0092
+        mock_add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(

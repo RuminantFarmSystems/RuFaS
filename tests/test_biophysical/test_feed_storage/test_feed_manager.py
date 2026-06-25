@@ -1151,7 +1151,7 @@ def test_deduct_feeds_from_inventory_error(
 
     with pytest.raises(ValueError):
         feed_manager._deduct_feeds_from_inventory(feeds_to_deduct, mock_simulation_day)
-    assert mock_om_add_variable.call_count == 10
+        assert mock_om_add_variable.call_count == 10
     mock_add_error.assert_called_once()
 
 
