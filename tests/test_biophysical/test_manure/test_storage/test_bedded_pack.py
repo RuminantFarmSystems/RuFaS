@@ -316,9 +316,11 @@ def test_nitrous_oxide_emission(
     assert result == pytest.approx(expected, rel=1e-6)
 
 
-def test_nitrous_oxide_negative_input(bedded_pack: BeddedPack) -> None:
+def test_nitrous_oxide_negative_input(bedded_pack: BeddedPack, mocker: MockerFixture) -> None:
+    mock_add_error = mocker.patch.object(bedded_pack._om, "add_error")
     with pytest.raises(ValueError, match="Daily nitrogen input mass must be non-negative: -1.0"):
         bedded_pack._calculate_bedded_pack_nitrous_oxide_emission(-1.0, True)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -333,9 +335,11 @@ def test_ammonia_emission(bedded_pack: BeddedPack, received_nitrogen: float, is_
     assert result == pytest.approx(expected, rel=1e-6)
 
 
-def test_ammonia_negative_input(bedded_pack: BeddedPack) -> None:
+def test_ammonia_negative_input(bedded_pack: BeddedPack, mocker: MockerFixture) -> None:
+    mock_add_error = mocker.patch.object(bedded_pack._om, "add_error")
     with pytest.raises(ValueError, match="Daily nitrogen input mass must be non-negative: -1.0"):
         bedded_pack._calculate_bedded_pack_ammonia_emission(-1.0, False)
+    mock_add_error.assert_called_once()
 
 
 def test_calculate_bedded_pack_methane_emission(bedded_pack: BeddedPack, mocker: MockerFixture) -> None:
@@ -388,9 +392,11 @@ def test_calculate_bedded_pack_mcf_returns_expected(
     assert result == expected_mcf
 
 
-def test_calculate_bedded_pack_mcf_raises_for_temperature_gap(bedded_pack: BeddedPack) -> None:
+def test_calculate_bedded_pack_mcf_raises_for_temperature_gap(bedded_pack: BeddedPack, mocker: MockerFixture) -> None:
     """Tests calculate_bedded_pack_mcf_returns_expected() for fall back cases."""
+    mock_add_error = mocker.patch.object(bedded_pack._om, "add_error")
     with pytest.raises(ValueError) as excinfo:
         bedded_pack.calculate_bedded_pack_methane_conversion_factor(True, math.nan)
 
     assert "out of any defined bin" in str(excinfo.value)
+    mock_add_error.assert_called_once()

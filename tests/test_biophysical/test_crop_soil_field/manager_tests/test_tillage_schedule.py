@@ -1,6 +1,7 @@
 from typing import List
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.data_structures.events import TillageEvent
@@ -86,6 +87,7 @@ def test_validate_tillage_parameters(
     mix_fracs: List[float],
     implements: List[str],
     expected: str,
+    mocker: MockerFixture
 ) -> None:
     """Tests that errors are raised correctly when invalid input is passed."""
     with pytest.raises(ValueError) as e:

@@ -3,12 +3,14 @@ from typing import List
 from unittest.mock import MagicMock, call, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.crop.crop_data import CropData
 from RUFAS.biophysical.field.crop.water_uptake import WaterUptake
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
+from RUFAS.output_manager import OutputManager
 from tests.test_biophysical.test_crop_soil_field.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
@@ -71,21 +73,25 @@ def test_uptake_water(mock_crop_data: CropData, max_trans: float) -> None:
     ],
 )
 def test_extract_water_from_soil(
-    mock_crop_data: CropData, layers: list[LayerData], uptakes: list[LayerData], should_fail: bool
+    mock_crop_data: CropData, layers: list[LayerData], uptakes: list[LayerData], should_fail: bool,
+    mocker: MockerFixture,
 ) -> None:
     """This method only tests for edge cases, other parts of the method already have coverage"""
     soil_data = SoilData(soil_layers=layers, field_size=3)
     uptake = WaterUptake(crop_data=mock_crop_data, actual_water_uptakes=uptakes)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
         with pytest.raises(Exception) as e:
             uptake.extract_water_from_soil(soil_data)
         assert str(e.value) == "actual_water_uptakes should be the same length as the number of soil layers"
+        mock_add_error.assert_called_once()
     else:
         soil_data.get_vectorized_layer_attribute = MagicMock()
         soil_data.set_vectorized_layer_attribute = MagicMock()
         uptake.extract_water_from_soil(soil_data)
         assert soil_data.get_vectorized_layer_attribute.call_count == 1
         assert soil_data.set_vectorized_layer_attribute.call_count == 1
+        mock_add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -102,8 +108,10 @@ def test_reduce_efficiency_of_uptake(
     water_availabilities: List[float],
     available_capacities: List[float],
     should_fail: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the reduced efficiency of uptake is calculated correctly when there's no error in input"""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
         with pytest.raises(Exception) as e:
             WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities, available_capacities)
@@ -111,6 +119,7 @@ def test_reduce_efficiency_of_uptake(
             str(e.value) == "potential_uptakes, water_availabilities, and available_capacities must be of equal"
             " length"
         )
+        mock_add_error.assert_called_once()
     else:
         WaterUptake._correct_layer_for_efficiency = MagicMock(return_value=0.5)
         result = WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities, available_capacities)
@@ -126,6 +135,7 @@ def test_reduce_efficiency_of_uptake(
         WaterUptake._correct_layer_for_efficiency.assert_has_calls(expected_calls)
         expected = [0.5] * len(potential_uptakes)
         assert expected == result
+        mock_add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -141,16 +151,20 @@ def test_adjust_water_uptakes(
     uptake_compensation: float,
     should_fail: bool,
     expected: List[float],
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the adjusted water uptakes are calculated correctly when there's no error in input"""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
         with pytest.raises(Exception) as e:
             WaterUptake._adjust_water_uptakes(potential_uptakes, unmet_demands, uptake_compensation)
         assert str(e.value) == "potential_uptakes and unmet_demands must be the same length."
+        mock_add_error.assert_called_once()
     else:
         assert WaterUptake._adjust_water_uptakes(
             potential_uptakes, unmet_demands, uptake_compensation
         ) == pytest.approx(expected)
+        mock_add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -172,12 +186,14 @@ def test_find_stratified_max_water_uptakes(
     root_depth: float,
     max_transpiration: float,
     water_distro_parameter: float,
-    upper_depths: List[float],
-    lower_depths: List[float],
+    upper_depths: list[float],
+    lower_depths: list[float],
     should_fail: bool,
-    expected: List[float],
+    expected: list[float],
+    mocker: MockerFixture
 ) -> None:
     """Tests that the stratified max water uptakes are calculated correctly when there's no error in input"""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
         with pytest.raises(Exception) as e:
             WaterUptake._find_stratified_max_water_uptakes(
@@ -188,6 +204,7 @@ def test_find_stratified_max_water_uptakes(
                 lower_depths,
             )
         assert str(e.value) == "upper_depths and lower_depths must be the same length"
+        mock_add_error.assert_called_once()
     else:
         assert pytest.approx(expected) == WaterUptake._find_stratified_max_water_uptakes(
             root_depth,
@@ -196,6 +213,7 @@ def test_find_stratified_max_water_uptakes(
             upper_depths,
             lower_depths,
         )
+        mock_add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -235,12 +253,15 @@ def test_take_up_water(
     water_availabilities: List[float],
     wilting_points: List[float],
     should_fail: bool,
+    mocker: MockerFixture
 ) -> None:
     """Tests that the the correct output _take_up_water of were calculated when there's no error in input"""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
         with pytest.raises(Exception) as e:
             WaterUptake._take_up_water(potential_uptakes, water_availabilities, wilting_points)
         assert str(e.value) == "potential_uptakes, water_availabilities, and wilting_points must be of equal length"
+        mock_add_error.assert_called_once()
     else:
         WaterUptake._determine_actual_layer_uptake = MagicMock(return_value=0.5)
         result = WaterUptake._take_up_water(potential_uptakes, water_availabilities, wilting_points)
@@ -250,3 +271,4 @@ def test_take_up_water(
         WaterUptake._determine_actual_layer_uptake.assert_has_calls(expected_calls)
         expected = [0.5] * len(potential_uptakes)
         assert expected == result
+        mock_add_error.assert_not_called()

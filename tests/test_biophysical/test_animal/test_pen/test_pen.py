@@ -1578,7 +1578,7 @@ def test_apply_bedding(
     mock_calculate_total_bedding_dry_solids.assert_called_once_with(num_animals)
 
 
-def test_apply_bedding_value_error(pen: Pen) -> None:
+def test_apply_bedding_value_error(pen: Pen, mocker: MockerFixture) -> None:
     mock_bedding = MagicMock(auto_spec=Bedding)
     mock_bedding.bedding_type = BeddingType.STRAW
     pen.beddings = {"dummy_bedding_name": mock_bedding}
@@ -1597,9 +1597,10 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         pen_manure_data=None,
         bedding_non_degradable_volatile_solids=10,
     )
-
+    mock_add_error = mocker.patch.object(pen.om, "add_error")
     with pytest.raises(ValueError):
         pen._apply_bedding(manure_stream, "dummy_bedding_name")
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -2692,6 +2693,7 @@ def test_calculate_manure_surface_area(
     has_cows: bool,
     expected_area: float | None,
     raises_error: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Tests _calculate_manure_surface_area() for various pen types and animal combinations."""
     # Arrange
@@ -2701,7 +2703,9 @@ def test_calculate_manure_surface_area(
 
     # Act & Assert
     if raises_error:
+        mock_add_error = mocker.patch.object(pen.om, "add_error")
         with pytest.raises(ValueError):
             pen._calculate_manure_surface_area()
+        mock_add_error.assert_called_once()
     else:
         assert pen._calculate_manure_surface_area() == expected_area

@@ -74,7 +74,7 @@ def test_calc_shape_log(heatfrac: float, areafrac: float) -> None:
         (0.5, -1),  # negative areafrac -- math domain
     ],
 )
-def test_error_calc_shape_log(heatfrac: float, areafrac: float) -> None:
+def test_error_calc_shape_log(heatfrac: float, areafrac: float, mocker: MockerFixture) -> None:
     """ensure that the errors are thrown for inappropriate input to calc_shape_log()"""
     with pytest.raises(Exception):
         LeafAreaIndex._calc_shape_log(heatfrac, areafrac)
@@ -124,10 +124,10 @@ def test_error_determine_lai_shape(
 ) -> None:
     """check that invalid input to test_error_calc_shape_parameters throws errors"""
     om = OutputManager()
-    mock_add = mocker.patch.object(om, "add_error")
+    mock_add_error = mocker.patch.object(om, "add_error")
     with pytest.raises(ValueError):
         LeafAreaIndex._determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2)
-    mock_add.assert_called_once()
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -152,10 +152,14 @@ def test_determine_senescent_leaf_area_index(heatfrac: float, senheatfrac: float
 
 
 @pytest.mark.parametrize("heatfrac,senheatfrac,optareafrac", [(1.1, 1, 0.9), (1.1, 1.9, 0.9)])
-def test_error_determine_senescent_leaf_area_index(heatfrac: float, senheatfrac: float, optareafrac: float) -> None:
+def test_error_determine_senescent_leaf_area_index(
+    heatfrac: float, senheatfrac: float, optareafrac: float, mocker: MockerFixture,
+) -> None:
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(Exception) as e:
         LeafAreaIndex._determine_senescent_leaf_area_index(heatfrac, senheatfrac, optareafrac)
     assert "Senescent heat fraction must be less than 1" in str(e.value)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -193,9 +197,11 @@ def test_determine_canopy_height(max_can_height: float, opt_leaf_area_frac: floa
         (-0.5, 1.3),  # Negative max canopy height and optimal leaf height > 1
     ],
 )
-def test_error_determine_canopy_height(max_can_height: float, opt_leaf_area_frac: float) -> None:
+def test_error_determine_canopy_height(max_can_height: float, opt_leaf_area_frac: float, mocker: MockerFixture) -> None:
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         LeafAreaIndex.determine_canopy_height(max_can_height, opt_leaf_area_frac)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

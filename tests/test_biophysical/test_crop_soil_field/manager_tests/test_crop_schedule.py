@@ -146,7 +146,8 @@ def test_crop_schedule_init(
         ),
     ],
 )
-def test_validate_planting_parameters(name: str, years: list[int], days: list[int], expected: str) -> None:
+def test_validate_planting_parameters(name: str, years: list[int], days: list[int], expected: str,
+                                      mocker: MockerFixture) -> None:
     """Tests that the errors are raised properly when crop planting parameters are invalid."""
     with pytest.raises(ValueError) as e:
         test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["harvest_kill"], False, 1, 1)
@@ -196,7 +197,7 @@ def test_validate_planting_parameters(name: str, years: list[int], days: list[in
     ],
 )
 def test_validate_harvest_parameters(
-    name: str, years: list[int], days: list[int], operations: list[str], expected: str
+    name: str, years: list[int], days: list[int], operations: list[str], expected: str, mocker: MockerFixture,
 ) -> None:
     """Tests that harvest schedule parameters are valid."""
     with pytest.raises(ValueError) as e:

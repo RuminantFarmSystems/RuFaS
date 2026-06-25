@@ -3,10 +3,12 @@ from typing import List
 from unittest.mock import MagicMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.soil.evaporation import Evaporation
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -59,9 +61,12 @@ def test_determine_layer_evaporative_demand(max_soil_water_evap, top_depth, bott
         (1, 1, None, 1),
     ],
 )
-def test_determine_layer_evaporative_demand_error(max_soil_water_evap, top_depth, bottom_depth, compensation):
+def test_determine_layer_evaporative_demand_error(max_soil_water_evap: int, top_depth: float | int | None,
+                                                  bottom_depth: int | None, compensation: int, mocker: MockerFixture):
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(Exception):
         Evaporation._determine_layer_evaporative_demand(max_soil_water_evap, top_depth, bottom_depth, compensation)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

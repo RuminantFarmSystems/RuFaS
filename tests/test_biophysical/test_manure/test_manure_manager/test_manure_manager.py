@@ -563,12 +563,15 @@ def test_validate_adjacency_matrix(
     expected_message: Optional[str],
     matrix: dict[str, dict[str, float]],
     manure_manager: ManureManager,
+    mocker: MockerFixture,
 ) -> None:
     """Tests _validate_adjacency_matrix()."""
     manure_manager._adjacency_matrix = matrix
     if expect_failure:
+        mock_add_error = mocker.patch.object(manure_manager._om, "add_error")
         with pytest.raises(ValueError, match=expected_message):
             manure_manager._validate_adjacency_matrix()
+        mock_add_error.assert_called_once()
     else:
         manure_manager._validate_adjacency_matrix()
         assert True
@@ -640,11 +643,14 @@ def test_traverse_adjacency_matrix_cycle(
     matrix: dict[str, dict[str, float]],
     expected_order: list[str],
     manure_manager: ManureManager,
+    mocker: MockerFixture,
 ) -> None:
     """Tests _traverse_adjacency_matrix() when there's a cycle."""
+    mock_add_error = mocker.patch.object(manure_manager._om, "add_error")
     with pytest.raises(ValueError, match="Cycle detected — topological sort not possible."):
         manure_manager._adjacency_matrix = matrix
         manure_manager._traverse_adjacency_matrix()
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -692,9 +698,11 @@ def test_merge_separator_rows_valid(
 
 
 def test_merge_invalid_separator_rows(
-    invalid_separator_adjacency_matrix: dict[str, dict[str, float]], manure_manager: ManureManager
+    invalid_separator_adjacency_matrix: dict[str, dict[str, float]], manure_manager: ManureManager,
+    mocker: MockerFixture,
 ) -> None:
     """Tests _merge_separator_rows() with invalid separator outputs."""
+    mock_add_error = mocker.patch.object(manure_manager._om, "add_error")
     with pytest.raises(ValueError):
         manure_manager._adjacency_matrix = invalid_separator_adjacency_matrix
         manure_manager._all_separators = {
@@ -702,6 +710,7 @@ def test_merge_invalid_separator_rows(
             "rotary_screen_1": MagicMock(Separator),
         }
         manure_manager._merge_separator_rows()
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -789,8 +798,7 @@ def test_run_daily_update_missing_first_processor_raises_keyerror(
     manure_manager._processing_order = []
     manure_manager._adjacency_matrix = {}
 
-    mock_om = mocker.patch.object(manure_manager, "_om")
-    mock_om.add_error = MagicMock()
+    mock_add_error = mocker.patch.object(manure_manager._om, "add_error")
 
     time = MagicMock(spec=RufasTime)
     day_conditions = MagicMock(spec=CurrentDayConditions)
@@ -798,7 +806,7 @@ def test_run_daily_update_missing_first_processor_raises_keyerror(
     with pytest.raises(KeyError, match="Processor 'nonexistent_proc' not found in the system."):
         manure_manager.run_daily_update(manure_streams, time, day_conditions)
 
-    mock_om.add_error.assert_called_once()
+    mock_add_error.assert_called_once()
 
 
 @pytest.fixture
@@ -883,14 +891,14 @@ def test_generate_origin_key_valid(
     assert manure_manager._generate_origin_key(processor_name, output_key) == expected_result
 
 
-def test_generate_origin_key_invalid_logs_and_raises(manure_manager: ManureManager) -> None:
+def test_generate_origin_key_invalid_logs_and_raises(manure_manager: ManureManager, mocker: MockerFixture) -> None:
     """Tests _generate_origin_key() with invalid processor name and output key."""
-    manure_manager._om = MagicMock()
+    mock_add_error = mocker.patch.object(manure_manager._om, "add_error")
 
     with pytest.raises(ValueError, match="Unexpected output key 'gas'"):
         manure_manager._generate_origin_key("procX", "gas")
 
-    manure_manager._om.add_error.assert_called_once_with(
+    mock_add_error.assert_called_once_with(
         "Invalid Output Key",
         "Unexpected output key 'gas' from processor 'procX'.",
         {"class": "ManureManager", "function": "run_daily_update"},
