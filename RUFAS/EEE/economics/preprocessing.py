@@ -809,7 +809,8 @@ class EconomicPreprocessor:
                     daily_area_by_seed[seed_key] = [0.0] * total_sim_days
 
                 arr = daily_area_by_seed[seed_key]
-                for plant_date, kill_date in self._growing_periods(schedule):
+                growing_periods = self._growing_periods(schedule)
+                for plant_date, kill_date in growing_periods:
                     plant_idx = (plant_date - start_date).days
                     kill_idx = (kill_date - start_date).days
 
@@ -837,7 +838,7 @@ class EconomicPreprocessor:
         )
         start_year: int = start_date.year
         end_year: int = end_date.year
-        fips_code: int = int(config_data["start_date"])
+        fips_code: int = int(config_data["FIPS_county_code"])
         days_count = (end_date - start_date).days
         date_generator = (start_date + timedelta(days=i) for i in range(days_count))
 
@@ -900,7 +901,7 @@ class EconomicPreprocessor:
             #     continue
 
             daily_price_per_area = [
-                seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area_by_seed[seed_key])
+                seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area)
             ]
             biophysical_values[seed_key] = extracted_prices     # is that right?
             price_values[seed_key] = daily_price_per_area       # is that right?
