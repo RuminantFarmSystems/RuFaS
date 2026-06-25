@@ -17,7 +17,7 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set, Tuple
 
@@ -727,7 +727,7 @@ class EconomicPreprocessor:
                 plant_date = None
         return periods
 
-    def _preprocess_seed_costs(self) -> Dict[str, List[float]]:
+    def _preprocess_seed_costs(self) -> dict[str, List[float]]:
         """Build a daily time-series of responsible field area (m²) per seed key.
 
         For each field, each crop's planting-to-kill periods are located within
@@ -771,7 +771,7 @@ class EconomicPreprocessor:
             )
             return {}
 
-        daily_area_by_seed: Dict[str, List[float]] = {}
+        daily_area_by_seed: dict[str, List[float]] = {}
 
         for field_key in field_keys:
             field_data = self.im.get_data(field_key)
@@ -826,6 +826,49 @@ class EconomicPreprocessor:
 
         return daily_area_by_seed
 
+    def _extract_daily_seed_price(self, price_data: Any) -> list[float]:
+        info_map = {"class": self.__class__.__name__, "function": self._extract_price_values.__name__}
+        config_data = self.im.get_data("config")
+        start_date = datetime.strptime(
+            str(config_data["start_date"]), "%Y:%j"
+        )
+        end_date = datetime.strptime(
+            str(config_data["end_date"]), "%Y:%j"
+        )
+        start_year: int = start_date.year
+        end_year: int = end_date.year
+        fips_code: int = int(config_data["start_date"])
+        days_count = (end_date - start_date).days
+        date_generator = (start_date + timedelta(days=i) for i in range(days_count))
+
+        daily_seed_price: list[float] = []
+        for key, value in price_data.items():
+            if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
+                self.om.add_warning(
+                    "MissingPriceData",
+                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format."
+                    "Using fallback price.",
+                    info_map,
+                )
+                daily_seed_price.extend(self._get_fallback_price(start_year, end_year, key))
+                continue
+            fips_idx = value["fips"].index(fips_code)
+            for date in date_generator:
+                year = date.year
+                try:
+                    price = value[f"{year}"][fips_idx]
+                    daily_seed_price.append(price)
+                except (KeyError, IndexError):
+                    self.om.add_warning(
+                        "MissingPriceData",
+                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
+                        "Using fallback price.",
+                        info_map,
+                    )
+                    daily_seed_price.extend(self._get_fallback_price(start_year, end_year, key))
+                    continue
+        return daily_seed_price
+
     def _process_seed_costs_item(self) -> Dict[str, Any]:
         """Build the full preprocessing result entry for the Seeds costs line item."""
 
@@ -834,8 +877,8 @@ class EconomicPreprocessor:
         daily_area_by_seed = self._preprocess_seed_costs()
 
         # biophysical_values: concatenation of all per-seed daily arrays.
-        biophysical_values: List[float] = []
-        price_values: List[float] = []
+        biophysical_values: dict[str, list[float]] = {}
+        price_values: dict[str, list[float]] = {}
         total_seed_cost = 0.0
 
         for seed_key, daily_area in daily_area_by_seed.items():
@@ -848,17 +891,20 @@ class EconomicPreprocessor:
                 )
                 continue
 
-            extracted_prices = self._extract_price_values({seed_key: raw_price})
+            extracted_prices = self._extract_daily_seed_price({seed_key: raw_price})
             if not extracted_prices:
                 continue
 
-            avg_price = self._aggregate(extracted_prices, "average")
-            if avg_price is None:
-                continue
+            # avg_price = self._aggregate(extracted_prices, "average")
+            # if avg_price is None:
+            #     continue
 
-            biophysical_values.extend(daily_area)
-            price_values.extend(extracted_prices)
-            total_seed_cost += sum(daily_area) * avg_price
+            daily_price_per_area = [
+                seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area_by_seed[seed_key])
+            ]
+            biophysical_values[seed_key] = extracted_prices     # is that right?
+            price_values[seed_key] = daily_price_per_area       # is that right?
+            total_seed_cost += sum(daily_price_per_area)        # is that right?
 
         if not daily_area_by_seed:
             self.om.add_warning(
@@ -867,7 +913,7 @@ class EconomicPreprocessor:
                 info_map,
             )
 
-        bio_total = sum(biophysical_values) if biophysical_values else None
+        bio_total = 0.0     # what to put here
         return {
             "biophysical_values": biophysical_values,
             "biophysical_aggregate": bio_total,
@@ -875,7 +921,7 @@ class EconomicPreprocessor:
             "biophysical_aggregate_by_scenario": {"baseline": bio_total},
             "price_data": {},
             "price_values": price_values,
-            "price_aggregate": self._aggregate(price_values, "average") if price_values else None,
+            "price_aggregate": 0.0,         # what to put here
             "line_item_values_by_scenario": {"baseline": total_seed_cost},
             "flow_type": "cost",
         }
