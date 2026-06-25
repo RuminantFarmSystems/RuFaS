@@ -1,7 +1,6 @@
 from typing import List
 
 import pytest
-from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
@@ -145,7 +144,6 @@ def test_validate_manure_parameters(
     depths: list[float],
     remainder_fracs: list[float],
     expected: str,
-    mocker: MockerFixture,
 ) -> None:
     """Tests that invalid input is caught and raised with the correct error message in the init function."""
     with pytest.raises(ValueError) as e:
