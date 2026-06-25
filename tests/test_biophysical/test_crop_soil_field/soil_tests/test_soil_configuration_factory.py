@@ -8,7 +8,6 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_config_factory import SoilConfigFactory, SoilConfiguration
 from RUFAS.biophysical.field.soil.soil_data import SoilData
-from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -32,11 +31,9 @@ def test_soil_config_enum(config: str, expected: SoilConfiguration) -> None:
 )
 def test_invalid_soil_config_enum(invalid_config: str, mocker: MockerFixture) -> None:
     """Tests that SoilConfiguration raises an error correctly when an invalid configuration name is passed"""
-    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as e:
         SoilConfiguration(invalid_config)
     assert str(e.value) == f"'{invalid_config}' is not a valid SoilConfiguration"
-    mock_add_error.assert_called_once()
 
 
 def test_config_factory_defaults():

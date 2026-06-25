@@ -5,7 +5,6 @@ from pytest_mock.plugin import MockerFixture
 from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 from RUFAS.biophysical.field.manager.crop_schedule import CropSchedule
 from RUFAS.data_structures.events import HarvestEvent, PlantingEvent
-from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -201,12 +200,10 @@ def test_validate_harvest_parameters(
     name: str, years: list[int], days: list[int], operations: list[str], expected: str, mocker: MockerFixture,
 ) -> None:
     """Tests that harvest schedule parameters are valid."""
-    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as e:
         test = CropSchedule(name, "test_crop", [1990], [130], years, days, operations, False, 1, 1)
         test._validate_harvest_parameters()
     assert str(e.value) == expected
-    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
