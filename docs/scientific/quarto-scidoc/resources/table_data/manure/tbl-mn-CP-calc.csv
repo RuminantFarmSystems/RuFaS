@@ -1,5 +1,5 @@
 ﻿Variable, Units, Calculation 
-water, kg ,  Stored manure water kg + received manure water kg  
+water, kg ,  Stored manure water + received manure water  
 total_ammoniacal_nitrogen, kg ,"  max (0, stored manure ammoniacal N + received ammoniacal N - NH$_3$-N emissions)  "
 nitrogen, kg ,  Stored nitrogen + received nitrogen - NH$_3$-N - N$_2$O-N emissions  
 phosphorus, kg ,  Stored phosphorus + received phosphorus 

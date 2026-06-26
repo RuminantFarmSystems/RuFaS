@@ -9,4 +9,4 @@ degradable_volatile_solids ,  kg , stored degradable VS + received degradable VS
 manure_non_degradable_volatile_solids, kg , stored manure non-degradable VS + received manure non-degradable VS - VSnd loss 
 bedding_non_degradable_volatile_solids, kg , stored bedding non-degradable VS + received bedding non-degradable VS
 total_solids, kg , Stored TS + received TS - VS loss 
-volume, m$^3$ , Stored volume + received volume - $\frac{VS loss}{SOLID_MANURE_DENSITY}$
+volume, m$^3$ , Stored volume + received volume - $\frac{\text{VS loss}}{\text{SOLID\_MANURE\_DENSITY}}$

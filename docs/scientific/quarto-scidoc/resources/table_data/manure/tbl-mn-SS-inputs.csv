@@ -1,6 +1,6 @@
 ﻿Variable, Units, Description
 Name, -- ,  Unique identifier of the specific slurry storage configuration used.  
-Capacity, $\text{m}^3$,"  The volumetric capacity of the slurry storage,  in   $\text{m}^3$. Note that this variable is a placeholder at this time,  and does not influence model calculations.  "
+Capacity, m$^3$,"  The volumetric capacity of the slurry storage, in m$^3$. Note that this variable is a placeholder at this time,  and does not influence model calculations.  "
 Cover,  -- ," Default value is “no cover” for slurry storage underfloor, as these storages do not generally have a synthetic cover, and typically receive too much surface disturbance to form a crust. Note that precipitation is always excluded from slurry storage underfloor given they are assumed to be completely covered or indoors. Default value for slurry storage outdoor is “no cover”. Cover (a synthetic, precipitation-excluding cover, or an enclosed tank) or crust (a naturally-forming crust over >50% of the stored manure surface) are also options. "
-Surface_area,  $\text{m}^3$,"  The surface area of the slurry storage. If not provided by the user, surface area is calculated based on the number of mature cows in the herd; see Calculate Surface Area section below.  "
+Surface_area,  m$^3$,"  The surface area of the slurry storage. If not provided by the user, surface area is calculated based on the number of mature cows in the herd; see Calculate Surface Area section below.  "
 Storage_time_period, days ,"  The number of days that manure is stored between emptying events. At the end of this interval, the manure storage is emptied completely.  "

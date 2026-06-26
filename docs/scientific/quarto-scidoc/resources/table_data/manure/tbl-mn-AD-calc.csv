@@ -1,12 +1,12 @@
 ﻿Variable, Units, Calculation 
 water, kg, Entering water
-total_ammoniacal_nitrogen, kg," min(entering ammoniacal_nitrogen (kg) x TAN_INCREASE_FACTOR, nitrogen (kg)"
+total_ammoniacal_nitrogen, kg," min(entering ammoniacal_nitrogen x TAN_INCREASE_FACTOR, nitrogen "
 nitrogen, kg, Entering nitrogen
 phosphorus, kg, Entering phosphorus 
 potassium, kg, Entering potassium
 ash, kg, Entering ash
-degradable_volatile_solids ,  -- , Entering degradable_volatile_solids (kg) - total_VS_destruction (kg) x degradable_VS_frac
-manure_non_degradable_volatile_solids , -- , Entering non_degradable_volatile_solids (kg) - total_VS_destruction (kg) x manure_non_degradable_VS_frac
-bedding_non_degradable_volatile_solids, -- , Entering non_degradable_volatile_solids (kg) - total_VS_destruction (kg) x (1 - degradable_VS_frac - manure_non_degradable_VS_frac)
-total\_solids, kg, Entering total_solids (kg) - total_VS_destruction (kg)
-volume, $\text{m}^3$, Entering volume ($\text{m}^3$) - $\frac{\text{total\_VS\_destruction (kg)}}{\text{ManureConstants.SLURRY\_MANURE\_DENSITY}}$ 
+degradable_volatile_solids ,  -- , Entering degradable_volatile_solids - total_VS_destruction x degradable_VS_frac
+manure_non_degradable_volatile_solids , -- , Entering non_degradable_volatile_solids - total_VS_destruction x manure_non_degradable_VS_frac
+bedding_non_degradable_volatile_solids, -- , Entering non_degradable_volatile_solids - total_VS_destruction x (1 - degradable_VS_frac - manure_non_degradable_VS_frac)
+total\_solids, kg, Entering total_solids - total_VS_destruction
+volume, m$^3$, Entering volume - $\frac{\text{total\_VS\_destruction}}{\text{ManureConstants.SLURRY\_MANURE\_DENSITY}}$ 

@@ -1,42 +1,42 @@
 ﻿Variable, Value, Definition
-MANURE_DAMPING_FACTOR , 0.65 , Fixed damping factor applied to the air temperature amplitude. 
-MANURE_TEMPERATURE_LAG , 30 , Lag constant representing delayed thermal response of manure temperature relative to air temperature (days). 
-ANAEROBIC_LAGOON_MANURE_RETENTION , 0.1 , Fraction of stored manure retained in anaerobic lagoon when storage interval is reached. 
-ACTIVATION_ENERGY , 81 000 J/mol , Apparent activation energy of methanogenesis in dairy manure. 
-DEFAULT_STORED_MANURE_PH , 7.5 , Default pH of manure in slurry storage or anaerobic lagoon. 
-FREEBOARD_CONSTANT , 1.2 , 20% volume allowance above max volume if surface area not user-defined. 
-DEPTH_CONSTANT , 4.572 , Depth of slurry/liquid manure storage used for surface area calculation (m). 
-PRECIPITATION_CONSTANT , 0.25 , Annual precipitation constant for determining storage surface area (m). 
-MANURE_CONVERSION_CONSTANT , 0.1175 , Factor to estimate manure volume per cow per day (m$^3$). 
-METHANE_DESTRUCTION_EFFICIENCY , 0.81 , Percent methane destroyed with cover and flare system. 
-VS_TO_METHANE_LOSS_RATIO , 6.665 kg , Mass ratio of CO<sub>2</sub>+CH<sub>4</sub> to CH<sub>4</sub> from storage. 
-NATURAL_LOG_ARRHENIUS_CONSTANT , 30.6 g CH<sub>4</sub>/kg VS/h , Log of Arrhenius parameter for methane emissions from stored manure. 
-STORAGE_RESISTANCE , 23.1 , Default resistance to ammonia volatilization (s/m). 
-SLURRY_MANURE_DENSITY , 990 kg/m$^3$} , Default density of manure as excreted. 
-AMMONIA_EMISSION_COEFFICIENT_UNTILLED , 0.25 , Ammonia emission coefficient (no mixing). 
-AMMONIA_EMISSION_COEFFICIENT_TILLED , 0.5 , Ammonia emission coefficient (with mixing). 
-DEFAULT_DAYS_SINCE_LAST_MIXING , 1 d , Days since last mixing for C decomposition. 
-NITROUS_OXIDE_EMISSION_UNTILLED , 0.01 , N<sub>2</sub>O-N emitted per kg manure N/day (no mixing). 
-NITROUS_OXIDE_EMISSION_TILLED , 0.07 , N<sub>2</sub>O-N emitted per kg manure N/day (with mixing). 
-HOUSING_SPECIFIC_CONSTANT , 260.0 s/m , Default constant for ammonia emissions from housing. 
-DEFAULT_PH_FOR_HOUSING_AMMONIA , 7.7 , Default pH for manure on housing floors. 
-MILKING_FRESH_WATER_USE_RATE , 30 L/animal/day , Milking water use rate per animal. 
-WATER_DENSITY_KG_PER_M3 , 0.997 kg/m$^3$ , Default water density. 
-CARBON_DIOXIDE_MOLAR_MASS , 44.01 g/mol , Molar mass of CO<sub>2</sub>. 
-CARBON_DIOXIDE_TO_METHANE_RATIO , 4-6 , Volumetric ratio of CO<sub>2</sub> to CH<sub>4</sub> during digestion. 
-IDEAL_GAS_LAW_R , 0.0821 L atm/mol K , Ideal gas law constant. 
-METHANE_MOLAR_MASS , 16.04 g/mol , Molar mass of CH<sub>4</sub>. 
-TAN_INCREASE_FACTOR , 1.60 , TAN increase from anaerobic digestion (unitless). 
-DEFAULT_LAYER_TEMPERATURE , 30 $^\circ$C , Default layer temperature for decomposition. 
-DECOMPOSITION_TEMPERATURE , 60 $^\circ$C , Temperature for peak microbial activity. 
-DEFAULT_CARBON_FRACTION_VSD , 0.5 , Carbon content of degradable VS. 
-DEFAULT_CARBON_FRACTION_VSND , 0.35 , Carbon content of non-degradable VS. 
-DEFAULT_MOISTURE_EFFECT , 0.65 , Moisture effect on microbial decomposition. 
-DEFAULT_LAG_TIME , 2 d , Lag time for C decomposition. 
-EFFECTIVE_MICROBIAL_DECOMP_RATE , 0.00237 , Microbial decomposition rate (unitless). 
-FIRST_ORDER_DECAY_COEFFICIENT , 0.01 , First-order decay coefficient. 
-LEACHING_COEFFICIENT , -- , N leached per kg manure N/day. 
-DEFAULT_DAYS_SINCE_LAST_HARROW , 1 d , Days since last harrow event. 
-ACHIEVABLE_METHANE_EMISSION , 0.24 m$^3$ CH<sub>4</sub>/kg VS , Achievable methane generation. 
-SOLID_MANURE_DENSITY , 700 kg/m$^3$ , Default solid manure density. 
-LIQUID_MANURE_DENSITY , 1000 kg/m$^3$ , Default liquid manure density. 
+MANURE_DAMPING_FACTOR , 0.65 , Fixed damping factor applied to the air temperature amplitude 
+MANURE_TEMPERATURE_LAG , 30 d , Lag constant representing delayed thermal response of manure temperature relative to air temperature
+ANAEROBIC_LAGOON_MANURE_RETENTION , 0.1 , Fraction of stored manure retained in anaerobic lagoon when storage interval is reached 
+ACTIVATION_ENERGY , 81 000 J/mol , Apparent activation energy of methanogenesis in dairy manure 
+DEFAULT_STORED_MANURE_PH , 7.5 , Default pH of manure in slurry storage or anaerobic lagoon 
+FREEBOARD_CONSTANT , 1.2 , 20% volume allowance above max volume if surface area not user-defined 
+DEPTH_CONSTANT , 4.572 m , Depth of slurry/liquid manure storage used for surface area calculation 
+PRECIPITATION_CONSTANT , 0.25 m , Annual precipitation constant for determining storage surface area 
+MANURE_CONVERSION_CONSTANT , 0.1175 m$^3$ , Factor to estimate manure volume per cow per day
+METHANE_DESTRUCTION_EFFICIENCY , 0.81 , Percent methane destroyed with cover and flare system 
+VS_TO_METHANE_LOSS_RATIO , 6.665 kg , Mass ratio of CO<sub>2</sub>+CH<sub>4</sub> to CH<sub>4</sub> from storage
+NATURAL_LOG_ARRHENIUS_CONSTANT , 30.6 g CH<sub>4</sub>/kg VS/h , Log of Arrhenius parameter for methane emissions from stored manure 
+STORAGE_RESISTANCE , 23.1 s/m , Default resistance to ammonia volatilization  
+SLURRY_MANURE_DENSITY , 990 kg/m$^3$ , Default density of manure as excreted.
+AMMONIA_EMISSION_COEFFICIENT_UNTILLED , 0.25 , Ammonia emission coefficient (no mixing) 
+AMMONIA_EMISSION_COEFFICIENT_TILLED , 0.5 , Ammonia emission coefficient (with mixing) 
+DEFAULT_DAYS_SINCE_LAST_MIXING , 1 d , Days since last mixing for C decomposition 
+NITROUS_OXIDE_EMISSION_UNTILLED , 0.01 , N<sub>2</sub>O-N emitted per kg manure N/day (no mixing)
+NITROUS_OXIDE_EMISSION_TILLED , 0.07 , N<sub>2</sub>O-N emitted per kg manure N/day (with mixing)
+HOUSING_SPECIFIC_CONSTANT , 260.0 s/m , Default constant for ammonia emissions from housing
+DEFAULT_PH_FOR_HOUSING_AMMONIA , 7.7 , Default pH for manure on housing floors
+MILKING_FRESH_WATER_USE_RATE , 30 L/animal/day , Milking water use rate per animal 
+WATER_DENSITY_KG_PER_M3 , 0.997 kg/m$^3$ , Default water density 
+CARBON_DIOXIDE_MOLAR_MASS , 44.01 g/mol , Molar mass of CO<sub>2</sub>
+CARBON_DIOXIDE_TO_METHANE_RATIO , 4-6 , Volumetric ratio of CO<sub>2</sub> to CH<sub>4</sub> during digestion
+IDEAL_GAS_LAW_R , 0.0821 L atm/mol K , Ideal gas law constant
+METHANE_MOLAR_MASS , 16.04 g/mol , Molar mass of CH<sub>4</sub> 
+TAN_INCREASE_FACTOR , 1.60 , TAN increase from anaerobic digestion (unitless)
+DEFAULT_LAYER_TEMPERATURE , 30°C , Default layer temperature for decomposition
+DECOMPOSITION_TEMPERATURE , 60°C, Temperature for peak microbial activity
+DEFAULT_CARBON_FRACTION_VSD , 0.5 , Carbon content of degradable VS
+DEFAULT_CARBON_FRACTION_VSND , 0.35 , Carbon content of non-degradable VS
+DEFAULT_MOISTURE_EFFECT , 0.65 , Moisture effect on microbial decomposition 
+DEFAULT_LAG_TIME , 2 d , Lag time for C decomposition
+EFFECTIVE_MICROBIAL_DECOMP_RATE , 0.00237 , Microbial decomposition rate (unitless)
+FIRST_ORDER_DECAY_COEFFICIENT , 0.01 , First-order decay coefficient
+LEACHING_COEFFICIENT , -- , N leached per kg manure N/day
+DEFAULT_DAYS_SINCE_LAST_HARROW , 1 d , Days since last harrow event
+ACHIEVABLE_METHANE_EMISSION , 0.24 m$^3$ CH<sub>4</sub>/kg VS , Achievable methane generation
+SOLID_MANURE_DENSITY , 700 kg/m$^3$ , Default solid manure density
+LIQUID_MANURE_DENSITY , 1000 kg/m$^3$ , Default liquid manure density
