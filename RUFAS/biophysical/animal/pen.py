@@ -1270,9 +1270,11 @@ class Pen:
         """Returns the pen-average enteric methane emission and urine nitrogen excretion (NASEM standard)."""
         animals = list(self.animals_in_pen.values())
         avg_enteric_methane = sum(
-            a.digestive_system.enteric_methane_emission
-            if a.animal_type.is_heifer
-            else a.digestive_system.enteric_methane_for_energy
+            (
+                a.digestive_system.enteric_methane_emission
+                if a.animal_type.is_heifer
+                else a.digestive_system.enteric_methane_for_energy
+            )
             for a in animals
         ) / len(animals)
         avg_urine_nitrogen = sum(a.digestive_system.manure_excretion.urine_nitrogen for a in animals) / len(animals)
