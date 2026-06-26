@@ -19,6 +19,7 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set
 
 from RUFAS.input_manager import InputManager
@@ -681,7 +682,57 @@ class EconomicPreprocessor:
         return getattr(raw, "value", raw)
 
     def _build_bedding_name_to_type(self, item: EconomicItem) -> Dict[str, Any]:
-        """Map each bedding config ``name`` to its canonical ``bedding_type``."""
+        """Map each bedding config ``name`` to its canonical ``bedding_type``.
+
+        A pen refers to its bedding by the user-defined ``name`` field of a
+        bedding config (e.g. ``"calf_straw"``), while commodity price files are
+        keyed by the canonical ``bedding_type`` (e.g. ``"straw"``). This builds
+        the lookup used to translate the former into the latter so the correct
+        price file can be selected for each pen (issue #3088).
+
+        The bedding configs are read from the InputManager at
+        ``item.bedding_configs_path`` (defaulting to ``"animal.bedding_configs"``)
+        and are expected to be a list of dicts. Each config's ``bedding_type`` is
+        normalized to a plain string via :meth:`_bedding_type_value`. Entries that
+        are not dicts, or that lack a ``name``, are skipped; a config missing a
+        ``bedding_type`` maps to ``None``.
+
+        Parameters
+        ----------
+        item : EconomicItem
+            The mapping entry being processed. Only ``bedding_configs_path`` is
+            used here.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A mapping of each bedding config ``name`` to its ``bedding_type``.
+            Empty when no bedding configs are available.
+
+        Examples
+        --------
+        Given the following ``animal.bedding_configs`` input::
+
+            [
+                {"name": "calf_straw", "bedding_type": "straw"},
+                {"name": "closeup_sawdust", "bedding_type": "sawdust"},
+                {"name": "lac_and_growing_sand", "bedding_type": "sand"},
+                {"name": "none (no bedding)", "bedding_type": "none"},
+            ]
+
+        the returned mapping is::
+
+            {
+                "calf_straw": "straw",
+                "closeup_sawdust": "sawdust",
+                "lac_and_growing_sand": "sand",
+                "none (no bedding)": "none",
+            }
+
+        A pen whose ``bedding_name`` is ``"calf_straw"`` therefore resolves to
+        type ``"straw"``, which selects the straw ``dollar_per_head`` price file.
+        A pen resolving to ``"none"`` is later treated as having no bedding cost.
+        """
 
         path = item.bedding_configs_path or "animal.bedding_configs"
         configs = self.im.get_data(path)
@@ -1141,6 +1192,7 @@ class EconomicPreprocessor:
             data=results,
             properties_blob_key="economic_preprocessing_properties",
             eager_termination=False,
+            input_path=Path("economic_preprocessed"),
         )
         self.om.add_log(
             "Economic preprocessing",
