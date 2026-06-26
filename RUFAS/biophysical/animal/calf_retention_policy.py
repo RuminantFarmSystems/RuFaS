@@ -54,7 +54,6 @@ class CalfRetentionPolicy:
 
     def __init__(self) -> None:
         self.om = OutputManager()
-        # Count-method (Option 2) per-year ledger. Unused under the rate method.
         self._scheduled_year: int | None = None
         self._daily_tag_release: dict[int, int] = {}
         self._outstanding_tags: int = 0
@@ -90,8 +89,6 @@ class CalfRetentionPolicy:
     def finalize_day(self, time: RufasTime) -> None:
         """
         Emit the year-end warning on the last day of a simulation year (count method).
-
-
 
         Parameters
         ----------
