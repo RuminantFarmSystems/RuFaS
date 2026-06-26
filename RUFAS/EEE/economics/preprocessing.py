@@ -877,9 +877,11 @@ class EconomicPreprocessor:
 
         daily_area_by_seed = self._preprocess_seed_costs()
 
-        # biophysical_values: concatenation of all per-seed daily arrays.
         biophysical_values: dict[str, list[float]] = {}
+        bio_total: dict[str, float] = {}
+        price_data: dict[str, list[float]] = {}
         price_values: dict[str, list[float]] = {}
+        price_aggregate: dict[str,float] = {}
         total_seed_cost = 0.0
 
         for seed_key, daily_area in daily_area_by_seed.items():
@@ -896,16 +898,15 @@ class EconomicPreprocessor:
             if not extracted_prices:
                 continue
 
-            # avg_price = self._aggregate(extracted_prices, "average")
-            # if avg_price is None:
-            #     continue
-
             daily_price_per_area = [
                 seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area)
             ]
-            biophysical_values[seed_key] = extracted_prices     # is that right?
-            price_values[seed_key] = daily_price_per_area       # is that right?
-            total_seed_cost += sum(daily_price_per_area)        # is that right?
+            biophysical_values[seed_key] = daily_area_by_seed[seed_key]
+            price_values[seed_key] = extracted_prices
+            bio_total[seed_key] = sum(biophysical_values[seed_key])
+            price_data[seed_key] = raw_price
+            price_aggregate[seed_key] = self._aggregate(extracted_prices, "average")
+            total_seed_cost += sum(daily_price_per_area)
 
         if not daily_area_by_seed:
             self.om.add_warning(
@@ -914,15 +915,14 @@ class EconomicPreprocessor:
                 info_map,
             )
 
-        bio_total = 0.0     # what to put here
         return {
             "biophysical_values": biophysical_values,
             "biophysical_aggregate": bio_total,
             "biophysical_values_by_scenario": {"baseline": biophysical_values},
             "biophysical_aggregate_by_scenario": {"baseline": bio_total},
-            "price_data": {},
+            "price_data": price_data,
             "price_values": price_values,
-            "price_aggregate": 0.0,         # what to put here
+            "price_aggregate": price_aggregate,
             "line_item_values_by_scenario": {"baseline": total_seed_cost},
             "flow_type": "cost",
         }
