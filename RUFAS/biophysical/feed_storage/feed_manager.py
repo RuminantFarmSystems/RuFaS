@@ -320,16 +320,6 @@ class FeedManager:
         for storage in self.active_storages.values():
             if storage.crop_name == crop_name and field_name in storage.field_names:
                 storage.receive_crop(harvested_crop, simulation_day)
-                self._om.add_variable(
-                    f"farmgrown_feed_{storage.rufas_feed_id}_received",
-                    harvested_crop.dry_matter_mass,
-                    {
-                        "class": self.__class__.__name__,
-                        "function": self.receive_crop.__name__,
-                        "simulation_day": simulation_day,
-                        "units": MeasurementUnits.DRY_KILOGRAMS,
-                    },
-                )
                 return
         else:
             info_map = {
@@ -865,11 +855,6 @@ class FeedManager:
                     "simulation_day": simulation_day,
                     "amount": amount,
                 },
-                info_map,
-            )
-            self._om.add_variable(
-                f"farmgrown_feed_{feed_id}_fed_dm",
-                amount,
                 info_map,
             )
 

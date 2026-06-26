@@ -127,12 +127,6 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "input_manager": ["economic_inputs.Feed_storage.labor_hours_per_day"],
                 "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
             },
-            "Homegrown feed fed": {
-                "biophysical_simulation": ["FeedManager._log_feed_deductions.farmgrown_feed_.*_fed_dm"],
-                "use_feed_config_price_map": True,
-                "notes": "Cost of homegrown feed fed to animals, valued at commodity price per kg DM. "
-                "Wildcard matches each RuFaS feed ID; price is resolved automatically from feed_storage_configurations.",
-            },
             "Purchased feed costs": {
                 "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_.*_cost"],
                 "economics_files": [
@@ -275,12 +269,6 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
         },
         "Revenue": {
-            "Homegrown feed received": {
-                "biophysical_simulation": ["FeedManager.receive_crop.farmgrown_feed_.*_received"],
-                "use_feed_config_price_map": True,
-                "notes": "Revenue from homegrown crops received into storage, valued at commodity price per kg DM. "
-                "Wildcard matches each RuFaS feed ID; price is resolved automatically from feed_storage_configurations.",
-            },
             "Feed_sales": {
                 "biophysical_simulation": ["CropManagement._record_yield.harvest_yield.field='field_.*'"],
                 "economics_files": [
@@ -315,7 +303,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "map against the "
                 "commodity prices "
                 "here",
-            },
+            }
         },
     },
     "Manure": {
