@@ -515,7 +515,11 @@ class Pen:
                 feeds_used=available_feeds,
                 ration_formulation=self.ration,
                 body_weight=animal.body_weight,
-                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                enteric_methane=(
+                    animal.digestive_system.enteric_methane_for_energy
+                    if animal.animal_type.is_cow
+                    else animal.digestive_system.enteric_methane_emission
+                ),
                 urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrition_supply = nutrient_supply
@@ -1022,7 +1026,11 @@ class Pen:
                 feeds_used=feeds_used,
                 ration_formulation=ration_formulation,
                 body_weight=animal.body_weight,
-                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                enteric_methane=(
+                    animal.digestive_system.enteric_methane_for_energy
+                    if animal.animal_type.is_cow
+                    else animal.digestive_system.enteric_methane_emission
+                ),
                 urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrients.set_dry_matter_intake(animal.nutrition_supply.dry_matter)
@@ -1261,7 +1269,12 @@ class Pen:
     def _calculate_pen_nasem_averages(self) -> tuple[float, float]:
         """Returns the pen-average enteric methane emission and urine nitrogen excretion (NASEM standard)."""
         animals = list(self.animals_in_pen.values())
-        avg_enteric_methane = sum(a.digestive_system.enteric_methane_emission for a in animals) / len(animals)
+        avg_enteric_methane = sum(
+            a.digestive_system.enteric_methane_emission
+            if a.animal_type.is_heifer
+            else a.digestive_system.enteric_methane_for_energy
+            for a in animals
+        ) / len(animals)
         avg_urine_nitrogen = sum(a.digestive_system.manure_excretion.urine_nitrogen for a in animals) / len(animals)
         return avg_enteric_methane, avg_urine_nitrogen
 
