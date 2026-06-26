@@ -28,21 +28,29 @@ class DummyOutputManager:
 
 
 class DummyInputManager:
-    def __init__(self, data):
+    def __init__(self, data, field_keys=None):
         self._data = {
-            "config.start_date": "2020:01:01",
-            "config.end_date": "2020:12:31",
+            "config.start_date": "2020:1",
+            "config.end_date": "2020:365",
             "config.FIPS_county_code": 1001,
             "_default_values": {"commodity": [], "2020": []},
             "_default_fallback_values": {"commodity": [], "2020": []},
             **data,
         }
+        self._field_keys = field_keys or []
         self.added_runtime = []
 
     def get_data(self, key):
         return self._data.get(key)
 
-    def add_runtime_variable_to_pool(self, variable_name, data, properties_blob_key, eager_termination=False):
+    def get_data_keys_by_properties(self, properties_key):
+        if properties_key == "field_properties":
+            return self._field_keys
+        return []
+
+    def add_runtime_variable_to_pool(
+        self, variable_name, data, properties_blob_key, eager_termination=False, input_path=None
+    ):
         self.added_runtime.append(
             {
                 "variable_name": variable_name,
@@ -528,3 +536,197 @@ def test_preprocess_expands_input_wildcard_with_value_map(monkeypatch: pytest.Mo
         {"X": "A", "Y": "B", "Z": "C"},
     )
     assert values == [5.0, 6.0, 7.0]
+
+
+def _seed_cost_map():
+    """Minimal ECONOMIC_MAP for seed cost tests."""
+    return {
+        "Soil_and_crop": {
+            "Costs": {
+                "Seeds costs": {
+                    "biophysical_simulation": ["field.crop_specification", "field.field_size"],
+                    "economics_files": ["commodity_prices_corn_seed_dollar_per_square_meter"],
+                }
+            }
+        }
+    }
+
+
+def _corn_schedule(plant_day: int, kill_day: int, year: int = 2020) -> dict:
+    """Build a minimal corn_silage crop schedule dict for tests."""
+    return {
+        "crop_species": "corn_silage",
+        "planting_years": [year],
+        "planting_days": [plant_day],
+        "harvest_years": [year],
+        "harvest_days": [kill_day],
+        "harvest_operations": ["harvest_kill"],
+        "pattern_repeat": 0,
+        "planting_skip": 0,
+        "harvesting_skip": 0,
+    }
+
+
+def test_preprocess_seed_costs_daily_array_shape_and_values(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Daily area array has length == sim days with correct values inside the growing period.
+
+    Sim: 2020:1 → 2020:365  (365 days, indices 0-364)
+    field_a: 1 ha corn_silage, planted day 100, killed day 200.
+      plant_idx = 99, kill_idx = 199, duration = 100
+      daily_value = 10,000 / 100 = 100.0
+      Array is 100.0 for indices 99-198, 0.0 elsewhere.
+    """
+    dummy_im = DummyInputManager(
+        data={
+            "field_a": {"crop_specification": "RotA", "field_size": 1.0},
+            "RotA.crop_schedules": [_corn_schedule(100, 200)],
+            "commodity_prices_corn_seed_dollar_per_square_meter": {"fips": [1001], "2020": [0.01]},
+        },
+        field_keys=["field_a"],
+    )
+    dummy_om = DummyOutputManager({})
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    daily = preprocessor._preprocess_seed_costs()
+
+    seed_key = "commodity_prices_corn_seed_dollar_per_square_meter"
+    assert seed_key in daily
+    arr = daily[seed_key]
+    assert len(arr) == 365
+    assert arr[98] == pytest.approx(0.0)   # day 99 (index 98) — before planting
+    assert arr[99] == pytest.approx(100.0)  # planting day (index 99)
+    assert arr[198] == pytest.approx(100.0) # last day of growth (index 198)
+    assert arr[199] == pytest.approx(0.0)   # harvest day — not included
+    assert sum(arr) == pytest.approx(10_000.0)  # 100 days × 100 m²/day
+
+
+def test_preprocess_seed_costs_computes_total_cost(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Total seed cost = sum(daily_area) × avg_price across all fields and seed types.
+
+    Sim: 2020:1 → 2020:365
+    field_a: 1 ha corn_silage, day 100→200:  sum = 10,000 m²
+    field_b: 2 ha corn_grain,  day  50→150:  sum = 20,000 m²
+             2 ha alfalfa_silage (no seed key) — skipped
+    corn_seed price = $0.01/m²  →  total = 30,000 × 0.01 = $300
+    """
+    dummy_im = DummyInputManager(
+        data={
+            "field_a": {"crop_specification": "RotA", "field_size": 1.0},
+            "field_b": {"crop_specification": "RotB", "field_size": 2.0},
+            "RotA.crop_schedules": [_corn_schedule(100, 200)],
+            "RotB.crop_schedules": [
+                {
+                    "crop_species": "corn_grain",
+                    "planting_years": [2020],
+                    "planting_days": [50],
+                    "harvest_years": [2020],
+                    "harvest_days": [150],
+                    "harvest_operations": ["harvest_kill"],
+                    "pattern_repeat": 0,
+                    "planting_skip": 0,
+                    "harvesting_skip": 0,
+                },
+                {
+                    "crop_species": "alfalfa_silage",
+                    "planting_years": [2020],
+                    "planting_days": [155],
+                    "harvest_years": [2020],
+                    "harvest_days": [300],
+                    "harvest_operations": ["harvest_kill"],
+                    "pattern_repeat": 0,
+                    "planting_skip": 0,
+                    "harvesting_skip": 0,
+                },
+            ],
+            "commodity_prices_corn_seed_dollar_per_square_meter": {"fips": [1001], "2020": [0.01]},
+        },
+        field_keys=["field_a", "field_b"],
+    )
+    dummy_om = DummyOutputManager({})
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(preprocessing, "ECONOMIC_MAP", _seed_cost_map())
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Soil_and_crop"]["Costs"]["Seeds costs"]
+    assert item["flow_type"] == "cost"
+    assert item["line_item_values_by_scenario"]["baseline"] == pytest.approx(300.0)
+
+
+def test_preprocess_seed_costs_warns_on_missing_field_data(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Seed costs handler emits warning when no field keys are available."""
+
+    dummy_im = DummyInputManager(data={}, field_keys=[])
+    dummy_om = DummyOutputManager({})
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(preprocessing, "ECONOMIC_MAP", _seed_cost_map())
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Soil_and_crop"]["Costs"]["Seeds costs"]
+    assert item["line_item_values_by_scenario"]["baseline"] == pytest.approx(0.0)
+    warning_codes = [code for code, _, _ in dummy_om.warnings]
+    assert "MissingBiophysicalData" in warning_codes
+
+
+def test_preprocess_seed_costs_clips_period_to_simulation_window(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Growing periods that extend beyond the simulation window are clipped.
+
+    Sim: 2020:1 → 2020:365  (365 days, indices 0-364)
+    field: 1 ha corn_silage, planted day 300, killed day 100 of 2021.
+      plant_idx = 299, kill_idx = (2021_day100 - 2020_day1).days = 464
+      Clipped range: [299, 365)  →  66 days active
+      duration (unclipped) = 464 - 299 = 165
+      daily_value = 10,000 / 165 ≈ 60.6
+      sum(arr) ≈ 66 × 60.6 ≈ 4,000  (= 10,000 × 66/165)
+    """
+    dummy_im = DummyInputManager(
+        data={
+            "field_a": {"crop_specification": "RotA", "field_size": 1.0},
+            "RotA.crop_schedules": [
+                {
+                    "crop_species": "corn_silage",
+                    "planting_years": [2020],
+                    "planting_days": [300],
+                    "harvest_years": [2021],
+                    "harvest_days": [100],
+                    "harvest_operations": ["harvest_kill"],
+                    "pattern_repeat": 0,
+                    "planting_skip": 0,
+                    "harvesting_skip": 0,
+                }
+            ],
+        },
+        field_keys=["field_a"],
+    )
+    dummy_om = DummyOutputManager({})
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    daily = preprocessor._preprocess_seed_costs()
+
+    seed_key = "commodity_prices_corn_seed_dollar_per_square_meter"
+    arr = daily[seed_key]
+    assert len(arr) == 365
+    assert arr[298] == pytest.approx(0.0)  # before planting
+
+    from datetime import datetime
+
+    plant_date = datetime.strptime("2020:300", "%Y:%j")
+    kill_date = datetime.strptime("2021:100", "%Y:%j")
+    start_date = datetime.strptime("2020:1", "%Y:%j")
+    duration = (kill_date - plant_date).days
+    expected_daily = 10_000.0 / duration
+    expected_sum = 10_000.0 * 66 / duration
+
+    assert arr[299] == pytest.approx(expected_daily)
+    assert arr[364] == pytest.approx(expected_daily)
+    assert sum(arr) == pytest.approx(expected_sum)
