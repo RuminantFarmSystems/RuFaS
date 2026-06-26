@@ -342,8 +342,6 @@ class HerdFactory:
         cow.reproduction.calf_birth_weight = 0.0
 
         calf = Animal(args, self.time)
-        # Herd initialization runs on a static clock, so count-based scheduling is not
-        # applicable here; stock the initial herd with rate-based retention (Option 1).
         CalfRetentionPolicy.apply_rate_based(calf, self.time.simulation_day)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
