@@ -1333,13 +1333,6 @@ class Animal:
             self.stillborn_day = simulation_day
             self.events.add_event(0, simulation_day, animal_constants.STILL_BIRTH)
 
-        is_sold = (
-            True
-            if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate or self.sold_at_day)
-            else False
-        )
-        self.sold_at_day = simulation_day if is_sold else None
-
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("birth_weight", 0.0)
         self.wean_weight = 0.0
