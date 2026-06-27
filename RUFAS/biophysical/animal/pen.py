@@ -1267,13 +1267,21 @@ class Pen:
         )
 
     def _calculate_pen_nasem_averages(self) -> tuple[float, float]:
-        """Returns the pen-average enteric methane emission and urine nitrogen excretion (NASEM standard)."""
+        """
+        Returns the pen-average enteric methane emission and urine nitrogen excretion (NASEM standard).
+
+        Notes
+        -----
+        Uses mitigated enteric methane levels for all animals except cows for which the unmitigated enteric methane
+        level is used.
+
+        """
         animals = list(self.animals_in_pen.values())
         avg_enteric_methane = sum(
             (
-                a.digestive_system.enteric_methane_emission
-                if a.animal_type.is_heifer
-                else a.digestive_system.enteric_methane_for_energy
+                a.digestive_system.enteric_methane_for_energy
+                if a.animal_type.is_cow
+                else a.digestive_system.enteric_methane_emission
             )
             for a in animals
         ) / len(animals)
