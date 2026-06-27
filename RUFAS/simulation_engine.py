@@ -301,7 +301,7 @@ class SimulationEngine:
 
     def _post_simulation_processing(self) -> None:
         """Runs end-of-simulation calculations for all active modules."""
-        EEEManager.estimate_all()
+        EEEManager.estimate_all(self.simulate_animals, self.simulate_feed, self.simulate_fields, self.simulate_manure)
 
     def _post_simulation_reporting(self) -> None:
         """Runs end-of-simulation reporting for all active modules."""
