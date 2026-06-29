@@ -17,6 +17,7 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set
 
 from RUFAS.input_manager import InputManager
@@ -765,6 +766,7 @@ class EconomicPreprocessor:
             data=results,
             properties_blob_key="economic_preprocessing_properties",
             eager_termination=False,
+            input_path=Path("<computed: EconomicPreprocessor.preprocess>"),
         )
         self.om.add_log(
             "Economic preprocessing",

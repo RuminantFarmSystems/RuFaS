@@ -177,44 +177,63 @@ class DCFRORCalculator:
         operating_costs = np.asarray((operating_units * operating_unit_costs).sum(axis=0), dtype=float)
         revenue = np.asarray((revenue_units * revenue_prices).sum(axis=0), dtype=float)
 
-        # Apply digester cost-curve economics directly when digester capital
-        # items are present in the capital-cost breakdown.
-        # This makes the documented digester costing methods influence
-        # project CAPEX/OPEX in the DCFROR result stream.
-        digester_rows = [row for row in cap_breakdown if "digester" in str(row.get("Item", "")).lower()]
-        if digester_rows:
-            cow_count = float(self.im.get_data("animal_properties.herd_information.cow_num"))
-            digester_config = self.im.get_data("manure_management_properties.anaerobic_digester")
-            hydraulic_retention_time_days = float(digester_config[0]["hydraulic_retention_time"])
-            digester_volume_proxy = max(1.0, cow_count * hydraulic_retention_time_days)
-
-            annual_fixed_cost = DigesterCostCalculator.calculate_digester_capital_cost(
-                animal_units=cow_count,
-                digester_volume=digester_volume_proxy,
-            )
+        # Apply digester cost-curve economics whenever anaerobic digesters are
+        # configured for the farm. The authoritative trigger is the presence of
+        # digesters in the manure configuration -- not the naming of rows in the
+        # capital-cost breakdown -- so the documented digester costing methods
+        # always influence project CAPEX/OPEX when a farm runs digesters
+        # (see issue #3063). Costs are aggregated across every configured
+        # digester rather than only the first one.
+        digester_config = self._get_digester_config()
+        if digester_config:
+            cow_count = float(self.im.get_data("animal.herd_information.cow_num"))
             discount_rate = float(input_dict["loan_interest_rate"])
             project_life_years = int(input_dict["project_term"])
             crf = DigesterCostCalculator.capital_recovery_factor(discount_rate, project_life_years)
-            digester_capex = DigesterCostCalculator.calculate_digester_capex(annual_fixed_cost, crf)
-            # Equation-5 scaling factor (six-tenths rule) for installed cost
-            # adjusted by effective digester volume proxy.
-            digester_capex = DigesterCostCalculator.scale_installed_cost(
-                base_cost=digester_capex,
-                volume=digester_volume_proxy,
-                base_volume=max(1.0, cow_count),
-                install_factor=0.6,
-            )
-            annual_opex_total = DigesterCostCalculator.calculate_digester_operational_cost(
-                True,
-                animal_units=cow_count,
-                farm_type_flag=1.0,
-                below_ground_flag=1.0,
-                concrete_flag=1.0,
-                steel_flag=0.0,
-            )
 
-            prior_digester_capex = float(sum(float(r.get("Cost", 0.0)) for r in digester_rows))
-            base_cost = base_cost - prior_digester_capex + digester_capex
+            digester_capex_total = 0.0
+            annual_opex_total = 0.0
+            for digester in digester_config:
+                hydraulic_retention_time_days = float(digester["hydraulic_retention_time"])
+                # NOTE: the ``cow_count * HRT`` volume proxy and the Equation-1
+                # capital-cost method below are carried over unchanged from the
+                # original implementation. The canonical CAPEX method and the
+                # true digester "volume" remain a maintainer decision (see the
+                # issue #3063 investigation); this fix only makes the existing
+                # costing reachable from real inputs and aggregates it.
+                digester_volume_proxy = max(1.0, cow_count * hydraulic_retention_time_days)
+
+                annual_fixed_cost = DigesterCostCalculator.calculate_digester_capital_cost(
+                    animal_units=cow_count,
+                    digester_volume=digester_volume_proxy,
+                )
+                digester_capex = DigesterCostCalculator.calculate_digester_capex(annual_fixed_cost, crf)
+                # Equation-5 scaling factor (six-tenths rule) for installed cost
+                # adjusted by effective digester volume proxy.
+                digester_capex = DigesterCostCalculator.scale_installed_cost(
+                    base_cost=digester_capex,
+                    volume=digester_volume_proxy,
+                    base_volume=max(1.0, cow_count),
+                    install_factor=0.6,
+                )
+                digester_capex_total += digester_capex
+                annual_opex_total += DigesterCostCalculator.calculate_digester_operational_cost(
+                    True,
+                    animal_units=cow_count,
+                    farm_type_flag=1.0,
+                    below_ground_flag=1.0,
+                    concrete_flag=1.0,
+                    steel_flag=0.0,
+                )
+
+            # Subtract any placeholder digester line items already present in the
+            # capital-cost breakdown so the computed CAPEX is not double counted,
+            # then add the computed digester CAPEX on top of the remaining
+            # (non-digester) capital cost.
+            prior_digester_capex = float(
+                sum(float(r.get("Cost", 0.0)) for r in cap_breakdown if "digester" in str(r.get("Item", "")).lower())
+            )
+            base_cost = base_cost - prior_digester_capex + digester_capex_total
             operating_costs = operating_costs + annual_opex_total
             capital_cost = base_cost
 
@@ -231,6 +250,27 @@ class DCFRORCalculator:
             "revenue": revenue[:project_term],
             "operating_costs": operating_costs[:project_term],
         }
+
+    def _get_digester_config(self) -> list:
+        """Return the configured anaerobic digesters, or an empty list.
+
+        Digester presence in the manure configuration -- rather than the
+        naming of capital-cost breakdown rows -- is the authoritative trigger
+        for digester economics (issue #3063). A missing input key or an empty
+        configuration cleanly disables the digester cost curve so non-digester
+        farms keep their plain capital cost.
+        """
+
+        try:
+            config = self.im.get_data("manure_management.anaerobic_digester")
+        except Exception:
+            return []
+        if not config:
+            return []
+        try:
+            return list(config)
+        except TypeError:
+            return []
 
     def _prepare_financing(self, input_dict: Dict[str, Any], project_term: int) -> Dict[str, Any]:
         """Normalise financing inputs and enforce valid borrowing shares."""
