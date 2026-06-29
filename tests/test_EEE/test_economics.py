@@ -10,26 +10,26 @@ from RUFAS.EEE.economics.metrics import EconomicMetrics
 from RUFAS.EEE.economics.digester_costs import (
     DigesterCostCalculator,
 )
-from RUFAS.EEE.economics.equations import (
-    construct_timeline,
-    discount_factor,
-    annual_capital_spent,
-    equity_contribution,
-    loan_principal,
-    construction_interest,
-    npv_capital_plus_interest,
-    annual_loan_payment,
-    interest_payment,
-    principal_after_payment,
-    depreciation_schedule,
-    net_revenue,
-    loss_carry_forward,
-    taxable_income,
-    income_tax,
-    annual_cash_income,
-    present_value,
-    net_present_value,
-)
+from RUFAS.EEE.economics.equations import EconomicEquations
+
+construct_timeline = EconomicEquations.construct_timeline
+discount_factor = EconomicEquations.discount_factor
+annual_capital_spent = EconomicEquations.annual_capital_spent
+equity_contribution = EconomicEquations.equity_contribution
+loan_principal = EconomicEquations.loan_principal
+construction_interest = EconomicEquations.construction_interest
+npv_capital_plus_interest = EconomicEquations.npv_capital_plus_interest
+annual_loan_payment = EconomicEquations.annual_loan_payment
+interest_payment = EconomicEquations.interest_payment
+principal_after_payment = EconomicEquations.principal_after_payment
+depreciation_schedule = EconomicEquations.depreciation_schedule
+net_revenue = EconomicEquations.net_revenue
+loss_carry_forward = EconomicEquations.loss_carry_forward
+taxable_income = EconomicEquations.taxable_income
+income_tax = EconomicEquations.income_tax
+annual_cash_income = EconomicEquations.annual_cash_income
+present_value = EconomicEquations.present_value
+net_present_value = EconomicEquations.net_present_value
 
 
 def test_run_economic_analysis_uses_dcfror_when_capital_present(
