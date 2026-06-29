@@ -91,6 +91,7 @@ v1.0.0
 - [3049](https://github.com/RuminantFarmSystems/RuFaS/pull/3049) - [minor change] [Utility] [NoInputChange] [NoOutputChange] Updates docstrings across 9 utility files to NumPy-style format.
 - [3100](https://github.com/RuminantFarmSystems/RuFaS/pull/3100) - [minor change] [Maintenance] [NoInputChange] [NoOutputChange] Aligns formatting on docstrings for `tuple` returns.
 - [3043](https://github.com/RuminantFarmSystems/RuFaS/pull/3043) - [minor change] [Animal] [Ration] [NoInputChange] [NoOutputChange] Refactor `Pen.formulate_optimized_ration` to remove the `# noqa: C901`; behavior unchanged.
+- [3120](https://github.com/RuminantFarmSystems/RuFaS/issues/3120) - [minor change] [Animal] [InputChange] [NoOutputChange] Make oversupply cull eligibility (minimum days in milk, maximum days carried calf) and ranking criteria (`milk` or `305_day_milk`) user inputs instead of hard-coded values.
 
 ### v1.0.0
 
@@ -406,7 +407,6 @@ v1.0.0
 - [2850](https://github.com/RuminantFarmSystems/RuFaS/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
 - [2908](https://github.com/RuminantFarmSystems/RuFaS/pull/2908) - [minor change] [NoInputChange] [OutputChange] Fix the FarmGrownFeed Emissions Unit issue on `test` branch.
 - [2964](https://github.com/RuminantFarmSystems/RuFaS/pull/2964) - [minor change] [NoInputChange] [NoOutputChange] Patched a missing comma in freestall task input
-- [3109](https://github.com/RuminantFarmSystems/RuFaS/issues/3109) - [minor change] [Animal] [InputChange] [NoOutputChange] Make oversupply cull eligibility (minimum days in milk, maximum days carried calf) and ranking criteria (`milk` or `305_day_milk`) user inputs instead of hard-coded values.
 
 ### v0.9.2
 
