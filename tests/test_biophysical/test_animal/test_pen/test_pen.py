@@ -108,6 +108,7 @@ def animals_in_pen() -> dict[int, Animal]:
         milk_production=milk_production,
         daily_distance=10,
         nutrition_supply=nutrition_supply,
+        enteric_methane=8.5,
     )
     animal_2 = MagicMock(spec=Animal)
     animal_2.configure_mock(
@@ -120,6 +121,7 @@ def animals_in_pen() -> dict[int, Animal]:
         body_weight=50,
         daily_distance=10,
         nutrition_supply=nutrition_supply,
+        enteric_methane=8.5,
     )
     return {1: animal_1, 2: animal_2}
 
@@ -2283,7 +2285,6 @@ def test_attempt_formulation_user_defined_and_nasem(
     pen.animals_in_pen = animals_in_pen
     for animal in pen.animals_in_pen.values():
         animal.nutrient_standard = NutrientStandard.NASEM
-        animal.enteric_methane = 8.5
         animal.digestive_system.manure_excretion.urine_nitrogen = 1.0
 
     user_defined_for_combo = {"feed1": 1.0, "feed2": 2.0}
@@ -2371,6 +2372,16 @@ def test_calculate_pen_nasem_averages_single_animal(pen: Pen) -> None:
 
     assert avg_methane == pytest.approx(42.0)
     assert avg_nitrogen == pytest.approx(7.5)
+
+
+def test_calculate_pen_nasem_averages_empty_pen(pen: Pen) -> None:
+    """An empty pen returns zero averages."""
+    pen.animals_in_pen = {}
+
+    avg_methane, avg_nitrogen = pen._calculate_pen_nasem_averages()
+
+    assert avg_methane == pytest.approx(0.0)
+    assert avg_nitrogen == pytest.approx(0.0)
 
 
 def test_apply_successful_solution(mocker: MockerFixture, pen: Pen) -> None:

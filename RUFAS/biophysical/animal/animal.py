@@ -1293,7 +1293,7 @@ class Animal:
 
     @property
     def enteric_methane(self) -> float:
-        """Returns the enteric methane for an animal based on animal type."""
+        """Returns unmitigated enteric methane for cows and mitigated enteric methane for non-cows."""
         return (
             self.digestive_system.enteric_methane_for_energy
             if self.animal_type.is_cow

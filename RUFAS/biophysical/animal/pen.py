@@ -1277,7 +1277,7 @@ class Pen:
         animals = list(self.animals_in_pen.values())
         if len(animals) == 0:
             return 0.0, 0.0
-        avg_enteric_methane = avg_enteric_methane = sum(a.enteric_methane for a in animals) / len(animals)
+        avg_enteric_methane = sum(a.enteric_methane for a in animals) / len(animals)
         avg_urine_nitrogen = sum(a.digestive_system.manure_excretion.urine_nitrogen for a in animals) / len(animals)
         return avg_enteric_methane, avg_urine_nitrogen
 
