@@ -632,8 +632,8 @@ def test_report_manure_streams_no_pen_manure(mocker: MockerFixture) -> None:
 
     with pytest.raises(ValueError):
         AnimalModuleReporter.report_manure_streams(manure_streams, 10)
-        mock_om_add_variable.assert_not_called()
-        mock_om_add_error.assert_called_once()
+    mock_om_add_variable.assert_not_called()
+    mock_om_add_error.assert_called_once()
 
 
 def test_report_manure_streams(mocker: MockerFixture) -> None:
