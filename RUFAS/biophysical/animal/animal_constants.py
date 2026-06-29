@@ -46,9 +46,25 @@ INJECT_CIDR = "inject CIDR"
 
 # herd size management
 MIN_DIM_FOR_REMOVAL = 60
-"""Minimum days in milk required for a cow to be eligible for removal."""
+"""Default minimum days in milk required for a cow to be eligible for an oversupply removal.
+
+Used as the fallback when the ``cull_eligibility_minimum_days_in_milk`` user input is not provided.
+"""
 MAX_DAYS_IN_PREG_FOR_REMOVAL = 180
-"""Maximum pregnancy duration for a cow to be eligible for removal."""
+"""Default maximum days carrying a calf (days in pregnancy) for a cow to be eligible for an oversupply removal.
+
+Used as the fallback when the ``cull_eligibility_maximum_days_carried_calf`` user input is not provided.
+"""
+
+# oversupply cull ranking criteria
+CULL_RANKING_CRITERIA_MILK = "milk"
+"""Cull ranking criterion that ranks eligible cows by their daily milk production."""
+CULL_RANKING_CRITERIA_305_DAY_MILK = "305_day_milk"
+"""Cull ranking criterion that ranks eligible cows by their 305-day milk yield."""
+CULL_RANKING_CRITERIA_OPTIONS = (CULL_RANKING_CRITERIA_MILK, CULL_RANKING_CRITERIA_305_DAY_MILK)
+"""All valid options for the ``cull_ranking_criteria`` user input."""
+DEFAULT_CULL_RANKING_CRITERIA = CULL_RANKING_CRITERIA_MILK
+"""Default cull ranking criterion used when the ``cull_ranking_criteria`` user input is not provided."""
 
 # presynch protocols
 PRESYNCH_PERIOD_START = "Presynch period started"
