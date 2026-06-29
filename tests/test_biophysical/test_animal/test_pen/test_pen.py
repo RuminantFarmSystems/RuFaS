@@ -104,6 +104,7 @@ def animals_in_pen() -> dict[int, Animal]:
         milk_production=milk_production,
         daily_distance=10,
         nutrition_supply=nutrition_supply,
+        enteric_methane=8.5,
     )
     animal_2 = MagicMock(spec=Animal)
     animal_2.configure_mock(
@@ -116,6 +117,7 @@ def animals_in_pen() -> dict[int, Animal]:
         body_weight=50,
         daily_distance=10,
         nutrition_supply=nutrition_supply,
+        enteric_methane=8.5,
     )
     return {1: animal_1, 2: animal_2}
 
@@ -1532,7 +1534,7 @@ def test_attempt_formulation_user_defined_and_nasem(
 
     assert kwargs["user_defined_ration_dictionary"] == user_defined_for_combo
     assert kwargs["user_defined_ration_tolerance"] == pytest.approx(0.123)
-    assert kwargs["pen_average_enteric_methane"] == pytest.approx(69.4)
+    assert kwargs["pen_average_enteric_methane"] == pytest.approx(8.5)
     assert kwargs["pen_average_urine_nitrogen"] == pytest.approx(15.0)
 
 
