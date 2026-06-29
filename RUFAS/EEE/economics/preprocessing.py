@@ -766,8 +766,6 @@ class EconomicPreprocessor:
             data=results,
             properties_blob_key="economic_preprocessing_properties",
             eager_termination=False,
-            # ``economic_preprocessed`` is computed in-memory (no source file);
-            # input_path is used only for provenance in validation messages.
             input_path=Path("<computed: EconomicPreprocessor.preprocess>"),
         )
         self.om.add_log(
