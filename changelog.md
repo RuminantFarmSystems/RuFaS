@@ -30,6 +30,7 @@ v1.0.0
 - [2998](https://github.com/RuminantFarmSystems/RuFaS/pull/2998) - [minor change] [NoInputChange] [OutputChange] Moved changelog entries to reflect what was in v1.0. Brought changes in 2994 and 2997 into one branch.
 - [3020](https://github.com/RuminantFarmSystems/RuFaS/pull/3020) - [minor change] [NoInputChange] [OutputChange] Corrected manure application ammonia composition calculation
 - [3091](https://github.com/RuminantFarmSystems/RuFaS/pull/3091) - [minor change] [InputChange] [OutputChange] Fixes large seedbed conditioner entry in `tractor_dataset.csv` input.
+- [3121](https://github.com/RuminantFarmSystems/RuFaS/pull/3121) - [minor change] [Animal] [InputChange] [OutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows. Similar changes made to `dev` branch on PR #3115.
   
 ### v1.0.0
 
