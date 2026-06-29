@@ -10,6 +10,9 @@
 	"herd_size_adjustment_period": 30,
   	"herd_size_sell_threshold": 101,
   	"herd_size_buy_threshold": 95,
+  	"cull_eligibility_minimum_days_in_milk": 60,
+  	"cull_eligibility_maximum_days_carried_calf": 180,
+  	"cull_ranking_criteria": "milk",
 	"breed": "HO",
 	"parity_fractions": {
 		"1": 0.36,

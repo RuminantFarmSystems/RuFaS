@@ -100,6 +100,24 @@
         "description": "The threshold that should buy animals to maintain herd size.",
         "minimum": 0
       },
+      "cull_eligibility_minimum_days_in_milk": {
+        "type": "number",
+        "description": "Minimum days in milk a cow must have reached to be eligible for an oversupply cull (protects fresh cows).",
+        "minimum": 0,
+        "default": 60
+      },
+      "cull_eligibility_maximum_days_carried_calf": {
+        "type": "number",
+        "description": "Maximum days carrying a calf (days pregnant) a cow may have to remain eligible for an oversupply cull (protects late-pregnant cows).",
+        "minimum": 0,
+        "default": 180
+      },
+      "cull_ranking_criteria": {
+        "type": "string",
+        "description": "Attribute used to rank eligible cows when selecting which to sell for an oversupply cull. One of 'milk' (daily milk production) or '305_day_milk' (305-day milk yield).",
+        "pattern": "^(milk|305_day_milk)$",
+        "default": "milk"
+      },
       "breed": {
         "type": "string",
         "default": "HO",
