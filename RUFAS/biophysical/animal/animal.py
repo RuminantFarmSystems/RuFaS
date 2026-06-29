@@ -1291,6 +1291,15 @@ class Animal:
                 animal_type=self.animal_type,
             )
 
+    @property
+    def enteric_methane(self) -> float:
+        """Returns the enteric methane for an animal based on animal type."""
+        return (
+            self.digestive_system.enteric_methane_for_energy
+            if self.animal_type.is_cow
+            else self.digestive_system.enteric_methane_emission
+        )
+
     def _assign_sex_to_newborn_calf(self) -> None:
         """
         Assign a sex to a newborn calf based on the semen type and male calf rate.
