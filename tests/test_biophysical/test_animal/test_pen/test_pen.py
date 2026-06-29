@@ -2283,8 +2283,7 @@ def test_attempt_formulation_user_defined_and_nasem(
     pen.animals_in_pen = animals_in_pen
     for animal in pen.animals_in_pen.values():
         animal.nutrient_standard = NutrientStandard.NASEM
-        animal.digestive_system.enteric_methane_for_energy = 8.0
-        animal.digestive_system.enteric_methane_emission = 9.0
+        animal.enteric_methane = 8.5
         animal.digestive_system.manure_excretion.urine_nitrogen = 1.0
 
     user_defined_for_combo = {"feed1": 1.0, "feed2": 2.0}
@@ -2341,6 +2340,7 @@ def _animal_with_nasem_values(enteric_methane: float, urine_nitrogen: float) -> 
     """Builds a mocked Animal whose digestive_system exposes the given NASEM averaging inputs."""
     animal = MagicMock(spec=Animal)
     animal.animal_type = AnimalType.LAC_COW
+    animal.enteric_methane = enteric_methane
     animal.digestive_system = MagicMock()
     animal.digestive_system.enteric_methane_for_energy = enteric_methane
     animal.digestive_system.enteric_methane_emission = enteric_methane
