@@ -105,6 +105,16 @@ class HerdManager:
         Herd size threshold above which animals may be sold.
     buying_threshold : int | float
         Herd size threshold below which replacement animals may be purchased.
+    cull_eligibility_minimum_days_in_milk : int | float
+        Minimum days in milk a cow must have reached to be eligible for an oversupply cull,
+        (simulation days). Protects fresh cows from being sold.
+    cull_eligibility_maximum_days_carried_calf : int | float
+        Maximum days carrying a calf (days in pregnancy) a cow may have to remain eligible for an
+        oversupply cull, (simulation days). Protects late-pregnant cows from being sold.
+    cull_ranking_criteria : str
+        Attribute used to rank eligible cows when selecting which to sell for an oversupply cull.
+        One of ``"milk"`` (daily milk production) or ``"305_day_milk"`` (305-day milk yield); the
+        lowest-ranked eligible cows are sold first.
     housing : dict[str, Any]
         Housing configuration information for the herd.
     pasture_concentrate : dict[str, Any]
@@ -183,6 +193,13 @@ class HerdManager:
         self.adjustment_period = animal_config_data["herd_information"]["herd_size_adjustment_period"]
         self.selling_threshold = animal_config_data["herd_information"]["herd_size_sell_threshold"]
         self.buying_threshold = animal_config_data["herd_information"]["herd_size_buy_threshold"]
+        self.cull_eligibility_minimum_days_in_milk = animal_config_data["herd_information"][
+            "cull_eligibility_minimum_days_in_milk"
+        ]
+        self.cull_eligibility_maximum_days_carried_calf = animal_config_data["herd_information"][
+            "cull_eligibility_maximum_days_carried_calf"
+        ]
+        self.cull_ranking_criteria = animal_config_data["herd_information"]["cull_ranking_criteria"]
         self.herd_reproduction_statistics = HerdReproductionStatistics()
         self.daily_herd_reproduction_statistics = HerdReproductionStatistics()
 
@@ -947,17 +964,51 @@ class HerdManager:
             newborn_calf.events.add_event(newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD)
         return newborn_calf
 
+    def _cull_ranking_value(self, cow: Animal) -> float:
+        """Returns the value used to rank ``cow`` for an oversupply cull, based on the user-defined
+        ``cull_ranking_criteria``.
+
+        Parameters
+        ----------
+        cow : Animal
+            The cow to compute a ranking value for.
+
+        Returns
+        -------
+        float
+            The cow's daily milk production when ``cull_ranking_criteria`` is ``"milk"``, or its
+            305-day milk yield when it is ``"305_day_milk"``.
+
+        Raises
+        ------
+        ValueError
+            If ``cull_ranking_criteria`` is not one of the supported options.
+
+        """
+        if self.cull_ranking_criteria == animal_constants.CULL_RANKING_CRITERIA_MILK:
+            return cow.milk_production.daily_milk_produced
+        if self.cull_ranking_criteria == animal_constants.CULL_RANKING_CRITERIA_305_DAY_MILK:
+            return cow.milk_production.milk_305_day_yield
+        raise ValueError(
+            f"Invalid cull_ranking_criteria '{self.cull_ranking_criteria}'. "
+            f"Valid options are {animal_constants.CULL_RANKING_CRITERIA_OPTIONS}."
+        )
+
     def _get_cow_removal_index(self, removed_animal: list[Animal]) -> int | None:
-        """Finds the indices of cows with the lowest daily milk production among cows that meet the specified
-        days-in-milk and days-pregnant criteria."""
+        """Finds the index of the lowest-ranked cow that is eligible for an oversupply cull.
+
+        Eligibility is governed by the ``cull_eligibility_minimum_days_in_milk`` and
+        ``cull_eligibility_maximum_days_carried_calf`` user inputs (protecting fresh and
+        late-pregnant cows respectively), and ranking is governed by the ``cull_ranking_criteria``
+        user input. The lowest-ranked eligible cow is selected for removal."""
         eligible_indices = []
 
         for index, cow in enumerate(self.cows):
             if cow in removed_animal:
                 continue
             eligible_for_removal = (
-                cow.days_in_milk > animal_constants.MIN_DIM_FOR_REMOVAL
-                and cow.days_in_pregnancy < animal_constants.MAX_DAYS_IN_PREG_FOR_REMOVAL
+                cow.days_in_milk > self.cull_eligibility_minimum_days_in_milk
+                and cow.days_in_pregnancy < self.cull_eligibility_maximum_days_carried_calf
             )
             if eligible_for_removal:
                 eligible_indices.append(index)
@@ -965,8 +1016,7 @@ class HerdManager:
         if not eligible_indices:
             return None
 
-        # For now we keep using daily production so cow-removal behavior stays unchanged.
-        return min(eligible_indices, key=lambda i: self.cows[i].milk_production.daily_milk_produced)
+        return min(eligible_indices, key=lambda i: self._cull_ranking_value(self.cows[i]))
 
     def _check_if_cows_need_to_be_sold(self, simulation_day: int, removed_animal: list[Animal]) -> list[Animal]:
         """Checks if surplus cows need to be sold based on herd size."""

@@ -1280,3 +1280,75 @@ def test_update_replacement_animal_genetics(herd_manager: HerdManager, mocker: M
     mock_genetics_instance.calculate_ebv_and_ranking_index.assert_called_once_with(
         replacement.animal_type, 5.0, 10.0, replacement.calves
     )
+
+
+def test_get_cow_removal_index_ranks_by_milk(herd_manager: HerdManager) -> None:
+    """When cull_ranking_criteria is 'milk', the eligible cow with the lowest daily milk
+    production is selected for removal, regardless of 305-day yield."""
+    herd_manager.cull_eligibility_minimum_days_in_milk = 60
+    herd_manager.cull_eligibility_maximum_days_carried_calf = 180
+    herd_manager.cull_ranking_criteria = "milk"
+
+    # index 0: highest daily milk but lowest 305-day yield.
+    cow_high_daily_low_305 = _create_sortable_mock_cow(1, False, 30.0, 100, 50)
+    cow_high_daily_low_305.milk_production.milk_305_day_yield = 5.0
+    # index 1: lowest daily milk, highest 305-day yield.
+    cow_low_daily_high_305 = _create_sortable_mock_cow(2, False, 10.0, 100, 50)
+    cow_low_daily_high_305.milk_production.milk_305_day_yield = 100.0
+
+    herd_manager.cows = [cow_high_daily_low_305, cow_low_daily_high_305]
+
+    assert herd_manager._get_cow_removal_index([]) == 1
+
+
+def test_get_cow_removal_index_ranks_by_305_day_milk(herd_manager: HerdManager) -> None:
+    """When cull_ranking_criteria is '305_day_milk', the eligible cow with the lowest 305-day milk
+    yield is selected for removal, regardless of daily milk production."""
+    herd_manager.cull_eligibility_minimum_days_in_milk = 60
+    herd_manager.cull_eligibility_maximum_days_carried_calf = 180
+    herd_manager.cull_ranking_criteria = "305_day_milk"
+
+    # index 0: highest daily milk but lowest 305-day yield.
+    cow_high_daily_low_305 = _create_sortable_mock_cow(1, False, 30.0, 100, 50)
+    cow_high_daily_low_305.milk_production.milk_305_day_yield = 5.0
+    # index 1: lowest daily milk, highest 305-day yield.
+    cow_low_daily_high_305 = _create_sortable_mock_cow(2, False, 10.0, 100, 50)
+    cow_low_daily_high_305.milk_production.milk_305_day_yield = 100.0
+
+    herd_manager.cows = [cow_high_daily_low_305, cow_low_daily_high_305]
+
+    assert herd_manager._get_cow_removal_index([]) == 0
+
+
+def test_get_cow_removal_index_respects_configurable_eligibility(herd_manager: HerdManager) -> None:
+    """Eligibility honors the user-defined minimum days in milk and maximum days carried calf."""
+    herd_manager.cull_eligibility_minimum_days_in_milk = 100
+    herd_manager.cull_eligibility_maximum_days_carried_calf = 50
+    herd_manager.cull_ranking_criteria = "milk"
+
+    # Protected: below the configured minimum days in milk (90 <= 100).
+    cow_fresh = _create_sortable_mock_cow(1, False, 1.0, 90, 0)
+    # Protected: at/above the configured maximum days carried calf (50 >= 50).
+    cow_late_preg = _create_sortable_mock_cow(2, False, 2.0, 200, 50)
+    # Eligible: past the DIM minimum and below the pregnancy maximum.
+    cow_eligible = _create_sortable_mock_cow(3, False, 40.0, 110, 40)
+
+    herd_manager.cows = [cow_fresh, cow_late_preg, cow_eligible]
+
+    # Only the eligible cow can be removed, even though it has the highest milk production.
+    assert herd_manager._get_cow_removal_index([]) == 2
+
+    # No cow qualifies once the only eligible cow is excluded.
+    assert herd_manager._get_cow_removal_index([cow_eligible]) is None
+
+
+def test_get_cow_removal_index_invalid_criteria_raises(herd_manager: HerdManager) -> None:
+    """An unsupported cull_ranking_criteria raises a clear ValueError."""
+    herd_manager.cull_eligibility_minimum_days_in_milk = 60
+    herd_manager.cull_eligibility_maximum_days_carried_calf = 180
+    herd_manager.cull_ranking_criteria = "genetic_index"
+
+    herd_manager.cows = [_create_sortable_mock_cow(1, False, 10.0, 100, 50)]
+
+    with pytest.raises(ValueError, match="Invalid cull_ranking_criteria"):
+        herd_manager._get_cow_removal_index([])
