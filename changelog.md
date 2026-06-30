@@ -92,6 +92,8 @@ v1.0.0
 - [3100](https://github.com/RuminantFarmSystems/RuFaS/pull/3100) - [minor change] [Maintenance] [NoInputChange] [NoOutputChange] Aligns formatting on docstrings for `tuple` returns.
 - [3043](https://github.com/RuminantFarmSystems/RuFaS/pull/3043) - [minor change] [Animal] [Ration] [NoInputChange] [NoOutputChange] Refactor `Pen.formulate_optimized_ration` to remove the `# noqa: C901`; behavior unchanged.
 - [3120](https://github.com/RuminantFarmSystems/RuFaS/issues/3120) - [minor change] [Animal] [InputChange] [NoOutputChange] Make oversupply cull eligibility (minimum days in milk, maximum days carried calf) and ranking criteria (`milk` or `305_day_milk`) user inputs instead of hard-coded values.
+- [3104](https://github.com/RuminantFarmSystems/RuFaS/pull/3104) - [minor change] [Testing] [NoInputChange] [NoOutputChange] Updates unit testing coverage for add_error calls added in PR 3000.
+- [3115](https://github.com/RuminantFarmSystems/RuFaS/pull/3115) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows.
 
 ### v1.0.0
 

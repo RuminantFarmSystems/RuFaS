@@ -241,7 +241,7 @@ class Genetics:
         except KeyError as key_error:
             info_map = {
                 "class": self.__class__.__name__,
-                "function": self._calculate_newborn_calf_tbv_values.__name__,
+                "function": self._calculate_phenotype_values.__name__,
             }
             earliest_phenotype_date = min(AnimalConfig.average_phenotype["fat_kg"])
             latest_phenotype_date = max(AnimalConfig.average_phenotype["fat_kg"])
