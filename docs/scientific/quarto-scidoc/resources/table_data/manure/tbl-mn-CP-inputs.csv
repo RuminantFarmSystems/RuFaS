@@ -1,0 +1,4 @@
+﻿Variable, Definition, Description
+Name, --,  Unique identifier of the specific handler configuration used.
+storage_time_period, days,"  The number of days that the manure is stored between emptying events. At the end of this interval, the manure storage is emptied completely. "
+composting_type," static pile, passive windrow, intensive windrow, or in-vessel", The type of method used for composting. 

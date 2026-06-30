@@ -1,0 +1,15 @@
+﻿Variable , Definition , Default , Min , Max 
+parity_death_prob ," Death probability by parity group (1st, 2nd, 3rd, 4th+ lactation) ", -- ,0,1
+parity_cull_prob ," Cull probability by parity group (1st, 2nd, 3rd, 4th+ lactation) ", -- ,0,1
+parity_day_prob* ," CDF values for likelihood of death over time, used with 'cull_day_count'", -- ,0,1
+cull_day_count* , Defines time segments (days in milk) for the CDF curve, -- ,0,1
+probability* , Conditional probability of culling due to each of six reasons; sums to 1 , -- ,0,1
+cull_day_prob* , CDF values for likelihood of [reason] culling over time, -- ,0,1
+do_not_breed time , Days after calving a cow will be culled if not pregnant ,0,185, --
+cull_milk_production , Milk threshold (kg/d) below which cows are culled ,0,30, --
+herd_num , Target number of dry and lactating cows on the farm ,100, 6 , --
+heifer_repo_cull_time , Max age (days) before a heifer is culled for not getting pregnant ,500,0, --
+keep_female_calf_rate , Fraction of female calves kept and raised on farm ,1,0,1
+male_calf_rate_sexed_semen , Male calf rate when using sexed semen ,0.1,0,1
+male_calf_rate_conventional_semen , Male calf rate when using conventional semen ,0.53,0,1
+still_birth_rate , Stillbirth rate ,0.065,0,1

@@ -1,0 +1,12 @@
+﻿Variable, Units, Calculation (Solids Fraction), Calculation (Liquids Fraction)
+water, kg, Separated solids mass - Separated solids TS, Entering water - Separated solids water
+total_ammoniacal _nitrogen , kg , Entering ammoniacal nitrogen x TAN removal efficiency  , Entering ammoniacal nitrogen x (1 - TAN removal efficiency)  
+nitrogen , kg , Entering nitrogen  x N removal efficiency  , Entering nitrogen x (1 - N removal efficiency)  
+phosphorus , kg , Entering phosphorus x phosphorus removal efficiency  , Entering phosphorus x (1 - phosphorus removal efficiency)  
+potassium  , kg , Entering potassium x potassium removal efficiency  , Entering potassium x (1 - potassium removal efficiency)  
+ash  , kg , Entering ash  x potassium removal efficiency  , Entering ash x (1 - potassium removal efficiency)  
+manure_degradable_volatile_solids , -- , Entering manure VSd x VS removal efficiency x degradable_VS_frac  , Entering VSd x (1 - VS removal efficiency) x (1 - degradable_VS_frac)  
+manure_non_degradable_volatile_solids , --  , Entering manure VSnd x VS removal efficiency x (1 - degradable_VS_frac)  , Entering VSnd x (1 - VS removal efficiency) x (1 - degradable_VS_frac)  
+bedding_non_degradable_volatile_solids , --  , Entering manure VSnd x VS removal efficiency x (1 - degradable_VS_frac)  , Entering VSnd x (1 - VS removal efficiency) x (1 - degradable_VS_frac)  
+total_solids , kg , Entering TS x TS removal efficiency  , Entering TS x (1 - TS removal efficiency)  
+volume  , $\text{m}^3$ ,  $\frac{\text{Separated solids mass}}{\text{SOLID\_MANURE\_DENSITY}}$  ,  $\frac{\text{Separated liquid mass}}{\text{LIQUID\_MANURE\_DENSITY}}$  

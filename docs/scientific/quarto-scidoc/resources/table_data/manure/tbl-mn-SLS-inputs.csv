@@ -1,0 +1,11 @@
+﻿Variable, Definition, Description
+Name , -- ,  Unique identifier of the specific separator configuration used 
+type , rotary screen or screw press ,"  The type of solid liquid separator; selection of this input indicates which default separations efficiencies should be used, however, any and all separation efficiencies may also be overwritten by user input"
+separated_solids_dry_matter , -- ,  percent dry matter by mass of the manure solids post solid-liquid separation 
+total_solids_efficiency , -- ,  the proportion of manure total solids (TS) that are separated into the manure solids fraction by the separator
+volatile_solids_efficiency , -- ,  the proportion of manure volatile solids (VS) that are separated into the manure solids fraction by the separator
+nitrogen_efficiency , -- ,  the proportion of manure total nitrogen that is separated into the manure solids fraction by the separator 
+ammoniacal_nitrogen_efficiency , -- ,  the proportion of manure ammoniacal nitrogen that is separated into the manure solids fraction by the separator 
+phosphorus_efficiency , -- ,  the proportion of manure phosphorus that is separated into the manure solids fraction by the separator
+potassium_efficiency , -- ,  the proportion of manure potassium that is separated into the manure solids fraction by the separator.
+ash_efficiency , -- ,  the proportion of manure ash that is separated into the manure solids fraction by the separator

@@ -1,0 +1,4 @@
+﻿Parameter , Definition , Units
+l, Farm-specific scaling factor of the lactation curve by parity , -- 
+m, Farm-specific rate of milk yield increase post-calving by parity , --
+n, Farm-specific rate of milk yield decline after peak lactaction by parity , -- 

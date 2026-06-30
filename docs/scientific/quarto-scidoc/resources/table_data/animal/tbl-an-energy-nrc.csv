@@ -1,0 +1,14 @@
+﻿Variable,Description,Units
+NEgacti , Actual net energy for growth of feed i, Mcal/kg
+NEmacti , Actual net energy for maintenance of feed i, Mcal/kg
+NElacti , Actual net energy for lactation of feed i , Mcal/kg
+MEacti , Actual metabolizable energy of feed i , Mcal/kg
+EEi , Feed fat (ether extract) content , %
+DEacti , Actual digestible energy of feed i , Mcal/kg
+DEi , Standard DE feed i , Mcal/kg
+TDNacti , Actual TDN content of feed i , %
+TDNi , Standard TDN content of feed i , %
+Discount , TDN digestibility decrease caused by DMI and TDNconc , --
+DMI_to_maint , The amount of intake needed to meet the maintenance requirement  , dimensionless
+TDNconc , TDN concentration , %
+TotalTDN , Dietary TDN content , --
