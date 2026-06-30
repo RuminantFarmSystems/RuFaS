@@ -58,6 +58,7 @@ class FieldDataReporter:
             "suffix": f"field='{field_name}',crop='{crop.data.name}',"
             f"planted={crop.data.planting_day},{crop.data.planting_year}",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
         self.om.add_variable(
             "root_depth",
@@ -489,6 +490,7 @@ class FieldDataReporter:
             "function": self.send_soil_layer_daily_variables.__name__,
             "suffix": "field='" + field_name + "',layer='" + str(index) + "'",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
         self.om.add_variable(
             "temperature",
@@ -1255,6 +1257,7 @@ class FieldDataReporter:
             "function": self.send_vadose_zone_layer_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "',vadose_zone_layer",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
         self.om.add_variable(
             "active_organic_nitrogen_content",
@@ -1433,6 +1436,7 @@ class FieldDataReporter:
             "function": self.send_soil_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "'",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
 
         self.om.add_variable(
@@ -2016,6 +2020,7 @@ class FieldDataReporter:
             "function": self.send_field_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "'",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
 
         self.om.add_variable(

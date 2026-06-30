@@ -935,7 +935,7 @@ def test_add_variable(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
 
     # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
     info_map["simulation_day"] = 0
@@ -956,7 +956,7 @@ def test_add_variable(
         )
         if isinstance(value, dict):
             for k in value.keys():
-                assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+                assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
 
 @pytest.mark.parametrize(
@@ -1195,7 +1195,7 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
@@ -1215,7 +1215,7 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -1254,7 +1254,7 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
@@ -1274,7 +1274,7 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 9
@@ -1314,7 +1314,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
@@ -1334,7 +1334,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -1374,7 +1374,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
@@ -1394,7 +1394,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -1515,20 +1515,20 @@ def test_stringify_units(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, exclude_info_maps_flag, first_map_only",
+    "dummy_value, exclude_info_maps_flag, first_map_only, is_daily_variable",
     [
-        ("dummy_value", False, False),
-        (2, False, False),
-        (3.45, False, True),
-        (True, False, True),
-        ({"key": "value"}, False, True),
-        ([1, 2, 3], False, False),
-        ("dummy_value", True, False),
-        (2, True, False),
-        (3.45, True, True),
-        (True, True, True),
-        ({"key": "value"}, True, True),
-        ([1, 2, 3], True, True),
+        ("dummy_value", False, False, True),
+        (2, False, False, False),
+        (3.45, False, True, True),
+        (True, False, True, False),
+        ({"key": "value"}, False, True, True),
+        ([1, 2, 3], False, False, False),
+        ("dummy_value", True, False, True),
+        (2, True, False, False),
+        (3.45, True, True, True),
+        (True, True, True, False),
+        ({"key": "value"}, True, True, True),
+        ([1, 2, 3], True, True, False),
     ],
 )
 def test_add_to_pool(
@@ -1536,6 +1536,7 @@ def test_add_to_pool(
     dummy_value: Any,
     exclude_info_maps_flag: bool,
     first_map_only: bool,
+    is_daily_variable: bool,
 ) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
 
@@ -1545,6 +1546,7 @@ def test_add_to_pool(
         "function": "dummy_func",
         "context": "dummy_context",
         "units": MeasurementUnits.ANIMALS.value,
+        "is_daily_variable": is_daily_variable,
     }
     key = "dummy_key"
     pool: dict[str, dict[str, Any]] = {}
@@ -1565,8 +1567,12 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
+    assert pool[key]["is_daily_variable"] is is_daily_variable
 
     # Arrange
     info_map["more_context"] = "1234567890"
@@ -1585,16 +1591,65 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     elif not first_map_only:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
-            {"context": "dummy_context", "more_context": "1234567890", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
+            {
+                "context": "dummy_context",
+                "more_context": "1234567890",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
+    assert pool[key]["is_daily_variable"] is is_daily_variable
 
     # Cleanup
     mock_output_manager._exclude_info_maps_flag = False
+
+
+def test_add_to_pool_defaults_missing_daily_flag_to_false(mock_output_manager: OutputManager) -> None:
+    """Unit test for defaulting missing daily reporting flags to False."""
+
+    pool: dict[str, dict[str, Any]] = {}
+    info_map = {
+        "class": "dummy_class",
+        "function": "dummy_func",
+        "context": "dummy_context",
+        "units": MeasurementUnits.ANIMALS.value,
+    }
+
+    mock_output_manager._add_to_pool(pool, "dummy_key", "dummy_value", info_map)
+
+    assert pool["dummy_key"]["is_daily_variable"] is False
+    assert pool["dummy_key"]["info_maps"] == [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}]
+
+
+def test_add_to_pool_daily_flag_is_sticky_true(mock_output_manager: OutputManager) -> None:
+    """A key marked daily once stays daily even if a later call omits or unsets the flag."""
+
+    pool: dict[str, dict[str, Any]] = {}
+    base_info_map = {
+        "class": "dummy_class",
+        "function": "dummy_func",
+        "context": "dummy_context",
+        "units": MeasurementUnits.ANIMALS.value,
+    }
+
+    mock_output_manager._add_to_pool(pool, "k", "v", {**base_info_map, "is_daily_variable": True})
+    assert pool["k"]["is_daily_variable"] is True
+
+    mock_output_manager._add_to_pool(pool, "k", "v", {**base_info_map, "is_daily_variable": False})
+    assert pool["k"]["is_daily_variable"] is True
+
+    mock_output_manager._add_to_pool(pool, "k", "v", base_info_map)
+    assert pool["k"]["is_daily_variable"] is True
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
@@ -1613,6 +1668,7 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
     assert om2.variables_pool[key] == {
         "info_maps": [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}],
         "values": ["dummy_value"],
+        "is_daily_variable": False,
     }
 
 
@@ -1757,14 +1813,20 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     # Arrange
     path = Path("/fake/directory")
     expected_file_name = "variables_usage_counts.csv"
+    expected_daily_file_name = "variables_reported_daily.csv"
+    expected_non_daily_file_name = "variables_not_reported_daily.csv"
     expected_full_path = Path(path, expected_file_name)
+    expected_daily_full_path = Path(path, expected_daily_file_name)
+    expected_non_daily_full_path = Path(path, expected_non_daily_file_name)
     output_manager = OutputManager()
-    output_manager._variables_usage_counter = Counter()
+    output_manager._filtered_variable_key_counter = Counter()
 
     mocker.patch.object(output_manager, "variables_pool", {})  # didn't work
 
     patch_for_generate_file_name = mocker.patch.object(
-        output_manager, "generate_file_name", return_value=expected_file_name
+        output_manager,
+        "generate_file_name",
+        side_effect=[expected_file_name, expected_daily_file_name, expected_non_daily_file_name],
     )
     patch_for_dict_to_file_json = mocker.patch.object(output_manager, "_dict_to_file_csv")
     data_dict: dict[str, dict[str, list[Any]]] = {
@@ -1776,9 +1838,113 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     output_manager.report_variables_usage_counts(path)
 
     # Assert
-    patch_for_generate_file_name.assert_called_once_with("variables_usage_counts", "csv")
-    patch_for_dict_to_file_json.assert_called_once_with(data_dict, expected_full_path)
-    output_manager._variables_usage_counter = Counter()
+    assert patch_for_generate_file_name.call_args_list == [
+        call("variables_usage_counts", "csv"),
+        call("variables_reported_daily", "csv"),
+        call("variables_not_reported_daily", "csv"),
+    ]
+    patch_for_dict_to_file_json.assert_has_calls(
+        [
+            call(data_dict, expected_full_path),
+            call({"variable_name": {"values": []}}, expected_daily_full_path),
+            call(
+                {
+                    "variable_name": {"values": []},
+                    "report_count": {"values": []},
+                },
+                expected_non_daily_full_path,
+            ),
+        ]
+    )
+
+
+def test_get_variables_reported_daily() -> None:
+    """Unit test for reporting variables explicitly marked as daily."""
+
+    output_manager = OutputManager()
+    output_manager._set_variables_pool(
+        {
+            "daily_variable": {
+                "values": [1, 2, 3, 4],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": True,
+            },
+            "daily_nested_variable": {
+                "values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}, {"a": 7, "b": 8}],
+                "info_maps": [{"units": {"a": "kg", "b": "kg"}}] * 4,
+                "is_daily_variable": True,
+            },
+            "non_daily_variable": {
+                "values": [10, 20, 30, 40],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": False,
+            },
+        }
+    )
+
+    actual = output_manager._get_variables_reported_daily()
+
+    assert actual == {
+        "variable_name": {"values": ["daily_nested_variable.a", "daily_nested_variable.b", "daily_variable"]}
+    }
+
+
+def test_get_variables_not_reported_daily() -> None:
+    """Unit test for reporting variables explicitly marked as non-daily."""
+
+    output_manager = OutputManager()
+    output_manager._set_variables_pool(
+        {
+            "daily_variable": {
+                "values": [1, 2],
+                "info_maps": [{"units": "kg"}] * 2,
+                "is_daily_variable": True,
+            },
+            "every_other_day_variable": {
+                "values": [10, 20, 30, 40],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": False,
+            },
+            "irregular_nested_variable": {
+                "values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}],
+                "info_maps": [{"units": {"a": "kg", "b": "kg"}}] * 2,
+                "is_daily_variable": False,
+            },
+        }
+    )
+
+    actual = output_manager._get_variables_not_reported_daily()
+
+    assert actual == {
+        "variable_name": {
+            "values": [
+                "every_other_day_variable",
+                "irregular_nested_variable.a",
+                "irregular_nested_variable.b",
+            ]
+        },
+        "report_count": {"values": [4, 2, 2]},
+    }
+
+
+def test_missing_daily_flag_defaults_to_non_daily() -> None:
+    """Unit test for treating variables without an explicit daily flag as non-daily."""
+
+    output_manager = OutputManager()
+    output_manager._set_variables_pool(
+        {
+            "unmarked_variable": {
+                "values": [1, 2, 3],
+                "info_maps": [{"units": "kg"}] * 3,
+            },
+        }
+    )
+
+    assert output_manager._get_variables_reported_daily() == {"variable_name": {"values": []}}
+    assert output_manager._get_variables_not_reported_daily() == {
+        "variable_name": {"values": ["unmarked_variable"]},
+        "report_count": {"values": [3]},
+    }
 
 
 @pytest.mark.parametrize(
@@ -2877,12 +3043,12 @@ def test_parse_filtered_variables(
     expected_counter: Counter[str],
 ) -> None:
     """Tests _parse_filtered_variables in the Output Manager."""
-    mock_output_manager._variables_usage_counter = Counter()
+    mock_output_manager._filtered_variable_key_counter = Counter()
 
     actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", exclusion)
 
     assert actual == expected
-    assert mock_output_manager._variables_usage_counter == expected_counter
+    assert mock_output_manager._filtered_variable_key_counter == expected_counter
 
 
 @pytest.mark.parametrize(

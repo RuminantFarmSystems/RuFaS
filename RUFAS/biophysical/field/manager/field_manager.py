@@ -97,6 +97,7 @@ class FieldManager:
                 "function": self.daily_update_routine.__name__,
                 "suffix": f"field='{field.field_data.name}'",
                 "units": MeasurementUnits.HOURS,
+                "is_daily_variable": True,
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
             manure_applications_for_field = [
