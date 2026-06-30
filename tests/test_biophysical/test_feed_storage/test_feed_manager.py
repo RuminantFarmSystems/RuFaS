@@ -902,17 +902,19 @@ def test_get_total_projected_inventory_zero_day_in_the_future(
     assert result.inventory_date == inventory_date
 
 
-def test_get_total_projected_inventory_value_error(feed_manager: FeedManager) -> None:
+def test_get_total_projected_inventory_value_error(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that get_total_projected_inventory correctly raises a ValueError when the inventory_date is in the past."""
     expected_days_in_the_future = -3
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = datetime.today()
+    mock_add_error = mocker.patch.object(feed_manager._om, "add_error")
     with pytest.raises(ValueError):
         feed_manager.get_total_projected_inventory(
             inventory_date=(datetime.today().date() + timedelta(days=expected_days_in_the_future)),
             weather=MagicMock(auto_spec=Weather),
             time=mock_time,
         )
+    mock_add_error.assert_called_once()
 
 
 def test_manage_planning_cycle_purchases(feed_manager: FeedManager, mocker: MockerFixture) -> None:
@@ -1026,12 +1028,14 @@ def test_purchase_feed_error(
     feed_manager._om = MagicMock(auto_spec=OutputManager)
 
     mocker.patch.object(feed_manager._om, "add_variable")
+    mock_add_error = mocker.patch.object(feed_manager._om, "add_error")
     mocker.patch.object(feed_manager, "_store_purchased_feed")
 
     with pytest.raises(ValueError, match="Trying to purchase unavailable feed 7"):
         feed_manager.purchase_feed(
             feeds_to_purchase, MagicMock(auto_spec=RufasTime, simulation_day=42), purchase_type="daily_feed_request"
         )
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1143,13 +1147,13 @@ def test_deduct_feeds_from_inventory_error(
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_simulation_day = 15
     mock_time.simulation_day = mock_simulation_day
-    mock_om = MagicMock(auto_spec=OutputManager)
-    mock_om_add_variable = mocker.patch.object(mock_om, "add_variable")
-    feed_manager._om = mock_om
+    mock_add_error = mocker.patch.object(feed_manager._om, "add_error")
+    mock_om_add_variable = mocker.patch.object(feed_manager._om, "add_variable")
 
     with pytest.raises(ValueError):
         feed_manager._deduct_feeds_from_inventory(feeds_to_deduct, mock_simulation_day)
         assert mock_om_add_variable.call_count == 10
+    mock_add_error.assert_called_once()
 
 
 def test_deduct_from_storage_farmgrown_basic_fifo_updates_cumulative(
@@ -1243,14 +1247,16 @@ def test_lookup_storage_rufas_id(feed_manager: FeedManager) -> None:
     assert feed_manager._lookup_storage_rufas_id("hay") == 2
 
 
-def test_lookup_storage_rufas_id_error(feed_manager: FeedManager) -> None:
+def test_lookup_storage_rufas_id_error(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that an error is raised when looking up a non-existent storage."""
     storage_1 = MagicMock(auto_spec=Dry)
     storage_1.crop_name = "corn"
     storage_1.rufas_feed_id = 1
     feed_manager.active_storages = {"example_dry": storage_1}
+    mock_add_error = mocker.patch.object(feed_manager._om, "add_error")
     with pytest.raises(ValueError, match="No rufas id found for crop name 'non_existent_storage'."):
         feed_manager._lookup_storage_rufas_id("non_existent_storage")
+    mock_add_error.assert_called_once()
 
 
 def test_gather_available_feeds_by_id_groups_and_sorts() -> None:

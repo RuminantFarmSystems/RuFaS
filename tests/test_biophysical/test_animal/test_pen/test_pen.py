@@ -108,6 +108,7 @@ def animals_in_pen() -> dict[int, Animal]:
         milk_production=milk_production,
         daily_distance=10,
         nutrition_supply=nutrition_supply,
+        enteric_methane=8.5,
     )
     animal_2 = MagicMock(spec=Animal)
     animal_2.configure_mock(
@@ -120,6 +121,7 @@ def animals_in_pen() -> dict[int, Animal]:
         body_weight=50,
         daily_distance=10,
         nutrition_supply=nutrition_supply,
+        enteric_methane=8.5,
     )
     return {1: animal_1, 2: animal_2}
 
@@ -1578,7 +1580,7 @@ def test_apply_bedding(
     mock_calculate_total_bedding_dry_solids.assert_called_once_with(num_animals)
 
 
-def test_apply_bedding_value_error(pen: Pen) -> None:
+def test_apply_bedding_value_error(pen: Pen, mocker: MockerFixture) -> None:
     mock_bedding = MagicMock(auto_spec=Bedding)
     mock_bedding.bedding_type = BeddingType.STRAW
     pen.beddings = {"dummy_bedding_name": mock_bedding}
@@ -1597,9 +1599,10 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         pen_manure_data=None,
         bedding_non_degradable_volatile_solids=10,
     )
-
+    mock_add_error = mocker.patch.object(pen.om, "add_error")
     with pytest.raises(ValueError):
         pen._apply_bedding(manure_stream, "dummy_bedding_name")
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1673,6 +1676,12 @@ def test_set_animal_nutritional_requirements(
 def test_set_animal_nutritional_supply(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
     """Tests setting the nutritional supplies for all animals in the pen."""
     pen.animals_in_pen = animals_in_pen
+
+    for animal in animals_in_pen.values():
+        animal.digestive_system.enteric_methane_for_energy = 8.0
+        animal.digestive_system.enteric_methane_emission = 9.0
+        animal.digestive_system.manure_excretion.urine_nitrogen = 1.0
+
     mock_set = mocker.patch.object(NutritionSupplyCalculator, "calculate_nutrient_supply")
     pen.set_animal_nutritional_supply([], {})
 
@@ -2277,6 +2286,7 @@ def test_attempt_formulation_user_defined_and_nasem(
     pen.animals_in_pen = animals_in_pen
     for animal in pen.animals_in_pen.values():
         animal.nutrient_standard = NutrientStandard.NASEM
+        animal.digestive_system.manure_excretion.urine_nitrogen = 1.0
 
     user_defined_for_combo = {"feed1": 1.0, "feed2": 2.0}
     mocker.patch.object(
@@ -2324,14 +2334,17 @@ def test_attempt_formulation_user_defined_and_nasem(
 
     assert kwargs["user_defined_ration_dictionary"] == user_defined_for_combo
     assert kwargs["user_defined_ration_tolerance"] == pytest.approx(0.123)
-    assert kwargs["pen_average_enteric_methane"] == pytest.approx(69.4)
-    assert kwargs["pen_average_urine_nitrogen"] == pytest.approx(15.0)
+    assert kwargs["pen_average_enteric_methane"] == pytest.approx(8.5)
+    assert kwargs["pen_average_urine_nitrogen"] == pytest.approx(1.0)
 
 
 def _animal_with_nasem_values(enteric_methane: float, urine_nitrogen: float) -> Animal:
     """Builds a mocked Animal whose digestive_system exposes the given NASEM averaging inputs."""
     animal = MagicMock(spec=Animal)
+    animal.animal_type = AnimalType.LAC_COW
+    animal.enteric_methane = enteric_methane
     animal.digestive_system = MagicMock()
+    animal.digestive_system.enteric_methane_for_energy = enteric_methane
     animal.digestive_system.enteric_methane_emission = enteric_methane
     animal.digestive_system.manure_excretion = MagicMock()
     animal.digestive_system.manure_excretion.urine_nitrogen = urine_nitrogen
@@ -2360,6 +2373,16 @@ def test_calculate_pen_nasem_averages_single_animal(pen: Pen) -> None:
 
     assert avg_methane == pytest.approx(42.0)
     assert avg_nitrogen == pytest.approx(7.5)
+
+
+def test_calculate_pen_nasem_averages_empty_pen(pen: Pen) -> None:
+    """An empty pen returns zero averages."""
+    pen.animals_in_pen = {}
+
+    avg_methane, avg_nitrogen = pen._calculate_pen_nasem_averages()
+
+    assert avg_methane == pytest.approx(0.0)
+    assert avg_nitrogen == pytest.approx(0.0)
 
 
 def test_apply_successful_solution(mocker: MockerFixture, pen: Pen) -> None:
@@ -2692,6 +2715,7 @@ def test_calculate_manure_surface_area(
     has_cows: bool,
     expected_area: float | None,
     raises_error: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Tests _calculate_manure_surface_area() for various pen types and animal combinations."""
     # Arrange
@@ -2701,7 +2725,9 @@ def test_calculate_manure_surface_area(
 
     # Act & Assert
     if raises_error:
+        mock_add_error = mocker.patch.object(pen.om, "add_error")
         with pytest.raises(ValueError):
             pen._calculate_manure_surface_area()
+        mock_add_error.assert_called_once()
     else:
         assert pen._calculate_manure_surface_area() == expected_area

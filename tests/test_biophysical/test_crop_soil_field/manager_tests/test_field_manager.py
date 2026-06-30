@@ -1396,9 +1396,10 @@ def test_setup_crop_schedule_schedule_no_data(mock_input_manager: InputManager, 
     """Test when no crop schedule input data available."""
     mocker.patch.object(mock_input_manager, "get_data", return_value=None)
     crop_configs = ["alfalfa", "corn", "oats"]
-
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         FieldManager._setup_crop_schedules("test_crop_schedule", crop_configs)
+    mock_add_error.assert_called_once()
 
 
 def test_crop_schedule_setup_error(mocker: MockerFixture, mock_input_manager: InputManager) -> None:
@@ -1419,9 +1420,10 @@ def test_crop_schedule_setup_error(mocker: MockerFixture, mock_input_manager: In
         }
     ]
     mocker.patch.object(mock_input_manager, "get_data", return_value=crop_rotations)
-
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         FieldManager._setup_crop_schedules("crop_schedule_error", ["alfalfa"])
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1567,10 +1569,12 @@ def test_setup_soil_layer(
         },
     ],
 )
-def test_setup_soil_layer_error(config: dict[str, float | int]) -> None:
+def test_setup_soil_layer_error(config: dict[str, float | int], mocker: MockerFixture) -> None:
     """Tests that errors are thrown correctly when not enough information is provided to create one."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(KeyError, match="Bottom depth is required for each soil layer."):
         FieldManager._setup_soil_layer(1.0, 0.0, 0.0, config)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1849,10 +1853,11 @@ def test_setup_soil_error(
 ) -> None:
     """Tests that errors are raised correctly when invalid soil configurations are passed."""
     mocker.patch.object(mock_input_manager, "get_data", return_value=soil_configuration)
-
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as e:
         FieldManager._setup_soil("soil_config", 1.3)
     assert str(e.value) == error_message
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
