@@ -49,8 +49,21 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             "Bedding requirements": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
                 "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
-                "match_source": "input_manager",
-                "wildcard_value_map": {"0_CALF": "0", "1_GROWING": "1", "2_CLOSE_UP": "2", "3_LAC_COW": "3"},
+                # Handled by EconomicPreprocessor._preprocess_bedding (issue #3088):
+                # each pen's bedding price is paired with that pen's animal count
+                # and converted from the annual dollar-per-head price.
+                "dedicated_processor": "bedding",
+                "bedding_configs_path": "animal.bedding_configs",
+                # A pen's manure_stream bedding_name is a user config name; resolve
+                # it to the config's canonical bedding_type, then to an economics
+                # file key below. Types with no entry here (e.g. "none") cost nothing.
+                "bedding_type_to_file_key": {
+                    "sand": "sand",
+                    "sawdust": "sawdust",
+                    "straw": "straw",
+                    "CBPB sawdust": "CBPB",
+                    "manure solids": "manure_solids",
+                },
                 "economics_files": {
                     "CBPB": "commodity_prices_bedding_compost_bedded_pack_dollar_per_head",
                     "manure_solids": "commodity_prices_bedding_manure_solids_dollar_per_head",
@@ -58,7 +71,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                     "sawdust": "commodity_prices_bedding_sawdust_dollar_per_head",
                     "straw": "commodity_prices_bedding_straw_dollar_per_head",
                 },
-                "preprocessing": "average number of animals in each pen",
+                "preprocessing": "per-pen annual bedding cost: average head per year x dollar-per-head-per-year",
             },
             "Purchased heifers": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_life_cycle_manager_data.bought_heifer_num"],
