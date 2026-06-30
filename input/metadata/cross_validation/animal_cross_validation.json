@@ -531,7 +531,7 @@
       ]
     },
     {
-      "description": "When cow repro method is TAI: ovsynch_program must be set, ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
+      "description": "When cow repro method is TAI: voluntary_waiting_period must be 0, ovsynch_program must be set, ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -568,6 +568,21 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
+              "operands": ["voluntary_waiting_period"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
               "operands": ["ovsynch_program"]
             }
           },
@@ -598,21 +613,6 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["ovsynch_program_start_day"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["voluntary_waiting_period"]
-            }
-          },
-          "relationship": "greater"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
               "operands": ["ovsynch_program_conception_rate"]
             }
           },
@@ -627,22 +627,17 @@
       ]
     },
     {
-      "description": "When cow repro method is TAI and resynch_program is in ['PGFatPD', 'none']: presynch_program must be set, presynch_program_start_day must be positive, and estrus_detection_rate and ED_conception_rate must be positive",
+      "description": "When cow repro method is TAI and resynch_program is in ['PGFatPD', 'none']: estrus_detection_rate and ED_conception_rate must be positive (subsequent breedings rely on estrus detection under these resynch protocols)",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
           "resynch_program": "animal.animal_config.farm_level.repro.cows.resynch_program",
-          "presynch_program": "animal.animal_config.farm_level.repro.cows.presynch_program",
-          "presynch_program_start_day": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day",
           "estrus_detection_rate": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
-          "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
-          "ovsynch_program_conception_rate": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate"
+          "ED_conception_rate": "animal.animal_config.farm_level.repro.cows.ED_conception_rate"
         },
         "constants": {
           "TAI": "TAI",
           "zero": 0,
-          "true_constant": true,
-          "PGFatPD_or_none": ["PGFatPD", "none"],
           "PGFatPD": "PGFatPD",
           "none": "none"
         }
@@ -684,36 +679,6 @@
           "left_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["presynch_program"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["true_constant"]
-            }
-          },
-          "relationship": "is_not_null"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["presynch_program_start_day"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["zero"]
-            }
-          },
-          "relationship": "greater"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
               "operands": ["estrus_detection_rate"]
             }
           },
@@ -743,7 +708,7 @@
       ]
     },
     {
-      "description": "When cow repro method is ED-TAI: voluntary_waiting_period must be positive, estrus_detection_rate and ED_conception_rate must be positive, ovsynch_program must be set, and ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
+      "description": "When cow repro method is ED-TAI: voluntary_waiting_period must be positive, estrus_detection_rate and ED_conception_rate must be positive, ovsynch_program must be set, ovsynch_program_start_day must be positive, and ovsynch_program_conception_rate must be positive",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -849,21 +814,6 @@
             "aggregation": {
               "operation": "no_op",
               "operands": ["zero"]
-            }
-          },
-          "relationship": "greater"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["ovsynch_program_start_day"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["voluntary_waiting_period"]
             }
           },
           "relationship": "greater"

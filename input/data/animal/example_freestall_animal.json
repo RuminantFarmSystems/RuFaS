@@ -49,7 +49,7 @@
         "milk_type": "whole"
       },
       "repro": {
-        "voluntary_waiting_period": 50,
+        "voluntary_waiting_period": 0,
         "conception_rate_decrease": 0.026,
         "decrease_conception_rate_in_rebreeding": false,
         "decrease_conception_rate_by_parity": false,
