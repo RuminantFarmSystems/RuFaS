@@ -2,10 +2,12 @@ from math import atan, exp, log, sin
 from unittest.mock import MagicMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 from RUFAS.biophysical.field.soil.soil_erosion import SoilErosion
+from RUFAS.output_manager import OutputManager
 
 
 # --- Static method tests ---
@@ -385,6 +387,7 @@ def test_erode(
     rainfall: float,
     should_fail: bool,
     accumulated_runoff: float,
+    mocker: MockerFixture,
 ) -> None:
     """Tests that erode() properly calls methods and stores values"""
 
@@ -402,9 +405,11 @@ def test_erode(
     incorp._determine_sediment_yield = MagicMock(return_value=0.05)
     incorp._determine_adjusted_sediment_yield = MagicMock(return_value=0.0498)
     if should_fail:
+        mock_add_error = mocker.patch.object(OutputManager, "add_error")
         with pytest.raises(TypeError) as e:
             incorp.erode(field_size, min_cover_factor, residue, rainfall)
             assert str(e) == "SoilData accumulated_runoff cannot be NoneType"
+        mock_add_error.assert_called_once()
     else:
         # Run method
         incorp.erode(field_size, min_cover_factor, residue, rainfall)

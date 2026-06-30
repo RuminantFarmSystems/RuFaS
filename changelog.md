@@ -90,8 +90,9 @@ v1.0.0
 - [3049](https://github.com/RuminantFarmSystems/RuFaS/pull/3049) - [minor change] [Utility] [NoInputChange] [NoOutputChange] Updates docstrings across 9 utility files to NumPy-style format.
 - [3100](https://github.com/RuminantFarmSystems/RuFaS/pull/3100) - [minor change] [Maintenance] [NoInputChange] [NoOutputChange] Aligns formatting on docstrings for `tuple` returns.
 - [3043](https://github.com/RuminantFarmSystems/RuFaS/pull/3043) - [minor change] [Animal] [Ration] [NoInputChange] [NoOutputChange] Refactor `Pen.formulate_optimized_ration` to remove the `# noqa: C901`; behavior unchanged.
+- [3104](https://github.com/RuminantFarmSystems/RuFaS/pull/3104) - [minor change] [Testing] [NoInputChange] [NoOutputChange] Updates unit testing coverage for add_error calls added in PR 3000.
+- [3115](https://github.com/RuminantFarmSystems/RuFaS/pull/3115) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows.
 - [3078](https://github.com/RuminantFarmSystems/RuFaS/pull/3078) - [minor change] [Animal] [InputChange] [NoOutputChange] Add a count-based female calf retention option (calf_retention_method, keep_female_calf_num_annual) to keep a target number of female calves per year instead of a rate, and consolidate all retention logic into a single CalfRetentionPolicy. Default (rate) behavior is unchanged.
-
 
 ### v1.0.0
 
