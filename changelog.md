@@ -94,6 +94,9 @@ v1.0.2
 - [3104](https://github.com/RuminantFarmSystems/RuFaS/pull/3104) - [minor change] [Testing] [NoInputChange] [NoOutputChange] Updates unit testing coverage for add_error calls added in PR 3000.
 - [3115](https://github.com/RuminantFarmSystems/RuFaS/pull/3115) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows.
 
+### v1.0.2
+
+- [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [minor change] [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
 
 ### v1.0.1
 
