@@ -1263,6 +1263,42 @@ import and flagging it repeatedly.
 
 ---
 
+## Lesson 12 — Jules's Standing PR Checklist (applies to every future PR, no exceptions)
+
+Jules gave this explicit checklist after PR #34's review cycle
+(multiple rounds were needed partly because these were missed):
+
+1. **Update the branch with the base branch** — rebase onto the
+   latest base before requesting review, every time, not just once
+   at PR creation.
+
+2. **Handle ALL AI agent comments** — every CodeRabbit and Gemini
+   comment must be either fixed or replied to with a clear reason
+   before requesting re-review. Do not let any sit unaddressed.
+
+3. **Fix missing coverage** — check the coverage delta in the CI
+   comment on every push; do not let coverage regress even slightly.
+
+4. **Check for strings instead of enums** — before any PR, grep the
+   full diff for string literals being compared where an enum exists
+   or should exist (sex, destinations, diet systems, protocols, etc.).
+   This was flagged TWICE on PR #33 and PR #34 — do this proactively,
+   not reactively.
+
+5. **Avoid unnecessary linting changes** — NEVER run `black .` or
+   any global formatter across the whole repo. Scope Black/flake8 to
+   ONLY the files actually being modified in that commit. Running a
+   global formatter creates merge conflicts with upstream
+   RuminantFarmSystems/RuFaS changes and was flagged on PR #34
+   THREE separate times before being fully resolved.
+
+This checklist must be run explicitly before every future PR
+(stocker module PRs SK-A through SK-D, and any future cow-calf
+follow-up PRs) — not assumed to be covered by existing TDD/gate
+discipline.
+
+---
+
 ## Appendix — Message to Feed Claude Code to Begin Step 1
 
 Paste the block below into Claude Code to begin implementation. It intentionally starts with only Step 1, following the same one-step-at-a-time discipline used for the feedlot module, rather than handing over the entire plan at once.
