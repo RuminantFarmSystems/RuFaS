@@ -241,7 +241,7 @@ class Genetics:
         except KeyError as key_error:
             info_map = {
                 "class": self.__class__.__name__,
-                "function": self._calculate_newborn_calf_tbv_values.__name__,
+                "function": self._calculate_phenotype_values.__name__,
             }
             earliest_phenotype_date = min(AnimalConfig.average_phenotype["fat_kg"])
             latest_phenotype_date = max(AnimalConfig.average_phenotype["fat_kg"])
@@ -307,7 +307,9 @@ class Genetics:
         Returns
         -------
         tuple[float, float]
-            EBV for fat and EBV for protein, respectively.
+            - EBV for fat.
+            - EBV for protein.
+
         """
         parity_index = min(parity, 3) if animal_type.is_cow and parity is not None else 0
         fat_accuracy, protein_accuracy = FAT_ACCURACY_BY_PARITY[parity_index], PROTEIN_ACCURACY_BY_PARITY[parity_index]

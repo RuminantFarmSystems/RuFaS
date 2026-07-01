@@ -17,6 +17,8 @@ class RationManager:
 
     Attributes
     ----------
+    _om : OutputManager
+        A private instance of OutputManager for use in this class.
     user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
         A mapping of animal groupings to their respective ration formulations.
     ration_feeds : dict[AnimalCombination, list[RUFAS_ID]]
@@ -44,7 +46,7 @@ class RationManager:
 
         Parameters
         ----------
-        ration_config : dict[str, list[int]]
+        ration_config : dict[str, Any]
             Collection of animal requirements and feed supply information for ration formulation.
 
         """
@@ -103,7 +105,7 @@ class RationManager:
 
         Parameters
         ----------
-        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+        feed_config : dict[str, Any]
             Collection of animal requirements and feed supply information for ration formulation.
 
         """
@@ -116,7 +118,7 @@ class RationManager:
 
         Parameters
         ----------
-        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+        ration_config : dict[str, Any]
             Collection of animal requirements and feed supply information for ration formulation.
 
         Raises
@@ -149,7 +151,8 @@ class RationManager:
             info_map["ration"] = ration
             info_map["animal_combination"] = animal_combo.value
             info_map["units"] = MeasurementUnits.PERCENT
-            if abs(total_percentage_of_ration - 100.0) > tolerance:
+
+            if abs(total_percentage_of_ration - 100.0) > tolerance * 100:
                 error_msg = (
                     f"Invalid user-defined ration for {animal_combo.value}. "
                     f"Ration percentages sum to {total_percentage_of_ration}. "

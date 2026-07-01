@@ -6,6 +6,7 @@ from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as ge
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
@@ -27,6 +28,7 @@ om = OutputManager()
 
 
 class AnimalModuleReporter:
+    """The reporting class for the Animal module."""
 
     @classmethod
     def report_daily_animal_population(cls, herd_statistics: HerdStatistics, simulation_day: int) -> None:
@@ -144,9 +146,7 @@ class AnimalModuleReporter:
         cls, average_genetics: dict[str, float | None], variable_name_prefix: str, simulation_day: int
     ) -> None:
         """
-        Reports the average genetics data with associated simulation metadata. The
-        method adds the given genetics data to a managed output variable, using
-        a specific variable name prefix and simulation day.
+        Reports the average genetics data with associated simulation metadata.
 
         Parameters
         ----------
@@ -160,9 +160,6 @@ class AnimalModuleReporter:
             The specific day in the simulation timeline, used to annotate the
             reported data for temporal tracking.
 
-        Returns
-        -------
-        None
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
@@ -326,6 +323,7 @@ class AnimalModuleReporter:
             such as energy, protein, and minerals.
         simulation_day : int
             Represents the simulation day for which the nutrient evaluation report is generated.
+
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
@@ -403,6 +401,7 @@ class AnimalModuleReporter:
             The total ration of the herd.
         simulation_day : int
             The day of simulation.
+
         """
         units = {key: MeasurementUnits.KILOGRAMS for key in herd_total_ration.keys()}
         info_map = {
@@ -430,6 +429,7 @@ class AnimalModuleReporter:
             Dictionary of feed types and total amounts fed to animals in the pen.
         simulation_day : int
             Day of simulation.
+
         """
         units = {key: MeasurementUnits.KILOGRAMS for key in pen_ration.keys()}
         info_map = {
@@ -578,6 +578,7 @@ class AnimalModuleReporter:
             The HerdStatistics object containing the daily herd statistics data.
         simulation_day : int
             Day of simulation.
+
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
@@ -843,6 +844,69 @@ class AnimalModuleReporter:
             herd_statistics.cull_reason_stats,
             dict(info_map, **{"units": cull_reason_stats_units}),
         )
+        for pen_id_str, heifer_adg in herd_statistics.heifer_average_daily_gain_by_pen.items():
+            om.add_variable(
+                f"heifer_average_daily_gain_in_pen_{pen_id_str}",
+                heifer_adg,
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+            )
+        om.add_variable(
+            "heiferI_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "heiferII_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "heiferIII_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+
+    @classmethod
+    def report_daily_reproduction_statistics(
+        cls, daily_herd_reproduction_statistics: HerdReproductionStatistics, simulation_day: int
+    ) -> None:
+        """
+        Adds daily herd reproduction statistics to OutputManager.
+
+        Reports the number of successful conceptions that occurred on the simulation day, at the
+        herd, heifer, and cow level. These daily values form a time series that can be summed over
+        any window (e.g. annually) for downstream analyses such as the economic layer. The
+        whole-simulation totals and conception rates are reported separately at end-of-simulation
+        (see ``report_end_of_simulation``).
+
+        Parameters
+        ----------
+        daily_herd_reproduction_statistics : HerdReproductionStatistics
+            Reproduction statistics accumulated over the current simulation day only.
+        simulation_day : int
+            Day of simulation.
+
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_reproduction_statistics.__name__,
+            "data_origin": [("HerdManager", "daily_update")],
+        }
+        om.add_variable(
+            "num_successful_conceptions",
+            daily_herd_reproduction_statistics.total_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions",
+            daily_herd_reproduction_statistics.heifer_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        om.add_variable(
+            "cow_num_successful_conceptions",
+            daily_herd_reproduction_statistics.cow_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
 
     @classmethod
     def report_daily_pen_total(
@@ -861,6 +925,7 @@ class AnimalModuleReporter:
             The number of animals in the pen.
         simulation_day : int
             The current simulation day.
+
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
@@ -936,7 +1001,9 @@ class AnimalModuleReporter:
         report_name : str
             The string to be appended to the variable being reported to the OM.
         total_days : int
-            The total number of days in the simulation
+            The total number of days in the simulation.
+
+
         """
 
         info_map = {
@@ -1004,7 +1071,8 @@ class AnimalModuleReporter:
         report_name : str
             The string to be appended to the variable being reported to the OM.
         total_days : int
-            The total number of days in the simulation
+            The total number of days in the simulation.
+
         """
 
         info_map = {
@@ -1131,6 +1199,7 @@ class AnimalModuleReporter:
             The dictionary of Cow events.
         all_animals_genetic_history : dict[int, str]
             The dict of genetic histories for all animals in the herd by their IDs.
+
         """
         empty_sold_animals: list[SoldAnimalTypedDict] = [
             {
@@ -1246,9 +1315,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def _record_heiferIIs_conception_rate(cls, herd_reproduction_statistics: HerdReproductionStatistics) -> None:
-        """
-        Record the conception rate of heiferIIs.
-        """
+        """Record the conception rate of heiferIIs."""
 
         info_map = {
             "class": AnimalModuleReporter.__name__,

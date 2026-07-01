@@ -8,6 +8,22 @@ from RUFAS.rufas_time import RufasTime
 
 
 class DailySpread(Storage):
+    """
+    The daily spread manure storage class.
+
+    Parameters
+    ----------
+    name : str
+        The name of the storage.
+    storage_time_period : int, default=1
+        The length of time (days) manure is stored for between emptying events.
+    surface_area : float, default=math.inf
+        The surface area of the manure storage (m^2).
+    cover : StorageCover, default=StorageCover.NO_COVER
+        The type of cover used with the specified storage.
+
+    """
+
     def __init__(
         self,
         name: str,
@@ -22,6 +38,7 @@ class DailySpread(Storage):
             storage_time_period=storage_time_period,
             surface_area=surface_area,
         )
+        self.available_for_field_application = ManureStream.make_empty_manure_stream()
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -48,8 +65,25 @@ class DailySpread(Storage):
         Returns
         -------
         dict[str, ManureStream]
-            _The processed manure stream.
+            The processed manure stream.
 
         """
         self._report_manure_stream(self._received_manure, "received", time.simulation_day)
-        return super().process_manure(current_day_conditions, time)
+        self._report_manure_stream(self.available_for_field_application, "emptied", time.simulation_day)
+        output_streams = super().process_manure(current_day_conditions, time)
+        self.available_for_field_application = output_streams.get("manure", ManureStream.make_empty_manure_stream())
+        return {}
+
+    def _report_emptied(self, manure_stream: ManureStream, simulation_day: int) -> None:
+        """
+        Suppress the parent's full-throughput "emptied" report.
+
+        For daily spread, "emptied" represents only the manure that was not spread on the field (exported
+        off-farm). That quantity is the unspread remainder left in ``available_for_field_application`` after
+        field operations, which ``process_manure`` reports directly.
+        """
+        return
+
+    def set_available_for_field_application(self, stream: ManureStream) -> None:
+        """Set remaining manure available for daily spread field application."""
+        self.available_for_field_application = stream

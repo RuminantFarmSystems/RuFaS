@@ -17,7 +17,7 @@
       "type": "string",
       "description": "The type of daily simulation to run. Will determine daily simulation function in SimulationEngine.",
       "default": "full_farm",
-      "pattern": "^(full_farm|field_and_feed)$"
+      "pattern": "^(full_farm|field_and_feed|field_only|animals_only)$"
     },
     "nutrient_standard": {
       "type": "string",
@@ -217,6 +217,20 @@
           "description": "Heifer Reproduction Cull Time (days) -- Days old when a heifer would be culled for failure to become pregnant",
           "default": 500,
           "minimum": 0
+        },
+        "calf_mortality_rate": {
+          "type": "number",
+          "description": "Calf Mortality Rate (decimal fraction) -- Cumulative probability that a live-born calf dies before weaning. Enter 0 to disable; e.g., 0.05 = 5%",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "heifer_mortality_rate": {
+          "type": "number",
+          "description": "Heifer Mortality Rate (decimal fraction) -- Cumulative probability that a post-wean heifer dies before calving. Deaths split 2/3 in HeiferI, 1/3 in HeiferII. Enter 0 to disable; e.g., 0.05 = 5%",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
         },
         "do_not_breed_time": {
           "type": "number",
@@ -2985,6 +2999,70 @@
         "pattern": "^(manure|synthetic fertilizer|none|synthetic fertilizer and manure)$"
       }
     },
+    "daily_spread": {
+      "type": "object",
+      "description": "Configuration for daily spread manure application sourced from DailySpread processors.",
+      "is_daily_spreading": {
+        "type": "bool",
+        "description": "Whether this field uses daily spread manure applications.",
+        "default": false
+      },
+      "spread_all_available_manure": {
+        "type": "bool",
+        "description": "If true, spread all manure available in DailySpread processors that day, ignoring nutrient targets, caps, manure type, and supplemental manure settings.",
+        "default": false
+      },
+      "nitrogen_spread_amount": {
+        "type": "number",
+        "description": "Target nitrogen amount for this field's daily spread request (kg).",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "phosphorus_spread_amount": {
+        "type": "number",
+        "description": "Target phosphorus amount for this field's daily spread request (kg).",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "potassium_spread_amount": {
+        "type": "number",
+        "description": "Target potassium amount for this field's daily spread request (kg).",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "coverage_fraction": {
+        "type": "number",
+        "description": "Fraction of field area covered by each daily spread manure application.",
+        "minimum": 0.01,
+        "maximum": 1.0,
+        "default": 1.0
+      },
+      "application_depth": {
+        "type": "number",
+        "description": "Depth of daily spread manure application (mm).",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "surface_remainder_fraction": {
+        "type": "number",
+        "description": "Fraction of daily spread manure remaining on soil surface.",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 1.0
+      },
+      "manure_type": {
+        "type": "string",
+        "description": "Type of manure requested for daily spread applications.",
+        "pattern": "^(liquid|solid)$",
+        "default": "solid"
+      },
+      "supplement_manure_nutrient_deficiencies": {
+        "type": "string",
+        "description": "Whether daily spread nutrient shortfalls can be supplemented.",
+        "pattern": "^(manure|synthetic fertilizer|none|synthetic fertilizer and manure)$",
+        "default": "none"
+      }
+    },
     "pattern_repeat": {
       "type": "number",
       "description": "Number of times that this manure application schedule should be repeated.",
@@ -4293,7 +4371,7 @@
       },
       "user_defined_ration_tolerance": {
         "type": "number",
-        "description": "Allowable +/- fractional variance for each defined ration inclusion percentage values.",
+        "description": "Allowable +/- fractional variance for each defined ration inclusion percentage values. As an example: a feed with a user defined ration percentage value of 20% and tolerance of 0.1 would correspond to an allowable range of 18% to 22%.",
         "minimum": 0,
         "maximum": 1,
         "default": 0.0
@@ -6173,7 +6251,7 @@
       "description": "The maximum throughput of the implement (tons dm/hour)",
       "properties": {
         "type": "number",
-        "default": 0
+        "default": 0.0
       }
     }
   },

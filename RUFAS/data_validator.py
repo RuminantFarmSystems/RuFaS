@@ -6,6 +6,9 @@ from typing import Any, Callable, Sequence, cast
 
 from RUFAS.util import Aggregator
 
+"""
+The functions available for aggregation in the input data validation process.
+"""
 AGGREGATION_FUNCTIONS: dict[
     str, Callable[[list[float]], float] | Callable[[list[float]], float | None] | Callable[[list[Any]], Any | None]
 ] = {
@@ -32,6 +35,7 @@ class ElementState(Enum):
         The element is invalid and cannot be fixed.
     FIXED : int
         The element is invalid initially but has been fixed.
+
     """
 
     VALID = "valid"
@@ -51,6 +55,7 @@ class ElementsCounter:
         The number of invalid elements.
     fixed_elements : int
         The number of fixed elements.
+
     """
 
     def __init__(self) -> None:
@@ -73,6 +78,7 @@ class ElementsCounter:
         ------
         ValueError
             If the state is not one of the valid states.
+
         """
         if state == ElementState.VALID:
             self.valid_elements += value
@@ -91,6 +97,7 @@ class ElementsCounter:
         ----------
         state : ElementState
             The state of the element.
+
         """
 
         self.update(state, 1)
@@ -105,16 +112,11 @@ class ElementsCounter:
         self.fixed_elements = 0
 
     def total_elements(self) -> int:
-        """
-        Returns the total number of elements by adding the counts of valid, invalid, and fixed elements.
-        """
+        """Returns the total number of elements by adding the counts of valid, invalid, and fixed elements."""
         return self.valid_elements + self.invalid_elements + self.fixed_elements
 
     def __str__(self) -> str:
-        """
-        Returns a string representation of the ElementsCounter object.
-        """
-
+        """Returns a string representation of the ElementsCounter object."""
         return str(
             {
                 "valid_elements": self.valid_elements,
@@ -137,6 +139,7 @@ class ElementsCounter:
         -------
         ElementsCounter
             A new ElementsCounter object with the counts of the two objects added together.
+
         """
 
         new_counter = ElementsCounter()
@@ -150,9 +153,6 @@ class Modifiability(Enum):
     """
     Enum class representing the modifiability status of a variable.
 
-    This Enum defines various levels of modifiability for a variable, indicating whether a variable is required at
-    initialization and if it can be modified during runtime.
-
     Attributes
     ----------
     REQUIRED_LOCKED : str
@@ -161,6 +161,12 @@ class Modifiability(Enum):
         Indicates the variable must be initialized with a value but can be modified during runtime.
     UNREQUIRED_UNLOCKED : str
         Indicates the variable does not need to be initialized with a value and can be modified during runtime.
+
+    Notes
+    -----
+    This Enum defines various levels of modifiability for a variable, indicating whether a variable is required at
+    initialization and if it can be modified during runtime.
+
     """
 
     REQUIRED_LOCKED = "required locked"
@@ -174,8 +180,9 @@ class Modifiability(Enum):
 
         Returns
         -------
-        List[str]
+        list[str]
             A list containing the string values of the enum members.
+
         """
         return list(map(lambda c: c.value, cls))
 
@@ -189,20 +196,30 @@ class Modifiability(Enum):
 
 
 class DataValidator:
-    """This class is will be utilized to validate all types of data across RuFas codebase."""
+    """
+    This class is will be utilized to validate all types of data across RuFas codebase.
+
+    Attributes
+    ----------
+    event_logs : list[dict[str, str | dict[str, str]]]
+        A list of the logs, warnings, and errors from the data validation process.
+
+    """
 
     def __init__(self) -> None:
         self.event_logs: list[dict[str, str | dict[str, str]]] = []
 
     def validate_properties(self, metadata: dict[str, Any], metadata_depth_limit: int) -> tuple[bool, str]:
-        """Iteratively traverses the metadata properties to check the max depth and routes
-        properties to be validated by type.
+        """
+        Iteratively traverses the metadata properties to check the max depth and routes properties to be validated by
+        type.
 
-        return
-        ------
-        Tuple[bool, str]
-            boolean to indicate the validation status, error message in str if there's error that should be raised by
-            the caller.
+        Returns
+        -------
+        tuple[bool, str]
+            - Boolean representing validation status
+            - An error message describing the first failure encountered. The message is empty when validation succeeds.
+
         """
         info_map = {
             "class": DataValidator.__name__,
@@ -283,7 +300,41 @@ class DataValidator:
         properties: dict[str, Any],
         path: list[str],
     ) -> tuple[bool, str]:
-        """Validates that keys in the metadata properties sections."""
+        """
+        Validates the keys defined within a metadata properties object.
+
+        Parameters
+        ----------
+        required_properties_keys : set[str]
+            Keys that must be present in the metadata properties definition.
+        optional_properties_keys : set[str]
+            Additional keys that are permitted but not required in the metadata
+            properties definition.
+        properties : dict[str, Any]
+            Metadata properties object to validate.
+        path : list[str]
+            Hierarchical path to the metadata properties object being validated.
+            Used for error reporting.
+
+        Returns
+        -------
+        tuple[bool, str]
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
+
+        Notes
+        -----
+        Validation consists of the following checks:
+
+        1. All keys listed in ``required_properties_keys`` must be present.
+        2. For non-object metadata types, only keys listed in ``required_properties_keys`` or
+        ``optional_properties_keys`` are permitted.
+        3. For metadata entries of type ``"object"``, at least one additional user-defined property must be present
+        beyond the standard metadata keys.
+
+        Validation failures are recorded in ``event_logs`` before the failure status and message are returned.
+
+        """
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._validate_metadata_properties_keys.__name__,
@@ -338,7 +389,38 @@ class DataValidator:
         return True, ""
 
     def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
-        """Validates number type properties in metadata."""
+        """
+        Validates a metadata properties definition for a numeric variable.
+
+        Parameters
+        ----------
+        key_path : list[str]
+            Hierarchical path to the metadata property being validated.
+            Used for error reporting.
+        value : dict[str, Any]
+            Metadata properties definition for a variable with type
+            ``"number"``.
+
+        Returns
+        -------
+        tuple[bool, str]
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
+
+        Notes
+        -----
+        Validation consists of the following checks:
+
+        1. Required and optional metadata keys are validated using ``_validate_metadata_properties_keys()``.
+        2. If a ``default`` value is specified, it must be numeric unless the value is explicitly ``None`` and the
+        variable is marked as nullable.
+        3. If specified, ``minimum`` and ``maximum`` values must be numeric.
+        4. If both ``minimum`` and ``maximum`` are specified, ``minimum <= maximum`` must hold.
+        5. If a default value is specified, it must fall within the defined minimum and maximum bounds.
+
+        Validation failures are recorded in ``event_logs`` before the failure status and message are returned.
+
+        """
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._metadata_number_validator.__name__,
@@ -448,7 +530,37 @@ class DataValidator:
         return True, ""
 
     def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
-        """Validates string type properties in metadata."""
+        """
+        Validates a metadata properties definition for a string variable.
+
+        Parameters
+        ----------
+        key_path : list[str]
+            Hierarchical path to the metadata property being validated.
+            Used for error reporting.
+        value : dict[str, Any]
+            Metadata properties definition for a variable with type
+            ``"string"``.
+
+        Returns
+        -------
+        tuple[bool, str]
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
+
+        Notes
+        -----
+        Validation consists of the following checks:
+
+        1. Required and optional metadata keys are validated using ``_validate_metadata_properties_keys()``.
+        2. If a ``default`` value is specified, it must be a string unless the value is explicitly ``None`` and the
+        variable is marked as nullable.
+        3. If specified, ``pattern`` must be a string containing a valid regular expression.
+        4. If both ``pattern`` and ``default`` are specified, the default value must match the regular expression.
+
+        Validation failures are recorded in ``event_logs`` before the failure status and message are returned.
+
+        """
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._metadata_string_validator.__name__,
@@ -533,7 +645,36 @@ class DataValidator:
         return True, ""
 
     def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
-        """Validates bool type properties in metadata."""
+        """
+        Validates a metadata properties definition for a boolean variable.
+
+        Parameters
+        ----------
+        key_path : list[str]
+            Hierarchical path to the metadata property being validated.
+            Used for error reporting.
+        value : dict[str, Any]
+            Metadata properties definition for a variable with type
+            ``"bool"``.
+
+        Returns
+        -------
+        tuple[bool, str]
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
+
+        Notes
+        -----
+        Validation consists of the following checks:
+
+        1. Required and optional metadata keys are validated using ``_validate_metadata_properties_keys()``.
+        2. If a ``default`` value is specified, it must be a boolean unless the value is explicitly ``None`` and the
+        variable is marked as nullable.
+        3. If ``nullable`` is ``False``, a default value of ``None`` is not permitted.
+
+        Validation failures are recorded in ``event_logs`` before the failure status and message are returned.
+
+        """
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._metadata_bool_validator.__name__,
@@ -572,7 +713,41 @@ class DataValidator:
         return True, ""
 
     def _metadata_array_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
-        """Validates array type properties in metadata."""
+        """
+        Validates a metadata properties definition for an array variable.
+
+        Parameters
+        ----------
+        key_path : list[str]
+            Hierarchical path to the metadata property being validated.
+            Used for error reporting.
+        value : dict[str, Any]
+            Metadata properties definition for a variable with type
+            ``"array"``.
+
+        Returns
+        -------
+        tuple[bool, str]
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
+
+        Notes
+        -----
+        Validation consists of the following checks:
+
+        1. Required and optional metadata keys are validated using ``_validate_metadata_properties_keys()``.
+        2. The ``properties`` key is present to define the metadata requirements for array elements.
+        3. If specified, ``minimum_length`` and ``maximum_length`` must be numeric values.
+        4. If both ``minimum_length`` and ``maximum_length`` are specified, ``minimum_length <= maximum_length`` must
+        hold.
+
+        This method validates only the array container metadata and does not validate the metadata definition contained
+        within the ``properties`` section. Nested metadata definitions are validated separately during metadata
+        traversal.
+
+        Validation failures are recorded in ``event_logs`` before the failure status and message are returned.
+
+        """
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._metadata_array_validator.__name__,
@@ -661,6 +836,13 @@ class DataValidator:
             The key in the metadata dictionary that points to the data to be validated.
         input_root : Path
             The root directory for input files.
+
+        Returns
+        -------
+        tuple[bool, str]
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
+
         """
         info_map = {
             "class": DataValidator.__name__,
@@ -750,7 +932,38 @@ class DataValidator:
     def _get_paths_to_check(
         self, key: str, data: dict[str, Any], info_map: dict[str, Any]
     ) -> tuple[list[str] | None, str]:
-        """Helper function to get the paths to check in metadata."""
+        """
+        Extracts and validates the file path entries defined for a metadata file blob.
+
+        Parameters
+        ----------
+        key : str
+            Name of the metadata file blob being validated. Used for error reporting.
+        data : dict[str, Any]
+            Metadata definition for the file blob. May contain either a single ``path`` entry, a ``paths`` list, or
+            both.
+        info_map : dict[str, Any]
+            Context information to include in validation event logs.
+
+        Returns
+        -------
+        tuple[list[str] | None, str]
+            - A validated list of the paths.
+            - An associated error message if a configured path value is missing, empty, or not a string.
+
+        Notes
+        -----
+        A valid metadata file blob may define either:
+
+        - ``path`` as a non-empty string.
+        - ``paths`` as a non-empty list of non-empty strings.
+        - Both ``path`` and ``paths``, in which case all configured paths are returned.
+
+        This method validates only the shape and type of the path entries. It does not check whether the referenced
+        files exist on disk; that is handled separately by ``_validate_paths_exist()``.
+
+        Validation failures are recorded in ``event_logs`` before the failure status and message are returned.
+        """
         paths: list[str] = []
 
         if "path" in data:
@@ -808,6 +1021,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """
         Validates the data based on its specified type.
@@ -826,10 +1040,12 @@ class DataValidator:
             The metadata properties for the data file being checked.
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
-        called_during_initialization: bool
+        called_during_initialization : bool
             Boolean variable indicating whether the function is being called during initialization.
-        fixable_data_types: set[str]
+        fixable_data_types : set[str]
             Set enumerating the data types that the caller will attempt to fix while validating data.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -869,6 +1085,7 @@ class DataValidator:
                     ElementsCounter,
                     bool,
                     set[str],
+                    Path,
                 ],
                 bool,
             ],
@@ -883,7 +1100,7 @@ class DataValidator:
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{path}' "
+                f"The metadata type of the element '{path}' in input '{input_path}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
@@ -896,13 +1113,14 @@ class DataValidator:
             elements_counter,
             called_during_initialization,
             fixable_data_types,
+            input_path,
         )
 
         if data_type not in fixable_data_types:
             if not is_valid:
                 error_message = (
-                    f"Variable: '{path}' data type '{data_type}' is not fixable by Input Manager."
-                    f" Please check the inputs."
+                    f"Variable: '{path}' data type '{data_type}' from the '{input_path}' "
+                    "is not fixable by Input Manager. Please check the inputs."
                 )
                 self.event_logs.append(
                     {
@@ -917,7 +1135,7 @@ class DataValidator:
             elements_counter.increment(ElementState.VALID)
             return True
 
-        is_fixed = self._fix_data(variable_properties, variable_path, data, properties_blob_key)
+        is_fixed = self._fix_data(variable_properties, variable_path, data, properties_blob_key, input_path)
 
         if is_fixed:
             elements_counter.increment(ElementState.FIXED)
@@ -938,9 +1156,9 @@ class DataValidator:
 
         Parameters
         ----------
-        variable_path : List[str | int]
+        variable_path : list[str | int]
             The path to the variable being validated.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             The metadata properties for the variable being validated.
         data : Any
             The data to be validated.
@@ -951,6 +1169,7 @@ class DataValidator:
         -------
         bool
             True if the array container properties are valid, False otherwise.
+
         """
         info_map = {
             "class": DataValidator.__name__,
@@ -1013,6 +1232,7 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """
         Validates a data element of type array.
@@ -1035,15 +1255,18 @@ class DataValidator:
             Boolean variable indicating whether the function is being called during initialization.
         fixable_data_types: set[str]
             Set of data types that are fixable.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
         bool
             True if the data element is valid or fixable, False otherwise.
+
         """
 
         array_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
 
         if variable_properties.get("nullable", False) and array_value is None:
@@ -1065,6 +1288,7 @@ class DataValidator:
                 elements_counter,
                 called_during_initialization,
                 fixable_data_types,
+                input_path,
             )
             is_whole_array_acceptable = is_whole_array_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -1081,6 +1305,7 @@ class DataValidator:
         elements_counter: ElementsCounter,
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
         """
         Validates a data element of type object.
@@ -1101,6 +1326,8 @@ class DataValidator:
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
@@ -1119,7 +1346,7 @@ class DataValidator:
         }
 
         object_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
         variable_path_str = self.convert_variable_path_to_str(variable_path)
         properties_violation_message = (
@@ -1129,7 +1356,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "warning": "Validation: object is not a dictionary",
-                    "message": f"Variable: '{variable_path_str}' is"
+                    "message": f"Variable: '{variable_path_str}' in '{input_path}' is"
                     f" not an object but has type: {type(object_value)}. "
                     f"{properties_violation_message}",
                     "info_map": info_map,
@@ -1150,6 +1377,7 @@ class DataValidator:
                 elements_counter,
                 called_during_initialization,
                 fixable_data_types,
+                input_path,
             )
             is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -1160,7 +1388,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "warning": "Validation: object contains extraneous data",
-                    "message": f"Variable: '{variable_path_str}' contains "
+                    "message": f"Variable: '{variable_path_str}' in '{input_path}' contains "
                     f"data at key '{key}' that is not specified in "
                     f"the metadata"
                     f" properties. {properties_violation_message}",
@@ -1181,10 +1409,54 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
-        """Validates an data number element."""
+        """
+        Validates a numeric data value against its metadata properties.
+
+        Parameters
+        ----------
+        variable_path : list[str | int]
+            Path to the variable being validated within the input data structure.
+        variable_properties : dict[str, Any]
+            Metadata properties defining the validation requirements for the variable.
+        data : dict[str | int, Any] | list[Any]
+            Data structure containing the value to validate.
+        eager_termination : bool
+            Indicates whether validation should terminate immediately upon encountering invalid data.
+        properties_blob_key : str
+            Metadata properties section used to validate the variable. Included in validation messages.
+        elements_counter : ElementsCounter
+            Counter used to track valid, invalid, and corrected elements during validation.
+        called_during_initialization : bool
+            Indicates whether validation is occurring during initialization or a runtime update.
+        fixable_data_types : set[str]
+            Set of data types that may be automatically corrected if validation fails.
+            Included for interface consistency with other type validators.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
+
+        Returns
+        -------
+        bool
+            ``True`` if the value satisfies all numeric validation requirements;
+            otherwise ``False``.
+
+        Notes
+        -----
+        Validation consists of the following checks:
+
+        1. The target value can be successfully extracted from the input data.
+        2. If the variable is marked as nullable and the value is ``None``, validation succeeds immediately.
+        3. The value is of type ``int`` or ``float``.
+        4. If a ``minimum`` value is defined in the metadata, the value must be greater than or equal to that minimum.
+        5. If a ``maximum`` value is defined in the metadata, the value must be less than or equal to that maximum.
+
+        Validation failures are recorded in ``event_logs`` before ``False`` is returned.
+
+        """
         data_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
@@ -1205,7 +1477,7 @@ class DataValidator:
         if type(data_value) is not float and type(data_value) is not int:
             warning_string = "Validation: value is not a number"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
+                f"Variable: '{variable_path_str}' in '{input_path}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
             self.event_logs.append({"warning": warning_string, "message": warning_message, "info_map": info_map})
@@ -1215,8 +1487,8 @@ class DataValidator:
             if not is_in_range:
                 warning_name = "Validation: value less than minimum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: {data_value}, less than minimum value: "
-                    f"{minimum_value: .2f}. {properties_violation_message}"
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: {data_value}, "
+                    f"less than minimum value: {minimum_value: .2f}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
                 return False
@@ -1225,8 +1497,8 @@ class DataValidator:
             if not is_in_range:
                 warning_name = "Validation: value greater than maximum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: {data_value}, greater than maximum value: "
-                    f"{maximum_value: .2f}. {properties_violation_message}"
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: {data_value}, "
+                    f"greater than maximum value: {maximum_value: .2f}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
                 return False
@@ -1243,10 +1515,54 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
-        """Validates a data string element."""
+        """
+        Validates a string data value against its metadata properties.
+
+        Parameters
+        ----------
+        variable_path : list[str | int]
+            Path to the variable being validated within the input data structure.
+        variable_properties : dict[str, Any]
+            Metadata properties defining the validation requirements for the variable.
+        data : dict[str | int, Any] | list[Any]
+            Data structure containing the value to validate.
+        eager_termination : bool
+            Indicates whether validation should terminate immediately upon encountering invalid data.
+        properties_blob_key : str
+            Metadata properties section used to validate the variable. Included in validation messages.
+        elements_counter : ElementsCounter
+            Counter used to track valid, invalid, and corrected elements during validation.
+        called_during_initialization : bool
+            Indicates whether validation is occurring during initialization or a runtime update.
+        fixable_data_types : set[str]
+            Set of data types that may be automatically corrected if validation fails.
+            Included for interface consistency with other type validators.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
+
+        Returns
+        -------
+        bool
+            ``True`` if the value satisfies all string validation requirements; otherwise ``False``.
+
+        Notes
+        -----
+        Validation consists of the following checks:
+
+        1. The target value can be successfully extracted from the input data.
+        2. If the variable is marked as nullable and the value is ``None``, validation succeeds immediately.
+        3. The value is of type ``str``.
+        4. If a ``pattern`` value is defined in the metadata, the string must match the regular expression.
+        5. If ``minimum_length`` is defined in the metadata, the string length must be greater than or equal to it.
+        6. If ``maximum_length`` is defined in the metadata, the string length must be less than or equal to it.
+
+        Validation failures are recorded in ``event_logs`` before ``False`` is returned.
+
+        """
         data_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
@@ -1264,7 +1580,7 @@ class DataValidator:
         if type(data_value) is not str:
             warning_name = "Validation: string variable is not a string"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
+                f"Variable: '{variable_path_str}' in '{input_path}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
             self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
@@ -1276,8 +1592,8 @@ class DataValidator:
             if not is_valid_string:
                 warning_name = "Validation: string variable does not match pattern"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{data_value}', does not match pattern: "
-                    f"{pattern_check}. {properties_violation_message}"
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: '{data_value}', "
+                    f"does not match pattern: {pattern_check}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
                 return False
@@ -1289,7 +1605,7 @@ class DataValidator:
             if not is_valid_string:
                 warning_name = "Validation: string length less than minimum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{data_value}', length is less than "
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: '{data_value}', length is less than "
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
@@ -1299,8 +1615,8 @@ class DataValidator:
             if not is_valid_string:
                 warning_name = "Validation: string length greater than maximum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{data_value}', length is greater than "
-                    f"maximum length: {maximum_length}. {properties_violation_message}"
+                    f"Variable: '{variable_path_str}' in '{input_path}' has value: '{data_value}', "
+                    f"length is greater than maximum length: {maximum_length}. {properties_violation_message}"
                 )
                 self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
                 return False
@@ -1317,10 +1633,51 @@ class DataValidator:
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
         fixable_data_types: set[str],
+        input_path: Path,
     ) -> bool:
-        """Validates a data bool element."""
+        """
+        Validates a boolean data value against its metadata properties.
+
+        Parameters
+        ----------
+        variable_path : list[str | int]
+            Path to the variable being validated within the input data structure.
+        variable_properties : dict[str, Any]
+            Metadata properties defining the validation requirements for the variable.
+        data : dict[str | int, Any] | list[Any]
+            Data structure containing the value to validate.
+        eager_termination : bool
+            Indicates whether validation should terminate immediately upon encountering invalid data.
+        properties_blob_key : str
+            Metadata properties section used to validate the variable. Included in validation messages.
+        elements_counter : ElementsCounter
+            Counter used to track valid, invalid, and corrected elements during validation.
+        called_during_initialization : bool
+            Indicates whether validation is occurring during initialization or a runtime update.
+        fixable_data_types : set[str]
+            Set of data types that may be automatically corrected if validation fails. Included for interface
+            consistency with other type validators.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
+
+        Returns
+        -------
+        bool
+            ``True`` if the value satisfies all boolean validation requirements; otherwise ``False``.
+
+        Notes
+        -----
+        Validation consists of the following checks:
+
+        1. The target value can be successfully extracted from the input data.
+        2. If the variable is marked as nullable and the value is ``None``, validation succeeds immediately.
+        3. The value is of type ``bool``.
+
+        Validation failures are recorded in ``event_logs`` before ``False`` is returned.
+
+        """
         data_value = self._extract_data_by_key_list(
-            data, variable_path, variable_properties, called_during_initialization
+            data, variable_path, variable_properties, called_during_initialization, input_path
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
@@ -1339,7 +1696,7 @@ class DataValidator:
         if type(data_value) is not bool:
             warning_name = "Validation: bool variable is not a bool"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: '{data_value}', is type: "
+                f"Variable: '{variable_path_str}' in '{input_path}' has value: '{data_value}', is type: "
                 f"'{type(data_value)}'. {properties_violation_message}"
             )
             self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
@@ -1354,28 +1711,29 @@ class DataValidator:
         element_hierarchy: list[str | int],
         data: dict[str | int, Any] | list[Any],
         properties_blob_key: str,
+        input_path: Path,
     ) -> bool:
         """
-        Attempt to fix the invalid data.
+        Attempts to fix the invalid data.
 
         Parameters
         ----------
         variable_properties : dict[str, Any]
             The properties for the variable of interest.
-
         element_hierarchy: list[str | int]
             A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.
-
         data: dict[str | int, Any] | list[Any]
             A buffer dictionary that holds the data for validation and fixing.
-
         properties_blob_key : str
             The metadata properties section keyword for the data file being checked.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
         bool
             True if the data is fixed, False otherwise.
+
         """
         info_map = {
             "class": DataValidator.__name__,
@@ -1397,7 +1755,7 @@ class DataValidator:
                 else variable_parent[int(element_hierarchy[-1])]
             )
             error_message = (
-                f"Variable: '{element_hierarchy[-1]}' has invalid value: '{invalid_value}'"
+                f"Variable: '{element_hierarchy[-1]}' in '{input_path}' has invalid value: '{invalid_value}'"
                 f", and cannot be changed to a default value. {properties_violation_message}"
             )
             self.event_logs.append(
@@ -1416,7 +1774,8 @@ class DataValidator:
             original_invalid_value = variable_parent.get(str(element_hierarchy[-1]))
 
         warning_message = (
-            f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
+            f"Variable: '{element_path}' in '{input_path}' has value: {original_invalid_value}."
+            f" {properties_violation_message}"
         )
         self.event_logs.append(
             {"warning": "Validation: invalid data found", "message": warning_message, "info_map": info_map}
@@ -1428,8 +1787,8 @@ class DataValidator:
             variable_parent[str(element_hierarchy[-1])] = variable_properties["default"]
 
         warning_message = (
-            f"Invalid data fixed: '{element_path}' value changed from {original_invalid_value} to "
-            f"{variable_properties['default']}. Fix enabled by default value specified in "
+            f"Invalid data from '{input_path}' fixed: '{element_path}' value changed from "
+            f"{original_invalid_value} to {variable_properties['default']}. Fix enabled by default value specified in "
             f"'{properties_blob_key}'."
         )
         self.event_logs.append({"warning": "Validation: data fixed", "message": warning_message, "info_map": info_map})
@@ -1441,6 +1800,7 @@ class DataValidator:
         variable_path: Sequence[str | int],
         variable_properties: dict[str, Any],
         called_during_initialization: bool,
+        input_path: Path,
     ) -> Any:
         """
         Extracts a value from the data based on a specified path and handles missing data by calling
@@ -1448,20 +1808,27 @@ class DataValidator:
 
         Parameters
         ----------
-        data : List[Any] | Dict[str, Any]
+        data : list[Any] | dict[str, Any]
             The data containing the value to be extracted.
-        variable_path : List[str | int]
+        variable_path : list[str | int]
             A list of keys to be used to extract the value from the data.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             The metadata properties for the variable being validated.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization.
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Returns
         -------
         Any
-            The value extracted from the data if found.
-            None if not found.
+            The extracted value.
+
+        Raises
+        ------
+        KeyError
+            If the value cannot be located and the missing data is required
+            based on the variable's modifiability rules.
 
         Notes
         -----
@@ -1470,21 +1837,27 @@ class DataValidator:
         If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
         the variable name by finding the last string element in the `variable_path` array and handles this missing data
         by calling DataValidator._log_missing_data().
+
         """
         result = None
         try:
-            result = self.extract_value_by_key_list(data, variable_path)
+            result = self.extract_value_by_key_list(data, variable_path, input_path)
         except KeyError:
             var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
             self._log_missing_data(
                 variable_properties=variable_properties,
                 var_name=var_name,
                 called_during_initialization=called_during_initialization,
+                input_path=input_path,
             )
         return result
 
     def _log_missing_data(
-        self, variable_properties: dict[str, Any], var_name: str, called_during_initialization: bool
+        self,
+        variable_properties: dict[str, Any],
+        var_name: str,
+        called_during_initialization: bool,
+        input_path: Path,
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -1492,12 +1865,14 @@ class DataValidator:
 
         Parameters
         ----------
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             Properties of the variable, potentially including its modifiability status.
         var_name : str
             The name of the variable with missing data.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization
+        input_path : Path
+            Reference identifying the origin of the data currently being validated.
 
         Raises
         ------
@@ -1509,10 +1884,14 @@ class DataValidator:
         This function determines if it's being called during the initialization phase and checks if the missing variable
         data is required at this stage using '_is_data_required_upon_initialization'. If required, it logs an error and
         raises a KeyError. If not, it logs a warning.
+
         """
         info_map = {"class": DataValidator.__name__, "function": DataValidator._log_missing_data.__name__}
         if not called_during_initialization:
-            error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."
+            error_msg = (
+                f"Key {var_name} not found in data from '{input_path}'. "
+                "A value is required to update variable during runtime."
+            )
             self.event_logs.append({"error": "Missing required data", "message": error_msg, "info_map": info_map})
             raise KeyError(error_msg)
 
@@ -1520,23 +1899,20 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Missing required data",
-                    "message": f"Key {var_name} not found in data. Data value is required for"
-                    f" this "
-                    "variable upon program initialization.",
+                    "message": f"Key {var_name} not found in data from source '{input_path}'. Data value is required "
+                    "for this variable upon program initialization.",
                     "info_map": info_map,
                 }
             )
             raise KeyError(
-                f"Key {var_name} not found in input data. Data value is required for this "
+                f"Key {var_name} not found in input data source '{input_path}'. Data value is required for this "
                 "variable upon program initialization."
             )
         self.event_logs.append(
             {
-                "warning": "Validation: key not found in input data -- data not required upon initialization",
-                "message": f"Key {var_name} not found in data. Data value is not required for "
-                f"this "
-                "variable upon program initialization, setting the variable value "
-                "to None.",
+                "warning": "Validation: key not found in input data. Data not required upon initialization",
+                "message": f"Key {var_name} not found in data source '{input_path}'. Data value is not required for "
+                "this variable upon program initialization, setting the variable value to None.",
                 "info_map": info_map,
             }
         )
@@ -1545,16 +1921,11 @@ class DataValidator:
         """
         Determines whether a variable requires a data value upon initialization based on its modifiability status.
 
-        This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
-        variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
-        modifiability status is either 'REQUIRED_AND_LOCKED' or 'REQUIRED_AND_UNLOCKED', indicating that the variable
-        must be initialized with a value.
-
         Parameters
         ----------
         variable_name : str
             The name of the variable being evaluated for its initialization requirements.
-        variable_properties : Dict[str, Any]
+        variable_properties : dict[str, Any]
             A dictionary containing the properties of the variable, which should include its modifiability status among
             others.
 
@@ -1563,6 +1934,13 @@ class DataValidator:
         bool
             True if the variable's modifiability status necessitates a data value upon initialization,
             False otherwise.
+
+        Notes
+        -----
+        This function utilizes the ``_get_variable_modifiability`` method to ascertain the modifiability status of the
+        variable identified by ``variable_name`` and described by ``variable_properties``. It then checks if the
+        modifiability status is either ``REQUIRED_LOCKED`` or ``REQUIRED_UNLOCKED``.
+
         """
         variable_modifiability = self._get_variable_modifiability(
             variable_name=variable_name, variable_properties=variable_properties
@@ -1573,13 +1951,6 @@ class DataValidator:
         """
         Determines the modifiability status of a variable based on its properties and returns the corresponding enum
         value.
-
-        Notes
-        -----
-        This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
-        empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
-        correspond to any enum members, a KeyError is raised after logging the error downstream. If 'modifiability'
-        is absent or its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.
 
         Parameters
         ----------
@@ -1592,6 +1963,13 @@ class DataValidator:
         -------
         Modifiability
             An enum member representing the variable's modifiability status.
+
+        Notes
+        -----
+        This function looks for a ``modifiability`` key within ``variable_properties``. If present and non-empty, the
+        value is mapped to a ``Modifiability`` enum member. If the value is not recognized, a warning is logged and
+        ``Modifiability.UNREQUIRED_UNLOCKED`` is used. If ``modifiability`` is absent or empty, the same default is
+        used.
 
         """
         info_map = {
@@ -1623,7 +2001,7 @@ class DataValidator:
 
         Parameters
         ----------
-        variable_path : List[str | int]
+        variable_path : list[str | int]
             A list of keys to be used to extract the value from the data.
 
         Returns
@@ -1642,6 +2020,7 @@ class DataValidator:
         >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
         >>> DataValidator.convert_variable_path_to_str(var_path)
         'manure_management_scenarios.[0].bedding_type'
+
         """
 
         formatted_path_elems = []
@@ -1653,17 +2032,20 @@ class DataValidator:
         return ".".join(formatted_path_elems)
 
     def extract_value_by_key_list(
-        self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int]
+        self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int], input_path: Path | None = None
     ) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 
         Parameters
         ----------
-        data : List[Any] | Dict[str, Any]
+        data : list[Any] | dict[str, Any]
             The data containing the value to be extracted.
-        variable_path : List[str | int]
+        variable_path : list[str | int]
             A list of keys to be used to extract the value from the data.
+        input_path : Path | str | None, default=None
+            Reference identifying the origin of the data currently being extracted.
+            None indicates that the extraction process is in-simulation data retrieval.
 
         Returns
         -------
@@ -1708,6 +2090,7 @@ class DataValidator:
         >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
         >>> DataValidator.extract_value_by_key_list(example_data, var_path)
         'straw'
+
         """
         for key in variable_path:
             if isinstance(data, list) and 0 <= int(key) < len(data):
@@ -1715,7 +2098,14 @@ class DataValidator:
             elif isinstance(data, dict) and isinstance(key, str) and key in data:
                 data = data[key]
             else:
+                if input_path is not None:
+                    raise KeyError(
+                        f"There is an error at key {key} in path {variable_path} "
+                        f"from input source '{input_path}'. Data cannot be extracted."
+                    )
+
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}. Data cannot be extracted.")
+
         return data
 
 
@@ -1777,6 +2167,7 @@ class CrossValidator:
         -------
         bool
             A boolean indicating whether the data passed cross-validation.
+
         """
         self._target_and_save(target_and_save_result)
 
@@ -1803,6 +2194,7 @@ class CrossValidator:
             The name of the alias to be saved.
         value : Any
             The value to be saved.
+
         """
         self._alias_pool[alias_name] = value
 
@@ -1906,8 +2298,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            Result of the expression evaluation and a boolean indicating whether
-            the expression was successfully evaluated.
+            - The result of the expression evaluation.
+            - A boolean indicating whether the expression was successfully evaluated.
 
         Raises
         ------
@@ -1925,6 +2317,7 @@ class CrossValidator:
         Array-of-dicts form:
         ``{"for_each": {"in": "...", "field": "...", "value_to_compare": "..." | "field_to_compare": "...",
         "relationship": "...", "mode": "filter" | "enforce"}, "save_as": "..."}``
+
         """
         if "for_each" in expression_block:
             result, evaluated = self._evaluate_for_each_block(
@@ -1972,7 +2365,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            Aggregated result and ``True`` on success, or ``(None, False)`` on error.
+            - The aggregated result.
+            - A boolean representing the success or failure of the aggregation.
 
         Raises
         ------
@@ -2010,6 +2404,7 @@ class CrossValidator:
         .. code-block:: python
 
             {"operands": ["alias_list"], "mode": "element_wise"}
+
         """
         operation = aggregation_block.get("operation", "no_op")
         aggregator = AGGREGATION_FUNCTIONS[operation]
@@ -2056,6 +2451,7 @@ class CrossValidator:
         -------
         list[dict[str, Any]] or None
             The resolved array on success, or ``None`` on error.
+
         """
         array = self._get_alias_value(source_alias, eager_termination, outer_relationship)
         if array is None or not (isinstance(array, list) and all(isinstance(entry, dict) for entry in array)):
@@ -2099,8 +2495,8 @@ class CrossValidator:
         Returns
         -------
         Callable[[dict[str, Any]], list[Any]] or None
-            A callable ``(entry) -> list`` on success, or ``None`` if alias resolution
-            fails.
+            A callable ``(entry) -> list`` on success, or ``None`` if alias resolution fails.
+
         """
         if value_to_compare_alias is not None:
             comparison_value = self._get_alias_value(value_to_compare_alias, eager_termination, outer_relationship)
@@ -2131,7 +2527,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            ``(result, True)`` on success or ``(None, False)`` on error.
+            - The result of the evaluation.
+            - A boolean representing the success or failure of the evaluation.
 
         Notes
         -----
@@ -2172,6 +2569,7 @@ class CrossValidator:
                 "relationship": "greater_than",
                 "mode": "enforce"
             }
+
         """
         source_alias: str = iter_block["in"]
         field: str = iter_block["field"]
@@ -2239,6 +2637,7 @@ class CrossValidator:
         bool
             Returns True if the expression block is valid, otherwise False if eager termination
             is disabled.
+
         """
         if len(ordered_values) > 1:
             self._log_cross_validation_error(
@@ -2300,6 +2699,7 @@ class CrossValidator:
         - Exactly one of ``aggregation`` or ``for_each`` must be present:
             - A block containing both keys is invalid.
             - A block containing neither key is invalid.
+
         """
         if "aggregation" in expression_block and "for_each" not in expression_block:
             return self._validate_aggregation_block_structure(expression_block["aggregation"], eager_termination)
@@ -2347,6 +2747,7 @@ class CrossValidator:
           and cannot be ``"no_op"``.
         - ``operation``, when provided, must be a known aggregation function.
         - ``mode``, when provided, must be ``"element_wise"`` or ``"aggregate"``.
+
         """
         function_name = self._validate_aggregation_block_structure.__name__
 
@@ -2429,6 +2830,7 @@ class CrossValidator:
         - ``in`` and ``field`` must both be present and non-empty.
         - Exactly one of ``value_to_compare`` or ``field_to_compare`` must be provided.
         - ``relationship`` must be present and be a known relation string.
+
         """
         function_name = self._validate_for_each_block_structure.__name__
 
@@ -2517,7 +2919,7 @@ class CrossValidator:
         return evaluation_function(left_hand, right_hand, eager_termination)
 
     def _validate_condition_clause(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
-        """Validate the whole condition block."""
+        """Validates the whole condition block."""
         left_expression = condition_clause.get("left_hand", False)
         right_expression = condition_clause.get("right_hand", False)
         relationship = condition_clause.get("relationship", False)
@@ -2560,7 +2962,7 @@ class CrossValidator:
         )
 
     def _log_cross_validation_error(self, error: str, message: str, function_name: str) -> None:
-        """Append a standardized cross-validation error entry to the event log."""
+        """Appends a standardized cross-validation error entry to the event log."""
         self._event_logs.append(
             {
                 "error": error,
@@ -2573,7 +2975,7 @@ class CrossValidator:
         )
 
     def _validate_relationship(self, relationship: Any, eager_termination: bool) -> bool:
-        """Validate if a valid relationship check is given."""
+        """Validates if a valid relationship check is given."""
         available_relationship = self.relation_mapping.keys()
         if not isinstance(relationship, str):
             self._event_logs.append(
@@ -2613,10 +3015,8 @@ class CrossValidator:
         comparison_function: Callable[[Any, Any], bool],
         eager_termination: bool,
     ) -> bool:
-        """Evaluate a comparison for two values.
-
-        When both inputs are lists, compare their values pairwise and require every comparison to pass. Otherwise,
-        compare the two input values directly.
+        """
+        Evaluates a comparison for two values.
 
         Parameters
         ----------
@@ -2633,6 +3033,12 @@ class CrossValidator:
         -------
         bool
             True when the direct comparison passes, or when all pairwise comparisons pass.
+
+        Notes
+        -----
+        When both inputs are lists, compare their values pairwise and require every comparison to pass. Otherwise,
+        compare the two input values directly.
+
         """
         if isinstance(left_hand_value, list) and isinstance(right_hand_value, list):
             if len(left_hand_value) != len(right_hand_value):
@@ -2764,6 +3170,7 @@ class CrossValidator:
         -------
         bool
             True if the value fully matches the regex pattern, otherwise False.
+
         """
         return bool(re.fullmatch(right_hand_value, left_hand_value) is not None)
 
@@ -2785,6 +3192,7 @@ class CrossValidator:
         -------
         bool
             A boolean indicating whether all conditions in the array are satisfied.
+
         """
         for clause in condition_clause_array:
             satisfied = self._evaluate_condition(clause, eager_termination)
