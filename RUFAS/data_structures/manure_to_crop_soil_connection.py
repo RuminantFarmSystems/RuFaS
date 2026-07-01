@@ -188,7 +188,8 @@ class NutrientRequestResults:
         if combined_total_nitrogen > 0:
 
             combined_organic_nitrogen_fraction = (
-                self.organic_nitrogen_fraction * self.nitrogen + other.organic_nitrogen_fraction * other.nitrogen
+                self.organic_nitrogen_fraction * self.nitrogen 
+                + other.organic_nitrogen_fraction * other.nitrogen
             ) / combined_total_nitrogen
 
             self_inorganic_nitrogen_mass = self.inorganic_nitrogen_fraction * self.nitrogen
@@ -196,7 +197,8 @@ class NutrientRequestResults:
             combined_total_inorganic_nitrogen = self_inorganic_nitrogen_mass + other_inorganic_nitrogen_mass
 
             combined_inorganic_nitrogen_fraction = (
-                self_inorganic_nitrogen_mass + other_inorganic_nitrogen_mass
+                self_inorganic_nitrogen_mass 
+                + other_inorganic_nitrogen_mass
             ) / combined_total_nitrogen
 
             if combined_total_inorganic_nitrogen > 0:
