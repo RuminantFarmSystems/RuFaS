@@ -96,6 +96,7 @@ v1.0.2
 
 
 ### v1.0.1
+
 - [3013](https://github.com/RuminantFarmSystems/RuFaS/pull/3013) - [minor change]  [minor change] [NoInputChange] [OutputChange] Replicates 2998, 2997, and 2994: Adds minimums to urine nitrogen excretion, updates tractor dataset, corrects changelog typos
 
 ### v1.0.0
