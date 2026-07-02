@@ -19,7 +19,7 @@ from RUFAS.biophysical.animal.calf_retention_policy import (
     CalfRetentionPolicy,
     RETENTION_METHOD_COUNT,
     RETENTION_METHOD_RATE,
-    UNFULFILLED_TAG_WARNING_FRACTION,
+    UNFULFILLED_TAG_ERROR_FRACTION,
 )
 from RUFAS.biophysical.animal.data_types.animal_enums import Sex
 from RUFAS.rufas_time import RufasTime
@@ -238,42 +238,78 @@ def test_year_rollover_rebuilds_schedule_and_resets_ledger() -> None:
     assert policy._tags_fulfilled_this_year == 0  # fulfilled counter reset for the new year
 
 
-def test_finalize_day_warns_when_target_unmet(mocker: MockerFixture) -> None:
+def test_finalize_day_warns_on_any_leftover_below_error_threshold(mocker: MockerFixture) -> None:
+    # Any leftover tag (but below the error threshold) warns without stopping the simulation.
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
     policy._scheduled_year = 1
     policy._target_tags_this_year = 100
-    policy._outstanding_tags = 20  # 20 > 5% of 100
+    policy._outstanding_tags = round(100 * UNFULFILLED_TAG_ERROR_FRACTION) - 1  # just below the error threshold
 
     policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
 
-    assert mock_om.add_warning.called, "expected a year-end warning for unfulfilled tags"
+    assert mock_om.add_warning.called
+    assert not mock_om.add_error.called
 
 
-def test_finalize_day_no_warning_when_target_met(mocker: MockerFixture) -> None:
+def test_finalize_day_warns_on_a_single_leftover_tag(mocker: MockerFixture) -> None:
+    # The animal team wants a warning for *any* leftover, even one.
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
     policy._scheduled_year = 1
     policy._target_tags_this_year = 100
-    policy._outstanding_tags = int(100 * UNFULFILLED_TAG_WARNING_FRACTION)  # exactly at threshold, not above
+    policy._outstanding_tags = 1
+
+    policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
+
+    assert mock_om.add_warning.called
+    assert not mock_om.add_error.called
+
+
+def test_finalize_day_no_message_when_target_fully_met(mocker: MockerFixture) -> None:
+    AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
+    policy = CalfRetentionPolicy()
+    mock_om = mocker.patch.object(policy, "om")
+    policy._scheduled_year = 1
+    policy._target_tags_this_year = 100
+    policy._outstanding_tags = 0  # every tag fulfilled
 
     policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
 
     assert not mock_om.add_warning.called
+    assert not mock_om.add_error.called
 
 
-def test_finalize_day_no_warning_before_year_end(mocker: MockerFixture) -> None:
+@pytest.mark.parametrize("fraction", [UNFULFILLED_TAG_ERROR_FRACTION, 0.5, 1.0])
+def test_finalize_day_errors_and_stops_when_shortfall_reaches_threshold(mocker: MockerFixture, fraction: float) -> None:
+    AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
+    policy = CalfRetentionPolicy()
+    mock_om = mocker.patch.object(policy, "om")
+    policy._scheduled_year = 1
+    policy._target_tags_this_year = 100
+    policy._outstanding_tags = round(100 * fraction)  # at or above the 20% error threshold
+
+    with pytest.raises(RuntimeError):
+        policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
+
+    assert mock_om.add_error.called
+    assert not mock_om.add_warning.called  # the error path replaces the warning
+
+
+def test_finalize_day_no_action_before_year_end(mocker: MockerFixture) -> None:
+    # A large shortfall must not warn or halt mid-year -- only on the last day of the year.
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
     policy._target_tags_this_year = 100
     policy._outstanding_tags = 99
 
-    policy.finalize_day(_time(sim_year=1, julian_day=200, year_end_day=365))
+    policy.finalize_day(_time(sim_year=1, julian_day=200, year_end_day=365))  # not the year-end day
 
     assert not mock_om.add_warning.called
+    assert not mock_om.add_error.called
 
 
 def test_hooks_are_noops_under_rate_method(mocker: MockerFixture) -> None:
@@ -288,3 +324,4 @@ def test_hooks_are_noops_under_rate_method(mocker: MockerFixture) -> None:
     assert policy._outstanding_tags == 0
     assert policy._scheduled_year is None
     assert not mock_om.add_warning.called
+    assert not mock_om.add_error.called

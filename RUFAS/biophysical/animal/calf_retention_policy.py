@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 RETENTION_METHOD_RATE = "rate"
 RETENTION_METHOD_COUNT = "count"
 
-UNFULFILLED_TAG_WARNING_FRACTION = 0.05
+UNFULFILLED_TAG_ERROR_FRACTION = 0.20
 
 
 class CalfRetentionPolicy:
@@ -88,12 +88,18 @@ class CalfRetentionPolicy:
 
     def finalize_day(self, time: RufasTime) -> None:
         """
-        Emit the year-end warning on the last day of a simulation year (count method).
+        Run the year-end keep-target check on the last day of a simulation year (count method).
 
         Parameters
         ----------
         time : RufasTime
             Current simulation time.
+
+        Raises
+        ------
+        RuntimeError
+            If at least ``UNFULFILLED_TAG_ERROR_FRACTION`` of the annual target went
+            unfulfilled (the simulation is stopped).
 
         Notes
         -----
@@ -104,7 +110,7 @@ class CalfRetentionPolicy:
         if not self.is_count_based:
             return
         if time.current_julian_day == time.year_end_day:
-            self._warn_if_target_unmet(time)
+            self._check_year_end_target(time)
 
     def apply(self, calf: "Animal", simulation_day: int) -> None:
         """Apply the configured retention decision to a newborn calf.
@@ -214,31 +220,54 @@ class CalfRetentionPolicy:
                 schedule[start_day + offset] = tags_today
         return schedule
 
-    def _warn_if_target_unmet(self, time: RufasTime) -> None:
+    def _check_year_end_target(self, time: RufasTime) -> None:
         """
-        Warn when too many keep tags went unfulfilled by year end.
+        React to keep tags left unfulfilled by the count-based target at year end.
+
+        Any leftover tags emit a warning. A shortfall of at least
+        ``UNFULFILLED_TAG_ERROR_FRACTION`` of the annual target raises a ``RuntimeError``,
+        stopping the simulation so the user can adjust inputs (the female-calf supply cannot
+        meet the requested target).
 
         Parameters
         ----------
         time : RufasTime
             Current simulation time.
 
+        Raises
+        ------
+        RuntimeError
+            If the unfulfilled fraction reaches ``UNFULFILLED_TAG_ERROR_FRACTION``.
+
         """
         unfulfilled = self._outstanding_tags
-        if unfulfilled > self._target_tags_this_year * UNFULFILLED_TAG_WARNING_FRACTION:
-            self.om.add_warning(
-                "Insufficient female calves to meet keep target",
-                (
-                    f"Simulation year {time.current_simulation_year}: {unfulfilled} of "
-                    f"{self._target_tags_this_year} female-calf keep tags went unfulfilled "
-                    f"(kept {self._tags_fulfilled_this_year}). Too few live female calves were "
-                    f"born to reach keep_female_calf_num_annual="
-                    f"{AnimalConfig.keep_female_calf_num_annual}. Consider lowering the male "
-                    f"calf rate to increase the number of female calves born."
-                ),
-                {
-                    "class": self.__class__.__name__,
-                    "function": self._warn_if_target_unmet.__name__,
-                    "simulation_day": time.simulation_day,
-                },
+        if unfulfilled <= 0:
+            return
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._check_year_end_target.__name__,
+            "simulation_day": time.simulation_day,
+        }
+        shortfall = (
+            f"Simulation year {time.current_simulation_year}: {unfulfilled} of "
+            f"{self._target_tags_this_year} female-calf keep tags went unfulfilled "
+            f"(kept {self._tags_fulfilled_this_year}). Fewer female calves were kept than the "
+            f"target keep_female_calf_num_annual={AnimalConfig.keep_female_calf_num_annual}."
+        )
+
+        if unfulfilled >= self._target_tags_this_year * UNFULFILLED_TAG_ERROR_FRACTION:
+            message = (
+                f"{shortfall} At least {round(UNFULFILLED_TAG_ERROR_FRACTION * 100)}% of the annual "
+                "target could not be met, so the simulation is stopped. Increase the number of "
+                "female calves born (for example, lower the male calf rate or use sexed semen) or "
+                "lower keep_female_calf_num_annual. To avoid this error, use the 'rate' retention method."
             )
+            self.om.add_error("Female-calf keep target unreachable", message, info_map)
+            raise RuntimeError(message)
+
+        self.om.add_warning(
+            "Insufficient female calves to meet keep target",
+            f"{shortfall} Consider lowering the male calf rate to increase the number of female calves born.",
+            info_map,
+        )
