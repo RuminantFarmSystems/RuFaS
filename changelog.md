@@ -24,7 +24,6 @@ A **changelog** is a structured record of changes made to the codebase over time
 v1.0.0
 
 ### Next Version Updates
-
 - [2994](https://github.com/RuminantFarmSystems/RuFaS/pull/2994) - [minor change] [NoInputChange] [OutputChange] Adds minimums to urine nitrogen equation.
 - [2997](https://github.com/RuminantFarmSystems/RuFaS/pull/2997) - [minor change] [NoInputChange] [OutputChange] Updates throughput in tractor dataset for combine headers.
 - [2998](https://github.com/RuminantFarmSystems/RuFaS/pull/2998) - [minor change] [NoInputChange] [OutputChange] Moved changelog entries to reflect what was in v1.0. Brought changes in 2994 and 2997 into one branch.
@@ -93,6 +92,7 @@ v1.0.0
 - [3043](https://github.com/RuminantFarmSystems/RuFaS/pull/3043) - [minor change] [Animal] [Ration] [NoInputChange] [NoOutputChange] Refactor `Pen.formulate_optimized_ration` to remove the `# noqa: C901`; behavior unchanged.
 - [3104](https://github.com/RuminantFarmSystems/RuFaS/pull/3104) - [minor change] [Testing] [NoInputChange] [NoOutputChange] Updates unit testing coverage for add_error calls added in PR 3000.
 - [3115](https://github.com/RuminantFarmSystems/RuFaS/pull/3115) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows.
+- [3078](https://github.com/RuminantFarmSystems/RuFaS/pull/3078) - [minor change] [Animal] [InputChange] [NoOutputChange] Add a count-based female calf retention option (calf_retention_method, keep_female_calf_num_annual) to keep a target number of female calves per year instead of a rate, and consolidate all retention logic into a single CalfRetentionPolicy. Default (rate) behavior is unchanged.
 
 ### v1.0.0
 
