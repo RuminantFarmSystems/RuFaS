@@ -207,6 +207,9 @@ class AnimalConfig:
         Number of cows per bull for natural-service mating; NRC reference range is 20–30:1.
     beef_cow_cull_rate_annual : float
         Annual culling rate for mature beef cows (fraction); default is 0.175 (USDA average).
+    beef_reproduction_program : BeefReproductionProtocol
+        Reproduction protocol used for the beef cow-calf herd;
+        default is NATURAL_SERVICE_SEASONAL.
 
     """
 
@@ -695,14 +698,10 @@ class AnimalConfig:
         cls.beef_mature_cow_weight_kg = float(merged["mature_cow_weight_kg"])
         cls.beef_natural_service_bull_ratio = int(merged["natural_service_bull_ratio"])
         cls.beef_cow_cull_rate_annual = float(merged["cow_cull_rate_annual"])
-        breeding_start_raw = beef_cfg.get("breeding_season_start_day")
-        cls.beef_breeding_season_start_day = int(
-            AnimalModuleConstants.BEEF_DEFAULT_BREEDING_SEASON_START_DAY
-            if breeding_start_raw is None
-            else breeding_start_raw
+        cls.beef_breeding_season_start_day = int(merged["breeding_season_start_day"])
+        cls.beef_weaning_weight_kg = (
+            float(merged["weaning_weight_kg"]) if merged["weaning_weight_kg"] is not None else None
         )
-        raw_weaning_weight = beef_cfg.get("weaning_weight_kg")
-        cls.beef_weaning_weight_kg = float(raw_weaning_weight) if raw_weaning_weight is not None else None
         cls.beef_creep_feeding_enabled = bool(beef_cfg.get("creep_feeding_enabled") or False)
 
     @classmethod

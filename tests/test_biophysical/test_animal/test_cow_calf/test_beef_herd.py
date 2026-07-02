@@ -579,6 +579,25 @@ def test_validate_beef_cow_calf_config_accepts_valid_config() -> None:
     )
 
 
+@pytest.mark.unit
+def test_validate_beef_cow_calf_config_accepts_explicit_none_values() -> None:
+    """Explicit None for mature_cow_weight_kg, weaning_age_days, breeding_season_length,
+    natural_service_bull_ratio, and cow_cull_rate_annual must not raise TypeError.
+
+    Verifies the None guards added in round 4: keys present but set to None mean
+    "use default" and must be skipped silently rather than crashing float(None).
+    """
+    DataValidator.validate_beef_cow_calf_config(
+        {
+            "mature_cow_weight_kg": None,
+            "weaning_age_days": None,
+            "breeding_season_length": None,
+            "natural_service_bull_ratio": None,
+            "cow_cull_rate_annual": None,
+        }
+    )
+
+
 # ---------------------------------------------------------------------------
 # Task 7.6 — None-guards and required metric fields in report_cow_calf_performance
 # ---------------------------------------------------------------------------

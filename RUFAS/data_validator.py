@@ -1840,17 +1840,17 @@ class DataValidator:
             - ``weaning_age_days`` must be > 0 and finite.
             - ``breeding_season_length`` must be > 0 and finite.
             - ``natural_service_bull_ratio`` must be between 1 and ``MAX_BULL_TO_COW_RATIO``.
-            - ``breeding_season_start_day`` must be 1–365 when present and non-None.
+            - ``breeding_season_start_day`` must be 1-365 when present and non-None.
             - ``weaning_weight_kg`` must be > 0 and finite when present and non-None.
 
         """
         for key in ("mature_cow_weight_kg", "weaning_age_days", "breeding_season_length"):
-            if key in config:
+            if key in config and config[key] is not None:
                 val = float(config[key])
                 if not math.isfinite(val) or val <= 0:
                     raise ValueError(f"{key} must be > 0, got {val}")
 
-        if "natural_service_bull_ratio" in config:
+        if "natural_service_bull_ratio" in config and config["natural_service_bull_ratio"] is not None:
             bull_ratio_raw = float(config["natural_service_bull_ratio"])
             if not math.isfinite(bull_ratio_raw):
                 raise ValueError(f"natural_service_bull_ratio is non-finite, got {bull_ratio_raw}")
@@ -1862,7 +1862,7 @@ class DataValidator:
                     f"natural_service_bull_ratio must be 1–{animal_constants.MAX_BULL_TO_COW_RATIO}, got {bull_ratio}"
                 )
 
-        if "cow_cull_rate_annual" in config:
+        if "cow_cull_rate_annual" in config and config["cow_cull_rate_annual"] is not None:
             rate = float(config["cow_cull_rate_annual"])
             if not math.isfinite(rate) or not (0.0 <= rate <= 1.0):
                 raise ValueError(f"cow_cull_rate_annual must be between 0.0 and 1.0, got {rate}")
