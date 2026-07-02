@@ -1816,6 +1816,8 @@ class DataValidator:
             - ``weaning_age_days`` must be > 0 and finite.
             - ``breeding_season_length`` must be > 0 and finite.
             - ``natural_service_bull_ratio`` must be between 1 and ``MAX_BULL_TO_COW_RATIO``.
+            - ``breeding_season_start_day`` must be 1–365 when present and non-None.
+            - ``weaning_weight_kg`` must be > 0 and finite when present and non-None.
 
         """
         for key in ("mature_cow_weight_kg", "weaning_age_days", "breeding_season_length"):
@@ -1840,6 +1842,20 @@ class DataValidator:
             rate = float(config["cow_cull_rate_annual"])
             if not math.isfinite(rate) or not (0.0 <= rate <= 1.0):
                 raise ValueError(f"cow_cull_rate_annual must be between 0.0 and 1.0, got {rate}")
+
+        if "breeding_season_start_day" in config:
+            bsd = config["breeding_season_start_day"]
+            if bsd is not None:
+                bsd_val = float(bsd)
+                if not math.isfinite(bsd_val) or bsd_val < 1 or bsd_val > 365:
+                    raise ValueError(f"breeding_season_start_day must be 1-365, got {bsd_val}")
+
+        if "weaning_weight_kg" in config:
+            ww = config["weaning_weight_kg"]
+            if ww is not None:
+                ww_val = float(ww)
+                if not math.isfinite(ww_val) or ww_val <= 0:
+                    raise ValueError(f"weaning_weight_kg must be positive and finite, got {ww_val}")
 
 
 class CrossValidator:

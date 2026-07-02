@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
@@ -875,6 +876,62 @@ def test_pen_forage_quality_factor_negative_raises() -> None:
             manure_streams=[],
             forage_quality_factor=-0.1,
         )
+
+
+# ---------------------------------------------------------------------------
+# FIX 1 (CodeRabbit round 3) — mature_bw fallback must use AnimalConfig, not DEFAULT_MATURE_BODY_WEIGHT_KG
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_beef_factory_mature_bw_fallback_uses_animal_config(mocker: MockerFixture) -> None:
+    """_parse_beef_cow_calf_config must fall back to AnimalConfig.beef_mature_cow_weight_kg when
+    mature_cow_weight_kg is absent from config, not the dairy DEFAULT_MATURE_BODY_WEIGHT_KG.
+
+    Regression guard: a farm with AnimalConfig.beef_mature_cow_weight_kg configured to a
+    beef-specific value (e.g. 550 kg) must see that value used as the fallback, not the
+    generic dairy default which may differ significantly.
+    """
+    mocker.patch.object(AnimalConfig, "beef_mature_cow_weight_kg", 550.0)
+    _, _, _, _, mature_bw, _, _ = HerdFactory._parse_beef_cow_calf_config({})
+    assert mature_bw == 550.0
+
+
+# ---------------------------------------------------------------------------
+# FIX 2 (CodeRabbit round 3) — validate_beef_cow_calf_config: breeding_season_start_day + weaning_weight_kg
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_validate_beef_cow_calf_config_rejects_nan_breeding_start_day() -> None:
+    """breeding_season_start_day of NaN must raise ValueError.
+
+    NaN propagates silently through calendar arithmetic; the validator must catch it at
+    config-load time rather than producing nonsensical scheduling at runtime.
+    """
+    with pytest.raises(ValueError, match="breeding_season_start_day"):
+        DataValidator.validate_beef_cow_calf_config({"breeding_season_start_day": float("nan")})
+
+
+@pytest.mark.unit
+def test_validate_beef_cow_calf_config_rejects_negative_weaning_weight() -> None:
+    """weaning_weight_kg of -1.0 must raise ValueError.
+
+    A negative weaning weight is biologically impossible and would corrupt growth models;
+    the validator must reject it before the simulation starts.
+    """
+    with pytest.raises(ValueError, match="weaning_weight_kg"):
+        DataValidator.validate_beef_cow_calf_config({"weaning_weight_kg": -1.0})
+
+
+@pytest.mark.unit
+def test_validate_beef_cow_calf_config_accepts_none_weaning_weight() -> None:
+    """None weaning_weight_kg must pass validation (age-based trigger used alone when unset).
+
+    weaning_weight_kg is an optional override; omitting it or passing None disables the
+    weight-based trigger and lets age alone govern weaning.
+    """
+    DataValidator.validate_beef_cow_calf_config({"weaning_weight_kg": None})
 
 
 @pytest.mark.unit

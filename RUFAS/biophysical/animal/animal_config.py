@@ -671,6 +671,12 @@ class AnimalConfig:
                 if beef_cfg.get("cow_cull_rate_annual") is not None
                 else AnimalModuleConstants.BEEF_ANNUAL_CULL_RATE
             ),
+            "breeding_season_start_day": (
+                beef_cfg["breeding_season_start_day"]
+                if beef_cfg.get("breeding_season_start_day") is not None
+                else AnimalModuleConstants.BEEF_DEFAULT_BREEDING_SEASON_START_DAY
+            ),
+            "weaning_weight_kg": beef_cfg.get("weaning_weight_kg"),
         }
 
     @classmethod

@@ -697,7 +697,7 @@ def test_B3_all_animal_types_in_life_stage_map(animal_type: AnimalType) -> None:
 
 
 @pytest.mark.unit
-def test_GA_male_calf_replacement_heifer_destination_sells() -> None:
+def test_GA_male_calf_replacement_heifer_destination_sells(mocker: MockerFixture) -> None:
     """GA: Male BEEF_CALF with destination='replacement_heifer' must sell at weaning.
 
     FIX 1 (PR #35 round 2): males cannot become replacement heifers; they route to
@@ -709,7 +709,7 @@ def test_GA_male_calf_replacement_heifer_destination_sells() -> None:
         days_born=weaning_age,
         sex=Sex.MALE,
     )
-    AnimalConfig.beef_post_weaning_destination = BeefPostWeaningDestination.REPLACEMENT_HEIFER
+    mocker.patch.object(AnimalConfig, "beef_post_weaning_destination", BeefPostWeaningDestination.REPLACEMENT_HEIFER)
     t = _mock_time(simulation_day=weaning_age)
 
     status, newborn = animal._beef_calf_life_stage_update(t)
@@ -719,7 +719,7 @@ def test_GA_male_calf_replacement_heifer_destination_sells() -> None:
 
 
 @pytest.mark.unit
-def test_GA_female_calf_replacement_heifer_destination_transitions() -> None:
+def test_GA_female_calf_replacement_heifer_destination_transitions(mocker: MockerFixture) -> None:
     """GA: Female BEEF_CALF with destination='replacement_heifer' must transition correctly.
 
     Regression guard: the sex guard must not block valid female transitions.
@@ -730,7 +730,7 @@ def test_GA_female_calf_replacement_heifer_destination_transitions() -> None:
         days_born=weaning_age,
         sex=Sex.FEMALE,
     )
-    AnimalConfig.beef_post_weaning_destination = BeefPostWeaningDestination.REPLACEMENT_HEIFER
+    mocker.patch.object(AnimalConfig, "beef_post_weaning_destination", BeefPostWeaningDestination.REPLACEMENT_HEIFER)
     t = _mock_time(simulation_day=weaning_age)
 
     status, newborn = animal._beef_calf_life_stage_update(t)

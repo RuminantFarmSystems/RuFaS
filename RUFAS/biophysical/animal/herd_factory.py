@@ -749,7 +749,7 @@ class HerdFactory:
         if min(n_cows, n_heifers, n_calves, n_bulls) < 0:
             raise ValueError("Beef cow-calf cohort counts must be non-negative.")
         mature_raw = cow_calf_cfg.get("mature_cow_weight_kg")
-        mature_bw = float(animal_constants.DEFAULT_MATURE_BODY_WEIGHT_KG) if mature_raw is None else float(mature_raw)
+        mature_bw = float(AnimalConfig.beef_mature_cow_weight_kg) if mature_raw is None else float(mature_raw)
         if not math.isfinite(mature_bw) or mature_bw <= 0:
             raise ValueError(f"mature_cow_weight_kg must be positive and finite, got {mature_bw}")
         calf_bw_raw = cow_calf_cfg.get("calf_birth_weight_kg")
