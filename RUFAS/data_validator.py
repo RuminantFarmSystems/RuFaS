@@ -1798,6 +1798,30 @@ class DataValidator:
             )
 
     @staticmethod
+    def _validate_beef_breeding_season_start_day(config: dict[str, Any]) -> None:
+        """Raise ValueError if breeding_season_start_day is present, non-None, and outside [1, 365]."""
+        if "breeding_season_start_day" not in config:
+            return
+        bsd = config["breeding_season_start_day"]
+        if bsd is None:
+            return
+        bsd_val = float(bsd)
+        if not math.isfinite(bsd_val) or bsd_val < 1 or bsd_val > 365:
+            raise ValueError(f"breeding_season_start_day must be 1-365, got {bsd_val}")
+
+    @staticmethod
+    def _validate_beef_weaning_weight(config: dict[str, Any]) -> None:
+        """Raise ValueError if weaning_weight_kg is present, non-None, and non-positive or non-finite."""
+        if "weaning_weight_kg" not in config:
+            return
+        ww = config["weaning_weight_kg"]
+        if ww is None:
+            return
+        ww_val = float(ww)
+        if not math.isfinite(ww_val) or ww_val <= 0:
+            raise ValueError(f"weaning_weight_kg must be positive and finite, got {ww_val}")
+
+    @staticmethod
     def validate_beef_cow_calf_config(config: dict[str, Any]) -> None:
         """
         Validate beef cow-calf configuration business rules.
@@ -1843,19 +1867,8 @@ class DataValidator:
             if not math.isfinite(rate) or not (0.0 <= rate <= 1.0):
                 raise ValueError(f"cow_cull_rate_annual must be between 0.0 and 1.0, got {rate}")
 
-        if "breeding_season_start_day" in config:
-            bsd = config["breeding_season_start_day"]
-            if bsd is not None:
-                bsd_val = float(bsd)
-                if not math.isfinite(bsd_val) or bsd_val < 1 or bsd_val > 365:
-                    raise ValueError(f"breeding_season_start_day must be 1-365, got {bsd_val}")
-
-        if "weaning_weight_kg" in config:
-            ww = config["weaning_weight_kg"]
-            if ww is not None:
-                ww_val = float(ww)
-                if not math.isfinite(ww_val) or ww_val <= 0:
-                    raise ValueError(f"weaning_weight_kg must be positive and finite, got {ww_val}")
+        DataValidator._validate_beef_breeding_season_start_day(config)
+        DataValidator._validate_beef_weaning_weight(config)
 
 
 class CrossValidator:
