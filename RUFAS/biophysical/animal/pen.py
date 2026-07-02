@@ -146,6 +146,8 @@ class Pen:
         self.first_parlor_processor = first_parlor_processor
         self.parlor_stream_name = parlor_stream_name
         self.manure_streams = manure_streams
+        if not math.isfinite(forage_quality_factor) or forage_quality_factor < 0.0:
+            raise ValueError(f"forage_quality_factor must be a non-negative finite value, got {forage_quality_factor}")
         self.forage_quality_factor: float = forage_quality_factor
         self.mud_condition: str = (
             AnimalConfig.feedlot_mud_condition

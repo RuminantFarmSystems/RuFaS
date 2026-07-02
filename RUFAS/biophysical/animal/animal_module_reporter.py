@@ -1493,7 +1493,8 @@ class AnimalModuleReporter:
         -----
         Reported metrics: days_in_pregnancy, lactation_day, body_condition_score_9,
         times_calved (parity), and calf weaning weight when applicable.
-        Called from HerdManager._process_daily_herd_updates (Lesson 9 — NOT from animal.py).
+        Called from HerdManager._process_daily_herd_updates, not from animal.py
+        (animal.py sits at a lower layer than the reporter).
 
         """
         info_map: dict[str, Any] = {

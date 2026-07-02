@@ -1,6 +1,6 @@
 """Tests for beef weaned calf hand-off — Step 8 (PR-C)."""
 
-import types
+import copy
 from collections.abc import Generator
 from datetime import date
 from unittest.mock import MagicMock
@@ -19,30 +19,25 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 
 
 @pytest.fixture(autouse=True)
-def reset_animal_config_state() -> Generator[None, None, None]:
-    """Snapshot and restore AnimalConfig class state after each test.
+def _restore_animal_config_state() -> Generator[None, None, None]:
+    """Save and restore AnimalConfig beef weaning attributes around each test.
 
-    Returns
-    -------
-    Generator[None, None, None]
-        Yields once; restores original class-level attributes on teardown.
+    Prevents test state from leaking into subsequent tests.
+
+    Yields
+    ------
+    None
+        Yields control to the test body; restores state on teardown.
     """
-    original_attrs = {
-        name: value
-        for name, value in AnimalConfig.__dict__.items()
-        if not name.startswith("__") and not isinstance(value, (types.FunctionType, classmethod, staticmethod))
-    }
-    original_names = set(original_attrs.keys())
+    saved_destination = copy.deepcopy(AnimalConfig.beef_post_weaning_destination)
+    saved_weaning_age = copy.deepcopy(AnimalConfig.beef_weaning_age_days)
+    saved_weaning_weight = copy.deepcopy(AnimalConfig.beef_weaning_weight_kg)
+    saved_mature_cow_weight = copy.deepcopy(AnimalConfig.beef_mature_cow_weight_kg)
     yield
-    for name in list(AnimalConfig.__dict__.keys()):
-        if name.startswith("__"):
-            continue
-        if isinstance(AnimalConfig.__dict__[name], (types.FunctionType, classmethod, staticmethod)):
-            continue
-        if name not in original_names:
-            delattr(AnimalConfig, name)
-    for name, value in original_attrs.items():
-        setattr(AnimalConfig, name, value)
+    AnimalConfig.beef_post_weaning_destination = saved_destination
+    AnimalConfig.beef_weaning_age_days = saved_weaning_age
+    AnimalConfig.beef_weaning_weight_kg = saved_weaning_weight
+    AnimalConfig.beef_mature_cow_weight_kg = saved_mature_cow_weight
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -232,8 +227,8 @@ def test_weaning_unknown_destination_raises_value_error() -> None:
 def test_weaning_animal_type_change_syncs_herd_manager_lists() -> None:
     """_remove_animal_from_current_array + _add_animal_to_new_array must sync BEEF_CALF → BEEF_HEIFER_REPLACEMENT.
 
-    Verifies Task 8.1 (Lesson 1 regression): after weaning a BEEF_CALF becomes
-    BEEF_HEIFER_REPLACEMENT; the HerdManager lists must be updated accordingly.
+    Verifies after weaning a BEEF_CALF becomes BEEF_HEIFER_REPLACEMENT;
+    the HerdManager lists must be updated accordingly.
     """
     hm = _make_minimal_herd_manager()
     calf = _make_beef_calf(sex=Sex.FEMALE, days_born=210)

@@ -777,7 +777,9 @@ class HerdFactory:
         except (KeyError, TypeError):
             return []
 
-        if not isinstance(cow_calf_cfg, dict) or not cow_calf_cfg:  # Lesson 2 guard
+        if (
+            not isinstance(cow_calf_cfg, dict) or not cow_calf_cfg
+        ):  # isinstance guard prevents .get() calls on non-dict config values
             return []
 
         n_cows, n_heifers, n_calves, n_bulls, mature_bw, calf_birth_weight_kg, breed_str = (

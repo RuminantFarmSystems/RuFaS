@@ -51,7 +51,7 @@ def test_herd_factory_has_beef_cow_calf_animals_class_attr() -> None:
 def test_animals_by_type_returns_distinct_lists() -> None:
     """BEEF_COW, BEEF_HEIFER_REPLACEMENT, BEEF_CALF, BEEF_BULL each resolve to separate list objects.
 
-    Verifies Lesson 1: each beef type maps to its OWN named list in HerdManager,
+    Verifies each beef type maps to its OWN named list in HerdManager,
     never pooled into a single shared list.
     """
     hm: HerdManager = HerdManager.__new__(HerdManager)
@@ -249,7 +249,7 @@ def _make_animal_mock(animal_type: AnimalType, status: AnimalStatus = AnimalStat
 def test_process_daily_herd_updates_includes_beef_groups(mocker: MockerFixture) -> None:
     """_process_daily_herd_updates must call _perform_daily_routines_for_animals for all four beef lists.
 
-    Verifies Lesson 10: beef_cows, beef_replacement_heifers, beef_calves, and beef_bulls
+    Verifies beef_cows, beef_replacement_heifers, beef_calves, and beef_bulls
     are each passed as the ``animals`` argument in a separate call.
     """
     cow = _make_animal_mock(AnimalType.BEEF_COW)
@@ -321,7 +321,7 @@ def test_beef_cow_calving_propagates_to_newborn_calves(mocker: MockerFixture) ->
 def test_process_daily_herd_updates_calls_reporter_for_beef(mocker: MockerFixture) -> None:
     """_process_daily_herd_updates must call report_cow_calf_performance once per beef animal.
 
-    Verifies Lessons 4 and 9: the reporter is called from HerdManager (not animal.py),
+    Verifies the reporter is called from HerdManager (not animal.py),
     once for each animal in the four beef lists combined.
     """
     cow = _make_animal_mock(AnimalType.BEEF_COW)
@@ -355,7 +355,7 @@ def test_process_daily_herd_updates_calls_reporter_for_beef(mocker: MockerFixtur
 def test_initialize_beef_cow_calf_herd_non_dict_config_returns_empty() -> None:
     """_initialize_beef_cow_calf_herd must return [] when config value is not a dict.
 
-    Verifies Lesson 2: the isinstance(cfg, dict) guard prevents attempts to call
+    Verifies the isinstance(cfg, dict) guard prevents attempts to call
     .get() on a non-dict value such as a list, int, or None.
     """
     hf: HerdFactory = HerdFactory.__new__(HerdFactory)
@@ -849,3 +849,56 @@ def test_initialize_pens_forage_quality_factor_zero_preserved(mocker: MockerFixt
     assert (
         kwargs["forage_quality_factor"] == 0.0
     ), "forage_quality_factor=0.0 in config must not be replaced by the 1.0 default"
+
+
+@pytest.mark.unit
+def test_pen_forage_quality_factor_negative_raises() -> None:
+    """Pen constructor must reject forage_quality_factor < 0.0.
+
+    0.0 is valid (complete forage failure / drought stress); negative is biologically impossible.
+    The ValueError is raised before _initialize_beddings() so no InputManager mock is needed.
+    """
+    with pytest.raises(ValueError, match="forage_quality_factor must be a non-negative finite value"):
+        Pen(
+            pen_id=1,
+            pen_name="test",
+            vertical_dist_to_milking_parlor=0.0,
+            horizontal_dist_to_milking_parlor=0.0,
+            number_of_stalls=10,
+            housing_type="freestall",
+            pen_type="freestall",
+            animal_combination=AnimalCombination.BEEF_COW_CALF_PAIR,
+            max_stocking_density=1.0,
+            minutes_away_for_milking=0,
+            first_parlor_processor=None,
+            parlor_stream_name=None,
+            manure_streams=[],
+            forage_quality_factor=-0.1,
+        )
+
+
+@pytest.mark.unit
+def test_pen_forage_quality_factor_zero_valid(mocker: MockerFixture) -> None:
+    """Pen constructor must accept forage_quality_factor=0.0 (complete forage failure is a valid scenario).
+
+    The ValueError guard must only block negative values and non-finite values, not 0.0.
+    _initialize_beddings is mocked to avoid InputManager dependency in this unit test.
+    """
+    mocker.patch.object(Pen, "_initialize_beddings")
+    pen = Pen(
+        pen_id=1,
+        pen_name="test",
+        vertical_dist_to_milking_parlor=0.0,
+        horizontal_dist_to_milking_parlor=0.0,
+        number_of_stalls=10,
+        housing_type="freestall",
+        pen_type="freestall",
+        animal_combination=AnimalCombination.BEEF_COW_CALF_PAIR,
+        max_stocking_density=1.0,
+        minutes_away_for_milking=0,
+        first_parlor_processor=None,
+        parlor_stream_name=None,
+        manure_streams=[],
+        forage_quality_factor=0.0,
+    )
+    assert pen.forage_quality_factor == 0.0

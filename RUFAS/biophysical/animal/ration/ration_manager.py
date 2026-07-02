@@ -113,7 +113,7 @@ class RationManager:
             int(f) for f in ration_config.get("feedlot_feeds", [])
         ]
 
-        # Stage beef rations in local variables first (Lesson 3 — atomic commit)
+        # Stage in local variables first — validate before modifying class state
         beef_lactating_pasture_ration = {
             int(k): float(v) for k, v in (ration_config.get("beef_lactating_pasture_ration") or {}).items()
         }

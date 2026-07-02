@@ -5,8 +5,7 @@ RED tests must FAIL before Step 6 is implemented and PASS (GREEN) after.
 
 from __future__ import annotations
 
-import contextlib
-import types
+import copy
 from collections.abc import Generator
 from unittest.mock import MagicMock
 
@@ -55,33 +54,25 @@ def _restore_animal_config_creep() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def restore_ration_manager_beef_state() -> Generator[None, None, None]:
-    """Snapshot and restore all four beef ration ClassVars after each test.
+def _restore_ration_manager_beef_state() -> Generator[None, None, None]:
+    """Save and restore RationManager beef ration class attributes around each test.
 
-    Prevents ration state leaking between tests (Lesson 5 isolation requirement).
+    Prevents ration state leaking between tests.
 
-    Returns
-    -------
-    Generator[None, None, None]
-        Yields once; restores all original RationManager class attributes on teardown.
+    Yields
+    ------
+    None
+        Yields control to the test body; restores state on teardown.
     """
-    original_attrs = {
-        name: value
-        for name, value in RationManager.__dict__.items()
-        if not name.startswith("__") and not isinstance(value, (types.FunctionType, classmethod, staticmethod))
-    }
-    original_names = set(original_attrs.keys())
+    saved_lactating = copy.deepcopy(getattr(RationManager, "beef_lactating_pasture_ration", {}))
+    saved_dry = copy.deepcopy(getattr(RationManager, "beef_dry_gestating_ration", {}))
+    saved_creep = copy.deepcopy(getattr(RationManager, "beef_creep_feed_ration", {}))
+    saved_heifer = copy.deepcopy(getattr(RationManager, "beef_replacement_heifer_ration", {}))
     yield
-    for name in list(RationManager.__dict__.keys()):
-        if name.startswith("__"):
-            continue
-        if isinstance(RationManager.__dict__[name], (types.FunctionType, classmethod, staticmethod)):
-            continue
-        if name not in original_names:
-            with contextlib.suppress(AttributeError):
-                delattr(RationManager, name)
-    for name, value in original_attrs.items():
-        setattr(RationManager, name, value)
+    RationManager.beef_lactating_pasture_ration = saved_lactating
+    RationManager.beef_dry_gestating_ration = saved_dry
+    RationManager.beef_creep_feed_ration = saved_creep
+    RationManager.beef_replacement_heifer_ration = saved_heifer
 
 
 def _make_minimal_ration_optimizer() -> RationOptimizer:
@@ -215,8 +206,8 @@ def test_set_ration_feeds_allows_empty_creep_feed() -> None:
 def test_set_ration_feeds_is_atomic() -> None:
     """If any beef ration is invalid, no class attribute is modified (atomic commit).
 
-    Verifies Lesson 3: all four ClassVars must remain unchanged when set_ration_feeds
-    raises; partial updates would leave RationManager in an inconsistent state.
+    Verifies all four ClassVars remain unchanged when set_ration_feeds raises;
+    partial updates would leave RationManager in an inconsistent state.
     """
     RationManager.beef_lactating_pasture_ration = SENTINEL_LACTATING
     RationManager.beef_dry_gestating_ration = SENTINEL_DRY
