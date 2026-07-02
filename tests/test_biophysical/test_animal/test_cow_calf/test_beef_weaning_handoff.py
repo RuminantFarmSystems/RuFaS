@@ -1,6 +1,5 @@
 """Tests for beef weaned calf hand-off — Step 8 (PR-C)."""
 
-import copy
 from collections.abc import Generator
 from datetime import date
 from unittest.mock import MagicMock
@@ -29,10 +28,10 @@ def _restore_animal_config_state() -> Generator[None, None, None]:
     None
         Yields control to the test body; restores state on teardown.
     """
-    saved_destination = copy.deepcopy(AnimalConfig.beef_post_weaning_destination)
-    saved_weaning_age = copy.deepcopy(AnimalConfig.beef_weaning_age_days)
-    saved_weaning_weight = copy.deepcopy(AnimalConfig.beef_weaning_weight_kg)
-    saved_mature_cow_weight = copy.deepcopy(AnimalConfig.beef_mature_cow_weight_kg)
+    saved_destination = AnimalConfig.beef_post_weaning_destination
+    saved_weaning_age = AnimalConfig.beef_weaning_age_days
+    saved_weaning_weight = AnimalConfig.beef_weaning_weight_kg
+    saved_mature_cow_weight = AnimalConfig.beef_mature_cow_weight_kg
     yield
     AnimalConfig.beef_post_weaning_destination = saved_destination
     AnimalConfig.beef_weaning_age_days = saved_weaning_age
