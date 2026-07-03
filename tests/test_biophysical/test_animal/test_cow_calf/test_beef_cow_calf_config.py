@@ -431,6 +431,8 @@ def test_initialize_invalid_reproduction_program_raises(mocker: pytest_mock.Mock
     _mock_im(mocker, beef_overrides={"reproduction_program": "synchronized_timed_ai"})
     with pytest.raises(ValueError, match="Invalid beef reproduction program"):
         AnimalConfig.initialize_animal_config()
+
+
 # ---------------------------------------------------------------------------
 # None-safe assignment block (FIX 1 — CodeRabbit Round 3)
 # ---------------------------------------------------------------------------
