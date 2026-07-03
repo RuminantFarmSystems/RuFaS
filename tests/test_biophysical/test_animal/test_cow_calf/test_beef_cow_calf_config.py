@@ -5,7 +5,6 @@ with correct defaults, and that initialize_animal_config() correctly
 reads them from a beef_cow_calf section in the input JSON.
 """
 
-import types
 from collections.abc import Generator
 from typing import Any
 
@@ -22,30 +21,38 @@ from RUFAS.biophysical.animal.data_types.animal_enums import BeefPostWeaningDest
 
 
 @pytest.fixture(autouse=True)
-def reset_animal_config_state() -> Generator[None, None, None]:
-    """
-    Snapshot AnimalConfig's non-callable class attributes before each test
-    and restore them afterwards to prevent state leakage.
-    """
-    original_attrs = {
-        name: value
-        for name, value in AnimalConfig.__dict__.items()
-        if not name.startswith("__") and not isinstance(value, (types.FunctionType, classmethod, staticmethod))
-    }
-    original_names = set(original_attrs.keys())
+def _restore_animal_config_state() -> Generator[None, None, None]:
+    """Save and restore AnimalConfig beef attributes around each test.
 
+    initialize_animal_config() sets all ten beef ClassVars; saving them
+    explicitly ensures teardown is predictable and type-safe.
+
+    Yields
+    ------
+    None
+        Yields control to the test body; restores state on teardown.
+    """
+    saved_breeding_season_start_day = AnimalConfig.beef_breeding_season_start_day
+    saved_breeding_season_length = AnimalConfig.beef_breeding_season_length
+    saved_weaning_age_days = AnimalConfig.beef_weaning_age_days
+    saved_weaning_weight_kg = AnimalConfig.beef_weaning_weight_kg
+    saved_creep_feeding_enabled = AnimalConfig.beef_creep_feeding_enabled
+    saved_post_weaning_destination = AnimalConfig.beef_post_weaning_destination
+    saved_mature_cow_weight_kg = AnimalConfig.beef_mature_cow_weight_kg
+    saved_natural_service_bull_ratio = AnimalConfig.beef_natural_service_bull_ratio
+    saved_cow_cull_rate_annual = AnimalConfig.beef_cow_cull_rate_annual
+    saved_reproduction_program = AnimalConfig.beef_reproduction_program
     yield
-
-    for name in list(AnimalConfig.__dict__.keys()):
-        if name.startswith("__"):
-            continue
-        if isinstance(AnimalConfig.__dict__[name], (types.FunctionType, classmethod, staticmethod)):
-            continue
-        if name not in original_names:
-            delattr(AnimalConfig, name)
-
-    for name, value in original_attrs.items():
-        setattr(AnimalConfig, name, value)
+    AnimalConfig.beef_breeding_season_start_day = saved_breeding_season_start_day
+    AnimalConfig.beef_breeding_season_length = saved_breeding_season_length
+    AnimalConfig.beef_weaning_age_days = saved_weaning_age_days
+    AnimalConfig.beef_weaning_weight_kg = saved_weaning_weight_kg
+    AnimalConfig.beef_creep_feeding_enabled = saved_creep_feeding_enabled
+    AnimalConfig.beef_post_weaning_destination = saved_post_weaning_destination
+    AnimalConfig.beef_mature_cow_weight_kg = saved_mature_cow_weight_kg
+    AnimalConfig.beef_natural_service_bull_ratio = saved_natural_service_bull_ratio
+    AnimalConfig.beef_cow_cull_rate_annual = saved_cow_cull_rate_annual
+    AnimalConfig.beef_reproduction_program = saved_reproduction_program
 
 
 # ---------------------------------------------------------------------------

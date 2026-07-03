@@ -5,7 +5,6 @@ is implemented and PASS (GREEN) after. Regression tests (L7, L16) must PASS
 both before and after.
 """
 
-import types
 from collections.abc import Generator
 from datetime import date
 from typing import cast
@@ -27,24 +26,21 @@ from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionSta
 
 
 @pytest.fixture(autouse=True)
-def reset_animal_config_state() -> Generator[None, None, None]:
-    """Snapshot and restore AnimalConfig class state after each test."""
-    original_attrs = {
-        name: value
-        for name, value in AnimalConfig.__dict__.items()
-        if not name.startswith("__") and not isinstance(value, (types.FunctionType, classmethod, staticmethod))
-    }
-    original_names = set(original_attrs.keys())
+def _restore_animal_config_state() -> Generator[None, None, None]:
+    """Save and restore the AnimalConfig attributes that tests in this file modify.
+
+    Yields
+    ------
+    None
+        Yields control to the test body; restores state on teardown.
+    """
+    saved_simulate_genetics = AnimalConfig.simulate_genetics
+    saved_post_weaning_destination = AnimalConfig.beef_post_weaning_destination
+    saved_breeding_season_start_day = AnimalConfig.beef_breeding_season_start_day
     yield
-    for name in list(AnimalConfig.__dict__.keys()):
-        if name.startswith("__"):
-            continue
-        if isinstance(AnimalConfig.__dict__[name], (types.FunctionType, classmethod, staticmethod)):
-            continue
-        if name not in original_names:
-            delattr(AnimalConfig, name)
-    for name, value in original_attrs.items():
-        setattr(AnimalConfig, name, value)
+    AnimalConfig.simulate_genetics = saved_simulate_genetics
+    AnimalConfig.beef_post_weaning_destination = saved_post_weaning_destination
+    AnimalConfig.beef_breeding_season_start_day = saved_breeding_season_start_day
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
