@@ -155,3 +155,23 @@ REPLACEMENT_HEIFER_REACHED_BREEDING_WEIGHT = "replacement_heifer_reached_breedin
 REPLACEMENT_HEIFER_PROMOTED_TO_COW = "replacement_heifer_promoted_to_cow"
 STILLBIRTH = "stillbirth"
 BEEF_CALVING = "beef_calving"
+
+# ── COW-CALF LIMITS ───────────────────────────────────────────────────────────
+MAX_BULL_TO_COW_RATIO: int = 50
+"""Maximum allowable cows-per-bull ratio for natural service breeding."""
+
+# ── COW-CALF HERD SEEDING DEFAULTS ────────────────────────────────────────────
+BEEF_COW_INITIAL_AGE_YEARS: int = 3
+"""Mature cow minimum age (years) used when seeding the initial herd."""
+
+BEEF_HEIFER_INITIAL_AGE_YEARS: int = 1
+"""Replacement heifer initial age (years) used when seeding the initial herd."""
+
+BEEF_BULL_INITIAL_AGE_YEARS: int = 2
+"""Bull minimum breeding age (years) used when seeding the initial herd."""
+
+BEEF_HEIFER_INITIAL_WEIGHT_PCT_MATURE: float = 0.6
+"""Replacement heifer starting weight as a fraction of mature body weight (~60% at ~1 yr)."""
+
+BEEF_BULL_INITIAL_WEIGHT_PCT_MATURE: float = 1.1
+"""Bull starting weight as a fraction of mature cow weight (bulls ~10% heavier)."""

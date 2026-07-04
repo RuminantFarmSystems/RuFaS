@@ -130,6 +130,8 @@ class RationOptimizer:
         self.cow_constraints: list[dict[str, Any]] = []
         self.heifer_constraints: list[dict[str, Any]] = []
         self.feedlot_constraints: list[dict[str, Any]] = []
+        self.beef_cow_constraints: list[dict[str, Any]] = []
+        self.beef_replacement_constraints: list[dict[str, Any]] = []
 
     def set_constraints(self, ration_config: RationConfig) -> None:
         """
@@ -191,6 +193,8 @@ class RationOptimizer:
         self.feedlot_constraints = [
             c for c in self.heifer_constraints if isinstance(c, dict) and c.get("fun") is not self.forage_NDF_constraint
         ]
+        self.beef_cow_constraints = list(self.heifer_constraints)
+        self.beef_replacement_constraints = list(self.heifer_constraints)
 
     @staticmethod
     def convert_decision_vec_to_feeds(
@@ -998,6 +1002,14 @@ class RationOptimizer:
             return self.heifer_constraints
         if animal_combination is AnimalCombination.FEEDLOT_FINISHING:
             return self.feedlot_constraints
+        if animal_combination in (
+            AnimalCombination.BEEF_COW_CALF_PAIR,
+            AnimalCombination.BEEF_GESTATING,
+            AnimalCombination.BEEF_BULL_BATTERY,
+        ):
+            return self.beef_cow_constraints
+        if animal_combination is AnimalCombination.BEEF_REPLACEMENT:
+            return self.beef_replacement_constraints
         OutputManager().add_error(
             "Ration Optimization Error",
             f"Invalid animal combination: {animal_combination}",
@@ -1125,18 +1137,9 @@ class RationOptimizer:
         om = OutputManager()
 
         constraints_failed_list = []
-        if animal_combination == AnimalCombination.LAC_COW:
-            failed_constraints = RationOptimizer.find_failed_constraints(
-                solution.x, self.cow_constraints, ration_config
-            )
-        elif animal_combination is AnimalCombination.FEEDLOT_FINISHING:
-            failed_constraints = RationOptimizer.find_failed_constraints(
-                solution.x, self.feedlot_constraints, ration_config
-            )
-        else:
-            failed_constraints = RationOptimizer.find_failed_constraints(
-                solution.x, self.heifer_constraints, ration_config
-            )
+        failed_constraints = RationOptimizer.find_failed_constraints(
+            solution.x, list(self._select_constraints(animal_combination)), ration_config
+        )
 
         if failed_constraints:
             for constraint in failed_constraints:

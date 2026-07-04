@@ -10,7 +10,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.data_types.animal_enums import BeefPostWeaningDestination, Breed, Sex, AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, BeefPostWeaningDestination, Breed, Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -201,8 +201,12 @@ class Animal:
         self.breed: Breed = Breed(Breed[args.get("breed")])
         self.animal_type = AnimalType(args.get("animal_type"))
         self.days_born = int(args.get("days_born"))
-        # birth_weight is unused for feedlot animals that enter at pen placement weight
-        self.birth_weight = 0.0 if self.animal_type.is_feedlot else float(args.get("birth_weight"))
+        # birth_weight is unused for feedlot and beef cow-calf animals (factory-managed)
+        self.birth_weight = (
+            0.0
+            if self.animal_type.is_feedlot or self.animal_type.is_beef_cow_calf
+            else float(args.get("birth_weight") or 0.0)
+        )
         self.body_condition_score_5 = AnimalModuleConstants.DEFAULT_BODY_CONDITION_SCORE_5
 
         self.cull_reason = ""
@@ -2278,8 +2282,6 @@ class Animal:
         AI protocols (AI_SEASONAL, AI_CONTROLLED_BREEDING) are declared in
         BeefReproductionProtocol but raise NotImplementedError in PR-B; only
         NATURAL_SERVICE_SEASONAL is implemented here.
-        # TODO(beef-integration): report_cow_calf_performance belongs in
-        # herd_factory.py _beef_cow_calf_update (Step 7).
 
         """
         if self.animal_type == AnimalType.BEEF_BULL:
@@ -2351,7 +2353,7 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
-            (SOLD, None), (LIFE_STAGE_CHANGED, None), or raises ValueError.
+            (SOLD, None) or (LIFE_STAGE_CHANGED, None).
 
         """
         self.events.add_event(self.days_born, time.simulation_day, animal_constants.CALF_WEANED)
@@ -2359,13 +2361,16 @@ class Animal:
         if self.dam is not None:
             self.dam.calf_at_side = None
 
+        self.wean_weight = self.body_weight
         destination = AnimalConfig.beef_post_weaning_destination
         if destination is BeefPostWeaningDestination.SELL:
             self.sold_at_day = time.simulation_day
             return AnimalStatus.SOLD, None
         if destination is BeefPostWeaningDestination.REPLACEMENT_HEIFER:
             if self.sex != Sex.FEMALE:
-                raise ValueError(f"Calf with sex {self.sex} cannot be transitioned to a replacement heifer.")
+                # Male calves under REPLACEMENT_HEIFER destination sell at weaning
+                self.sold_at_day = time.simulation_day
+                return AnimalStatus.SOLD, None
             self.animal_type = AnimalType.BEEF_HEIFER_REPLACEMENT
             return AnimalStatus.LIFE_STAGE_CHANGED, None
         if destination is BeefPostWeaningDestination.DIRECT_TO_FEEDLOT:
@@ -2439,7 +2444,6 @@ class Animal:
         -----
         Actual removal of open cows from the herd is deferred to Step 7 (PR-C); this method
         only sets cull_reason so the higher layer (herd_factory) can act.
-        # TODO(beef-integration): report_cow_calf_performance belongs in herd_factory.py (Step 7).
 
         """
         if self.days_born >= AnimalModuleConstants.BEEF_COW_MAX_AGE_DAYS:

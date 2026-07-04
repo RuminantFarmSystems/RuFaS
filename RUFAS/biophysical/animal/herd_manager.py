@@ -84,6 +84,14 @@ class HerdManager:
         Animals currently classified as heifer III.
     cows : list[Animal]
         Animals currently classified as lactating or dry cows.
+    beef_cows : list[Animal]
+        Animals currently classified as beef cows.
+    beef_replacement_heifers : list[Animal]
+        Animals currently classified as beef replacement heifers.
+    beef_calves : list[Animal]
+        Animals currently classified as beef calves.
+    beef_bulls : list[Animal]
+        Animals currently classified as beef bulls.
     replacement_market : list[Animal]
         Replacement animals available for purchase into the herd.
     heifers_sold : list[Animal]
@@ -243,6 +251,13 @@ class HerdManager:
             herd_population.replacement,
         )
         self.feedlot_animals = list(HerdFactory.feedlot_animals)
+        beef_all = list(HerdFactory.beef_cow_calf_animals)
+        self.beef_cows: list[Animal] = [a for a in beef_all if a.animal_type == AnimalType.BEEF_COW]
+        self.beef_replacement_heifers: list[Animal] = [
+            a for a in beef_all if a.animal_type == AnimalType.BEEF_HEIFER_REPLACEMENT
+        ]
+        self.beef_calves: list[Animal] = [a for a in beef_all if a.animal_type == AnimalType.BEEF_CALF]
+        self.beef_bulls: list[Animal] = [a for a in beef_all if a.animal_type == AnimalType.BEEF_BULL]
 
         self.allocate_animals_to_pens(time.simulation_day)
         self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -268,6 +283,10 @@ class HerdManager:
             AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
             AnimalType.FEEDLOT_STEER: [a for a in self.feedlot_animals if a.animal_type == AnimalType.FEEDLOT_STEER],
             AnimalType.FEEDLOT_HEIFER: [a for a in self.feedlot_animals if a.animal_type == AnimalType.FEEDLOT_HEIFER],
+            AnimalType.BEEF_COW: self.beef_cows,
+            AnimalType.BEEF_HEIFER_REPLACEMENT: self.beef_replacement_heifers,
+            AnimalType.BEEF_CALF: self.beef_calves,
+            AnimalType.BEEF_BULL: self.beef_bulls,
         }
 
     @property
@@ -290,8 +309,17 @@ class HerdManager:
             *self.heiferIIs,
             *self.heiferIIIs,
             *self.cows,
+            *self.beef_cows,
+            *self.beef_replacement_heifers,
+            *self.beef_calves,
+            *self.beef_bulls,
         ]:
-            animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+            try:
+                animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+            except NotImplementedError:
+                if animal.animal_type == AnimalType.BEEF_COW:
+                    continue  # pending runtime reproduction-state dispatch
+                raise
             animals_by_combination[animal_combination].append(animal)
         return animals_by_combination
 
@@ -515,6 +543,43 @@ class HerdManager:
         self._update_sold_heiferII_statistics(sold_heiferIIs)
         self._update_sold_newborn_calf_statistics(sold_newborn_calves)
 
+    def _collect_newborn_calf(
+        self,
+        newborn_calf_config: NewBornCalfValuesTypedDict,
+        time: RufasTime,
+        stillborn_newborn_calves: list[Animal],
+        sold_newborn_calves: list[Animal],
+        newborn_calves: list[Animal],
+    ) -> None:
+        """Create a newborn calf from config and route it to the appropriate output list.
+
+        Parameters
+        ----------
+        newborn_calf_config : NewBornCalfValuesTypedDict
+            Config dict produced by the calving event, passed to _create_newborn_calf.
+        time : RufasTime
+            Current simulation time.
+        stillborn_newborn_calves : list[Animal]
+            Accumulator for stillborn calves.
+        sold_newborn_calves : list[Animal]
+            Accumulator for calves sold at birth.
+        newborn_calves : list[Animal]
+            Accumulator for live calves to add to the herd.
+
+        Returns
+        -------
+        None
+            Appends the newborn to exactly one of the three output lists.
+
+        """
+        newborn_calf = self._create_newborn_calf(newborn_calf_config, time=time)
+        if newborn_calf.stillborn:
+            stillborn_newborn_calves.append(newborn_calf)
+        elif newborn_calf.sold:
+            sold_newborn_calves.append(newborn_calf)
+        else:
+            newborn_calves.append(newborn_calf)
+
     def _perform_daily_routines_for_animals(
         self, time: RufasTime, animals: list[Animal]
     ) -> tuple[list[Animal], list[Animal], list[Animal], list[Animal], list[Animal]]:
@@ -533,16 +598,26 @@ class HerdManager:
             if animal_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(animal)
                 if animal_daily_routines_output.newborn_calf_config is not None:
-                    newborn_calf = self._create_newborn_calf(
-                        animal_daily_routines_output.newborn_calf_config, time=time
+                    self._collect_newborn_calf(
+                        animal_daily_routines_output.newborn_calf_config,
+                        time,
+                        stillborn_newborn_calves,
+                        sold_newborn_calves,
+                        newborn_calves,
                     )
-                    if newborn_calf.stillborn:
-                        stillborn_newborn_calves.append(newborn_calf)
-                    elif newborn_calf.sold:
-                        sold_newborn_calves.append(newborn_calf)
-                    else:
-                        newborn_calves.append(newborn_calf)
                     self._update_genetic_values_at_lactation_start(animal, time)
+            elif (
+                animal_daily_routines_output.animal_status == AnimalStatus.REMAIN
+                and animal.animal_type == AnimalType.BEEF_COW
+                and animal_daily_routines_output.newborn_calf_config is not None
+            ):
+                self._collect_newborn_calf(
+                    animal_daily_routines_output.newborn_calf_config,
+                    time,
+                    stillborn_newborn_calves,
+                    sold_newborn_calves,
+                    newborn_calves,
+                )
             elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
             animal.update_genetic_history(simulation_day=time.simulation_day)
@@ -610,6 +685,10 @@ class HerdManager:
             # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
             ("heiferIIIs", self.heiferIIIs),
             ("cows", self.cows),
+            ("beef_cows", self.beef_cows),
+            ("beef_replacement_heifers", self.beef_replacement_heifers),
+            ("beef_calves", self.beef_calves),
+            ("beef_bulls", self.beef_bulls),
         ]
 
         for animal_group_name, animals in animal_groups:
@@ -620,7 +699,7 @@ class HerdManager:
                 group_newborn_calves,
                 group_sold_newborn_calves,
             ) = self._perform_daily_routines_for_animals(time, animals)
-            collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
+            collect_birth_results = animal_group_name in ["heiferIIIs", "cows", "beef_cows", "beef_replacement_heifers"]
             daily_herd_updates.graduated_animals += group_graduated_animals
             daily_herd_updates.removed_animals += sold_animals
             if collect_birth_results:
@@ -632,6 +711,8 @@ class HerdManager:
             elif animal_group_name == "cows":
                 daily_herd_updates.sold_and_died_cows = sold_animals
 
+        for animal in [*self.beef_cows, *self.beef_replacement_heifers, *self.beef_calves, *self.beef_bulls]:
+            AnimalModuleReporter.report_cow_calf_performance(animal, time.simulation_day)
         return daily_herd_updates
 
     def _apply_daily_herd_structure_updates(
@@ -989,6 +1070,10 @@ class HerdManager:
         self.heiferIIs = [heiferII for heiferII in self.heiferIIs if heiferII != animal]
         self.heiferIIIs = [heiferIII for heiferIII in self.heiferIIIs if heiferIII != animal]
         self.cows = [cow for cow in self.cows if cow != animal]
+        self.beef_cows = [a for a in self.beef_cows if a != animal]
+        self.beef_replacement_heifers = [a for a in self.beef_replacement_heifers if a != animal]
+        self.beef_calves = [a for a in self.beef_calves if a != animal]
+        self.beef_bulls = [a for a in self.beef_bulls if a != animal]
 
     def _add_animal_to_new_array(self, animal: Animal) -> None:
         """
@@ -1007,6 +1092,12 @@ class HerdManager:
             AnimalType.HEIFER_III: self.heiferIIIs,
             AnimalType.LAC_COW: self.cows,
             AnimalType.DRY_COW: self.cows,
+            AnimalType.BEEF_COW: self.beef_cows,
+            AnimalType.BEEF_HEIFER_REPLACEMENT: self.beef_replacement_heifers,
+            AnimalType.BEEF_CALF: self.beef_calves,
+            AnimalType.BEEF_BULL: self.beef_bulls,
+            AnimalType.FEEDLOT_STEER: self.feedlot_animals,
+            AnimalType.FEEDLOT_HEIFER: self.feedlot_animals,
         }
         new_array = animal_type_to_array_map[animal.animal_type]
         new_array.append(animal)
@@ -1184,6 +1275,9 @@ class HerdManager:
                 first_parlor_processor=first_parlor_processor,
                 parlor_stream_name=parlor_stream_name,
                 manure_streams=manure_streams,
+                forage_quality_factor=(
+                    1.0 if pen_data.get("forage_quality_factor") is None else float(pen_data["forage_quality_factor"])
+                ),
             )
 
             self.all_pens.append(pen)

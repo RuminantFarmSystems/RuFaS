@@ -5,7 +5,6 @@ is implemented and PASS (GREEN) after. Regression tests (L7, L16) must PASS
 both before and after.
 """
 
-import types
 from collections.abc import Generator
 from datetime import date
 from typing import cast
@@ -27,24 +26,21 @@ from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionSta
 
 
 @pytest.fixture(autouse=True)
-def reset_animal_config_state() -> Generator[None, None, None]:
-    """Snapshot and restore AnimalConfig class state after each test."""
-    original_attrs = {
-        name: value
-        for name, value in AnimalConfig.__dict__.items()
-        if not name.startswith("__") and not isinstance(value, (types.FunctionType, classmethod, staticmethod))
-    }
-    original_names = set(original_attrs.keys())
+def _restore_animal_config_state() -> Generator[None, None, None]:
+    """Save and restore the AnimalConfig attributes that tests in this file modify.
+
+    Yields
+    ------
+    None
+        Yields control to the test body; restores state on teardown.
+    """
+    saved_simulate_genetics = AnimalConfig.simulate_genetics
+    saved_post_weaning_destination = AnimalConfig.beef_post_weaning_destination
+    saved_breeding_season_start_day = AnimalConfig.beef_breeding_season_start_day
     yield
-    for name in list(AnimalConfig.__dict__.keys()):
-        if name.startswith("__"):
-            continue
-        if isinstance(AnimalConfig.__dict__[name], (types.FunctionType, classmethod, staticmethod)):
-            continue
-        if name not in original_names:
-            delattr(AnimalConfig, name)
-    for name, value in original_attrs.items():
-        setattr(AnimalConfig, name, value)
+    AnimalConfig.simulate_genetics = saved_simulate_genetics
+    AnimalConfig.beef_post_weaning_destination = saved_post_weaning_destination
+    AnimalConfig.beef_breeding_season_start_day = saved_breeding_season_start_day
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -697,11 +693,11 @@ def test_B3_all_animal_types_in_life_stage_map(animal_type: AnimalType) -> None:
 
 
 @pytest.mark.unit
-def test_GA_male_calf_replacement_heifer_destination_raises_value_error() -> None:
-    """GA: Male BEEF_CALF with destination='replacement_heifer' must raise ValueError.
+def test_GA_male_calf_replacement_heifer_destination_sells(mocker: MockerFixture) -> None:
+    """GA: Male BEEF_CALF with destination='replacement_heifer' must sell at weaning.
 
-    Verifies the sex guard added in Fix A prevents males from being incorrectly
-    transitioned to BEEF_HEIFER_REPLACEMENT.
+    FIX 1 (PR #35 round 2): males cannot become replacement heifers; they route to
+    SOLD so the simulation continues rather than crashing with ValueError.
     """
     weaning_age = AnimalConfig.beef_weaning_age_days
     animal = _make_beef_animal(
@@ -709,15 +705,17 @@ def test_GA_male_calf_replacement_heifer_destination_raises_value_error() -> Non
         days_born=weaning_age,
         sex=Sex.MALE,
     )
-    AnimalConfig.beef_post_weaning_destination = BeefPostWeaningDestination.REPLACEMENT_HEIFER
+    mocker.patch.object(AnimalConfig, "beef_post_weaning_destination", BeefPostWeaningDestination.REPLACEMENT_HEIFER)
     t = _mock_time(simulation_day=weaning_age)
 
-    with pytest.raises(ValueError, match="replacement heifer"):
-        animal._beef_calf_life_stage_update(t)
+    status, newborn = animal._beef_calf_life_stage_update(t)
+
+    assert status == AnimalStatus.SOLD
+    assert newborn is None
 
 
 @pytest.mark.unit
-def test_GA_female_calf_replacement_heifer_destination_transitions() -> None:
+def test_GA_female_calf_replacement_heifer_destination_transitions(mocker: MockerFixture) -> None:
     """GA: Female BEEF_CALF with destination='replacement_heifer' must transition correctly.
 
     Regression guard: the sex guard must not block valid female transitions.
@@ -728,7 +726,7 @@ def test_GA_female_calf_replacement_heifer_destination_transitions() -> None:
         days_born=weaning_age,
         sex=Sex.FEMALE,
     )
-    AnimalConfig.beef_post_weaning_destination = BeefPostWeaningDestination.REPLACEMENT_HEIFER
+    mocker.patch.object(AnimalConfig, "beef_post_weaning_destination", BeefPostWeaningDestination.REPLACEMENT_HEIFER)
     t = _mock_time(simulation_day=weaning_age)
 
     status, newborn = animal._beef_calf_life_stage_update(t)

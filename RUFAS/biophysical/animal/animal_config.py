@@ -12,6 +12,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferSynchEDSubProtocol,
     BeefReproductionProtocol,
 )
+from RUFAS.data_validator import DataValidator
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -206,6 +207,9 @@ class AnimalConfig:
         Number of cows per bull for natural-service mating; NRC reference range is 20–30:1.
     beef_cow_cull_rate_annual : float
         Annual culling rate for mature beef cows (fraction); default is 0.175 (USDA average).
+    beef_reproduction_program : BeefReproductionProtocol
+        Reproduction protocol used for the beef cow-calf herd;
+        default is NATURAL_SERVICE_SEASONAL.
 
     """
 
@@ -607,48 +611,129 @@ class AnimalConfig:
         cls.feedlot_ndf_minimum_pct = float(feedlot_cfg.get("ndf_minimum_pct", 10.0))
 
         # ── COW-CALF PARAMETERS ──────────────────────────────────────────────
-        beef_cfg: dict[str, Any] = animal_config_data.get("beef_cow_calf", {})
-        cls.beef_breeding_season_start_day = int(beef_cfg.get("breeding_season_start_day", 90))
-        cls.beef_breeding_season_length = int(
-            beef_cfg.get("breeding_season_length", AnimalModuleConstants.BEEF_DEFAULT_BREEDING_SEASON_LENGTH_DAYS)
+        cls._initialize_beef_cow_calf_config(animal_config_data)
+
+    @classmethod
+    def _initialize_beef_cow_calf_config(cls, animal_config_data: dict[str, Any]) -> None:
+        """Initialize cow-calf ClassVars from the ``beef_cow_calf`` config block.
+
+        Parameters
+        ----------
+        animal_config_data : dict[str, Any]
+            The parsed ``animal_config`` sub-dict from InputManager.
+        """
+        beef_cfg_raw: Any = animal_config_data.get("beef_cow_calf", {})
+        if beef_cfg_raw is None:
+            beef_cfg: dict[str, Any] = {}
+        elif not isinstance(beef_cfg_raw, dict):
+            raise ValueError("animal_config.beef_cow_calf must be a dictionary when provided")
+        else:
+            beef_cfg = beef_cfg_raw
+        merged_beef_cfg = cls._merge_beef_defaults(beef_cfg)
+        DataValidator.validate_beef_cow_calf_config(merged_beef_cfg)
+        cls._assign_beef_config_fields(beef_cfg, merged_beef_cfg)
+        cls._parse_beef_enum_fields(beef_cfg)
+
+    @classmethod
+    def _merge_beef_defaults(cls, beef_cfg: dict[str, Any]) -> dict[str, Any]:
+        """Return a merged config dict with defaults substituted for missing/None values.
+
+        Parameters
+        ----------
+        beef_cfg : dict[str, Any]
+            The raw ``beef_cow_calf`` sub-dict (may be empty).
+
+        Returns
+        -------
+        dict[str, Any]
+            Complete config with all required numeric fields present.
+        """
+        return {
+            "mature_cow_weight_kg": (
+                beef_cfg["mature_cow_weight_kg"]
+                if beef_cfg.get("mature_cow_weight_kg") is not None
+                else AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG
+            ),
+            "weaning_age_days": (
+                beef_cfg["weaning_age_days"]
+                if beef_cfg.get("weaning_age_days") is not None
+                else AnimalModuleConstants.BEEF_DEFAULT_WEANING_AGE_DAYS
+            ),
+            "breeding_season_length": (
+                beef_cfg["breeding_season_length"]
+                if beef_cfg.get("breeding_season_length") is not None
+                else AnimalModuleConstants.BEEF_DEFAULT_BREEDING_SEASON_LENGTH_DAYS
+            ),
+            "natural_service_bull_ratio": (
+                beef_cfg["natural_service_bull_ratio"]
+                if beef_cfg.get("natural_service_bull_ratio") is not None
+                else AnimalModuleConstants.BEEF_DEFAULT_NATURAL_SERVICE_BULL_RATIO
+            ),
+            "cow_cull_rate_annual": (
+                beef_cfg["cow_cull_rate_annual"]
+                if beef_cfg.get("cow_cull_rate_annual") is not None
+                else AnimalModuleConstants.BEEF_ANNUAL_CULL_RATE
+            ),
+            "breeding_season_start_day": (
+                beef_cfg["breeding_season_start_day"]
+                if beef_cfg.get("breeding_season_start_day") is not None
+                else AnimalModuleConstants.BEEF_DEFAULT_BREEDING_SEASON_START_DAY
+            ),
+            "weaning_weight_kg": beef_cfg.get("weaning_weight_kg"),
+        }
+
+    @classmethod
+    def _assign_beef_config_fields(cls, beef_cfg: dict[str, Any], merged: dict[str, Any]) -> None:
+        """Assign validated numeric and boolean ClassVars from the merged config.
+
+        Parameters
+        ----------
+        beef_cfg : dict[str, Any]
+            Raw ``beef_cow_calf`` sub-dict for optional fields.
+        merged : dict[str, Any]
+            Merged config with defaults applied (output of ``_merge_beef_defaults``).
+        """
+        cls.beef_breeding_season_length = int(merged["breeding_season_length"])
+        cls.beef_weaning_age_days = int(merged["weaning_age_days"])
+        cls.beef_mature_cow_weight_kg = float(merged["mature_cow_weight_kg"])
+        cls.beef_natural_service_bull_ratio = int(merged["natural_service_bull_ratio"])
+        cls.beef_cow_cull_rate_annual = float(merged["cow_cull_rate_annual"])
+        cls.beef_breeding_season_start_day = int(merged["breeding_season_start_day"])
+        cls.beef_weaning_weight_kg = (
+            float(merged["weaning_weight_kg"]) if merged["weaning_weight_kg"] is not None else None
         )
-        cls.beef_weaning_age_days = int(
-            beef_cfg.get("weaning_age_days", AnimalModuleConstants.BEEF_DEFAULT_WEANING_AGE_DAYS)
-        )
-        raw_weaning_weight = beef_cfg.get("weaning_weight_kg")
-        cls.beef_weaning_weight_kg = float(raw_weaning_weight) if raw_weaning_weight is not None else None
-        cls.beef_creep_feeding_enabled = bool(beef_cfg.get("creep_feeding_enabled", False))
-        destination_str = str(beef_cfg.get("post_weaning_destination", BeefPostWeaningDestination.SELL.value))
+        cls.beef_creep_feeding_enabled = bool(beef_cfg.get("creep_feeding_enabled") or False)
+
+    @classmethod
+    def _parse_beef_enum_fields(cls, beef_cfg: dict[str, Any]) -> None:
+        """Parse and validate post-weaning destination and reproduction program enums.
+
+        Parameters
+        ----------
+        beef_cfg : dict[str, Any]
+            Raw ``beef_cow_calf`` sub-dict.
+        """
+        destination_str = str(beef_cfg.get("post_weaning_destination") or BeefPostWeaningDestination.SELL.value)
         try:
             cls.beef_post_weaning_destination = BeefPostWeaningDestination(destination_str)
         except ValueError:
             valid = sorted(d.value for d in BeefPostWeaningDestination)
             raise ValueError(
-                f"Invalid beef post-weaning destination '{destination_str}'. " f"Expected one of: {valid}."
-            )
+                f"Invalid beef post-weaning destination '{destination_str}'. Expected one of: {valid}."
+            ) from None
         if cls.beef_post_weaning_destination is BeefPostWeaningDestination.STOCKER:
             raise NotImplementedError(
                 "BeefPostWeaningDestination.STOCKER requires the native stocker "
                 "module (Segment 3) which is not yet implemented. "
                 "Use SELL, REPLACEMENT_HEIFER, or DIRECT_TO_FEEDLOT."
             )
-        cls.beef_mature_cow_weight_kg = float(
-            beef_cfg.get("mature_cow_weight_kg", AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG)
-        )
-        cls.beef_natural_service_bull_ratio = int(beef_cfg.get("natural_service_bull_ratio", 25))
-        cls.beef_cow_cull_rate_annual = float(
-            beef_cfg.get("cow_cull_rate_annual", AnimalModuleConstants.BEEF_ANNUAL_CULL_RATE)
-        )
         reproduction_program_str = str(
-            beef_cfg.get(
-                "reproduction_program",
-                BeefReproductionProtocol.NATURAL_SERVICE_SEASONAL.value,
-            )
+            beef_cfg.get("reproduction_program", BeefReproductionProtocol.NATURAL_SERVICE_SEASONAL.value)
         )
         try:
             cls.beef_reproduction_program = BeefReproductionProtocol(reproduction_program_str)
         except ValueError:
             valid = sorted(p.value for p in BeefReproductionProtocol)
             raise ValueError(
-                f"Invalid beef reproduction program '{reproduction_program_str}'. " f"Expected one of: {valid}."
-            )
+                f"Invalid beef reproduction program '{reproduction_program_str}'. Expected one of: {valid}."
+            ) from None

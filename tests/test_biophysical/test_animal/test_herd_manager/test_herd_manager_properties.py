@@ -34,6 +34,10 @@ def test_animals_by_type(herd_manager: HerdManager, mock_herd: dict[str, list[An
         AnimalType.LAC_COW: mock_herd["lac_cows"],
         AnimalType.FEEDLOT_STEER: herd_manager.feedlot_animals,
         AnimalType.FEEDLOT_HEIFER: herd_manager.feedlot_animals,
+        AnimalType.BEEF_COW: herd_manager.beef_cows,
+        AnimalType.BEEF_HEIFER_REPLACEMENT: herd_manager.beef_replacement_heifers,
+        AnimalType.BEEF_CALF: herd_manager.beef_calves,
+        AnimalType.BEEF_BULL: herd_manager.beef_bulls,
     }
     actual = herd_manager.animals_by_type
 
@@ -82,6 +86,10 @@ def test_phosphorus_concentration_by_animal_class(
         AnimalType.LAC_COW: 0.0,
         AnimalType.FEEDLOT_STEER: 0.0,
         AnimalType.FEEDLOT_HEIFER: 0.0,
+        AnimalType.BEEF_COW: 0.0,
+        AnimalType.BEEF_HEIFER_REPLACEMENT: 0.0,
+        AnimalType.BEEF_CALF: 0.0,
+        AnimalType.BEEF_BULL: 0.0,
     }
     animals_by_type_mapping: dict[AnimalType, list[Animal]] = {
         AnimalType.CALF: mock_herd["calves"],
@@ -92,19 +100,13 @@ def test_phosphorus_concentration_by_animal_class(
         AnimalType.LAC_COW: mock_herd["lac_cows"],
         AnimalType.FEEDLOT_STEER: [],
         AnimalType.FEEDLOT_HEIFER: [],
+        AnimalType.BEEF_COW: herd_manager.beef_cows,
+        AnimalType.BEEF_HEIFER_REPLACEMENT: herd_manager.beef_replacement_heifers,
+        AnimalType.BEEF_CALF: herd_manager.beef_calves,
+        AnimalType.BEEF_BULL: herd_manager.beef_bulls,
     }
 
-    for animal_type in [
-        AnimalType.CALF,
-        AnimalType.HEIFER_I,
-        AnimalType.HEIFER_II,
-        AnimalType.HEIFER_III,
-        AnimalType.LAC_COW,
-        AnimalType.DRY_COW,
-        AnimalType.FEEDLOT_STEER,
-        AnimalType.FEEDLOT_HEIFER,
-    ]:
-        animals = animals_by_type_mapping[animal_type]
+    for animal_type, animals in animals_by_type_mapping.items():
         total_phosphorus = sum(
             [animal.nutrients.total_phosphorus_in_animal * GeneralConstants.GRAMS_TO_KG for animal in animals]
         )

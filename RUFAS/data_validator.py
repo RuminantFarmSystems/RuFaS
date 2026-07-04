@@ -5,6 +5,7 @@ import re
 from enum import Enum
 from typing import Any, Callable, Sequence, cast
 
+from RUFAS.biophysical.animal import animal_constants
 from RUFAS.util import Aggregator
 
 AGGREGATION_FUNCTIONS: dict[
@@ -1795,6 +1796,79 @@ class DataValidator:
             raise ValueError(
                 f"feedlot mud_condition must be one of {sorted(valid_mud_conditions)}, " f"got '{mud_condition}'"
             )
+
+    @staticmethod
+    def _validate_beef_breeding_season_start_day(config: dict[str, Any]) -> None:
+        """Raise ValueError if breeding_season_start_day is present, non-None, and outside [1, 365]."""
+        if "breeding_season_start_day" not in config:
+            return
+        bsd = config["breeding_season_start_day"]
+        if bsd is None:
+            return
+        bsd_val = float(bsd)
+        if not math.isfinite(bsd_val) or bsd_val < 1 or bsd_val > 365:
+            raise ValueError(f"breeding_season_start_day must be 1-365, got {bsd_val}")
+
+    @staticmethod
+    def _validate_beef_weaning_weight(config: dict[str, Any]) -> None:
+        """Raise ValueError if weaning_weight_kg is present, non-None, and non-positive or non-finite."""
+        if "weaning_weight_kg" not in config:
+            return
+        ww = config["weaning_weight_kg"]
+        if ww is None:
+            return
+        ww_val = float(ww)
+        if not math.isfinite(ww_val) or ww_val <= 0:
+            raise ValueError(f"weaning_weight_kg must be positive and finite, got {ww_val}")
+
+    @staticmethod
+    def validate_beef_cow_calf_config(config: dict[str, Any]) -> None:
+        """
+        Validate beef cow-calf configuration business rules.
+
+        Parameters
+        ----------
+        config : dict[str, Any]
+            The beef_cow_calf config block from the animal input file.
+
+        Raises
+        ------
+        ValueError
+            If any of the following rules are violated:
+
+            - ``mature_cow_weight_kg`` must be > 0 and finite.
+            - ``weaning_age_days`` must be > 0 and finite.
+            - ``breeding_season_length`` must be > 0 and finite.
+            - ``natural_service_bull_ratio`` must be between 1 and ``MAX_BULL_TO_COW_RATIO``.
+            - ``breeding_season_start_day`` must be 1-365 when present and non-None.
+            - ``weaning_weight_kg`` must be > 0 and finite when present and non-None.
+
+        """
+        for key in ("mature_cow_weight_kg", "weaning_age_days", "breeding_season_length"):
+            if key in config and config[key] is not None:
+                val = float(config[key])
+                if not math.isfinite(val) or val <= 0:
+                    raise ValueError(f"{key} must be > 0, got {val}")
+
+        if "natural_service_bull_ratio" in config and config["natural_service_bull_ratio"] is not None:
+            bull_ratio_raw = float(config["natural_service_bull_ratio"])
+            if not math.isfinite(bull_ratio_raw):
+                raise ValueError(f"natural_service_bull_ratio is non-finite, got {bull_ratio_raw}")
+            if not bull_ratio_raw.is_integer():
+                raise ValueError(f"natural_service_bull_ratio must be a whole number, got {bull_ratio_raw}")
+            bull_ratio = int(bull_ratio_raw)
+            if bull_ratio <= 0 or bull_ratio > animal_constants.MAX_BULL_TO_COW_RATIO:
+                raise ValueError(
+                    f"natural_service_bull_ratio must be 1–{animal_constants.MAX_BULL_TO_COW_RATIO}, got {bull_ratio}"
+                )
+
+        if "cow_cull_rate_annual" in config and config["cow_cull_rate_annual"] is not None:
+            rate = float(config["cow_cull_rate_annual"])
+            if not math.isfinite(rate) or not (0.0 <= rate <= 1.0):
+                raise ValueError(f"cow_cull_rate_annual must be between 0.0 and 1.0, got {rate}")
+
+        DataValidator._validate_beef_breeding_season_start_day(config)
+        DataValidator._validate_beef_weaning_weight(config)
 
 
 class CrossValidator:

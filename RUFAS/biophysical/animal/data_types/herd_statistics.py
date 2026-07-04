@@ -305,6 +305,10 @@ class HerdStatistics:
             AnimalType.HEIFER_III: 0,
             AnimalType.LAC_COW: 0,
             AnimalType.DRY_COW: 0,
+            AnimalType.BEEF_COW: 0,
+            AnimalType.BEEF_HEIFER_REPLACEMENT: 0,
+            AnimalType.BEEF_CALF: 0,
+            AnimalType.BEEF_BULL: 0,
         }
 
     def reset_daily_stats(self) -> None:
@@ -358,6 +362,10 @@ class HerdStatistics:
             AnimalType.HEIFER_III: 0,
             AnimalType.LAC_COW: 0,
             AnimalType.DRY_COW: 0,
+            AnimalType.BEEF_COW: 0,
+            AnimalType.BEEF_HEIFER_REPLACEMENT: 0,
+            AnimalType.BEEF_CALF: 0,
+            AnimalType.BEEF_BULL: 0,
         }
 
         self.preg_cow_percent = 0.0

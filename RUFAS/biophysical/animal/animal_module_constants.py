@@ -316,6 +316,12 @@ class AnimalModuleConstants:
     BEEF_DEFAULT_BREEDING_SEASON_LENGTH_DAYS: int = 63
     """Standard 9-week (63-day) breeding season per NRC 2016 management reference."""
 
+    BEEF_DEFAULT_NATURAL_SERVICE_BULL_RATIO: int = 25
+    """Default bulls-per-cow ratio for natural service breeding (industry standard 25:1)."""
+
+    BEEF_DEFAULT_BREEDING_SEASON_START_DAY: int = 90
+    """Default Julian day on which the breeding season opens (approximately April 1)."""
+
     BEEF_DEFAULT_BCS_9: float = 5.0
     """Default moderate body condition score on the NRC 2016 beef 1–9 scale (not the dairy 1–5 scale)."""
 
