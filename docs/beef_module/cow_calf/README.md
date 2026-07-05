@@ -17,7 +17,8 @@ The following were explicitly named and deferred in the integration plan (Lesson
 3. **No stocker/backgrounding intermediate phase** (Step 8.1): `direct_to_feedlot` destination
    sends a freshly weaned calf (typically 240 kg) directly to FEEDLOT_STEER/HEIFER at weaning
    weight, skipping the stocker/backgrounding growing phase (NRC 2016: 300–400 kg typical feedlot
-   entry weight). Future PR: stocker/backgrounding module.
+   entry weight). The stocker/backgrounding phase is the next planned implementation segment
+   (SK-A through SK-D). This limitation will be resolved after the stocker module merges.
 
 4. **Flat forage_quality_factor** (Step 7.3): pasture intake adjustment is a single config-driven
    float rather than a full pasture-growth model or per-paddock forage mass. Future PR: integrate

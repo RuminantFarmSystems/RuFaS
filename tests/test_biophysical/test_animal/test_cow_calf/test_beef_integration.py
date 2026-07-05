@@ -36,14 +36,18 @@ from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.rufas_time import RufasTime
 
-# ── Number of exposed cows (matches config below) ─────────────────────────────
+# ── Simulation parameters ─────────────────────────────────────────────────────
 _NUM_COWS: int = 80
+_N_REPLACEMENT_HEIFERS: int = 15
+_N_BULLS: int = 3
+_SIMULATION_DAYS: int = 730
+_BREEDING_SEASON_START: int = 90
 
 # ── Beef config dict passed to mock InputManager ──────────────────────────────
 _BEEF_CONFIG: dict[str, object] = {
     "num_cows": _NUM_COWS,
-    "num_replacement_heifers": 15,
-    "num_bulls": 3,
+    "num_replacement_heifers": _N_REPLACEMENT_HEIFERS,
+    "num_bulls": _N_BULLS,
     "mature_cow_weight_kg": 520.0,
     "breed": "AN",
     "calf_birth_weight_kg": 40.0,
@@ -454,7 +458,7 @@ def test_beef_herd_730_day_lifecycle(mocker: MockerFixture) -> None:
         lactose_percent=AnimalModuleConstants.MILK_LACTOSE,
     )
 
-    AnimalConfig.beef_breeding_season_start_day = 90
+    AnimalConfig.beef_breeding_season_start_day = _BREEDING_SEASON_START
     AnimalConfig.beef_breeding_season_length = AnimalModuleConstants.BEEF_DEFAULT_BREEDING_SEASON_LENGTH_DAYS
     AnimalConfig.beef_weaning_age_days = AnimalModuleConstants.BEEF_DEFAULT_WEANING_AGE_DAYS
     AnimalConfig.beef_weaning_weight_kg = None
@@ -482,7 +486,7 @@ def test_beef_herd_730_day_lifecycle(mocker: MockerFixture) -> None:
 
     weaned_calf_ids: set[int] = set()
 
-    for _day in range(730):
+    for _day in range(_SIMULATION_DAYS):
         time.current_date += datetime.timedelta(days=1)
 
         # Assertion 10 (inline): no KeyError on animals_deaths_by_stage
