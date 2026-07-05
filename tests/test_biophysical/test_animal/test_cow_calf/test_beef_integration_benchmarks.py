@@ -293,7 +293,7 @@ def test_combined_state_dispatch_reaches_calculator_without_error(mocker: Mocker
         "birth_weight": AnimalModuleConstants.BEEF_CALF_BIRTH_WEIGHT_KG,
         "body_weight": AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
         "mature_body_weight": AnimalModuleConstants.BEEF_DEFAULT_MATURE_COW_WEIGHT_KG,
-        "sex": "FEMALE",
+        "sex": Sex.FEMALE.name,
         "times_calved": 2,
         "is_open": False,
         "days_since_calving": 60,
