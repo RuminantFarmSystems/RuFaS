@@ -1025,7 +1025,13 @@ class ManureManager:
 
         """
         daily_spread_storages, non_daily_storages = self._split_storages_by_daily_spread()
-        storage_processors: list[Storage] = daily_spread_storages if include_daily_spread else non_daily_storages
+        #storage_processors: list[Storage] = daily_spread_storages if include_daily_spread else non_daily_storages
+        storage_processors:list[Storage] = []
+
+        for processor in non_daily_storages:
+            if isinstance(processor, AnaerobicLagoon): 
+                storage_processors.append(processor)
+       
         nutrient_pool = self._aggregate_storage_nutrients(storage_processors, manure_type)
         if math.isclose(nutrient_pool.total_manure_mass, 0.0, abs_tol=1e-5):
             return

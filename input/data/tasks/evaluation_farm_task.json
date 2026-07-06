@@ -1,0 +1,13 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "rufas_inputs/metadata/biofiltro_metadata.json",
+      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
+      "output_prefix": "biofiltro",
+      "log_verbosity": "errors"
+
+    }
+]
+}
