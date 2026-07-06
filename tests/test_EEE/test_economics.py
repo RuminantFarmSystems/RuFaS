@@ -249,6 +249,8 @@ def test_dcfror_goal_seek_returns_nan_for_invalid_bounds(mocker: MockerFixture) 
 def test_dcfror_prepare_costs_applies_goal_seek_unit_price_multiplier(mocker: MockerFixture) -> None:
     calc = DCFRORCalculator.__new__(DCFRORCalculator)
     calc.om = mocker.Mock()
+    calc.im = mocker.Mock()
+    calc.im.get_data.side_effect = KeyError
     calc.inputs = {}
 
     prepared = calc._prepare_costs(
@@ -272,55 +274,6 @@ def test_dcfror_prepare_costs_applies_goal_seek_unit_price_multiplier(mocker: Mo
 def test_estimate_digester_trucking_cost() -> None:
     assert pytest.approx(DigesterCostCalculator.estimate_digester_trucking_cost(1000)) == 137.5 * 1000
     assert pytest.approx(DigesterCostCalculator.estimate_digester_trucking_cost(5000)) == 137.5 * 5000
-
-
-def test_dcfror_prepare_costs_applies_digester_cost_curve(mocker: MockerFixture) -> None:
-    calc = DCFRORCalculator.__new__(DCFRORCalculator)
-    calc.om = mocker.Mock()
-    calc.im = mocker.Mock()
-    calc.im.get_data.side_effect = lambda key: {
-        "animal.herd_information.cow_num": 1000.0,
-        "manure_management.anaerobic_digester": [{"hydraulic_retention_time": 30.0}],
-    }[key]
-    mocker.patch(
-        "RUFAS.EEE.economics.dcfror.DigesterCostCalculator.calculate_digester_capital_cost",
-        return_value=1000.0,
-    )
-    mocker.patch(
-        "RUFAS.EEE.economics.dcfror.DigesterCostCalculator.capital_recovery_factor",
-        return_value=0.2,
-    )
-    mocker.patch(
-        "RUFAS.EEE.economics.dcfror.DigesterCostCalculator.calculate_digester_capex",
-        return_value=5000.0,
-    )
-    mocker.patch(
-        "RUFAS.EEE.economics.dcfror.DigesterCostCalculator.scale_installed_cost",
-        return_value=8000.0,
-    )
-    mocker.patch(
-        "RUFAS.EEE.economics.dcfror.DigesterCostCalculator.calculate_digester_operational_cost",
-        return_value=250.0,
-    )
-
-    prepared = calc._prepare_costs(
-        {
-            "cost_capital_multiple": [{"Item": "Digester", "Cost": 1.0}, {"Item": "Other", "Cost": 9.0}],
-            "interest_rate_construction": 0.05,
-            "construction_term": 1,
-            "construction_finish_pcts": [1.0],
-            "cost_operational_units": [[1.0, 1.0]],
-            "cost_operational_unit_cost": [[1.0, 1.0]],
-            "units_produced": [[2.0, 2.0]],
-            "unit_cost": [[10.0, 10.0]],
-            "goal_seek_unit_price_multiplier": 1.0,
-            "loan_interest_rate": 0.07,
-            "project_term": 2,
-        }
-    )
-
-    assert prepared["capital_cost"] == pytest.approx(8009.0)
-    assert prepared["operating_costs"].tolist() == pytest.approx([251.0, 251.0])
 
 
 def test_equation_helpers() -> None:

@@ -263,13 +263,8 @@ class DCFRORCalculator:
 
         try:
             config = self.im.get_data("manure_management.anaerobic_digester")
-        except Exception:
-            return []
-        if not config:
-            return []
-        try:
-            return list(config)
-        except TypeError:
+            return list(config) if config else []
+        except (KeyError, TypeError):
             return []
 
     def _prepare_financing(self, input_dict: Dict[str, Any], project_term: int) -> Dict[str, Any]:
