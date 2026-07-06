@@ -171,7 +171,7 @@ class ManureManager:
     def _build_nutrient_pools(self) -> None:
         """Build the pool for aggregated storage type."""
         for name, processor in self.all_processors.items():
-            if isinstance(processor, Storage) and not isinstance(processor, DailySpread):
+            if isinstance(processor, Storage) and not isinstance(processor, DailySpread) and isinstance(processor, AnaerobicLagoon):
                 manure_type = STORAGE_CLASS_TO_TYPE.get(type(processor))
                 nutrients = ManureNutrients(
                     manure_type=manure_type,
