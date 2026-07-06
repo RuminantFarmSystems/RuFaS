@@ -18,6 +18,7 @@ import math
 from pathlib import Path
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set
 
 from RUFAS.input_manager import InputManager
@@ -29,6 +30,10 @@ from RUFAS.EEE.economics.fallback_values import (
     ECONOMIC_PRICE_FALLBACK,
     ECONOMIC_QUANTITY_FALLBACK,
 )
+
+# Provenance marker for pool variables computed in-memory rather than loaded
+# from an input file; used only in InputManager validation messages.
+COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
 
 
 @dataclass(frozen=True)
@@ -766,7 +771,7 @@ class EconomicPreprocessor:
             data=results,
             properties_blob_key="economic_preprocessing_properties",
             eager_termination=False,
-            input_path=Path("")
+            input_path=COMPUTED_PREPROCESSING_INPUT_PATH,
         )
         self.om.add_log(
             "Economic preprocessing",

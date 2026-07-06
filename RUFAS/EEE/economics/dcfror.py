@@ -177,28 +177,35 @@ class DCFRORCalculator:
         operating_costs = np.asarray((operating_units * operating_unit_costs).sum(axis=0), dtype=float)
         revenue = np.asarray((revenue_units * revenue_prices).sum(axis=0), dtype=float)
 
-        # Apply digester cost-curve economics directly when digester capital
-        # items are present in the capital-cost breakdown.
-        # This makes the documented digester costing methods influence
-        # project CAPEX/OPEX in the DCFROR result stream.
-        digester_rows = [row for row in cap_breakdown if "digester" in str(row.get("Item", "")).lower()]
-        if digester_rows:
-            cow_count = float(self.im.get_data("animal_properties.herd_information.cow_num"))
+        # Apply digester cost-curve economics whenever anaerobic digesters are
+        # configured for the farm. The authoritative trigger is the presence of
+        # digesters in the manure configuration -- not the naming of rows in the
+        # capital-cost breakdown -- so the documented digester costing methods
+        # always influence project CAPEX/OPEX when a farm runs digesters.
+        # Costs are aggregated across every configured digester.
+        digester_config = self._get_digester_config()
+        if digester_config:
+            cow_count = float(self.im.get_data("animal.herd_information.cow_num"))
 
-            digester_config = self.im.get_data("manure_management_properties.anaerobic_digester")
-            digester_system = DigesterCostCalculator.get_digester_system_name(digester_config)
+            digester_capex_total = 0.0
+            annual_opex_total = 0.0
 
-            digester_costs = DigesterCostCalculator.estimate_digester_costs(digester_system, cow_count)
+            for digester in digester_config:
+                digester_system = DigesterCostCalculator.get_digester_system_name(digester)
+                digester_costs = DigesterCostCalculator.estimate_digester_costs(digester_system, cow_count)
 
-            digester_capex = float(digester_costs["capital_expenditure"])
-            digester_operating_costs = digester_costs["operating_costs"]
-            annual_opex_total = sum(float(cost) for cost in digester_operating_costs.values())
+                digester_capex_total += float(digester_costs["capital_expenditure"])
 
-            if "rng" in digester_system.lower():
-                annual_opex_total += DigesterCostCalculator.estimate_digester_trucking_cost(cow_count)
+                digester_operating_costs = digester_costs["operating_costs"]
+                annual_opex_total += sum(float(cost) for cost in digester_operating_costs.values())
 
-            prior_digester_capex = float(sum(float(row.get("Cost", 0.0)) for row in digester_rows))
-            base_cost = base_cost - prior_digester_capex + digester_capex
+                if "rng" in digester_system.lower():
+                    annual_opex_total += DigesterCostCalculator.estimate_digester_trucking_cost(cow_count)
+
+            prior_digester_capex = float(
+                sum(float(row.get("Cost", 0.0)) for row in cap_breakdown if "digester" in str(row.get("Item", "")).lower())
+            )
+            base_cost = base_cost - prior_digester_capex + digester_capex_total
             operating_costs = operating_costs + annual_opex_total
             capital_cost = base_cost
 
@@ -215,6 +222,22 @@ class DCFRORCalculator:
             "revenue": revenue[:project_term],
             "operating_costs": operating_costs[:project_term],
         }
+
+    def _get_digester_config(self) -> list:
+        """Return the configured anaerobic digesters, or an empty list.
+
+        Digester presence in the manure configuration -- rather than the
+        naming of capital-cost breakdown rows -- is the authoritative trigger
+        for digester economics (issue #3063). A missing input key or an empty
+        configuration cleanly disables the digester cost curve so non-digester
+        farms keep their plain capital cost.
+        """
+
+        try:
+            config = self.im.get_data("manure_management.anaerobic_digester")
+            return list(config) if config else []
+        except (KeyError, TypeError):
+            return []
 
     def _prepare_financing(self, input_dict: Dict[str, Any], project_term: int) -> Dict[str, Any]:
         """Normalise financing inputs and enforce valid borrowing shares."""
