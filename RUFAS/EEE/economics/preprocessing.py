@@ -15,6 +15,7 @@ validated using the ``economic_preprocessing_properties`` metadata.
 from __future__ import annotations
 
 import math
+from pathlib import Path
 import re
 from dataclasses import dataclass
 from pathlib import Path
