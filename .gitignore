@@ -44,13 +44,8 @@ output/output_filters/*
 *.vscode
 *.settings
 .idea/**
-
-# Virtual environments
-.venv/
-.venv*/
-venv/
 env/
-ENV/
+venv/
 
 # ignore build files
 dist/
