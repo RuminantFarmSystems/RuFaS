@@ -10,7 +10,7 @@ from RUFAS.data_structures.manure_types import ManureType
 
 @mark.parametrize("nitrogen_one", [100, 0])
 @mark.parametrize("nitrogen_two", [125, 0])
-@mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99])  # TODO: how to handle zero?
+@mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99])
 @mark.parametrize("inorganic_frac_two", [0.2, 0.01, 0.99])
 @mark.parametrize("ammonium_frac_one", [0.1, 0.01, 0.99])
 @mark.parametrize("ammonium_frac_two", [0.5, 0.01, 0.99])
@@ -49,7 +49,7 @@ def test_add_nitrogen_nutrient_request_results(
     # Expected values
     expected_nitrogen = nitrogen_one + nitrogen_two
 
-    if expected_nitrogen <= 0:  # both zero TODO: I'm confused by this.
+    if expected_nitrogen <= 0:
         expected_inorganic_frac = inorganic_frac_one
         expected_organic_frac = organic_frac_one
         expected_ammonium_frac = ammonium_frac_one
@@ -59,7 +59,7 @@ def test_add_nitrogen_nutrient_request_results(
         total_inorganic = inorganic_one + inorganic_two
         expected_inorganic_frac = total_inorganic / expected_nitrogen
 
-        expected_organic_frac = 1 - expected_inorganic_frac  # works here because of our setup above.
+        expected_organic_frac = 1 - expected_inorganic_frac
 
         inorganic_total = expected_inorganic_frac * expected_nitrogen
         ammonium_one = ammonium_frac_one * inorganic_frac_one * nitrogen_one
@@ -78,7 +78,7 @@ def test_add_nitrogen_nutrient_request_results(
 
 @mark.parametrize("phosphorus_one", [100, 0])
 @mark.parametrize("phosphorus_two", [125, 0])
-@mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99])  # TODO: how to handle zero?
+@mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99])
 @mark.parametrize("inorganic_frac_two", [0.2, 0.01, 0.99])
 def test_add_phosphorus_nutrient_request_results(
     phosphorus_one: float,
@@ -105,7 +105,7 @@ def test_add_phosphorus_nutrient_request_results(
     # Expected
     expected_phosphorus = phosphorus_one + phosphorus_two
 
-    if expected_phosphorus <= 0:  # TODO: I'm confused by this
+    if expected_phosphorus <= 0:
         expected_inorganic_fraction = inorganic_frac_one
         expected_organic_fraction = organic_frac_one
     else:
@@ -126,7 +126,7 @@ def test_add_phosphorus_nutrient_request_results(
 
 @mark.parametrize("mass_one", [100, 0])
 @mark.parametrize("mass_two", [125, 0])
-@mark.parametrize("dry_frac_one", [0.5, 0.01, 0.99])  # TODO: how to handle zero?
+@mark.parametrize("dry_frac_one", [0.5, 0.01, 0.99])
 @mark.parametrize("dry_frac_two", [0.2, 0.01, 0.99])
 def test_add_matter_nutrient_request_results(
     mass_one: float, mass_two: float, dry_frac_one: float, dry_frac_two: float
@@ -149,7 +149,7 @@ def test_add_matter_nutrient_request_results(
     expected_dry_matter = dry_matter_one + dry_matter_two
     expected_dry_fraction = (
         expected_dry_matter / expected_mass if expected_mass > 0 else dry_frac_one
-    )  # TODO: I'm confused by the <= 0 case
+    )
 
     # Observed
     combined_request = first_request + second_request
