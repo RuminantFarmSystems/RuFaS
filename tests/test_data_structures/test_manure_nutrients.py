@@ -147,9 +147,7 @@ def test_add_matter_nutrient_request_results(
     # Expected
     expected_mass = mass_one + mass_two
     expected_dry_matter = dry_matter_one + dry_matter_two
-    expected_dry_fraction = (
-        expected_dry_matter / expected_mass if expected_mass > 0 else dry_frac_one
-    )
+    expected_dry_fraction = expected_dry_matter / expected_mass if expected_mass > 0 else dry_frac_one
 
     # Observed
     combined_request = first_request + second_request
