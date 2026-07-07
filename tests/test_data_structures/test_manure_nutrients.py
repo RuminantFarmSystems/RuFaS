@@ -113,7 +113,7 @@ def test_add_phosphorus_nutrient_request_results(
         inorganic_two = inorganic_frac_two * phosphorus_two
         expected_inorganic_fraction = (inorganic_one + inorganic_two) / expected_phosphorus
 
-        expected_organic_fraction = 1 - expected_inorganic_fraction  # works here because of our setup above.
+        expected_organic_fraction = 1 - expected_inorganic_fraction
 
     # Observed
     combined_request = first_request + second_request
