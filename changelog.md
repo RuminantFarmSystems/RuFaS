@@ -27,7 +27,7 @@ v1.0.2
 
 ### v1.0.2
 
-- [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [minor change] [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
+- [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
 
 ### v1.0.1
 
