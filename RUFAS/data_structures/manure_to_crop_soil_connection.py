@@ -167,7 +167,8 @@ class NutrientRequestResults:
 
     def __add__(self, other: "NutrientRequestResults") -> "NutrientRequestResults":
         """
-        Add two NutrientRequestResults objects together.
+        Add two NutrientRequestResults objects together. Updates nutrient composition by taking
+        weighted averages.
 
         Parameters
         ----------
