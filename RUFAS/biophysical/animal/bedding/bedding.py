@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 
 
@@ -7,11 +5,26 @@ class Bedding:
     """
     Abstract base class for all bedding types.
 
-    This class provides a base for all bedding types. It initializes with a configuration of bedding
-    attributes and includes methods for calculating various bedding properties. While bedding mass
-    and nutrients are added to individual manure streams, which may represent only a fraction of the
-    total manure excreted by a pen, the mass of bedding applied per animal is based on the total
-    number of animals housed in the pen from which the manure stream originated.
+    Parameters
+    ----------
+    name : str
+        Unique identifier to reference this bedding configuration.
+    bedding_mass_per_day : float
+        The daily mass of fresh bedding added to the housing area per animal per day on a wet weight
+        basis (kg/animal/day). Bedding mass is applied based on the total number of animals in the pen,
+        and is not based on the stream proportion of the manure stream the bedding is assigned to.
+    bedding_density : float
+        The density of the bedding on a wet weight basis (kg/:math:`m^3`).
+    bedding_dry_matter_content : float
+        The fraction (0.XX) of dry matter in the bedding (unitless).
+    bedding_carbon_fraction : float
+        The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).
+    bedding_phosphorus_content : float
+        The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).
+    bedding_type : str
+        The type of bedding material as a string.
+    sand_removal_efficiency : float | None, default=None
+        The efficiency rate of sand removal from the bedding.
 
     Attributes
     ----------
@@ -31,6 +44,8 @@ class Bedding:
         The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).
     bedding_type : str
         The type of bedding material as a string.
+    sand_removal_efficiency : float | None, default=None
+        The efficiency rate of sand removal from the bedding.
 
     Methods
     -------
@@ -43,6 +58,14 @@ class Bedding:
     calc_total_bedding_water(num_animals: int) -> float
         Calculates the mass of water in the bedding used.
 
+    Notes
+    -----
+    This class provides a base for all bedding types. It initializes with a configuration of bedding
+    attributes and includes methods for calculating various bedding properties. While bedding mass
+    and nutrients are added to individual manure streams, which may represent only a fraction of the
+    total manure excreted by a pen, the mass of bedding applied per animal is based on the total
+    number of animals housed in the pen from which the manure stream originated.
+
     """
 
     def __init__(
@@ -54,7 +77,7 @@ class Bedding:
         bedding_carbon_fraction: float,
         bedding_phosphorus_content: float,
         bedding_type: BeddingType,
-        sand_removal_efficiency: Optional[float] = None,
+        sand_removal_efficiency: float | None = None,
     ) -> None:
         """Initialize the base bedding class with specific configuration data."""
         self.name = name

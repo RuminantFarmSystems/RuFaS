@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.crop.crop_data import CropData
 
 
@@ -9,38 +7,38 @@ class HeatUnits:
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
-        An instance of `CropData` containing crop specifications and attributes. If not provided, a default
-        `CropData` instance is initialized with default values.
+    crop_data : CropData, optional
+        An instance of ``CropData`` containing crop specifications and attributes. If not provided, a default
+        ``CropData`` instance is initialized with default values.
     maximum_temperature : float, default 38
         Maximum temperature for plant growth (Celsius).
     use_heat_unit_temperature : bool, default False
         If alternative heat unit method is used.
-    new_heat_units : Optional[float], default None
+    new_heat_units : float, optional
         Heat units accumulated on the current day (Celsius).
-    minimum_heat_unit_temperature : Optional[float], default None
+    minimum_heat_unit_temperature : float, optional
         Minimum temperature for heat unit calculations (Celsius).
-    maximum_heat_unit_temperature : Optional[float], default None
+    maximum_heat_unit_temperature : float, optional
         Maximum temperature for heat unit calculations (Celsius).
-    heat_unit_temperature : Optional[float], default None
+    heat_unit_temperature : float, optional
         Heat unit temperature for alternative method (Celsius).
 
     Attributes
     ----------
     data : CropData
-        A reference to the `crop_data` object, used for accessing and updating crop-related data like
+        A reference to the ``crop_data`` object, used for accessing and updating crop-related data like
         temperature thresholds, accumulated heat units, and growth stages.
     maximum_temperature : float
         Maximum temperature for plant growth (Celsius).
     use_heat_unit_temperature : bool
         If alternative heat unit method is used.
-    new_heat_units : Optional[float]
+    new_heat_units : float | None
         Heat units accumulated on the current day (Celsius*).
-    minimum_heat_unit_temperature : Optional[float]
+    minimum_heat_unit_temperature : float | None
         Minimum temperature for heat unit calculations (Celsius).
-    maximum_heat_unit_temperature : Optional[float]
+    maximum_heat_unit_temperature : float | None
         Maximum temperature for heat unit calculations (Celsius).
-    heat_unit_temperature : Optional[float]
+    heat_unit_temperature : float | None
         Heat unit temperature for alternative method (Celsius).
 
     Notes
@@ -51,13 +49,13 @@ class HeatUnits:
 
     def __init__(
         self,
-        crop_data: Optional[CropData] = None,
+        crop_data: CropData | None = None,
         maximum_temperature: float = 38.0,
         use_heat_unit_temperature: bool = False,
-        new_heat_units: Optional[float] = None,
-        minimum_heat_unit_temperature: Optional[float] = None,
-        maximum_heat_unit_temperature: Optional[float] = None,
-        heat_unit_temperature: Optional[float] = None,
+        new_heat_units: float | None = None,
+        minimum_heat_unit_temperature: float | None = None,
+        maximum_heat_unit_temperature: float | None = None,
+        heat_unit_temperature: float | None = None,
     ) -> None:
         self.data = crop_data or CropData()
         self.maximum_temperature = maximum_temperature
@@ -78,17 +76,17 @@ class HeatUnits:
 
         Parameters
         ----------
-        mean_air_temperature : Optional[float]
+        mean_air_temperature : float, optional
             Average air temperature for the day (°C).
-        min_air_temperature : Optional[float]
+        min_air_temperature : float, optional
             Minimum air temperature for the day (°C).
-        max_air_temperature : Optional[float]
+        max_air_temperature : float, optional
             Maximum air temperature for the day (°C).
 
         Notes
         -----
-        If the attribute `use_heat_unit_temperature` in CropData is False, both `min_air_temperature` and
-        `max_air_temperature` are optional. Otherwise, they are used to determine heat unit accumulation rather than
+        If the attribute ``use_heat_unit_temperature`` in CropData is False, both ``min_air_temperature`` and
+        ``max_air_temperature`` are optional. Otherwise, they are used to determine heat unit accumulation rather than
         average air temperature.
 
         References
@@ -112,52 +110,42 @@ class HeatUnits:
         self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
 
-    def accumulate_heat_units(self, air_temperature: Optional[float] = None) -> None:
+    def accumulate_heat_units(self, air_temperature: float | None = None) -> None:
         """
-        Accumulates heat units during a day based on the air temperature.
+        Add the day's heat unit value to the cumulative sum of heat unit values from previous days.
 
         Parameters
         ----------
         air_temperature : float
-            The average air temperature during the day (°C).
+            The average air temperature for the day (Celsius).
 
         Notes
         -----
-        The method of accumulation depends on the attribute `use_heat_unit_temperature`:
-        - If `use_heat_unit_temperature` is False (default), the method accumulates every degree Celsius above the
-        crop's minimum temperature for growth as heat units, following the SWAT manual.
-        - If `use_heat_unit_temperature` is True, or `air_temperature` is None, an alternative method is used. In this
-        method, the `heat_unit_temperature` attribute is used in place of the average air temperature. The accumulation
-        varies depending on the relationship between the air temperature range and the crop's growth temperature range:
-            1. If both min and max air temperatures are higher than the crop's min and max growth temperatures,
-               accumulation is greater than the main method.
-            2. If both min and max air temperatures are lower than the crop's min and max temperatures,
-               accumulation is greater than the main method.
-            3. If the air temperature range is entirely within the crop's temperature range, accumulation equals
-               the middle of the crop temperature window.
-            4. If the crop's temperature range is entirely within the air temperature range, accumulation equals
-               the middle of the air temperature range.
+        The method for calculating the heat units depends on ``self.use_heat_unit_temperature`` and possibly
+        ``self.heat_unit_temperature``. See documentation of ``self.assign_new_heat_units`` for details.
 
         """
-        self.assign_new_heat_units(air_temperature)
+        self.assign_current_heat_units(air_temperature)
         self.add_heat_units()
 
-    def assign_new_heat_units(self, air_temperature: Optional[float] = None) -> None:
+    def assign_current_heat_units(self, air_temperature: float | None = None) -> None:
         """
-        Assign new heat units based on whether the alternative accumulation method is to be used.
+        Determine and save the day's "heat units".
 
         Parameters
         ----------
-        air_temperature : Optional[float], optional
-            The average air temperature during the day (°C).
+        air_temperature : float, optional
+            The average air temperature during the day (°C) used to determine the heat units via
+            ``self._determine_heat_unit_value``. If None or if ``self.use_heat_unit_temperature=True``, then
+            ``self.heat_unit_temperature`` is used instead.
 
         """
         if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
-            self.new_heat_units = self._determine_new_heat_units(
+            self.new_heat_units = self._determine_heat_unit_value(
                 self.heat_unit_temperature, self.data.minimum_temperature
             )
         else:  # main method
-            self.new_heat_units = self._determine_new_heat_units(air_temperature, self.data.minimum_temperature)
+            self.new_heat_units = self._determine_heat_unit_value(air_temperature, self.data.minimum_temperature)
 
     def add_heat_units(self) -> None:
         """
@@ -166,28 +154,30 @@ class HeatUnits:
         self.data.accumulated_heat_units += self.new_heat_units
 
     @staticmethod
-    def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:
+    def _determine_heat_unit_value(air_temperature: float, min_growing_temperature: float) -> float:
         """
-        Calculates the heat units that will be accumulated during a day.
+        Calculates heat units as the zero-bounded difference between an air temperature and a crop's minimum
+        growing temperature.
 
         Parameters
         ----------
-        temperature : float
-            The temperature to be compared to min_temperature for accumulating heat units (°C).
-        min_temperature : float
-            The minimum temperature below which a crop cannot grow (°C).
+        air_temperature : float
+            The air temperature to be compared with min_temperature (Celsius).
+        min_growing_temperature : float
+            The minimum temperature below which a crop cannot grow (Celsius).
 
         Returns
         -------
         float
-            The calculated heat units to be accumulated based on the given temperature and minimum temperature (C).
+            The heat units for the day in degrees C, calculated by subtracting min_growing_temperature from
+            ``air_temperature``.
+            If the temperature difference is negative, 0 the result is 0.
 
         References
         ----------
         SWAT Reference 5:1.1
-
         """
-        return max(temperature - min_temperature, 0)
+        return max(air_temperature - min_growing_temperature, 0)
 
     @staticmethod
     def _determine_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float:

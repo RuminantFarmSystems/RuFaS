@@ -1,76 +1,130 @@
 \@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\etoc@setlocaltop \Etoc@part@@ 
 \babel@toc {english}{}\relax 
 \contentsline {part}{I\hspace {1em}Animal Module}{2}{part.1}%
 \etoc@startlocaltoc {1}
-\contentsline {section}{\numberline {I.}Module Introduction}{5}{section.1}%
-\contentsline {subsection}{\numberline {A.}Animal Life Cycle}{6}{subsection.1.1}%
-\contentsline {section}{\numberline {II.}Herd-level Processes and Management}{7}{section.2}%
-\contentsline {subsection}{\numberline {A.}Herd Initialization}{7}{subsection.2.1}%
+\etoc@startlocaltoc {2}
+\etoc@startlocaltoc {3}
+\contentsline {section}{\numberline {1}Module Introduction}{6}{section.1}%
+\contentsline {subsection}{\numberline {1.a}Animal Life Cycle}{6}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Herd-level Processes and Management}{7}{section.2}%
+\contentsline {subsection}{\numberline {2.a}Herd Initialization}{7}{subsection.2.1}%
 \contentsline {paragraph}{Introduction}{7}{subsection.2.1}%
-\contentsline {paragraph}{Methodology}{10}{table.3}%
-\contentsline {subsection}{\numberline {B.}Pens and Animal Grouping}{11}{subsection.2.2}%
-\contentsline {paragraph}{Introduction}{11}{subsection.2.2}%
-\contentsline {paragraph}{Methodology}{13}{table.5}%
-\contentsline {paragraph}{Remove\_animals\_by\_ids}{13}{table.caption.2}%
-\contentsline {paragraph}{\_add\_new\_animals}{14}{table.caption.2}%
-\contentsline {paragraph}{Set\_animal\_nutritional\_requirements}{14}{table.caption.2}%
-\contentsline {subsection}{\numberline {C.}Ration Formulation}{14}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {a.}Energy and Nutrition Requirements}{14}{subsubsection.2.3.1}%
-\contentsline {paragraph}{NRC: Calculating Nutrient Requirements of Dairy Cattle}{14}{subsubsection.2.3.1}%
-\contentsline {subsubsection}{\numberline {b.}Nutrient Requirements of Dairy Cattle (NRC)}{15}{subsubsection.2.3.2}%
-\contentsline {paragraph}{NASEM: Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition}{24}{table.9}%
-\contentsline {paragraph}{NASEM: Calculating Amino Acid Requirements}{35}{table.12}%
-\contentsline {subsubsection}{\numberline {c.}Energy and Nutrition Supply }{39}{subsubsection.2.3.3}%
-\contentsline {paragraph}{Nutrient Supply}{39}{subsubsection.2.3.3}%
-\contentsline {paragraph}{Energy Supply - NRC 2001}{39}{subsubsection.2.3.3}%
-\contentsline {paragraph}{Energy Supply - NASEM 2021}{41}{table.15}%
-\contentsline {paragraph}{AA Nutrient Supply}{47}{table.18}%
-\contentsline {subsubsection}{\numberline {d.}Automated Ration Formulation}{49}{subsubsection.2.3.4}%
-\contentsline {paragraph}{Introduction}{49}{subsubsection.2.3.4}%
-\contentsline {paragraph}{Methodology}{51}{table.20}%
-\contentsline {subsubsection}{\numberline {e.}User-defined ration formulation}{52}{subsubsection.2.3.5}%
-\contentsline {paragraph}{Introduction}{52}{subsubsection.2.3.5}%
-\contentsline {paragraph}{Methodology}{52}{table.22}%
-\contentsline {subsection}{\numberline {D.}Herd Size Management}{53}{subsection.2.4}%
-\contentsline {section}{\numberline {III.}Animal-level Processes and Management}{55}{section.3}%
-\contentsline {paragraph}{Flow of information}{55}{section.3}%
-\contentsline {subsection}{\numberline {A.}RuFaS Bodyweight and Growth}{56}{subsection.3.1}%
-\contentsline {paragraph}{Introduction}{56}{subsection.3.1}%
-\contentsline {paragraph}{Methodology}{57}{table.23}%
-\contentsline {paragraph}{Parity 1 Animals:}{59}{table.23}%
-\contentsline {paragraph}{Parity 2 Animals}{59}{table.23}%
-\contentsline {subsection}{\numberline {B.}Animal Reproduction}{61}{subsection.3.2}%
-\contentsline {paragraph}{Introduction}{61}{subsection.3.2}%
-\contentsline {paragraph}{Methodology}{66}{table.caption.6}%
-\contentsline {subsection}{\numberline {C.}Milk Production}{73}{subsection.3.3}%
-\contentsline {paragraph}{Introduction}{73}{subsection.3.3}%
-\contentsline {paragraph}{Methodology}{77}{table.30}%
-\contentsline {subsection}{\numberline {D.}Lactation Curve: Parameters and Definitions}{81}{subsection.3.4}%
-\contentsline {paragraph}{Introduction}{81}{subsection.3.4}%
-\contentsline {paragraph}{Methodology}{86}{table.36}%
-\contentsline {subsection}{\numberline {E.}Culling}{88}{subsection.3.5}%
-\contentsline {paragraph}{Introduction}{88}{subsection.3.5}%
-\contentsline {paragraph}{Methodology}{92}{table.37}%
-\contentsline {section}{\numberline {IV.}Methane Emission and Manure Excretion}{97}{section.4}%
-\contentsline {subsection}{\numberline {A.}Manure Excretion}{97}{subsection.4.1}%
-\contentsline {paragraph}{Introduction}{97}{subsection.4.1}%
-\contentsline {paragraph}{Methodology}{100}{table.42}%
-\contentsline {paragraph}{Manure excretions}{100}{table.42}%
-\contentsline {paragraph}{Manure nutrient composition}{101}{table.42}%
+\contentsline {table}{\numberline {1}{\ignorespaces Overview of the distinct phases by which animals are created and introduced to the herd.}}{8}{table.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section}}{9}{table.2}%
+\contentsline {table}{\numberline {3}{\ignorespaces User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section.}}{9}{table.3}%
+\contentsline {paragraph}{Methodology}{11}{table.3}%
+\contentsline {subsection}{\numberline {2.b}Pens and Animal Grouping}{12}{subsection.2.2}%
+\contentsline {paragraph}{Introduction}{12}{subsection.2.2}%
+\contentsline {table}{\numberline {4}{\ignorespaces The user must define at least 3 pens and for each pen, key inputs are:}}{13}{table.4}%
+\contentsline {paragraph}{Methodology}{14}{table.5}%
+\contentsline {table}{\numberline {6}{\ignorespaces A summary of animal types}}{14}{table.caption.2}%
+\contentsline {paragraph}{Remove\_animals\_by\_ids}{14}{table.caption.2}%
+\contentsline {paragraph}{\_add\_new\_animals}{15}{table.caption.2}%
+\contentsline {paragraph}{Set\_animal\_nutritional\_requirements}{15}{table.caption.2}%
+\contentsline {subsection}{\numberline {2.c}Ration Formulation}{15}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.c.i}Energy and Nutrition Requirements}{15}{subsubsection.2.3.1}%
+\contentsline {paragraph}{NRC: Calculating Nutrient Requirements of Dairy Cattle}{15}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.c.ii}Nutrient Requirements of Dairy Cattle (NRC)}{16}{subsubsection.2.3.2}%
+\contentsline {table}{\numberline {7}{\ignorespaces Key variables used in protein requirement calculations.}}{21}{table.7}%
+\contentsline {table}{\numberline {8}{\ignorespaces Key variables used in mineral requirement calculations.}}{24}{table.8}%
+\contentsline {table}{\numberline {9}{\ignorespaces Key variables used in DMI requirement calculations.}}{25}{table.9}%
+\contentsline {paragraph}{NASEM: Calculating Nutrient Requirements of Dairy Cattle: Eighth Revised Edition}{25}{table.9}%
+\contentsline {table}{\numberline {10}{\ignorespaces Key variables used in protein requirement calculations.}}{31}{table.10}%
+\contentsline {table}{\numberline {11}{\ignorespaces Key variables used in mineral requirement calculations.}}{34}{table.11}%
+\contentsline {table}{\numberline {12}{\ignorespaces Key variables used in DMI estimation calculations.}}{36}{table.12}%
+\contentsline {paragraph}{NASEM: Calculating Amino Acid Requirements}{36}{table.12}%
+\contentsline {table}{\numberline {13}{\ignorespaces Essential and non-essential amino acids}}{36}{table.13}%
+\contentsline {table}{\numberline {14}{\ignorespaces Key variables used in calculation of AA.}}{38}{table.14}%
+\contentsline {subsubsection}{\numberline {2.c.iii}Energy and Nutrition Supply }{40}{subsubsection.2.3.3}%
+\contentsline {paragraph}{Nutrient Supply}{40}{subsubsection.2.3.3}%
+\contentsline {paragraph}{Energy Supply - NRC 2001}{40}{subsubsection.2.3.3}%
+\contentsline {table}{\numberline {15}{\ignorespaces Key variables used in calculation of net energy in NRC 2001.}}{42}{table.15}%
+\contentsline {paragraph}{Energy Supply - NASEM 2021}{42}{table.15}%
+\contentsline {table}{\numberline {16}{\ignorespaces Key variables used in calculation of net energy supply from NASEM 2021.}}{44}{table.16}%
+\contentsline {table}{\numberline {17}{\ignorespaces Key variables used in calculation of AA.}}{47}{table.17}%
+\contentsline {table}{\numberline {18}{\ignorespaces Key variables used in calculation of AA.}}{47}{table.18}%
+\contentsline {paragraph}{AA Nutrient Supply}{48}{table.18}%
+\contentsline {subsubsection}{\numberline {2.c.iv}Automated Ration Formulation}{50}{subsubsection.2.3.4}%
+\contentsline {paragraph}{Introduction}{50}{subsubsection.2.3.4}%
+\contentsline {table}{\numberline {19}{\ignorespaces Key inputs found in the animal input file.}}{51}{table.caption.3}%
+\contentsline {table}{\numberline {20}{\ignorespaces Key inputs found in the feed input file.}}{52}{table.caption.4}%
+\contentsline {paragraph}{Methodology}{53}{table.caption.4}%
+\contentsline {table}{\numberline {21}{\ignorespaces Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages}}{54}{table.21}%
+\contentsline {subsubsection}{\numberline {2.c.v}User-defined ration formulation}{54}{subsubsection.2.3.5}%
+\contentsline {paragraph}{Introduction}{54}{subsubsection.2.3.5}%
+\contentsline {table}{\numberline {22}{\ignorespaces Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages.}}{55}{table.caption.5}%
+\contentsline {paragraph}{Methodology}{56}{table.caption.5}%
+\contentsline {subsection}{\numberline {2.d}Herd Size Management}{56}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Animal-level Processes and Management}{58}{section.3}%
+\contentsline {paragraph}{Flow of information}{58}{section.3}%
+\contentsline {figure}{\numberline {1}{\ignorespaces There are 5 life stages from calf to cow and a cull stage as outlined in this figure.}}{59}{figure.caption.6}%
+\contentsline {subsection}{\numberline {3.a}RuFaS Bodyweight and Growth}{59}{subsection.3.1}%
+\contentsline {paragraph}{Introduction}{59}{subsection.3.1}%
+\contentsline {table}{\numberline {23}{\ignorespaces Below is a summary of the user inputs that are available and their definitions.}}{60}{table.23}%
+\contentsline {paragraph}{Methodology}{60}{table.23}%
+\contentsline {paragraph}{Parity 1 Animals:}{62}{table.23}%
+\contentsline {paragraph}{Parity 2 Animals}{62}{table.23}%
+\contentsline {subsection}{\numberline {3.b}Animal Reproduction}{64}{subsection.3.2}%
+\contentsline {paragraph}{Introduction}{64}{subsection.3.2}%
+\contentsline {table}{\numberline {24}{\ignorespaces Below are the key user inputs that determine the \textbf {heifer reproductive breeding program} and impact reproductive efficiency and age at first calving.}}{66}{table.caption.8}%
+\contentsline {table}{\numberline {25}{\ignorespaces The following inputs determine reproductive efficiency of cows and influence culling, calving interval, and calf output.}}{67}{table.25}%
+\contentsline {table}{\numberline {26}{\ignorespaces The following inputs can be used to determine if there is a \textbf {decrease in the conception rate} with parity and rebreeding attempts.}}{68}{table.caption.9}%
+\contentsline {paragraph}{Methodology}{69}{table.caption.9}%
+\contentsline {figure}{\numberline {2}{\ignorespaces This is a high level schematic to illustrate the methodology behind the heifer breeding and re-breeding in RuFaS Animal Module.}}{70}{figure.caption.10}%
+\contentsline {figure}{\numberline {3}{\ignorespaces This is a high level schematic to illustrate the methodology behind the cow breeding and re-breeding in RuFaS Animal Module.}}{72}{figure.caption.11}%
+\contentsline {table}{\numberline {27}{\ignorespaces Important functions for the reproduction section.}}{74}{table.27}%
+\contentsline {subsection}{\numberline {3.c}Milk Production}{76}{subsection.3.3}%
+\contentsline {paragraph}{Introduction}{76}{subsection.3.3}%
+\contentsline {table}{\numberline {28}{\ignorespaces The following user inputs are used to estimate customized herd-level lactation curve parameters. See the Methodology section of this document and the Lactation Curve Scientific Documentation for more detail about how these inputs are used with relation to daily milk production.}}{77}{table.28}%
+\contentsline {table}{\numberline {29}{\ignorespaces The following inputs are used to determine the milk fat and milk protein percentages for each lactating cow}}{78}{table.29}%
+\contentsline {table}{\numberline {30}{\ignorespaces The following inputs are used to constrain how much an average cow’s daily milk production will be reduced due to an inadequate ration. See the Methodology section of this document and the Ration Formulation scientific documentation for more detail about how these inputs are used with relation to daily milk production.}}{79}{table.30}%
+\contentsline {paragraph}{Methodology}{80}{table.30}%
+\contentsline {figure}{\numberline {4}{\ignorespaces A schematic illustrating the flow of milk reduction in ration formulation logic.}}{83}{figure.caption.12}%
+\contentsline {subsection}{\numberline {3.d}Lactation Curve: Parameters and Definitions}{84}{subsection.3.4}%
+\contentsline {paragraph}{Introduction}{84}{subsection.3.4}%
+\contentsline {table}{\numberline {31}{\ignorespaces Wood's Lactation Curve Base Parameters – These inputs provide the baseline values and variability for Wood’s lactation curve parameters as derived from \blx@tocontentsinit {1}\textcite {Li2022}.}}{86}{table.31}%
+\contentsline {table}{\numberline {33}{\ignorespaces Adjustment Factors – These factors adjust the base parameters based on geographical, temporal, management, and parity considerations.}}{87}{table.33}%
+\contentsline {table}{\numberline {35}{\ignorespaces Farm Specific 305-Day Milk Production — These inputs help tailor the lactation curve to the farm’s production targets and herd composition.}}{88}{table.35}%
+\contentsline {table}{\numberline {36}{\ignorespaces Summary of important functions for the reproduction section. }}{89}{table.36}%
+\contentsline {paragraph}{Methodology}{89}{table.36}%
+\contentsline {subsection}{\numberline {3.e}Culling}{91}{subsection.3.5}%
+\contentsline {paragraph}{Introduction}{91}{subsection.3.5}%
+\contentsline {table}{\numberline {37}{\ignorespaces The following inputs are used to determine the probability and timing of cow death and sales events.}}{93}{table.37}%
+\contentsline {paragraph}{Methodology}{94}{table.37}%
+\contentsline {table}{\numberline {38}{\ignorespaces Cumulative distribution function (CDF) values associated with the conditional probability that a sold animal is removed due to each group of issues and/or the conditional probability of death over time. Corresponds to the “probability” value for each cull reason in the animal input json file. The 'cull\_day\_count' array defines the segments of the CDF}}{98}{table.caption.13}%
+\contentsline {section}{\numberline {4}Methane Emission and Manure Excretion}{99}{section.4}%
+\contentsline {subsection}{\numberline {4.a}Manure Excretion}{99}{subsection.4.1}%
+\contentsline {paragraph}{Introduction}{99}{subsection.4.1}%
+\contentsline {table}{\numberline {39}{\ignorespaces These inputs define basic animal and diet properties used to calculate nutrient intake and manure production.}}{100}{table.39}%
+\contentsline {table}{\numberline {40}{\ignorespaces These inputs are used when modeling cows and are particularly relevant for lactating animals.}}{100}{table.40}%
+\contentsline {table}{\numberline {41}{\ignorespaces These inputs define phosphorus-related outputs relevant to lactating cows.}}{101}{table.41}%
+\contentsline {table}{\numberline {42}{\ignorespaces Expected outputs from this section.}}{101}{table.42}%
+\contentsline {paragraph}{Methodology}{102}{table.42}%
 \contentsline {paragraph}{Manure excretions}{102}{table.42}%
 \contentsline {paragraph}{Manure nutrient composition}{103}{table.42}%
 \contentsline {paragraph}{Manure excretions}{104}{table.42}%
 \contentsline {paragraph}{Manure nutrient composition}{105}{table.42}%
 \contentsline {paragraph}{Manure excretions}{106}{table.42}%
-\contentsline {subsection}{\numberline {B.}Enteric Methane Emission}{109}{subsection.4.2}%
-\contentsline {paragraph}{Introduction}{109}{subsection.4.2}%
-\contentsline {paragraph}{Methodology}{110}{table.46}%
-\contentsline {paragraph}{Mutian Model}{111}{table.46}%
-\contentsline {paragraph}{Mills Model}{112}{table.46}%
-\contentsline {paragraph}{IPCC Model}{112}{table.46}%
-\contentsline {paragraph}{Mills Model}{112}{table.46}%
-\contentsline {paragraph}{IPCC Model}{112}{table.46}%
-\contentsline {subsection}{\numberline {C.}Enteric Methane Mitigation}{113}{subsection.4.3}%
-\contentsline {paragraph}{Introduction}{113}{subsection.4.3}%
-\contentsline {paragraph}{Methodology}{114}{table.50}%
-\contentsline {section}{\numberline {V.}References}{116}{section.5}%
+\contentsline {paragraph}{Manure nutrient composition}{107}{table.42}%
+\contentsline {paragraph}{Manure excretions}{108}{table.42}%
+\contentsline {subsection}{\numberline {4.b}Enteric Methane Emission}{111}{subsection.4.2}%
+\contentsline {paragraph}{Introduction}{111}{subsection.4.2}%
+\contentsline {table}{\numberline {43}{\ignorespaces These inputs define basic animal and diet properties used to calculate nutrient intake and manure production.}}{111}{table.43}%
+\contentsline {table}{\numberline {44}{\ignorespaces These inputs are used when modeling cows and are particularly relevant for lactating animals.}}{111}{table.44}%
+\contentsline {table}{\numberline {45}{\ignorespaces Inputs specific to the methane emissions model and selected mitigation strategies.}}{112}{table.45}%
+\contentsline {table}{\numberline {46}{\ignorespaces Expected outputs from this section.}}{112}{table.46}%
+\contentsline {paragraph}{Methodology}{112}{table.46}%
+\contentsline {paragraph}{Mutian Model}{113}{table.46}%
+\contentsline {paragraph}{Mills Model}{114}{table.46}%
+\contentsline {paragraph}{IPCC Model}{114}{table.46}%
+\contentsline {paragraph}{Mills Model}{114}{table.46}%
+\contentsline {paragraph}{IPCC Model}{114}{table.46}%
+\contentsline {subsection}{\numberline {4.c}Enteric Methane Mitigation}{115}{subsection.4.3}%
+\contentsline {paragraph}{Introduction}{115}{subsection.4.3}%
+\contentsline {table}{\numberline {47}{\ignorespaces General dietary fiber and fat concentration inputs.}}{115}{table.47}%
+\contentsline {table}{\numberline {48}{\ignorespaces Feed-based methane mitigation strategies.}}{115}{table.48}%
+\contentsline {table}{\numberline {49}{\ignorespaces Dosage of methane mitigation additives.}}{116}{table.49}%
+\contentsline {table}{\numberline {50}{\ignorespaces Expected outputs from this section.}}{116}{table.50}%
+\contentsline {paragraph}{Methodology}{116}{table.50}%
+\contentsline {section}{\numberline {5}References}{118}{section.5}%

@@ -18,7 +18,9 @@ author = "RuFaS team"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc"]
+extensions = ["sphinx.ext.autodoc", "sphinxcontrib.mermaid"]
+
+mermaid_d3_zoom = True
 
 autodoc_default_options = {
     "members": True,

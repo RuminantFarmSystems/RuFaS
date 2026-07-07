@@ -89,19 +89,38 @@ class AnimalModuleConstants:
     """The fraction of the dry matter intake requirement used as the basis for
     the inclusion rate bounds in user defined ration formulation method."""
 
+    DMI_RETRY_INCREASE_FACTOR: float = 1.1
+    """Multiplier applied to the dry matter intake when a lactating-cow ration retry is warranted."""
+
     MINIMUM_DMI: float = 1.0
     """Minimum estimated DMI instituted for all animals, kg/day"""
 
     MINIMUM_DAILY_DMI_RATIO: float = 0.01
     """Minimum estimated DMI (kg/day), as a fraction of body_weight in kg"""
 
-    MINIMUM_DMI_LACT: float = 2.0
-    """Minimum estimated DMI for lactating cows, kg/day. Note that in the dataset used to generate the equation,
-    the mimimum DMI is 3.94 kg/day (Reed et al. 2015)"""
+    MINIMUM_DMI_LACT: float = 6.06
+    """Minimum pen-level DMI for lactating cows, calculated as an average across the
+    literature, kg/day (Appuhamy 2014; Appuhamy 2018; Reed 2015; Nennich 2015)."""
 
-    MINIMUM_DMI_DRY: float = 2.0
-    """Minimum estimated DMI for dry cows, kg/day. Note that in the dataset used to generate the equation,
-    the minimum DMI is 7.1 kg/day (Appuhamy 2018)"""
+    MINIMUM_DMI_DRY: float = 3.6
+    """Minimum pen-level DMI for dry cows, calculated as an average across the
+    literature, kg/day (Reed 2015; Nennich 2015)."""
+
+    MINIMUM_DMI_HEIFER: float = 4.17
+    """Minimum pen-level DMI for heifers, calculated as an average across the
+    literature, kg/day (Reed 2015; Nennich 2015)."""
+
+    MINIMUM_DMI_CALF: float = 2.38
+    """Minimum pen-level DMI for calves, calculated as an average across the
+    literature, kg/day (Nennich 2015)."""
+
+    MINIMUM_DMI_LACT_FOR_MANURE_VS: float = 7.1
+    """Minimum DMI for lactating cows in the dataset used to generate the equation,
+    kg/day (Appuhamy 2018)."""
+
+    MINIMUM_DMI_DRY_FOR_MANURE_VS: float = 7.1
+    """Minimum DMI for dry cows in the dataset used to generate the equation,
+    kg/day (Appuhamy 2018)."""
 
     MINIMUM_PHOSPHORUS: float = 0.0
     """Minimum phosphorus estimate, g/day"""
@@ -138,3 +157,8 @@ class AnimalModuleConstants:
 
     EFF_OF_ME_USE: float = 0.66
     """Efficiency of metabolizable energy use, e.g. conversion rate of metabolizable energy to net energy, unitless."""
+
+    HEIFER_MORTALITY_HEIFERI_FRACTION: float = 2 / 3
+    """Fraction of post-wean (heifer) mortality allocated to the HeiferI (pre-breeding) stage.
+    The remaining (1 - fraction) is allocated to the HeiferII (post-breeding) stage. Per SME
+    guidance, two-thirds of youngstock losses occur before breeding and one-third after, unitless."""

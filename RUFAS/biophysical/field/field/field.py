@@ -1,6 +1,6 @@
 import math
 from math import exp
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Sequence, TypeVar, Any
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
@@ -31,6 +31,8 @@ from RUFAS.biophysical.field.soil.soil import Soil
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
+FieldManagementEventT = TypeVar("FieldManagementEventT", bound=BaseFieldManagementEvent)
+
 
 class Field:
     """
@@ -41,24 +43,26 @@ class Field:
 
     Parameters
     ----------
-    field_data : FieldData, default=None
+    field_data : FieldData, optional
         FieldData object that will be simulated.
-    soil : Soil, default=None
+    soil : Soil, optional
         The soil component of the field.
-    plantings : List[PlantingEvent], default=None
+    plantings : list[PlantingEvent], optional
         List of all planting events that will occur over the run of the simulation in this field.
-    harvestings : List[HarvestEvent], default=None
+    harvestings : list[HarvestEvent], optional
         List of all harvesting events that will occur over the run of the simulation in the field.
-    custom_crop_specifications : dict[str, dict[str, Any]], default=None
-        Dictionary where keys are crop references and values are dictionaries containing crop specifications.
-    tillage_events : List[TillageEvent], default=None
+    tillage_events : list[TillageEvent], optional
         List of all tillage events that will occur over the run of the simulation in this field.
-    fertilizer_events : List[FertilizerEvent], default=None
+    fertilizer_events : list[FertilizerEvent], optional
         List of all fertilizer mixes available for application to this field.
-    fertilizer_mixes : Dict[str, Dict[str, float]], default=None
+    fertilizer_mixes : dict[str, dict[str, float]], optional
         List of all fertilizer mixes available for application to this field.
-    manure_events : List[ManureEvent], default=None
+    manure_events : list[ManureEvent], optional
         Manure application interface.
+    daily_spread_settings : dict[str, Any], optional
+        Configuration for daily spread manure applications, taken from the ``daily_spread`` block of the field's
+        manure schedule. When ``None`` (or when its ``is_daily_spreading`` flag is false) no daily spread events
+        are generated.
 
     Attributes
     ----------
@@ -66,31 +70,32 @@ class Field:
         Reference to the FieldData object
     soil : Soil
         Reference to the Soil object
-    crops : List[Crop]
+    crops : list[Crop]
         Reference to the list of Crop objects
-    planting_events : List[PlantingEvent]
+    planting_events : list[PlantingEvent]
         Reference to the list of PlantingEvent objects
-    harvest_events : List[HarvestEvent]
+    harvest_events : list[HarvestEvent]
         Reference to the list of HarvestEvent objects
-    custom_crop_specifications : dict[str, dict[str, Any]]
-        Reference to the custom crop specifications dictionary.
     fertilizer_applicator : FertilizerApplication(self.soil)
         Provides interface for adding fertilizer to the field
-    fertilizer_events : List
+    fertilizer_events : list
         Reference to the list of FertilizerEvent objects
-    available_fertilizer_mixes : Dict
+    available_fertilizer_mixes : dict
         List of all fertilizer mixes available for application to this field. The 100_0_0 and 26_4_24 mixes will
         always be available as supplements to unfulfilled manure nutrient demands.
     ONLY_NITROGEN_MIX : str
         Constant with the name of the fertilizer mix that contains only Nitrogen.
     tiller : TillageApplication
         Provides interface to till the field.
-    tillage_events: List[TillageEvent]
+    tillage_events: list[TillageEvent]
         List of all tillage events that will occur over the run of the simulation in this field.
-    manure_applicator = ManureApplication
+    manure_applicator : ManureApplication
         List of ManureApplication objects.
-    manure_events: List[ManureEvent]
+    manure_events: list[ManureEvent]
         List of all manure applications that will be applied to this field.
+    daily_spread_settings : dict[str, Any] | None
+        Configuration for daily spread manure applications, or ``None`` if the field does not daily spread.
+        See :meth:`_create_daily_spread_event` for the recognized keys.
 
     Methods
     -------
@@ -101,14 +106,15 @@ class Field:
 
     def __init__(
         self,
-        field_data: Optional[FieldData] = None,
-        soil: Optional[Soil] = None,
-        plantings: Optional[List[PlantingEvent]] = None,
-        harvestings: Optional[List[HarvestEvent]] = None,
-        tillage_events: Optional[List[TillageEvent]] = None,
-        fertilizer_events: Optional[List[FertilizerEvent]] = None,
-        fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
-        manure_events: Optional[List[ManureEvent]] = None,
+        field_data: FieldData | None = None,
+        soil: Soil | None = None,
+        plantings: List[PlantingEvent] | None = None,
+        harvestings: List[HarvestEvent] | None = None,
+        tillage_events: List[TillageEvent] | None = None,
+        fertilizer_events: List[FertilizerEvent] | None = None,
+        fertilizer_mixes: Dict[str, Dict[str, float]] | None = None,
+        manure_events: List[ManureEvent] | None = None,
+        daily_spread_settings: dict[str, Any] | None = None,
     ) -> None:
         # field-wide attributes
         self.om = OutputManager()
@@ -141,6 +147,7 @@ class Field:
         self.manure_applicator = ManureApplication(self.soil.data)
 
         self.manure_events: list[ManureEvent] = manure_events or []
+        self.daily_spread_settings = daily_spread_settings
 
     def manage_field(
         self,
@@ -281,7 +288,6 @@ class Field:
             )
             application_depth = 0.0
             surface_remainder_fraction = 1.0
-
         if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
             self._record_nutrient_application_error(application_depth, None, error_message, year, day)
             application_depth = self.soil.data.soil_layers[-1].bottom_depth
@@ -289,6 +295,18 @@ class Field:
         try:
             fertilizer_mix = self.available_fertilizer_mixes[mix_name]
         except KeyError:
+            self.om.add_error(
+                "Incorrect fertilizer mix error",
+                f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
+                f"received '{self.available_fertilizer_mixes}'.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._execute_fertilizer_application.__name__,
+                    "suffix": f"field='{self.field_data.name}'",
+                    "year": year,
+                    "day": day,
+                },
+            )
             raise KeyError(
                 f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
                 f"received '{self.available_fertilizer_mixes}'."
@@ -349,7 +367,7 @@ class Field:
             Minimum amount of nitrogen to be included in this fertilizer application.
         requested_phosphorus : float
             Minimum amount of phosphorus to be included in this fertilizer application.
-        available_mixes : Dict[str, Dict[str, float]]
+        available_mixes : dict[str, dict[str, float]]
             List of fertilizer mixes available for application to the field.
 
         Returns
@@ -400,21 +418,21 @@ class Field:
         Parameters
         ----------
         nitrogen_fraction : float
-            Fraction of fertilizer mix that is nitrogen, in range [0.0, 1.0] (unitless)
+            Fraction of fertilizer mix that is nitrogen, in range [0.0, 1.0] (unitless).
         phosphorus_fraction : float
-            Fraction of fertilizer mix that is phosphorus, in range [0.0, 1.0] (unitless)
+            Fraction of fertilizer mix that is phosphorus, in range [0.0, 1.0] (unitless).
         potassium_fraction : float
-            Fraction of fertilizer mix that is potassium, in range [0.0, 1.0] (unitless)
+            Fraction of fertilizer mix that is potassium, in range [0.0, 1.0] (unitless).
         requested_nitrogen : float
-            Minimum mass of nitrogen to be included in fertilizer application (kg)
+            Minimum mass of nitrogen to be included in fertilizer application (kg).
         requested_phosphorus : float
-            Minimum mass of phosphorus to be included in fertilizer application (kg)
+            Minimum mass of phosphorus to be included in fertilizer application (kg).
         requested_potassium : float
-            Minimum mass of potassium to be included in fertilizer application (kg)
+            Minimum mass of potassium to be included in fertilizer application (kg).
 
         Returns
         -------
-        Dict[str, float]
+        dict[str, float]
             The total mass of fertilizer, and the masses of nitrogen, phosphorus, and potassium in the fertilizer.
 
         """
@@ -544,7 +562,7 @@ class Field:
             Calendar year in which this manure application occurs.
         day : int
             Julian day on which this manure application occurs.
-        manure_supplied : NutrientRequestResults | None
+        manure_supplied : NutrientRequestResults, optional
             An object containing the information that defines a manure application.
         manure_supplement_method : ManureSupplementMethod
             Enum option indicating how to supplement the manure application.
@@ -698,7 +716,8 @@ class Field:
         Returns
         -------
         tuple[float, float]
-            The validated application depth and surface remainder fraction.
+            - The validated application depth.
+            - The surface remainder fraction.
 
         Raises
         ------
@@ -717,10 +736,26 @@ class Field:
 
         soil_layers = self.soil.data.soil_layers
         if not soil_layers:
+            self.om.add_error(
+                "Soil layers not initialized error",
+                "soil_layers is not initialized",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_application_depth_and_fraction.__name__,
+                },
+            )
             raise ValueError("soil_layers is not initialized")
 
         bottom_layer = soil_layers[-1]
         if bottom_layer.bottom_depth is None:
+            self.om.add_error(
+                "Bottom depth error",
+                "bottom_depth is not set for the last soil layer",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_application_depth_and_fraction.__name__,
+                },
+            )
             raise ValueError("bottom_depth is not set for the last soil layer")
 
         max_depth = bottom_layer.bottom_depth
@@ -831,7 +866,7 @@ class Field:
         year: int,
         day: int,
         output_name: str,
-        potassium: Optional[float] = None,
+        potassium: float | None = None,
     ) -> None:
         """
         Records the amount of manure and related values for an individual manure application.
@@ -839,15 +874,15 @@ class Field:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
+            Fraction of the field this manure is applied to (unitless).
         nitrogen : float
-            Mass of nitrogen in the manure applied (kg)
+            Mass of nitrogen in the manure applied (kg).
         phosphorus : float
-            Mass of phosphorus in the manure applied (kg)
+            Mass of phosphorus in the manure applied (kg).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
@@ -856,8 +891,8 @@ class Field:
             Calendar year in which this manure application occurs.
         day : int
             Julian day on which this manure application occurs.
-        potassium : float, Optional
-            Mass of potassium in the manure applied (kg)
+        potassium : float, optional
+            Mass of potassium in the manure applied (kg).
 
         """
         units = {
@@ -930,7 +965,7 @@ class Field:
     def _record_nutrient_application_error(
         self,
         application_depth: float,
-        surface_remainder_fraction: Optional[float],
+        surface_remainder_fraction: float | None,
         error_name: str,
         year: int,
         day: int,
@@ -942,7 +977,7 @@ class Field:
         ----------
         application_depth : float
             Depth of the manure or fertilizer application (mm).
-        surface_remainder_fraction : Optional[float]
+        surface_remainder_fraction : float, optional
             Fraction of manure or fertilizer applied that remains on the soil surface after application (unitless).
         error_name : str
             Name of the error, indicating whether it occurred during manure or fertilizer application.
@@ -951,8 +986,8 @@ class Field:
         -----
         There are two possible errors that this method can log. One is an invalid combination of application depth and
         surface remainder fraction, the other is an application depth deeper than the bottom of the soil profile. The
-        two are differentiated by what is passed for `surface_remainder_fraction`. If it is a number, it is the former,
-        and if None, then it is the latter.
+        two are differentiated by what is passed for ``surface_remainder_fraction``. If it is a number, it is the
+        former, and if None, then it is the latter.
 
         """
         info_map = {
@@ -1053,11 +1088,65 @@ class Field:
             on the current day.
         """
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
+        field_name = self.field_data.name or ""
         manure_requests: list[ManureEventNutrientRequest] = []
         for event in todays_manure_events:
             manure_request = self._create_manure_request(event)
-            manure_requests.append(ManureEventNutrientRequest(self.field_data.name, event, manure_request))
+            manure_requests.append(ManureEventNutrientRequest(field_name, event, manure_request))
+
+        daily_spread_event = self._create_daily_spread_event(time)
+        if daily_spread_event is not None:
+            manure_request = self._create_manure_request(daily_spread_event)
+            manure_requests.append(ManureEventNutrientRequest(field_name, daily_spread_event, manure_request))
         return manure_requests
+
+    def _create_daily_spread_event(self, time: RufasTime) -> ManureEvent | None:
+        """
+        Build the daily-spread manure event for the current day, if daily spreading is enabled.
+
+        Daily spreading applies manure to the field every day as it is produced, in addition to any scheduled
+        manure events. The settings are read from the ``daily_spread`` block of the manure schedule; if it is
+        missing or ``is_daily_spreading`` is false, no event is created. Either a target amount
+        (``nitrogen_spread_amount`` / ``phosphorus_spread_amount``) is requested, or, when
+        ``spread_all_available_manure`` is true, all manure currently in DailySpread storage is applied.
+
+        Parameters
+        ----------
+        time : RufasTime
+            The current simulation time, stamped onto the generated event.
+
+        Returns
+        -------
+        ManureEvent | None
+            The daily spread event for the current day, or ``None`` if daily spreading is disabled.
+
+        """
+        if not (self.daily_spread_settings and self.daily_spread_settings.get("is_daily_spreading", False)):
+            return None
+
+        manure_type = ManureType(self.daily_spread_settings["manure_type"])
+        manure_supplement_method = ManureSupplementMethod(
+            self.daily_spread_settings.get(
+                "supplement_manure_nutrient_deficiencies",
+                ManureSupplementMethod.NONE.value,
+            )
+        )
+        nitrogen_spread_amount = self.daily_spread_settings["nitrogen_spread_amount"]
+        phosphorus_spread_amount = self.daily_spread_settings["phosphorus_spread_amount"]
+        spread_all_available_manure: bool = self.daily_spread_settings["spread_all_available_manure"]
+        return ManureEvent(
+            nitrogen_mass=nitrogen_spread_amount,
+            phosphorus_mass=phosphorus_spread_amount,
+            manure_type=manure_type,
+            manure_supplement_method=manure_supplement_method,
+            field_coverage=self.daily_spread_settings.get("coverage_fraction", 1.0),
+            application_depth=self.daily_spread_settings.get("application_depth", 0.0),
+            surface_remainder_fraction=self.daily_spread_settings.get("surface_remainder_fraction", 1.0),
+            year=time.current_calendar_year,
+            day=time.current_julian_day,
+            is_daily_spread=True,
+            spread_all_available_manure=spread_all_available_manure,
+        )
 
     def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
         """
@@ -1082,12 +1171,13 @@ class Field:
             "year": event.year,
             "day": event.day,
         }
-        if event.nitrogen_mass == event.phosphorus_mass == 0.0:
+        spread_all_available_manure = event.spread_all_available_manure
+        if not spread_all_available_manure and event.nitrogen_mass == event.phosphorus_mass == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             self.om.add_warning("Manure Application Warning", log_message, info_map)
             return None
 
-        use_supplemental_manure = event.manure_supplement_method in [
+        use_supplemental_manure = not spread_all_available_manure and event.manure_supplement_method in [
             ManureSupplementMethod.MANURE,
             ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
         ]
@@ -1097,6 +1187,8 @@ class Field:
             phosphorus=event.phosphorus_mass,
             manure_type=event.manure_type,
             use_supplemental_manure=use_supplemental_manure,
+            use_daily_spread_source=event.is_daily_spread,
+            spread_all_available_manure=spread_all_available_manure,
         )
 
     def _check_crop_harvest_schedule(
@@ -1175,8 +1267,8 @@ class Field:
 
     @staticmethod
     def _filter_events(
-        all_events: Sequence[BaseFieldManagementEvent], time: RufasTime
-    ) -> tuple[Sequence[BaseFieldManagementEvent], Sequence[BaseFieldManagementEvent]]:
+        all_events: Sequence[FieldManagementEventT], time: RufasTime
+    ) -> tuple[list[FieldManagementEventT], list[FieldManagementEventT]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
@@ -1190,9 +1282,9 @@ class Field:
 
         Returns
         -------
-        Tuple
-            A tuple containing the list of all Events that will occur in this field after the current day, and a list of
-            Events that will occur on the current day.
+        tuple[list[FieldManagementEventT], list[FieldManagementEventT]]
+            - The list of all Events that will occur in this field after the current day.
+            - A list of Events that will occur on the current day.
 
         Notes
         -----
@@ -1275,8 +1367,8 @@ class Field:
             "year": MeasurementUnits.CALENDAR_YEAR,
             "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
-            "average_clay_percent": MeasurementUnits.PERCENT,
             "field_name": MeasurementUnits.UNITLESS,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -1290,8 +1382,8 @@ class Field:
             "year": year,
             "day": day,
             "field_size": self.field_data.field_size,
-            "average_clay_percent": self.soil.data.average_clay_percent,
             "field_name": self.field_data.name,
+            "average_clay_percent": self.soil.data.average_clay_percent,
         }
         self.om.add_variable("crop_planting", value, info_map)
 
@@ -1638,12 +1730,12 @@ class Field:
         Parameters
         ----------
         precipitation_total : float
-            Total amount of precipitation that fell on the field today (mm)
+            Total amount of precipitation that fell on the field today (mm).
 
         Returns
         -------
         float
-            Amount of water that reaches the soil surface (mm)
+            Amount of water that reaches the soil surface (mm).
 
         Notes
         -----
@@ -1666,12 +1758,12 @@ class Field:
         Parameters
         ----------
         evapotranspirative_demand : float
-            Evapotranspirative demand on the field on the current day (mm)
+            Evapotranspirative demand on the field on the current day (mm).
 
         Returns
         -------
         float
-            Evapotranspirative demand after evaporating water from crops' canopies (mm)
+            Evapotranspirative demand after evaporating water from crops' canopies (mm).
         """
         remaining_evapotranspirative_demand = evapotranspirative_demand
 
@@ -1730,7 +1822,7 @@ class Field:
         """
         avg_air_temp = avg_air_temp if avg_air_temp else (max_air_temp + min_air_temp) / 2
         latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
-        potential_evapotranspiration = (
+        potential_evapotranspiration: float = (
             0.0023 * extraterrestrial_radiation * ((max_air_temp - min_air_temp) ** 0.5) * (avg_air_temp + 17.8)
         ) / latent_heat_vaporization
         return max(0.0, potential_evapotranspiration)
@@ -1742,12 +1834,12 @@ class Field:
         Parameters
         ----------
         avg_air_temp : float
-            Average air temperature (degrees C)
+            Average air temperature (degrees C).
 
         Returns
         -------
         float
-            latent heat of vaporization (MJ per kg)
+            latent heat of vaporization (MJ per kg).
 
         References
         ----------
@@ -1769,15 +1861,15 @@ class Field:
         Parameters
         ----------
         above_ground_biomass : float
-            Mass of plant above ground (kg per hectare)
+            Mass of plant above ground (kg per hectare).
         residue : float
-            Biomass separated from plant on the ground (kg per hectare)
+            Biomass separated from plant on the ground (kg per hectare).
         snow_water_content : float
-            Amount of water in the snow pack (mm)
+            Amount of water in the snow pack (mm).
         potential_evapotranspiration_adjusted : float
             Potential evapotranspiration adjusted for evaporation of free water in canopy (mm)
         transpiration : float
-            Maximum transpiration for a given day (mm)
+            Maximum transpiration for a given day (mm).
 
         Returns
         -------

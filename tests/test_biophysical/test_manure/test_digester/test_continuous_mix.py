@@ -53,7 +53,7 @@ def manure_stream() -> ManureStream:
         volume=500.0,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -86,13 +86,15 @@ def test_receive_manure(digester: ContinuousMix, manure_stream: ManureStream) ->
     assert digester._manure_in_digester == manure_stream
 
 
-def test_receive_manure_error(digester: ContinuousMix, manure_stream: ManureStream) -> None:
+def test_receive_manure_error(digester: ContinuousMix, manure_stream: ManureStream, mocker: MockerFixture) -> None:
     """Test that Anaerobic Digester raises an error when incompatible manure is passed."""
     manure_stream.pen_manure_data = PenManureData(
         100, 500.0, AnimalCombination.LAC_COW, "open lot", 1000.0, 50.0, StreamType.GENERAL
     )
+    mock_add_error = mocker.patch.object(digester._om, "add_error")
     with pytest.raises(ValueError):
         digester.receive_manure(manure_stream)
+    mock_add_error.assert_called_once()
 
 
 def test_process_manure(
@@ -176,8 +178,11 @@ def test_calculate_generated_methane(digester: ContinuousMix, mocker: MockerFixt
 @pytest.mark.parametrize(
     "bedding_non_degradable, degradable, non_degradable, destroyed, expected_degradable, expected_non_degradable,"
     " expected_error_count",
-    [(50, 100.0, 100.0, 50.0, 80.0, 80.0, 0), (50, 900.0, 100.0, 100.0, 814.2857142857143, 90.47619047619048, 0),
-     (1, 50.0, 20.0, 75.0, 0.0, 0.0, 1)],
+    [
+        (50, 100.0, 100.0, 50.0, 80.0, 80.0, 0),
+        (50, 900.0, 100.0, 100.0, 814.2857142857143, 90.47619047619048, 0),
+        (1, 50.0, 20.0, 75.0, 0.0, 0.0, 1),
+    ],
 )
 def test_destroy_volatile_solids(
     digester: ContinuousMix,

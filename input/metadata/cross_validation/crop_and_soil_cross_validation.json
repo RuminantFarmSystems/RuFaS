@@ -1,0 +1,380 @@
+{
+  "cross_validation": [
+    {
+      "description": "All crop configurations: optimal_temperature must be greater than or equal to minimum_temperature",
+      "aliases": {
+        "variables": {
+          "crop_configurations": "crop_configurations.crop_configurations"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "crop_configurations",
+              "field": "optimal_temperature",
+              "field_to_compare": "minimum_temperature",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All crop configurations: optimal_harvest_index must be greater than or equal to minimum_harvest_index",
+      "aliases": {
+        "variables": {
+          "crop_configurations": "crop_configurations.crop_configurations"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "crop_configurations",
+              "field": "optimal_harvest_index",
+              "field_to_compare": "minimum_harvest_index",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_1 watering amount must be zero when watering interval is zero",
+      "aliases": {
+        "variables": {
+          "watering_amount_in_liters": "field_1.watering_amount_in_liters",
+          "watering_interval": "field_1.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_amount_in_liters"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_1 watering interval must be greater than zero when watering amount is positive",
+      "aliases": {
+        "variables": {
+          "watering_amount_in_liters": "field_1.watering_amount_in_liters",
+          "watering_interval": "field_1.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_amount_in_liters"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "field_2 watering amount must be zero when watering interval is zero",
+      "aliases": {
+        "variables": {
+          "watering_amount_in_liters": "field_2.watering_amount_in_liters",
+          "watering_interval": "field_2.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_amount_in_liters"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "field_2 watering interval must be greater than zero when watering amount is positive",
+      "aliases": {
+        "variables": {
+          "watering_amount_in_liters": "field_2.watering_amount_in_liters",
+          "watering_interval": "field_2.watering_interval"
+        },
+        "constants": {
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_amount_in_liters"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["watering_interval"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "All soil_1 layers: field_capacity_water_concentration must be greater than or equal to wilting_point_water_concentration",
+      "aliases": {
+        "variables": {
+          "soil_1_layers": "soil_1.soil_layers"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "soil_1_layers",
+              "field": "field_capacity_water_concentration",
+              "field_to_compare": "wilting_point_water_concentration",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All soil_1 layers: saturation_point_water_concentration must be greater than or equal to field_capacity_water_concentration",
+      "aliases": {
+        "variables": {
+          "soil_1_layers": "soil_1.soil_layers"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "soil_1_layers",
+              "field": "saturation_point_water_concentration",
+              "field_to_compare": "field_capacity_water_concentration",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All soil_2 layers: field_capacity_water_concentration must be greater than or equal to wilting_point_water_concentration",
+      "aliases": {
+        "variables": {
+          "soil_2_layers": "soil_2.soil_layers"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "soil_2_layers",
+              "field": "field_capacity_water_concentration",
+              "field_to_compare": "wilting_point_water_concentration",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "All soil_2 layers: saturation_point_water_concentration must be greater than or equal to field_capacity_water_concentration",
+      "aliases": {
+        "variables": {
+          "soil_2_layers": "soil_2.soil_layers"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "soil_2_layers",
+              "field": "saturation_point_water_concentration",
+              "field_to_compare": "field_capacity_water_concentration",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    }
+  ]
+}

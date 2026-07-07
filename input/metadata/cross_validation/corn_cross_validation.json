@@ -1,0 +1,68 @@
+{
+  "cross_validation": [
+    {
+      "description": "Corn schedule 0 has equal planting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn.crop_schedules.0.planting_years",
+          "planting_days": "Corn.crop_schedules.0.planting_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn schedule 0 has equal harvest year/day lengths",
+      "aliases": {
+        "variables": {
+          "harvest_years": "Corn.crop_schedules.0.harvest_years",
+          "harvest_days": "Corn.crop_schedules.0.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    }
+  ]
+}

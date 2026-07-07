@@ -179,14 +179,14 @@ def test_set_milk_type(milk_type: CalfMilkType, expected_milk_type: CalfMilkType
         ),
     ],
 )
-def test_calc_requirements(
+def test_calculate_requirements(
     days_born: int,
     body_weight: float,
     temp: float,
     animal_intake: dict[str, int | float],
     expected_output: dict[str, float],
 ) -> None:
-    result = CalfRationManager.calc_requirements(days_born, body_weight, temp, animal_intake)
+    result = CalfRationManager.calculate_requirements(days_born, body_weight, temp, animal_intake)
 
     for key, expected_value in expected_output.items():
         assert math.isclose(result[key], expected_value, rel_tol=1e-6)
@@ -512,7 +512,7 @@ def test_calc_requirements(
         ),
     ],
 )
-def test_calc_intake(
+def test_calculate_intake(
     birth_weight: float,
     body_weight: float,
     wean_day: int,
@@ -525,7 +525,7 @@ def test_calc_intake(
         CalfMilkType.WHOLE if expected_output["whole_milk_intake"] > 0 else CalfMilkType.REPLACER
     )
 
-    result = CalfRationManager.calc_intake(
+    result = CalfRationManager.calculate_intake(
         birth_weight, body_weight, wean_day, wean_length, available_feeds, nutrient_standard
     )
 
@@ -946,7 +946,7 @@ def starter() -> NASEMFeed:
         ),
     ],
 )
-def test_calc_intake_2(
+def test_calculate_intake_2(
     birth_weight: float,
     body_weight: float,
     wean_day: int,
@@ -958,20 +958,16 @@ def test_calc_intake_2(
     milk_replacer: NASEMFeed,
     starter: NASEMFeed,
 ) -> None:
-    # Select the correct milk type based on the test case
     CalfRationManager.milk_type = (
         CalfMilkType.WHOLE if expected_output["whole_milk_intake"] > 0 else CalfMilkType.REPLACER
     )
 
-    # Resolve fixture references into actual objects
     feed_objects = {"whole_milk": whole_milk, "milk_replacer": milk_replacer, "starter": starter}
     selected_feeds: list[NASEMFeed | NRCFeed] = [feed_objects[feed] for feed in available_feeds]
 
-    # Run the function under test
-    result = CalfRationManager.calc_intake(
+    result = CalfRationManager.calculate_intake(
         birth_weight, body_weight, wean_day, wean_length, selected_feeds, nutrient_standard
     )
 
-    # Validate results
     for key, expected_value in expected_output.items():
         assert math.isclose(result[key], expected_value, rel_tol=1e-6), f"Mismatch in {key}"

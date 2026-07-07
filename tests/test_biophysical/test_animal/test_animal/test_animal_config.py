@@ -72,6 +72,8 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
             "semen_type": "conventional",
             "days_in_preg_when_dry": 218,
             "heifer_repro_cull_time": 500,
+            "calf_mortality_rate": 0,
+            "heifer_mortality_rate": 0,
             "do_not_breed_time": 185,
             "cull_milk_production": 30,
             "cow_times_milked_per_day": 3,
@@ -186,13 +188,18 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
             "methane_mitigation_method": "None",
             "methane_mitigation_additive_amount": 0.0,
         },
+        "herd_information": {"simulate_genetics": False},
     }
 
     def get_data_side_effect(key: str) -> Any:
         if key == "animal":
             return animal_data
-        if key == "feed.milk_reduction_maximum":
+        if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
             return 1.23
+        if key == "animal_mean_phenotype":
+            return {}
+        if key == "animal_top_listing_semen":
+            return {}
         raise KeyError(key)
 
     mock_im.get_data.side_effect = get_data_side_effect
@@ -234,6 +241,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
             "semen_type": "conventional",
             "days_in_preg_when_dry": 218,
             "heifer_repro_cull_time": 500,
+            "calf_mortality_rate": 0,
+            "heifer_mortality_rate": 0,
             "do_not_breed_time": 185,
             "cull_milk_production": 30,
             "cow_times_milked_per_day": 3,
@@ -343,13 +352,18 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
             "methane_mitigation_method": "None",
             "methane_mitigation_additive_amount": 0.0,
         },
+        "herd_information": {"simulate_genetics": False},
     }
 
     def get_data_side_effect(key: str) -> Any:
         if key == "animal":
             return animal_data
-        elif key == "feed.milk_reduction_maximum":
+        elif key == "feed.ration_formulation_parameters.milk_reduction_maximum":
             return 2.5
+        if key == "animal_mean_phenotype":
+            return {}
+        if key == "animal_top_listing_semen":
+            return {}
         raise KeyError(key)
 
     mock_im.get_data.side_effect = get_data_side_effect

@@ -33,9 +33,9 @@ class EntericMethaneCalculator:
 
         """
         if methane_model == "Pattanaik":
-            methane_emission = (
-                0.013 * (body_weight**0.75) * GeneralConstants.KCAL_TO_MJ
-            ) / GeneralConstants.MJ_CH4_TO_G_CH4
+            methane_emission: float = (
+                0.013 * (body_weight**0.75) * GeneralConstants.MCAL_TO_MJ
+            ) / GeneralConstants.G_CH4_TO_MJ_CH4
             return methane_emission
         else:
             return 0.0
@@ -47,13 +47,6 @@ class EntericMethaneCalculator:
     ) -> float:
         """
         Calculates the amount of methane emission for heifer.
-
-        Notes
-        -----
-        Soluble residue: [AN.MET.1]
-        Gross energy concentration: [AN.MET.2]
-        Starch to acid detergent fiber concentration ratio: [AN.MET.3]
-        Enteric methane emission:  [AN.MET.5]
 
         Parameters
         ----------
@@ -70,6 +63,10 @@ class EntericMethaneCalculator:
         References
         ----------
         (IPCC tier 2, 2006)
+        Soluble residue: [AN.MET.1]
+        Gross energy concentration: [AN.MET.2]
+        Starch to acid detergent fiber concentration ratio: [AN.MET.3]
+        Enteric methane emission:  [AN.MET.5]
 
         """
         if methane_model == "IPCC":
@@ -87,14 +84,9 @@ class EntericMethaneCalculator:
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
         methane_models: dict[str, Any],
-    ) -> float:
+    ) -> tuple[float, float]:
         """
         Calculates the daily enteric emissions for cows.
-
-        Notes
-        -----
-        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
-        and nitrogen ("N") are all percentages of dry matter.
 
         Parameters
         ----------
@@ -118,8 +110,14 @@ class EntericMethaneCalculator:
 
         Returns
         -------
-        float
-            The daily enteric emissions for cows (g/day).
+        tuple[float, float]
+            - The daily mitigated enteric emissions for cows (g/day).
+            - The daily unmitigated enteric emissions for cows (g/day).
+
+        Notes
+        -----
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         dry_matter_intake = nutrient_amounts.dry_matter
@@ -137,6 +135,7 @@ class EntericMethaneCalculator:
                 nutrient_amounts,
                 methane_models,
             )
+            unmitigated_methane = methane_emission
             if methane_mitigation_method:
                 methane_yield = 0.0
                 methane_yield_reduction = 0.0
@@ -160,8 +159,9 @@ class EntericMethaneCalculator:
             methane_emission = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
                 methane_models, metabolizable_energy_intake, nutrient_amounts
             )
+            unmitigated_methane = methane_emission
 
-        return methane_emission
+        return methane_emission, unmitigated_methane
 
     @staticmethod
     def _calculate_lactating_cow_enteric_methane(
@@ -291,9 +291,9 @@ class EntericMethaneCalculator:
         mitscherlich_parameter_b = animal_constants.MITS_PARAMETER_B
         mitscherlich_parameter_c = -0.0011 * starch_concentration / acid_detergent_fiber_concentration + 0.0045
         methane_emission_MJ = mitscherlich_parameter_a - (mitscherlich_parameter_a + mitscherlich_parameter_b) * exp(
-            -mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.KCAL_TO_MJ
+            -mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.MCAL_TO_MJ
         )
-        methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
+        methane_emission: float = methane_emission_MJ / GeneralConstants.G_CH4_TO_MJ_CH4
         return methane_emission
 
     @staticmethod
@@ -335,5 +335,5 @@ class EntericMethaneCalculator:
             + 0.198 * neutral_detergent_fiber_concentration
             + 0.160 * soluble_residue
         )
-        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / GeneralConstants.MJ_CH4_TO_G_CH4
+        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / GeneralConstants.G_CH4_TO_MJ_CH4
         return methane_emission

@@ -88,11 +88,13 @@ def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop
     assert storage.stored[0].storage_time.year == harvested_crop.storage_time.year
 
 
-def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: HarvestedCrop) -> None:
+def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: HarvestedCrop, mocker: MockerFixture) -> None:
     """Tests that receiving a crop exceeding capacity raises an exception."""
     storage.capacity = 50.0  # Set a smaller capacity
+    mock_add_error = mocker.patch.object(storage.om, "add_error")
     with pytest.raises(Exception) as excinfo:
         storage.receive_crop(harvested_crop, 15)
+    mock_add_error.assert_called_once()
     assert "exceeds the storage capacity" in str(excinfo.value)
 
 

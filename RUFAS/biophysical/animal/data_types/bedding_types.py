@@ -5,9 +5,6 @@ class BeddingType(Enum):
     """
     Enumerate the different types of bedding.
 
-    This class provides a set of predefined constants that represent different types of bedding such as sawdust,
-    straw, and sand. The default type is sand.
-
     Attribute
     ----------
     SAWDUST : str

@@ -17,26 +17,17 @@ EFFLUENT_CONSTRAINER = 10
 
 class Silage(Storage):
     """
-    Class representing the Silage storage type, inheriting from Storage.
+    Represents Silage storage, a subclass of ``Storage``.
 
     Parameters
     ----------
-    config : dict[str, str | float]
+    config : dict[str, str | float | list[str]]
         Configuration dictionary for the silage storage.
 
     Attributes
     ----------
     om : OutputManager
-        OutputManager instance for logging variables.
-
-    Methods
-    -------
-    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: RufasTime)
-        Calculates the number of days to effluent loss needs to be processed for in the given crop.
-    calculate_dry_matter_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
-        Calculates the total dry matter lost to effluent that occurred over the given number of days.
-    calculate_moisture_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
-        Calculates the total moisture lost to effluent that occurred over the given number of days.
+        The singleton output manager used for model outputs.
 
     """
 
@@ -46,8 +37,8 @@ class Silage(Storage):
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
-        Processes the losses of nutrients and mass to effluent in the ensiled crops, calls the parent implementation of
-        of `process_degradations` to handle the fermentative loss.
+        Processes the losses of nutrients and mass to effluent in the ensiled crops, and calls the parent
+        implementation of ``process_degradations`` to handle the fermentative loss.
 
         Parameters
         ----------
@@ -89,7 +80,7 @@ class Silage(Storage):
         Parameters
         ----------
         crops : list[HarvestedCrop]
-            List of HarvestedCrops to project degradations for.
+            List of ``HarvestedCrop`` objects to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
@@ -118,14 +109,14 @@ class Silage(Storage):
         Parameters
         ----------
         crop : HarvestedCrop
-            HarvestedCrop to calculate effluent losses from.
+            ``HarvestedCrop`` to calculate effluent losses from.
         time : RufasTime
             RufasTime instance tracking the current time of the simulation.
 
         Returns
         -------
         dict[str, float]
-            Mapping of crop's attributes to their values after effluent loss.
+            Mapping of the crop's attributes to their values after effluent loss.
 
         """
         post_loss_values = {
@@ -179,8 +170,9 @@ class Silage(Storage):
 
         Notes
         -----
-        - Effluent loss is fixed at 10 days if the crop is still within the first 10 days of storage.
-        - After that period, it is calculated as the number of days since the last degradation.
+        Effluent loss is fixed at 10 days if the crop is still within the first 10 days of storage. After that period,
+        it is calculated as the number of days since the last degradation.
+
         """
         days_since_storage = (time.current_date.date() - crop.storage_time).days
 
@@ -197,17 +189,17 @@ class Silage(Storage):
         ----------
         estimated_maximum_effluent : float
             The estimated maximum effluent.
-        days_of_effluent_loss : int
+        days_of_loss : int
             The number of days effluent loss will be calculated for.
 
         Returns
         -------
         float
-            The amount of dry matter lost to effluent, in kg.
+            The amount of dry matter lost to effluent (kg).
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equations FS.SIL.4, FS.SIL.6, and FS.SIL.7
+        Feed Storage Scientific Documentation, equations FS.SIL.4, FS.SIL.6, and FS.SIL.7.
 
         """
         return estimated_maximum_effluent * days_of_loss * DRY_MATTER_FRACTION_OF_EFFLUENT / EFFLUENT_CONSTRAINER
@@ -220,17 +212,17 @@ class Silage(Storage):
         ----------
         estimated_maximum_effluent : float
             The estimated maximum effluent.
-        days_of_effluent_loss : int
+        days_of_loss : int
             The number of days effluent loss will be calculated for.
 
         Returns
         -------
         float
-            The amount of moisture lost to effluent, in kg.
+            The amount of moisture lost to effluent (kg).
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.SIL.5
+        Feed Storage Scientific Documentation, equation FS.SIL.5.
 
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
@@ -257,7 +249,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
+        Feed Storage Scientific Documentation, equation FS.NUT.1.
 
         """
         if loss_fraction == 0.0:
@@ -291,7 +283,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
+        Feed Storage Scientific Documentation, equation FS.NUT.1.
 
         """
         if loss_fraction == 0.0:
@@ -305,39 +297,24 @@ class Silage(Storage):
 
 
 class Bunker(Silage):
-    """
-    Class representing the Bunker type of Silage storage.
-    """
+    """Represents the Bunker type of Silage storage."""
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
-        """
-        Initializes a Bunker instance.
-        """
         super().__init__(config)
         self.bunker_size = config["size"]
 
 
 class Pile(Silage):
-    """
-    Class representing the Pile type of Silage storage.
-    """
+    """Represents the Pile type of Silage storage."""
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
-        """
-        Initializes a Pile instance.
-        """
         super().__init__(config)
         self.pile_size = config["size"]
 
 
 class Bag(Silage):
-    """
-    Class representing the Bag type of Silage storage.
-    """
+    """Represents the Bag type of Silage storage."""
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
-        """
-        Initializes a Bag instance.
-        """
         super().__init__(config)
         self.bag_size = config["size"]

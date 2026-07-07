@@ -51,7 +51,7 @@ def test_save_graph_exception(graph_generator: GraphGenerator, mocker: MockerFix
 
 
 def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None:
-    graph_details: Dict[str, str] = {
+    graph_details: dict[str, str] = {
         "title": "Test Graph",
         "x_label": "X Axis",
         "y_label": "Y Axis",
@@ -559,14 +559,15 @@ def test_mask_values(graph_generator: GraphGenerator) -> None:
     [
         (
             {"variable1": {"values": [{"a": 1, "b": 2}, {"a": 3, "b": "ungraphable string"}]}},
-            {"variables": ["a", "b"], "title": "Test_6"},
+            {"variables": ["a", "b"], "title": "Test_data"},
             [{"a": [1, 3], "b": [2, "ungraphable string"]}],
             [{"a": [1, 3], "b": [2, "ungraphable string"]}],
             [
                 {
-                    "error": "Can't plot Test_6 data set",
-                    "message": "variable1 key contains non-numerical data that are {<class 'dict'>} and "
-                    "can't be graphed.",
+                    "warning": "Bad data found in Test_data data set",
+                    "message": "variable1 key contains non-numerical data of type(s) {<class 'dict'>} "
+                    "at index 0: {'a': 1, 'b': 2}, index 1: {'a': 3, 'b': 'ungraphable string'} and will be sanitized "
+                    "for graphing.",
                     "info_map": {
                         "class": "GraphGenerator",
                         "function": "_log_non_numerical_data",
@@ -576,14 +577,14 @@ def test_mask_values(graph_generator: GraphGenerator) -> None:
         ),
         (
             {"variable1": {"values": "a"}},
-            {"title": "Test_6"},
+            {"title": "Test_data"},
             ["ungraphable string"],
             ["ungraphable string"],
             [
                 {
-                    "error": "Can't plot Test_6 data set",
-                    "message": "variable1 key contains non-numerical data that are <class 'str'> and "
-                    "can't be graphed.",
+                    "warning": "Bad data found in Test_data data set",
+                    "message": "variable1 key contains non-numerical data of type <class 'str'> "
+                    "and will be sanitized for graphing.",
                     "info_map": {
                         "class": "GraphGenerator",
                         "function": "_log_non_numerical_data",

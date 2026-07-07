@@ -1,5 +1,4 @@
 from math import exp, log
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -24,7 +23,7 @@ class Infiltration:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def infiltrate(self, rainfall: float) -> None:
@@ -101,7 +100,7 @@ class Infiltration:
 
     # --- static methods ---
     @staticmethod
-    def _determine_first_moisture_condition_parameter(second_moisture_condition: float):
+    def _determine_first_moisture_condition_parameter(second_moisture_condition: float) -> float:
         """
         Determine the curve number for dry (wilting point) conditions.
 
@@ -125,7 +124,7 @@ class Infiltration:
         return second_moisture_condition - (top / bottom)
 
     @staticmethod
-    def _determine_third_moisture_condition_parameter(second_moisture_condition: float):
+    def _determine_third_moisture_condition_parameter(second_moisture_condition: float) -> float:
         """
         Determine the curve number for wet (field capacity) conditions.
 
@@ -188,9 +187,9 @@ class Infiltration:
         saturation : float
             Amount of water in soil profile when saturated (mm).
         max_retention_parameter : float
-            Retention parameter calculated from curve number 1 (the driest conditions) (unitless).
+            Retention parameter calculated from curve number under the driest conditions (unitless).
         third_moisture_condition_retention_parameter : float
-            Retention parameter calculated from curve number 3 (the wettest conditions) (unitless).
+            Retention parameter calculated from curve number 3 under the wettest conditions (unitless).
 
         Returns
         -------
@@ -263,8 +262,7 @@ class Infiltration:
             Amount of water held in the soil profile excluding the amount of water held in
             the profile at the wilting point (mm).
         max_retention_parameter : float
-            Maximum retention parameter, calculated from curve number 1
-            (the driest conditions) (mm).
+            Maximum retention parameter, calculated from curve number 1 under the driest conditions (mm).
         first_shape_coefficient : float
             First shape coefficient (unitless).
         second_shape_coefficient : float
@@ -296,8 +294,7 @@ class Infiltration:
         Parameters
         ----------
         max_retention_parameter : float
-            Maximum retention parameter, calculated from curve number 1.
-            (the driest conditions) (mm).
+            Maximum retention parameter, calculated from curve number 1 under the driest conditions (mm).
         retention_parameter : float
             Retention parameter for a given day (mm).
 

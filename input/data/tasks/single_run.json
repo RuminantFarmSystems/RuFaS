@@ -6,7 +6,10 @@
       "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
       "output_prefix": "Task 2",
       "log_verbosity": "warnings",
-      "random_seed": 42
+      "random_seed": 42,
+      "cross_validation_file_paths": [
+        "input/metadata/cross_validation/example_cross_validation.json"
+      ]
     }
   ]
 }

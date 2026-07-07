@@ -10,16 +10,15 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
-    NASEMFeed,
-    NRCFeed,
-    NutrientStandard,
     FeedCategorization,
     FeedComponentType,
     Feed,
+    FeedFulfillmentResults,
     PlanningCycleAllowance,
     RuntimePurchaseAllowance,
     RequestedFeed,
     IdealFeeds,
+    AdvancePurchaseAllowance,
 )
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.biophysical.feed_storage.grain import Dry
@@ -27,7 +26,6 @@ from RUFAS.biophysical.feed_storage.silage import Pile, Bag
 from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
-from RUFAS.input_manager import InputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
@@ -219,6 +217,9 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
     feed_manager.runtime_purchase_allowance = RuntimePurchaseAllowance(
         [{"purchased_feed": feed.rufas_id, "runtime_purchase_allowance": 10.0} for feed in mock_available_feeds]
     )
+    feed_manager.advance_purchase_allowance = AdvancePurchaseAllowance(
+        [{"purchased_feed": feed.rufas_id, "advance_purchase_allowance": 10.0} for feed in mock_available_feeds]
+    )
 
     return feed_manager
 
@@ -252,37 +253,81 @@ def storage() -> Storage:
 
 def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
     """Test that Feed Manager is initialized correctly."""
-    feed_1, feed_2 = MagicMock(auto_spec=Feed), MagicMock(auto_spec=Feed)
-    feed_1.rufas_id, feed_2.rufas_id = 1, 2
-    mock_setup_available_feeds = mocker.patch(
-        "RUFAS.biophysical.feed_storage.feed_manager.FeedManager._setup_available_feeds",
-        return_value=(mock_available_feeds := [feed_1, feed_2]),
+    feed_1 = MagicMock(auto_spec=Feed)
+    feed_2 = MagicMock(auto_spec=Feed)
+    feed_1.rufas_id = 1
+    feed_2.rufas_id = 2
+    mock_available_feeds = cast(list[Feed], [feed_1, feed_2])
+
+    mock_planning_cycle_allowance_init = mocker.patch.object(
+        PlanningCycleAllowance,
+        "__init__",
+        return_value=None,
     )
-    mock_planning_cycle_allowance_init = mocker.patch.object(PlanningCycleAllowance, "__init__", return_value=None)
-    mock_runtime_purchase_allowance_init = mocker.patch.object(RuntimePurchaseAllowance, "__init__", return_value=None)
+    mock_runtime_purchase_allowance_init = mocker.patch.object(
+        RuntimePurchaseAllowance,
+        "__init__",
+        return_value=None,
+    )
+    mock_advance_purchase_allowance_init = mocker.patch.object(
+        AdvancePurchaseAllowance,
+        "__init__",
+        return_value=None,
+    )
+    mock_purchased_feed_storage_init = mocker.patch(
+        "RUFAS.biophysical.feed_storage.feed_manager.PurchasedFeedStorage",
+    )
+
     mock_create_all_storages = mocker.patch.object(
         FeedManager,
         "_create_all_storages",
         autospec=True,
     )
     mock_create_all_storages.side_effect = lambda self, *_a, **_k: setattr(
-        self, "active_storages", {"Test Storage": storage}
+        self,
+        "active_storages",
+        {"Test Storage": storage},
     )
 
     feed_manager = FeedManager(
-        feed_config=(mock_feed_config := {"allowances": [{"purchased_feed": 1}]}),
-        nutrient_standard=(mock_nutrient_standard := NutrientStandard.NASEM),
+        feed_config={
+            "feeds": [
+                {
+                    "feed_type": 1,
+                    "planning_cycle_allowance": 0.0,
+                    "runtime_purchase_allowance": 0.0,
+                    "advance_purchase_allowance": 0.0,
+                }
+            ]
+        },
+        available_feeds=mock_available_feeds,
         feed_storage_configs={"type": "pile", "rufas_id": 1, "field_name": "field_1", "crop_name": "corn"},
         feed_storage_instances={"Test Storage": ["instance_1"]},
     )
 
     assert feed_manager.active_storages == {"Test Storage": storage}
-    mock_setup_available_feeds.assert_called_once_with(mock_feed_config, mock_nutrient_standard)
-    assert feed_manager.available_feeds == mock_available_feeds
-    mock_planning_cycle_allowance_init.assert_called_once_with(mock_feed_config["allowances"])
-    mock_runtime_purchase_allowance_init.assert_called_once_with(mock_feed_config["allowances"])
-    assert mock_create_all_storages.call_count == 1
+    assert feed_manager._available_feeds == mock_available_feeds
+
+    mock_create_all_storages.assert_called_once()
+    mock_purchased_feed_storage_init.assert_called_once_with(mock_available_feeds)
+
+    sorted_allowances = [
+        {
+            "purchased_feed": 1,
+            "planning_cycle_allowance": 0.0,
+            "runtime_purchase_allowance": 0.0,
+            "advance_purchase_allowance": 0.0,
+        }
+    ]
+    mock_planning_cycle_allowance_init.assert_called_once_with(sorted_allowances)
+    mock_runtime_purchase_allowance_init.assert_called_once_with(sorted_allowances)
+    mock_advance_purchase_allowance_init.assert_called_once_with(sorted_allowances)
+
     assert feed_manager.crop_to_rufas_id == {"corn_silage": 1}
+    assert feed_manager._cumulative_feed_requests == {1: 0.0, 2: 0.0}
+    assert feed_manager._cumulative_purchased_feeds_fed == {1: 0.0, 2: 0.0}
+    assert feed_manager._cumulative_farmgrown_feeds_fed == {1: 0.0, 2: 0.0}
+    assert feed_manager._cumulative_purchased_feeds == {1: 0.0, 2: 0.0}
 
 
 @pytest.mark.parametrize(
@@ -506,12 +551,6 @@ def test_validate_storage_config_names_duplicate_raises(feed_manager: FeedManage
     add_error.assert_called_once()
 
 
-def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
-    """Test for FeedManager available_feeds property."""
-    feed_manager._available_feeds = mock_available_feeds
-    assert feed_manager.available_feeds == mock_available_feeds
-
-
 def test_update_available_feed_amounts(
     feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
 ) -> None:
@@ -527,7 +566,7 @@ def test_update_available_feed_amounts(
 
     mock_query_available_feed_totals.assert_called_once_with([feed.rufas_id for feed in mock_available_feeds])
     assert {
-        feed.rufas_id: feed.amount_available for feed in feed_manager.available_feeds
+        feed.rufas_id: feed.amount_available for feed in feed_manager._available_feeds
     } == expected_feeds_amount_available
 
 
@@ -714,7 +753,7 @@ def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixt
     )
     mock_purchase_feed = mocker.patch.object(feed_manager, "purchase_feed")
     mock_deduct_feeds_from_inventory = mocker.patch.object(
-        feed_manager, "_deduct_feeds_from_inventory", return_value={}
+        feed_manager, "_deduct_feeds_from_inventory", return_value=FeedFulfillmentResults.empty()
     )
     mocker.patch.object(feed_manager, "report_stored_farmgrown_feeds")
 
@@ -727,7 +766,7 @@ def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixt
 
     result = feed_manager.manage_daily_feed_request(requested_feed=requested_feed, time=mock_time)
 
-    assert result == (True, {})
+    assert result == (True, FeedFulfillmentResults.empty())
     mock_query_available_feed_totals.assert_called_once_with(list(requested_feed.requested_feed.keys()))
     mock_purchase_feed.assert_called_once_with(
         pytest.approx(expected_feeds_to_purchase), mock_time, purchase_type="daily_feed_request"
@@ -757,7 +796,7 @@ def test_manage_daily_feed_request_unfulfillable(feed_manager: FeedManager, mock
 
     mock_purchase_feed = mocker.patch.object(feed_manager, "purchase_feed", return_value=None)
     mock_deduct_feeds_from_inventory = mocker.patch.object(
-        feed_manager, "_deduct_feeds_from_inventory", return_value=None
+        feed_manager, "_deduct_feeds_from_inventory", return_value=FeedFulfillmentResults.empty()
     )
 
     mock_time = mocker.Mock(spec=RufasTime)
@@ -765,7 +804,7 @@ def test_manage_daily_feed_request_unfulfillable(feed_manager: FeedManager, mock
 
     result = feed_manager.manage_daily_feed_request(requested_feed=requested_feed, time=mock_time)
 
-    assert result == (False, {})
+    assert result == (False, FeedFulfillmentResults.empty())
     mock_query_available_feed_totals.assert_called_once_with(list(requested_feed.requested_feed.keys()))
     mock_purchase_feed.assert_not_called()
     mock_deduct_feeds_from_inventory.assert_not_called()
@@ -862,17 +901,19 @@ def test_get_total_projected_inventory_zero_day_in_the_future(
     assert result.inventory_date == inventory_date
 
 
-def test_get_total_projected_inventory_value_error(feed_manager: FeedManager) -> None:
+def test_get_total_projected_inventory_value_error(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that get_total_projected_inventory correctly raises a ValueError when the inventory_date is in the past."""
     expected_days_in_the_future = -3
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = datetime.today()
+    mock_add_error = mocker.patch.object(feed_manager._om, "add_error")
     with pytest.raises(ValueError):
         feed_manager.get_total_projected_inventory(
             inventory_date=(datetime.today().date() + timedelta(days=expected_days_in_the_future)),
             weather=MagicMock(auto_spec=Weather),
             time=mock_time,
         )
+    mock_add_error.assert_called_once()
 
 
 def test_manage_planning_cycle_purchases(feed_manager: FeedManager, mocker: MockerFixture) -> None:
@@ -986,12 +1027,14 @@ def test_purchase_feed_error(
     feed_manager._om = MagicMock(auto_spec=OutputManager)
 
     mocker.patch.object(feed_manager._om, "add_variable")
+    mock_add_error = mocker.patch.object(feed_manager._om, "add_error")
     mocker.patch.object(feed_manager, "_store_purchased_feed")
 
     with pytest.raises(ValueError, match="Trying to purchase unavailable feed 7"):
         feed_manager.purchase_feed(
             feeds_to_purchase, MagicMock(auto_spec=RufasTime, simulation_day=42), purchase_type="daily_feed_request"
         )
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1103,13 +1146,13 @@ def test_deduct_feeds_from_inventory_error(
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_simulation_day = 15
     mock_time.simulation_day = mock_simulation_day
-    mock_om = MagicMock(auto_spec=OutputManager)
-    mock_om_add_variable = mocker.patch.object(mock_om, "add_variable")
-    feed_manager._om = mock_om
+    mock_add_error = mocker.patch.object(feed_manager._om, "add_error")
+    mock_om_add_variable = mocker.patch.object(feed_manager._om, "add_variable")
 
     with pytest.raises(ValueError):
         feed_manager._deduct_feeds_from_inventory(feeds_to_deduct, mock_simulation_day)
         assert mock_om_add_variable.call_count == 10
+    mock_add_error.assert_called_once()
 
 
 def test_deduct_from_storage_farmgrown_basic_fifo_updates_cumulative(
@@ -1203,14 +1246,16 @@ def test_lookup_storage_rufas_id(feed_manager: FeedManager) -> None:
     assert feed_manager._lookup_storage_rufas_id("hay") == 2
 
 
-def test_lookup_storage_rufas_id_error(feed_manager: FeedManager) -> None:
+def test_lookup_storage_rufas_id_error(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that an error is raised when looking up a non-existent storage."""
     storage_1 = MagicMock(auto_spec=Dry)
     storage_1.crop_name = "corn"
     storage_1.rufas_feed_id = 1
     feed_manager.active_storages = {"example_dry": storage_1}
+    mock_add_error = mocker.patch.object(feed_manager._om, "add_error")
     with pytest.raises(ValueError, match="No rufas id found for crop name 'non_existent_storage'."):
         feed_manager._lookup_storage_rufas_id("non_existent_storage")
+    mock_add_error.assert_called_once()
 
 
 def test_gather_available_feeds_by_id_groups_and_sorts() -> None:
@@ -1279,105 +1324,3 @@ def test_gather_available_feeds_by_id_groups_and_sorts() -> None:
     assert set(purchased_by_id.keys()) == {1, 2}
     assert purchased_by_id[1] == [p1, p1b]
     assert purchased_by_id[2] == [p2]
-
-
-@pytest.mark.parametrize("standard, feed_cls", [(NutrientStandard.NASEM, NASEMFeed), (NutrientStandard.NRC, NRCFeed)])
-def test_setup_available_feeds_using_real_feed_objects(
-    feed_manager: FeedManager,
-    mocker: MockerFixture,
-    standard: NutrientStandard,
-    feed_cls: type[NASEMFeed] | type[NRCFeed],
-    mock_feed: dict[str, Any],
-    mock_NASEM_feed: dict[str, Any],
-    mock_NRC_feed: dict[str, Any],
-) -> None:
-    def nutritive_props_for(rufas_id: int) -> dict[str, Any]:
-        base = dict(mock_feed)
-        base["rufas_id"] = rufas_id
-
-        if standard is NutrientStandard.NASEM:
-            base |= dict(mock_NASEM_feed)
-        else:
-            base |= dict(mock_NRC_feed)
-
-        for k in ("rufas_id", "amount_available", "on_farm_cost", "purchase_cost", "buffer"):
-            base.pop(k, None)
-
-        return base
-
-    feed_lib = {
-        1: nutritive_props_for(1),
-        2: nutritive_props_for(2),
-    }
-
-    mocker.patch.object(feed_manager, "_process_feed_library", return_value=feed_lib)
-
-    feed_config = {
-        "purchased_feeds": [
-            {"purchased_feed": 2, "purchased_feed_cost": 2.0, "buffer": 0.0},
-            {"purchased_feed": 1, "purchased_feed_cost": 1.0, "buffer": 0.0},
-        ]
-    }
-
-    result = feed_manager._setup_available_feeds(feed_config, standard)
-
-    assert [f.rufas_id for f in result] == [1, 2]
-    assert all(isinstance(f, feed_cls) for f in result)
-    assert result[0].purchase_cost == 1.0
-    assert result[0].on_farm_cost == pytest.approx(0.01)
-    assert result[1].purchase_cost == 2.0
-    assert result[1].on_farm_cost == pytest.approx(0.02)
-
-
-def test_setup_available_feeds_error(feed_manager: FeedManager, mocker: MockerFixture) -> None:
-    """Test that an error is thrown when a non-existent feed is listed."""
-    feed_lib = {
-        1: {
-            "feed_type": FeedComponentType.FORAGE,
-            "Fd_Category": FeedCategorization.GRASS_LEGUME_FORAGE,
-            "units": MeasurementUnits.KILOGRAMS,
-        },
-        2: {
-            "feed_type": FeedComponentType.CONC,
-            "Fd_Category": FeedCategorization.FAT_SUPPLEMENT,
-            "units": MeasurementUnits.KILOGRAMS,
-        },
-    }
-    mocker.patch.object(feed_manager, "_process_feed_library", return_value=feed_lib)
-    feed_config = {"purchased_feeds": [{"purchased_feed": 3, "purchased_feed_cost": 1.0}]}
-
-    with pytest.raises(KeyError):
-        feed_manager._setup_available_feeds(feed_config, NutrientStandard.NASEM)
-
-
-@pytest.mark.parametrize(
-    "standard, expected", [(NutrientStandard.NASEM, "NASEM_Comp"), (NutrientStandard.NRC, "NRC_Comp")]
-)
-def test_process_feed_library(
-    feed_manager: FeedManager, mocker: MockerFixture, standard: NutrientStandard, expected: str
-) -> None:
-    """Test that the feed library is processed correctly."""
-    feed_data = {
-        "rufas_id": [1, 2],
-        "feed_type": ["Forage", "Conc"],
-        "Fd_Category": ["Grass/Legume Forage", "Fat Supplement"],
-        "units": ["kg", "kg"],
-    }
-    im = InputManager()
-    get_data = mocker.patch.object(im, "get_data", return_value=feed_data)
-
-    actual = feed_manager._process_feed_library(standard)
-
-    assert actual == {
-        1: {
-            "feed_type": FeedComponentType.FORAGE,
-            "Fd_Category": FeedCategorization.GRASS_LEGUME_FORAGE,
-            "units": MeasurementUnits.KILOGRAMS,
-        },
-        2: {
-            "feed_type": FeedComponentType.CONC,
-            "Fd_Category": FeedCategorization.FAT_SUPPLEMENT,
-            "units": MeasurementUnits.KILOGRAMS,
-        },
-    }
-    get_data.assert_called_once_with(expected)

@@ -1,8 +1,13 @@
-from typing import List
+from typing import Any
 
-from RUFAS.biophysical.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, HarvestOperation
+from RUFAS.biophysical.field.crop.harvest_operations import (
+    FINAL_HARVEST_OPERATIONS,
+    VALID_HARVEST_OPERATIONS,
+    HarvestOperation,
+)
 from RUFAS.data_structures.events import HarvestEvent, PlantingEvent
 from RUFAS.biophysical.field.manager.schedule import Schedule
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -18,17 +23,17 @@ class CropSchedule(Schedule):
         Reference to the name of this crop schedule that will be used to distinguish this schedule from others.
     crop_reference : str
         Reference to the name of the crop that will be used to identify the correct crop specifications.
-    planting_years : List[int]
+    planting_years : list[int]
         Years in which the crop is planted.
-    planting_days : List[int]
+    planting_days : list[int]
         Julian days on which the crop is planted.
-    harvest_years : List[int]
+    harvest_years : list[int]
         Years in which the crop is harvested.
-    harvest_days : List[int]
+    harvest_days : list[int]
         Julian days on which the crop is harvested.
-    harvest_operations : List[str]
+    harvest_operations : list[str]
         Operations with which the crop is harvested.
-    use_heat_scheduling : bool, optional, default False
+    use_heat_scheduling : bool, default False
         Indicates if heat scheduling should be used to determine when the crop is harvested.
     planting_skip : int, optional, default 0
         Number of years to skip between planting cycles.
@@ -41,26 +46,26 @@ class CropSchedule(Schedule):
     ----------
     crop_reference : str
         Identifier for the crop associated with this schedule.
-    planting_years : List[int]
+    planting_years : list[int]
         List of years in which planting events will occur.
-    planting_days : List[int]
+    planting_days : list[int]
         Corresponding Julian days for planting.
     planting_skip : int
         Number of years to skip between planting events.
-    harvest_years : List[int]
+    harvest_years : list[int]
         List of years in which harvesting events will occur.
-    harvest_days : List[int]
+    harvest_days : list[int]
         Corresponding Julian days for harvesting.
-    harvest_operations : List[HarvestOperation]
+    harvest_operations : list[HarvestOperation]
         Enumerated list of operations to perform at harvest.
     heat_scheduled : bool
         Flag indicating if heat unit scheduling is utilized for harvesting decisions.
-    harvesting_skip : int, optional, default 0.0
+    harvesting_skip : int, default 0.0
         Number of years to skip between harvesting cycles.
 
     Notes
     -----
-    This class extends the `Schedule` class, adding specific functionality for managing agricultural crop schedules.
+    This class extends the ``Schedule`` class, adding specific functionality for managing agricultural crop schedules.
     It involves detailed tracking and management of planting and harvesting events, including optional heat scheduling
     for advanced crop management.
 
@@ -70,11 +75,11 @@ class CropSchedule(Schedule):
         self,
         name: str,
         crop_reference: str,
-        planting_years: List[int],
-        planting_days: List[int],
-        harvest_years: List[int],
-        harvest_days: List[int],
-        harvest_operations: List[str],
+        planting_years: list[int],
+        planting_days: list[int],
+        harvest_years: list[int],
+        harvest_days: list[int],
+        harvest_operations: list[str],
         use_heat_scheduling: bool = False,
         planting_skip: int = 0,
         harvesting_skip: int = 0,
@@ -105,13 +110,6 @@ class CropSchedule(Schedule):
         """
         Checks fields that dictate planting for correctness, otherwise raises errors.
 
-        Raises
-        ------
-        ValueError
-            If not all planting years are valid.
-            If not all planting days are valid.
-            If not number of planting years and days are not equal.
-
         """
         self._validate_parameters([], [], self.planting_years, self.planting_days, self.name)
 
@@ -124,10 +122,7 @@ class CropSchedule(Schedule):
         Raises
         ------
         ValueError
-            If not all harvest years are valid.
-            If not all harvest days are valid.
-            If the number of harvest years, days, and operations are not equal.
-            If the last harvest operation is not a final one, or if any operations before the last are final ones.
+            If the final harvest operation is not the only one that kills the crop.
 
         """
         self._validate_parameters([], [], self.harvest_years, self.harvest_days, self.name)
@@ -143,18 +138,24 @@ class CropSchedule(Schedule):
         others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
         only_last_kills = last_kills and others_dont_kill
         if not only_last_kills:
+            OutputManager().add_error(
+                "Final harvest operation not a kill operation",
+                f"'{self.name}': expected the final harvest operation to be the only one that kills the "
+                f"crop, received '{self.harvest_operations}'.",
+                info_map={"class": self.__class__.__name__, "function": self._validate_harvest_parameters.__name__},
+            )
             raise ValueError(
                 f"'{self.name}': expected the final harvest operation to be the only one that kills the "
                 f"crop, received '{self.harvest_operations}'."
             )
 
-    def generate_planting_events(self) -> List[PlantingEvent]:
+    def generate_planting_events(self) -> list[PlantingEvent]:
         """
         Generates a list of all planting events that should happen for this crop schedule.
 
         Returns
         -------
-        List[PlantingEvent]
+        list[PlantingEvent]
             List of all planting events that will happen for this crop schedule.
 
         """
@@ -176,7 +177,7 @@ class CropSchedule(Schedule):
 
         Returns
         -------
-        List[HarvestEvent]
+        list[HarvestEvent]
             List of harvesting events that will happen for this crop schedule.
 
         Notes
@@ -196,3 +197,88 @@ class CropSchedule(Schedule):
             all_events[:] = [harvest for harvest in all_events if harvest[0] in FINAL_HARVEST_OPERATIONS]
         result = [HarvestEvent(self.crop_reference, *event) for event in all_events]
         return result
+
+    @staticmethod
+    def validate_crop_schedule_event_order(rotation: dict[str, Any], schedule_name: str) -> None:
+        """
+        Validates that planting, harvest, and kill events occur in a biologically valid order.
+
+        Parameters
+        ----------
+        rotation : dict[str, Any]
+            Crop schedule definition from the crop rotation input file. Must contain the planting and harvest year/day
+            information required to construct a chronological event sequence.
+        schedule_name : str
+            Name of the crop schedule being validated. Used for error reporting.
+
+        Raises
+        ------
+        ValueError
+            If a harvest or kill operation occurs before planting, or if one occurs after the crop has already been
+            terminated and before another planting.
+
+        Notes
+        -----
+        A crop must be planted before any harvest or kill operation can occur. Once an operation in
+        ``FINAL_HARVEST_OPERATIONS`` occurs, including ``harvest_kill`` or ``kill_only``, no additional harvest or kill
+        events are permitted until another planting event re-establishes the crop. These rules are evaluated
+        chronologically across the entire schedule and are not reset at calendar year boundaries, allowing support for
+        perennial and overwintering crops.
+
+        """
+        events: list[tuple[int, int, str | HarvestOperation]] = []
+        om = OutputManager()
+        info_map = {
+            "class": CropSchedule.__name__,
+            "function": CropSchedule.validate_crop_schedule_event_order.__name__,
+        }
+        for year, day in zip(rotation["planting_years"], rotation["planting_days"]):
+            events.append((year, day, "planting"))
+
+        for year, day, operation in zip(
+            rotation["harvest_years"],
+            rotation["harvest_days"],
+            rotation["harvest_operations"],
+        ):
+            try:
+                harvest_operation = HarvestOperation(operation)
+            except ValueError as e:
+                valid_operations = [operation.value for operation in VALID_HARVEST_OPERATIONS]
+                err_msg = (
+                    f"Invalid crop schedule '{schedule_name}': harvest operation '{operation}' "
+                    f"on year {year}, day {day} is not supported. "
+                    f"Valid harvest operations are: {valid_operations}."
+                )
+                om.add_error("Invalid crop schedule harvest operation.", err_msg, info_map)
+                raise ValueError(err_msg) from e
+            events.append((year, day, harvest_operation))
+
+        event_order = {
+            "planting": 0,
+            HarvestOperation.HARVEST_ONLY: 1,
+            HarvestOperation.HARVEST_KILL: 1,
+            HarvestOperation.KILL_ONLY: 1,
+        }
+        events.sort(key=lambda event: (event[0], event[1], event_order.get(event[2], 99)))
+
+        has_live_crop = False
+
+        for year, day, event_type in events:
+            if event_type == "planting":
+                has_live_crop = True
+                continue
+
+            if event_type in VALID_HARVEST_OPERATIONS:
+                if not has_live_crop:
+                    err_msg = (
+                        f"Invalid crop schedule '{schedule_name}': {event_type.value} on "
+                        f"year {year}, day {day} occurs before an active planting event. "
+                        "A crop must be planted before any harvest or kill operation, and "
+                        "after a terminating operation another planting must occur before "
+                        "additional harvest or kill operations."
+                    )
+                    om.add_error("Invalid crop schedule event order.", err_msg, info_map)
+                    raise ValueError(err_msg)
+
+                if event_type in FINAL_HARVEST_OPERATIONS:
+                    has_live_crop = False

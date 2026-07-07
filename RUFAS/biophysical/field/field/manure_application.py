@@ -1,8 +1,7 @@
-from typing import Dict, Optional
-
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 FRESH_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
 """This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically."""
@@ -48,7 +47,7 @@ class ManureApplication:
         be tracked.
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None) -> None:
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None) -> None:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def apply_grazing_manure(
@@ -156,10 +155,10 @@ class ManureApplication:
             Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
             Fraction of dry manure mass that is organic nitrogen (unitless).
-        water_extractable_inorganic_phosphorus_fraction : float, default=None
+        water_extractable_inorganic_phosphorus_fraction : float, optional
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless).
-        source_animal : str, default=None
+        source_animal : str, optional
             Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless).
 
         Raises
@@ -176,8 +175,14 @@ class ManureApplication:
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
             if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 0.95:
+                OutputManager().add_error(
+                    "Invalid water extractable inorganic phos fraction",
+                    "Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
+                    f"received '{water_extractable_inorganic_phosphorus_fraction}'.",
+                    info_map={"class": self.__class__.__name__, "function": self.apply_machine_manure.__name__},
+                )
                 raise ValueError(
-                    f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
+                    "Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
                     f"received '{water_extractable_inorganic_phosphorus_fraction}'."
                 )
         else:
@@ -457,14 +462,14 @@ class ManureApplication:
         Parameters
         ----------
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
         total_manure_applied : float
-            Total mass of the manure application (kg)
+            Total mass of the manure application (kg).
 
         Returns
         -------
         float
-            The fraction of the field covered by manure (unitless)
+            The fraction of the field covered by manure (unitless).
 
         Notes
         -----
@@ -493,17 +498,17 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
 
         Returns
         -------
         float
-            The moisture factor of this application of manure (unitless)
+            The moisture factor of this application of manure (unitless).
 
         Raises
         ------
         ValueError
-            If the dry matter content is not inside the range (0.0, 1.0]
+            If the dry matter content is not inside the range (0.0, 1.0].
 
         Notes
         -----
@@ -514,6 +519,14 @@ class ManureApplication:
 
         """
         if not 0.0 < dry_matter_fraction <= 1.0:
+            OutputManager().add_error(
+                "Invalid dry matter content",
+                f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.",
+                info_map={
+                    "class": ManureApplication.__name__,
+                    "function": ManureApplication._determine_moisture_factor.__name__,
+                },
+            )
             raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.")
         return min(0.9, (1 - dry_matter_fraction))
 
@@ -525,32 +538,28 @@ class ManureApplication:
         application_dry_mass: float,
         application_dry_fraction: float,
         application_field_coverage: float,
-    ) -> Dict:
+    ) -> dict[str, float]:
         """Recalculates the manure pool attributes that use a weighted average to find their new values.
 
         Parameters
         ----------
         old_total_dry_mass : float
-            Dry weight equivalent of the manure that was already on the field (kg)
+            Dry weight equivalent of the manure that was already on the field (kg).
         old_moisture_factor : float
-            Moisture factor of the manure that was already on the field, between [0, 0.9] (unitless)
+            Moisture factor of the manure that was already on the field, between [0, 0.9] (unitless).
         old_field_coverage : float
-            The fraction of the area of the field that was already covered by old manure, between [0, 1] (unitless)
+            The fraction of the area of the field that was already covered by old manure, between [0, 1] (unitless).
         application_dry_mass : float
-            Dry weight equivalent of manure application (kg)
+            Dry weight equivalent of manure application (kg).
         application_dry_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         application_field_coverage : float
-            Fraction of the field covered by the manure application (unitless)
+            Fraction of the field covered by the manure application (unitless).
 
         Returns
         -------
-        new_dry_matter_mass : float
-            The new dry weight equivalent of manure on the field (kg)
-        new_moisture_factor : float
-            The new moisture factor of the manure on the field, in the range [0, 0.9] (unitless)
-        new_field_coverage : float
-            The new fraction of field area that is covered by manure, in the range [0, 1] (unitless)
+        dict[str, float]
+            The mapping of manure attributes to their values.
 
         Notes
         -----
@@ -591,12 +600,12 @@ class ManureApplication:
         Parameters
         ----------
         animal_type : str
-            Type of animal that produced the manure (can be either "CATTLE", "SWINE", or "POULTRY")
+            Type of animal that produced the manure (can be either "CATTLE", "SWINE", or "POULTRY").
 
         Returns
         -------
         float
-            Fraction of manure that is water-extractable inorganic phosphorus (unitless)
+            Fraction of manure that is water-extractable inorganic phosphorus (unitless).
 
         Raises
         ------
@@ -605,7 +614,7 @@ class ManureApplication:
 
         Notes
         -----
-        These are reasonable defaults provided Pete Vadas.
+        These are reasonable defaults provided by Pete Vadas.
 
         """
         if animal_type == "CATTLE":
@@ -615,4 +624,13 @@ class ManureApplication:
         elif animal_type == "POULTRY":
             return 0.20
         else:
+            fun_name = ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.__name__
+            OutputManager().add_error(
+                "Invalid animal type",
+                f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.',
+                info_map={
+                    "class": ManureApplication.__name__,
+                    "function": fun_name,
+                },
+            )
             raise ValueError(f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.')
