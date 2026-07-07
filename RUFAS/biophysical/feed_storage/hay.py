@@ -204,9 +204,7 @@ class Hay(Storage):
         )
 
         fraction_of_initial_dry_matter_lost = (
-            numerator / denominator * fraction_of_total_loss
-            if denominator > 0.0
-            else 0
+            numerator / denominator * fraction_of_total_loss if denominator > 0.0 else 0
         )
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 

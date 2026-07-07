@@ -15,8 +15,12 @@ from RUFAS.data_structures.manure_types import ManureType
 @mark.parametrize("ammonium_frac_one", [0.1, 0.01, 0.99])
 @mark.parametrize("ammonium_frac_two", [0.5, 0.01, 0.99])
 def test_add_nitrogen_nutrient_request_results(
-        nitrogen_one: float, nitrogen_two: float, inorganic_frac_one: float, inorganic_frac_two: float,
-        ammonium_frac_one: float, ammonium_frac_two: float
+    nitrogen_one: float,
+    nitrogen_two: float,
+    inorganic_frac_one: float,
+    inorganic_frac_two: float,
+    ammonium_frac_one: float,
+    ammonium_frac_two: float,
 ) -> None:
     """Tests that the various nitrogen components of two ``NutrientRequestResults`` object are properly added together
     via the custom ``__add__`` method.
@@ -32,13 +36,13 @@ def test_add_nitrogen_nutrient_request_results(
         nitrogen=nitrogen_one,
         organic_nitrogen_fraction=organic_frac_one,
         inorganic_nitrogen_fraction=inorganic_frac_one,
-        ammonium_nitrogen_fraction=ammonium_frac_one
+        ammonium_nitrogen_fraction=ammonium_frac_one,
     )
     second_request = NutrientRequestResults(
         nitrogen=nitrogen_two,
         organic_nitrogen_fraction=organic_frac_two,
         inorganic_nitrogen_fraction=inorganic_frac_two,
-        ammonium_nitrogen_fraction=ammonium_frac_two
+        ammonium_nitrogen_fraction=ammonium_frac_two,
     )
     # Act
 
@@ -57,8 +61,8 @@ def test_add_nitrogen_nutrient_request_results(
 
         expected_organic_frac = 1 - expected_inorganic_frac
 
-        inorganic_total = (expected_inorganic_frac * expected_nitrogen)
-        ammonium_one = (ammonium_frac_one * inorganic_frac_one * nitrogen_one)
+        inorganic_total = expected_inorganic_frac * expected_nitrogen
+        ammonium_one = ammonium_frac_one * inorganic_frac_one * nitrogen_one
         ammonium_two = ammonium_frac_two * inorganic_frac_two * nitrogen_two
         expected_ammonium_frac = (ammonium_one + ammonium_two) / inorganic_total
 
@@ -77,7 +81,10 @@ def test_add_nitrogen_nutrient_request_results(
 @mark.parametrize("inorganic_frac_one", [0.5, 0.01, 0.99])
 @mark.parametrize("inorganic_frac_two", [0.2, 0.01, 0.99])
 def test_add_phosphorus_nutrient_request_results(
-        phosphorus_one: float, phosphorus_two: float, inorganic_frac_one: float, inorganic_frac_two: float,
+    phosphorus_one: float,
+    phosphorus_two: float,
+    inorganic_frac_one: float,
+    inorganic_frac_two: float,
 ) -> None:
     # Assemble
     organic_frac_one = 1 - inorganic_frac_one
@@ -119,23 +126,20 @@ def test_add_phosphorus_nutrient_request_results(
 
 @mark.parametrize("mass_one", [100, 0])
 @mark.parametrize("mass_two", [125, 0])
-@mark.parametrize("dry_frac_one", [0.5, 0.01, 0.99])  
+@mark.parametrize("dry_frac_one", [0.5, 0.01, 0.99])
 @mark.parametrize("dry_frac_two", [0.2, 0.01, 0.99])
 def test_add_matter_nutrient_request_results(
-        mass_one: float, mass_two: float, dry_frac_one: float, dry_frac_two: float) -> None:
+    mass_one: float, mass_two: float, dry_frac_one: float, dry_frac_two: float
+) -> None:
     # Assemble
     dry_matter_one = dry_frac_one * mass_one
     dry_matter_two = dry_frac_two * mass_two
 
     first_request = NutrientRequestResults(
-        total_manure_mass=mass_one,
-        dry_matter_fraction=dry_frac_one,
-        dry_matter=dry_matter_one
+        total_manure_mass=mass_one, dry_matter_fraction=dry_frac_one, dry_matter=dry_matter_one
     )
     second_request = NutrientRequestResults(
-        total_manure_mass=mass_two,
-        dry_matter_fraction=dry_frac_two,
-        dry_matter=dry_matter_two
+        total_manure_mass=mass_two, dry_matter_fraction=dry_frac_two, dry_matter=dry_matter_two
     )
 
     # Act
