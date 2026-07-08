@@ -105,9 +105,13 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
             "herd_size_adjustment_period": 30,
             "herd_size_sell_threshold": 101,
             "herd_size_buy_threshold": 106,
-            "cull_eligibility_minimum_days_in_milk": 60,
-            "cull_eligibility_maximum_days_carried_calf": 180,
-            "cull_ranking_criteria": "milk",
+        },
+        "animal_config": {
+            "management_decisions": {
+                "cull_eligibility_minimum_days_in_milk": 60,
+                "cull_eligibility_maximum_days_carried_calf": 180,
+                "cull_ranking_criteria": "milk",
+            },
         },
         "housing": "barn",
         "pasture_concentrate": 0,
@@ -216,9 +220,13 @@ def test_init_raises_runtime_error_when_herd_population_is_none(mocker: MockerFi
             "herd_size_adjustment_period": 30,
             "herd_size_sell_threshold": 101,
             "herd_size_buy_threshold": 106,
-            "cull_eligibility_minimum_days_in_milk": 60,
-            "cull_eligibility_maximum_days_carried_calf": 180,
-            "cull_ranking_criteria": "milk",
+        },
+        "animal_config": {
+            "management_decisions": {
+                "cull_eligibility_minimum_days_in_milk": 60,
+                "cull_eligibility_maximum_days_carried_calf": 180,
+                "cull_ranking_criteria": "milk",
+            },
         },
         "housing": "barn",
         "pasture_concentrate": 0,

@@ -193,13 +193,12 @@ class HerdManager:
         self.adjustment_period = animal_config_data["herd_information"]["herd_size_adjustment_period"]
         self.selling_threshold = animal_config_data["herd_information"]["herd_size_sell_threshold"]
         self.buying_threshold = animal_config_data["herd_information"]["herd_size_buy_threshold"]
-        self.cull_eligibility_minimum_days_in_milk = animal_config_data["herd_information"][
-            "cull_eligibility_minimum_days_in_milk"
-        ]
-        self.cull_eligibility_maximum_days_carried_calf = animal_config_data["herd_information"][
+        management_decisions = animal_config_data["animal_config"]["management_decisions"]
+        self.cull_eligibility_minimum_days_in_milk = management_decisions["cull_eligibility_minimum_days_in_milk"]
+        self.cull_eligibility_maximum_days_carried_calf = management_decisions[
             "cull_eligibility_maximum_days_carried_calf"
         ]
-        self.cull_ranking_criteria = animal_config_data["herd_information"]["cull_ranking_criteria"]
+        self.cull_ranking_criteria = management_decisions["cull_ranking_criteria"]
         self.herd_reproduction_statistics = HerdReproductionStatistics()
         self.daily_herd_reproduction_statistics = HerdReproductionStatistics()
 
