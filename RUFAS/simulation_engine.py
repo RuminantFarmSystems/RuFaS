@@ -207,7 +207,12 @@ class SimulationEngine:
         weather_data: dict[str, list[int | float]] = self.im.get_data("weather")
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
-        self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
+        self.emissions_estimator: EmissionsEstimator = EmissionsEstimator(
+            simulate_animals=self.simulate_animals,
+            simulate_feed=self.simulate_feed,
+            simulate_fields=self.simulate_fields,
+            simulate_manure=self.simulate_manure,
+        )
 
         if self.simulate_fields:
             field_data = self._gather_field_data()

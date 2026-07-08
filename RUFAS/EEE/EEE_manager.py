@@ -26,6 +26,13 @@ class EEEManager:
         emissions_estimator.estimate_farmgrown_feed_emissions()
         om.add_log("Emissions Processing", "Completed processing of emissions.", info_map)
 
-        om.add_log("Energy Processing", "Starting processing of energy.", info_map)
-        EnergyEstimator.estimate_all()
-        om.add_log("Energy Processing", "Completed processing of energy.", info_map)
+            om.add_log("Energy Processing", "Starting processing of energy.", info_map)
+            EnergyEstimator.estimate_all()
+            om.add_log("Energy Processing", "Completed processing of energy.", info_map)
+        
+        else:
+            om.add_log(
+                "No Energy or Emissions processing",
+                "Fields not simulated, none of these calculations will be run.",
+                info_map
+            )
