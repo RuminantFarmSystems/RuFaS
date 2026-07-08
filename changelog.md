@@ -28,7 +28,6 @@ v1.0.2
 ### v1.0.2
 
 - [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
-- [3078](https://github.com/RuminantFarmSystems/RuFaS/pull/3078) - [minor change] [Animal] [InputChange] [NoOutputChange] Add a count-based female calf retention option (calf_retention_method, keep_female_calf_num_annual) to keep a target number of female calves per year instead of a rate, and consolidate all retention logic into a single CalfRetentionPolicy. Default (rate) behavior is unchanged.
 
 ### v1.0.1
 
