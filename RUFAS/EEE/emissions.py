@@ -99,11 +99,7 @@ class EmissionsEstimator:
     """
 
     def __init__(
-            self,
-            simulate_animals: bool,
-            simulate_feed: bool,
-            simulate_fields: bool,
-            simulate_manure: bool
+        self, simulate_animals: bool, simulate_feed: bool, simulate_fields: bool, simulate_manure: bool
     ) -> None:
         """Initializes the EmissionsEstimator with location-specific feed emissions data and feed configurations."""
         self.im = InputManager()
