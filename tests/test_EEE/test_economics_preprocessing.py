@@ -42,13 +42,16 @@ class DummyInputManager:
     def get_data(self, key):
         return self._data.get(key)
 
-    def add_runtime_variable_to_pool(self, variable_name, data, properties_blob_key, eager_termination=False):
+    def add_runtime_variable_to_pool(
+        self, variable_name, data, properties_blob_key, eager_termination=False, input_path=None
+    ):
         self.added_runtime.append(
             {
                 "variable_name": variable_name,
                 "data": data,
                 "properties_blob_key": properties_blob_key,
                 "eager_termination": eager_termination,
+                "input_path": input_path,
             }
         )
         return True
