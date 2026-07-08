@@ -17,6 +17,7 @@ from __future__ import annotations
 import math
 import re
 from collections import defaultdict
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -45,14 +46,14 @@ class EconomicItem:
     section: str
     category: str
     name: str
-    biophysical_simulation: List[str]
-    input_manager: List[str]
+    biophysical_simulation: list[str]
+    input_manager: list[str]
     economics_files: Any
     match_source: str | None
-    wildcard_value_map: Dict[str, str] | None
+    wildcard_value_map: dict[str, str] | None
     preprocessing: str | None
     dedicated_processor: str | None = None
-    bedding_type_to_file_key: Dict[str, str] | None = None
+    bedding_type_to_file_key: dict[str, str] | None = None
     bedding_configs_path: str | None = None
 
 
@@ -674,19 +675,31 @@ class EconomicPreprocessor:
         # Default aggregation is sum
         return Aggregator.sum(values)
 
-    # ------------------------------------------------------------------
-    # Bedding (issue #3088): per-pen, per-year cost handled separately
-    # because the generic engine lumps every pen into one average and
-    # cannot pair a pen's animal count with that pen's bedding price.
-    # ------------------------------------------------------------------
-
     def _bedding_type_value(self, raw: Any) -> Any:
-        """Return a bedding type as a plain value (handles enum-like objects)."""
+        """
+        Normalizes a bedding type into a plain value.
 
+        A bedding type may be a plain string (read directly from JSON input) or an
+        enum-like object exposing a ``value`` attribute. This returns the underlying
+        value in both cases so downstream lookups always compare against strings.
+
+        Parameters
+        ----------
+        raw : Any
+            The bedding type value to normalize.
+
+        Returns
+        -------
+        Any
+            ``raw.value`` when ``raw`` exposes a ``value`` attribute, otherwise ``raw``
+            unchanged.
+
+        """
         return getattr(raw, "value", raw)
 
-    def _build_bedding_name_to_type(self, item: EconomicItem) -> Dict[str, Any]:
-        """Map each bedding config ``name`` to its canonical ``bedding_type``.
+    def _build_bedding_name_to_type(self, item: EconomicItem) -> dict[str, Any]:
+        """
+        Maps each bedding config ``name`` to its canonical ``bedding_type``.
 
         A pen refers to its bedding by the user-defined ``name`` field of a
         bedding config (e.g. ``"calf_straw"``), while commodity price files are
@@ -709,7 +722,7 @@ class EconomicPreprocessor:
 
         Returns
         -------
-        Dict[str, Any]
+        dict[str, Any]
             A mapping of each bedding config ``name`` to its ``bedding_type``.
             Empty when no bedding configs are available.
 
@@ -740,7 +753,7 @@ class EconomicPreprocessor:
 
         path = item.bedding_configs_path or "animal.bedding_configs"
         configs = self.im.get_data(path)
-        name_to_type: Dict[str, Any] = {}
+        name_to_type: dict[str, Any] = {}
         if isinstance(configs, (list, tuple)):
             for config in configs:
                 if isinstance(config, dict) and "name" in config:
@@ -748,7 +761,18 @@ class EconomicPreprocessor:
         return name_to_type
 
     def _simulation_start(self) -> tuple[int, datetime]:
-        """Return the simulation start year and start date (``YYYY:day_of_year``)."""
+        """
+        Returns the simulation start year and start date.
+
+        The start date is read from ``config.start_date`` in the ``YYYY:day_of_year``
+        format (for example ``"2013:20"``) and converted to a calendar date.
+
+        Returns
+        -------
+        tuple[int, datetime]
+            The start year and the calendar date of the first simulation day.
+
+        """
 
         raw = self.im.get_data("config.start_date")
         parts = str(raw).split(":")
@@ -757,8 +781,26 @@ class EconomicPreprocessor:
         start_date = datetime(year, 1, 1) + timedelta(days=day_of_year - 1)
         return year, start_date
 
-    def _payload_series(self, payload: Any) -> tuple[List[float], List[Any]]:
-        """Extract aligned daily values and their info maps from a pen payload."""
+    def _payload_series(self, payload: Any) -> tuple[list[float], list[Any]]:
+        """
+        Extracts aligned daily values and info maps from an OutputManager payload.
+
+        A payload is normally a mapping of the form
+        ``{"values": [...], "info_maps": [...]}``, but a bare list or scalar is also
+        accepted. Non-numeric values are dropped, and each retained value keeps its
+        matching info map (an empty dict when none exists).
+
+        Parameters
+        ----------
+        payload : Any
+            The OutputManager payload for a single reported variable.
+
+        Returns
+        -------
+        tuple[list[float], list[Any]]
+            The numeric daily values and their corresponding info maps, index-aligned.
+
+        """
 
         if isinstance(payload, dict) and "values" in payload:
             raw_values = payload.get("values", [])
@@ -768,8 +810,8 @@ class EconomicPreprocessor:
         else:
             raw_values, raw_info_maps = [payload], []
 
-        values: List[float] = []
-        info_maps: List[Any] = []
+        values: list[float] = []
+        info_maps: list[Any] = []
         for index, value in enumerate(raw_values):
             try:
                 numeric = float(value)
@@ -779,22 +821,37 @@ class EconomicPreprocessor:
             info_maps.append(raw_info_maps[index] if index < len(raw_info_maps) else {})
         return values, info_maps
 
-    def _collect_pen_series(self, sim_paths: Iterable[str]) -> Dict[str, Dict[str, Dict[str, List[Any]]]]:
-        """Collect per-pen daily head counts (with info maps), grouped by scenario.
+    def _collect_pen_series(self, sim_paths: Iterable[str]) -> dict[str, dict[str, dict[str, list[Any]]]]:
+        """
+        Collects each pen's daily head counts from the OutputManager, grouped by scenario.
 
-        Returns ``{scenario: {pen_capture: {"values": [...], "info_maps": [...]}}}``
-        where ``pen_capture`` is the regex match for ``.*`` (e.g. ``"0_CALF"``).
+        Each pattern is matched against the variables pool; the wildcard portion of a
+        matched variable name (for example ``"0_CALF"``) identifies the pen. Results are
+        grouped by scenario, which is ``"baseline"`` for a single run or the run's name
+        in a multi-run comparison.
+
+        Parameters
+        ----------
+        sim_paths : Iterable[str]
+            The biophysical variable-name patterns to match.
+
+        Returns
+        -------
+        dict[str, dict[str, dict[str, list[Any]]]]
+            A nested mapping of the form
+            ``{scenario: {pen_capture: {"values": [...], "info_maps": [...]}}}``.
+
         """
 
         pool = getattr(self.om, "variables_pool", {})
         baseline_mode = True
-        scenario_names: Set[str] = set()
+        scenario_names: set[str] = set()
         if isinstance(pool, dict) and pool:
             baseline_mode = all(isinstance(value, dict) and "values" in value for value in pool.values())
             if not baseline_mode:
                 scenario_names = {name for name, data in pool.items() if isinstance(data, dict) and data}
 
-        series: Dict[str, Dict[str, Dict[str, List[Any]]]] = {}
+        series: dict[str, dict[str, dict[str, list[Any]]]] = {}
         for path in sim_paths:
             capture_pattern = re.compile(path.replace(".*", "(.+?)") + "$")
             filtered_pool = self.om.filter_variables_pool({"filters": [path]})
@@ -809,8 +866,6 @@ class EconomicPreprocessor:
                 if baseline_mode:
                     scenario = "baseline"
                 else:
-                    # Mirror the generic engine: only accept a discovered scenario
-                    # name, otherwise fall back to "baseline".
                     candidate = variable_name.split(".", 1)[0]
                     scenario = candidate if candidate in scenario_names else "baseline"
                 values, info_maps = self._payload_series(payload)
@@ -820,17 +875,33 @@ class EconomicPreprocessor:
         return series
 
     def _bedding_counts_by_year(
-        self, values: List[float], info_maps: List[Any], start_date: datetime
-    ) -> Dict[int, List[float]]:
-        """Group daily head counts by calendar year using ``simulation_day``.
+        self, values: list[float], info_maps: list[Any], start_date: datetime
+    ) -> dict[int, list[float]]:
+        """
+        Groups a pen's daily head counts by calendar year.
 
-        ``simulation_day`` is 0-indexed (``(current_date - start_date).days``), so
-        the calendar date is ``start_date + simulation_day`` with no offset. When a
-        day lacks a recorded ``simulation_day`` the positional (0-indexed) order is
-        used as a fallback.
+        Each value's calendar date is ``start_date`` plus its ``simulation_day`` (taken
+        from the info map, or the 0-indexed position when absent). ``simulation_day`` is
+        itself 0-indexed (``(current_date - start_date).days``), so no offset is applied.
+
+        Parameters
+        ----------
+        values : list[float]
+            The pen's daily head counts.
+        info_maps : list[Any]
+            The info map for each value, providing ``simulation_day``. Index-aligned
+            with ``values``.
+        start_date : datetime
+            The calendar date of the first simulation day.
+
+        Returns
+        -------
+        dict[int, list[float]]
+            A mapping of each calendar year to the daily head counts recorded in that year.
+
         """
 
-        counts_by_year: Dict[int, List[float]] = defaultdict(list)
+        counts_by_year: dict[int, list[float]] = defaultdict(list)
         for index, value in enumerate(values):
             sim_day = None
             if index < len(info_maps) and isinstance(info_maps[index], dict):
@@ -847,13 +918,37 @@ class EconomicPreprocessor:
         year: int,
         fips: Any,
         file_key: str,
-        warned_years: Set[str],
-        info_map: Dict[str, str],
+        warned_years: set[str],
+        info_map: dict[str, str],
     ) -> float:
-        """Look up a ``dollar_per_head`` price for ``year`` at the simulation FIPS.
+        """
+        Looks up the dollar-per-head bedding price for a year at the simulation county.
 
-        The bedding price files currently carry only a single year column, so a
-        requested year with no column falls back to the nearest available year.
+        The price table holds one column per year, indexed by FIPS county code. When
+        the requested year has no column, the nearest available year is used. A missing
+        or malformed table, an unknown county, or a missing year each emit a single
+        warning and fall back to the default cost.
+
+        Parameters
+        ----------
+        price_dict : Any
+            The loaded price table, expected as ``{"fips": [...], "<year>": [...], ...}``.
+        year : int
+            The calendar year to price.
+        fips : Any
+            The simulation's FIPS county code.
+        file_key : str
+            The price-file key, used in warning messages and to de-duplicate warnings.
+        warned_years : set[str]
+            The set of warning keys already emitted, so each warning fires only once.
+        info_map : dict[str, str]
+            Contextual information attached to any emitted warning.
+
+        Returns
+        -------
+        float
+            The dollar-per-head price for the year, or the fallback cost when unavailable.
+
         """
 
         fallback = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
@@ -900,8 +995,26 @@ class EconomicPreprocessor:
         except (KeyError, IndexError, TypeError, ValueError):
             return fallback
 
-    def _navigate_path(self, data: Any, keys: List[str]) -> Any:
-        """Walk ``data`` by dict keys / list indices, returning ``None`` on a miss."""
+    def _navigate_path(self, data: Any, keys: list[str]) -> Any:
+        """
+        Walks a nested structure by a sequence of dict keys and list indices.
+
+        Numeric keys index into lists and string keys index into dicts. Any missing key,
+        out-of-range index, or non-indexable value stops the walk and returns ``None``.
+
+        Parameters
+        ----------
+        data : Any
+            The nested structure to traverse.
+        keys : list[str]
+            The ordered keys or indices to follow.
+
+        Returns
+        -------
+        Any
+            The value at the end of the path, or ``None`` if the path cannot be resolved.
+
+        """
 
         for key in keys:
             if isinstance(data, (list, tuple)):
@@ -920,13 +1033,28 @@ class EconomicPreprocessor:
                 return None
         return data
 
-    def _build_pen_id_to_bedding_name(self, item: EconomicItem) -> Dict[str, Any]:
-        """Map each pen's ``id`` to its first manure stream's ``bedding_name``.
+    def _build_pen_id_to_bedding_name(self, item: EconomicItem) -> dict[str, Any]:
+        """
+        Maps each pen's ``id`` to its first manure stream's ``bedding_name``.
 
         Pen totals are reported under the pen's ``id`` field, while the input
-        ``pen_information`` is a list whose order need not match those ids. Matching
-        on ``id`` (rather than list position) keeps each pen paired with its own
-        bedding even when ids are reordered or non-contiguous (issue #3088).
+        ``pen_information`` is a list whose order need not match those ids. Matching on
+        ``id`` (rather than list position) keeps each pen paired with its own bedding
+        even when ids are reordered or non-contiguous (issue #3088). The pen list and
+        the bedding-name location within each entry are derived from the item's
+        ``input_manager`` path.
+
+        Parameters
+        ----------
+        item : EconomicItem
+            The mapping entry being processed. Its ``input_manager`` path locates the pens.
+
+        Returns
+        -------
+        dict[str, Any]
+            A mapping of each pen ``id`` (as a string) to its bedding name. Empty when no
+            pen list is available.
+
         """
 
         template = (
@@ -936,7 +1064,7 @@ class EconomicPreprocessor:
             return {}
         prefix, _, suffix = template.partition(".*.")
         pens = self.im.get_data(prefix)
-        pen_map: Dict[str, Any] = {}
+        pen_map: dict[str, Any] = {}
         if isinstance(pens, (list, tuple)):
             suffix_keys = suffix.split(".") if suffix else []
             for entry in pens:
@@ -944,51 +1072,150 @@ class EconomicPreprocessor:
                     pen_map[str(entry["id"])] = self._navigate_path(entry, suffix_keys)
         return pen_map
 
-    def _preprocess_bedding(self, item: EconomicItem) -> Dict[str, Any]:
-        """Compute bedding cost per pen, per year, then sum (issue #3088).
+    def _warn_if_pricing_missing(
+        self, item: EconomicItem, price_data: dict[str, Any], info_map: dict[str, str]
+    ) -> None:
+        """
+        Warns when an item expected commodity pricing but none could be retrieved.
+
+        Parameters
+        ----------
+        item : EconomicItem
+            The mapping entry being processed.
+        price_data : dict[str, Any]
+            The pricing payloads that were successfully retrieved for the item.
+        info_map : dict[str, str]
+            Contextual information attached to the emitted warning.
+
+        """
+        if item.economics_files and not price_data:
+            self.om.add_warning(
+                "MissingEconomicsFile",
+                f"No commodity pricing retrieved for '{item.name}'",
+                info_map,
+            )
+
+    def _package_line_item(
+        self,
+        values_by_scenario: dict[str, list[float]],
+        aggregated_value: float | None,
+        aggregates_by_scenario: Mapping[str, float | None],
+        price_data: dict[str, Any],
+        price_values: list[float],
+        price_aggregate: float | None,
+        line_item_values_by_scenario: dict[str, float],
+        flow_type: str,
+    ) -> dict[str, Any]:
+        """
+        Packages one preprocessed line item into the shared output structure.
+
+        This is the single definition of the per-item output shape consumed
+        downstream (framework breakdown, partial budget, and the
+        ``economic_preprocessing_properties`` validation). Both the generic engine
+        and dedicated processors build their results through this method so the
+        two paths cannot drift apart.
+
+        Parameters
+        ----------
+        values_by_scenario : dict[str, list[float]]
+            The raw quantity values used, grouped by scenario.
+        aggregated_value : float | None
+            The aggregate across all scenarios (quantity for generic items, total
+            cost for dedicated processors).
+        aggregates_by_scenario : Mapping[str, float | None]
+            The per-scenario aggregate values.
+        price_data : dict[str, Any]
+            The pricing payloads that were retrieved.
+        price_values : list[float]
+            Every price used, kept as a record for reporting.
+        price_aggregate : float | None
+            The average of ``price_values``, or ``None`` when no prices were found.
+        line_item_values_by_scenario : dict[str, float]
+            The item's final value per scenario.
+        flow_type : str
+            Either ``"cost"`` or ``"revenue"``.
+
+        Returns
+        -------
+        dict[str, Any]
+            The line item in the standard preprocessed shape.
+
+        """
+        biophysical_values = [value for scenario_values in values_by_scenario.values() for value in scenario_values]
+        return {
+            "biophysical_values": biophysical_values,
+            "biophysical_aggregate": aggregated_value,
+            "biophysical_values_by_scenario": values_by_scenario,
+            "biophysical_aggregate_by_scenario": aggregates_by_scenario,
+            "price_data": price_data,
+            "price_values": price_values,
+            "price_aggregate": price_aggregate,
+            "line_item_values_by_scenario": line_item_values_by_scenario,
+            "flow_type": flow_type,
+        }
+
+    def _preprocess_bedding(self, item: EconomicItem) -> dict[str, Any]:
+        """
+        Computes bedding cost per pen, per year, then sums them (issue #3088).
 
         For each pen the bedding name (an input config name) is resolved to its
-        canonical ``bedding_type`` and then to a price file. For each simulation
-        year the cost is ``(average head present that year) * (that year's
-        dollar-per-head price)``; pens with no bedding (``bedding_type`` ``none``)
-        incur no cost. The returned dict mirrors the generic engine's keys so
-        downstream consumers are unaffected.
+        canonical ``bedding_type`` and then to a price file. For each simulation year
+        the cost is ``(average head present that year) * (that year's dollar-per-head
+        price)``. Pens with no bedding (``bedding_type`` of ``"none"``) incur no cost.
+        The returned dict mirrors the generic engine's keys so downstream consumers are
+        unaffected.
+
+        Parameters
+        ----------
+        item : EconomicItem
+            The ``Bedding requirements`` mapping entry to process.
+
+        Returns
+        -------
+        dict[str, Any]
+            The preprocessed line item, matching the shape produced by the generic
+            engine (including ``line_item_values_by_scenario`` and ``flow_type``).
+
         """
 
         info_map = {"class": self.__class__.__name__, "function": self._preprocess_bedding.__name__}
 
-        name_to_type = self._build_bedding_name_to_type(item)
-        pen_id_to_bedding_name = self._build_pen_id_to_bedding_name(item)
-        type_to_key = item.bedding_type_to_file_key or {}
+        # Lookup tables built once up front:
+        name_to_type = self._build_bedding_name_to_type(item)  # bedding name -> type ("calf_straw" -> "straw")
+        pen_id_to_bedding_name = self._build_pen_id_to_bedding_name(item)  # pen id -> its bedding name
+        type_to_key = item.bedding_type_to_file_key or {}  # type -> price-file key ("CBPB sawdust" -> "CBPB")
         normalized_type_to_key = {str(key).strip().lower(): value for key, value in type_to_key.items()}
-        economics_files = item.economics_files if isinstance(item.economics_files, dict) else {}
+        economics_files = item.economics_files if isinstance(item.economics_files, dict) else {}  # key -> price file
 
-        _, start_date = self._simulation_start()
-        fips = self.im.get_data("config.FIPS_county_code")
+        _, start_date = self._simulation_start()  # simulation start date, to bucket days into years
+        fips = self.im.get_data("config.FIPS_county_code")  # county, to pick the right price row
 
+        # Each pen's daily head counts, grouped by scenario (= one simulation run; usually just "baseline").
         series_by_scenario = self._collect_pen_series(item.biophysical_simulation)
         if not series_by_scenario:
             series_by_scenario = {"baseline": {}}
 
-        price_cache: Dict[str, Any] = {}
-        price_data: Dict[str, Any] = {}
-        warned_years: Set[str] = set()
-        price_values: List[float] = []
+        price_cache: dict[str, Any] = {}  # avoid re-loading the same price file twice
+        price_data: dict[str, Any] = {}
+        warned_years: set[str] = set()  # so a missing-price warning fires once, not per day
+        price_values: list[float] = []
 
-        line_item_values_by_scenario: Dict[str, float] = {}
-        values_by_scenario: Dict[str, List[float]] = {}
-        aggregates_by_scenario: Dict[str, float] = {}
+        line_item_values_by_scenario: dict[str, float] = {}
+        values_by_scenario: dict[str, list[float]] = {}
+        aggregates_by_scenario: dict[str, float] = {}
 
-        for scenario, pens in series_by_scenario.items():
+        for scenario, pens in series_by_scenario.items():  # each simulation run
             scenario_cost = 0.0
-            scenario_values: List[float] = []
-            for capture, payload in pens.items():
-                pen_id = capture.split("_", 1)[0]
+            scenario_values: list[float] = []
+            for capture, payload in pens.items():  # each pen in that run
+                pen_id = capture.split("_", 1)[0]  # "0_CALF" -> "0"
+                # Step 1: which bedding does this pen use?
                 bedding_name = pen_id_to_bedding_name.get(pen_id)
                 if bedding_name is None:
                     self.om.add_warning("MissingBeddingName", f"No bedding_name for pen '{pen_id}'", info_map)
                     continue
 
+                # Step 2: bedding name -> its type.
                 bedding_type = name_to_type.get(str(bedding_name))
                 if bedding_type is None:
                     self.om.add_warning(
@@ -998,12 +1225,13 @@ class EconomicPreprocessor:
                     )
                     continue
 
+                # No bedding -> pen is free, skip it.
                 normalized_type = str(bedding_type).strip().lower()
                 if not normalized_type or normalized_type == "none":
-                    # Pen has no bedding -> no bedding cost.
                     scenario_values.extend(payload.get("values", []))
                     continue
 
+                # Step 3: type -> price-file key -> price file path.
                 file_key = normalized_type_to_key.get(normalized_type)
                 economics_file = economics_files.get(file_key) if file_key else None
                 if file_key is None or economics_file is None:
@@ -1014,6 +1242,7 @@ class EconomicPreprocessor:
                     )
                     continue
 
+                # Step 4: load that price file (cached), skip the pen if it can't be read.
                 if file_key not in price_cache:
                     fetched = self._get_data_with_handling(economics_file, info_map)
                     price_cache[file_key] = fetched
@@ -1030,6 +1259,7 @@ class EconomicPreprocessor:
                     scenario_values.extend(payload.get("values", []))
                     continue
 
+                # Step 5: cost this pen, one calendar year at a time.
                 daily_values = payload.get("values", [])
                 daily_info_maps = payload.get("info_maps", [])
                 scenario_values.extend(daily_values)
@@ -1038,6 +1268,7 @@ class EconomicPreprocessor:
                 for year, daily in counts_by_year.items():
                     if not daily:
                         continue
+                    # average head that year = head-days / days in that year (366 in leap years)
                     days_in_year = (
                         GeneralConstants.LEAP_YEAR_LENGTH
                         if Utility.is_leap_year(year)
@@ -1046,37 +1277,26 @@ class EconomicPreprocessor:
                     average_head = sum(daily) / days_in_year
                     price = self._annual_bedding_price(pen_price_dict, year, fips, file_key, warned_years, info_map)
                     price_values.append(price)
-                    scenario_cost += average_head * price
+                    scenario_cost += average_head * price  # add this pen-year to the running total
 
+            # This run's total (sum of every pen and year).
             line_item_values_by_scenario[scenario] = scenario_cost
             values_by_scenario[scenario] = scenario_values
             aggregates_by_scenario[scenario] = scenario_cost
 
-        if item.economics_files and not price_data:
-            self.om.add_warning(
-                "MissingEconomicsFile",
-                f"No commodity pricing retrieved for '{item.name}'",
-                info_map,
-            )
+        self._warn_if_pricing_missing(item, price_data, info_map)
 
-        all_values: List[float] = []
-        for scenario_values in values_by_scenario.values():
-            all_values.extend(scenario_values)
-
-        total_cost = sum(line_item_values_by_scenario.values())
-        price_aggregate = self._aggregate(price_values, "average")
-
-        return {
-            "biophysical_values": all_values,
-            "biophysical_aggregate": total_cost,
-            "biophysical_values_by_scenario": values_by_scenario,
-            "biophysical_aggregate_by_scenario": aggregates_by_scenario,
-            "price_data": price_data,
-            "price_values": price_values,
-            "price_aggregate": price_aggregate,
-            "line_item_values_by_scenario": line_item_values_by_scenario,
-            "flow_type": "cost",
-        }
+        # Package the result in the same shape the generic engine returns.
+        return self._package_line_item(
+            values_by_scenario=values_by_scenario,
+            aggregated_value=sum(line_item_values_by_scenario.values()),
+            aggregates_by_scenario=aggregates_by_scenario,
+            price_data=price_data,
+            price_values=price_values,
+            price_aggregate=self._aggregate(price_values, "average"),
+            line_item_values_by_scenario=line_item_values_by_scenario,
+            flow_type="cost",
+        )
 
     def preprocess(self) -> Dict[str, Dict[str, Dict[str, Dict[str, Any]]]]:
         """Run preprocessing and store results in the InputManager."""
@@ -1088,10 +1308,6 @@ class EconomicPreprocessor:
             section_data = results.setdefault(item.section, {})
             category_data = section_data.setdefault(item.category, {})
 
-            # Items flagged with a dedicated processor bypass the generic engine,
-            # which cannot express per-pen pairing of a quantity with a selected
-            # price file (see issue #3088). ``continue`` is the loop continue, so
-            # the runtime variable is still stored after the loop.
             if item.dedicated_processor == "bedding":
                 category_data[item.name] = self._preprocess_bedding(item)
                 continue
@@ -1136,12 +1352,7 @@ class EconomicPreprocessor:
                 input_match_values=input_match_values,
                 biophysical_match_values=biophysical_match_values,
             )
-            if item.economics_files and not price_data:
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"No commodity pricing retrieved for '{item.name}'",
-                    info_map,
-                )
+            self._warn_if_pricing_missing(item, price_data, info_map)
 
             price_values = self._extract_price_values(price_data)
             price_aggregate = self._aggregate(price_values, "average")
@@ -1177,18 +1388,16 @@ class EconomicPreprocessor:
                 fallback_price = ECONOMIC_PRICE_FALLBACK.get(fallback_flow_type, 1.0)
                 line_item_values_by_scenario["baseline"] = aggregated_value * fallback_price
 
-            flow_type = self._infer_flow_type(item) or "cost"
-            category_data[item.name] = {
-                "biophysical_values": biophysical_values,
-                "biophysical_aggregate": aggregated_value,
-                "biophysical_values_by_scenario": values_by_scenario,
-                "biophysical_aggregate_by_scenario": aggregates_by_scenario,
-                "price_data": price_data,
-                "price_values": price_values,
-                "price_aggregate": price_aggregate,
-                "line_item_values_by_scenario": line_item_values_by_scenario,
-                "flow_type": flow_type,
-            }
+            category_data[item.name] = self._package_line_item(
+                values_by_scenario=values_by_scenario,
+                aggregated_value=aggregated_value,
+                aggregates_by_scenario=aggregates_by_scenario,
+                price_data=price_data,
+                price_values=price_values,
+                price_aggregate=price_aggregate,
+                line_item_values_by_scenario=line_item_values_by_scenario,
+                flow_type=self._infer_flow_type(item) or "cost",
+            )
 
         # Store aggregated results back into the InputManager
         self.im.add_runtime_variable_to_pool(
