@@ -14,6 +14,7 @@ Scope (Option B):
     docs/beef_module/cow_calf/README.md).
 """
 
+import copy
 import datetime
 from typing import Generator
 
@@ -89,10 +90,10 @@ def _restore_animal_config() -> Generator[None, None, None]:
 @pytest.fixture(autouse=True)
 def _restore_ration_manager() -> Generator[None, None, None]:
     """Save and restore RationManager beef ration class attributes after each test."""
-    saved_lp = dict(RationManager.beef_lactating_pasture_ration)
-    saved_dg = dict(RationManager.beef_dry_gestating_ration)
-    saved_cf = dict(RationManager.beef_creep_feed_ration)
-    saved_rh = dict(RationManager.beef_replacement_heifer_ration)
+    saved_lp = copy.deepcopy(getattr(RationManager, "beef_lactating_pasture_ration", {}))
+    saved_dg = copy.deepcopy(getattr(RationManager, "beef_dry_gestating_ration", {}))
+    saved_cf = copy.deepcopy(getattr(RationManager, "beef_creep_feed_ration", {}))
+    saved_rh = copy.deepcopy(getattr(RationManager, "beef_replacement_heifer_ration", {}))
     yield
     RationManager.beef_lactating_pasture_ration = saved_lp
     RationManager.beef_dry_gestating_ration = saved_dg

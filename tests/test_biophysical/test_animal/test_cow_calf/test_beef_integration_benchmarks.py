@@ -9,6 +9,7 @@ Test 2 confirms the full dispatch chain (animal.daily_routines) is wired
 correctly for a cow in this combined state.
 """
 
+import copy
 import datetime
 from typing import Generator
 
@@ -130,42 +131,15 @@ def _restore_animal_config() -> Generator[None, None, None]:
 @pytest.fixture(autouse=True)
 def _restore_ration_manager() -> Generator[None, None, None]:
     """Save and restore RationManager beef ration class attributes after each test."""
-    saved_lp = dict(RationManager.beef_lactating_pasture_ration)
-    saved_dg = dict(RationManager.beef_dry_gestating_ration)
-    saved_cf = dict(RationManager.beef_creep_feed_ration)
-    saved_rh = dict(RationManager.beef_replacement_heifer_ration)
+    saved_lp = copy.deepcopy(getattr(RationManager, "beef_lactating_pasture_ration", {}))
+    saved_dg = copy.deepcopy(getattr(RationManager, "beef_dry_gestating_ration", {}))
+    saved_cf = copy.deepcopy(getattr(RationManager, "beef_creep_feed_ration", {}))
+    saved_rh = copy.deepcopy(getattr(RationManager, "beef_replacement_heifer_ration", {}))
     yield
     RationManager.beef_lactating_pasture_ration = saved_lp
     RationManager.beef_dry_gestating_ration = saved_dg
     RationManager.beef_creep_feed_ration = saved_cf
     RationManager.beef_replacement_heifer_ration = saved_rh
-
-
-# ── Autouse fixture: save/restore MilkProduction class-level quality attrs ────
-
-
-@pytest.fixture(autouse=True)
-def _restore_milk_production() -> Generator[None, None, None]:
-    """Save and restore MilkProduction class-level quality attributes after each test."""
-    had_fat = hasattr(MilkProduction, "fat_percent")
-    had_protein = hasattr(MilkProduction, "true_protein_percent")
-    had_lactose = hasattr(MilkProduction, "lactose_percent")
-    saved_fat = getattr(MilkProduction, "fat_percent", None)
-    saved_protein = getattr(MilkProduction, "true_protein_percent", None)
-    saved_lactose = getattr(MilkProduction, "lactose_percent", None)
-    yield
-    if had_fat:
-        MilkProduction.fat_percent = saved_fat  # type: ignore[assignment]
-    elif hasattr(MilkProduction, "fat_percent"):
-        delattr(MilkProduction, "fat_percent")
-    if had_protein:
-        MilkProduction.true_protein_percent = saved_protein  # type: ignore[assignment]
-    elif hasattr(MilkProduction, "true_protein_percent"):
-        delattr(MilkProduction, "true_protein_percent")
-    if had_lactose:
-        MilkProduction.lactose_percent = saved_lactose  # type: ignore[assignment]
-    elif hasattr(MilkProduction, "lactose_percent"):
-        delattr(MilkProduction, "lactose_percent")
 
 
 # ── Helper: build a minimal RufasTime without InputManager/OutputManager ──────
@@ -271,15 +245,14 @@ def test_combined_state_dispatch_reaches_calculator_without_error(mocker: Mocker
     Parameters
     ----------
     mocker : MockerFixture
-        pytest-mock fixture for patching AnimalModuleReporter.report_cow_calf_performance.
+        pytest-mock fixture for patching AnimalModuleReporter.report_cow_calf_performance
+        and MilkProduction class-level quality attributes.
 
     """
     _set_beef_animal_config()
-    MilkProduction.set_milk_quality(
-        fat_percent=AnimalConfig.milk_fat_percent,
-        true_protein_percent=AnimalConfig.true_protein_percent,
-        lactose_percent=AnimalModuleConstants.MILK_LACTOSE,
-    )
+    mocker.patch.object(MilkProduction, "fat_percent", new=AnimalConfig.milk_fat_percent, create=True)
+    mocker.patch.object(MilkProduction, "true_protein_percent", new=AnimalConfig.true_protein_percent, create=True)
+    mocker.patch.object(MilkProduction, "lactose_percent", new=AnimalModuleConstants.MILK_LACTOSE, create=True)
 
     mocker.patch.object(AnimalModuleReporter, "report_cow_calf_performance", return_value=None)
 
