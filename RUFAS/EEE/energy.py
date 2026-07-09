@@ -129,12 +129,7 @@ class EnergyEstimator:
     """Estimates energy consumption for the various field operations on the farm."""
 
     @staticmethod
-    def estimate_all(
-        simulate_animals: bool,
-        simulate_feed: bool,
-        simulate_fields: bool,
-        simulate_manure: bool
-    ) -> None:
+    def estimate_all(simulate_animals: bool, simulate_feed: bool, simulate_fields: bool, simulate_manure: bool) -> None:
         """
         Runs the diesel consumption estimation for all field operations and reports the per-operation and total
         results.
