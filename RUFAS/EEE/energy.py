@@ -133,6 +133,18 @@ class EnergyEstimator:
         """
         Runs the diesel consumption estimation for all field operations and reports the per-operation and total
         results.
+
+        Parameters
+        ----------
+        simulate_animals : bool
+            Whether the simulation initialized and used the AnimalManager module.
+        simulate_feed : bool
+            Whether the simulation initialized and used the FeedManager module
+        simulate_fields : bool
+            Whether the simulation initialized and used the FieldManager module.
+        simulate_manure : bool
+            Whether the simulation initialized and used the ManureManager module
+
         """
         base_info_map = {
             "class": EnergyEstimator.__name__,

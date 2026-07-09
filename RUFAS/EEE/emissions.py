@@ -78,12 +78,31 @@ class EmissionsEstimator:
     """
     Estimates the emissions and resources associated with the feeds used to feed animals.
 
+    Parameters
+    ----------
+    simulate_animals : bool
+        Whether the simulation initialized and used the AnimalManager module.
+    simulate_feed : bool
+        Whether the simulation initialized and used the FeedManager module
+    simulate_fields : bool
+        Whether the simulation initialized and used the FieldManager module.
+    simulate_manure : bool
+        Whether the simulation initialized and used the ManureManager module
+
     Attributes
     ----------
     im : InputManager
         An instance of the InputManager class.
     om : OutputManager
         An instance of the OutputManager class.
+    simulate_animals : bool
+        Whether the simulation initialized and used the AnimalManager module.
+    simulate_feed : bool
+        Whether the simulation initialized and used the FeedManager module
+    simulate_fields : bool
+        Whether the simulation initialized and used the FieldManager module.
+    simulate_manure : bool
+        Whether the simulation initialized and used the ManureManager module
     crop_species_to_purchased_feed_id : dict[str, list[str]]
         A dictionary mapping crop species to their corresponding RuFaS feed IDs.
     purchased_feed_emissions_by_location : dict[str, float]
@@ -96,6 +115,7 @@ class EmissionsEstimator:
         A set of RuFaS feed IDs that were used in the simulation but do not have purchased feed emissions data.
     _missing_land_use_ids : set[str]
         A set of RuFaS feed IDs that were used in the simulation but do not have land use change emissions data.
+
     """
 
     def __init__(
