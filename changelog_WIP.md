@@ -92,3 +92,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3043](https://github.com/RuminantFarmSystems/RuFaS/pull/3043) - [minor change] [Animal] [Ration] [NoInputChange] [NoOutputChange] Refactor `Pen.formulate_optimized_ration` to remove the `# noqa: C901`; behavior unchanged.
 - [3104](https://github.com/RuminantFarmSystems/RuFaS/pull/3104) - [minor change] [Testing] [NoInputChange] [NoOutputChange] Updates unit testing coverage for add_error calls added in PR 3000.
 - [3115](https://github.com/RuminantFarmSystems/RuFaS/pull/3115) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows.
+- [3132](https://github.com/RuminantFarmSystems/RuFaS/pull/3132) - [minor change] [EEE] [InputChange] [NoOutputChange] Adds `tractor_size` input for fields.
