@@ -189,7 +189,7 @@ def test_post_loop_processing(
     simulation_engine._post_simulation_processing()
 
     # Assert
-    mock_estimate_all.assert_called_once_with()
+    mock_estimate_all.assert_called_once_with(True, True, True, True)
 
 
 @pytest.mark.parametrize(
@@ -1325,7 +1325,8 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
     mock_weather_init.assert_called_once_with(mock_weather_data, mock_time)
     assert simulation_engine.weather == mock_weather
 
-    mock_emissions_estimator_init.assert_called_once_with()
+    mock_emissions_estimator_init.assert_called_once_with(simulate_animals=True, simulate_feed=True,
+                                                          simulate_fields=True, simulate_manure=True)
     assert simulation_engine.emissions_estimator == mock_emissions_estimator
 
     mock_field_manager_init.assert_called_once_with(mock_field_data)
