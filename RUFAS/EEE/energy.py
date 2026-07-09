@@ -147,6 +147,7 @@ class EnergyEstimator:
             harvest_type: HarvestOperation | None = None
             if harvest_type_str := diesel_consumption_data_item.get("harvest_type"):
                 harvest_type = HarvestOperation(harvest_type_str)
+
             tractor = Tractor(
                 operation_event=diesel_consumption_data_item["operation_event"],
                 crop_type=diesel_consumption_data_item.get("crop_type"),

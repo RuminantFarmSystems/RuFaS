@@ -5,7 +5,7 @@
     "mixing_fractions": [0.5],
     "tillage_depths": [100],
     "implements": ["moldboard-plow"],
-    "tractor_size": "large",
+    "tractor_sizes": ["medium"],
     "pattern_repeat": 7,
     "pattern_skip": 0
 }
