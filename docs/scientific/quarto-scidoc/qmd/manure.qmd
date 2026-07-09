@@ -1300,7 +1300,7 @@ Equations in the table below (Calculation column) are in the format of: updated 
 #| label: tbl-mn-AL-calc
 #| tbl-cap: Manure storage variable calculations.
 import_table(
-  "../resources/table_data/manure/tbl-mn-SS-calc.csv",
+  "../resources/table_data/manure/tbl-mn-AL-calc.csv",
   colalign = ["left", "center", "left"]
 )
 ```
