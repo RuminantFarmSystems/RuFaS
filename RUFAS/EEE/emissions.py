@@ -98,10 +98,17 @@ class EmissionsEstimator:
         A set of RuFaS feed IDs that were used in the simulation but do not have land use change emissions data.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self, simulate_animals: bool, simulate_feed: bool, simulate_fields: bool, simulate_manure: bool
+    ) -> None:
         """Initializes the EmissionsEstimator with location-specific feed emissions data and feed configurations."""
         self.im = InputManager()
         self.om = OutputManager()
+        self.simulate_animals = simulate_animals
+        self.simulate_feed = simulate_feed
+        self.simulate_fields = simulate_fields
+        self.simulate_manure = simulate_manure
+
         county_code = self.im.get_data("config.FIPS_county_code")
 
         purchased_feed_emissions_data = self.im.get_data("purchased_feeds_emissions")
@@ -115,26 +122,26 @@ class EmissionsEstimator:
         )
         self._missing_purchased_ids: set[str] = set()
         self._missing_land_use_ids: set[str] = set()
-
-        feed_storage_configs = self.im.get_data("feed_storage_configurations")
-        feed_storage_instances = self.im.get_data("feed_storage_instances")
-
-        all_configs: list[dict[str, Any]] = [
-            storage_config
-            for storage_config_list in feed_storage_configs.values()
-            for storage_config in storage_config_list
-        ]
-        instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
-
         self.crop_species_to_purchased_feed_id: dict[str, list[str]] = {}
-        for config in all_configs:
-            if config["name"] not in instance_names:
-                continue
-            else:
-                if "crop_species" in config and "rufas_ids" in config:
-                    self.crop_species_to_purchased_feed_id[config["crop_species"]] = [
-                        str(rufas_id) for rufas_id in config["rufas_ids"]
-                    ]
+
+        if self.simulate_feed:
+            feed_storage_configs = self.im.get_data("feed_storage_configurations")
+            feed_storage_instances = self.im.get_data("feed_storage_instances")
+
+            all_configs: list[dict[str, Any]] = [
+                storage_config
+                for storage_config_list in feed_storage_configs.values()
+                for storage_config in storage_config_list
+            ]
+            instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
+            for config in all_configs:
+                if config["name"] not in instance_names:
+                    continue
+                else:
+                    if "crop_species" in config and "rufas_ids" in config:
+                        self.crop_species_to_purchased_feed_id[config["crop_species"]] = [
+                            str(rufas_id) for rufas_id in config["rufas_ids"]
+                        ]
 
     def check_available_purchased_feed_data(self, available_feed_ids: list[int]) -> None:
         """

@@ -49,10 +49,13 @@ def test_estimate_all(
     def mock_get_data(data_address: str) -> Any:
         if data_address == "EEE_constants.constants":
             return EEE_constants
-        elif data_address == "tractor_dataset":
+        if data_address == "tractor_dataset":
             return tractor_dataset
-        else:
+        if data_address == "animal.herd_information.herd_num":
             return 10
+        if data_address.endswith(".tractor_size"):
+            return TractorSize.SMALL.value
+        return 10
 
     mocker.patch.object(
         im,
@@ -61,7 +64,8 @@ def test_estimate_all(
     )
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
 
-    EnergyEstimator.estimate_all()
+    EnergyEstimator.estimate_all(simulate_animals=True, simulate_feed=True, simulate_fields=True,
+                                 simulate_manure=True)
 
     mock_parse_inputs_for_diesel_consumption_calculation.assert_called_once_with()
     assert mock_calculate_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
