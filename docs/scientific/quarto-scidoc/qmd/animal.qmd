@@ -3070,8 +3070,8 @@ Probability of death associated with each lactation (1, 2, 3, 4+) is specified a
 * Parity death probability: `parity_death_prob` 
    * Probability of death during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
 * Death day probability: `death_day_prob`
-   * Values to construct the CDF to determine future death day, given that death is going to occur (default values are given in @tbl-an-cull-cdf-death)
-   * Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days” in @tbl-an-cull-cdf-death)
+   * Values to construct the CDF to determine future death day, given that death is going to occur (default values are given in @tbl-an-cdf-cull-death)
+   * Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days” in @tbl-an-cdf-cull-death)
 
 **Parameters and Equations**
 

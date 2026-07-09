@@ -181,7 +181,7 @@ Multiplication may be indicated with a \times
 
 Below is how the equation can be linked in other parts of the text: 
 
-See [AN.NRC.2026](#eq-an-nrc-2026)<!-- @eq-an-nrc-2026 -->.
+See [AN.NRC.2026](#eq-an-nrc-2026)
 
 ```
 
@@ -194,7 +194,7 @@ $$
 $$
 :::
 
-See [AN.NRC.2026](#eq-an-nrc-2026)<!-- @eq-an-nrc-2026 -->.
+See [AN.NRC.2026](#eq-an-nrc-2026)
 
 Some equations may be too long to fit on a single line and within the margins. Unfortunately, you will need to manually break the equation into multiple lines. 
 
