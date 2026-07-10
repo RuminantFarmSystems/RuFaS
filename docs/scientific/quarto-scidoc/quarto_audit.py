@@ -120,6 +120,24 @@ SHEET_SPECS = [
         None,
     ),
     (
+    "crossref_health",
+    [
+        "label",
+        "type",
+        "referenced",
+        "reference_count",
+        "defined",
+        "definition_count",
+        "duplicate_definition",
+        "definition_file",
+        "definition_source",
+        "status",
+        "likely_issue",
+    ],
+    "crossref_health",
+    None,
+    ),
+    (
         "duplicate_label_groups",
         ["label", "type", "count", "files"],
         "duplicate_label_summary",
@@ -827,6 +845,63 @@ def build_duplicate_equation_summary(custom_id: str, rows: list[dict]) -> dict:
         "files": "; ".join(sorted({row["file"] for row in rows})),
     }
 
+def analyze_crossrefs(audit: dict) -> list[dict]:
+    label_to_rows = group_by(audit["labels"], "label")
+    ref_to_rows = group_by(audit["label_refs"], "reference")
+
+    all_crossref_keys = sorted(set(label_to_rows) | set(ref_to_rows))
+
+    crossref_health: list[dict] = []
+
+    for label in all_crossref_keys:
+        if not is_crossref_key(label):
+            continue
+
+        rows = label_to_rows.get(label, [])
+        ref_rows = ref_to_rows.get(label, [])
+
+        referenced = bool(ref_rows)
+        reference_count = len(ref_rows)
+
+        defined = bool(rows)
+        definition_count = len(rows)
+        duplicate_definition = definition_count > 1
+
+        definition_file = "; ".join(sorted({row["file"] for row in rows}))
+        definition_source = "; ".join(sorted({row["source"] for row in rows}))
+
+        label_type = rows[0]["type"] if rows else infer_label_type(label)
+
+        if not defined:
+            status = "ERROR"
+            likely_issue = "Referenced but no matching label was found"
+        elif duplicate_definition:
+            status = "ERROR"
+            likely_issue = "Duplicate definition"
+        elif not referenced:
+            status = "WARNING"
+            likely_issue = "Defined but not referenced"
+        else:
+            status = "OK"
+            likely_issue = ""
+
+        crossref_health.append(
+            {
+                "label": label,
+                "type": label_type,
+                "referenced": "YES" if referenced else "NO",
+                "reference_count": reference_count,
+                "defined": "YES" if defined else "NO",
+                "definition_count": definition_count,
+                "duplicate_definition": "YES" if duplicate_definition else "NO",
+                "definition_file": definition_file,
+                "definition_source": definition_source,
+                "status": status,
+                "likely_issue": likely_issue,
+            }
+        )
+
+    return crossref_health
 
 def analyze_audit(audit: dict) -> dict:
     label_to_rows = group_by(audit["labels"], "label")
@@ -868,6 +943,8 @@ def analyze_audit(audit: dict) -> dict:
     analysis["broken_internal_links"] = find_broken_internal_links(
         analysis["internal_links"]
     )
+    analysis["crossref_health"] = analyze_crossrefs(audit)
+
     analysis.update(analyze_equations(audit["equations"]))
     return analysis
 
