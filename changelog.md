@@ -28,6 +28,8 @@ v1.0.2
 ### v1.0.2
 
 - [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
+- [3127](https://github.com/RuminantFarmSystems/RuFaS/pull/3127) - [minor change] [GraphGenerator] [NoInputChange] [NoOutputChange] Fixes crash in `GraphGenerator._draw_graph()` when `slice_start` is set but `slice_end` is `None` by defaulting `slice_end_sim_day` to `simulation_length_days`.
+
 
 ### v1.0.1
 
