@@ -203,9 +203,7 @@ class Hay(Storage):
             14206 - 2433 * FINAL_MOISTURE_PERCENTAGE / (1 - FINAL_MOISTURE_PERCENTAGE)
         )
 
-        fraction_of_initial_dry_matter_lost = (
-            numerator / denominator * fraction_of_total_loss if denominator > 0.0 else 0
-        )
+        fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
     def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: date) -> float:
