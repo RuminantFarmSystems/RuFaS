@@ -93,6 +93,7 @@ v1.0.0
 - [3043](https://github.com/RuminantFarmSystems/RuFaS/pull/3043) - [minor change] [Animal] [Ration] [NoInputChange] [NoOutputChange] Refactor `Pen.formulate_optimized_ration` to remove the `# noqa: C901`; behavior unchanged.
 - [3104](https://github.com/RuminantFarmSystems/RuFaS/pull/3104) - [minor change] [Testing] [NoInputChange] [NoOutputChange] Updates unit testing coverage for add_error calls added in PR 3000.
 - [3115](https://github.com/RuminantFarmSystems/RuFaS/pull/3115) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows.
+- [3127](https://github.com/RuminantFarmSystems/RuFaS/pull/3127) - [minor change] [GraphGenerator] [NoInputChange] [NoOutputChange] Fixes crash in `GraphGenerator._draw_graph()` when `slice_start` is set but `slice_end` is `None` by defaulting `slice_end_sim_day` to `simulation_length_days`.
 
 ### v1.0.0
 
