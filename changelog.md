@@ -28,8 +28,6 @@ v1.0.2
 ### v1.0.2
 
 - [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
-- [2935](https://github.com/RuminantFarmSystems/RuFaS/pull/2935) - [minor change] [Animal] [Cross Validation] [InputChange] [NoOutputChange] Adds 26 cross-validation rules for the Animal module and extends `CrossValidator` with `is_not_null`, `is_in` operators and a `field_to_save` option in `for_each` blocks.
-
 
 ### v1.0.1
 
