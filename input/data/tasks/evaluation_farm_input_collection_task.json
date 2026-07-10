@@ -3,21 +3,23 @@
   "tasks": [
   
     {
-      "task_type": "SIMULATION_MULTI_RUN",
+      "task_type": "INPUT_DATA_AUDIT",
       "metadata_file_path": "rufas_inputs/metadata/biofiltro_baseline_metadata.json",
       "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
       "output_prefix": "biofiltro-baseline",
-      "log_verbosity": "errors",
-      "multi_run_counts": 2
+      "log_verbosity": "errors", 
+      "export_input_data_to_csv": true,
+      "input_data_csv_export_path": "C:/Users/Kristan Reed/RuFaSRepo/RuFaS/output"
 
     },
     {
-      "task_type": "SIMULATION_MULTI_RUN",
+      "task_type": "INPUT_DATA_AUDIT",
       "metadata_file_path": "rufas_inputs/metadata/biofiltro_metadata.json",
       "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
       "output_prefix": "biofiltro",
       "log_verbosity": "errors",
-      "multi_run_counts": 5
+      "export_input_data_to_csv": true,
+      "input_data_csv_export_path": "C:/Users/Kristan Reed/RuFaSRepo/RuFaS/output"
 
     }
 ]
