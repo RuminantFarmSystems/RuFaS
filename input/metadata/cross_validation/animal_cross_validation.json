@@ -159,7 +159,7 @@
       ]
     },
     {
-      "description": "prefresh_day must be shorter than both gestation length (avg_gestation_len) and the dry period duration (avg_gestation_len - days_in_preg_when_dry)",
+      "description": "Days from calving at prefresh_day must be less than both gestation length (avg_gestation_length) and dry period duration (avg_gestation_len - days_in_preg_when_dry)",
       "aliases": {
         "variables": {
           "prefresh_day": "animal.animal_config.farm_level.repro.prefresh_day",
@@ -836,7 +836,7 @@
       ]
     },
     {
-      "description": "Holstein birth weight std dev must be less than 20% of average: birth_weight_std_ho < 0.2 * birth_weight_avg_ho",
+      "description": "Holstein birth weight std dev must be less than 20% of average birth weight: birth_weight_std_ho < 0.2 * birth_weight_avg_ho",
       "aliases": {
         "variables": {
           "birth_weight_std_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_std_ho",
