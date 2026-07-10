@@ -760,7 +760,7 @@ class EconomicPreprocessor:
                     name_to_type[str(config["name"])] = self._bedding_type_value(config.get("bedding_type"))
         return name_to_type
 
-    def _simulation_start(self) -> tuple[int, datetime]:
+    def _get_simulation_start_date(self) -> tuple[int, datetime]:
         """
         Returns the simulation start year and start date.
 
@@ -1016,22 +1016,26 @@ class EconomicPreprocessor:
 
         """
 
+        # Step one key at a time, descending deeper into `data` each pass.
         for key in keys:
             if isinstance(data, (list, tuple)):
+                # A list step: the key must be a usable integer index.
                 try:
-                    index = int(key)
+                    index = int(key)  # e.g. "0" -> 0
                 except (TypeError, ValueError):
-                    return None
+                    return None  # key wasn't a number, so it can't index a list
                 if not 0 <= index < len(data):
-                    return None
+                    return None  # index off the end of the list
                 data = data[index]
             elif isinstance(data, dict):
+                # A dict step: the key must be present.
                 if key not in data:
                     return None
                 data = data[key]
             else:
+                # Ran out of nesting before running out of keys (e.g. hit a str/int).
                 return None
-        return data
+        return data  # whatever we landed on after following every key
 
     def _build_pen_id_to_bedding_name(self, item: EconomicItem) -> dict[str, Any]:
         """
@@ -1057,18 +1061,27 @@ class EconomicPreprocessor:
 
         """
 
+        # The mapping path, e.g. "animal.pen_information.*.manure_streams.0.bedding_name".
+        # The "*" stands for "each pen"; everything before it locates the pen list,
+        # everything after it locates the bedding name inside one pen entry.
         template = (
             item.input_manager[0] if item.input_manager else "animal.pen_information.*.manure_streams.0.bedding_name"
         )
         if "*" not in template:
-            return {}
+            return {}  # nothing per-pen to resolve
+
+        # Split on ".*." -> prefix="animal.pen_information", suffix="manure_streams.0.bedding_name".
         prefix, _, suffix = template.partition(".*.")
-        pens = self.im.get_data(prefix)
+        pens = self.im.get_data(prefix)  # the whole pen_information list
+
         pen_map: dict[str, Any] = {}
         if isinstance(pens, (list, tuple)):
-            suffix_keys = suffix.split(".") if suffix else []
+            suffix_keys = suffix.split(".") if suffix else []  # ["manure_streams", "0", "bedding_name"]
             for entry in pens:
+                # Key the map by the pen's own "id" field (NOT its list position), so a
+                # reordered or non-contiguous pen list still pairs correctly (issue #3088).
                 if isinstance(entry, dict) and "id" in entry:
+                    # Walk into this pen entry to pull out its bedding name.
                     pen_map[str(entry["id"])] = self._navigate_path(entry, suffix_keys)
         return pen_map
 
@@ -1187,7 +1200,7 @@ class EconomicPreprocessor:
         normalized_type_to_key = {str(key).strip().lower(): value for key, value in type_to_key.items()}
         economics_files = item.economics_files if isinstance(item.economics_files, dict) else {}  # key -> price file
 
-        _, start_date = self._simulation_start()  # simulation start date, to bucket days into years
+        _, start_date = self._get_simulation_start_date()  # simulation start date, to bucket days into years
         fips = self.im.get_data("config.FIPS_county_code")  # county, to pick the right price row
 
         # Each pen's daily head counts, grouped by scenario (= one simulation run; usually just "baseline").
