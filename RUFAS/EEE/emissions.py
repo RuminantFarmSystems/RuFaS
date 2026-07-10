@@ -116,8 +116,8 @@ class EmissionsEstimator:
         self._missing_purchased_ids: set[str] = set()
         self._missing_land_use_ids: set[str] = set()
 
-        feed_storage_configs = self.im.get_data("feed_storage_configurations")
-        feed_storage_instances = self.im.get_data("feed_storage_instances")
+        feed_storage_configs = self.im.get_data("feed_storage_configurations", required=False) or {}
+        feed_storage_instances = self.im.get_data("feed_storage_instances", required=False) or {}
 
         all_configs: list[dict[str, Any]] = [
             storage_config
