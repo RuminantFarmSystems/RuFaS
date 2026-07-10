@@ -169,6 +169,7 @@ def test_execute_allocation_plan(
     animal_type_to_allocate: AnimalType,
     value_error_expected: bool,
     herd_manager: HerdManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _execute_allocation_plan()"""
     animals: list[Animal] = []
@@ -183,8 +184,10 @@ def test_execute_allocation_plan(
         ]
 
     if value_error_expected:
+        mock_add_error = mocker.patch.object(herd_manager.om, "add_error")
         with pytest.raises(ValueError):
             herd_manager._execute_allocation_plan(allocation_plan, animals, pens)
+        mock_add_error.assert_called_once()
     else:
         expected_animals_in_pen_by_id: dict[int, dict[int, Animal]] = {}
         current_i = 0
@@ -383,11 +386,14 @@ def test_calculate_max_animal_spaces_per_pen(
     expected: int | None,
     raise_value_error: bool,
     herd_manager: HerdManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _calculate_max_animal_spaces_per_pen()"""
     if raise_value_error:
+        mock_add_error = mocker.patch.object(herd_manager.om, "add_error")
         with pytest.raises(ValueError):
             herd_manager._calculate_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+        mock_add_error.assert_called_once()
     else:
         result = herd_manager._calculate_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
         assert result == expected

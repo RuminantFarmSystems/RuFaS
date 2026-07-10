@@ -1,7 +1,3 @@
 {
-    "soil_layers": [
-        {
-            "bottom_depth": 20
-        }
-    ]
+    "exclude_from_pool": true
 }

@@ -54,12 +54,6 @@ class Composting(Storage):
     """
     Class for managing and simulating the composting process of manure treatment.
 
-    This class simulates the composting process by considering various factors like weather,
-    manure characteristics, and composting configurations. It provides methods for daily
-    update of compost characteristics such as methane emissions, nitrogen content, and
-    carbon decomposition. The calculations are based on standard composting models and
-    environmental factors.
-
     Parameters
     ----------
     name : str
@@ -68,6 +62,22 @@ class Composting(Storage):
         The type of the composting process being used.
     storage_time_period : int
         The storage time period.
+    surface_area : float, default=inf
+        The surface area of the manure storage (m^2).
+
+    Attributes
+    ----------
+    _composting_type : CompostingType
+        The type of composting.
+
+    Notes
+    -----
+    This class simulates the composting process by considering various factors like weather,
+    manure characteristics, and composting configurations. It provides methods for daily
+    update of compost characteristics such as methane emissions, nitrogen content, and
+    carbon decomposition. The calculations are based on standard composting models and
+    environmental factors.
+
     """
 
     def __init__(
@@ -99,7 +109,8 @@ class Composting(Storage):
         Returns
         -------
         dict[str, ManureStream]
-            _The processed manure stream.
+            The processed manure stream.
+
         """
         original_received_manure = copy(self._received_manure)
         self._manure_to_process = copy(self._received_manure)
@@ -190,7 +201,7 @@ class Composting(Storage):
 
     def _apply_dry_matter_loss(self, methane_emission: float, carbon_decomposition: float) -> None:
         """
-        This function calculates and then applies the dry matter loss to the received manure in place.
+        Calculates and then applies the dry matter loss to the received manure in place.
 
         Parameters
         ----------
@@ -204,19 +215,26 @@ class Composting(Storage):
         ValueError
             If any of the dry matter loss calculations results in negative values for received-manure
             non-degradable volatile solids, degradable volatile solids, or total solids.
+
         """
         dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
             self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_volatile_solids
         )
-        non_degradable_volatile_solids_after_losses = max(0, (
-            self._manure_to_process.non_degradable_volatile_solids
-            - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
-        ))
-        degradable_volatile_solids_after_losses = max(0, (
-            self._manure_to_process.degradable_volatile_solids
-            - dry_matter_loss * degradable_volatile_solids_fraction
-        ))
+        non_degradable_volatile_solids_after_losses = max(
+            0,
+            (
+                self._manure_to_process.non_degradable_volatile_solids
+                - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
+            ),
+        )
+        degradable_volatile_solids_after_losses = max(
+            0,
+            (
+                self._manure_to_process.degradable_volatile_solids
+                - dry_matter_loss * degradable_volatile_solids_fraction
+            ),
+        )
         total_solids_after_losses = self._manure_to_process.total_solids - dry_matter_loss
 
         errors = []
@@ -249,7 +267,7 @@ class Composting(Storage):
         self, storage_nitrous_oxide_N: float, storage_ammonia_N: float, storage_N_loss_from_leaching: float
     ) -> None:
         """
-        This function applies the nitrogen losses to the received manure nitrogen and ammoniacal nitrogen in place.
+        Applies the nitrogen losses to the received manure nitrogen and ammoniacal nitrogen in place.
 
         Parameters
         ----------
@@ -264,6 +282,7 @@ class Composting(Storage):
         ------
         ValueError
             If the total nitrogen losses are greater than the total received manure nitrogen.
+
         """
         received_manure_nitrogen_after_losses = (
             self._manure_to_process.nitrogen
@@ -291,7 +310,7 @@ class Composting(Storage):
         composting_type: CompostingType, received_manure_nitrogen: float
     ) -> float:
         """
-        This function calculates the total nitrogen loss to ammonia emission on the current day.
+        Calculates the total nitrogen loss to ammonia emission on the current day.
 
         Parameters
         ----------
@@ -304,6 +323,7 @@ class Composting(Storage):
         -------
         float
             The total nitrogen loss to ammonia emission on the current day, kg.
+
         """
         return FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[composting_type] * received_manure_nitrogen
 
@@ -315,7 +335,7 @@ class Composting(Storage):
         methane_production_potential: float,
     ) -> float:
         """
-        This function calculates the composting solid manure methane emission on the current day.
+        Calculates the composting solid manure methane emission on the current day.
 
         Parameters
         ----------
@@ -332,6 +352,7 @@ class Composting(Storage):
         -------
         float
             The solid manure methane emission on the current day, kg/day.
+
         """
         methane_conversion_factor = (
             Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
@@ -342,7 +363,7 @@ class Composting(Storage):
     @staticmethod
     def _calculate_methane_conversion_factor(manure_temperature: float, composting_type: CompostingType) -> float:
         """
-        This function returns the methane conversion factor depending on the composting type and the temperature.
+        Returns the methane conversion factor depending on the composting type and the temperature.
 
         Parameters
         ----------

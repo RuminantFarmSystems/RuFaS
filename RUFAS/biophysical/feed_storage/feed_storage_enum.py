@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Type
 
 from RUFAS.biophysical.feed_storage.hay import Hay, ProtectedIndoors, ProtectedWrapped, ProtectedTarped, Unprotected
 from RUFAS.biophysical.feed_storage.silage import Bunker, Pile, Bag
@@ -28,27 +27,28 @@ class StorageType(Enum):
     Bag = Bag
 
     @classmethod
-    def get_storage_class(cls, storage_type: str) -> Type["Storage"]:
+    def get_storage_class(cls, storage_type: str) -> type["Storage"]:
         """
         Get the corresponding feed storage class directly from the Enum.
 
         Parameters
         ----------
         storage_type : str
-            The type of feedstorage as a string (from JSON).
+            The type of feed storage as a string (from JSON).
 
         Returns
         -------
-        Type[Storage]
+        type[Storage]
             The class corresponding to the feed storage type.
 
         Raises
         ------
         ValueError
             If the feed storage type is not recognized.
+
         """
         try:
-            storage: Type["Storage"] = cls[storage_type].value
+            storage: type["Storage"] = cls[storage_type].value
             return storage
         except KeyError:
             OutputManager().add_error(

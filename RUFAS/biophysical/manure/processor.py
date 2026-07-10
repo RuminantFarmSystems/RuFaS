@@ -110,6 +110,7 @@ class Processor(ABC):
         ValueError
             If the manure stream is the wrong data type.
             If the manure stream keys don't match the manure_stream_units keys.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -177,6 +178,7 @@ class Processor(ABC):
 
         A mismatch between processor type and manure stream structure will result in
         the processor being considered incompatible.
+
         """
         is_valid_housing_emissions_calculator = (
             True if (self.is_housing_emissions_calculator and manure_stream.pen_manure_data is not None) else False

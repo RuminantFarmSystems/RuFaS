@@ -1,6 +1,8 @@
 from typing import Any
 from unittest.mock import MagicMock
 
+import pytest
+
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from pytest_mock import MockerFixture
 
@@ -164,3 +166,100 @@ def test_init_uses_set_ration_feeds_when_not_user_defined(mocker: MockerFixture)
     mock_set_user_defined_ration_tolerance.assert_not_called()
 
     mock_nutrient_standard_cls.assert_called_once_with(config_data["nutrient_standard"])
+
+
+def test_init_raises_runtime_error_when_herd_population_is_none(mocker: MockerFixture) -> None:
+    """HerdManager.__init__ should log an error and raise RuntimeError if herd population is None."""
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.herd_manager.InputManager")
+    mock_om_cls = mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager")
+    mock_im = mock_im_cls.return_value
+    mock_om = mock_om_cls.return_value
+
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_manager.AnimalConfig.initialize_animal_config",
+        return_value=None,
+    )
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_manager.LactationCurve.set_lactation_parameters",
+        return_value=None,
+    )
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_manager.MilkProduction.set_milk_quality",
+        return_value=None,
+    )
+    mocker.patch("RUFAS.biophysical.animal.herd_manager.RationManager.set_ration_feeds")
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_manager.AdvancePurchaseAllowance",
+        return_value=MagicMock(),
+    )
+    mocker.patch("RUFAS.biophysical.animal.herd_manager.NutrientStandard")
+    mocker.patch(
+        "RUFAS.biophysical.animal.herd_manager.Animal.set_nutrient_standard",
+        return_value=None,
+    )
+
+    mocker.patch.object(HerdManager, "initialize_pens", return_value=None)
+    mocker.patch.object(HerdManager, "set_milk_type_in_calf_ration_manager", return_value=None)
+
+    mocker.patch("RUFAS.biophysical.animal.herd_manager.HerdFactory.post_animal_population", None)
+
+    config_data: dict[str, Any] = {
+        "simulation_type": "field_and_feed",
+        "nutrient_standard": {"dummy": "ns"},
+    }
+    animal_data: dict[str, Any] = {
+        "herd_information": {
+            "herd_num": 123,
+            "herd_size_adjustment_period": 30,
+            "herd_size_sell_threshold": 101,
+            "herd_size_buy_threshold": 106,
+        },
+        "housing": "barn",
+        "pasture_concentrate": 0,
+        "ration": {"formulation_interval": 7, "maximum_ration_reformulation_attempts": 250},
+        "pen_information": [],
+    }
+    feed_data = {
+        "feeds": [
+            {
+                "feed_type": 1,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0,
+            },
+        ]
+    }
+
+    def get_data_side_effect(key: str) -> Any:
+        if key == "config":
+            return config_data
+        if key == "animal":
+            return animal_data
+        if key == "feed":
+            return feed_data
+        if key == "feed.feeds":
+            return feed_data["feeds"]
+        raise KeyError(key)
+
+    mock_im.get_data.side_effect = get_data_side_effect
+
+    weather = MagicMock()
+    time = MagicMock()
+    time.simulation_day = 0
+
+    with pytest.raises(RuntimeError, match="Herd population has not been initialized."):
+        HerdManager(
+            weather=weather,
+            time=time,
+            is_ration_defined_by_user=False,
+            available_feeds=[],
+        )
+
+    mock_om.add_error.assert_called_once_with(
+        "Herd population is None.",
+        "Expected there to be a herd and got None from HerdFactory.",
+        info_map={
+            "class": HerdManager.__name__,
+            "function": HerdManager.__init__.__name__,
+        },
+    )

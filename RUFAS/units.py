@@ -5,15 +5,14 @@ from enum import Enum, unique
 @unique
 class MeasurementUnits(Enum):
     """
-    A list of acceptable units used within the RuFaS model.
-
+    An enumeration of acceptable units used within the RuFaS model.
     """
 
     ANIMALS = "animals"
     ARTIFICIAL_INSEMINATIONS = "AI"
     BYTES = "bytes"
     CALENDAR_YEAR = "calendar year"
-    MCAL_PER_MJ = "Mcal/MJ"
+    MJ_PER_MCAL = "MJ/Mcal"
     CENTIMETERS = "cm"
     CENTIMETERS_PER_MILLIMETER = "cm/mm"
     CONCEPTIONS = "conception"
@@ -81,7 +80,7 @@ class MeasurementUnits(Enum):
     MILLIMETERS = "mm"
     MILLIMETERS_PER_CENTIMETER = "mm/cm"
     MILLIMETERS_PER_HECTARE = "mm/ha"
-    MJ_CH4_PER_G_CH4 = "MJ/g"
+    MJ_CH4_PER_G_CH4 = "MJ/g CH4"
     ORDINAL_DAY = "ordinal day"
     PERCENT = "percent"
     PERCENT_OF_DRY_MATTER = "percent of DM"
@@ -101,15 +100,13 @@ class MeasurementUnits(Enum):
     WET_KILOGRAMS_PER_HECTARE = "wet kg/ha"
 
     def __str__(self) -> str:
-        """
-        Returns the value of the enum member as its string representation.
-        """
-
+        """Returns the value of the enum member as its string representation."""
         return self.value
 
     @staticmethod
     def _parse_unit(unit: str) -> dict[str, int]:
-        """Parses a unit string to handle units with exponents.
+        """
+        Parses a unit string to handle units with exponents.
 
         Parameters
         ----------
@@ -118,7 +115,7 @@ class MeasurementUnits(Enum):
 
         Returns
         -------
-        dict
+        dict[str, int]
             A dictionary where the keys are unit names (str) and the values are their exponents (int).
         """
         unit_dict = {}
@@ -132,7 +129,8 @@ class MeasurementUnits(Enum):
 
     @staticmethod
     def extract_units(key: str) -> tuple[dict[str, int], dict[str, int]]:
-        """Extracts the units from a key.
+        """
+        Extracts the units from a key.
 
         Parameters
         ----------
@@ -141,10 +139,10 @@ class MeasurementUnits(Enum):
 
         Returns
         -------
-        tuple[dict, dict]
-            A tuple of the numerator and denominator units. If there is no denominator, the first element of tuple will
-            have the units and the second will be an empty string. If no units are found, it will return a tuple with
-            two empty strings.
+        tuple[dict[str, int], dict[str, int]]
+            - Numerator units, mapping unit names to exponents.
+            - Denominator units. Empty dict if no denominator or no units are found.
+
         """
         match = re.search(r"\((.*?)\)", key)
         if match:
@@ -162,7 +160,8 @@ class MeasurementUnits(Enum):
 
     @staticmethod
     def adjust_unit_exponents(units1: dict[str, int], units2: dict[str, int]) -> dict[str, int]:
-        """Combines two unit dictionaries by adding or subtracting their exponents.
+        """
+        Combines two unit dictionaries by adding or subtracting their exponents.
 
         Parameters
         ----------
@@ -201,9 +200,9 @@ class MeasurementUnits(Enum):
         Returns
         -------
         tuple[dict[str, int], dict[str, int]]
-            A tuple containing two dictionaries:
-            - The first dictionary represents the simplified numerator units with non-zero exponents.
-            - The second dictionary represents the simplified denominator units with non-zero exponents.
+            - The simplified numerator units with non-zero exponents.
+            - The the simplified denominator units with non-zero exponents.
+
         """
         combined_numerator = numerator.copy()
         combined_denominator = denominator.copy()
@@ -227,9 +226,9 @@ class MeasurementUnits(Enum):
 
         Parameters
         ----------
-        numerator : dict
+        numerator : dict[str, int]
             A dictionary where the keys are unit names (str) and the values are their exponents (int) for the numerator.
-        denominator : dict
+        denominator : dict[str, int]
             A dictionary where the keys are unit names (str) and the values are their exponents (int) for the
             denominator.
 

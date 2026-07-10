@@ -65,6 +65,8 @@ def animal_json() -> dict[str, Any]:
                 "semen_type": "conventional",
                 "days_in_preg_when_dry": 218,
                 "heifer_repro_cull_time": 500,
+                "calf_mortality_rate": 0,
+                "heifer_mortality_rate": 0,
                 "do_not_breed_time": 185,
                 "cull_milk_production": 30,
                 "cow_times_milked_per_day": 3,

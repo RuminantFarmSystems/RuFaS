@@ -101,6 +101,10 @@ DISEASE_CULL = "culled for disease"
 UDDER_CULL = "culled for udder"
 UNKNOWN_CULL = "culled for unknown"
 
+# youngstock mortality (a loss from death, not a cull)
+CALF_MORTALITY_LOSS = "died from pre-wean mortality"
+HEIFER_MORTALITY_LOSS = "died from post-wean mortality"
+
 # STATS
 STDI = 2
 

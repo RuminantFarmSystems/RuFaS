@@ -76,7 +76,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
 
 class EmissionsEstimator:
     """
-    Estimates emissions associated with purchased feeds used for animals.
+    Estimates the emissions and resources associated with the feeds used to feed animals.
 
     Attributes
     ----------
@@ -99,6 +99,7 @@ class EmissionsEstimator:
     """
 
     def __init__(self) -> None:
+        """Initializes the EmissionsEstimator with location-specific feed emissions data and feed configurations."""
         self.im = InputManager()
         self.om = OutputManager()
         county_code = self.im.get_data("config.FIPS_county_code")
@@ -138,6 +139,16 @@ class EmissionsEstimator:
     def check_available_purchased_feed_data(self, available_feed_ids: list[int]) -> None:
         """
         Checks that all purchased feed IDs used in the simulation have emissions data available for them.
+
+        Parameters
+        ----------
+        available_feed_ids : list[int]
+            The RuFaS feed IDs used in the simulation to check for available emissions data.
+
+        Notes
+        -----
+        Any feed IDs that are missing purchased feed or land use change emissions data are recorded and reported as
+        warnings to the ``OutputManager``.
         """
         available_feeds = {str(feed_id) for feed_id in available_feed_ids}
         missing_purchased = sorted(available_feeds - set(self.purchased_feed_emissions_by_location.keys()))
@@ -169,9 +180,17 @@ class EmissionsEstimator:
         purchased_feeds: dict[int, float],
     ) -> None:
         """
-        Calculates the emissions from purchased feeds and land use changes and reports them to OutputManager.
-        If there are feed IDs with missing emissions factor data, they will be omitted from the calculations
-        and not reported.
+        Calculates the emissions from purchased feeds and land use changes and reports them to the ``OutputManager``.
+
+        Parameters
+        ----------
+        purchased_feeds : dict[int, float]
+            A mapping of RuFaS feed IDs to the amount of each purchased feed used (kg dry matter).
+
+        Notes
+        -----
+        If there are feed IDs with missing emissions factor data, they are omitted from the calculations and not
+        reported.
         """
         purchased_feed_emissions: dict[str, float] = {}
         land_use_change_emissions: dict[str, float] = {}
@@ -198,7 +217,27 @@ class EmissionsEstimator:
     def _get_feed_emissions_data(
         self, county_code: int, feed_emissions_data: dict[str, list[float]]
     ) -> dict[str, float]:
-        """Grabs the appropriate list of emissions for purchased feeds for the location of the simulation."""
+        """
+        Grabs the appropriate emissions factors for purchased feeds for the location of the simulation.
+
+        Parameters
+        ----------
+        county_code : int
+            The FIPS county code of the simulation location.
+        feed_emissions_data : dict[str, list[float]]
+            A mapping of RuFaS feed IDs to their emissions factors per county, including a ``"county_code"`` key
+            listing the county codes in the same order as the factors.
+
+        Returns
+        -------
+        dict[str, float]
+            A mapping of RuFaS feed IDs to their emissions factors for the simulation's county.
+
+        Raises
+        ------
+        ValueError
+            If the simulation's county code is not present in ``feed_emissions_data``.
+        """
         county_codes = feed_emissions_data["county_code"]
         try:
             emissions_index = county_codes.index(county_code)
@@ -838,7 +877,15 @@ class EmissionsEstimator:
         self,
         daily_farmgrown_feed_fed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
     ) -> None:
-        """Reports the emissions and resources for daily farmgrown feeds fed to the animals."""
+        """
+        Reports the emissions and resources for daily farmgrown feeds fed to the animals.
+
+        Parameters
+        ----------
+        daily_farmgrown_feed_fed_emissions_and_resources : dict[RUFAS_ID, dict[int, dict[str, float]]]
+            The daily emissions and resources attributable to the farmgrown feed fed to animals, keyed by feed ID,
+            simulation day, and variable name.
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._report_daily_farmgrown_feed_fed_emissions_and_resources.__name__,
@@ -901,7 +948,16 @@ class EmissionsEstimator:
     def _calculate_and_report_lca_emissions(
         self, farm_grown_feeds_fed_to_animals: list[RUFAS_ID], feed_deductions_data: dict[RUFAS_ID, dict[int, float]]
     ) -> None:
-        """Calculates and reports LCA and Land-Use-Change emissions."""
+        """
+        Calculates and reports life cycle assessment (LCA) and land use change emissions.
+
+        Parameters
+        ----------
+        farm_grown_feeds_fed_to_animals : list[RUFAS_ID]
+            The feed IDs of the farmgrown feeds that were fed to animals during the simulation.
+        feed_deductions_data : dict[RUFAS_ID, dict[int, float]]
+            Daily feed deduction amounts for each farmgrown feed, keyed by feed ID and simulation day.
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._calculate_and_report_lca_emissions.__name__,
