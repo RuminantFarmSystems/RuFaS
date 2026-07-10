@@ -563,7 +563,10 @@ class GraphGenerator:
         max_data_length = max(len(v) for v in data.values())
         if slice_start is not None:
             slice_start_sim_day = self.time.convert_slice_to_simulation_day(slice_start)
-            slice_end_sim_day = self.time.convert_slice_to_simulation_day(slice_end)
+            if slice_end is None:
+                slice_end_sim_day = self.time.simulation_length_days
+            else:
+                slice_end_sim_day = self.time.convert_slice_to_simulation_day(slice_end)
             dates_in_data_range = [
                 self.time.convert_simulation_day_to_date(i) for i in range(slice_start_sim_day, slice_end_sim_day)
             ]
