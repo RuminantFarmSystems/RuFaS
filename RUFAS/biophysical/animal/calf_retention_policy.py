@@ -1,22 +1,3 @@
-"""Single home for all female-calf retention logic (keep vs. sell).
-
-Two user-selectable methods are supported (see issue #3055 and the design doc):
-
-* ``"rate"`` (Option 1, the historical default): each live female calf is kept with
-  probability :attr:`AnimalConfig.keep_female_calf_rate`.
-* ``"count"`` (Option 2): the user specifies a target number of female calves to keep
-  per year (:attr:`AnimalConfig.keep_female_calf_num_annual`). That target is spread
-  evenly across the simulation year as "keep tags"; each live female calf born consumes
-  an outstanding tag and is kept, otherwise it is sold. Tags left unfulfilled at year
-  end trigger a warning.
-
-Consolidating both methods here is deliberate. The keep/sell decision previously lived
-inside ``Animal._initialize_newborn_calf`` with no access to herd-level, per-year state,
-which made the count-based option impossible to express. Owning the decision (and the
-annual schedule) in one place lets ``HerdManager`` drive it and makes the logic
-unit-testable in isolation.
-"""
-
 from __future__ import annotations
 
 from random import random
@@ -41,14 +22,37 @@ UNFULFILLED_TAG_ERROR_FRACTION = 0.20
 class CalfRetentionPolicy:
     """Decide whether each newborn female calf is kept on-farm or sold.
 
-    A single instance is owned by :class:`HerdManager` for the live simulation. The
-    rate-based decision is also exposed as a class method for herd initialization
-    (spin-up), where the simulation clock does not advance.
-
     Attributes
     ----------
     om : OutputManager
-        Used to emit the year-end "insufficient female calves" warning (count method).
+        Used to emit the year-end warning/error about insufficient female calves (count method only).
+    _scheduled_year : int | None
+        Simulation year the active keep-tag schedule was built for; used to detect year rollovers.
+    _daily_tag_release : dict[int, int]
+        Mapping of Julian day to the number of keep tags released that day in the current year.
+    _outstanding_tags : int
+        Keep tags released but not yet fulfilled by a live female calf.
+    _target_tags_this_year : int
+        Total keep tags scheduled for the current simulation year.
+    _tags_fulfilled_this_year : int
+        Keep tags fulfilled (female calves kept) so far in the current simulation year.
+
+    Notes
+    -----
+    This class is the single home for all female-calf retention (keep vs. sell) logic. Two
+    user-selectable methods are supported:
+
+    * ``"rate"`` (the historical default): each live female calf is kept with probability
+      :attr:`AnimalConfig.keep_female_calf_rate`.
+    * ``"count"``: the user specifies a target number of female calves to keep per year
+      (:attr:`AnimalConfig.annual_keep_female_calf_num`). That target is spread evenly across
+      the simulation year as "keep tags"; each live female calf born consumes an outstanding
+      tag and is kept, otherwise it is sold. Tags left unfulfilled at year end trigger a
+      warning, and a large shortfall stops the simulation.
+
+    A single instance is owned by :class:`HerdManager` for the live simulation. The rate-based
+    decision is also exposed as a class method for herd initialization (spin-up), where the
+    simulation clock does not advance.
 
     """
 
@@ -62,7 +66,7 @@ class CalfRetentionPolicy:
 
     @property
     def is_count_based(self) -> bool:
-        """Whether the count-based (Option 2) method is selected."""
+        """Whether the count-based method is selected."""
         return AnimalConfig.calf_retention_method == RETENTION_METHOD_COUNT
 
     def begin_day(self, time: RufasTime) -> None:
@@ -87,8 +91,7 @@ class CalfRetentionPolicy:
         self._outstanding_tags += self._daily_tag_release.get(time.current_julian_day, 0)
 
     def finalize_day(self, time: RufasTime) -> None:
-        """
-        Run the year-end keep-target check on the last day of a simulation year (count method).
+        """Run the year-end keep-target check on the last day of a simulation year (count method only).
 
         Parameters
         ----------
@@ -112,11 +115,8 @@ class CalfRetentionPolicy:
         if time.current_julian_day == time.year_end_day:
             self._check_year_end_target(time)
 
-    def apply(self, calf: "Animal", simulation_day: int) -> None:
+    def apply_retention_decision(self, calf: "Animal", simulation_day: int) -> None:
         """Apply the configured retention decision to a newborn calf.
-
-        Sets ``calf.sold_at_day`` when the calf is not kept; leaves it untouched (``None``)
-        when the calf is kept.
 
         Parameters
         ----------
@@ -124,19 +124,20 @@ class CalfRetentionPolicy:
             The freshly created newborn calf (sex and stillborn status already assigned).
         simulation_day : int
             The current simulation day, recorded as the sale day when the calf is sold.
+
+        Notes
+        -----
+        Sets ``calf.sold_at_day`` when the calf is not kept; leaves it untouched (``None``)
+        when the calf is kept.
+
         """
         is_sold = self._is_sold_count_based(calf) if self.is_count_based else self._is_sold_rate_based(calf)
         if is_sold:
             calf.sold_at_day = simulation_day
 
     @classmethod
-    def apply_rate_based(cls, calf: "Animal", simulation_day: int) -> None:
-        """Apply rate-based (Option 1) retention regardless of the configured method.
-
-        Used during herd initialization (spin-up). The spin-up clock does not advance, so
-        the count-based annual schedule cannot be built there; the initial herd is instead
-        stocked with the historical rate-based behavior, and the count-based target then
-        governs intake once the main simulation begins.
+    def apply_rate_based_retention(cls, calf: "Animal", simulation_day: int) -> None:
+        """Apply rate-based retention regardless of the configured method.
 
         Parameters
         ----------
@@ -145,14 +146,20 @@ class CalfRetentionPolicy:
         simulation_day : int
             The current simulation day, recorded as the sale day when the calf is sold.
 
+        Notes
+        -----
+        Used during herd initialization (spin-up). The spin-up clock does not advance, so the
+        count-based annual schedule cannot be built there; the initial herd is instead stocked
+        with the historical rate-based behavior, and the count-based target then governs intake
+        once the main simulation begins.
+
         """
         if cls._is_sold_rate_based(calf):
             calf.sold_at_day = simulation_day
 
     @staticmethod
     def _is_sold_rate_based(calf: "Animal") -> bool:
-        """
-        Option 1: sell males; keep each live female with probability keep_female_calf_rate.
+        """Sell males; keep each live female with probability keep_female_calf_rate.
 
         Notes
         -----
@@ -164,7 +171,7 @@ class CalfRetentionPolicy:
         return calf.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate
 
     def _is_sold_count_based(self, calf: "Animal") -> bool:
-        """Option 2: keep a live female calf only if an outstanding keep tag is available."""
+        """Keep a live female calf only if an outstanding keep tag is available."""
         if calf.sex == Sex.MALE or calf.stillborn:
             return True
         if self._outstanding_tags > 0:
@@ -185,21 +192,27 @@ class CalfRetentionPolicy:
     def _build_year_schedule(time: RufasTime) -> dict[int, int]:
         """Spread the annual keep target evenly across the simulated days of the current year.
 
-        Returns a mapping of Julian day -> number of keep tags released that day. The annual
-        target is prorated for partial first/last simulation years (a half-year of operation
-        keeps roughly half the annual target). Tags are distributed deterministically with a
-        cumulative-floor (Bresenham-style) sweep, so the schedule sums exactly to the
-        (prorated) target and never depends on the RNG.
+        Parameters
+        ----------
+        time : RufasTime
+            Current simulation time (provides the year's day range and calendar year).
+
+        Returns
+        -------
+        dict[int, int]
+            Mapping of Julian day to the number of keep tags released that day. The annual
+            target is prorated for partial first/last simulation years, and the schedule sums
+            exactly to the (prorated) target.
 
         Notes
         -----
-        The design doc suggests randomly rounding the ``days / target`` spacing. A
-        deterministic even spread is used instead for reproducibility and testability (the
-        codebase has known PYTHONHASHSEED-sensitive behavior). The temporal distribution is
-        equivalent in aggregate; this choice is flagged for SME review.
+        Tags are distributed deterministically with a cumulative-floor (Bresenham-style) sweep
+        rather than by randomly rounding the spacing, so the schedule never depends on the RNG
+        (the codebase has known PYTHONHASHSEED-sensitive behavior). The temporal distribution
+        is equivalent in aggregate.
 
         """
-        target_annual = AnimalConfig.keep_female_calf_num_annual
+        target_annual = AnimalConfig.annual_keep_female_calf_num
         start_day = time.year_start_day
         end_day = time.year_end_day
         days_available = end_day - start_day + 1
@@ -221,13 +234,7 @@ class CalfRetentionPolicy:
         return schedule
 
     def _check_year_end_target(self, time: RufasTime) -> None:
-        """
-        React to keep tags left unfulfilled by the count-based target at year end.
-
-        Any leftover tags emit a warning. A shortfall of at least
-        ``UNFULFILLED_TAG_ERROR_FRACTION`` of the annual target raises a ``RuntimeError``,
-        stopping the simulation so the user can adjust inputs (the female-calf supply cannot
-        meet the requested target).
+        """React to keep tags left unfulfilled by the count-based target at year end.
 
         Parameters
         ----------
@@ -238,6 +245,13 @@ class CalfRetentionPolicy:
         ------
         RuntimeError
             If the unfulfilled fraction reaches ``UNFULFILLED_TAG_ERROR_FRACTION``.
+
+        Notes
+        -----
+        Any leftover tags emit a warning. A shortfall of at least
+        ``UNFULFILLED_TAG_ERROR_FRACTION`` of the annual target raises a ``RuntimeError``,
+        stopping the simulation so the user can adjust inputs (the female-calf supply cannot
+        meet the requested target).
 
         """
         unfulfilled = self._outstanding_tags
@@ -253,7 +267,7 @@ class CalfRetentionPolicy:
             f"Simulation year {time.current_simulation_year}: {unfulfilled} of "
             f"{self._target_tags_this_year} female-calf keep tags went unfulfilled "
             f"(kept {self._tags_fulfilled_this_year}). Fewer female calves were kept than the "
-            f"target keep_female_calf_num_annual={AnimalConfig.keep_female_calf_num_annual}."
+            f"target annual_keep_female_calf_num={AnimalConfig.annual_keep_female_calf_num}."
         )
 
         if unfulfilled >= self._target_tags_this_year * UNFULFILLED_TAG_ERROR_FRACTION:
@@ -261,7 +275,7 @@ class CalfRetentionPolicy:
                 f"{shortfall} At least {round(UNFULFILLED_TAG_ERROR_FRACTION * 100)}% of the annual "
                 "target could not be met, so the simulation is stopped. Increase the number of "
                 "female calves born (for example, lower the male calf rate or use sexed semen) or "
-                "lower keep_female_calf_num_annual. To avoid this error, use the 'rate' retention method."
+                "lower annual_keep_female_calf_num. To avoid this error, use the 'rate' retention method."
             )
             self.om.add_error("Female-calf keep target unreachable", message, info_map)
             raise RuntimeError(message)

@@ -1,11 +1,3 @@
-"""Unit tests for CalfRetentionPolicy (issue #3055).
-
-Covers both retention methods that the policy consolidates:
-* ``"rate"`` (Option 1): per-calf probabilistic keep/sell, preserving legacy behavior.
-* ``"count"`` (Option 2): annual keep-tag target spread across the year, with a year-end
-  warning when too few female calves are born to meet it.
-"""
-
 from collections.abc import Generator
 from types import SimpleNamespace
 from typing import cast
@@ -59,18 +51,17 @@ def restore_retention_config() -> Generator[None, None, None]:
     """Snapshot and restore the AnimalConfig fields the policy reads (global class state)."""
     saved = (
         AnimalConfig.calf_retention_method,
-        AnimalConfig.keep_female_calf_num_annual,
+        AnimalConfig.annual_keep_female_calf_num,
         AnimalConfig.keep_female_calf_rate,
     )
     yield
     (
         AnimalConfig.calf_retention_method,
-        AnimalConfig.keep_female_calf_num_annual,
+        AnimalConfig.annual_keep_female_calf_num,
         AnimalConfig.keep_female_calf_rate,
     ) = saved
 
 
-# --------------------------------------------------------------------------- rate method
 def test_rate_method_keeps_female_when_draw_at_or_below_rate(mocker: MockerFixture) -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
     AnimalConfig.keep_female_calf_rate = 0.5
@@ -78,9 +69,9 @@ def test_rate_method_keeps_female_when_draw_at_or_below_rate(mocker: MockerFixtu
     policy = CalfRetentionPolicy()
 
     calf = _calf(sex=Sex.FEMALE)
-    policy.apply(calf, simulation_day=10)
+    policy.apply_retention_decision(calf, simulation_day=10)
 
-    assert calf.sold_at_day is None  # kept
+    assert calf.sold_at_day is None
 
 
 def test_rate_method_sells_female_when_draw_above_rate(mocker: MockerFixture) -> None:
@@ -90,9 +81,9 @@ def test_rate_method_sells_female_when_draw_above_rate(mocker: MockerFixture) ->
     policy = CalfRetentionPolicy()
 
     calf = _calf(sex=Sex.FEMALE)
-    policy.apply(calf, simulation_day=10)
+    policy.apply_retention_decision(calf, simulation_day=10)
 
-    assert calf.sold_at_day == 10  # sold
+    assert calf.sold_at_day == 10
 
 
 def test_rate_method_always_sells_males_without_drawing(mocker: MockerFixture) -> None:
@@ -102,32 +93,29 @@ def test_rate_method_always_sells_males_without_drawing(mocker: MockerFixture) -
     policy = CalfRetentionPolicy()
 
     calf = _calf(sex=Sex.MALE)
-    policy.apply(calf, simulation_day=7)
+    policy.apply_retention_decision(calf, simulation_day=7)
 
     assert calf.sold_at_day == 7
-    mock_random.assert_not_called()  # short-circuits before drawing, matching legacy behavior
+    mock_random.assert_not_called()
 
 
-def test_apply_rate_based_classmethod(mocker: MockerFixture) -> None:
-    # Used during herd initialization regardless of the configured method.
-    AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT  # should be ignored by apply_rate_based
+def test_apply_rate_based_retention_classmethod(mocker: MockerFixture) -> None:
+    AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     AnimalConfig.keep_female_calf_rate = 1.0
     mocker.patch(RANDOM_PATH, return_value=0.99)
 
     kept = _calf(sex=Sex.FEMALE)
-    CalfRetentionPolicy.apply_rate_based(kept, simulation_day=3)
-    assert kept.sold_at_day is None  # rate 1.0 keeps every live female
+    CalfRetentionPolicy.apply_rate_based_retention(kept, simulation_day=3)
+    assert kept.sold_at_day is None
 
     AnimalConfig.keep_female_calf_rate = 0.0
     sold = _calf(sex=Sex.FEMALE)
-    CalfRetentionPolicy.apply_rate_based(sold, simulation_day=3)
+    CalfRetentionPolicy.apply_rate_based_retention(sold, simulation_day=3)
     assert sold.sold_at_day == 3
 
 
-# -------------------------------------------------------------------------- count method
 def test_count_method_fulfills_tags_then_sells(mocker: MockerFixture) -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
-    # random must never be consulted in count mode.
     mock_random = mocker.patch(RANDOM_PATH)
     policy = CalfRetentionPolicy()
     policy._outstanding_tags = 2
@@ -135,13 +123,13 @@ def test_count_method_fulfills_tags_then_sells(mocker: MockerFixture) -> None:
     first = _calf(sex=Sex.FEMALE)
     second = _calf(sex=Sex.FEMALE)
     third = _calf(sex=Sex.FEMALE)
-    policy.apply(first, simulation_day=5)
-    policy.apply(second, simulation_day=5)
-    policy.apply(third, simulation_day=5)
+    policy.apply_retention_decision(first, simulation_day=5)
+    policy.apply_retention_decision(second, simulation_day=5)
+    policy.apply_retention_decision(third, simulation_day=5)
 
-    assert first.sold_at_day is None  # tag consumed -> kept
-    assert second.sold_at_day is None  # tag consumed -> kept
-    assert third.sold_at_day == 5  # no tags left -> sold
+    assert first.sold_at_day is None
+    assert second.sold_at_day is None
+    assert third.sold_at_day == 5
     assert policy._outstanding_tags == 0
     assert policy._tags_fulfilled_this_year == 2
     mock_random.assert_not_called()
@@ -154,64 +142,61 @@ def test_count_method_males_and_stillborn_never_consume_tags() -> None:
 
     male = _calf(sex=Sex.MALE)
     stillborn_female = _calf(sex=Sex.FEMALE, stillborn=True)
-    policy.apply(male, simulation_day=9)
-    policy.apply(stillborn_female, simulation_day=9)
+    policy.apply_retention_decision(male, simulation_day=9)
+    policy.apply_retention_decision(stillborn_female, simulation_day=9)
 
     assert male.sold_at_day == 9
     assert stillborn_female.sold_at_day == 9
-    assert policy._outstanding_tags == 1  # tag preserved for a live female
+    assert policy._outstanding_tags == 1
 
 
-# ------------------------------------------------------------------ schedule generation
 def test_schedule_sums_to_target_over_full_year() -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
-    AnimalConfig.keep_female_calf_num_annual = 500
+    AnimalConfig.annual_keep_female_calf_num = 500
     policy = CalfRetentionPolicy()
 
     schedule = policy._build_year_schedule(_time(year_start_day=1, year_end_day=365, calendar_year=2023))
 
-    assert sum(schedule.values()) == 500  # exact, deterministic
-    assert len(schedule) > 1  # spread across the year, not dumped on one day
-    assert max(schedule.values()) <= 2  # ~500/365 -> at most 2 per day
+    assert sum(schedule.values()) == 500
+    assert len(schedule) > 1
+    assert max(schedule.values()) <= 2
 
 
 def test_schedule_sums_to_target_over_leap_year() -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
-    AnimalConfig.keep_female_calf_num_annual = 366
+    AnimalConfig.annual_keep_female_calf_num = 366
     policy = CalfRetentionPolicy()
 
     schedule = policy._build_year_schedule(_time(year_start_day=1, year_end_day=366, calendar_year=2024))
 
     assert sum(schedule.values()) == 366
-    assert all(count == 1 for count in schedule.values())  # one tag per day in a 366/366 case
+    assert all(count == 1 for count in schedule.values())
 
 
 def test_schedule_prorates_partial_year() -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
-    AnimalConfig.keep_female_calf_num_annual = 400
+    AnimalConfig.annual_keep_female_calf_num = 400
     policy = CalfRetentionPolicy()
 
-    # Simulation starts mid-year on Julian day 183 of a non-leap year (183 days available).
     schedule = policy._build_year_schedule(_time(year_start_day=183, year_end_day=365, calendar_year=2023))
 
     days_available = 365 - 183 + 1
     assert sum(schedule.values()) == round(400 * days_available / 365)
-    assert sum(schedule.values()) < 400  # fewer than a full year's target
-    assert min(schedule) >= 183  # tags only on simulated days
+    assert sum(schedule.values()) < 400
+    assert min(schedule) >= 183
 
 
 def test_schedule_empty_when_target_zero() -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
-    AnimalConfig.keep_female_calf_num_annual = 0
+    AnimalConfig.annual_keep_female_calf_num = 0
     policy = CalfRetentionPolicy()
 
     assert policy._build_year_schedule(_time()) == {}
 
 
-# ----------------------------------------------------------------------- per-day hooks
 def test_begin_day_releases_scheduled_tags() -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
-    AnimalConfig.keep_female_calf_num_annual = 365  # 1 tag/day over a full non-leap year
+    AnimalConfig.annual_keep_female_calf_num = 365
     policy = CalfRetentionPolicy()
 
     policy.begin_day(_time(sim_year=1, julian_day=1, year_end_day=365, calendar_year=2023))
@@ -223,29 +208,27 @@ def test_begin_day_releases_scheduled_tags() -> None:
 
 def test_year_rollover_rebuilds_schedule_and_resets_ledger() -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
-    AnimalConfig.keep_female_calf_num_annual = 365
+    AnimalConfig.annual_keep_female_calf_num = 365
     policy = CalfRetentionPolicy()
 
     policy.begin_day(_time(sim_year=1, julian_day=5, year_end_day=365, calendar_year=2023))
     assert policy._scheduled_year == 1
-    policy._outstanding_tags += 50  # pretend some tags accumulated unfulfilled
+    policy._outstanding_tags += 50
     policy._tags_fulfilled_this_year = 7
 
-    # Roll into a new simulation year (non-leap, so 365 tags spread one-per-day).
     policy.begin_day(_time(sim_year=2, julian_day=1, year_end_day=365, calendar_year=2025))
     assert policy._scheduled_year == 2
-    assert policy._outstanding_tags == 1  # ledger reset to 0, then day-1 release of the new year
-    assert policy._tags_fulfilled_this_year == 0  # fulfilled counter reset for the new year
+    assert policy._outstanding_tags == 1
+    assert policy._tags_fulfilled_this_year == 0
 
 
 def test_finalize_day_warns_on_any_leftover_below_error_threshold(mocker: MockerFixture) -> None:
-    # Any leftover tag (but below the error threshold) warns without stopping the simulation.
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
     policy._scheduled_year = 1
     policy._target_tags_this_year = 100
-    policy._outstanding_tags = round(100 * UNFULFILLED_TAG_ERROR_FRACTION) - 1  # just below the error threshold
+    policy._outstanding_tags = round(100 * UNFULFILLED_TAG_ERROR_FRACTION) - 1
 
     policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
 
@@ -254,7 +237,6 @@ def test_finalize_day_warns_on_any_leftover_below_error_threshold(mocker: Mocker
 
 
 def test_finalize_day_warns_on_a_single_leftover_tag(mocker: MockerFixture) -> None:
-    # The animal team wants a warning for *any* leftover, even one.
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
@@ -274,7 +256,7 @@ def test_finalize_day_no_message_when_target_fully_met(mocker: MockerFixture) ->
     mock_om = mocker.patch.object(policy, "om")
     policy._scheduled_year = 1
     policy._target_tags_this_year = 100
-    policy._outstanding_tags = 0  # every tag fulfilled
+    policy._outstanding_tags = 0
 
     policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
 
@@ -289,24 +271,23 @@ def test_finalize_day_errors_and_stops_when_shortfall_reaches_threshold(mocker: 
     mock_om = mocker.patch.object(policy, "om")
     policy._scheduled_year = 1
     policy._target_tags_this_year = 100
-    policy._outstanding_tags = round(100 * fraction)  # at or above the 20% error threshold
+    policy._outstanding_tags = round(100 * fraction)
 
     with pytest.raises(RuntimeError):
         policy.finalize_day(_time(sim_year=1, julian_day=365, year_end_day=365))
 
     assert mock_om.add_error.called
-    assert not mock_om.add_warning.called  # the error path replaces the warning
+    assert not mock_om.add_warning.called
 
 
 def test_finalize_day_no_action_before_year_end(mocker: MockerFixture) -> None:
-    # A large shortfall must not warn or halt mid-year -- only on the last day of the year.
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
     policy._target_tags_this_year = 100
     policy._outstanding_tags = 99
 
-    policy.finalize_day(_time(sim_year=1, julian_day=200, year_end_day=365))  # not the year-end day
+    policy.finalize_day(_time(sim_year=1, julian_day=200, year_end_day=365))
 
     assert not mock_om.add_warning.called
     assert not mock_om.add_error.called
@@ -314,7 +295,7 @@ def test_finalize_day_no_action_before_year_end(mocker: MockerFixture) -> None:
 
 def test_hooks_are_noops_under_rate_method(mocker: MockerFixture) -> None:
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
-    AnimalConfig.keep_female_calf_num_annual = 365
+    AnimalConfig.annual_keep_female_calf_num = 365
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
 

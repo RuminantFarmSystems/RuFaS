@@ -79,7 +79,7 @@ def animal_json() -> dict[str, Any]:
                     "male_calf_rate_conventional_semen": 0.53,
                     "keep_female_calf_rate": 1,
                     "calf_retention_method": "rate",
-                    "keep_female_calf_num_annual": 0,
+                    "annual_keep_female_calf_num": 0,
                     "wean_day": 60,
                     "wean_length": 7,
                     "milk_type": "whole",

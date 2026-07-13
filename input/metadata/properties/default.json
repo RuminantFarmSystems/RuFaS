@@ -279,7 +279,7 @@
           },
           "keep_female_calf_rate": {
             "type": "number",
-            "description": "Female Calf Retention Rate (percent) -- The percentage of female calves kept and raised on-farm; used when Female Calf Retention Method is 'rate'",
+            "description": "Female Calf Retention Rate (fraction) -- The fraction of female calves kept and raised on-farm; used when Female Calf Retention Method is 'rate'",
             "default": 1,
             "minimum": 0,
             "maximum": 1
@@ -290,7 +290,7 @@
             "pattern": "^(rate|count)$",
             "description": "Female Calf Retention Method (select one) -- 'rate' keeps each live female calf with probability Female Calf Retention Rate; 'count' keeps a target number of female calves per year (Female Calves Kept Per Year)"
           },
-          "keep_female_calf_num_annual": {
+          "annual_keep_female_calf_num": {
             "type": "number",
             "description": "Female Calves Kept Per Year (head/year) -- Target number of dairy female calves to keep per year; used when Female Calf Retention Method is 'count'",
             "default": 0,
