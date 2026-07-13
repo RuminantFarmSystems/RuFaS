@@ -59,9 +59,7 @@ def test_estimate_all(
     mock_tractor = mocker.patch(
         f"{EnergyEstimator.__module__}.Tractor",
     )
-    mock_tractor.return_value.tractor_size = (
-        TractorSize(tractor_size) if tractor_size else TractorSize.SMALL
-    )
+    mock_tractor.return_value.tractor_size = TractorSize(tractor_size) if tractor_size else TractorSize.SMALL
 
     def mock_get_data(data_address: str) -> Any:
         if data_address == "EEE_constants.constants":
@@ -85,12 +83,8 @@ def test_estimate_all(
     )
 
     mock_parse_inputs.assert_called_once_with()
-    assert mock_calculate_diesel_consumption.call_count == len(
-        parsed_diesel_consumption_inputs
-    )
-    assert mock_report_diesel_consumption.call_count == len(
-        parsed_diesel_consumption_inputs
-    )
+    assert mock_calculate_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
+    assert mock_report_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
     assert mock_tractor.call_count == len(parsed_diesel_consumption_inputs)
 
     expected_tractor_size = TractorSize(tractor_size) if tractor_size else None
