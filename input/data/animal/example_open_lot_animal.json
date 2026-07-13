@@ -49,6 +49,8 @@
         "male_calf_rate_sexed_semen": 0.1,
         "male_calf_rate_conventional_semen": 0.53,
         "keep_female_calf_rate": 1,
+        "calf_retention_method": "rate",
+        "annual_keep_female_calf_num": 0,
         "wean_day": 60,
         "wean_length": 7,
         "milk_type": "whole"
@@ -65,7 +67,7 @@
         "heifers": {
             "estrus_detection_rate": 0.9,
             "estrus_conception_rate": 0.6,
-            "repro_sub_protocol": "5dCG2P",
+            "repro_sub_protocol": "N/A",
             "repro_sub_properties": {
                 "conception_rate": 0.6,
                 "estrus_detection_rate": 0.9

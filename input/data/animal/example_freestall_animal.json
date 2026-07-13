@@ -49,12 +49,14 @@
         "male_calf_rate_sexed_semen": 0.1,
         "male_calf_rate_conventional_semen": 0.53,
         "keep_female_calf_rate": 1,
+        "calf_retention_method": "rate",
+        "annual_keep_female_calf_num": 0,
         "wean_day": 60,
         "wean_length": 7,
         "milk_type": "whole"
       },
       "repro": {
-        "voluntary_waiting_period": 50,
+        "voluntary_waiting_period": 0,
         "conception_rate_decrease": 0.026,
         "decrease_conception_rate_in_rebreeding": false,
         "decrease_conception_rate_by_parity": false,
