@@ -342,7 +342,7 @@ class HerdFactory:
         cow.reproduction.calf_birth_weight = 0.0
 
         calf = Animal(args, self.time)
-        CalfRetentionPolicy.apply_rate_based(calf, self.time.simulation_day)
+        CalfRetentionPolicy.apply_rate_based_retention(calf, self.time.simulation_day)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
 
@@ -405,7 +405,7 @@ class HerdFactory:
                 animal_type=AnimalType.CALF.value,
             )
             calf = Animal(args, self.time)
-            CalfRetentionPolicy.apply_rate_based(calf, self.time.simulation_day)
+            CalfRetentionPolicy.apply_rate_based_retention(calf, self.time.simulation_day)
             if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
 

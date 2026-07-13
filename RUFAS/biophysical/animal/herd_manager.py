@@ -946,7 +946,7 @@ class HerdManager:
         """
         newborn_calf_config["id"] = AnimalPopulation.next_id()
         newborn_calf: Animal = Animal(args=newborn_calf_config, time=time)
-        self.calf_retention_policy.apply(newborn_calf, time.simulation_day)
+        self.calf_retention_policy.apply_retention_decision(newborn_calf, time.simulation_day)
         if AnimalConfig.simulate_genetics and newborn_calf.genetics is not None:
             mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
                 [animal.genetics for animal in self.calves if animal.genetics is not None]
