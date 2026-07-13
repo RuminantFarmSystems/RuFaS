@@ -33,6 +33,10 @@ from RUFAS.EEE.economics.fallback_values import (
     ECONOMIC_QUANTITY_FALLBACK,
 )
 
+# Provenance marker for pool variables computed in-memory rather than loaded
+# from an input file; used only in InputManager validation messages.
+COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
+
 
 @dataclass(frozen=True)
 class EconomicItem:
@@ -1089,7 +1093,7 @@ class EconomicPreprocessor:
             data=results,
             properties_blob_key="economic_preprocessing_properties",
             eager_termination=False,
-            input_path=Path(),
+            input_path=COMPUTED_PREPROCESSING_INPUT_PATH,
         )
         self.om.add_log(
             "Economic preprocessing",

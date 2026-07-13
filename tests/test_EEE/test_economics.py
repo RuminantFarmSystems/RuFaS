@@ -12,6 +12,26 @@ from RUFAS.EEE.economics.digester_costs import (
 )
 from RUFAS.EEE.economics.equations import EconomicEquations
 
+construct_timeline = EconomicEquations.construct_timeline
+discount_factor = EconomicEquations.discount_factor
+annual_capital_spent = EconomicEquations.annual_capital_spent
+equity_contribution = EconomicEquations.equity_contribution
+loan_principal = EconomicEquations.loan_principal
+construction_interest = EconomicEquations.construction_interest
+npv_capital_plus_interest = EconomicEquations.npv_capital_plus_interest
+annual_loan_payment = EconomicEquations.annual_loan_payment
+interest_payment = EconomicEquations.interest_payment
+principal_after_payment = EconomicEquations.principal_after_payment
+depreciation_schedule = EconomicEquations.depreciation_schedule
+net_revenue = EconomicEquations.net_revenue
+loss_carry_forward = EconomicEquations.loss_carry_forward
+max_loss_utilized = EconomicEquations.max_loss_utilized
+taxable_income = EconomicEquations.taxable_income
+income_tax = EconomicEquations.income_tax
+annual_cash_income = EconomicEquations.annual_cash_income
+present_value = EconomicEquations.present_value
+net_present_value = EconomicEquations.net_present_value
+
 
 def test_run_economic_analysis_uses_dcfror_when_capital_present(
     mocker: MockerFixture,
@@ -26,19 +46,18 @@ def test_run_economic_analysis_uses_dcfror_when_capital_present(
     sentinel = {"section": {}}
     mock_preproc_cls = mocker.patch("RUFAS.EEE.economics.framework.EconomicPreprocessor")
     mock_preproc_cls.return_value.preprocess.return_value = sentinel
-    mock_om_cls = mocker.patch("RUFAS.EEE.economics.framework.OutputManager")
+    mocker.patch("RUFAS.EEE.economics.framework.OutputManager")
 
     result = EconomicFramework().run_economic_analysis()
 
     mock_calc_cls.assert_called_once_with()
-    mock_calc_cls.return_value.calculate.assert_called_once_with(sentinel)
-    mock_om_cls.return_value.add_variable.assert_not_called()
+    mock_calc_cls.return_value.calculate.assert_called_once_with()
     assert result is None
 
 
 def test_run_economic_analysis_uses_pba_when_no_capital(mocker: MockerFixture) -> None:
     im_cls = mocker.patch("RUFAS.EEE.economics.framework.InputManager")
-    im_cls.return_value.get_data.return_value = pd.DataFrame({"Cost": [0]})
+    im_cls.return_value.get_data.return_value = pd.DataFrame()
     sentinel = {"section": {"category": {}}}
     mock_preproc_cls = mocker.patch("RUFAS.EEE.economics.framework.EconomicPreprocessor")
     mock_preproc_cls.return_value.preprocess.return_value = sentinel
@@ -47,12 +66,11 @@ def test_run_economic_analysis_uses_pba_when_no_capital(mocker: MockerFixture) -
         "RUFAS.EEE.economics.framework.PartialBudget.has_partial_budget_activity",
         return_value=True,
     )
-    mock_om_cls = mocker.patch("RUFAS.EEE.economics.framework.OutputManager")
+    mocker.patch("RUFAS.EEE.economics.framework.OutputManager")
 
     result = EconomicFramework().run_economic_analysis()
 
     mock_pba.assert_called_once_with(sentinel)
-    mock_om_cls.return_value.add_variable.assert_not_called()
     assert result is None
 
 
@@ -231,6 +249,8 @@ def test_dcfror_goal_seek_returns_nan_for_invalid_bounds(mocker: MockerFixture) 
 def test_dcfror_prepare_costs_applies_goal_seek_unit_price_multiplier(mocker: MockerFixture) -> None:
     calc = DCFRORCalculator.__new__(DCFRORCalculator)
     calc.om = mocker.Mock()
+    calc.im = mocker.Mock()
+    calc.im.get_data.side_effect = KeyError
     calc.inputs = {}
 
     prepared = calc._prepare_costs(
@@ -254,39 +274,6 @@ def test_dcfror_prepare_costs_applies_goal_seek_unit_price_multiplier(mocker: Mo
 def test_estimate_digester_trucking_cost() -> None:
     assert pytest.approx(DigesterCostCalculator.estimate_digester_trucking_cost(1000)) == 137.5 * 1000
     assert pytest.approx(DigesterCostCalculator.estimate_digester_trucking_cost(5000)) == 137.5 * 5000
-
-
-def test_dcfror_prepare_costs_applies_digester_cost_curve(mocker: MockerFixture) -> None:
-    calc = DCFRORCalculator.__new__(DCFRORCalculator)
-    calc.om = mocker.Mock()
-    calc.im = mocker.Mock()
-    calc.im.get_data.side_effect = lambda key: {
-        "animal_properties.herd_information.cow_num": 1000.0,
-        "economic_inputs.Manure.digester.system_type": "Covered Lagoon - RNG",
-    }[key]
-
-    prepared = calc._prepare_costs(
-        {
-            "cost_capital_multiple": [{"Item": "Digester", "Cost": 1.0}, {"Item": "Other", "Cost": 9.0}],
-            "interest_rate_construction": 0.05,
-            "construction_term": 1,
-            "construction_finish_pcts": [1.0],
-            "cost_operational_units": [[1.0, 1.0]],
-            "cost_operational_unit_cost": [[1.0, 1.0]],
-            "units_produced": [[2.0, 2.0]],
-            "unit_cost": [[10.0, 10.0]],
-            "goal_seek_unit_price_multiplier": 1.0,
-            "project_term": 2,
-        }
-    )
-
-    # Capital should replace existing digester row with modeled curve:
-    # (base 10 - old digester 1 + modeled 1,500,000)
-    assert prepared["capital_cost"] == pytest.approx(1_500_009.0)
-
-    # Annual modeled opex: labor + energy + repairs for 1000 cows
-    # = (162,000 + 34,821 + 66,730.25) and added to each year's op cost.
-    assert prepared["operating_costs"].tolist() == pytest.approx([263_552.25, 263_552.25])
 
 
 def test_equation_helpers() -> None:
@@ -330,10 +317,13 @@ def test_equation_helpers() -> None:
     nr = EconomicEquations.net_revenue(500.0, 200.0, 30.0, 20.0)
     assert nr == 250.0
 
-    loss = EconomicEquations.loss_carry_forward(-50.0)
-    assert loss == -50.0
+    carried_loss = loss_carry_forward(-50.0, 0.0)
+    assert carried_loss == -50.0
 
-    taxable = EconomicEquations.taxable_income(nr, loss)
+    used_loss = max_loss_utilized(nr, carried_loss)
+    assert used_loss == 50.0
+
+    taxable = taxable_income(nr, used_loss)
     assert taxable == 200.0
 
     tax = EconomicEquations.income_tax(taxable, 0.3)

@@ -57,6 +57,7 @@ class DummyInputManager:
                 "data": data,
                 "properties_blob_key": properties_blob_key,
                 "eager_termination": eager_termination,
+                "input_path": input_path,
             }
         )
         return True
