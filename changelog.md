@@ -4,6 +4,8 @@
 
 A **changelog** is a structured record of changes made to the codebase over time. It documents new features, bug fixes, and improvements, giving both developers and users a transparent view of how the project evolves across versions. A changelog ensures that the entire development process is **trackable**, improves **collaboration** by clearly communicating changes across team members, and offers **transparency** to users and stakeholders. Additionally, it helps with **debugging** by highlighting specific updates or changes that could potentially introduce new issues.
 
+This **changelog** file keeps a record of updates included in existing version releases.
+
 ### Each changelog entry must include
 
 - PR #. Just the number, omit "PR" and "#". Include a link to the Pull Request using the format "\[<PR #>\]\(\<link to PR\>\)" (see the example below).
@@ -21,15 +23,19 @@ A **changelog** is a structured record of changes made to the codebase over time
 
 ### Current version
 
-v1.0.0
+v1.0.2
 
-### Next Version Updates
+### v1.0.3
 
-- [2994](https://github.com/RuminantFarmSystems/RuFaS/pull/2994) - [minor change] [NoInputChange] [OutputChange] Adds minimums to urine nitrogen equation.
-- [2997](https://github.com/RuminantFarmSystems/RuFaS/pull/2997) - [minor change] [NoInputChange] [OutputChange] Updates throughput in tractor dataset for combine headers.
-- [2998](https://github.com/RuminantFarmSystems/RuFaS/pull/2998) - [minor change] [NoInputChange] [OutputChange] Moved changelog entries to reflect what was in v1.0. Brought changes in 2994 and 2997 into one branch.
-- [3020](https://github.com/RuminantFarmSystems/RuFaS/pull/3020) - [minor change] [NoInputChange] [OutputChange] Corrected manure application ammonia composition calculation
-- [3091](https://github.com/RuminantFarmSystems/RuFaS/pull/3091) - [minor change] [InputChange] [OutputChange] Fixes large seedbed conditioner entry in `tractor_dataset.csv` input.
+- [3121](https://github.com/RuminantFarmSystems/RuFaS/pull/3121) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows. Similar changes made to `dev` branch on PR 3115
+
+### v1.0.2
+
+- [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
+
+### v1.0.1
+
+- [3013](https://github.com/RuminantFarmSystems/RuFaS/pull/3013) - [minor change] [NoInputChange] [OutputChange] Replicates 2998, 2997, and 2994: Adds minimums to urine nitrogen excretion, updates tractor dataset, corrects changelog typos
   
 ### v1.0.0
 
