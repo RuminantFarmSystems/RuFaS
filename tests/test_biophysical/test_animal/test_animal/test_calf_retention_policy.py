@@ -304,7 +304,7 @@ def test_finalize_day_no_action_before_year_end(mocker: MockerFixture) -> None:
     policy._target_tags_this_year = 100
     policy._outstanding_tags = 99
 
-    policy.finalize_day(_time(sim_year=1, julian_day=200, year_end_day=365))  # not the year-end day
+    policy.finalize_day(_time(sim_year=1, julian_day=200, year_end_day=365))
 
     assert not mock_om.add_warning.called
     assert not mock_om.add_error.called
