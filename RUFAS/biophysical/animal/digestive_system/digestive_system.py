@@ -11,17 +11,33 @@ from RUFAS.output_manager import OutputManager
 
 class DigestiveSystem:
     """
-    This class serves as an entry point for the animal digestive systems.
+    An entry point for the animal digestive systems.
+
+    Attributes
+    ----------
+    manure_excretion : AnimalManureExcretions
+        A collection of the animal's manure excretion data.
+    phosphorous_excreted : float
+        The phosphorous excreted by the animal.
+    enteric_methane_emission : float
+        The CH₄ used for GHG reporting and downstream emissions calculations.
+        Represents mitigated enteric methane for cows.
+    enteric_methane_for_energy : float
+        The unmitigated CH₄ used in NASEM ME and ration optimization for cows.
+        Remains at 0.0 for other animals.
+
     """
 
     manure_excretion: AnimalManureExcretions
     phosphorus_excreted: float
     enteric_methane_emission: float
+    enteric_methane_for_energy: float
 
     def __init__(self) -> None:
         self.manure_excretion = AnimalManureExcretions()
         self.phosphorus_excreted = 0.0
         self.enteric_methane_emission: float = 0.0
+        self.enteric_methane_for_energy: float = 0.0
 
     def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> None:
         """
@@ -108,7 +124,7 @@ class DigestiveSystem:
             self.manure_excretion = excretion
 
         elif digestive_system_inputs.animal_type.is_cow:
-            methane_emission = EntericMethaneCalculator.calculate_cow_methane(
+            mitigated_methane_emission, unmitigated_methane_emission = EntericMethaneCalculator.calculate_cow_methane(
                 digestive_system_inputs.is_milking,
                 digestive_system_inputs.body_weight,
                 digestive_system_inputs.fat_content,
@@ -130,7 +146,8 @@ class DigestiveSystem:
                 digestive_system_inputs.nutrients,
             )
 
-            self.enteric_methane_emission = methane_emission
+            self.enteric_methane_emission = mitigated_methane_emission
+            self.enteric_methane_for_energy = unmitigated_methane_emission
             self.phosphorus_excreted = phosphorus
             self.manure_excretion = excretion
 
