@@ -63,6 +63,7 @@ def restore_retention_config() -> Generator[None, None, None]:
 
 
 def test_rate_method_keeps_female_when_draw_at_or_below_rate(mocker: MockerFixture) -> None:
+    """Rate method keeps a live female calf when the random draw is at or below the retention rate."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
     AnimalConfig.keep_female_calf_rate = 0.5
     mocker.patch(RANDOM_PATH, return_value=0.3)
@@ -75,6 +76,7 @@ def test_rate_method_keeps_female_when_draw_at_or_below_rate(mocker: MockerFixtu
 
 
 def test_rate_method_sells_female_when_draw_above_rate(mocker: MockerFixture) -> None:
+    """Rate method sells a female calf when the random draw exceeds the retention rate."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
     AnimalConfig.keep_female_calf_rate = 0.5
     mocker.patch(RANDOM_PATH, return_value=0.7)
@@ -87,6 +89,7 @@ def test_rate_method_sells_female_when_draw_above_rate(mocker: MockerFixture) ->
 
 
 def test_rate_method_always_sells_males_without_drawing(mocker: MockerFixture) -> None:
+    """Rate method sells every male calf without consuming a random draw."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
     AnimalConfig.keep_female_calf_rate = 1.0
     mock_random = mocker.patch(RANDOM_PATH)
@@ -100,6 +103,7 @@ def test_rate_method_always_sells_males_without_drawing(mocker: MockerFixture) -
 
 
 def test_apply_rate_based_retention_classmethod(mocker: MockerFixture) -> None:
+    """apply_rate_based_retention keeps or sells by rate regardless of the configured method."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     AnimalConfig.keep_female_calf_rate = 1.0
     mocker.patch(RANDOM_PATH, return_value=0.99)
@@ -115,6 +119,7 @@ def test_apply_rate_based_retention_classmethod(mocker: MockerFixture) -> None:
 
 
 def test_count_method_fulfills_tags_then_sells(mocker: MockerFixture) -> None:
+    """Count method keeps female calves while tags remain, then sells once tags are exhausted."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     mock_random = mocker.patch(RANDOM_PATH)
     policy = CalfRetentionPolicy()
@@ -136,6 +141,7 @@ def test_count_method_fulfills_tags_then_sells(mocker: MockerFixture) -> None:
 
 
 def test_count_method_males_and_stillborn_never_consume_tags() -> None:
+    """Count method sells males and stillborn calves without consuming a keep tag."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     policy._outstanding_tags = 1
@@ -151,6 +157,7 @@ def test_count_method_males_and_stillborn_never_consume_tags() -> None:
 
 
 def test_schedule_sums_to_target_over_full_year() -> None:
+    """The yearly tag schedule sums exactly to the target over a full non-leap year."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     AnimalConfig.annual_keep_female_calf_num = 500
     policy = CalfRetentionPolicy()
@@ -163,6 +170,7 @@ def test_schedule_sums_to_target_over_full_year() -> None:
 
 
 def test_schedule_sums_to_target_over_leap_year() -> None:
+    """The yearly tag schedule sums exactly to the target over a full leap year."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     AnimalConfig.annual_keep_female_calf_num = 366
     policy = CalfRetentionPolicy()
@@ -174,6 +182,7 @@ def test_schedule_sums_to_target_over_leap_year() -> None:
 
 
 def test_schedule_prorates_partial_year() -> None:
+    """The tag target is prorated across the simulated days of a partial year."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     AnimalConfig.annual_keep_female_calf_num = 400
     policy = CalfRetentionPolicy()
@@ -187,6 +196,7 @@ def test_schedule_prorates_partial_year() -> None:
 
 
 def test_schedule_empty_when_target_zero() -> None:
+    """A target of zero produces an empty tag schedule."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     AnimalConfig.annual_keep_female_calf_num = 0
     policy = CalfRetentionPolicy()
@@ -195,6 +205,7 @@ def test_schedule_empty_when_target_zero() -> None:
 
 
 def test_begin_day_releases_scheduled_tags() -> None:
+    """begin_day adds each day's scheduled tags to the outstanding pool."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     AnimalConfig.annual_keep_female_calf_num = 365
     policy = CalfRetentionPolicy()
@@ -207,6 +218,7 @@ def test_begin_day_releases_scheduled_tags() -> None:
 
 
 def test_year_rollover_rebuilds_schedule_and_resets_ledger() -> None:
+    """A new simulation year rebuilds the schedule and resets the tag ledger."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     AnimalConfig.annual_keep_female_calf_num = 365
     policy = CalfRetentionPolicy()
@@ -223,6 +235,7 @@ def test_year_rollover_rebuilds_schedule_and_resets_ledger() -> None:
 
 
 def test_finalize_day_warns_on_any_leftover_below_error_threshold(mocker: MockerFixture) -> None:
+    """A shortfall below the error threshold logs a warning but does not stop the simulation."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
@@ -237,6 +250,7 @@ def test_finalize_day_warns_on_any_leftover_below_error_threshold(mocker: Mocker
 
 
 def test_finalize_day_warns_on_a_single_leftover_tag(mocker: MockerFixture) -> None:
+    """Even a single unfulfilled tag triggers the year-end warning."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
@@ -251,6 +265,7 @@ def test_finalize_day_warns_on_a_single_leftover_tag(mocker: MockerFixture) -> N
 
 
 def test_finalize_day_no_message_when_target_fully_met(mocker: MockerFixture) -> None:
+    """No warning or error is emitted when every keep tag is fulfilled."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
@@ -266,6 +281,7 @@ def test_finalize_day_no_message_when_target_fully_met(mocker: MockerFixture) ->
 
 @pytest.mark.parametrize("fraction", [UNFULFILLED_TAG_ERROR_FRACTION, 0.5, 1.0])
 def test_finalize_day_errors_and_stops_when_shortfall_reaches_threshold(mocker: MockerFixture, fraction: float) -> None:
+    """A shortfall at or above the error threshold logs an error and stops the simulation."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
@@ -281,6 +297,7 @@ def test_finalize_day_errors_and_stops_when_shortfall_reaches_threshold(mocker: 
 
 
 def test_finalize_day_no_action_before_year_end(mocker: MockerFixture) -> None:
+    """The year-end check does nothing on days that are not the last day of the year."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
     policy = CalfRetentionPolicy()
     mock_om = mocker.patch.object(policy, "om")
@@ -294,6 +311,7 @@ def test_finalize_day_no_action_before_year_end(mocker: MockerFixture) -> None:
 
 
 def test_hooks_are_noops_under_rate_method(mocker: MockerFixture) -> None:
+    """begin_day and finalize_day are no-ops under the rate method."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
     AnimalConfig.annual_keep_female_calf_num = 365
     policy = CalfRetentionPolicy()
