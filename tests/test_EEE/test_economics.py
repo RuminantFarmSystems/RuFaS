@@ -10,26 +10,7 @@ from RUFAS.EEE.economics.metrics import EconomicMetrics
 from RUFAS.EEE.economics.digester_costs import (
     DigesterCostCalculator,
 )
-from RUFAS.EEE.economics.equations import (
-    construct_timeline,
-    discount_factor,
-    annual_capital_spent,
-    equity_contribution,
-    loan_principal,
-    construction_interest,
-    npv_capital_plus_interest,
-    annual_loan_payment,
-    interest_payment,
-    principal_after_payment,
-    depreciation_schedule,
-    net_revenue,
-    loss_carry_forward,
-    taxable_income,
-    income_tax,
-    annual_cash_income,
-    present_value,
-    net_present_value,
-)
+from RUFAS.EEE.economics.equations import EconomicEquations
 
 
 def test_run_economic_analysis_uses_dcfror_when_capital_present(
@@ -309,60 +290,60 @@ def test_dcfror_prepare_costs_applies_digester_cost_curve(mocker: MockerFixture)
 
 
 def test_equation_helpers() -> None:
-    years = construct_timeline(2, 5)
+    years = EconomicEquations.construct_timeline(2, 5)
     assert years.tolist() == [-1, 0, 1, 2, 3, 4, 5]
 
-    df = discount_factor(0.1, 2)
+    df = EconomicEquations.discount_factor(0.1, 2)
     assert pytest.approx(df) == 1 / (1.1**2)
-    assert pytest.approx(discount_factor(0.1, -1)) == 1 / 1.1
+    assert pytest.approx(EconomicEquations.discount_factor(0.1, -1)) == 1 / 1.1
 
     construction_rates = [0.5, 0.5]
-    cap = annual_capital_spent(100.0, construction_rates)
+    cap = EconomicEquations.annual_capital_spent(100.0, construction_rates)
     assert cap.tolist() == [50.0, 50.0]
 
-    equity = equity_contribution(100.0, construction_rates, 0.4)
+    equity = EconomicEquations.equity_contribution(100.0, construction_rates, 0.4)
     assert equity.tolist() == [20.0, 20.0]
 
-    lp = loan_principal(100.0, construction_rates, 0.6)
+    lp = EconomicEquations.loan_principal(100.0, construction_rates, 0.6)
     assert lp.tolist() == [30.0, 30.0]
 
-    ci = construction_interest(lp, 0.05)
+    ci = EconomicEquations.construction_interest(lp, 0.05)
     assert ci.tolist() == [1.5, 3.0]
 
-    npv_ci = npv_capital_plus_interest(cap, ci, 0.1, np.array([-1, 0]))
-    expected_npv = (cap + ci) * np.array([discount_factor(0.1, -1), discount_factor(0.1, 0)])
+    npv_ci = EconomicEquations.npv_capital_plus_interest(cap, ci, 0.1, np.array([-1, 0]))
+    expected_npv = (cap + ci) * np.array([EconomicEquations.discount_factor(0.1, -1), EconomicEquations.discount_factor(0.1, 0)])
     assert np.allclose(npv_ci, expected_npv)
 
-    payment = annual_loan_payment(1000.0, 0.05, 5, 0.8)
+    payment = EconomicEquations.annual_loan_payment(1000.0, 0.05, 5, 0.8)
     expected_payment = 1000.0 * 0.05 * 0.8 / (1 - (1 + 0.05) ** -5)
     assert pytest.approx(payment) == expected_payment
 
-    int_pay = interest_payment(800.0, 0.05)
+    int_pay = EconomicEquations.interest_payment(800.0, 0.05)
     assert pytest.approx(int_pay) == 40.0
 
-    remaining = principal_after_payment(800.0, payment, int_pay)
+    remaining = EconomicEquations.principal_after_payment(800.0, payment, int_pay)
     assert pytest.approx(remaining) == 800.0 - payment + int_pay
 
-    dep = depreciation_schedule(1000.0, np.array([0.1, 0.2]))
+    dep = EconomicEquations.depreciation_schedule(1000.0, np.array([0.1, 0.2]))
     assert dep.tolist() == [100.0, 200.0]
 
-    nr = net_revenue(500.0, 200.0, 30.0, 20.0)
+    nr = EconomicEquations.net_revenue(500.0, 200.0, 30.0, 20.0)
     assert nr == 250.0
 
-    loss = loss_carry_forward(-50.0)
+    loss = EconomicEquations.loss_carry_forward(-50.0)
     assert loss == -50.0
 
-    taxable = taxable_income(nr, loss)
+    taxable = EconomicEquations.taxable_income(nr, loss)
     assert taxable == 200.0
 
-    tax = income_tax(taxable, 0.3)
+    tax = EconomicEquations.income_tax(taxable, 0.3)
     assert tax == 60.0
 
-    aci = annual_cash_income(500.0, 200.0, 50.0, tax)
+    aci = EconomicEquations.annual_cash_income(500.0, 200.0, 50.0, tax)
     assert aci == 190.0
 
-    pv = present_value(aci, discount_factor(0.1, 1))
+    pv = EconomicEquations.present_value(aci, EconomicEquations.discount_factor(0.1, 1))
     assert pytest.approx(pv) == aci / 1.1
 
-    npv = net_present_value(np.array([pv]), np.array([10.0]))
+    npv = EconomicEquations.net_present_value(np.array([pv]), np.array([10.0]))
     assert pytest.approx(npv) == pv - 10.0

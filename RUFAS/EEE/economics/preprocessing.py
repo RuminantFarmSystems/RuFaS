@@ -21,9 +21,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set, Tuple
 
+from RUFAS.biophysical.field.manager.schedule import Schedule
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.util import Aggregator
+from RUFAS.util import Aggregator, Utility
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
@@ -659,28 +660,6 @@ class EconomicPreprocessor:
     # Harvest operations that terminate a crop's life in the field.
     _FINAL_HARVEST_OPS: frozenset[str] = frozenset({"harvest_kill", "kill_only"})
 
-    @staticmethod
-    def _expand_years_with_pattern(years: List[int], skip: int, repeat: int) -> List[int]:
-        """Expand a year list by repeating its spacing pattern, mirroring Schedule.repeat_pattern."""
-        if not years or repeat <= 0:
-            return list(years)
-        differences = [skip + 1]
-        for i in range(1, len(years)):
-            differences.append(years[i] - years[i - 1])
-        full = list(years)
-        diff_idx = 0
-        for _ in range(repeat * len(years)):
-            full.append(full[-1] + differences[diff_idx])
-            diff_idx = (diff_idx + 1) % len(years)
-        return full
-
-    @staticmethod
-    def _elongate(lst: List[Any], target_len: int) -> List[Any]:
-        """Repeat a single-element list to match target_len, otherwise return as-is."""
-        if len(lst) == 1 and target_len > 1:
-            return lst * target_len
-        return list(lst)
-
     def _growing_periods(
         self, schedule: Dict[str, Any]
     ) -> List[Tuple[datetime, datetime]]:
@@ -695,20 +674,20 @@ class EconomicPreprocessor:
         planting_skip = int(schedule.get("planting_skip") or 0)
         harvesting_skip = int(schedule.get("harvesting_skip") or 0)
 
-        raw_p_years: List[int] = list(schedule.get("planting_years") or [])
-        raw_p_days: List[int] = list(schedule.get("planting_days") or [])
-        raw_h_years: List[int] = list(schedule.get("harvest_years") or [])
-        raw_h_days: List[int] = list(schedule.get("harvest_days") or [])
-        raw_h_ops: List[str] = list(schedule.get("harvest_operations") or [])
+        raw_p_years: list[int] = list(schedule.get("planting_years") or [])
+        raw_p_days: list[int] = list(schedule.get("planting_days") or [])
+        raw_h_years: list[int] = list(schedule.get("harvest_years") or [])
+        raw_h_days: list[int] = list(schedule.get("harvest_days") or [])
+        raw_h_ops: list[str] = list(schedule.get("harvest_operations") or [])
 
         if not raw_p_years or not raw_h_years:
             return []
 
-        p_years = self._expand_years_with_pattern(raw_p_years, planting_skip, pattern_repeat)
-        p_days = self._elongate(raw_p_days * (pattern_repeat + 1), len(p_years))
-        h_years = self._expand_years_with_pattern(raw_h_years, harvesting_skip, pattern_repeat)
-        h_days = self._elongate(raw_h_days * (pattern_repeat + 1), len(h_years))
-        h_ops = self._elongate(raw_h_ops * (pattern_repeat + 1), len(h_years))
+        p_years = Schedule.repeat_pattern(raw_p_years, planting_skip, pattern_repeat)
+        p_days = Utility.elongate_list(raw_p_days * (pattern_repeat + 1), len(p_years))
+        h_years = Schedule.repeat_pattern(raw_h_years, harvesting_skip, pattern_repeat)
+        h_days = Utility.elongate_list(raw_h_days * (pattern_repeat + 1), len(h_years))
+        h_ops = Utility.elongate_list(raw_h_ops * (pattern_repeat + 1), len(h_years))
 
         events: List[Tuple[datetime, str]] = []
         for y, d in zip(p_years, p_days):
@@ -828,22 +807,36 @@ class EconomicPreprocessor:
         return daily_area_by_seed
 
     def _extract_daily_seed_price(self, price_data: Any) -> list[float]:
-        info_map = {"class": self.__class__.__name__, "function": self._extract_price_values.__name__}
-        config_data = self.im.get_data("config")
-        start_date = datetime.strptime(
-            str(config_data["start_date"]), "%Y:%j"
-        )
-        end_date = datetime.strptime(
-            str(config_data["end_date"]), "%Y:%j"
-        )
+        """Extract a per-simulation-day price series from seed pricing payloads.
+
+        Yearly prices are resolved per commodity key (with fallback prices for
+        malformed payloads or missing years), then expanded so each simulation
+        day carries its year's price.
+
+        Parameters
+        ----------
+        price_data : Any
+            Mapping of commodity price keys to pricing payloads keyed by year
+            and FIPS code.
+
+        Returns
+        -------
+        list[float]
+            One price per simulation day, matching the length of the daily
+            area series produced by ``_preprocess_seed_costs``.
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._extract_daily_seed_price.__name__}
+        start_date = datetime.strptime(str(self.im.get_data("config.start_date")), "%Y:%j")
+        end_date = datetime.strptime(str(self.im.get_data("config.end_date")), "%Y:%j")
         start_year: int = start_date.year
         end_year: int = end_date.year
-        fips_code: int = int(config_data["FIPS_county_code"])
-        days_count = (end_date - start_date).days
-        date_generator = (start_date + timedelta(days=i) for i in range(days_count))
+        fips_code: int = int(self.im.get_data("config.FIPS_county_code"))
+        days_count = (end_date - start_date).days + 1
 
         daily_seed_price: list[float] = []
         for key, value in price_data.items():
+            fallback_prices: list[float] | None = None
+            price_by_year: dict[int, float] = {}
             if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
                 self.om.add_warning(
                     "MissingPriceData",
@@ -851,23 +844,25 @@ class EconomicPreprocessor:
                     "Using fallback price.",
                     info_map,
                 )
-                daily_seed_price.extend(self._get_fallback_price(start_year, end_year, key))
-                continue
-            fips_idx = value["fips"].index(fips_code)
-            for date in date_generator:
-                year = date.year
-                try:
-                    price = value[f"{year}"][fips_idx]
-                    daily_seed_price.append(price)
-                except (KeyError, IndexError):
-                    self.om.add_warning(
-                        "MissingPriceData",
-                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
-                        "Using fallback price.",
-                        info_map,
-                    )
-                    daily_seed_price.extend(self._get_fallback_price(start_year, end_year, key))
-                    continue
+                fallback_prices = self._get_fallback_price(start_year, end_year, key)
+                price_by_year = {start_year + i: price for i, price in enumerate(fallback_prices)}
+            else:
+                fips_idx = value["fips"].index(fips_code)
+                for year in range(start_year, end_year + 1):
+                    try:
+                        price_by_year[year] = value[f"{year}"][fips_idx]
+                    except (KeyError, IndexError):
+                        self.om.add_warning(
+                            "MissingPriceData",
+                            f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
+                            "Using fallback price.",
+                            info_map,
+                        )
+                        if fallback_prices is None:
+                            fallback_prices = self._get_fallback_price(start_year, end_year, key)
+                        price_by_year[year] = fallback_prices[year - start_year]
+            for i in range(days_count):
+                daily_seed_price.append(price_by_year[(start_date + timedelta(days=i)).year])
         return daily_seed_price
 
     def _process_seed_costs_item(self) -> Dict[str, Any]:
@@ -881,7 +876,7 @@ class EconomicPreprocessor:
         bio_total: dict[str, float] = {}
         price_data: dict[str, list[float]] = {}
         price_values: dict[str, list[float]] = {}
-        price_aggregate: dict[str,float] = {}
+        price_aggregate: dict[str, float] = {}
         total_seed_cost = 0.0
 
         for seed_key, daily_area in daily_area_by_seed.items():
@@ -1063,7 +1058,7 @@ class EconomicPreprocessor:
             data=results,
             properties_blob_key="economic_preprocessing_properties",
             eager_termination=False,
-            input_path=Path()
+            input_path=Path(),
         )
         self.om.add_log(
             "Economic preprocessing",
