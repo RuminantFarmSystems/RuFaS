@@ -235,7 +235,7 @@ class EconomicPreprocessor:
                     )
         return values
 
-    def _scenario_names(self) -> List[str]:
+    def _scenario_names(self) -> list[str]:
         """Determine scenario names from the OutputManager variables pool.
 
         Returns
@@ -245,7 +245,7 @@ class EconomicPreprocessor:
             ``["baseline"]`` when the pool is flat (plain variable payloads)
             or empty.
         """
-        scenario_names: List[str] = []
+        scenario_names: list[str] = []
         pool = getattr(self.om, "variables_pool", {})
         if isinstance(pool, dict) and pool:
             if all(isinstance(value, dict) and "values" in value for value in pool.values()):
@@ -793,9 +793,7 @@ class EconomicPreprocessor:
                 crop_species = schedule.get("crop_species")
                 if not isinstance(crop_species, str):
                     continue
-                seed_key = self._CROP_TO_SEED_KEY.get(crop_species)
-                if seed_key is None:
-                    continue
+                seed_key = self._CROP_TO_SEED_KEY.get(crop_species, f"fallback_{crop_species}")
 
                 if seed_key not in daily_area_by_seed:
                     daily_area_by_seed[seed_key] = [0.0] * total_sim_days
@@ -850,6 +848,9 @@ class EconomicPreprocessor:
         for key, value in price_data.items():
             fallback_prices: list[float] | None = None
             price_by_year: dict[int, float] = {}
+            if "fallback" in key:
+                daily_seed_price = BIOPHYSICAL_FALLBACKS["seed_cost"] * days_count
+                break
             if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
                 self.om.add_warning(
                     "MissingPriceData",
@@ -891,7 +892,6 @@ class EconomicPreprocessor:
 
         scenario_names = self._scenario_names()
 
-
         biophysical_values_by_scenario: dict[str, dict[str, list[float]]] = {}
         biophysical_aggregate_by_scenario: dict[str, dict[str, float]] = {}
         line_item_values_by_scenario: dict[str, float] = {}
@@ -910,10 +910,9 @@ class EconomicPreprocessor:
                 if raw_price is None:
                     self.om.add_warning(
                         "MissingEconomicsFile",
-                        f"Seed commodity pricing '{seed_key}' not found in InputManager",
+                        f"Seed commodity pricing '{seed_key}' not found in InputManager, using fallback price.",
                         info_map,
                     )
-                    continue
 
                 extracted_prices = self._extract_daily_seed_price({seed_key: raw_price})
                 if not extracted_prices:
@@ -987,7 +986,7 @@ class EconomicPreprocessor:
             if item.section == "Soil_and_crop" and item.name == "Seeds costs":
                 category_data[item.name] = self._process_seed_costs_item()
                 #TODO: remove this
-                # json.dump(category_data[item.name], open(f"seed_cost_data.json", "w"), indent=4)
+                json.dump(category_data[item.name], open(f"seed_cost_data.json", "w"), indent=4)
                 continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
