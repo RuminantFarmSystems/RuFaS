@@ -730,3 +730,39 @@ def test_preprocess_seed_costs_clips_period_to_simulation_window(monkeypatch: py
     assert arr[299] == pytest.approx(expected_daily)
     assert arr[364] == pytest.approx(expected_daily)
     assert sum(arr) == pytest.approx(expected_sum)
+
+
+def test_process_seed_costs_handles_multiple_scenarios(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Seed cost entry carries one value per scenario found in the OM pool.
+
+    Field schedules do not vary by scenario, so every scenario receives the
+    same seed cost total (1 ha corn, 100 days × 100 m²/day × $0.01/m² = $100).
+    """
+    dummy_im = DummyInputManager(
+        data={
+            "field_a": {"crop_specification": "RotA", "field_size": 1.0},
+            "RotA.crop_schedules": [_corn_schedule(100, 200)],
+            "commodity_prices_corn_seed_dollar_per_square_meter": {"fips": [1001], "2020": [0.01]},
+        },
+        field_keys=["field_a"],
+    )
+    dummy_om = DummyOutputManager({})
+    dummy_om.variables_pool = {
+        "baseline": {"some.variable": {"values": [1.0]}},
+        "scenario_1": {"some.variable": {"values": [2.0]}},
+    }
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(preprocessing, "ECONOMIC_MAP", _seed_cost_map())
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Soil_and_crop"]["Costs"]["Seeds costs"]
+    seed_key = "commodity_prices_corn_seed_dollar_per_square_meter"
+    assert set(item["line_item_values_by_scenario"]) == {"baseline", "scenario_1"}
+    assert set(item["biophysical_values_by_scenario"]) == {"baseline", "scenario_1"}
+    assert set(item["biophysical_aggregate_by_scenario"]) == {"baseline", "scenario_1"}
+    for scenario in ("baseline", "scenario_1"):
+        assert item["line_item_values_by_scenario"][scenario] == pytest.approx(100.0)
+        assert item["biophysical_aggregate_by_scenario"][scenario][seed_key] == pytest.approx(10_000.0)

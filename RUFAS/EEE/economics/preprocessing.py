@@ -14,6 +14,7 @@ validated using the ``economic_preprocessing_properties`` metadata.
 
 from __future__ import annotations
 
+import json
 import math
 import re
 from dataclasses import dataclass
@@ -234,6 +235,27 @@ class EconomicPreprocessor:
                     )
         return values
 
+    def _scenario_names(self) -> List[str]:
+        """Determine scenario names from the OutputManager variables pool.
+
+        Returns
+        -------
+        list[str]
+            Scenario names found as top-level keys of the variables pool, or
+            ``["baseline"]`` when the pool is flat (plain variable payloads)
+            or empty.
+        """
+        scenario_names: List[str] = []
+        pool = getattr(self.om, "variables_pool", {})
+        if isinstance(pool, dict) and pool:
+            if all(isinstance(value, dict) and "values" in value for value in pool.values()):
+                scenario_names = ["baseline"]
+            else:
+                scenario_names = [name for name, data in pool.items() if isinstance(data, dict) and data]
+        if not scenario_names:
+            scenario_names = ["baseline"]
+        return scenario_names
+
     def _fetch_values_by_scenario(self, sim_paths: Iterable[str]) -> Dict[str, List[float]]:
         """Collect values per scenario from the OutputManager."""
 
@@ -244,16 +266,7 @@ class EconomicPreprocessor:
             fallback_values = self._fallback_values_by_scenario(sim_paths)
             return fallback_values
 
-        scenario_names: List[str] = []
-        pool = getattr(self.om, "variables_pool", {})
-        if isinstance(pool, dict) and pool:
-            if all(isinstance(value, dict) and "values" in value for value in pool.values()):
-                scenario_names = ["baseline"]
-            else:
-                scenario_names = [name for name, data in pool.items() if isinstance(data, dict) and data]
-        if not scenario_names:
-            scenario_names = ["baseline"]
-
+        scenario_names = self._scenario_names()
         values_by_scenario: Dict[str, List[float]] = {scenario: [] for scenario in scenario_names}
         info_map = {"class": self.__class__.__name__, "function": self._fetch_values_by_scenario.__name__}
 
@@ -866,59 +879,76 @@ class EconomicPreprocessor:
         return daily_seed_price
 
     def _process_seed_costs_item(self) -> Dict[str, Any]:
-        """Build the full preprocessing result entry for the Seeds costs line item."""
+        """Build the full preprocessing result entry for the Seeds costs line item.
+
+        Scenario names are resolved from the OutputManager variables pool the
+        same way ``preprocess`` does for regular line items. Field schedules
+        and sizes come from the InputManager and do not vary by scenario, so
+        every scenario receives the same seed cost values.
+        """
 
         info_map = {"class": self.__class__.__name__, "function": "_process_seed_costs_item"}
 
-        daily_area_by_seed = self._preprocess_seed_costs()
+        scenario_names = self._scenario_names()
 
-        biophysical_values: dict[str, list[float]] = {}
-        bio_total: dict[str, float] = {}
-        price_data: dict[str, list[float]] = {}
-        price_values: dict[str, list[float]] = {}
-        price_aggregate: dict[str, float] = {}
-        total_seed_cost = 0.0
 
-        for seed_key, daily_area in daily_area_by_seed.items():
-            raw_price = self._get_data_with_handling(seed_key, info_map)
-            if raw_price is None:
+        biophysical_values_by_scenario: dict[str, dict[str, list[float]]] = {}
+        biophysical_aggregate_by_scenario: dict[str, dict[str, float]] = {}
+        line_item_values_by_scenario: dict[str, float] = {}
+
+        for scenario_name in scenario_names:
+            daily_area_by_seed = self._preprocess_seed_costs()
+
+            biophysical_values: dict[str, list[float]] = {}
+            bio_total: dict[str, float] = {}
+            price_data: dict[str, list[float]] = {}
+            price_values: dict[str, list[float]] = {}
+            price_aggregate: dict[str, float] = {}
+            total_seed_cost = 0.0
+            for seed_key, daily_area in daily_area_by_seed.items():
+                raw_price = self._get_data_with_handling(seed_key, info_map)
+                if raw_price is None:
+                    self.om.add_warning(
+                        "MissingEconomicsFile",
+                        f"Seed commodity pricing '{seed_key}' not found in InputManager",
+                        info_map,
+                    )
+                    continue
+
+                extracted_prices = self._extract_daily_seed_price({seed_key: raw_price})
+                if not extracted_prices:
+                    continue
+
+                daily_price_per_area = [
+                    seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area)
+                ]
+                biophysical_values[seed_key] = daily_area_by_seed[seed_key]
+                price_values[seed_key] = extracted_prices
+                bio_total[seed_key] = sum(biophysical_values[seed_key])
+                price_data[seed_key] = raw_price
+                price_aggregate[seed_key] = self._aggregate(extracted_prices, "average")
+                total_seed_cost += sum(daily_price_per_area)
+
+            biophysical_values_by_scenario[scenario_name] = biophysical_values
+            biophysical_aggregate_by_scenario[scenario_name] = bio_total
+            line_item_values_by_scenario[scenario_name] = total_seed_cost
+
+            if not daily_area_by_seed:
                 self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"Seed commodity pricing '{seed_key}' not found in InputManager",
+                    "MissingBiophysicalData",
+                    "No field data found for seed cost preprocessing",
                     info_map,
                 )
-                continue
-
-            extracted_prices = self._extract_daily_seed_price({seed_key: raw_price})
-            if not extracted_prices:
-                continue
-
-            daily_price_per_area = [
-                seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area)
-            ]
-            biophysical_values[seed_key] = daily_area_by_seed[seed_key]
-            price_values[seed_key] = extracted_prices
-            bio_total[seed_key] = sum(biophysical_values[seed_key])
-            price_data[seed_key] = raw_price
-            price_aggregate[seed_key] = self._aggregate(extracted_prices, "average")
-            total_seed_cost += sum(daily_price_per_area)
-
-        if not daily_area_by_seed:
-            self.om.add_warning(
-                "MissingBiophysicalData",
-                "No field data found for seed cost preprocessing",
-                info_map,
-            )
 
         return {
             "biophysical_values": biophysical_values,
             "biophysical_aggregate": bio_total,
-            "biophysical_values_by_scenario": {"baseline": biophysical_values},
-            "biophysical_aggregate_by_scenario": {"baseline": bio_total},
+            "biophysical_values_by_scenario": biophysical_values_by_scenario,
+            "biophysical_aggregate_by_scenario": biophysical_aggregate_by_scenario,
             "price_data": price_data,
             "price_values": price_values,
             "price_aggregate": price_aggregate,
-            "line_item_values_by_scenario": {"baseline": total_seed_cost},
+            "line_item_values_by_scenario": line_item_values_by_scenario,
             "flow_type": "cost",
         }
 
@@ -956,6 +986,8 @@ class EconomicPreprocessor:
 
             if item.section == "Soil_and_crop" and item.name == "Seeds costs":
                 category_data[item.name] = self._process_seed_costs_item()
+                #TODO: remove this
+                # json.dump(category_data[item.name], open(f"seed_cost_data.json", "w"), indent=4)
                 continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
