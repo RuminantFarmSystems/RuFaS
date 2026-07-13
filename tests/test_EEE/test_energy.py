@@ -10,6 +10,7 @@ from RUFAS.EEE.tractor_implement import TractorImplement
 from RUFAS.data_structures.tillage_implements import TractorSize, FieldOperationEvent, TillageImplement
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 from tests.test_EEE.fixtures import (
     parsed_diesel_consumption_inputs,
     EEE_constants,
@@ -23,23 +24,44 @@ assert tractor_dataset is not None
 assert filtered_variable_pool is not None
 
 
+@pytest.mark.parametrize(
+    "tractor_size",
+    [
+        TractorSize.SMALL.value,
+        None,
+    ],
+)
 def test_estimate_all(
     parsed_diesel_consumption_inputs: list[dict[str, Any]],
     EEE_constants: list[dict[str, Any]],
     tractor_dataset: dict[str, list[Any]],
+    tractor_size: str | None,
     mocker: MockerFixture,
 ) -> None:
-    """Tests the estimation routines are called correctly."""
+    """Tests the estimation routines are called correctly with and without a configured tractor size."""
     im, om = InputManager(), OutputManager()
-    mock_parse_inputs_for_diesel_consumption_calculation = mocker.patch.object(
+
+    mock_parse_inputs = mocker.patch.object(
         EnergyEstimator,
         "parse_inputs_for_diesel_consumption_calculation",
         return_value=parsed_diesel_consumption_inputs,
     )
     mock_calculate_diesel_consumption = mocker.patch.object(
-        EnergyEstimator, "calculate_diesel_consumption", return_value=10
+        EnergyEstimator,
+        "calculate_diesel_consumption",
+        return_value=10,
     )
-    mock_report_diesel_consumption = mocker.patch.object(EnergyEstimator, "report_diesel_consumption")
+    mock_report_diesel_consumption = mocker.patch.object(
+        EnergyEstimator,
+        "report_diesel_consumption",
+    )
+
+    mock_tractor = mocker.patch(
+        f"{EnergyEstimator.__module__}.Tractor",
+    )
+    mock_tractor.return_value.tractor_size = (
+        TractorSize(tractor_size) if tractor_size else TractorSize.SMALL
+    )
 
     def mock_get_data(data_address: str) -> Any:
         if data_address == "EEE_constants.constants":
@@ -49,18 +71,43 @@ def test_estimate_all(
         if data_address == "animal.herd_information.herd_num":
             return 10
         if data_address.endswith(".tractor_size"):
-            return TractorSize.SMALL.value
+            return tractor_size
         return 10
 
     mocker.patch.object(im, "get_data", side_effect=mock_get_data)
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
 
-    EnergyEstimator.estimate_all(simulate_animals=True, simulate_feed=True, simulate_fields=True, simulate_manure=True)
+    EnergyEstimator.estimate_all(
+        simulate_animals=True,
+        simulate_feed=True,
+        simulate_fields=True,
+        simulate_manure=True,
+    )
 
-    mock_parse_inputs_for_diesel_consumption_calculation.assert_called_once_with()
-    assert mock_calculate_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
-    assert mock_report_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
-    mock_om_add_variable.assert_called_once()
+    mock_parse_inputs.assert_called_once_with()
+    assert mock_calculate_diesel_consumption.call_count == len(
+        parsed_diesel_consumption_inputs
+    )
+    assert mock_report_diesel_consumption.call_count == len(
+        parsed_diesel_consumption_inputs
+    )
+    assert mock_tractor.call_count == len(parsed_diesel_consumption_inputs)
+
+    expected_tractor_size = TractorSize(tractor_size) if tractor_size else None
+
+    for tractor_call in mock_tractor.call_args_list:
+        assert tractor_call.kwargs["herd_size"] == 10
+        assert tractor_call.kwargs["tractor_size"] == expected_tractor_size
+
+    mock_om_add_variable.assert_called_once_with(
+        "total_diesel_consumption_tractor_implement",
+        10,
+        {
+            "class": EnergyEstimator.__name__,
+            "function": EnergyEstimator.estimate_all.__name__,
+            "units": MeasurementUnits.LITERS_PER_HA,
+        },
+    )
 
 
 @pytest.mark.parametrize(

@@ -167,7 +167,7 @@ class EnergyEstimator:
                 operation_event=diesel_consumption_data_item["operation_event"],
                 crop_type=diesel_consumption_data_item.get("crop_type"),
                 herd_size=herd_size,
-                tractor_size=TractorSize(tractor_size),
+                tractor_size=TractorSize(tractor_size) if tractor_size else None,
                 application_depth=diesel_consumption_data_item.get("application_depth"),
                 tillage_implement=diesel_consumption_data_item.get("tillage_implement"),
                 harvest_type=harvest_type,
