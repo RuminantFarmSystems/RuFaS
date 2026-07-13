@@ -1289,10 +1289,8 @@ def test_get_cow_removal_index_ranks_by_milk(herd_manager: HerdManager) -> None:
     herd_manager.cull_eligibility_maximum_days_carried_calf = 180
     herd_manager.cull_ranking_criteria = "milk"
 
-    # index 0: highest daily milk but lowest 305-day yield.
     cow_high_daily_low_305 = _create_sortable_mock_cow(1, False, 30.0, 100, 50)
     cow_high_daily_low_305.milk_production.milk_305_day_yield = 5.0
-    # index 1: lowest daily milk, highest 305-day yield.
     cow_low_daily_high_305 = _create_sortable_mock_cow(2, False, 10.0, 100, 50)
     cow_low_daily_high_305.milk_production.milk_305_day_yield = 100.0
 
@@ -1308,10 +1306,8 @@ def test_get_cow_removal_index_ranks_by_305_day_milk(herd_manager: HerdManager) 
     herd_manager.cull_eligibility_maximum_days_carried_calf = 180
     herd_manager.cull_ranking_criteria = "305_day_milk"
 
-    # index 0: highest daily milk but lowest 305-day yield.
     cow_high_daily_low_305 = _create_sortable_mock_cow(1, False, 30.0, 100, 50)
     cow_high_daily_low_305.milk_production.milk_305_day_yield = 5.0
-    # index 1: lowest daily milk, highest 305-day yield.
     cow_low_daily_high_305 = _create_sortable_mock_cow(2, False, 10.0, 100, 50)
     cow_low_daily_high_305.milk_production.milk_305_day_yield = 100.0
 
@@ -1326,19 +1322,14 @@ def test_get_cow_removal_index_respects_configurable_eligibility(herd_manager: H
     herd_manager.cull_eligibility_maximum_days_carried_calf = 50
     herd_manager.cull_ranking_criteria = "milk"
 
-    # Protected: below the configured minimum days in milk (90 <= 100).
     cow_fresh = _create_sortable_mock_cow(1, False, 1.0, 90, 0)
-    # Protected: at/above the configured maximum days carried calf (50 >= 50).
     cow_late_preg = _create_sortable_mock_cow(2, False, 2.0, 200, 50)
-    # Eligible: past the DIM minimum and below the pregnancy maximum.
     cow_eligible = _create_sortable_mock_cow(3, False, 40.0, 110, 40)
 
     herd_manager.cows = [cow_fresh, cow_late_preg, cow_eligible]
 
-    # Only the eligible cow can be removed, even though it has the highest milk production.
     assert herd_manager._get_cow_removal_index([]) == 2
 
-    # No cow qualifies once the only eligible cow is excluded.
     assert herd_manager._get_cow_removal_index([cow_eligible]) is None
 
 
