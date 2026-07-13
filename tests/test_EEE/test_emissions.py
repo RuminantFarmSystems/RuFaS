@@ -163,7 +163,7 @@ def test_emissions_estimator_init(mocker: MockerFixture) -> None:
         "emissions": [{"50": 0.1, "51": 0.2, "52": 0.3}],
     }
 
-    def get_data_side_effect(key: str) -> Any:
+    def get_data_side_effect(key: str, required: bool = True) -> Any:
         if key == "config.FIPS_county_code":
             return county_code
         if key == "purchased_feeds_emissions":
@@ -185,6 +185,39 @@ def test_emissions_estimator_init(mocker: MockerFixture) -> None:
         "alfalfa_hay": ["100", "103", "106", "107", "108"],
     }
     assert estimator.crop_species_to_purchased_feed_id == expected
+
+
+def test_emissions_estimator_init_without_feed_storage_data(mocker: MockerFixture) -> None:
+    """Initialize EmissionsEstimator when feed storage inputs are excluded from the input
+    pool, as is the case for simulation types that do not simulate the feed module."""
+    mocker.patch("RUFAS.EEE.emissions.OutputManager")
+    im_cls = mocker.patch("RUFAS.EEE.emissions.InputManager")
+    im = im_cls.return_value
+
+    county_code = 11111
+
+    mocker.patch.object(
+        EmissionsEstimator,
+        "_get_feed_emissions_data",
+        side_effect=[{"50": 1.0}, {"50": 0.1}],
+    )
+
+    def get_data_side_effect(key: str, required: bool = True) -> Any:
+        if key == "config.FIPS_county_code":
+            return county_code
+        if key == "purchased_feeds_emissions":
+            return {"county_code": [county_code], "emissions": [{"50": 1.0}]}
+        if key == "purchased_feed_land_use_change_emissions":
+            return {"county_code": [county_code], "emissions": [{"50": 0.1}]}
+        if key in ("feed_storage_configurations", "feed_storage_instances"):
+            return None
+        raise KeyError(key)
+
+    im.get_data.side_effect = get_data_side_effect
+
+    estimator = EmissionsEstimator()
+
+    assert estimator.crop_species_to_purchased_feed_id == {}
 
 
 def test_estimate_emissions(
