@@ -27,6 +27,10 @@ v1.0.2
 
 ### v1.0.2
 
+- [3037](https://github.com/RuminantFarmSystems/RuFaS/pull/3037) - [minor change]  [NoInputChange] [OutputChange] Replicates 3130 on dev to fix bug where stored Hay was projected to have negative dm.
+
+### v1.0.2
+
 - [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
 
 ### v1.0.1
