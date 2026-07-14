@@ -70,9 +70,9 @@ REQUIRED_FILE_BLOBS: set[str] = {
 The paths to the properties that define the inputs.
 """
 PROPERTIES_FILE_PATHS: dict[str, Path] = {
-    "default": Path("input/metadata/properties/default.json"),
-    "tasks_properties": Path("input/metadata/properties/tasks_properties.json"),
-    "commodity_properties": Path("input/metadata/properties/commodity_properties.json"),
+    "default": Path("RUFAS/input/metadata/properties/default.json"),
+    "tasks_properties": Path("RUFAS/input/metadata/properties/tasks_properties.json"),
+    "commodity_properties": Path("RUFAS/input/metadata/properties/commodity_properties.json"),
 }
 
 
