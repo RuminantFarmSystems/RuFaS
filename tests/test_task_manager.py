@@ -252,7 +252,9 @@ def test_task_manager_start(
             " JSON.\n"
         )
 
-    mock_print_credits.assert_called_once_with("1.0.0", )
+    mock_print_credits.assert_called_once_with(
+        "1.0.0",
+    )
     mock_check_dependencies.assert_called_once()
     mock_check_python_version.assert_called_once()
     mock_handle_post_processing.assert_called_once()
@@ -472,7 +474,7 @@ def test_handle_post_processing(
         "output_pool_path": Path("/fake/pool"),
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": suppress_logs,
-        "output_prefix": "output_prefix"
+        "output_prefix": "output_prefix",
     }
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_flush_pool = mocker.patch.object(mock_input_manager, "flush_pool", return_value=None)
@@ -523,7 +525,7 @@ def test_handle_post_processing_export_input_tocsv(
         "suppress_log_files": True,
         "input_data_csv_export_path": Path("/fake/saved_input"),
         "input_data_csv_import_path": Path("/fake/saved_input"),
-        "output_prefix": "output_prefix"
+        "output_prefix": "output_prefix",
     }
     task_manager.handle_post_processing(
         args=args,
@@ -644,7 +646,7 @@ def test_handle_post_processing_load_pool(
         "output_pool_path": Path("/fake/pool"),
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": True,
-        "output_prefix": "output_prefix"
+        "output_prefix": "output_prefix",
     }
     task_manager.handle_post_processing(
         args=args,
@@ -684,7 +686,7 @@ def test_handle_post_processing_save_result(
         "output_pool_path": Path("/fake/pool"),
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": True,
-        "output_prefix": "output_prefix"
+        "output_prefix": "output_prefix",
     }
     task_manager.handle_post_processing(
         args=args,
