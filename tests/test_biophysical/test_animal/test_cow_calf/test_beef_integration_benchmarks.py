@@ -109,20 +109,25 @@ _ANGUS_COW_COMBINED = CowCalfRequirementsInputs(
 @pytest.fixture(autouse=True)
 def _restore_animal_config() -> Generator[None, None, None]:
     """Save and restore AnimalConfig beef class attributes after each test."""
-    saved = {
-        "beef_breeding_season_start_day": AnimalConfig.beef_breeding_season_start_day,
-        "beef_breeding_season_length": AnimalConfig.beef_breeding_season_length,
-        "beef_weaning_age_days": AnimalConfig.beef_weaning_age_days,
-        "beef_weaning_weight_kg": AnimalConfig.beef_weaning_weight_kg,
-        "beef_creep_feeding_enabled": AnimalConfig.beef_creep_feeding_enabled,
-        "beef_post_weaning_destination": AnimalConfig.beef_post_weaning_destination,
-        "beef_mature_cow_weight_kg": AnimalConfig.beef_mature_cow_weight_kg,
-        "beef_natural_service_bull_ratio": AnimalConfig.beef_natural_service_bull_ratio,
-        "beef_cow_cull_rate_annual": AnimalConfig.beef_cow_cull_rate_annual,
-    }
+    saved_start = AnimalConfig.beef_breeding_season_start_day
+    saved_length = AnimalConfig.beef_breeding_season_length
+    saved_weaning_age = AnimalConfig.beef_weaning_age_days
+    saved_weaning_weight = AnimalConfig.beef_weaning_weight_kg
+    saved_creep = AnimalConfig.beef_creep_feeding_enabled
+    saved_destination = AnimalConfig.beef_post_weaning_destination
+    saved_mature_weight = AnimalConfig.beef_mature_cow_weight_kg
+    saved_bull_ratio = AnimalConfig.beef_natural_service_bull_ratio
+    saved_cull_rate = AnimalConfig.beef_cow_cull_rate_annual
     yield
-    for attr, val in saved.items():
-        setattr(AnimalConfig, attr, val)
+    AnimalConfig.beef_breeding_season_start_day = saved_start
+    AnimalConfig.beef_breeding_season_length = saved_length
+    AnimalConfig.beef_weaning_age_days = saved_weaning_age
+    AnimalConfig.beef_weaning_weight_kg = saved_weaning_weight
+    AnimalConfig.beef_creep_feeding_enabled = saved_creep
+    AnimalConfig.beef_post_weaning_destination = saved_destination
+    AnimalConfig.beef_mature_cow_weight_kg = saved_mature_weight
+    AnimalConfig.beef_natural_service_bull_ratio = saved_bull_ratio
+    AnimalConfig.beef_cow_cull_rate_annual = saved_cull_rate
 
 
 # ── Autouse fixture: save/restore RationManager beef ration class attrs ───────
@@ -131,10 +136,10 @@ def _restore_animal_config() -> Generator[None, None, None]:
 @pytest.fixture(autouse=True)
 def _restore_ration_manager() -> Generator[None, None, None]:
     """Save and restore RationManager beef ration class attributes after each test."""
-    saved_lp = copy.deepcopy(getattr(RationManager, "beef_lactating_pasture_ration", {}))
-    saved_dg = copy.deepcopy(getattr(RationManager, "beef_dry_gestating_ration", {}))
-    saved_cf = copy.deepcopy(getattr(RationManager, "beef_creep_feed_ration", {}))
-    saved_rh = copy.deepcopy(getattr(RationManager, "beef_replacement_heifer_ration", {}))
+    saved_lp = copy.deepcopy(RationManager.beef_lactating_pasture_ration)
+    saved_dg = copy.deepcopy(RationManager.beef_dry_gestating_ration)
+    saved_cf = copy.deepcopy(RationManager.beef_creep_feed_ration)
+    saved_rh = copy.deepcopy(RationManager.beef_replacement_heifer_ration)
     yield
     RationManager.beef_lactating_pasture_ration = saved_lp
     RationManager.beef_dry_gestating_ration = saved_dg

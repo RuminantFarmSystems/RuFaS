@@ -4,7 +4,7 @@ Implementation across PR-A (#33), PR-B (#34), PR-C (#35), PR-D (this PR).
 
 ## Named Scope Boundaries (explicitly not implemented)
 
-The following were explicitly named and deferred in the integration plan (Lesson 7):
+The following were explicitly deferred — not implemented in this module:
 
 1. **Simplified conception model** (Step 5.3): a single daily-probability draw rather than a
    full 21-day estrus cycle model. Aggregate herd pregnancy rate matches the USDA 85.5%
