@@ -3794,19 +3794,20 @@ def test_print_credits(
 
 
 @pytest.mark.parametrize(
-    "log_verbose, task_id, expected_output",
+    "log_verbose, task_id, output_prefix, expected_output",
     [
-        (LogVerbosity.NONE, "id", ""),
-        (LogVerbosity.CREDITS, "id", "Starting task: id\n"),
-        (LogVerbosity.ERRORS, "id", "Starting task: id\n"),
-        (LogVerbosity.WARNINGS, "id", "Starting task: id\n"),
-        (LogVerbosity.LOGS, "id", "Starting task: id\n"),
+        (LogVerbosity.NONE, "id", "freestall", ""),
+        (LogVerbosity.CREDITS, "id", "freestall", "Starting task: id (freestall)\n"),
+        (LogVerbosity.ERRORS, "id", "freestall", "Starting task: id (freestall)\n"),
+        (LogVerbosity.WARNINGS, "id", "freestall", "Starting task: id (freestall)\n"),
+        (LogVerbosity.LOGS, "id", "freestall", "Starting task: id (freestall)\n"),
     ],
 )
 def test_print_task_id(
     mock_output_manager: OutputManager,
     log_verbose: LogVerbosity,
     task_id: str,
+    output_prefix: str,
     expected_output: str,
     capfd: CaptureFixture[str],
 ) -> None:
@@ -3818,7 +3819,7 @@ def test_print_task_id(
         "_OutputManager__log_verbose",
         log_verbose,
     )
-    mock_output_manager.print_task_id(task_id)
+    mock_output_manager.print_task_id(task_id, output_prefix)
     captured = capfd.readouterr()
     assert captured.out == expected_output
 
@@ -3827,10 +3828,10 @@ def test_print_task_id(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
-        (LogVerbosity.ERRORS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
-        (LogVerbosity.WARNINGS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
-        (LogVerbosity.LOGS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.CREDITS, "Finished task: id (freestall) with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.ERRORS, "Finished task: id (freestall) with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.WARNINGS, "Finished task: id (freestall) with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.LOGS, "Finished task: id (freestall) with 2 error(s), 1 warning(s), and 5 log(s).\n"),
     ],
 )
 def test_print_errors_warnings_logs(
@@ -3842,8 +3843,9 @@ def test_print_errors_warnings_logs(
         log_verbose,
     )
     task_id = "id"
+    output_prefix = "freestall"
     with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
-        mock_output_manager.print_errors_warnings_logs_counts(task_id)
+        mock_output_manager.print_errors_warnings_logs_counts(task_id, output_prefix)
         captured = capfd.readouterr()
         assert captured.out == expected_output
 
@@ -4386,7 +4388,7 @@ def test_run_startup_sequence_clear_output_directory(
         is_e2e_run,
     )
 
-    mock_print_task_id.assert_called_once_with(dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id, dummy_output_prefix)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
@@ -4437,7 +4439,7 @@ def test_run_startup_sequence_not_clear_output_directory(
         False,
     )
 
-    mock_print_task_id.assert_called_once_with(dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id, dummy_output_prefix)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
@@ -4486,7 +4488,7 @@ def test_run_startup_sequence_chunkification(
         dummy_task_id,
         False,
     )
-    mock_print_task_id.assert_called_once_with(dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id, dummy_output_prefix)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)

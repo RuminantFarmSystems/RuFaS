@@ -1127,7 +1127,7 @@ class TaskManager:
             output_manager.load_variables_pool_from_file(args["output_pool_path"])
             output_manager.set_metadata_prefix("reload")
 
-        output_manager.print_errors_warnings_logs_counts(task_id)
+        output_manager.print_errors_warnings_logs_counts(task_id, args["output_prefix"])
         if should_flush_im_pool:
             input_manager.flush_pool()
         if args.get("task_type") == TaskType.POST_PROCESSING:
