@@ -2399,7 +2399,7 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model. Version: {version_number}\n{DISCLAIMER_MESSAGE}\n")
 
-    def print_task_id(self, task_id: str) -> None:
+    def print_task_id(self, task_id: str, output_prefix: str) -> None:
         """
         Prints out the ``task_id`` when ``LogVerbosity`` is set to any level except ``NONE``.
 
@@ -2407,11 +2407,14 @@ class OutputManager(object):
         ----------
         task_id : str
             Identifier of the task.
+        output_prefix : str
+            The output prefix for the task.
+
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
-            sys.stdout.write(f"Starting task: {task_id}\n")
+            sys.stdout.write(f"Starting task: {task_id} ({output_prefix})\n")
 
-    def print_errors_warnings_logs_counts(self, task_id: str) -> None:
+    def print_errors_warnings_logs_counts(self, task_id: str, output_prefix: str) -> None:
         """
         Prints out the logs, warnings, and errors counts when ``LogVerbosity`` is set to any level except ``NONE``.
 
@@ -2419,11 +2422,14 @@ class OutputManager(object):
         ----------
         task_id : str
             Identifier of the task.
+        output_prefix : str
+            The output prefix for the task.
+
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(
-                f"Finished task: {task_id} with {errors_count} error(s), "
+                f"Finished task: {task_id} ({output_prefix}) with {errors_count} error(s), "
                 f"{warnings_count} warning(s), and {logs_count} log(s).\n"
             )
 
@@ -2615,7 +2621,7 @@ class OutputManager(object):
         is_end_to_end_testing_run : bool
             Whether the current run is an end-to-end testing run.
         """
-        self.print_task_id(task_id)
+        self.print_task_id(task_id, output_prefix)
         self.flush_pools()
         self.set_exclude_info_maps_flag(exclude_info_maps)
         self.set_log_verbose(verbosity)
