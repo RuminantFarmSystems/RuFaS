@@ -44,7 +44,7 @@
       "description": "Herd Demographics",
       "calf_num": {
         "type": "number",
-        "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
+        "description": "Number of Calves (head) -- The initial number of pre-weaned calves.",
         "default": 8,
         "minimum": 2
       },
