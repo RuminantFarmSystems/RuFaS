@@ -64,10 +64,10 @@ def _restore_ration_manager_beef_state() -> Generator[None, None, None]:
     None
         Yields control to the test body; restores state on teardown.
     """
-    saved_lactating = copy.deepcopy(getattr(RationManager, "beef_lactating_pasture_ration", {}))
-    saved_dry = copy.deepcopy(getattr(RationManager, "beef_dry_gestating_ration", {}))
-    saved_creep = copy.deepcopy(getattr(RationManager, "beef_creep_feed_ration", {}))
-    saved_heifer = copy.deepcopy(getattr(RationManager, "beef_replacement_heifer_ration", {}))
+    saved_lactating = copy.deepcopy(RationManager.beef_lactating_pasture_ration)
+    saved_dry = copy.deepcopy(RationManager.beef_dry_gestating_ration)
+    saved_creep = copy.deepcopy(RationManager.beef_creep_feed_ration)
+    saved_heifer = copy.deepcopy(RationManager.beef_replacement_heifer_ration)
     yield
     RationManager.beef_lactating_pasture_ration = saved_lactating
     RationManager.beef_dry_gestating_ration = saved_dry
