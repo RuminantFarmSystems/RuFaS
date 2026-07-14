@@ -23,7 +23,7 @@ This **changelog** file keeps a record of updates included in existing version r
 
 ### Current version
 
-v1.0.2
+v1.0.3
 
 ### v1.0.3
 
