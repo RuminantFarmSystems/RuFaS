@@ -31,6 +31,8 @@ v1.0.2
 
 - [3130](https://github.com/RuminantFarmSystems/RuFaS/pull/3020) - [minor change] [NoInputChange] [NoOutputChange] Fixes bug where stored Hay was projected to have negative dm.
 
+- [3141](https://github.com/RuminantFarmSystems/RuFaS/pull/3141) - [minor change] [Weather] [NoInputChange] [NoOutputChange] Excludes missing (NaN) daily temperatures from the average annual temperature and the seasonal temperature regression, so simulations with gaps in the weather data no longer crash. Similar changes made to `dev` branch on PR 3139
+
 ### v1.0.2
 
 - [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
