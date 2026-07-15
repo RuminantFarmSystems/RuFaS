@@ -117,11 +117,17 @@ class Weather:
 
         From the fitted model, the method calculates and stores the fitted intercept term representing average air
         temperature, amplitude of the modeled cos/sin function, and phase shift (peak temperature). These parameters are
-        simulation-wide, i.e., only weather data utilized in the simulation is used.
+        simulation-wide, i.e., only weather data utilized in the simulation is used. Days with missing (NaN) mean air
+        temperatures are excluded from the regression.
         """
         mean_temperatures = np.array(self.means, dtype=float)
         cosine_components = np.array(self.cos, dtype=float)
         sine_components = np.array(self.sin, dtype=float)
+
+        valid_days = ~np.isnan(mean_temperatures)
+        mean_temperatures = mean_temperatures[valid_days]
+        cosine_components = cosine_components[valid_days]
+        sine_components = sine_components[valid_days]
 
         design_matrix = np.column_stack((cosine_components, sine_components, np.ones_like(mean_temperatures)))
 
@@ -285,11 +291,19 @@ class Weather:
         float
             The average annual air temperature (degrees C).
 
+        Raises
+        ------
+        ValueError
+            If every daily average air temperature is missing.
+
         Notes
         -----
         This method calculates the average annual air temperature by taking the average of all daily average air
         temperatures provided in the weather input file. Previous implementations calculated the average annual
         temperature for individual years, which led to the value fluctuating more than desired.
+
+        Missing daily values (NaN) are excluded from the average, since weather stations commonly go offline for
+        short periods. A warning is recorded when any values are missing.
 
         This method is intended to approximate SWAT's method for calculating the average annual temperature. SWAT
         calculates average high and low temperatures for each month over every simulated year, then averages those
@@ -297,7 +311,29 @@ class Weather:
         this can be found at in the SWAT source code file `readwgn.f
         <https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/readwgn.f>`_
         """
-        return np.mean(np.array(daily_average_temperatures))
+        daily_temperatures = np.array(daily_average_temperatures, dtype=float)
+        missing_count = int(np.isnan(daily_temperatures).sum())
+        info_map = {
+            "class": Weather.__name__,
+            "function": Weather._calculate_average_annual_temperature.__name__,
+            "prefix": "Weather",
+        }
+        if missing_count == daily_temperatures.size:
+            OutputManager().add_error(
+                "No temperature data",
+                "All daily average air temperatures in the weather data are missing, so the average annual air"
+                " temperature cannot be calculated.",
+                info_map,
+            )
+            raise ValueError("All daily average air temperatures in the weather data are missing")
+        if missing_count > 0:
+            OutputManager().add_warning(
+                "Missing temperature data",
+                f"{missing_count} daily average air temperature value(s) are missing from the weather data and are"
+                " excluded from the average annual air temperature.",
+                info_map,
+            )
+        return float(np.nanmean(daily_temperatures))
 
     @staticmethod
     def check_adequate_weather_data(weather_file: dict, time: RufasTime) -> None:
