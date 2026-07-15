@@ -999,12 +999,20 @@ class HerdManager:
         )
 
     def _get_cow_removal_index(self, removed_animal: list[Animal]) -> int | None:
-        """Finds the index of the lowest-ranked cow that is eligible for an oversupply cull.
+        """
+        Finds the index of the lowest-ranked cow that is eligible for an oversupply cull.
 
         Eligibility is governed by the ``cull_eligibility_minimum_days_in_milk`` and
         ``cull_eligibility_maximum_days_carried_calf`` user inputs (protecting fresh and
         late-pregnant cows respectively), and ranking is governed by the ``cull_ranking_criteria``
-        user input. The lowest-ranked eligible cow is selected for removal."""
+        user input. The lowest-ranked eligible cow is selected for removal.
+        
+        Returns
+        -------
+        int | None
+            Index into ``self.cows`` of the lowest-ranked eligible cow, or ``None`` if no
+            eligible cow exists.
+        """
         eligible_indices = []
 
         for index, cow in enumerate(self.cows):
