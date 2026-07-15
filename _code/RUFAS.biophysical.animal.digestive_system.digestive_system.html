@@ -152,7 +152,21 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.digestive_system.digestive_system.</span></span><span class="sig-name descname"><span class="pre">DigestiveSystem</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class serves as an entry point for the animal digestive systems.</p>
+<p>An entry point for the animal digestive systems.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>manure_excretion<span class="classifier">AnimalManureExcretions</span></dt><dd><p>A collection of the animal’s manure excretion data.</p>
+</dd>
+<dt>phosphorous_excreted<span class="classifier">float</span></dt><dd><p>The phosphorous excreted by the animal.</p>
+</dd>
+<dt>enteric_methane_emission<span class="classifier">float</span></dt><dd><p>The CH₄ used for GHG reporting and downstream emissions calculations.
+Represents mitigated enteric methane for cows.</p>
+</dd>
+<dt>enteric_methane_for_energy<span class="classifier">float</span></dt><dd><p>The unmitigated CH₄ used in NASEM ME and ration optimization for cows.
+Remains at 0.0 for other animals.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.__init__'"><span>#</span></a></dt>
@@ -169,13 +183,17 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_emission">
 <span class="sig-name descname"><span class="pre">enteric_methane_emission</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_emission" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_emission'"><span>#</span></a></dt>
 <dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_for_energy">
+<span class="sig-name descname"><span class="pre">enteric_methane_for_energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_for_energy" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_for_energy'"><span>#</span></a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.process_digestion">
 <span class="sig-name descname"><span class="pre">process_digestion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">digestive_system_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DigestiveSystemInputs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.process_digestion" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.process_digestion'"><span>#</span></a></dt>
 <dd><p>Processes the digestion for different types of animals by calculating methane emission
 and manure excretion based on the provided digestive system inputs.</p>
 <section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>digestive_system_inputs<span class="classifier">DigestiveSystemInputs</span></dt><dd><p>Contains inputs related to the digestive system of the animal, including animal type,
 body weight, nutrient details, fecal phosphorus, and urine phosphorus requirements.</p>
@@ -183,7 +201,7 @@ body weight, nutrient details, fecal phosphorus, and urine phosphorus requiremen
 </dl>
 </section>
 <section id="raises">
-<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>TypeError</dt><dd><p>If the animal type in digestive_system_inputs is not supported, a TypeError is raised
 with information about supported animal types.</p>
@@ -199,7 +217,7 @@ with information about supported animal types.</p>
 based on the animal’s body weight, phosphorus intake, requirements, reserves,
 and endogenous loss.</p>
 <section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>body_weight<span class="classifier">float</span></dt><dd><p>The body weight of the animal (kg).</p>
 </dd>
@@ -215,7 +233,7 @@ Can be negative indicating a deficit.</p>
 </dl>
 </section>
 <section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[float, float]</dt><dd><p>A tuple containing two values:
 - The amount of phosphorus excreted in urine (g).
@@ -224,6 +242,7 @@ Can be negative indicating a deficit.</p>
 </dl>
 </section>
 </dd></dl>
+</section>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -234,6 +253,7 @@ Can be negative indicating a deficit.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.manure_excretion'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.manure_excretion"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem.manure_excretion</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.phosphorus_excreted'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.phosphorus_excreted"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem.phosphorus_excreted</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_emission'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_emission"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem.enteric_methane_emission</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_for_energy'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.enteric_methane_for_energy"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem.enteric_methane_for_energy</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.process_digestion'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem.process_digestion"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem.process_digestion()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem._calculate_base_manure'" class="reference internal" href="#RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem._calculate_base_manure"><code class="docutils literal notranslate"><span class="pre">DigestiveSystem._calculate_base_manure()</span></code></a></li>
 </ul>

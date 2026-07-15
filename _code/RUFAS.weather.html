@@ -203,7 +203,8 @@ The function then fits the model:</p>
 </dl>
 <p>From the fitted model, the method calculates and stores the fitted intercept term representing average air
 temperature, amplitude of the modeled cos/sin function, and phase shift (peak temperature). These parameters are
-simulation-wide, i.e., only weather data utilized in the simulation is used.</p>
+simulation-wide, i.e., only weather data utilized in the simulation is used. Days with missing (NaN) mean air
+temperatures are excluded from the regression.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.get_current_day_conditions">
@@ -291,10 +292,19 @@ provided, then no daylengths will be included in weather conditions returned.</p
 </dl>
 </section>
 <section id="id8">
-<h3>Notes<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<h3>Raises<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If every daily average air temperature is missing.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Notes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <p>This method calculates the average annual air temperature by taking the average of all daily average air
 temperatures provided in the weather input file. Previous implementations calculated the average annual
 temperature for individual years, which led to the value fluctuating more than desired.</p>
+<p>Missing daily values (NaN) are excluded from the average, since weather stations commonly go offline for
+short periods. A warning is recorded when any values are missing.</p>
 <p>This method is intended to approximate SWAT’s method for calculating the average annual temperature. SWAT
 calculates average high and low temperatures for each month over every simulated year, then averages those
 values to get a single annual average air temperature for the entire simulation. The exact implementation for
@@ -305,8 +315,8 @@ this can be found at in the SWAT source code file <a class="reference external" 
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.check_adequate_weather_data">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">check_adequate_weather_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.check_adequate_weather_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather.check_adequate_weather_data'"><span>#</span></a></dt>
 <dd><p>Checks that there is enough weather data to cover the whole simulation time.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>weather_file: dict</dt><dd><p>File containing weather data.</p>
 </dd>
@@ -314,8 +324,8 @@ this can be found at in the SWAT source code file <a class="reference external" 
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
