@@ -6069,7 +6069,7 @@
       "description": "The categorical size of the tractor for this field.",
       "pattern": "^(small|medium|large)$",
       "nullable": true,
-      "default": null
+      "default": "medium"
     }
   },
   "weather_properties": {
