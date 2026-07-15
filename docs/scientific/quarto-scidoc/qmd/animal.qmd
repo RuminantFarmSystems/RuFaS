@@ -3604,6 +3604,7 @@ $$
 :::
 
 Fecal nitrogen (kg/d):
+
 ::: {#eq-an-exc-26}
 [[**AN.EXC.26**]]{.aside .content-visible when-format="html"}
 $$
