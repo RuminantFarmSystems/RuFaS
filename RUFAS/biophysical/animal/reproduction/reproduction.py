@@ -1812,11 +1812,8 @@ class Reproduction:
         Returns
         -------
         tuple[bool, ReproductionDataStream]
-            A tuple containing:
-            1. bool
-                Whether hormone delivery should be set up for presynch.
-            2. ReproductionDataStream
-                The updated reproduction data stream.
+            - Whether hormone delivery should be set up for presynch.
+            - The updated reproduction data stream.
 
         Notes
         -----
@@ -1889,11 +1886,8 @@ class Reproduction:
         Returns
         -------
         tuple[bool, ReproductionDataStream]
-            A tuple containing:
-            1. bool
-                Whether hormone delivery should be set up for OvSynch.
-            2. ReproductionDataStream
-                The updated reproduction data stream.
+            - Whether hormone delivery should be set up for OvSynch.
+            - The updated reproduction data stream.
 
         Notes
         -----
@@ -1913,6 +1907,7 @@ class Reproduction:
 
         If the cow is already in the IN_OVSYNCH state, this method returns True even
         if no new state transition occurs.
+
         """
         if reproduction_data_stream.is_pregnant:
             return False, reproduction_data_stream

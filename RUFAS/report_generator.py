@@ -311,18 +311,15 @@ class ReportGenerator:
         Returns
         -------
         tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]
-            1. dict[str, dict[str, list[Any]]] | dict[str, list[Any]]
-                The aggregated report data.
+            - The aggregated report data.
                 - If no aggregation is specified, all the columns will be returned.
                 - If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
                     that is either ``hor_ver_agg`` or ``ver_hor_agg`` depending on the value of the
                     ``horizontal_first`` key in the filter content.
                 - If only horizontal aggregation is specified, the returned dictionary will have one key ``hor_agg``.
                 - If only vertical aggregation is specified, the returned dictionary will have one key ``ver_agg``.
-            2. list[dict[str, str | dict[str, str]]]
-                The event logs
-            3. bool
-                A boolean indicating whether the report data has been aggregated.
+            - The event logs.
+            - A boolean indicating whether the report data has been aggregated.
 
         Raises
         ------
@@ -390,10 +387,9 @@ class ReportGenerator:
         Returns
         -------
         tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]
-            1. dict[str, dict[str, list[Any]]] | dict[str, list[Any]]
-                The aggregated data.
-            2. list[dict[str, str | dict[str, str]]]
-                The logs to be passed to ``OutputManager``.
+            - The aggregated data.
+            - The logs to be passed to ``OutputManager``.
+
         """
         aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
@@ -502,15 +498,14 @@ class ReportGenerator:
         Returns
         -------
         tuple[str | Any, dict[str, str | dict[str, str]]]
-            1. str | Any
-                The expected units of aggregating the report data using the accompanying aggregator function.
-            2. dict[str, str | dict[str, str]]
-                The event logs.
+            - The expected units of aggregating the report data using the accompanying aggregator function.
+            - The event logs.
 
         Raises
         ------
         ValueError
             If there is an error extracting units from the report data.
+
         """
         event_log: dict[str, str | dict[str, str]] = {}
         if len(report_data) == 0:
@@ -573,12 +568,10 @@ class ReportGenerator:
         Returns
         -------
         tuple[dict[str, int], dict[str, int], dict[str, str | dict[str, str]]]
-            1. dict[str, int]
-                Combined numerator units.
-            2. dict[str, int]
-                Combined denominator units.
-            3. dict[str, str | dict[str, str]]
-                The event logs.
+            - Combined numerator units.
+            - Combined denominator units.
+            - The event logs.
+
         """
         info_map: dict[str, str] = {
             "class": ReportGenerator.__class__.__name__,
@@ -633,10 +626,9 @@ class ReportGenerator:
         Returns
         -------
         tuple[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]
-            1. dict[str, list[Any]]
-                The aggregated report data.
-            2. list[dict[str, str | dict[str, str]]]
-                The event logs.
+            - The aggregated report data.
+            - The event logs.
+
         """
 
         horizontal_first = self._get_horizontal_first_value(filter_content)
@@ -695,10 +687,9 @@ class ReportGenerator:
         Returns
         -------
         tuple[str | None, str | None]
-            1. str | None
-                The extracted horizontal aggregation key, or None if not specified.
-            2. str | None
-                The extracted vertical aggregation key, or None if not specified.
+            - The extracted horizontal aggregation key, or None if not specified.
+            - The extracted vertical aggregation key, or None if not specified.
+
         """
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
@@ -730,17 +721,15 @@ class ReportGenerator:
         Returns
         -------
         tuple[list[float], str, list[dict[str, str | dict[str, str]]]]
-            1. list[float]
-                The aggregated data.
-            2. str
-                The aggregated units.
-            3. list[dict[str, str | dict[str, str]]]
-                The event logs.
+            - The aggregated data.
+            - The aggregated units.
+            - The event logs.
 
         Raises
         ------
         ValueError
             If the data to be aggregated has different lengths.
+
         """
 
         lengths = [len(report_data[key]) for key in report_data if any(loop_key in key for loop_key in loop_list)]
@@ -785,10 +774,9 @@ class ReportGenerator:
         Returns
         -------
         tuple[dict[str, list[float | None]], list[dict[str, str | dict[str, str]]]]
-            1. dict[str, list[float | None]]
-                The aggregated data.
-            2. list[dict[str, str | dict[str, str]]]
-                The event logs.
+            - The aggregated data.
+            - The event logs.
+
         """
 
         aggregated_data: dict[str, list[float | None]] = {}
@@ -821,10 +809,9 @@ class ReportGenerator:
         Returns
         -------
         tuple[float | None, dict[str, str | dict[str, str]]]
-            1. float | None
-                The aggregated data. If the data is empty, returns None.
-            2. dict[str, str | dict[str, str]]
-                The event logs. An error is logged if the data contains any values that cannot be aggregated.
+            - The aggregated data. If the data is empty, returns None.
+            - The event logs. An error is logged if the data contains any values that cannot be aggregated.
+
         """
         aggregated_data = None
         info_map: dict[str, str] = {
@@ -919,10 +906,9 @@ class ReportGenerator:
         Returns
         -------
         tuple[dict[str, int | float], list[dict[str, str | dict[str, str]]]]
-            1. dict[str, int | float]
-                The updated constants configuration.
-            2. list[dict[str, str | dict[str, str]]]
-                The event logs.
+            - The updated constants configuration.
+            - The event logs.
+
         """
         updated_constants_config: dict[str, int | float] = {}
         event_logs: list[dict[str, str | dict[str, str]]] = []

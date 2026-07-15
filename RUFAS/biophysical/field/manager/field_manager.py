@@ -177,7 +177,9 @@ class FieldManager:
             field_configuration_data["fertilizer_management_specification"]
         )
 
-        manure_events = FieldManager._setup_manure_events(field_configuration_data["manure_management_specification"])
+        manure_events, daily_spread_settings = FieldManager._setup_manure_events(
+            field_configuration_data["manure_management_specification"]
+        )
 
         tillage_events = FieldManager._setup_tillage_events(
             field_configuration_data["tillage_management_specification"]
@@ -196,6 +198,7 @@ class FieldManager:
             fertilizer_events=fertilizer_events,
             fertilizer_mixes=available_fertilizer_mixes,
             manure_events=manure_events,
+            daily_spread_settings=daily_spread_settings,
         )
 
     @staticmethod
@@ -250,7 +253,6 @@ class FieldManager:
         Returns
         -------
         tuple[list[PlantingEvent], list[HarvestEvent]]
-            A tuple containing two lists:
             - List of all planting events required by the crop rotation schedule.
             - List of all harvest events corresponding to the planting events.
 
@@ -278,24 +280,14 @@ class FieldManager:
         Returns
         -------
         tuple[dict[str, dict[str, float], FertilizerSchedule]
-            Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
-
-        Raises
-        ------
-        ValueError
-            If no fertilizer data sent.
+            - Dictionary containing the specifications of the available fertilizer mixes.
+            - A FertilizerSchedule.
 
         """
         im = InputManager()
-        fertilizer_data: dict[str, Any] = im.get_data(fertilizer_schedule)
+        fertilizer_data: dict[str, Any] = im.get_data(fertilizer_schedule, required=False)
         if fertilizer_data is None:
-            om = OutputManager()
-            info_map = {
-                "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_fertilizer_events.__name__,
-            }
-            om.add_error("No fertilizer data", "Field data provided with empty fertilizer data.", info_map)
-            raise ValueError("No fertilizer data")
+            return {}, []
         available_fertilizer_mixes: dict[str, dict[str, float]] = {}
         fertilizer_mix_data: list[dict[str, Any]] = fertilizer_data["available_fertilizer_mixes"]
         for mix in fertilizer_mix_data:
@@ -325,7 +317,7 @@ class FieldManager:
         return available_fertilizer_mixes, fertilizer_application_events
 
     @staticmethod
-    def _setup_manure_events(manure_schedule: str) -> list[ManureEvent]:
+    def _setup_manure_events(manure_schedule: str) -> tuple[list[ManureEvent], dict[str, Any] | None]:
         """
         Sets up a list of manure events from ManureSchedule.
 
@@ -336,25 +328,15 @@ class FieldManager:
 
         Returns
         -------
-        list[ManureEvent]
-            A list of generated manure events.
-
-        Raises
-        ------
-        ValueError
-            If no manure data provided.
+        tuple[list[ManureEvent], dict[str, Any] | None]
+            - A list of generated manure events
+            - Optional daily spread settings.
 
         """
         im = InputManager()
-        manure_schedule_data: dict[str, Any] = im.get_data(manure_schedule)
+        manure_schedule_data: dict[str, Any] = im.get_data(manure_schedule, required=False)
         if manure_schedule_data is None:
-            om = OutputManager()
-            info_map = {
-                "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_manure_events.__name__,
-            }
-            om.add_error("No manure data", "Field data provided with empty manure data.", info_map)
-            raise ValueError("No manure data")
+            return []
         manure_type_strings: list[str] = manure_schedule_data["manure_types"]
         manure_supplement_methods_strings: list[str] = manure_schedule_data["supplement_manure_nutrient_deficiencies"]
         manure_supplement_methods: list[ManureSupplementMethod] = [
@@ -377,7 +359,8 @@ class FieldManager:
             pattern_repeat=manure_schedule_data["pattern_repeat"],
         )
         manure_events = manure_schedule_instance.generate_manure_events()
-        return manure_events
+        daily_spread_settings = manure_schedule_data.get("daily_spread")
+        return manure_events, daily_spread_settings
 
     @staticmethod
     def _setup_tillage_events(tillage_schedule: str) -> list[TillageEvent]:
@@ -394,22 +377,11 @@ class FieldManager:
         list[TillageEvent]
             A list of generated tillage events.
 
-        Raises
-        ------
-        ValueError
-            If no tillage data provided.
-
         """
         im = InputManager()
-        tillage_schedule_data: dict[str, Any] = im.get_data(tillage_schedule)
+        tillage_schedule_data: dict[str, Any] = im.get_data(tillage_schedule, required=False)
         if tillage_schedule_data is None:
-            om = OutputManager()
-            info_map = {
-                "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_tillage_events.__name__,
-            }
-            om.add_error("No tillage data", "Field data provided with empty tillage data.", info_map)
-            raise ValueError("No tillage data")
+            return []
         tillage_schedule_instance = TillageSchedule(
             name="tillage_schedule",
             years=tillage_schedule_data["years"],

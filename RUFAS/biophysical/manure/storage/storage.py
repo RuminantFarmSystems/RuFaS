@@ -221,22 +221,22 @@ class Storage(Processor):
         )
         if not is_emptying_day:
             empty_stream = ManureStream.make_empty_manure_stream()
-            self._report_manure_stream(empty_stream, "emptied", time.simulation_day)
+            self._report_emptied(empty_stream, time.simulation_day)
             manure_to_be_returned = {}
         else:
             self._validate_emptying_fraction()
             if 0.0 < self._emptying_fraction < 1.0:
                 emptied_stream = self.stored_manure.split_stream(self._emptying_fraction)
                 retained_stream = self.stored_manure.split_stream(1.0 - self._emptying_fraction)
-                self._report_manure_stream(emptied_stream, "emptied", time.simulation_day)
+                self._report_emptied(emptied_stream, time.simulation_day)
                 self.stored_manure = retained_stream
                 manure_to_be_returned = {"manure": replace(self.stored_manure)}
             elif self._emptying_fraction == 0.0:
                 empty_stream = ManureStream.make_empty_manure_stream()
-                self._report_manure_stream(empty_stream, "emptied", time.simulation_day)
+                self._report_emptied(empty_stream, time.simulation_day)
                 manure_to_be_returned = {}
             else:
-                self._report_manure_stream(self.stored_manure, "emptied", time.simulation_day)
+                self._report_emptied(self.stored_manure, time.simulation_day)
                 manure_to_be_returned = {"manure": replace(self.stored_manure)}
                 self.stored_manure = ManureStream.make_empty_manure_stream()
 
@@ -244,6 +244,15 @@ class Storage(Processor):
             self.handle_overflowing_manure(time)
 
         return manure_to_be_returned
+
+    def _report_emptied(self, manure_stream: ManureStream, simulation_day: int) -> None:
+        """
+        Report the manure removed from this storage on the current day under the ``"emptied"`` stream.
+
+        Provided as an overridable hook so subclasses can change what counts as "emptied" (e.g. ``DailySpread``
+        reports only the manure that was not spread on the field).
+        """
+        self._report_manure_stream(manure_stream, "emptied", simulation_day)
 
     def _validate_emptying_fraction(self) -> None:
         """Validates that the emptying fraction is between 0.0 and 1.0."""
@@ -374,7 +383,8 @@ class Storage(Processor):
         Returns
         -------
         tuple[float, float]
-            The amount of storage methane burned and the adjusted methane loss (kg).
+            - The amount of storage methane burned (kg).
+            - The adjusted methane loss (kg).
 
         """
         storage_methane_burned = (

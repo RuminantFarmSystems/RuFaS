@@ -217,8 +217,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an error message describing the first failure encountered. The message is empty when
-            validation succeeds.
+            - Boolean representing validation status
+            - An error message describing the first failure encountered. The message is empty when validation succeeds.
 
         """
         info_map = {
@@ -319,10 +319,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata properties object is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -406,10 +404,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata definition is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -549,10 +545,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata definition is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -666,10 +660,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata definition is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -736,10 +728,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message.
-
-            - ``(True, "")`` if the metadata definition is valid.
-            - ``(False, message)`` if validation fails.
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         Notes
         -----
@@ -850,8 +840,8 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            Validation status and an associated error message. The message is
-            empty when validation succeeds.
+            - A boolean representing validation status.
+            - An error message if validation fails and an empty string if validation succeeds.
 
         """
         info_map = {
@@ -958,10 +948,8 @@ class DataValidator:
         Returns
         -------
         tuple[list[str] | None, str]
-            Tuple containing the validated list of paths and an associated error message.
-
-            - ``(paths, "")`` if all configured path values are valid.
-            - ``(None, message)`` if a configured path value is missing, empty, or not a string.
+            - A validated list of the paths.
+            - An associated error message if a configured path value is missing, empty, or not a string.
 
         Notes
         -----
@@ -2154,6 +2142,8 @@ class CrossValidator:
             ),
             "is_of_type": lambda left, right, eager_termination: self._evaluate_is_type(left, right, eager_termination),
             "is_null": lambda left, _right, eager_termination: self._evaluate_is_null(left),
+            "is_not_null": lambda left, _right, eager_termination: self._evaluate_is_not_null(left),
+            "is_in": lambda left, right, _eager_termination: self._evaluate_is_in(left, right),
             "regex": lambda left, right, eager_termination: self._evaluate_regex(left, right),
             "is_equal_length": lambda left, right, eager_termination: self._evaluate_equal_data_length(
                 left, right, eager_termination
@@ -2310,8 +2300,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            Result of the expression evaluation and a boolean indicating whether
-            the expression was successfully evaluated.
+            - The result of the expression evaluation.
+            - A boolean indicating whether the expression was successfully evaluated.
 
         Raises
         ------
@@ -2377,7 +2367,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            Aggregated result and ``True`` on success, or ``(None, False)`` on error.
+            - The aggregated result.
+            - A boolean representing the success or failure of the aggregation.
 
         Raises
         ------
@@ -2538,7 +2529,8 @@ class CrossValidator:
         Returns
         -------
         tuple[Any, bool]
-            ``(result, True)`` on success or ``(None, False)`` on error.
+            - The result of the evaluation.
+            - A boolean representing the success or failure of the evaluation.
 
         Notes
         -----
@@ -2553,6 +2545,9 @@ class CrossValidator:
         - ``relationship``: one of the supported relationship strings (e.g. ``"equal"``).
         - ``mode``: ``"filter"`` to return the matching subset; ``"enforce"`` to
           return ``[True]`` when all entries satisfy, otherwise ``[False]``.
+        - ``field_to_save``: *(filter mode only)* key to extract from each matched
+          entry. When provided, the result is a flat list of that field's values
+          instead of a list of full dict objects.
 
         Examples
         --------
@@ -2566,6 +2561,19 @@ class CrossValidator:
                 "value_to_compare": "alias_status",
                 "relationship": "equal",
                 "mode": "filter"
+            }
+
+        Filter and extract a single field from each matched entry:
+
+        .. code-block:: python
+
+            {
+                "in": "pen_information",
+                "field": "animal_combination",
+                "value_to_compare": "LAC_COW",
+                "relationship": "equal",
+                "mode": "filter",
+                "field_to_save": "number_of_stalls"
             }
 
         Enforce that all entries have ``"age"`` greater than a peer field:
@@ -2585,6 +2593,7 @@ class CrossValidator:
         field: str = iter_block["field"]
         value_to_compare_alias: str | None = iter_block.get("value_to_compare", None)
         field_to_compare: str | None = iter_block.get("field_to_compare", None)
+        field_to_save: str | None = iter_block.get("field_to_save", None)
         relationship: str = iter_block["relationship"]
         mode: str = iter_block["mode"]
 
@@ -2601,11 +2610,14 @@ class CrossValidator:
             return None, False
 
         if mode == "filter":
-            return [
+            filtered = [
                 entry
                 for entry in array_of_dicts
                 if compare_function([entry.get(field)], comparand_for(entry), eager_termination)
-            ], True
+            ]
+            if field_to_save is not None:
+                return [entry.get(field_to_save) for entry in filtered], True
+            return filtered, True
         else:
             return [
                 all(
@@ -2753,8 +2765,6 @@ class CrossValidator:
         The following rules are enforced:
 
         - ``operands`` must be a non-empty list.
-        - When ``operands`` has more than one entry, ``operation`` must be provided
-          and cannot be ``"no_op"``.
         - ``operation``, when provided, must be a known aggregation function.
         - ``mode``, when provided, must be ``"element_wise"`` or ``"aggregate"``.
 
@@ -2773,19 +2783,6 @@ class CrossValidator:
             return False
 
         operation = aggregation_block.get("operation")
-        if len(operands) > 1:
-            if not operation or operation == "no_op":
-                self._log_cross_validation_error(
-                    "Invalid operation for multi-operand aggregation",
-                    "When 'operands' has more than one entry, 'operation' must be provided and " "cannot be 'no_op'.",
-                    function_name,
-                )
-                if eager_termination:
-                    raise ValueError(
-                        "Cross-validation error: 'operation' must be provided and cannot be 'no_op' "
-                        "when 'operands' has more than one entry."
-                    )
-                return False
 
         if operation is not None and operation not in AGGREGATION_FUNCTIONS:
             self._log_cross_validation_error(
@@ -3120,6 +3117,10 @@ class CrossValidator:
         """Evaluates is null condition."""
         return bool(all(value is None for value in left_hand_value))
 
+    def _evaluate_is_not_null(self, left_hand_value: Any) -> bool:
+        """Evaluates is not null condition."""
+        return bool(all(value is not None for value in left_hand_value))
+
     def _evaluate_is_type(self, left_hand_value: Any, data_type: Any, eager_termination: bool) -> bool:
         """Evaluates the if_type condition"""
         if not isinstance(data_type[0], str):
@@ -3164,6 +3165,25 @@ class CrossValidator:
             return False
 
         return bool(all(checker(value) for value in left_hand_value))
+
+    def _evaluate_is_in(self, left_hand_value: Any, right_hand_value: Any) -> bool:
+        """
+        Check if every value in ``left_hand_value`` is present in ``right_hand_value``.
+
+        Parameters
+        ----------
+        left_hand_value : list[Any]
+            Values to test for membership.
+        right_hand_value : list[Any]
+            Allowed values (the set to test against).
+
+        Returns
+        -------
+        bool
+            ``True`` if every element of ``left_hand_value`` is in ``right_hand_value``,
+            ``False`` otherwise.
+        """
+        return bool(all(v in right_hand_value for v in left_hand_value))
 
     def _evaluate_regex(self, left_hand_value: Any, right_hand_value: Any) -> bool:
         """

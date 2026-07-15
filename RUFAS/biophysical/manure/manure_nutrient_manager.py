@@ -93,9 +93,8 @@ class ManureNutrientManager:
         Returns
         -------
         tuple[NutrientRequestResults | None, bool]
-            A tuple containing the results of the nutrient request and a boolean indicating whether additional
-            manure would be needed to fulfill the request. If the request cannot be fulfilled at all, the first
-            element of the tuple will be None.
+            - The results of the nutrient request; will be None if the request cannot be fulfilled at all.
+            - A boolean indicating whether additional manure would be needed to fulfill the request.
 
         Notes
         -----
@@ -119,9 +118,8 @@ class ManureNutrientManager:
         Returns
         -------
         tuple[NutrientRequestResults | None, bool]
-            A tuple containing the results of the nutrient request and a boolean indicating whether additional
-            manure would be needed to fulfill the request. If the request cannot be fulfilled at all, the first
-            element of the tuple will be None.
+            - The results of the nutrient request. Will be None if the request cannot be fulfilled at all.
+            - A boolean indicating whether additional manure would be needed to fulfill the request.
 
         """
         is_nutrient_request_fulfilled = False

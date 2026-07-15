@@ -63,8 +63,9 @@ class Growth:
         Returns
         -------
         tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]
-            The updated animal growth properties, reproduction properties, and the general properties of the animal
-            after the growth-related routines for the current day.
+            - The updated animal growth properties after the growth-related routines for the current day.
+            - The updated reproduction properties after the growth-related routines for the current day.
+            - The updated general properties of the animal after the growth-related routines for the current day.
 
         Raises
         ------
@@ -230,7 +231,8 @@ class Growth:
         Returns
         -------
         tuple[float, float]
-            The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).
+            - The daily body weight growth for pregnant heifers (kg).
+            - The updated conceptus weight (kg).
 
         References
         ----------
@@ -259,8 +261,9 @@ class Growth:
         Returns
         -------
         tuple[float, float, float]
-            The daily body weight growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
-            tissue changed (kg).
+            - The daily body weight growth for pregnant heifers (kg).
+            - The updated conceptus weight (kg).
+            - The updated tissue changed (kg).
 
         References
         ----------
@@ -294,7 +297,8 @@ class Growth:
         Returns
         -------
         tuple[float, float]
-            The conceptus growth for pregnant heifers (kg), and the updated conceptus weight (kg).
+            - The conceptus growth for pregnant heifers (kg).
+            - The updated conceptus weight (kg).
 
         References
         ----------
@@ -330,8 +334,9 @@ class Growth:
         Returns
         -------
         tuple[float, float, float]
-            The conceptus growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
-            tissue changed (kg).
+            - The conceptus growth for pregnant heifers (kg).
+            - The updated conceptus weight (kg).
+            - The updated tissue changed (kg).
 
         Referemces
         ----------
@@ -427,7 +432,8 @@ class Growth:
         Returns
         -------
         tuple[float, float]
-            The body weight tissue growth for cows (kg), and the updated tissue changed (kg).
+            - The body weight tissue growth for cows (kg).
+            - The updated tissue changed (kg).
 
         References
         ----------

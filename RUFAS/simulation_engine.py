@@ -450,7 +450,9 @@ class SimulationEngine:
                 manure_request_results = None
                 if manure_request is not None:
                     if self.simulate_manure:
-                        manure_request_results = self.manure_manager.request_nutrients(manure_request, self.time)
+                        manure_request_results = self.manure_manager.request_nutrients(
+                            manure_request, field_name, self.time
+                        )
                     else:
                         manure_request_results = FieldManureSupplier.request_nutrients(manure_request)
                 manure_applications.append(ManureEventNutrientRequestResults(field_name, event, manure_request_results))
@@ -580,10 +582,10 @@ class SimulationEngine:
         Returns
         -------
         tuple[dict[str, ManureStream] | None, dict[str, float]]
-            A tuple containing:
             - A dictionary mapping pens to their corresponding ManureStream objects generated
               from the daily routines. If animals are not being simulated, this will be None.
             - A dictionary mapping feed types to the amount of purchased feed fed to the herd.
+
         """
         all_manure_data = self.herd_manager.execute_daily_routines(
             self.available_feeds,

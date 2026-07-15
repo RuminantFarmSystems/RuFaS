@@ -129,12 +129,34 @@ def test_weather_init(mock_weather_input: dict, mock_time: RufasTime, mocker: Mo
     [
         ([12.3, 20.4, 15.6, 20.5, 17.8], 17.32),
         ([-4.55, -3.22, -1.05, -0.3, 1.44, 3.99, 8.6], 0.7014285714285712),
+        ([12.3, float("nan"), 15.6, float("nan"), 17.8], 15.233333333333334),
+        ([float("nan"), -3.22, -1.05], -2.135),
     ],
 )
 def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float], expected: float) -> None:
     """Tests that the annual average air temperature is correctly calculated based on average daily temperatures."""
     actual = Weather._calculate_average_annual_temperature(avg_daily_temperatures)
-    assert actual == expected
+    assert actual == pytest.approx(expected)
+
+
+def test_calculate_average_annual_temperature_warns_on_missing_values(mocker: MockerFixture) -> None:
+    """Tests that a warning is recorded when some daily average temperatures are missing."""
+    patch_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+
+    Weather._calculate_average_annual_temperature([12.3, float("nan"), 15.6])
+
+    patch_add_warning.assert_called_once()
+
+
+def test_calculate_average_annual_temperature_all_missing_error(mocker: MockerFixture) -> None:
+    """Tests that an error is raised when all daily average temperatures are missing."""
+    patch_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+
+    with pytest.raises(ValueError) as e:
+        Weather._calculate_average_annual_temperature([float("nan"), float("nan")])
+
+    assert str(e.value) == "All daily average air temperatures in the weather data are missing"
+    patch_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -422,3 +444,20 @@ def test_set_LINEST_temperature_factors(
     assert mock_weather.intercept_mean_temp == expected_intercept
     assert mock_weather.amplitude == expected_amplitude
     assert mock_weather.phase_shift == pytest.approx(expected_phase_shift, abs=1e-4)
+
+
+def test_set_linest_temperature_factors_excludes_missing_temperatures(
+    mock_weather: Weather, mocker: MockerFixture
+) -> None:
+    """Tests that days with missing mean air temperatures are excluded from the regression."""
+    lstsq = mocker.patch("numpy.linalg.lstsq", return_value=(np.array([10.0, 0.0, 20.0]), None, None, None))
+
+    mock_weather.means = [10.0, float("nan"), 30.0]
+    mock_weather.cos = [0.5, 0.6, 0.7]
+    mock_weather.sin = [0.1, 0.2, 0.3]
+
+    mock_weather.set_linest_temperature_factors()
+
+    design_matrix, mean_temperatures = lstsq.call_args.args
+    np.testing.assert_array_equal(mean_temperatures, np.array([10.0, 30.0]))
+    np.testing.assert_array_equal(design_matrix, np.column_stack(([0.5, 0.7], [0.1, 0.3], [1.0, 1.0])))

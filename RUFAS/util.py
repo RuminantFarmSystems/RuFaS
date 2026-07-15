@@ -197,10 +197,8 @@ class Utility:
         Returns
         -------
         tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]
-            1. dict[str, dict[str, list[Any]]]
-                The expanded data.
-            2. list[dict[str, str | dict[str, str]]]
-                The logs generated from the expansion process.
+            - The expanded data.
+            - The logs generated from the expansion process.
 
         Raises
         ------
@@ -210,6 +208,7 @@ class Utility:
             If there is no data to be filled.
             If the number of ``info_map`` does not match the number of values for a variable.
             If a value for ``simulation_day`` is not present in every ``info_map``.
+
         """
         if not data_to_expand:
             raise ValueError("Data Expansion error: Cannot fill empty dataset.")
@@ -396,16 +395,36 @@ class Utility:
         Returns
         -------
         tuple[int, float]
-            1. int
-                Updated number of values.
-            2. float
-                Updated average.
+            - Updated number of values.
+            - Updated average.
 
         """
         new_num_values = num_values + 1
         new_avg = (cur_avg * num_values + new_value) / new_num_values
 
         return new_num_values, new_avg
+
+    @staticmethod
+    def clamp(value: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
+        """
+        Constrain a value to the inclusive range [minimum, maximum].
+
+        Parameters
+        ----------
+        value : float
+            The value to constrain.
+        minimum : float, default 0.0
+            The lower bound of the range.
+        maximum : float, default 1.0
+            The upper bound of the range.
+
+        Returns
+        -------
+        float
+            ``value`` limited to the range, equivalent to ``max(minimum, min(maximum, value))``.
+
+        """
+        return max(minimum, min(maximum, value))
 
     @staticmethod
     def remove_items_from_list_by_indices(data: list[Any], indices_to_remove: list[int]) -> None:
@@ -862,16 +881,15 @@ class Utility:
         Returns
         -------
         tuple[float, float]
-            1. float
-                The first random number.
-            2. float
-                The second random number.
+            - The first random number.
+            - The second random number.
 
         Raises
         ------
         ValueError
             If either standard deviation is non-positive, or if ``rho`` is
             outside the range ``[-1, 1]``.
+
         """
         if sigma_x <= 0 or sigma_y <= 0:
             raise ValueError("The standard deviations for a bivariate distribution must be positive.")

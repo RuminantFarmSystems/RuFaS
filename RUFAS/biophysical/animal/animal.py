@@ -1291,6 +1291,15 @@ class Animal:
                 animal_type=self.animal_type,
             )
 
+    @property
+    def enteric_methane(self) -> float:
+        """Returns unmitigated enteric methane for cows and mitigated enteric methane for non-cows."""
+        return (
+            self.digestive_system.enteric_methane_for_energy
+            if self.animal_type.is_cow
+            else self.digestive_system.enteric_methane_emission
+        )
+
     def _assign_sex_to_newborn_calf(self) -> None:
         """
         Assign a sex to a newborn calf based on the semen type and male calf rate.
@@ -1332,13 +1341,6 @@ class Animal:
         if random() < AnimalConfig.still_birth_rate:
             self.stillborn_day = simulation_day
             self.events.add_event(0, simulation_day, animal_constants.STILL_BIRTH)
-
-        is_sold = (
-            True
-            if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate or self.sold_at_day)
-            else False
-        )
-        self.sold_at_day = simulation_day if is_sold else None
 
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("birth_weight", 0.0)
@@ -1390,9 +1392,9 @@ class Animal:
 
         Returns
         -------
-        tuple (HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol)
-            A tuple where the first element is the determined heifer reproduction program and
-            the second element is the corresponding sub-program for the specified reproduction program.
+        tuple[HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol]
+            - The determined heifer reproduction program.
+            - The corresponding sub-program for the specified reproduction program.
 
         """
         heifer_reproduction_program_string = args.get("heifer_reproduction_program")
@@ -1709,11 +1711,10 @@ class Animal:
 
         Returns
         -------
-        NewBornCalfValuesTypedDict | None
-            A dictionary containing details related to a newly born calf if a calf is born during this update;
+        tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]
+            - A dictionary containing details related to a newly born calf if a calf is born during this update;
             otherwise, None.
-        HerdReproductionStatistics
-            A collection of statistical properties related to the animal's reproduction lifecycle.
+            - A collection of statistical properties related to the animal's reproduction lifecycle.
 
         """
         if not (self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow):
@@ -1830,9 +1831,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, None]
-            A tuple where the first value indicates whether the life stage was changed
-            (AnimalStatus.LIFE_STAGE_CHANGED) or remains the same (AnimalStatus.REMAIN).
-            The second value is always None.
+            - Whether the life stage was changed.
+            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
 
         Notes
         -----
@@ -1856,8 +1856,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, None]
-            AnimalStatus.LIFE_STAGE_CHANGED, None: If the heiferI transitions to the heifer II life stage.
-            AnimalStatus.REMAIN, None: If the heiferI remains in the current life stage.
+            - The updated status on whether the animal remains in the same life stage or transitions.
+            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
 
         Notes
         -----
@@ -1882,8 +1882,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, None]
-            A tuple containing the status of the animal (whether it is sold, its life stage
-            has changed, or it remains in the current state) and None.
+            - Whether it is sold, its life stage has changed, or it remains in the current state).
+            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
 
         Notes
         -----
@@ -1916,12 +1916,9 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
-            A tuple containing the animal status and optional newborn calf data.
+            - The animal status and optional newborn calf data.
+            - Optional newborn calf data.
 
-            * `AnimalStatus.LIFE_STAGE_CHANGED` and newborn calf configuration
-            if the animal transitions to Cow.
-            * `AnimalStatus.REMAIN` and `None` if the animal remains in the
-            HeiferIII stage.
         """
         if self.evaluate_heiferIII_for_cow():
             newborn_calf_config = self.transition_heiferIII_to_cow(time)
@@ -1941,8 +1938,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, None]
-            A tuple where the first element indicates whether the life stage has changed or remains the same,
-            and the second element is always None.
+            - Whether the life stage has changed or remains the same.
+            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
 
         """
         if self.animal_type == AnimalType.LAC_COW and self.is_milking is False:
@@ -1967,7 +1964,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
-            A tuple containing the updated animal status and, if applicable, configuration for a newborn calf.
+            - The updated animal status and, if applicable, configuration for a newborn calf.
+            - Optional newborn calf data.
 
         """
         ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP: dict[
@@ -2472,7 +2470,8 @@ class Animal:
         Returns
         -------
         tuple[int, str]
-            Future cull date in simulation days and reason for culling.
+            - Future cull date in simulation days.
+            - Reason for culling.
 
         Notes
         -------
