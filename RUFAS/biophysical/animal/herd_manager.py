@@ -1012,7 +1012,7 @@ class HerdManager:
         ``cull_eligibility_maximum_days_carried_calf`` user inputs (protecting fresh and
         late-pregnant cows respectively), and ranking is governed by the ``cull_ranking_criteria``
         user input. The lowest-ranked eligible cow is selected for removal.
-        
+
         Returns
         -------
         int | None
