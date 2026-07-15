@@ -1,7 +1,9 @@
 import dataclasses
 from enum import Enum
+from typing import Any
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 class SoilConfiguration(Enum):
@@ -21,7 +23,7 @@ class SoilConfigFactory:
     def create_soil_data(
         field_size: float,
         config: SoilConfiguration = SoilConfiguration("generic"),
-        **kwargs,
+        **kwargs: dict[str, Any],
     ) -> SoilData:
         """
         Creates a soil data object from a SoilConfiguration enum, with the defaults from that configurations and the
@@ -45,15 +47,20 @@ class SoilConfigFactory:
         config_class = configuration_by_type[config]
         config_instance = config_class(field_size=field_size)
 
-        # handle any attributes that need to be modified
         if kwargs:
             attribute_list = dataclasses.asdict(config_instance).keys()
-
-            # update all valid attributes
             for attribute, value in kwargs.items():
                 if attribute in attribute_list:
                     setattr(config_instance, attribute, value)
                 else:
+                    OutputManager().add_error(
+                        "Invalid SoilData attribute",
+                        f"{attribute} is not a valid attribute of SoilData",
+                        info_map={
+                            "class": SoilConfigFactory.__name__,
+                            "function": SoilConfigFactory.create_soil_data.__name__,
+                        },
+                    )
                     raise AttributeError(f"{attribute} is not a valid attribute of SoilData")
 
         return config_instance

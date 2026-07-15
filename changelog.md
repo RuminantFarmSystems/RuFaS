@@ -65,7 +65,7 @@ v1.0.3
 - [1945](https://github.com/RuminantFarmSystems/RuFaS/pull/1945) - [minor change] [Animal] Implements Animal Genetics submodule.
 - [2048](https://github.com/RuminantFarmSystems/RuFaS/pull/2048) - [minor change] [Animal][Testing] Adds end to end testing for Animal domain.
 - [1809](https://github.com/RuminantFarmSystems/RuFaS/pull/1809) - [minor change] [InputManager] Extract the validation methods from InputManager.
-- [2045](https://github.com/RuminantFarmSystems/RuFaS/pull/2045) - [minor change] [Documentation] Regenerates the Sphinx HTML documentation.
+- [2045](https://github.com/RuminantFarmSystems/RuFaS/pull/2045) - [minor change] [Documentation] Regenerates the Sphinx HTML documentation. f 
 - [2050](https://github.com/RuminantFarmSystems/RuFaS/pull/2050) - [minor change] [Crop & Soil][Feed Storage] Disentangle the Crop & Soil and Feed Storage modules.
 - [2061](https://github.com/RuminantFarmSystems/RuFaS/pull/2061) - [minor change] [DataValidator] Removed the usage of OutputManager in DataValidator.
 - [2057](https://github.com/RuminantFarmSystems/RuFaS/pull/2057) - [minor change] [Crop & Soil][Manure] Disentangle the Crop & Soil and Manure modules.
@@ -354,6 +354,7 @@ v1.0.3
 - [2872](https://github.com/RuminantFarmSystems/RuFaS/pull/2872) - [minor change] [NoInputChange] [NoOutputChange] Adds information and links for onboarding videos.
 - [2850](https://github.com/RuminantFarmSystems/RuFaS/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
 - [2908](https://github.com/RuminantFarmSystems/RuFaS/pull/2908) - [minor change] [NoInputChange] [OutputChange] Fix the FarmGrownFeed Emissions Unit issue on `test` branch.
+- [2964](https://github.com/RuminantFarmSystems/RuFaS/pull/2964) - [minor change] [NoInputChange] [NoOutputChange] Patched a missing comma in freestall task input
 
 ### v0.9.2
 

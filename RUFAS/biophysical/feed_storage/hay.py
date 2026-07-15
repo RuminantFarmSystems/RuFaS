@@ -28,26 +28,22 @@ UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT = 0.000_06
 
 class Hay(Storage):
     """
-    Represents a Hay storage subclass of Storage.
+    Represents Hay storage, a subclass of ``Storage``.
 
     Parameters
     ----------
-    config : dict[str, str | float]
+    config : dict[str, str | float | list[str]]
         Configuration dictionary for the hay storage.
 
     Attributes
     ----------
     bale_size : float
-        Diameter of the hay bale in meters.
+        Diameter of the hay bale (m).
     target_dry_matter : float
         The target dry matter content of hay after drying down in storage (unitless).
     additional_dry_matter_loss_coefficient : float
         Coefficient determining how much additional dry matter is lost in hayed crops (unitless).
 
-    Methods
-    -------
-    calculate_protein_loss():
-        Calculates the protein loss in the hay.
     """
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
@@ -65,7 +61,7 @@ class Hay(Storage):
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the loss of moisture in hayed crops, and calls the base class's implementation of
-        `process_degradations` to process the loss of dry matter.
+        ``process_degradations`` to process the loss of dry matter.
 
         Parameters
         ----------
@@ -92,7 +88,7 @@ class Hay(Storage):
         Parameters
         ----------
         crops : list[HarvestedCrop]
-            List of HarvestedCrops to project degradations for.
+            List of ``HarvestedCrop`` objects to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
@@ -127,13 +123,12 @@ class Hay(Storage):
         Returns
         -------
         float
-            Mass of gaseous dry matter lost since from hayed crop since the last time it losses were processed for it
-            (kg).
+            Mass of gaseous dry matter lost from the hayed crop since the last time losses were processed for it (kg).
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equations FS.HAY.1, FS.HAY.2., FS.HAY.3, FS.HAY.4, FS.HAY.5,
-        FS.HAY.6, FS.HAY.7
+        Feed Storage Scientific Documentation, equations FS.HAY.1, FS.HAY.2, FS.HAY.3, FS.HAY.4, FS.HAY.5, FS.HAY.6,
+        FS.HAY.7.
 
         """
         days_stored = (time.current_date.date() - crop.storage_time).days
@@ -191,7 +186,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.HAY.3, FS.HAY.4, FS.HAY.5
+        Feed Storage Scientific Documentation, equations FS.HAY.3, FS.HAY.4, FS.HAY.5.
 
         """
         days_stored = (time - crop.storage_time).days
@@ -209,9 +204,7 @@ class Hay(Storage):
         )
 
         fraction_of_initial_dry_matter_lost = (
-            numerator / denominator * fraction_of_total_loss
-            if denominator > 0.0
-            else 0
+            numerator / denominator * fraction_of_total_loss if denominator > 0.0 else 0
         )
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
@@ -233,7 +226,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation FS.HAY.6
+        Feed Storage Scientific Documentation, equation FS.HAY.6.
 
         """
         days_stored = (time - crop.storage_time).days
@@ -257,7 +250,7 @@ class Hay(Storage):
         Returns
         -------
         float
-            Loss of dry matter that occurred over the specified period of weather conditions in kg.
+            Loss of dry matter that occurred over the specified period of weather conditions (kg).
 
         Notes
         -----
@@ -266,7 +259,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scienitific Documentation, equation FS.HAY.7 and Table FS.HAY.8
+        Feed Storage Scientific Documentation, equation FS.HAY.7 and Table FS.HAY.8.
 
         """
         if self.additional_dry_matter_loss_coefficient == 0.0:
@@ -284,18 +277,14 @@ class Hay(Storage):
 
 
 class ProtectedIndoors(Hay):
-    """
-    Represents protected indoors hay storage, a subclass of Hay.
-    """
+    """Represents protected indoors hay storage, a subclass of ``Hay``."""
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
 
 
 class ProtectedWrapped(Hay):
-    """
-    Represents protected wrapped hay storage, a subclass of Hay.
-    """
+    """Represents protected wrapped hay storage, a subclass of ``Hay``."""
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
@@ -303,9 +292,7 @@ class ProtectedWrapped(Hay):
 
 
 class ProtectedTarped(Hay):
-    """
-    Represents protected tarped hay storage, a subclass of Hay.
-    """
+    """Represents protected tarped hay storage, a subclass of ``Hay``."""
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
@@ -314,7 +301,7 @@ class ProtectedTarped(Hay):
 
 class Unprotected(Hay):
     """
-    Represents unprotected hay storage, a subclass of Hay.
+    Represents unprotected hay storage, a subclass of ``Hay``.
 
     Notes
     -----

@@ -376,6 +376,7 @@ def test_repr(
     for cow in cows:
         cow.calves = 1
         cow.days_in_milk = 1
+        setattr(cow, "is_milking", True)
     expected = {
         "calves": [{"dummy": "animal"}] * num_calf,
         "heiferIs": [{"dummy": "animal"}] * num_heiferI,

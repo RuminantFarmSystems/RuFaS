@@ -343,8 +343,124 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
     assert actual == expected
 
 
+def test_find_group_prefixes_basic() -> None:
+    """Test extraction of prefixes from standard flattened keys."""
+    data: dict[str, Any] = {
+        "a.b": 1,
+        "a.c": 2,
+        "d.e": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["a", "d"]
+
+
+def test_find_group_prefixes_deduplication() -> None:
+    """Ensure duplicate prefixes are only returned once."""
+    data: dict[str, Any] = {
+        "group1.x": 1,
+        "group1.y": 2,
+        "group1.z": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["group1"]
+
+
+def test_find_group_prefixes_complex_keys() -> None:
+    """Test realistic complex keys similar to production format."""
+    data: dict[str, Any] = {
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass": 1,
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'.year": 2020,
+        "Field._record_fertilizer_application.fertilizer_application.field='field_2'.mass": 2,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    expected = [
+        "Field._record_fertilizer_application.fertilizer_application.field='field_1'",
+        "Field._record_fertilizer_application.fertilizer_application.field='field_2'",
+    ]
+
+    assert result == sorted(expected)
+
+
+def test_find_group_prefixes_with_required_suffixes() -> None:
+    """Test filtering using required_suffixes."""
+    data: dict[str, Any] = {
+        "a.mass": 1,
+        "a.year": 2020,
+        "b.day": 10,
+        "c.mass": 5,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass"},
+    )
+
+    assert result == ["a", "c"]
+
+
+def test_find_group_prefixes_required_suffixes_no_match() -> None:
+    """Test when no suffix matches the required set."""
+    data: dict[str, Any] = {
+        "a.year": 2020,
+        "b.day": 10,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass"},
+    )
+
+    assert result == []
+
+
+def test_find_group_prefixes_ignores_keys_without_dot() -> None:
+    """Ensure keys without a dot are ignored."""
+    data: dict[str, Any] = {
+        "a": 1,
+        "b": 2,
+        "c.d": 3,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(data)
+
+    assert result == ["c"]
+
+
+def test_find_group_prefixes_empty_input() -> None:
+    """Test behavior with empty input."""
+    result = Utility.find_group_prefixes_from_keys({})
+
+    assert result == []
+
+
+def test_find_group_prefixes_multiple_suffix_filtering() -> None:
+    """Test filtering with multiple allowed suffixes."""
+    data: dict[str, Any] = {
+        "a.mass": 1,
+        "a.year": 2020,
+        "b.day": 10,
+        "c.depth": 5,
+    }
+
+    result = Utility.find_group_prefixes_from_keys(
+        data,
+        required_suffixes={"mass", "year"},
+    )
+
+    assert result == ["a"]
+
+
 @pytest.mark.parametrize(
-    "data_to_pad,fill_value,gap_pad,end_pad,expected",
+    (
+        "data_to_expand,simulation_length,fill_value,use_fill_value_before_start,"
+        "use_fill_value_in_gaps,use_fill_value_at_end,expand_data_to_observed_range,expected"
+    ),
     [
         (
             {
@@ -365,33 +481,39 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     ],
                 },
             },
+            6,
             math.nan,
             False,
+            False,
             True,
-            {
-                "a": {
-                    "values": ["a", "a", "a", "b", "c", math.nan],
-                    "info_maps": [
-                        {"simulation_day": 1, "units": "kg"},
-                        {"simulation_day": 2, "units": "kg"},
-                        {"simulation_day": 3, "units": "kg"},
-                        {"simulation_day": 4, "units": "kg"},
-                        {"simulation_day": 5, "units": "kg"},
-                        {"simulation_day": 6, "units": "kg"},
-                    ],
+            False,
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "a", "a", "b", "c"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "kg"},
+                            {"simulation_day": 1, "units": "kg"},
+                            {"simulation_day": 2, "units": "kg"},
+                            {"simulation_day": 3, "units": "kg"},
+                            {"simulation_day": 4, "units": "kg"},
+                            {"simulation_day": 5, "units": "kg"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["d", "d", "d", "d", "e", "e"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "g"},
+                            {"simulation_day": 1, "units": "g"},
+                            {"simulation_day": 2, "units": "g"},
+                            {"simulation_day": 3, "units": "g"},
+                            {"simulation_day": 4, "units": "g"},
+                            {"simulation_day": 5, "units": "g"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": [math.nan, math.nan, "d", "e", "e", "f"],
-                    "info_maps": [
-                        {"simulation_day": 1, "units": "g"},
-                        {"simulation_day": 2, "units": "g"},
-                        {"simulation_day": 3, "units": "g"},
-                        {"simulation_day": 4, "units": "g"},
-                        {"simulation_day": 5, "units": "g"},
-                        {"simulation_day": 6, "units": "g"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -412,33 +534,39 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     ],
                 },
             },
+            6,
             math.nan,
             True,
+            True,
             False,
-            {
-                "a": {
-                    "values": ["a", math.nan, math.nan, "b", "c", "c"],
-                    "info_maps": [
-                        {"simulation_day": 1, "units": "kg"},
-                        {"simulation_day": 2, "units": "kg"},
-                        {"simulation_day": 3, "units": "kg"},
-                        {"simulation_day": 4, "units": "kg"},
-                        {"simulation_day": 5, "units": "kg"},
-                        {"simulation_day": 6, "units": "kg"},
-                    ],
+            False,
+            (
+                {
+                    "a": {
+                        "values": [math.nan, "a", math.nan, math.nan, "b", "c"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "kg"},
+                            {"simulation_day": 1, "units": "kg"},
+                            {"simulation_day": 2, "units": "kg"},
+                            {"simulation_day": 3, "units": "kg"},
+                            {"simulation_day": 4, "units": "kg"},
+                            {"simulation_day": 5, "units": "kg"},
+                        ],
+                    },
+                    "b": {
+                        "values": [math.nan, math.nan, math.nan, "d", "e", math.nan],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "g"},
+                            {"simulation_day": 1, "units": "g"},
+                            {"simulation_day": 2, "units": "g"},
+                            {"simulation_day": 3, "units": "g"},
+                            {"simulation_day": 4, "units": "g"},
+                            {"simulation_day": 5, "units": "g"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": [math.nan, math.nan, "d", "e", math.nan, "f"],
-                    "info_maps": [
-                        {"simulation_day": 1, "units": "g"},
-                        {"simulation_day": 2, "units": "g"},
-                        {"simulation_day": 3, "units": "g"},
-                        {"simulation_day": 4, "units": "g"},
-                        {"simulation_day": 5, "units": "g"},
-                        {"simulation_day": 6, "units": "g"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -448,27 +576,33 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     "info_maps": [{"simulation_day": 3, "units": "pi"}, {"simulation_day": 4, "units": "pi"}],
                 },
             },
+            4,
             None,
             True,
+            True,
             False,
-            {
-                "a": {
-                    "values": ["a", "a", "a"],
-                    "info_maps": [
-                        {"simulation_day": 2, "units": "pi"},
-                        {"simulation_day": 3, "units": "pi"},
-                        {"simulation_day": 4, "units": "pi"},
-                    ],
+            True,
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "a"],
+                        "info_maps": [
+                            {"simulation_day": 2, "units": "pi"},
+                            {"simulation_day": 3, "units": "pi"},
+                            {"simulation_day": 4, "units": "pi"},
+                        ],
+                    },
+                    "b": {
+                        "values": [None, "b", "c"],
+                        "info_maps": [
+                            {"simulation_day": 2, "units": "pi"},
+                            {"simulation_day": 3, "units": "pi"},
+                            {"simulation_day": 4, "units": "pi"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": [None, "b", "c"],
-                    "info_maps": [
-                        {"simulation_day": 2, "units": "pi"},
-                        {"simulation_day": 3, "units": "pi"},
-                        {"simulation_day": 4, "units": "pi"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -481,19 +615,31 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
                 },
             },
+            2,
             8,
             False,
             True,
-            {
-                "a": {
-                    "values": ["a", "b"],
-                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+            True,
+            False,
+            (
+                {
+                    "a": {
+                        "values": ["a", "a"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha"},
+                            {"simulation_day": 1, "units": "ha"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["c", "c"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha"},
+                            {"simulation_day": 1, "units": "ha"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": ["c", "d"],
-                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
@@ -506,89 +652,277 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     "info_maps": [{"simulation_day": 1, "units": "l"}, {"simulation_day": 3, "units": "l"}],
                 },
             },
+            3,
             "fill",
+            False,
             True,
             False,
-            {
-                "a": {
-                    "values": ["a", "fill", "b"],
-                    "info_maps": [
-                        {"simulation_day": 1, "units": "ha^2"},
-                        {"simulation_day": 2, "units": "ha^2"},
-                        {"simulation_day": 3, "units": "ha^2"},
-                    ],
+            False,
+            (
+                {
+                    "a": {
+                        "values": ["a", "a", "fill"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "ha^2"},
+                            {"simulation_day": 1, "units": "ha^2"},
+                            {"simulation_day": 2, "units": "ha^2"},
+                        ],
+                    },
+                    "b": {
+                        "values": ["c", "c", "fill"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "l"},
+                            {"simulation_day": 1, "units": "l"},
+                            {"simulation_day": 2, "units": "l"},
+                        ],
+                    },
                 },
-                "b": {
-                    "values": ["c", "fill", "d"],
-                    "info_maps": [
-                        {"simulation_day": 1, "units": "l"},
-                        {"simulation_day": 2, "units": "l"},
-                        {"simulation_day": 3, "units": "l"},
-                    ],
-                },
-            },
+                [],
+            ),
         ),
         (
             {
                 "a": {
                     "values": ["a", "b"],
-                    "info_maps": [{"simulation_day": 1, "units": "GB"}, {"simulation_day": 3, "units": "GB"}],
+                    "info_maps": [{"simulation_day": 2, "units": "GB"}, {"simulation_day": 3, "units": "GB"}],
                 },
             },
+            3,
             math.pi,
             True,
             True,
-            {
-                "a": {
-                    "values": ["a", math.pi, "b"],
-                    "info_maps": [
-                        {"simulation_day": 1, "units": "GB"},
-                        {"simulation_day": 2, "units": "GB"},
-                        {"simulation_day": 3, "units": "GB"},
-                    ],
-                }
-            },
+            True,
+            False,
+            (
+                {
+                    "a": {
+                        "values": [math.pi, math.pi, "a"],
+                        "info_maps": [
+                            {"simulation_day": 0, "units": "GB"},
+                            {"simulation_day": 1, "units": "GB"},
+                            {"simulation_day": 2, "units": "GB"},
+                        ],
+                    }
+                },
+                [],
+            ),
         ),
     ],
 )
 def test_expand_data_temporally(
-    data_to_pad: dict[str, dict[str, list[Any]]],
+    data_to_expand: dict[str, dict[str, list[Any]]],
+    simulation_length: int,
     fill_value: Any,
-    gap_pad: bool,
-    end_pad: bool,
-    expected: dict[str, dict[str, list[Any]]],
+    use_fill_value_before_start: bool,
+    use_fill_value_in_gaps: bool,
+    use_fill_value_at_end: bool,
+    expand_data_to_observed_range: bool,
+    expected: tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]],
 ) -> None:
-    """Tests the utility method expand_data_temporally."""
+    """Tests the util method expand_data_temporally()."""
     actual = Utility.expand_data_temporally(
-        data_to_pad, fill_value=fill_value, use_fill_value_in_gaps=gap_pad, use_fill_value_at_end=end_pad
+        data_to_expand=data_to_expand,
+        simulation_length=simulation_length,
+        fill_value=fill_value,
+        use_fill_value_before_start=use_fill_value_before_start,
+        use_fill_value_in_gaps=use_fill_value_in_gaps,
+        use_fill_value_at_end=use_fill_value_at_end,
+        expand_data_to_observed_range=expand_data_to_observed_range,
     )
 
     assert actual == expected
 
 
-def test_expand_data_temporally_errors() -> None:
-    """Tests that errors are correctly raised by expand_data_temporally."""
-    empty_data: dict[str, dict[str, list[Any]]] = {}
-    with pytest.raises(ValueError, match="empty dataset"):
-        Utility.expand_data_temporally(empty_data)
-
-    data_one = {"a": {"values": ["a", "b"]}, "b": {"values": ["c", "d"]}}
-    with pytest.raises(TypeError, match="no info maps"):
-        Utility.expand_data_temporally(data_one)
-
-    data_two: dict[str, dict[str, list[Any]]] = {
-        "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}]},
-        "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+def test_expand_data_temporally_observed_range_only() -> None:
+    """Tests observed range case for expand_data_temporally()."""
+    data_to_expand: dict[str, dict[str, list[Any]]] = {
+        "a": {
+            "values": ["x", "y"],
+            "info_maps": [
+                {"simulation_day": 3, "units": "kg"},
+                {"simulation_day": 5, "units": "kg"},
+            ],
+        }
     }
-    with pytest.raises(ValueError, match="number of values and info maps"):
-        Utility.expand_data_temporally(data_two)
 
-    data_three: dict[str, dict[str, list[Any]]] = {
-        "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"foo": "bar"}]},
-        "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+    actual = Utility.expand_data_temporally(
+        data_to_expand=data_to_expand,
+        simulation_length=10,
+        fill_value="fill",
+        use_fill_value_before_start=False,
+        use_fill_value_in_gaps=False,
+        use_fill_value_at_end=False,
+        expand_data_to_observed_range=True,
+    )
+
+    expected: tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]] = (
+        {
+            "a": {
+                "values": ["x", "x", "y"],
+                "info_maps": [
+                    {"simulation_day": 3, "units": "kg"},
+                    {"simulation_day": 4, "units": "kg"},
+                    {"simulation_day": 5, "units": "kg"},
+                ],
+            }
+        },
+        [],
+    )
+
+    assert actual == expected
+
+
+def test_expand_data_temporally_error_empty_dataset() -> None:
+    """Tests expand_data_temporally raises on an empty dataset."""
+    with pytest.raises(ValueError, match="Data Expansion error: Cannot fill empty dataset."):
+        Utility.expand_data_temporally(
+            data_to_expand={},
+            simulation_length=5,
+        )
+
+
+def test_expand_data_temporally_logs_warning_for_mismatched_complex_fill_value() -> None:
+    """Tests complex data with mismatched fill_value type logs a warning and fills with last reported values."""
+    data_to_expand: dict[str, dict[str, list[Any]]] = {
+        "a": {
+            "values": [{"x": 1}, {"x": 2}],
+            "info_maps": [
+                {"simulation_day": 1, "units": "kg"},
+                {"simulation_day": 3, "units": "kg"},
+            ],
+        }
     }
-    with pytest.raises(ValueError, match="simulation day value in every info map"):
-        Utility.expand_data_temporally(data_three)
+
+    actual_data, actual_logs = Utility.expand_data_temporally(
+        data_to_expand=data_to_expand,
+        simulation_length=4,
+        fill_value="bad fill value",
+        use_fill_value_before_start=True,
+        use_fill_value_in_gaps=True,
+        use_fill_value_at_end=True,
+        expand_data_to_observed_range=False,
+    )
+
+    expected_data = {
+        "a": {
+            "values": [
+                {"x": 1},
+                {"x": 1},
+                {"x": 1},
+                {"x": 2},
+            ],
+            "info_maps": [
+                {"simulation_day": 0, "units": "kg"},
+                {"simulation_day": 1, "units": "kg"},
+                {"simulation_day": 2, "units": "kg"},
+                {"simulation_day": 3, "units": "kg"},
+            ],
+        }
+    }
+    expected_logs = [
+        {
+            "warning": "Data expansion fill warning",
+            "message": (
+                "User-provided fill value type <class 'str'> does not match "
+                "type of data to be expanded <class 'dict'>, "
+                "filling with last reported value."
+            ),
+            "info_map": {
+                "class": "Utility",
+                "function": "expand_data_temporally",
+            },
+        }
+    ]
+
+    assert actual_data == expected_data
+    assert actual_logs == expected_logs
+
+
+@pytest.mark.parametrize(
+    "data_to_expand,expected",
+    [
+        (
+            {
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                    ],
+                }
+            },
+            [1, 4],
+        ),
+        (
+            {
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                    ],
+                },
+                "b": {
+                    "values": ["c", "d", "e"],
+                    "info_maps": [
+                        {"simulation_day": 2, "units": "g"},
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
+                    ],
+                },
+            },
+            [1, 4, 2, 3, 6],
+        ),
+        (
+            {},
+            [],
+        ),
+    ],
+)
+def test_gather_data_sim_days(
+    data_to_expand: dict[str, dict[str, list[Any]]],
+    expected: list[int],
+) -> None:
+    """Tests _gather_data_sim_days returns the expected simulation days."""
+    actual = Utility._gather_data_sim_days(data_to_expand)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "data_to_expand,error_type,error_match",
+    [
+        (
+            {"a": {"values": ["a", "b"]}, "b": {"values": ["c", "d"]}},
+            TypeError,
+            "Variable 'a' has no info maps",
+        ),
+        (
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}]},
+                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+            },
+            ValueError,
+            "Variable 'a' does not have matching number of values and info maps",
+        ),
+        (
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"foo": "bar"}]},
+                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+            },
+            ValueError,
+            "Variable 'a' does not have simulation day value in every info map",
+        ),
+    ],
+)
+def test_gather_data_sim_days_errors(
+    data_to_expand: dict[str, dict[str, list[Any]]],
+    error_type: type[Exception],
+    error_match: str,
+) -> None:
+    """Tests _gather_data_sim_days raises the expected errors for invalid input."""
+    with pytest.raises(error_type, match=error_match):
+        Utility._gather_data_sim_days(data_to_expand)
 
 
 def test_deep_merge_dict() -> None:
@@ -892,7 +1226,7 @@ def test_combine(
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_normal_case() -> None:
-    input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
+    input_dict: dict[str, list[Any]] = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
     expected_output = [
         {"id": 1, "name": "Alice", "age": 25},
         {"id": 2, "name": "Bob", "age": 30},
@@ -902,13 +1236,13 @@ def test_convert_dict_of_lists_to_list_of_dicts_normal_case() -> None:
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_empty_input() -> None:
-    input_dict = {}
-    expected_output = []
+    input_dict: dict[str, list[Any]] = {}
+    expected_output: list[dict[str, Any]] = []
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
 
 def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists() -> None:
-    input_dict = {"id": [1], "name": ["Alice"], "age": [25]}
+    input_dict: dict[str, list[Any]] = {"id": [1], "name": ["Alice"], "age": [25]}
     expected_output = [{"id": 1, "name": "Alice", "age": 25}]
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
@@ -923,13 +1257,13 @@ def test_convert_list_to_dict_by_key_basic() -> None:
 
 
 def test_convert_list_to_dict_by_key_empty_list() -> None:
-    list_of_dicts = []
-    expected_output = {}
+    list_of_dicts: list[dict[str, Any]] = []
+    expected_output: dict[Any, dict[str, Any]] = {}
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "ID") == expected_output
 
 
 def test_convert_list_to_dict_by_key_missing_key() -> None:
-    list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]  # Missing 'ID'
+    list_of_dicts = [{"ID": 1, "value": 2}, {"value": 3}]
     with pytest.raises(KeyError):
         Utility.convert_list_to_dict_by_key(list_of_dicts, "ID")
 
@@ -938,38 +1272,6 @@ def test_convert_list_to_dict_by_key_different_key() -> None:
     list_of_dicts = [{"unique_id": 1, "value": "A"}, {"unique_id": 2, "value": "B"}]
     expected_output = {1: {"value": "A"}, 2: {"value": "B"}}
     assert Utility.convert_list_to_dict_by_key(list_of_dicts, "unique_id") == expected_output
-
-
-def test_find_max_index_from_keys_mixed_single_and_multi_digit_numbers() -> None:
-    data = {
-        "Prefix_0.suffix": ["value"],
-        "Prefix_1.suffix": ["value"],
-        "Prefix_10.suffix": ["value"],
-        "Prefix_2.suffix": ["value"],
-        "Prefix_21.suffix": ["value"],
-    }
-    assert Utility.find_max_index_from_keys(data) == 21
-
-
-def test_find_max_index_from_keys_no_matching_keys() -> None:
-    data = {
-        "NoPrefixOrNumber.suffix": ["value"],
-        "AnotherWithoutNumber": ["value"],
-    }
-    assert Utility.find_max_index_from_keys(data) is None
-
-
-def test_find_max_index_from_keys_negative_numbers() -> None:
-    data = {
-        "Prefix_-1.suffix": ["value"],
-        "Prefix_-2.suffix": ["value"],
-    }
-    assert Utility.find_max_index_from_keys(data) is None
-
-
-def test_find_max_index_from_keys_empty_dictionary() -> None:
-    data = {}
-    assert Utility.find_max_index_from_keys(data) is None
 
 
 @pytest.mark.parametrize(

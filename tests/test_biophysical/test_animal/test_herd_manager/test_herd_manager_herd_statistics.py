@@ -1,4 +1,5 @@
 from random import randint, uniform
+from unittest.mock import MagicMock
 
 import pytest
 from pytest_mock import MockerFixture
@@ -7,8 +8,11 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
+from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
+from RUFAS.biophysical.animal.pen import Pen
+from RUFAS.output_manager import OutputManager
 
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json,
@@ -57,7 +61,7 @@ def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[li
         if calving_to_pregnancy_time > 0
     ]
     expected_average_calving_to_pregnancy_time = (
-        sum(calving_to_pregnancy_times) / number_of_cows if number_of_cows > 0 else 0
+        sum(calving_to_pregnancy_times) / len(calving_to_pregnancy_times) if len(calving_to_pregnancy_times) > 0 else 0
     )
 
     return cows, {
@@ -84,8 +88,9 @@ def test_update_herd_statistics(
     mock_update_average_mature_body_weight = mocker.patch.object(herd_manager, "_update_average_mature_body_weight")
     mock_update_average_cow_body_weight = mocker.patch.object(herd_manager, "_update_average_cow_body_weight")
     mock_update_average_cow_parity = mocker.patch.object(herd_manager, "_update_average_cow_parity")
+    mock_calculate_heifer_adg = mocker.patch.object(herd_manager, "_calculate_heifer_average_daily_weight_gain")
 
-    herd_manager.update_herd_statistics()
+    herd_manager.update_herd_statistics(simulation_day=5)
 
     assert herd_manager.herd_statistics.calf_num == len(herd_manager.calves)
     assert herd_manager.herd_statistics.heiferI_num == len(herd_manager.heiferIs)
@@ -103,6 +108,7 @@ def test_update_herd_statistics(
     mock_update_average_mature_body_weight.assert_called_once_with()
     mock_update_average_cow_body_weight.assert_called_once_with()
     mock_update_average_cow_parity.assert_called_once_with()
+    mock_calculate_heifer_adg.assert_called_once_with(5)
 
 
 def test_calculate_herd_percentages(herd_manager: HerdManager, mock_herd: dict[str, list[Animal]]) -> None:
@@ -169,7 +175,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 0,
-                animal_constants.LOW_PROD_CULL: 0,
+                animal_constants.OVERSUPPLY_CULL: 0,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -180,7 +186,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             0,
             {
                 animal_constants.DEATH_CULL: 0.0,
-                animal_constants.LOW_PROD_CULL: 0.0,
+                animal_constants.OVERSUPPLY_CULL: 0.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -193,7 +199,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 5,
-                animal_constants.LOW_PROD_CULL: 0,
+                animal_constants.OVERSUPPLY_CULL: 0,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -204,7 +210,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             5,
             {
                 animal_constants.DEATH_CULL: 100.0,
-                animal_constants.LOW_PROD_CULL: 0.0,
+                animal_constants.OVERSUPPLY_CULL: 0.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -218,7 +224,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 5,
-                animal_constants.LOW_PROD_CULL: 5,
+                animal_constants.OVERSUPPLY_CULL: 5,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -229,7 +235,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             10,
             {
                 animal_constants.DEATH_CULL: 50.0,
-                animal_constants.LOW_PROD_CULL: 50.0,
+                animal_constants.OVERSUPPLY_CULL: 50.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -243,7 +249,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 3,
-                animal_constants.LOW_PROD_CULL: 2,
+                animal_constants.OVERSUPPLY_CULL: 2,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -254,7 +260,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             10,
             {
                 animal_constants.DEATH_CULL: 30.0,
-                animal_constants.LOW_PROD_CULL: 20.0,
+                animal_constants.OVERSUPPLY_CULL: 20.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -269,7 +275,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 2,
-                animal_constants.LOW_PROD_CULL: 0,
+                animal_constants.OVERSUPPLY_CULL: 0,
                 animal_constants.LAMENESS_CULL: 0,
                 animal_constants.INJURY_CULL: 0,
                 animal_constants.MASTITIS_CULL: 0,
@@ -280,7 +286,7 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             10,
             {
                 animal_constants.DEATH_CULL: 20.0,
-                animal_constants.LOW_PROD_CULL: 0.0,
+                animal_constants.OVERSUPPLY_CULL: 0.0,
                 animal_constants.LAMENESS_CULL: 0.0,
                 animal_constants.INJURY_CULL: 0.0,
                 animal_constants.MASTITIS_CULL: 0.0,
@@ -533,7 +539,7 @@ def test_update_sold_and_died_cow_statistics(
 ) -> None:
     """Unit test for _update_sold_and_died_cow_statistics()"""
     cull_reasons = [
-        animal_constants.LOW_PROD_CULL,
+        animal_constants.OVERSUPPLY_CULL,
         animal_constants.LAMENESS_CULL,
         animal_constants.INJURY_CULL,
         animal_constants.MASTITIS_CULL,
@@ -598,13 +604,14 @@ def test_update_sold_and_died_cow_statistics(
             cull_reason=cow.cull_reason,
             days_in_milk=cow.days_in_milk,
             parity=cow.reproduction.calves,
+            genetic_history=str(cow.genetic_history),
         )
         for cow in sold_and_died_cows
     ]
 
     current_cull_reason_stats = {
         animal_constants.DEATH_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.LOW_PROD_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.OVERSUPPLY_CULL: randint(0, num_total_sold_and_died_cows),
         animal_constants.LAMENESS_CULL: randint(0, num_total_sold_and_died_cows),
         animal_constants.INJURY_CULL: randint(0, num_total_sold_and_died_cows),
         animal_constants.MASTITIS_CULL: randint(0, num_total_sold_and_died_cows),
@@ -616,8 +623,8 @@ def test_update_sold_and_died_cow_statistics(
     expected_cull_reason_stats = {
         animal_constants.DEATH_CULL: current_cull_reason_stats[animal_constants.DEATH_CULL]
         + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DEATH_CULL]),
-        animal_constants.LOW_PROD_CULL: current_cull_reason_stats[animal_constants.LOW_PROD_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PROD_CULL]),
+        animal_constants.OVERSUPPLY_CULL: current_cull_reason_stats[animal_constants.OVERSUPPLY_CULL]
+        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.OVERSUPPLY_CULL]),
         animal_constants.LAMENESS_CULL: current_cull_reason_stats[animal_constants.LAMENESS_CULL]
         + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LAMENESS_CULL]),
         animal_constants.INJURY_CULL: current_cull_reason_stats[animal_constants.INJURY_CULL]
@@ -647,6 +654,7 @@ def test_update_sold_and_died_cow_statistics(
             cull_reason=cow.cull_reason,
             days_in_milk=cow.days_in_milk,
             parity=cow.reproduction.calves,
+            genetic_history=str(cow.genetic_history),
         )
         for cow in sold_cows
     ]
@@ -721,6 +729,7 @@ def test_update_sold_heiferII_statistics(
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history=str(heiferII.genetic_history),
         )
         for heiferII in sold_heiferIIs
     ]
@@ -764,6 +773,7 @@ def test_update_sold_newborn_calf_statistics(
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history=str(calf.genetic_history),
         )
         for calf in sold_calves
     ]
@@ -1019,3 +1029,147 @@ def test_update_total_enteric_methane_merges_and_accumulates(herd_manager: HerdM
     assert totals["N2O"] == pytest.approx(1.0)
 
     assert AnimalType.HEIFER_I not in herd_manager.herd_statistics.total_enteric_methane
+
+
+def _make_mock_heifer(animal_type: AnimalType, daily_growth: float) -> MagicMock:
+    """Creates a mock heifer with the given animal_type and daily_growth value."""
+    heifer = MagicMock(spec=Animal)
+    heifer.animal_type = animal_type
+    heifer.growth = MagicMock()
+    heifer.growth.daily_growth = daily_growth
+    return heifer
+
+
+def _make_mock_pen(
+    pen_id: int,
+    animals: dict[int, MagicMock],
+    animal_combination: AnimalCombination = AnimalCombination.GROWING,
+) -> MagicMock:
+    """Creates a mock Pen with the given id, animals_in_pen dict, and animal_combination."""
+    pen = MagicMock(spec=Pen)
+    pen.id = pen_id
+    pen.animals_in_pen = animals
+    pen.animal_combination = animal_combination
+    return pen
+
+
+def test_calculate_heifer_average_daily_weight_gain_with_heifers_in_pen(
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for _calculate_heifer_average_daily_weight_gain when heifers are present in pens.
+
+    Verifies average daily gain per pen and per animal type are correctly computed.
+    """
+    heifer_i_a = _make_mock_heifer(AnimalType.HEIFER_I, daily_growth=1.0)
+    heifer_i_b = _make_mock_heifer(AnimalType.HEIFER_I, daily_growth=3.0)
+    heifer_ii = _make_mock_heifer(AnimalType.HEIFER_II, daily_growth=2.0)
+
+    mock_cow = MagicMock(spec=Animal)
+    mock_cow.animal_type = AnimalType.LAC_COW
+
+    pen_with_heifers = _make_mock_pen(pen_id=1, animals={0: heifer_i_a, 1: heifer_i_b, 2: mock_cow})
+    pen_with_heifer_ii = _make_mock_pen(pen_id=2, animals={3: heifer_ii})
+
+    herd_manager.all_pens = [pen_with_heifers, pen_with_heifer_ii]
+    herd_manager.heiferIs = [heifer_i_a, heifer_i_b]
+    herd_manager.heiferIIs = [heifer_ii]
+    herd_manager.heiferIIIs = []
+
+    mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager")
+
+    herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=5)
+
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["1"] == pytest.approx(2.0)
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["2"] == pytest.approx(2.0)
+
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I] == pytest.approx(
+        2.0
+    )
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II] == pytest.approx(
+        2.0
+    )
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III] is None
+
+
+def test_calculate_heifer_average_daily_weight_gain_no_heifers_in_pen(
+    herd_manager: HerdManager,
+) -> None:
+    """
+    Unit test for _calculate_heifer_average_daily_weight_gain when no heifers are in any pen.
+
+    Pen dict must not be updated; all animal-type entries must be None.
+    """
+    mock_cow = MagicMock(spec=Animal)
+    mock_cow.animal_type = AnimalType.LAC_COW
+
+    pen_cows_only = _make_mock_pen(pen_id=1, animals={0: mock_cow}, animal_combination=AnimalCombination.LAC_COW)
+    herd_manager.all_pens = [pen_cows_only]
+    herd_manager.heiferIs = []
+    herd_manager.heiferIIs = []
+    herd_manager.heiferIIIs = []
+
+    herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=1)
+
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen == {}
+
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I] is None
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II] is None
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III] is None
+
+
+def test_calculate_heifer_average_daily_weight_gain_new_pen_triggers_backfill(
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for _calculate_heifer_average_daily_weight_gain when a pen ID is seen for the first time.
+
+    Verifies OutputManager.add_variable_bulk is called to backfill prior simulation days.
+    """
+    heifer = _make_mock_heifer(AnimalType.HEIFER_I, daily_growth=1.5)
+    pen = _make_mock_pen(pen_id=99, animals={0: heifer})
+    herd_manager.all_pens = [pen]
+    herd_manager.heiferIs = [heifer]
+    herd_manager.heiferIIs = []
+    herd_manager.heiferIIIs = []
+
+    mock_om_instance = MagicMock(spec=OutputManager)
+    mock_om_class = mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager", return_value=mock_om_instance)
+
+    herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=3)
+
+    mock_om_class.assert_called_once()
+    bulk_call_args = mock_om_instance.add_variable_bulk.call_args[0][0]
+    assert len(bulk_call_args) == 3
+
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["99"] == pytest.approx(1.5)
+
+
+def test_calculate_heifer_average_daily_weight_gain_existing_pen_no_backfill(
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for _calculate_heifer_average_daily_weight_gain when a pen ID already exists in stats.
+
+    Verifies OutputManager.add_variable_bulk is NOT called for already-tracked pens.
+    """
+    # Arrange
+    heifer = _make_mock_heifer(AnimalType.HEIFER_I, daily_growth=2.0)
+    pen = _make_mock_pen(pen_id=5, animals={0: heifer})
+    herd_manager.all_pens = [pen]
+    herd_manager.heiferIs = [heifer]
+    herd_manager.heiferIIs = []
+    herd_manager.heiferIIIs = []
+
+    herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["5"] = 1.0
+
+    mock_om_class = mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager")
+
+    herd_manager._calculate_heifer_average_daily_weight_gain(simulation_day=10)
+
+    mock_om_class.assert_not_called()
+
+    assert herd_manager.herd_statistics.heifer_average_daily_gain_by_pen["5"] == pytest.approx(2.0)

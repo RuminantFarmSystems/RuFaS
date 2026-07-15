@@ -10,6 +10,7 @@ from RUFAS.biophysical.field.field.field_data import FieldData
 from RUFAS.biophysical.field.field.tillage_application import TillageApplication
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
 
@@ -75,14 +76,16 @@ def test_remove_amount_incorporated(
         ),
     ],
 )
-def test_remove_amount_incorporated_error(data: object, expected: str) -> None:
+def test_remove_amount_incorporated_error(data: object, expected: str, mocker: MockerFixture) -> None:
     """Test that errors are handled correctly when removing material from soil surface."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(TypeError) as e:
         TillageApplication._remove_amount_incorporated(data, "test", 0.5)
     assert (
         str(e.value) == f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
         f"'{expected}'."
     )
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

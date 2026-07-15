@@ -44,6 +44,14 @@ INJECT_PGF = "inject PGF"
 # heifer repro
 INJECT_CIDR = "inject CIDR"
 
+# oversupply cull ranking criteria
+CULL_RANKING_CRITERIA_MILK = "milk"
+"""Cull ranking criterion that ranks eligible cows by their daily milk production."""
+CULL_RANKING_CRITERIA_305_DAY_MILK = "305_day_milk"
+"""Cull ranking criterion that ranks eligible cows by their 305-day milk yield."""
+CULL_RANKING_CRITERIA_OPTIONS = (CULL_RANKING_CRITERIA_MILK, CULL_RANKING_CRITERIA_305_DAY_MILK)
+"""All valid options for the ``cull_ranking_criteria`` user input."""
+
 # presynch protocols
 PRESYNCH_PERIOD_START = "Presynch period started"
 PRESYNCH_PERIOD_END = "Presynch period ended"
@@ -86,7 +94,7 @@ DRY = "dry"
 
 # culling
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
-LOW_PROD_CULL = "culled for low production"
+OVERSUPPLY_CULL = "culled for herd resize"
 DEATH_CULL = "culled for death"
 LAMENESS_CULL = "culled for lameness"
 INJURY_CULL = "culled for injury"
@@ -94,6 +102,10 @@ MASTITIS_CULL = "culled for mastitis"
 DISEASE_CULL = "culled for disease"
 UDDER_CULL = "culled for udder"
 UNKNOWN_CULL = "culled for unknown"
+
+# youngstock mortality (a loss from death, not a cull)
+CALF_MORTALITY_LOSS = "died from pre-wean mortality"
+HEIFER_MORTALITY_LOSS = "died from post-wean mortality"
 
 # STATS
 STDI = 2

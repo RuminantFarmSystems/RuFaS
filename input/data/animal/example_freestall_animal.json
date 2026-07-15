@@ -7,6 +7,9 @@
 	"cow_num": 100,
 	"replace_num": 500,
 	"herd_num": 100,
+	"herd_size_adjustment_period": 30,
+  	"herd_size_sell_threshold": 101,
+  	"herd_size_buy_threshold": 95,
 	"breed": "HO",
 	"parity_fractions": {
 		"1": 0.36,
@@ -16,7 +19,8 @@
 		"5": 0.09
     },
 	"milking_cow_fraction": 0.8356,
-    "annual_milk_yield": null
+    "annual_milk_yield": null,
+    "simulate_genetics": false
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
@@ -30,8 +34,12 @@
       "semen_type": "conventional",
       "days_in_preg_when_dry": 218,
       "heifer_repro_cull_time": 500,
+      "calf_mortality_rate": 0.0,
+      "heifer_mortality_rate": 0.0,
       "do_not_breed_time": 185,
-      "cull_milk_production": 30,
+      "cull_eligibility_minimum_days_in_milk": 60,
+      "cull_eligibility_maximum_days_carried_calf": 180,
+      "cull_ranking_criteria": "milk",
       "cow_times_milked_per_day": 3,
 	    "milk_fat_percent": 4,
 	    "milk_protein_percent": 3.2
@@ -41,12 +49,14 @@
         "male_calf_rate_sexed_semen": 0.1,
         "male_calf_rate_conventional_semen": 0.53,
         "keep_female_calf_rate": 1,
+        "calf_retention_method": "rate",
+        "annual_keep_female_calf_num": 0,
         "wean_day": 60,
         "wean_length": 7,
         "milk_type": "whole"
       },
       "repro": {
-        "voluntary_waiting_period": 50,
+        "voluntary_waiting_period": 0,
         "conception_rate_decrease": 0.026,
         "decrease_conception_rate_in_rebreeding": false,
         "decrease_conception_rate_by_parity": false,

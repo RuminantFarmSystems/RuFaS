@@ -224,6 +224,12 @@ class ManurePool:
         field_size : float
             The size of the field (ha).
 
+        Returns
+        -------
+        tuple[float, float]
+            - The organic results for infiltrated phosphorous.
+            - The inorganic results for infiltrated phosphorous.
+
         """
         organic_results = self._determine_phosphorus_leached_from_surface(
             rainfall,
@@ -287,11 +293,10 @@ class ManurePool:
 
         Returns
         -------
-        Tuple[float, float]
-            decomposed_manure_mass_change: change in the mass of applied manure on the field surface
-                decomposed on this day (kg).
-            decomposed_manure_coverage_change: change in field coverage of applied manure on the field
-                surface (unitless).
+        tuple[float, float]
+            - The change in the mass of applied manure on the field surface decomposed on this day (kg).
+            - The change in field coverage of applied manure on the field surface (unitless).
+
         """
         manure_dry_matter_decomposition_rate = max(
             0.0, self._determine_dry_matter_decomposition_rate(temperature_factor)
@@ -299,8 +304,8 @@ class ManurePool:
         (
             decomposed_manure_mass_change,
             decomposed_manure_coverage_change,
-        ) = (0, 0)
-        if self.manure_dry_mass > 0 and self.manure_field_coverage > 0:
+        ) = (0.0, 0.0)
+        if self.manure_dry_mass > 0.0 and self.manure_field_coverage > 0.0:
             decomposed_manure_mass_change = min(
                 (self.manure_dry_mass * manure_dry_matter_decomposition_rate),
                 self.manure_dry_mass,
@@ -327,12 +332,12 @@ class ManurePool:
         Returns
         -------
         tuple[float, float]
-            assimilated_manure: Amount of manure that is assimilated on a given day (kg).
-            manure_coverage: Amount of decrease in the fraction of field covered by manure on a given day (unitless).
+            - Amount of manure that is assimilated on a given day (kg).
+            - Amount of decrease in the fraction of field covered by manure on a given day (unitless).
 
         """
-        assimilated_manure, manure_coverage = 0, 0
-        if self.manure_dry_mass > 0 and self.manure_field_coverage > 0:
+        assimilated_manure, manure_coverage = 0.0, 0.0
+        if self.manure_dry_mass > 0 and self.manure_field_coverage > 0.0:
             manure_cover_area = self.manure_field_coverage * field_size
             assimilated_manure = max(
                 0.0,
@@ -356,7 +361,7 @@ class ManurePool:
         Parameters
         ----------
         mean_air_temperature : float
-            The average air temperature of the current day (degrees Celsius).
+            The average air temperature of the current day (Celsius).
 
         Returns
         -------
@@ -444,7 +449,7 @@ class ManurePool:
         temperature_factor: float,
     ) -> float:
         """
-        This function determines the daily change in the moisture factor of the maure based on the current days
+        This function determines the daily change in the moisture factor of the manure based on the current days
         precipitation conditions.
 
         Parameters
@@ -461,7 +466,7 @@ class ManurePool:
         Returns
         -------
         float
-            The change the moisture factor of the manure application on this day.
+            The change of the moisture factor of the manure application on this day (unitless).
 
         References
         ----------
@@ -536,11 +541,11 @@ class ManurePool:
         water_extractable_phosphorus : float
             The mass of the water extractable phosphorus pool that is being leached from (kg).
         is_organic : bool
-            Is the phosphorus being leached organic (True / False).
+            Is the phosphorus being leached organic.
 
         Returns
         -------
-        dict (keys listed below)
+        dict[str, float]
             new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg).
             infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg).
             runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg).

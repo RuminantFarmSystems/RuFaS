@@ -4,9 +4,10 @@ import os
 import re
 import shutil
 from copy import deepcopy
+from datetime import timedelta
 from pathlib import Path
 from random import random
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Optional
 
 import numpy as np
 import pandas as pd
@@ -16,23 +17,25 @@ from RUFAS.general_constants import GeneralConstants
 
 
 class Utility:
+    """This class contains utility functions that are used throughout the project."""
+
     @staticmethod
-    def convert_list_of_dicts_to_dict_of_lists(list_of_dicts: List[Dict[str, Any]]) -> Dict[str, List[Any]]:
+    def convert_list_of_dicts_to_dict_of_lists(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]:
         """
         Convert a list of dictionaries into a dictionary of lists.
 
         Parameters
         ----------
-        list_of_dicts : List[Dict[str, Any]]
+        list_of_dicts : list[dict[str, Any]]
             A list of dictionaries with string keys and integer values.
 
         Returns
         -------
-        Dict[str, List[Any]]
+        dict[str, list[Any]]
             A dictionary where keys are unique keys from input dictionaries,
             and values are lists of corresponding values from input dictionaries.
         """
-        result: Dict[str, List[Any]] = {}
+        result: dict[str, list[Any]] = {}
 
         for item in list_of_dicts:
             for key, value in item.items():
@@ -61,7 +64,7 @@ class Utility:
         return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
 
     @staticmethod
-    def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def flatten_keys_to_nested_structure(input_dict: dict[str, Any]) -> dict[str, Any]:
         """
         Convert a dictionary with flat, dot-separated keys into a nested structure composed of
         dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
@@ -69,21 +72,21 @@ class Utility:
 
         Parameters
         ----------
-        input_dict : Dict[str, Any]
+        input_dict : dict[str, Any]
             A dictionary where the keys are strings that may include dots to signify hierarchical
             levels in the resulting nested structure. Numeric key segments result in list creations,
             and non-numeric segments result in dictionary creations.
 
         Returns
         -------
-        Dict[str, Union[Dict, list]]
+        dict[str, Any]
             A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.
 
         """
-        nested_structure: Dict[str, Any] = {}
+        nested_structure: dict[str, Any] = {}
         for flat_key, value in input_dict.items():
             keys = flat_key.split(".")
-            current: Dict[str, Any] | List[Any] = nested_structure
+            current: dict[str, Any] | list[Any] = nested_structure
             for i, key in enumerate(keys[:-1]):
                 next_key_is_digit = keys[i + 1].isdigit() if i + 1 < len(keys) else False
 
@@ -111,40 +114,60 @@ class Utility:
         return nested_structure
 
     @staticmethod
-    def find_max_index_from_keys(data: dict[str, Any]) -> int | None:
+    def find_group_prefixes_from_keys(
+        data: dict[str, Any],
+        required_suffixes: set[str] | None = None,
+    ) -> list[str]:
         """
-        Extracts and returns the maximum index (n) from the keys of the given dictionary.
-        Assumes keys follow the format `<prefix>_<number>.<suffix>` and number >= 0.
+        Extracts unique group prefixes from flattened keys of the form:
+
+            ``<group_prefix>.<suffix>``
+
+        For example:
+            ``Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass``
+            ``Field._record_fertilizer_application.fertilizer_application.field='field_1'.year``
+
+        would yield the group prefix:
+            ``Field._record_fertilizer_application.fertilizer_application.field='field_1'``
 
         Parameters
         ----------
-        data: Dict[str, Any]
-            The dictionary whose keys will be analyzed.
+        data : dict[str, Any]
+            Dictionary whose keys are flattened variable names.
+        required_suffixes : set[str] | None, default None
+            If provided, only prefixes that have at least one matching suffix from this set
+            will be included.
 
         Returns
         -------
-        int | None
-            The maximum index found among the keys, or None if no numeric index is found.
+        list[str]
+            Sorted list of unique group prefixes.
         """
-        pattern = re.compile(r"_([0-9]+)\.")
-        max_number = -1
+        prefixes: set[str] = set()
 
-        for key in data.keys():
-            match = pattern.search(key)
-            if match:
-                number = int(match.group(1))
-                if number > max_number:
-                    max_number = number
+        for key in data:
+            if "." not in key:
+                continue
 
-        return max_number if max_number != -1 else None
+            prefix, suffix = key.rsplit(".", 1)
+
+            if required_suffixes is not None and suffix not in required_suffixes:
+                continue
+
+            prefixes.add(prefix)
+
+        return sorted(prefixes)
 
     @staticmethod
     def expand_data_temporally(
         data_to_expand: dict[str, dict[str, list[Any]]],
+        simulation_length: int,
         fill_value: Any = np.nan,
+        use_fill_value_before_start: bool = True,
         use_fill_value_in_gaps: bool = True,
         use_fill_value_at_end: bool = True,
-    ) -> dict[str, dict[str, list[Any]]]:
+        expand_data_to_observed_range: bool = False,
+    ) -> tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
         """
         Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
         recorded, so that values are present for all days in a certain range.
@@ -153,95 +176,186 @@ class Utility:
         ----------
         data_to_expand : dict[str, dict[str, list[Any]]]
             The data to be padded and expanded. The top level key is a variable name, and points to a dictionary that
-            contains the keys "values" and optionally "info_maps".
+            contains the keys ``values`` and optionally ``info_maps``.
+        simulation_length : int
+            Total number of simulation days.
         fill_value : Any, default numpy.nan
-            Value that is used to pad the front of the data values, and optionally the values in between original values
-            and after the last original value.
+            Value used when a region is configured to use fill values.
+        use_fill_value_before_start : bool, default True
+            If ``True``, days before the first known datapoint are filled with `fill_value`; otherwise, they are filled
+            with the first known value.
         use_fill_value_in_gaps : bool, default True
-            If false, values between known data points are expanded with the last known value from the data set. If
-            true, values between known data points are filled with `fill_value`.
+            If ``True``, days between known datapoints are filled with `fill_value`; otherwise, they are filled with the
+            last known value.
         use_fill_value_at_end : bool, default True
-            If false, values after last known data point are padded with the last known value from the data set. If
-            true, values after the last known data point are filled with `fill_value`.
+            If ``True``, days after the last known datapoint are filled with `fill_value`; otherwise, they are filled
+            with the last known value.
+        expand_data_to_observed_range : bool, default False
+            If ``False``, expands data from simulation day 1 through ``simulation_length``. If ``True``, expands only
+            from the first simulation day present in the dataset through the last simulation day present in the dataset.
 
         Returns
         -------
-        dict[str, dict[str, list[Any]]]
-            The filled data, so that gaps in the data are filled in with the last known value or `fill_value`.
+        tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]
+            - The expanded data.
+            - The logs generated from the expansion process.
 
         Raises
         ------
         TypeError
-            If a variable has no info maps.
+            If a variable has no ``info_map``.
         ValueError
             If there is no data to be filled.
-            If the number of info maps does not match the number of values for a variable.
-            If a value for "simulation_day" is not present in every info map.
-
-        Notes
-        -----
-        This method assumes there will never be multiple values recorded for a single variable on a single simulation
-        day.
+            If the number of ``info_map`` does not match the number of values for a variable.
+            If a value for ``simulation_day`` is not present in every ``info_map``.
 
         """
         if not data_to_expand:
-            raise ValueError("Cannot fill empty dataset.")
+            raise ValueError("Data Expansion error: Cannot fill empty dataset.")
 
-        all_simulation_days = []
-        for key, value in data_to_expand.items():
-            info_maps = value.get("info_maps")
-            if info_maps is None:
-                raise TypeError(f"Variable '{key}' has no info maps.")
-            if len(info_maps) != len(value["values"]):
-                raise ValueError(f"Variable '{key}' does not have matching number of values and info maps.")
-            if not all("simulation_day" in info_map.keys() for info_map in info_maps):
-                raise ValueError(f"Variable '{key}' does not have simulation day value in every info map.")
-            all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
-
+        all_simulation_days = Utility._gather_data_sim_days(data_to_expand)
         filtered_simulation_days = sorted(set(all_simulation_days))
-        first_day = filtered_simulation_days[0]
-        last_day = filtered_simulation_days[-1]
 
+        first_day = filtered_simulation_days[0] if expand_data_to_observed_range else 0
+        last_day = filtered_simulation_days[-1] if expand_data_to_observed_range else simulation_length - 1
+
+        log_pool: list[dict[str, str | dict[str, str]]] = []
         expanded_data: dict[str, dict[str, list[Any]]] = {}
         for key, data in data_to_expand.items():
             expanded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
             original_units = data["info_maps"][0]["units"]
-            zipped_data = zip(data["values"], data["info_maps"])
-            indexed_data = {data[1]["simulation_day"]: data for data in zipped_data}
+
+            start_fill = use_fill_value_before_start
+            gap_fill = use_fill_value_in_gaps
+            end_fill = use_fill_value_at_end
+
+            if data["values"]:
+                first_value = data["values"][0]
+
+                if isinstance(first_value, (dict, list, tuple)) and not isinstance(fill_value, type(first_value)):
+                    start_fill = False
+                    gap_fill = False
+                    end_fill = False
+                    fill_warning: dict[str, str | dict[str, str]] = {
+                        "warning": "Data expansion fill warning",
+                        "message": f"User-provided fill value type {type(fill_value)} does not match "
+                        f"type of data to be expanded {type(first_value)}, "
+                        "filling with last reported value.",
+                        "info_map": {
+                            "class": Utility.__name__,
+                            "function": Utility.expand_data_temporally.__name__,
+                        },
+                    }
+                    log_pool.append(fill_warning)
+
+            indexed_data = {
+                info_map["simulation_day"]: (value, info_map)
+                for value, info_map in zip(data["values"], data["info_maps"])
+            }
+
+            first_day_of_original_data = min(indexed_data.keys())
             last_day_of_original_data = max(indexed_data.keys())
-            last_value = (fill_value, {"simulation_day": 0, "units": original_units})
-            for day in range(first_day, last_day_of_original_data + 1):
-                if day in indexed_data.keys():
-                    last_value = indexed_data[day] if not use_fill_value_in_gaps else (fill_value, indexed_data[day][1])
-                    expanded_variable_data["values"].append(indexed_data[day][0])
-                    expanded_variable_data["info_maps"].append(indexed_data[day][1])
-                    expanded_variable_data["info_maps"][-1]["simulation_day"] = day
-                else:
-                    expanded_variable_data["values"].append(last_value[0])
-                    expanded_variable_data["info_maps"].append(last_value[1].copy())
+
+            first_known_value, first_known_info_map = indexed_data[first_day_of_original_data]
+            last_known_value = fill_value
+            last_known_info_map = {"simulation_day": 0, "units": original_units}
+
+            for day in range(first_day, last_day + 1):
+                if day in indexed_data:
+                    value, info_map = indexed_data[day]
+                    expanded_variable_data["values"].append(value)
+                    expanded_variable_data["info_maps"].append(info_map.copy())
                     expanded_variable_data["info_maps"][-1]["simulation_day"] = day
 
-            tail_fill_value = indexed_data[last_day_of_original_data][0] if not use_fill_value_at_end else fill_value
-            for day in range(last_day_of_original_data + 1, last_day + 1):
-                expanded_variable_data["values"].append(tail_fill_value)
-                expanded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
+                    last_known_value = value
+                    last_known_info_map = info_map.copy()
+
+                elif day < first_day_of_original_data:
+                    value_to_add = fill_value if start_fill else first_known_value
+                    info_map_to_add = first_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
+
+                elif day < last_day_of_original_data:
+                    value_to_add = fill_value if gap_fill else last_known_value
+                    info_map_to_add = last_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
+
+                else:
+                    value_to_add = fill_value if end_fill else last_known_value
+                    info_map_to_add = last_known_info_map.copy()
+                    info_map_to_add["simulation_day"] = day
+
+                    expanded_variable_data["values"].append(value_to_add)
+                    expanded_variable_data["info_maps"].append(info_map_to_add)
 
             expanded_data[key] = expanded_variable_data
 
-        return expanded_data
+        return expanded_data, log_pool
 
     @staticmethod
-    def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
+    def _gather_data_sim_days(data_to_expand: dict[str, dict[str, list[Any]]]) -> list[int]:
         """
-        Recursively merges 'updates' into 'target'. Supports deep merging for dictionaries and lists, including lists
-        that contain dictionaries and dictionaries that contain lists.
+        Helper function for ``expand_data_temporally()``.
+        Validates the data structure and gathers the simulation days from the accompanying info maps.
 
         Parameters
         ----------
-        target : Dict[Any, Any]
+        data_to_expand : dict[str, dict[str, list[Any]]]
+            The data to be expanded.
+
+        Returns
+        -------
+        list[int]
+            A list of simulation days from the info maps of the ``data_to_expand``.
+
+        Raises
+        ------
+        TypeError
+            If ``info_map``s are not present in the ``data_to_expand``.
+        ValueError
+            If the lists of ``info_map``s and values are different length.
+        ValueError
+            If ``simulation_day`` has not been reported in every ``info_map`` instance.
+        """
+        all_simulation_days = []
+        for key, value in data_to_expand.items():
+            info_maps = value.get("info_maps")
+            if info_maps is None:
+                raise TypeError(f"Data Expansion error: Variable '{key}' has no info maps.")
+            if len(info_maps) != len(value["values"]):
+                raise ValueError(
+                    f"Data Expansion error: Variable '{key}' does not have matching number of values and " "info maps."
+                )
+            if not all("simulation_day" in info_map.keys() for info_map in info_maps):
+                raise ValueError(
+                    f"Data Expansion error: Variable '{key}' does not have simulation day value in every " "info map."
+                )
+            all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
+
+        return all_simulation_days
+
+    @staticmethod
+    def deep_merge(target: dict[Any, Any], updates: dict[Any, Any]) -> None:
+        """
+        Recursively merges ``updates`` into ``target``. Supports deep merging for dictionaries and lists, including
+        lists that contain dictionaries and dictionaries that contain lists.
+
+        Parameters
+        ----------
+        target : dict[Any, Any]
             The primary dictionary to be updated.
-        updates : Dict[Any, Any]
+        updates : dict[Any, Any]
             The dictionary containing updates to be merged into target.
+
+        Notes
+        -----
+        This function modifies the ``target`` dictionary in-place.
         """
         for key, value in updates.items():
             if key in target:
@@ -265,21 +379,24 @@ class Utility:
                 target[key] = value
 
     @staticmethod
-    def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
+    def calc_average(num_values: int, cur_avg: float, new_value: float) -> tuple[int, float]:
         """
-        Calculate the new average given the number of values,
-        the current average, and the new value.
+        Calculates the new average given the number of values, the current average, and the new value.
 
         Parameters
         ----------
-        num_values: number of values for the current average
-        cur_avg: the current average value
-        new_value: the new value to be averaged
+        num_values : int
+            Number of values in the current average.
+        cur_avg : float
+            The current average value.
+        new_value : float
+            The new value to incorporate into the average.
 
         Returns
         -------
-        new_num_values: the new number of values for the new average
-        new_avg: the new average value calculated
+        tuple[int, float]
+            - Updated number of values.
+            - Updated average.
 
         """
         new_num_values = num_values + 1
@@ -288,43 +405,63 @@ class Utility:
         return new_num_values, new_avg
 
     @staticmethod
-    def remove_items_from_list_by_indices(data: List[Any], indices_to_remove: List[int]) -> None:
+    def clamp(value: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
         """
-        Remove items from a list given a list of indices.
-        The operation is done in-place.
+        Constrain a value to the inclusive range [minimum, maximum].
 
         Parameters
         ----------
-        data: List[Any] a list of items
-            The list to remove items from
-        indices_to_remove : List[Any]
-            The list that contains indices of the items to be removed
+        value : float
+            The value to constrain.
+        minimum : float, default 0.0
+            The lower bound of the range.
+        maximum : float, default 1.0
+            The upper bound of the range.
 
         Returns
         -------
-        None
+        float
+            ``value`` limited to the range, equivalent to ``max(minimum, min(maximum, value))``.
 
         """
+        return max(minimum, min(maximum, value))
 
-        # Sort and reverse the index list before removing items to make sure items are removed from the end of the list
-        # to prevent the shifting of indices from affecting later removals.
+    @staticmethod
+    def remove_items_from_list_by_indices(data: list[Any], indices_to_remove: list[int]) -> None:
+        """
+        Remove items from a list given a list of indices.
+
+        Parameters
+        ----------
+        data : list[Any]
+            The list to remove items from.
+        indices_to_remove : list[int]
+            The list that contains indices of the items to be removed.
+
+        Notes
+        -----
+        The operation is done in-place.
+        Indices are sorted in reverse before removal to prevent index shifting from
+        affecting later deletions.
+        """
         for idx in sorted(indices_to_remove, reverse=True):
             del data[idx]
 
     @staticmethod
     def percent_calculator(denominator: float) -> Callable[[float], float]:
         """
-        Return a percent calculator closure that already stores the value of the given denominator.
+        Returns a percent calculator closure that already stores the value of the given denominator.
 
         Parameters
         ----------
-        denominator: the denominator to
+        denominator : float
+            The denominator for the percentage calculation.
 
         Returns
         -------
-        A closure function that already stores the denominator internally
-        so the user only needs to pass in the numerator.
-
+        Callable[[float], float]
+            A closure function that already stores the denominator internally so the user only needs to pass in the
+            numerator.
         """
 
         def calc(numerator: float) -> float:
@@ -334,28 +471,27 @@ class Utility:
 
     @classmethod
     def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
-        """Converts the given object into a serializable object.
+        """
+        Converts the given object into a serializable object.
 
         Parameters
         ----------
-        obj
+        obj : object
             The object to be serialized.
         max_depth : int, optional
             The maximum depth of recursion.
 
         Returns
         -------
-        A serializable object.
-
+        object
+            A serializable object.
         """
         return cls._make_serializable(obj, depth=0, max_depth=max_depth)
 
     @classmethod
     def _make_serializable(cls, obj: object, depth: int, max_depth: int) -> object:
-        """Makes the given object serializable.
-
-        The object can be a primitive type, a list, a tuple, a set, a dictionary,
-        or an instance of a custom class.
+        """
+        Makes the given object serializable.
 
         A recursive algorithm is used to traverse the object and convert it into
         a serializable object. The maximum depth of recursion is specified by the
@@ -375,6 +511,9 @@ class Utility:
         object
             A serializable object.
 
+        Notes
+        -----
+        The object can be a primitive type, a list, a tuple, a set, a dictionary, or an instance of a custom class.
         """
         # If the object is a primitive type, return it directly
         if isinstance(obj, (int, float, str, bool, type(None))):
@@ -416,7 +555,8 @@ class Utility:
 
     @classmethod
     def _get_str(cls, obj: object) -> str:
-        """Returns a string representation of the given object.
+        """
+        Returns a string representation of the given object.
 
         Parameters
         ----------
@@ -430,16 +570,15 @@ class Utility:
 
         Notes
         -----
-        If the object has a custom __str__ method, then that method will be used.
-        Otherwise, a variant of the default __str__ method will be used.
+        If the object has a custom ``__str__`` method, then that method will be used.
+        Otherwise, a variant of the default ``__str__`` method will be used.
 
-        Normally, the default __str__ method returns a string of the format:
-        `<module>.<class> object at <memory address>`.
+        Normally, the default ``__str__`` method returns a string of the format:
+        ``<module>.<class> object at <memory address>``.
         Here, we want to simplify that string to the format:
-        `<class> object at <memory address>`.
+        ``<class> object at <memory address>``.
 
         This turns out to be saving quite a bit of space when serializing objects.
-
         """
         if obj.__class__.__str__ != object.__str__:
             return str(obj)
@@ -449,20 +588,16 @@ class Utility:
         return f"{class_name} object at {memory_address}"
 
     @classmethod
-    def empty_dir(cls, dir_path: Path, keep: Optional[List[str]] = None) -> None:
-        """Empties the given directory, except for the files or subdirectories in the keep list.
+    def empty_dir(cls, dir_path: Path, keep: Optional[list[str]] = None) -> None:
+        """
+        Empties the given directory, except for the files or subdirectories in the keep list.
 
         Parameters
         ----------
         dir_path : Path
             The path to the directory to be emptied.
-        keep : List, optional
+        keep : list[str], optional
             A list of file or subdirectory names to be kept.
-
-        Returns
-        -------
-        None
-
         """
         if keep is None:
             keep = []
@@ -482,7 +617,7 @@ class Utility:
         Parameters
         ----------
         include_millis : bool
-            If True, adds milliseconds to the timestamp.
+            If ``True``, adds milliseconds to the timestamp.
 
         Returns
         -------
@@ -491,9 +626,16 @@ class Utility:
 
         Example
         --------
-        >>> Utility.get_timestamp(include_millis=True)
+        .. code-block:: python
+
+            Utility.get_timestamp(include_millis=True)
+
         28-Jun-2023_Wed_15-48-21.406585
-        >>> Utility.get_timestamp(include_millis=False)
+
+        .. code-block:: python
+
+            Utility.get_timestamp(include_millis=False)
+
         28-Jun-2023_Wed_15-48-21
         """
 
@@ -503,16 +645,16 @@ class Utility:
 
     @staticmethod
     def filter_dictionary(
-        dict_to_filter: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
-    ) -> Dict[Any, Any]:
+        dict_to_filter: dict[str, Any], filter_patterns: list[str], filter_by_exclusion: bool
+    ) -> dict[Any, Any]:
         """
         Returns a filtered dictionary based on either inclusion or exclusion.
 
         Parameters
         ----------
-        dict_to_filter : Dict[str, Any]
+        dict_to_filter : dict[str, Any]
             The dictionary to be filtered.
-        filter_patterns : List[str]
+        filter_patterns : list[str]
             A list of patterns by which to filter the dictionary.
         filter_by_exclusion : bool
             A flag indicating whether the dictionary should be filtered by exclusion
@@ -520,7 +662,7 @@ class Utility:
 
         Returns
         -------
-        Dict[str, Any]
+        dict[str, Any]
             The filtered dictionary.
         """
         if filter_by_exclusion:
@@ -537,11 +679,12 @@ class Utility:
 
     @staticmethod
     def remove_special_chars(input_string: str | list[str]) -> str:
-        """Function to remove special characters from a string.
+        """
+        Function to remove special characters from a string.
 
         Parameters
         ----------
-        input_string : str
+        input_string : str | list[str]
             The string from which the special characters should be removed.
 
         Returns
@@ -558,7 +701,7 @@ class Utility:
     @staticmethod
     def is_leap_year(year: int) -> bool:
         """
-        Helper method determines if the given year is a leap year
+        Determines if the given year is a leap year
 
         Parameters
         ----------
@@ -568,7 +711,7 @@ class Utility:
         Returns
         -------
         bool
-            True if the year is a leap year, otherwise False.
+            ``True`` if the year is a leap year, otherwise ``False``.
         """
         if year % 400 == 0:
             return True
@@ -597,26 +740,51 @@ class Utility:
         Raises
         ------
         ValueError
-            If the starting_offset is greater than the ending_offset.
+            If the ``starting_offset`` is greater than the ``ending_offset``.
 
         Examples
         --------
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
-        [datetime.date(2024, 6, 1)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
-        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
-        [datetime.date(2024, 5, 30)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
-        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
-        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
-        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
-        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
+        .. code-block:: python
 
+            Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
+
+        [datetime.date(2024, 6, 1)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
+
+        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
+
+        [datetime.date(2024, 5, 30)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
+
+        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
+
+        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
+
+        .. code-block:: python
+
+            Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
+
+        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
         """
         if starting_offset > ending_offset:
-            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
+            raise ValueError(
+                "Time Series Generation error: "
+                f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=})."
+            )
 
         time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
 
@@ -624,30 +792,137 @@ class Utility:
 
     @staticmethod
     def convert_celsius_to_kelvin(temperature: float) -> float:
-        """Converts a temperature in degrees Celsius to degrees Kelvin."""
+        """
+        Converts a temperature from Celsius to Kelvin.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in degrees Celsius.
+
+        Returns
+        -------
+        float
+            Temperature in Kelvin.
+        """
         return temperature + GeneralConstants.CELSIUS_TO_KELVIN
 
     @staticmethod
     def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
-        """Generates a datetime.date based on a year and ordinal day."""
+        """
+        Converts a year and ordinal day to a ``datetime.date``.
+
+        Parameters
+        ----------
+        year : int
+            The year.
+        day : int
+            Ordinal day of the year.
+
+        Returns
+        -------
+        datetime.date
+            Date corresponding to the given year and ordinal day.
+
+        Raises
+        ------
+        ValueError
+            If ``day`` is outside the valid range for the given year.
+        """
         maximum_day = (
             GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
         )
         if not 1 <= day <= maximum_day:
-            raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
+            raise ValueError(
+                "Error converting ordinal date: "
+                f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}."
+            )
         return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
 
     @staticmethod
     def generate_random_number(mean: float, std_dev: float) -> float:
-        """Generates a normally distributed random number using the provided mean and standard deviation."""
+        """
+        Generates a normally distributed random number.
+
+        Parameters
+        ----------
+        mean : float
+            Mean of the normal distribution.
+        std_dev : float
+            Standard deviation of the normal distribution.
+
+        Returns
+        -------
+        float
+            Random sample drawn from the specified normal distribution.
+        """
         return np.random.normal(mean, std_dev)
+
+    @staticmethod
+    def generate_bivariate_random_numbers(
+        mu_x: float, mu_y: float, sigma_x: float, sigma_y: float, rho: float
+    ) -> tuple[float, float]:
+        """
+        Generates two correlated random numbers from a bivariate normal distribution.
+
+        Parameters
+        ----------
+        mu_x : float
+            Mean of the first random variable.
+        mu_y : float
+            Mean of the second random variable.
+        sigma_x : float
+            Standard deviation of the first random variable.
+        sigma_y : float
+            Standard deviation of the second random variable.
+        rho : float
+            Correlation coefficient between the two random variables.
+
+        Returns
+        -------
+        tuple[float, float]
+            - The first random number.
+            - The second random number.
+
+        Raises
+        ------
+        ValueError
+            If either standard deviation is non-positive, or if ``rho`` is
+            outside the range ``[-1, 1]``.
+
+        """
+        if sigma_x <= 0 or sigma_y <= 0:
+            raise ValueError("The standard deviations for a bivariate distribution must be positive.")
+        if not (-1.0 <= rho <= 1.0):
+            raise ValueError("The correlation coefficient for a bivariate distribution must be between -1 and 1.")
+        mean = [mu_x, mu_y]
+        cov = [[sigma_x**2, rho * sigma_x * sigma_y], [rho * sigma_x * sigma_y, sigma_y**2]]
+        return tuple(np.random.multivariate_normal(mean, cov))
 
     @staticmethod
     def flatten_dictionary(
         input_dictionary: dict[str, Any], parent_key: str = "", separator: str = "."
     ) -> dict[str, Any]:
         """
-        Flatten a nested dictionary to a single level of depth by joining the keys with "."
+        Flattens a nested dictionary to a single level by joining keys with a separator.
+
+        Parameters
+        ----------
+        input_dictionary : dict[str, Any]
+            Nested dictionary to flatten.
+        parent_key : str, optional
+            Prefix prepended to all keys. Defaults to ``""``.
+        separator : str, optional
+            String used to join nested keys. Defaults to ``"."``.
+
+        Returns
+        -------
+        dict[str, Any]
+            Flattened dictionary with all keys joined by the separator.
+
+        Notes
+        -----
+        List-of-dict values are flattened by index, with each index appended to the key as ``_{i}``.
         """
         items: list[tuple[str, Any]] = []
         for key, value in input_dictionary.items():
@@ -666,7 +941,24 @@ class Utility:
         saved_csv_working_folder: Path, output_csv_path: Path, import_csv_path: Path | None
     ) -> None:
         """
-        Merge multiple saved input data CSVs files into one single CSV file for a direct side-by-side comparison.
+        Merges multiple saved input data CSV files into a single CSV for side-by-side comparison.
+
+        Parameters
+        ----------
+        saved_csv_working_folder : Path
+            Directory containing the CSV files to merge. Deleted after merging.
+        output_csv_path : Path
+            Directory where the merged ``saved_input_data.csv`` file will be written.
+        import_csv_path : Path or None
+            Optional path to an existing CSV to include as the base frame. Ignored
+            if ``None`` or an empty path.
+
+        Notes
+        -----
+        All CSV files in ``saved_csv_working_folder`` are merged on ``property_group`` and ``variable_name``.
+        If an optional base CSV is provided via ``import_csv_path``, it is included as the starting frame.
+        Duplicate column prefixes are disambiguated by appending numeric suffixes. The working folder
+        is deleted after the merged file is written.
         """
         result_df = pd.DataFrame(columns=["property_group", "variable_name"])
 
@@ -700,45 +992,65 @@ class Utility:
         shutil.rmtree(saved_csv_working_folder)
 
     @staticmethod
-    def convert_list_to_dict_by_key(list_of_dicts: List[Dict[str, Any]], id_key: str) -> Dict[Any, Dict[str, Any]]:
+    def convert_list_to_dict_by_key(list_of_dicts: list[dict[str, Any]], id_key: str) -> dict[Any, dict[str, Any]]:
         """
         Convert a list of dictionaries into a dictionary keyed by a specified identifier,
         where each value is the original dictionary minus the identifier key.
 
         Parameters
         ----------
-        list_of_dicts : List[Dict[str, Any]]
+        list_of_dicts : list[dict[str, Any]]
             A list of dictionaries, each containing a unique identifier and other data.
         id_key : str
             The key in each dictionary to use as the unique identifier.
 
         Returns
         -------
-        Dict[Any, Dict[str, Any]]
+        Dict[Any, dict[str, Any]]
             A dictionary where each key is the unique identifier from the list and each
             value is the corresponding dictionary minus the identifier key.
 
+        Raises
+        ------
+        KeyError
+            When the specified ``id_key`` is not found in any of the dictionaries in the list.
+
         Notes
         -----
-        The use of dict_.pop('ID') mutates the original dictionaries in list_of_dicts by removing their 'ID' keys.
-        If you need to keep the original list and dictionaries intact, make a copy before calling this function.
+        The use of ``dict_.pop('ID')`` mutates the original dictionaries in ``list_of_dicts`` by removing their
+        ``ID`` keys. If you need to keep the original list and dictionaries intact, make a copy before calling
+        this function.
+
+        The use ``deepcopy`` is necessary here because ``dict_.pop('ID')`` mutates ``list_of_dicts`` in place.
+        To avoid side effects, we use ``deepcopy`` to make a copy before mutating the original list.
 
         Example
         -------
         Given a list of dictionaries like this:
-        [
-            {"ID": 1, "value": 2, "other_keys": "other values"},
-            {"ID": 3, "value": 4, "other_keys": "other values"}
-        ]
-        And using 'ID' as the id_key:
 
-        convert_list_to_dict_by_key(list_of_dicts, 'ID')
+        .. code-block:: python
+
+            [
+                {"ID": 1, "value": 2, "other_keys": "other values"},
+                {"ID": 3, "value": 4, "other_keys": "other values"}
+            ]
+
+        And using ``ID`` as the ``id_key``:
+
+        .. code-block:: python
+
+            convert_list_to_dict_by_key(list_of_dicts, 'ID')
+
 
         Would return:
+
+        .. code-block:: python
+
         {
             1: {"value": 2, "other_keys": "other values"},
             3: {"value": 4, "other_keys": "other values"}
         }
+
         """
         result = {}
         for dict_ in deepcopy(list_of_dicts):
@@ -746,7 +1058,7 @@ class Utility:
                 id_value = dict_.pop(id_key)
                 result[id_value] = dict_
             else:
-                raise KeyError(f"Key '{id_key}' not found in dictionary.")
+                raise KeyError(f"List to dict conversion error: Key '{id_key}' not found in dictionary.")
 
         return result
 
@@ -771,7 +1083,6 @@ class Utility:
         -----
         In the context of Schedule-descendant classes, the reference list length will always be the length of the years
         list.
-
         """
         if len(list_to_elongate) != 1:
             return list_to_elongate
@@ -785,75 +1096,81 @@ class Utility:
 
         Parameters
         ----------
-        values : List[Any]
+        values : list[int | float]
             List of values to be checked.
 
         Returns
         -------
         bool
-            True if all values are >= 0, False otherwise.
-
+            ``True`` if all values are >= 0, ``False`` otherwise.
         """
         return all(value >= 0 for value in values)
 
     @staticmethod
-    def validate_fractions(fractions: List[float]) -> bool:
+    def validate_fractions(fractions: list[float]) -> bool:
         """
         Checks that all fractions passed are valid.
 
         Parameters
         ----------
-        fractions : List[float]
-            List of fractions to be valid
+        fractions : list[float]
+            List of fractions to be validated.
 
         Returns
         -------
         bool
-            True if all fractions passed are valid, False otherwise.
+            ``True`` if all fractions passed are valid, ``False`` otherwise.
 
         Notes
         -----
         A fraction is valid if it is in the range[0.0, 1.0]
-
         """
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
 
     @staticmethod
-    def round_numeric_values_in_dict(data: dict[str, any], significant_digits: int) -> dict[str, Any]:
+    def round_numeric_values_in_dict(data: dict[str, Any], significant_digits: int) -> dict[str, Any]:
         """
         Rounds all numeric values in a dictionary to the specified number of significant digits.
 
         Parameters
         ----------
-        data : dict[str, any]
+        data : dict[str, Any]
             The dictionary containing numeric values to be rounded.
         significant_digits : int
             The number of significant digits to round the numeric values to.
 
         Returns
         -------
-        dict[str, any]
+        dict[str, Any]
             The dictionary with numeric values rounded to the specified number of significant digits.
 
         Notes
         -----
-        Some specific behavior of the round() function used by this method:
+        Some specific behavior of the ``round()`` function used by this method:
 
-        If significant_digits is None or 0, floats are converted to ints.
-        round(12.7) -> 13 (int)
-        round(12.3) -> 12 (int)
-        round(-12.7) -> -13 (int)
-        round(12.5) -> 12 (int) - If rounded number is 5, Python rounds to the nearest even number.
-        round(11.5) -> 12 (int) - Because of this rule, both 11.5 and 12.5 round to 12.
+        - If ``significant_digits`` is ``None`` or ``0``, floats are converted to ints.
+            .. code-block:: python
 
-        If significant_digits is less than 0, it rounds to the nearest multiple of 10, 100, 1000, etc.
-        round(1234, -2) -> 1200 (rounds to the nearest multiple of 100)
-        round(1234, -3) -> 1000 (rounds to the nearest multiple of 1000)
-        round(-1234, -1) -> -1230 (rounds to the nearest multiple of 10)
+                round(12.7) -> 13 (int)
+                round(12.3) -> 12 (int)
+                round(-12.7) -> -13 (int)
+                round(12.5) -> 12 (int)     # If the rounded number is 5, Python rounds to the nearest even number.
+                round(11.5) -> 12 (int)     # Because of this rule, both 11.5 and 12.5 round to 12.
 
-        If significant_digits is 0, it rounds to the nearest integer and converts it to a float.
-        round(12.7, 0) -> 13.0 (float)
-        round(-12.3, 0) -> -12.0 (float)
+        - If ``significant_digits`` is less than ``0``, it rounds to the nearest multiple of 10, 100, 1000, etc.
+
+            .. code-block:: python
+
+                round(1234, -2) -> 1200     # (rounds to the nearest multiple of 100)
+                round(1234, -3) -> 1000     # (rounds to the nearest multiple of 1000)
+                round(-1234, -1) -> -1230   # (rounds to the nearest multiple of 10)
+
+        - If ``significant_digits`` is ``0``, it rounds to the nearest integer and converts it to a float.
+        .. code-block:: python
+
+                round(12.7, 0) -> 13.0          # (float)
+                round(-12.3, 0) -> -12.0        # (float)
+
         """
         return {
             key: (
@@ -877,7 +1194,7 @@ class Utility:
         Returns
         -------
         bool
-            True if the randomized rate is less than the reference rate, False otherwise.
+            ``True`` if the randomized rate is less than the reference rate, ``False`` otherwise.
         """
 
         return random() < reference_rate
@@ -885,7 +1202,7 @@ class Utility:
     @staticmethod
     def validate_date_format(date_format: str) -> bool:
         """
-        Checks if date_format is a valid Python datetime format for both strftime() and strptime().
+        Checks if date_format is a valid Python datetime format for both ``strftime()`` and ``strptime()``.
 
         Parameters
         ----------
@@ -895,7 +1212,7 @@ class Utility:
         Returns
         -------
         bool
-
+            ``True`` if valid, ``False`` otherwise.
         """
         test_date = datetime.datetime(2020, 12, 31, 00, 00, 00, 00)
         try:
@@ -908,11 +1225,11 @@ class Utility:
     @staticmethod
     def get_date_formatter(date_format: str | None) -> DateFormatter:
         """
-        Get a `matplotlib.dates.DateFormatter` instance for the requested date format.
+        Get a ``matplotlib.dates.DateFormatter`` instance for the requested date format.
 
         Parameters
         ----------
-        date_format : str
+        date_format : str | None
             The format requested by the user. Common date formats are:
             - "%j/%Y": Formats dates as "day_of_year/year" (e.g., "123/2024").
             - "%d/%m/%Y": Formats dates as "day/month/year" (e.g., "23/12/2024").
@@ -926,11 +1243,11 @@ class Utility:
         Returns
         -------
         matplotlib.dates.DateFormatter
-            A `DateFormatter` instance for the specified format.
+            A ``DateFormatter`` instance for the specified format.
 
         Notes
         -----
-        If the date_format is None or invalid, the default format "%d/%m/%Y" will be used instead.
+        If the ``date_format`` is ``None`` or invalid, the default format "%d/%m/%Y" will be used instead.
 
         """
 
@@ -939,8 +1256,29 @@ class Utility:
 
         return DateFormatter(date_format)
 
+    @staticmethod
+    def back_track_birth_date(days_born: int, current_date: datetime.datetime) -> datetime.datetime:
+        """
+        Calculates the birthdate by subtracting a given number of days from the current date.
+
+        Parameters
+        ----------
+        days_born : int
+            The number of days since the animal's birth.
+        current_date : datetime.datetime
+            The current date from which the days will be subtracted.
+
+        Returns
+        -------
+        datetime.datetime
+            The calculated date of birth.
+        """
+        return current_date - timedelta(days_born)
+
 
 class Aggregator:
+    """This class houses the aggregation functions used in the simulation."""
+
     @staticmethod
     def average(data: list[float]) -> float:
         """
@@ -970,7 +1308,7 @@ class Aggregator:
 
         Returns
         -------
-        float
+        float | None
             The result of dividing the first number by each subsequent number.
             Returns None if the list is empty or has only one element.
         """
@@ -1050,7 +1388,7 @@ class Aggregator:
 
         Returns
         -------
-        float
+        float | None
             The result of subtracting each subsequent number from the first number.
             Returns None if the list is empty or has only one element.
         """
@@ -1063,4 +1401,17 @@ class Aggregator:
 
     @staticmethod
     def no_op(data: list[Any]) -> Any | None:
+        """
+        Returns the data unchanged, or ``None`` if the data is empty or falsy.
+
+        Parameters
+        ----------
+        data : list[Any]
+            Input data to pass through.
+
+        Returns
+        -------
+        Any | None
+            The input data if it is not None, otherwise ``None``.
+        """
         return data if data else None

@@ -4,6 +4,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
+from RUFAS.output_manager import OutputManager
 
 
 def test_calculate_nitrogen_loss_to_leaching() -> None:
@@ -125,10 +126,12 @@ def test_calculate_ifsm_methane_emission(mocker: MockerFixture) -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_calculate_ifsm_methane_emission_error() -> None:
+def test_calculate_ifsm_methane_emission_error(mocker: MockerFixture) -> None:
     """Tests invalid case for calculate_ifsm_methane_emission()."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError, match="Manure volatile solids mass must be positive. Received -5."):
         SolidsStorageCalculator.calculate_ifsm_methane_emission(-5, 30, 0.24)
+    mock_add_error.assert_called_once()
 
 
 def test_calculate_degradable_volatile_solids_fraction() -> None:

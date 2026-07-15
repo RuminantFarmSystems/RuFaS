@@ -1,5 +1,4 @@
 from math import exp
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -15,7 +14,7 @@ class NitrificationVolatilization:
         The SoilData object used by this module for tracking the nitrification and volatilization of ammonium in the
         soil. If not provided, a new SoilData object will be instantiated.
     field_size : float, optional
-        The size of the field in hectares (ha), used to initialize a SoilData object if one is not directly provided.
+        The size of the field in hectares used to initialize a SoilData object if one is not directly provided (ha).
 
     Attributes
     ----------
@@ -30,7 +29,7 @@ class NitrificationVolatilization:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def do_daily_nitrification_and_volatilization(self) -> None:
@@ -39,7 +38,7 @@ class NitrificationVolatilization:
 
         Notes
         -----
-        This method uses the `nutrient_cycling_water_factor` calculated by :class:`LayerData`, instead of the water
+        This method uses the ``nutrient_cycling_water_factor`` calculated by :class:``LayerData``, instead of the water
         factor that SWAT specifies for use in calculating denitrification/volatilization (see SWAT Theoretical
         documentation eqn. 3:1.3.2, 3).
 
@@ -320,7 +319,7 @@ class NitrificationVolatilization:
         -----
         This method is intended to be used to calculate both the amount of ammonium lost to nitrification and to
         volatilization. To calculate the amount lost to nitrification, pass the nitrification loss fraction as the
-        `actual_loss_fraction` and the volatilization loss fraction as the `other_loss_fraction`, and vice versa for
+        ``actual_loss_fraction`` and the volatilization loss fraction as the ``other_loss_fraction``, and vice versa for
         calculating the amount lost to volatilization.
 
         """

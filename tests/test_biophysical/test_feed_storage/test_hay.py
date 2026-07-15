@@ -193,7 +193,6 @@ def test_calculate_dry_matter_loss_to_gas_floors_negative_loss(
     mock_add_warning = mocker.patch.object(hay.om, "add_warning")
 
     actual = hay.calculate_dry_matter_loss_to_gas(harvested_crop, [], time)
-
     assert actual == 0.0
     mock_add_warning.assert_not_called()
 

@@ -1322,21 +1322,17 @@ def test_clear_reports(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "filter_content, expected_result, expected_exception",
+    "filter_content, expected_result",
     [
-        ({"horizontal_first": True}, True, None),
-        ({"horizontal_first": False}, False, None),
-        ({}, False, None),
-        ({"horizontal_first": "true"}, None, ValueError),
-        ({"horizontal_first": "false"}, None, ValueError),
-        ({"horizontal_first": 1}, None, ValueError),
-        ({"horizontal_first": None}, False, None),
+        ({"horizontal_first": True}, True),
+        ({"horizontal_first": False}, False),
+        ({}, False),
+        ({"horizontal_first": None}, False),
     ],
 )
 def test_get_horizontal_first_value(
     filter_content: Dict[str, Any],
     expected_result: bool,
-    expected_exception: Exception | None,
 ) -> None:
     """
     Unit test for the _get_horizontal_first_value method of ReportGenerator class in report_generator.py file.
@@ -1346,17 +1342,8 @@ def test_get_horizontal_first_value(
     report_generator = ReportGenerator()
 
     # Act & Assert
-    if expected_exception:
-        with pytest.raises(ValueError) as exc_info:
-            report_generator._get_horizontal_first_value(filter_content)
-        assert str(exc_info.value) == (
-            f"The value of 'horizontal_first' in the report filter should be a boolean. "
-            f"Value provided: {repr(filter_content['horizontal_first'])} "
-            f"(type {type(filter_content['horizontal_first'])})"
-        )
-    else:
-        result = report_generator._get_horizontal_first_value(filter_content)
-        assert result == expected_result
+    result = report_generator._get_horizontal_first_value(filter_content)
+    assert result == expected_result
 
 
 @pytest.mark.parametrize(

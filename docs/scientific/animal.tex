@@ -2843,7 +2843,7 @@ This section is divided into several subsections including Rumen Degraded and Un
     \end{center}
     \vspace{0.5cm}
     
-            {\raggedleft \textbf{[31]}\par}
+            {\raggedleft \textbf{[AN.SUP.31]}\par}
             \vspace{0.5cm}
 
     \textbf{ Mineral Supply}
@@ -2894,85 +2894,67 @@ Automated ration formulation in RuFaS optimizes a ration for a single objective 
 
 
 
-\renewcommand{\arraystretch}{1.4} % More vertical space between rows
-\begin{longtable}{@{} L{5cm} L{7cm} C{2cm} C{2cm} C{2cm} @{} }
-\caption{Key inputs found in the animal input file.} \\
+\begin{landscape}
+\thispagestyle{empty}
+
+\begin{table}[h!]
+\caption{Key inputs found in the animal input file.}
+\centering
+\renewcommand{\arraystretch}{1.4}
+
+\begin{tabular}{@{} L{5cm} L{7cm} C{2cm} C{2cm} C{2cm} @{}}
+
 \toprule
-\multicolumn{1}{c}{\textbf{Variable}} & 
-\multicolumn{1}{c}{\textbf{Definition}} &
-\multicolumn{1}{c}{\textbf{Default}} &
-\multicolumn{1}{c}{\textbf{Min}} &
-\multicolumn{1}{c}{\textbf{Max}} \\
+\textbf{Variable} & \textbf{Definition} & \textbf{Default} & \textbf{Min} & \textbf{Max} \\
 \midrule
-\endfirsthead
 
-\multicolumn{5}{@{}l}{\textit{Table continued from previous page}} \\
-\toprule
-\multicolumn{1}{c}{\textbf{Variable}} & 
-\multicolumn{1}{c}{\textbf{Definition}} &
-\multicolumn{1}{c}{\textbf{Default}} &
-\multicolumn{1}{c}{\textbf{Min}} &
-\multicolumn{1}{c}{\textbf{Max}} \\
-\midrule
-\endhead
+ration.user\_input & User decision to use the user-defined ration formulation or the automated ration formulation methods (true or false, respectively). & TRUE & - & - \\
 
-\midrule
-\multicolumn{5}{@{}r@{}}{\textit{Continued on next page}} \\
-\endfoot
-
-\bottomrule
-\endlastfoot
-
-ration.user\_input & User decision to use the user-defined ration formulation or the automated ration formulation methods (true or false, respectively). & TRUE & - & -  \\
 ration.formulation\_interval & Ration formulation interval (days). & 30 & 1 & - \\
+
 ration.phosphorus\_requirement\_buffer & Increase in phosphorus nutrient requirement in calculation of animal requirements (percentage). & 75 & 0 & - \\
-\end{longtable}
-\vspace{0.2cm}
-
-
-\renewcommand{\arraystretch}{1.4} % More vertical space between rows
-
-\begin{longtable}{@{} L{3.5cm} L{5.5cm} L{4.5cm} C{2cm} C{2cm} C{2cm} @{}}
-\caption{Key inputs found in the feed input file.} \\
-\toprule
-\multicolumn{1}{c}{\textbf{Section}} &
-\multicolumn{1}{c}{\textbf{Variable}} &
-\multicolumn{1}{c}{\textbf{Definition}} &
-\multicolumn{1}{c}{\textbf{Default}} &
-\multicolumn{1}{c}{\textbf{Min}} &
-\multicolumn{1}{c}{\textbf{Max}} \\
-\midrule
-\endfirsthead
-
-\toprule
-\multicolumn{1}{c}{\textbf{Section}} &
-\multicolumn{1}{c}{\textbf{Variable}} &
-\multicolumn{1}{c}{\textbf{Definition}} &
-\multicolumn{1}{c}{\textbf{Default}} &
-\multicolumn{1}{c}{\textbf{Min}} &
-\multicolumn{1}{c}{\textbf{Max}} \\
-\midrule
-\endhead
-
-\midrule
-\multicolumn{6}{@{}r@{}}{\textit{Continued on next page}} \\
-\endfoot
 
 \bottomrule
-\endlastfoot
 
-- & calf\_feeds or growing\_feeds or close\_up\_feeds or lac\_cow\_feeds & Each section is comprised of a list of feeds (RuFaS Feed IDs). & - & - & - \\
+\end{tabular}
+\end{table}
 
-\multirow{2}{*}{\textbf{purchased\_feeds}} 
-& purchased\_feed & RuFaS Feed ID & - & - & - \\
-& purchased\_feed\_cost & Price per feed (dollars/kg DM). & - & - & - \\
+\end{landscape}
 
-\multirow{3}{*}{\textbf{User\_defined\_ration\_percentages}} 
-& calves/growing/close\_up/lac\_cow.ration\_percentage & For each feed ID, amount of a ration that is a given feed (percentage). & - & 0 & 100 \\
-& tolerance & Allowable +/- percentage variance in each of the defined ration inclusion percentage values (fraction). & 0.1 & 0 & 1 \\
-& milk\_reduction\_maximum & Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements. & 15 & 0 & 50 \\
 
-\end{longtable}
+\begin{landscape}
+\thispagestyle{empty}
+
+\begin{table}[h!]
+\caption{Key inputs found in the feed input file.}
+\centering
+\renewcommand{\arraystretch}{1.4}
+
+\begin{tabular}{@{} L{3.5cm} L{5.5cm} L{4.5cm} C{2cm} C{2cm} C{2cm} @{}}
+
+\toprule
+\textbf{Section} & \textbf{Variable} & \textbf{Definition} & \textbf{Default} & \textbf{Min} & \textbf{Max} \\
+\midrule
+
+ & calf\_feeds or growing\_feeds or close\_up\_feeds or lac\_cow\_feeds & Each section is comprised of a list of feeds (RuFaS Feed IDs). & - & - & - \\
+
+\multirow{2}{*}{\textbf{purchased\_feeds}}
+ & purchased\_feed & RuFaS Feed ID & - & - & - \\
+ & purchased\_feed\_cost & Price per feed (dollars/kg DM). & - & - & - \\
+
+\cmidrule(lr){1-6}
+
+\multirow{3}{*}{\parbox{3cm}{\textbf{User\_defined\_ration\_percentages}}}
+ & calves/growing/close\_up/lac\_cow.ration\_percentage & For each feed ID, amount of a ration that is a given feed (percentage). & - & 0 & 100 \\
+ & tolerance & Allowable +/- percentage variance in each of the defined ration inclusion percentage values (fraction). & 0.1 & 0 & 1 \\
+ & milk\_reduction\_maximum & Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements. & 15 & 0 & 50 \\
+
+\bottomrule
+
+\end{tabular}
+\end{table}
+
+\end{landscape}
 
 
 
@@ -3044,8 +3026,6 @@ If a ration cannot be formulated that meets the constraints given the pen-level 
 The generalized equation for sequential quadratic programming is as follows \parencite{Li2022} and gi(x) is constraint i, which must be twice continuously differentiable with respect to all xj in x.”).
 
 
-\textbf{\large INSERT EQUATION HERE}
-
 
 \renewcommand{\arraystretch}{1.4} % More vertical space between rows
 
@@ -3098,48 +3078,39 @@ Forage NDF & 15\% of ration &  & All except calves \\
 
 
 \subsubsection{User-defined ration formulation}
+\vspace{0.3cm}
+
 \paragraph{Introduction}
-The user-defined ration methodology follows the same process as described in the Automated ration formulation methodology, with the addition of the inputs found in Table RF4, as described in the Methodology below.
+The user-defined ration methodology follows the same process as described in the Automated ration formulation methodology, with the addition of the inputs found in this section, as described in the Methodology below.
 
 \textbf{Required User Inputs}
 
-\renewcommand{\arraystretch}{1.4} % More vertical space between rows
+\begin{landscape}
+\thispagestyle{empty}
 
-\begin{longtable}{@{} L{3.5cm} L{5.5cm} L{4.5cm} C{2cm} C{2cm} @{}}
-\caption{Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages} \\
-\toprule
+\begin{table}[h!]
+\caption{Key inputs found in the feed input file specific to user defined ration methodology. All are found in the section user\_defined\_ration\_percentages.}
+\centering
+\renewcommand{\arraystretch}{1.4}
 
-\multicolumn{1}{c}{\textbf{Variable}} &
-\multicolumn{1}{c}{\textbf{Definition}} &
-\multicolumn{1}{c}{\textbf{Default}} &
-\multicolumn{1}{c}{\textbf{Min}} &
-\multicolumn{1}{c}{\textbf{Max}} \\
-\midrule
-\endfirsthead
+\begin{tabular}{@{} L{3.5cm} L{5.5cm} L{4.5cm} C{2cm} C{2cm} @{}}
 
 \toprule
-
-\multicolumn{1}{c}{\textbf{Variable}} &
-\multicolumn{1}{c}{\textbf{Definition}} &
-\multicolumn{1}{c}{\textbf{Default}} &
-\multicolumn{1}{c}{\textbf{Min}} &
-\multicolumn{1}{c}{\textbf{Max}} \\
+\textbf{Variable} & \textbf{Definition} & \textbf{Default} & \textbf{Min} & \textbf{Max} \\
 \midrule
-\endhead
-
-\midrule
-\multicolumn{5}{@{}r@{}}{\textit{Continued on next page}} \\
-\endfoot
-
-\bottomrule
-\endlastfoot
 
 calves or growing or close\_up or lac\_cow.ration\_percentage & For each feed ID, amount of a ration that is a given feed (percentage). &  & 0 & 100 \\
+
 tolerance & Allowable +/- percentage variance in each of the defined ration inclusion percentage values (fraction). & 0.1 & 0 & 1 \\
+
 milk\_reduction\_maximum & Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements. & 15 & 0 & 50 \\
 
+\bottomrule
 
-\end{longtable}
+\end{tabular}
+\end{table}
+
+\end{landscape}
 
 
 \paragraph{Methodology}
@@ -4784,7 +4755,7 @@ Information about death and sale events are tracked and aggregated daily, includ
 \thispagestyle{empty} % Suppress headers and footers on this landscape page
 
 \renewcommand{\arraystretch}{1.4} % More vertical space between rows
-\begin{longtable}{@{} L{4cm} L{8cm} C{2cm} C{2cm} C{2cm} @{}}
+\begin{longtable}{@{} L{6cm} L{12cm} C{2cm} C{2cm} C{2cm} @{}}
 \caption{The following inputs are used to determine the probability and timing of cow death and sales events.} \\
 \toprule
 \textbf{Variable} & \textbf{Definition} & \textbf{Default} & \textbf{Min} & \textbf{Max} \\
@@ -4821,8 +4792,6 @@ still\_birth\_rate & Stillbirth rate & 0.065 & 0 & 1 \\
 
 % <-- Ensure there's a final newline before closing the table
 \end{longtable}
-
-\vspace{0.2cm}
 
 {\footnotesize \textit{Note:} Variables marked with \textsuperscript{*} are commonly left at default values. Adjusting them changes the timing of cow exit from the herd but does not affect the total number of exits.}
 

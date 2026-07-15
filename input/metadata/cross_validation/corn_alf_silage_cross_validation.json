@@ -1,0 +1,260 @@
+{
+  "cross_validation": [
+    {
+      "description": "Corn-Alf-Silage schedule 0 has equal planting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.0.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.0.planting_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 0 has equal harvest year/day lengths",
+      "aliases": {
+        "variables": {
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.0.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.0.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 1 has equal planting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.1.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.1.planting_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 1 has equal harvest year/day lengths",
+      "aliases": {
+        "variables": {
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.1.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.1.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 2 has equal planting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.2.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.2.planting_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 2 has equal harvest year/day lengths",
+      "aliases": {
+        "variables": {
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.2.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.2.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 3 has equal planting year/day lengths",
+      "aliases": {
+        "variables": {
+          "planting_years": "Corn-Alf-Silage.crop_schedules.3.planting_years",
+          "planting_days": "Corn-Alf-Silage.crop_schedules.3.planting_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "planting_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    },
+    {
+      "description": "Corn-Alf-Silage schedule 3 has equal harvest year/day lengths",
+      "aliases": {
+        "variables": {
+          "harvest_years": "Corn-Alf-Silage.crop_schedules.3.harvest_years",
+          "harvest_days": "Corn-Alf-Silage.crop_schedules.3.harvest_days"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_years"
+              ]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "harvest_days"
+              ]
+            }
+          },
+          "relationship": "is_equal_length"
+        }
+      ]
+    }
+  ]
+}

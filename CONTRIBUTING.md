@@ -90,6 +90,12 @@ RuFaS adopted the [![Contributor Covenant](https://img.shields.io/badge/Contribu
 
 ---
 
+## Forking Guidelines
+
+We support both public and private forks. See detailed guidelines for forking from the RuFaS repository in the [FORKING.MD page](https://github.com/RuminantFarmSystems/RuFaS/blob/dev/FORKING.md)
+
+---
+
 ## Coding conventions, style guidance, versioning policy and review process for code contributions
 
 Please familiarize yourself with the coding conventions, style, versioning policy, and code review process before submitting pull requests for coding contributions.
