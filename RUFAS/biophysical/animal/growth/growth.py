@@ -376,7 +376,10 @@ class Growth:
         divisor = abs(growth_inputs.gestation_length - growth_inputs.days_in_pregnancy)
         if divisor == 0:
             divisor = 1
-        return (0.82 * 0.96 * growth_inputs.mature_body_weight - 0.96 * growth_inputs.body_weight) / divisor
+        return max(
+            (0.82 * 0.96 * growth_inputs.mature_body_weight - 0.96 * growth_inputs.body_weight) / divisor,
+            AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE,
+        )
 
     def _calculate_cow_target_daily_growth(self, growth_inputs: GrowthInputs) -> float:
         """
