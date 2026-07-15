@@ -1463,6 +1463,32 @@
           "relationship": "equal"
         }
       ]
+    },
+    {
+      "description": "The maximum days carried calf cannot be more than gestation length",
+      "aliases": {
+        "variables": {
+          "max_days_carried_calf": "animal.animal_config.management_decisions.cull_eligibility_maximum_days_carried_calf",
+          "avg_gestation_len": "animal.animal_config.farm_level.repro.avg_gestation_len"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["avg_gestation_len"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["max_days_carried_calf"]
+            }
+          },
+          "relationship": "greater_or_equal_to"
+        }
+      ]
     }
   ]
 }
