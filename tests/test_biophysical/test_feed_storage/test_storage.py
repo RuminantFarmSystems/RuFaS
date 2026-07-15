@@ -566,6 +566,7 @@ def test_calculate_moisture_loss(
         (0.5, 0.7, 100.0, 200.0, 0.0, True),
         (3.4, 0.8, 0.0, 200.0, 3.4, False),
         (5.8, 0.08, 100.0, 100.0, 0.0, False),
+        (4.5, 0.5, 10.0, 0.0, 4.5, False),
     ],
 )
 def test_recalculate_nutrient_percentage(
