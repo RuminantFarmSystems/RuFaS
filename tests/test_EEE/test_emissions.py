@@ -49,7 +49,7 @@ assert expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id is n
 @pytest.fixture
 def em(mocker: MockerFixture) -> EmissionsEstimator:
     mocker.patch.object(EmissionsEstimator, "__init__", return_value=None)
-    em = EmissionsEstimator()
+    em = EmissionsEstimator(simulate_animals=True, simulate_feed=True, simulate_fields=True, simulate_manure=True)
 
     em.im = InputManager()
     em.om = OutputManager()
@@ -178,7 +178,9 @@ def test_emissions_estimator_init(mocker: MockerFixture) -> None:
 
     im.get_data.side_effect = get_data_side_effect
 
-    estimator = EmissionsEstimator()
+    estimator = EmissionsEstimator(
+        simulate_animals=True, simulate_feed=True, simulate_fields=True, simulate_manure=True
+    )
 
     expected = {
         "corn_silage": ["50", "51", "52"],
