@@ -1,0 +1,15 @@
+Section,Variable,Units,Description
+Stream formation,minutes_away_for_milking, minutes ,"The total time (minutes) per day that animals spend walking to/from the parlor, waiting in holding areas, or being actively milked. For non?lactating animals, this value may be omitted or entered as “null”. "
+,first_parlor_processor,,The name of the processor defined in the Manure module inputs that manure from the milking parlor should enter. 
+,parlor_stream_name,,The user-defined name of this pen’s parlor stream. 
+,stream_name,,The user-defined name of this stream. 
+,bedding_name,,The name of the specific bedding configuration used with this stream. See section 2 for more information. 
+,stream_proportion, 0–1 ,The proportion of daily manure excreted outside of the parlor and while traveling to/from the parlor that enters this stream. All stream proportions within a pen must sum to 1.0. Optional if only one stream. 
+,first_processor,,The name of the processor defined in the Manure module inputs that this ManureStream should enter. 
+Bedding,bedding_type,,"The type of bedding material. Options: sand, straw, sawdust, manure solids, or none. "
+,bedding_mass_per_day, kg/day ,"Daily mass of fresh bedding added per animal per day (wet weight). Bedding mass is applied based on the total number of animals in the pen, and is not based on the stream proportion of the manure stream the bedding is assigned to. "
+,bedding_density, kg/m³ ,Density of the bedding on a wet weight basis. 
+,bedding_dry_matter_content, fraction ,Bedding dry matter content as a fraction of total mass. 
+,bedding_carbon_fraction, fraction ,Bedding carbon content as a fraction of total mass. 
+,bedding_phosphorus_content, fraction ,Bedding phosphorus content as a fraction of total mass. 
+,sand_removal_efficiency, fraction ,"The proportion (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn"
