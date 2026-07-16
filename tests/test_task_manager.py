@@ -348,7 +348,7 @@ def test_task_manager_start_invalid_data(
             "variable_name_style": "verbose",
             "logs_directory": Path("logs/directory"),
             "suppress_log_files": False,
-            "output_prefix": "task_manager"
+            "output_prefix": "task_manager",
         },
         input_manager=mock_input_manager,
         output_manager=mock_output_manager,
