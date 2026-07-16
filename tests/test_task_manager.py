@@ -257,7 +257,22 @@ def test_task_manager_start(
     )
     mock_check_dependencies.assert_called_once()
     mock_check_python_version.assert_called_once()
-    mock_handle_post_processing.assert_called_once()
+    mock_handle_post_processing.assert_called_once_with(
+        args={
+            "exclude_info_maps": exclude_info_maps,
+            "variable_name_style": "verbose",
+            "logs_directory": Path("logs/directory"),
+            "suppress_log_files": suppress_log_files,
+            "input_data_csv_export_path": Path(""),
+            "input_data_csv_import_path": Path(""),
+            "output_prefix": "task_manager",
+        },
+        input_manager=mock_im,
+        output_manager=mock_output_manager,
+        task_id="TASK_MANAGER",
+        should_flush_im_pool=False,
+        export_input_data_to_csv=False,
+    )
 
 
 def test_task_manager_start_invalid_data(
@@ -333,6 +348,7 @@ def test_task_manager_start_invalid_data(
             "variable_name_style": "verbose",
             "logs_directory": Path("logs/directory"),
             "suppress_log_files": False,
+            "output_prefix": "task_manager"
         },
         input_manager=mock_input_manager,
         output_manager=mock_output_manager,

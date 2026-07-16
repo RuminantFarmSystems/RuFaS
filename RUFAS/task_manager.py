@@ -185,6 +185,7 @@ class TaskManager:
                     "variable_name_style": "verbose",
                     "logs_directory": logs_directory,
                     "suppress_log_files": suppress_log_files,
+                    "output_prefix": "task_manager"
                 },
                 input_manager=self.input_manager,
                 output_manager=self.output_manager,
@@ -248,6 +249,7 @@ class TaskManager:
                 "suppress_log_files": suppress_log_files,
                 "input_data_csv_export_path": Path(input_data_csv_export_path),
                 "input_data_csv_import_path": Path(input_data_csv_import_path),
+                "output_prefix": "task_manager"
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
