@@ -173,7 +173,9 @@ Nutrients that are separated according to this pattern are presented in the tabl
 #| tbl-cap: Classes for solid liquid separators.
 import_table(
   "../resources/table_data/manure/tbl-mn-sls-sep-eff-rotary.csv",
-  colalign = ["left", "center", "center", "center"]
+  colalign = ["left", "center", "center", "center"],
+  maxcolwidths = [None, 0.05, 0.05, 0.05],
+  tablefmt = "simple"
 )
 ```
 
@@ -186,6 +188,7 @@ import_table(
 )
 ```
 [@Jorgensen2009; @Fournel2019]
+
 
 **Calculate Total Mass and Water**
 
@@ -1037,6 +1040,22 @@ Calculates the daily mass of methane emitted from the bedded pack based on daily
 The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded
 :::
 
+::: {#tbl-mn-bp-met-conv} 
+
++-----------+-----------------------------------------------------------------------------------------------+
+|           |                                     Average Air Temp (℃)                                     |
++-----------+------------------+-----------------+------------------+-------------------+-------------------+
+|           | $\leq$ 4.6 (℃)  | 4.7 - 5.8 (℃)  | 5.8 - 13.9 (℃)  | 14.0 - 25.1 (℃)  | $\geq$ 25.2 (℃)   |
++-----------+------------------+-----------------+------------------+-------------------+-------------------+
+| Mixing    |        0.5       |       0.5       |        1.0       |        1.0        |        1.5        |
++-----------+------------------+-----------------+------------------+-------------------+-------------------+
+| No mixing |        21        |        26       |        37        |         41        |         74        |
++-----------+------------------+-----------------+------------------+-------------------+-------------------+
+
+: Methane conversion factor values for bedded pack pens, based on presence or absence of mixing and average annual air temperature. 
+::: 
+
+
 ```{python}
 #| label: tbl-mn-bp-met-conv
 #| tbl-cap: Methane conversion factor values for bedded pack pens, based on presence or absence of mixing and average annual air temperature.
@@ -1097,7 +1116,7 @@ $$
 *Where*:
 
 * `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless): The effectiveness of microbial decomposition rate per day, set to 0.00237
-* `DEFAULT_LAYER_TEMPERATURE`: temperature of the pack layer, set to 30℃ Setting the layer temperature to a constant value is a simplification as manure pack temperature is not modeled dynamically at this time.
+* `DEFAULT_LAYER_TEMPERATURE`: temperature of the pack layer, set to 30℃ Setting the layer temperature to a constant value is a simplification as manure pack temperature is not modeled dynamically at this time
 
 Second, we calculate the carbon decomposition rate per day (`calculate_carbon_decomposition_rate`). The value of this parameter is equal to 0.03876, but the equation and set values are included below for reference. 
 
@@ -1139,7 +1158,7 @@ $$
 * `oxygen_half_saturation_constant`: the half-saturation constant, unitless, set at 0.02 by the original publication.
 * `oxygen_ambient_air_mole_fraction`: the mole fraction of oxygen in ambient air, unitless, set at 0.21 (ambient air is approximately 21% oxygen).
 
-Fourth, we calculate total carbon in the manure/bedding pack available for decomposition. Here we make some assumptions on the carbon content of manure degradable vs. non-degradable volatile solids. Degradable volatile solids, which originate from fecal excretion by animals, are considered to be 50\% carbon by weight [@larney2011]. Non-degradable volatile solids, which originate primarily from bedding addition, are assumed to contain 35% carbon by weight. The total carbon available is the sum of these two quantities.         
+Fourth, we calculate total carbon in the manure/bedding pack available for decomposition. Here we make some assumptions on the carbon content of manure degradable vs. non-degradable volatile solids. Degradable volatile solids, which originate from fecal excretion by animals, are considered to be 50% carbon by weight [@larney2011]. Non-degradable volatile solids, which originate primarily from bedding addition, are assumed to contain 35% carbon by weight. The total carbon available is the sum of these two quantities.         
 
 ::: {#eq-mn-sto-7}
 [[**MN.STO.7**]]{.aside .content-visible when-format="html"}
@@ -1426,7 +1445,7 @@ $$
 *Where*:
 
 * B$_0$ = methane production potential (kg CH<sub>4</sub> per kg manure VS) of manure excreted onto the lot on a specified simulation day
-* MCF = methane conversion factor calculated in [MN.MET.5]{#eq-mn-met-5}, based on daily ambient temperature
+* MCF = methane conversion factor calculated in [MN.MET.5](#eq-mn-met-5), based on daily ambient temperature
 * tVS (kg) = daily mass (kg) of manure-excreted volatile solids in the open lot pen, received from `ManureStream(s)`; bedding volatile solids are not included in this value
 * `METHANE_FACTOR` = 0.67; unit conversion factor for CH<sub>4</sub> volume to mass (kg)
 

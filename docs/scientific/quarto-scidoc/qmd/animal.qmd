@@ -3082,7 +3082,7 @@ The values for the CDF determining probability of death by day of lactation are 
 #| tbl-cap: Cumulative Distribution Function (CDF) values associated with the conditional probability of death over time. The 'cull_day_count' array defines the segments of the CDF.
 import_table(
   "../resources/table_data/animal/tbl-an-cull-cdf-death.csv",
-    colalign = ["left", "center", "center", "center", "center"]
+    colalign = ["center", "right", "center", "center", "center"], headersalign = ["same"]
 )
 ```
 
@@ -3128,7 +3128,7 @@ Probability of disease sales associated with each lactation (1, 2, 3, 4+) is spe
 * Parity cull probability: `parity_cull_prob` 
    * Probability of sale for disease during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
 * PFor each of the six reasons:
-   * `Probability` - Conditional probability that a sold animal is removed due to each group of issues. This probability is used to determine the reason for sale after it has been decided that the animal will be sold during the current lactation. The sum of probabilities for the six culling reasons equals 1. See @tbl-an-cull-reason below for default values used to construct the empirical PDF.
+   * `Probability` - Conditional probability that a sold animal is removed due to each group of issues. This probability is used to determine the reason for sale after it has been decided that the animal will be sold during the current lactation. The sum of probabilities for the six culling reasons equals 1. See @tbl-an-cull-reason below for default values used to construct the empirical CDF.
   * `Cull_day_prob`: Values to construct the CDF to determine future sale day, given that disease-related sale is going to occur. Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days”; default values in @tbl-an-cull-cdf) 
 
 
@@ -3136,10 +3136,10 @@ Probability of disease sales associated with each lactation (1, 2, 3, 4+) is spe
 
 ```{python}
 #| label: tbl-an-cull-reason
-#| tbl-cap: Cumulative Distribution Function (CDF) values associated with the conditional probability that a solud animal is removed due to each group of issues. Corresponds to the “probability” value for each cull reason in the animal input json file..
+#| tbl-cap: Default values used to construct the Cumulative Distribution Function (CDF) values associated with the conditional probability that a sold animal is removed due to each group of issues.
 import_table(
   "../resources/table_data/animal/tbl-an-cull-reason.csv",
-  colalign = ["left", "center", "center", "center", "center"]
+  colalign = ["center", "center", "center", "center", "center"]
 )
 ```
 
