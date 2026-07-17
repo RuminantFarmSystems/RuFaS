@@ -380,16 +380,16 @@ def test_load_data_from_csv_invalid_data_raises_error(
 
 
 @pytest.mark.parametrize(
-    "eager_termination, populate_ok, cv_ok, expected_return",
+    "eager_termination, populate_ok, cv_ok, expected_return, expected_error",
     [
-        (True, True, True, True),
-        (True, False, True, False),
-        (True, True, False, False),
-        (True, False, False, False),
-        (False, True, True, True),
-        (False, False, True, False),
-        (False, True, False, False),
-        (False, False, False, False),
+        (True, True, True, True, None),
+        (True, False, True, None, "Input Data Not Valid."),
+        (True, True, False, False, None),
+        (True, False, False, None, "Input Data Not Valid."),
+        (False, True, True, True, None),
+        (False, False, True, None, "Input Data Not Valid."),
+        (False, True, False, False, None),
+        (False, False, False, None, "Input Data Not Valid."),
     ],
 )
 def test_start_data_processing(
@@ -398,34 +398,69 @@ def test_start_data_processing(
     eager_termination: bool,
     populate_ok: bool,
     cv_ok: bool,
-    expected_return: bool,
+    expected_return: bool | None,
+    expected_error: str | None,
 ) -> None:
-    """Covers: metadata/properties valid, populate_pool path, CV blocks (none/pass/fail,
-    eager short-circuit vs collect)."""
+    """Tests successful processing, cross-validation failures, and invalid input data."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
     mocker.patch.object(mock_input_manager, "_load_properties")
     mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
-    mocker.patch.object(mock_input_manager, "_cross_validate_data", return_value=cv_ok)
-    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
-    mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties", return_value=(True, ""))
-    mocker.patch.object(type(mock_input_manager), "_populate_pool", return_value=populate_ok)
+
+    mock_cross_validate_data = mocker.patch.object(
+        mock_input_manager,
+        "_cross_validate_data",
+        return_value=cv_ok,
+    )
+    mocker.patch.object(
+        type(mock_input_manager.data_validator),
+        "validate_metadata",
+        return_value=(True, ""),
+    )
+    mocker.patch.object(
+        type(mock_input_manager.data_validator),
+        "validate_properties",
+        return_value=(True, ""),
+    )
+    mocker.patch.object(
+        type(mock_input_manager),
+        "_populate_pool",
+        return_value=populate_ok,
+    )
 
     route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
 
     setattr(mock_input_manager, "_InputManager__metadata", {"files": {}})
     mock_input_manager.data_validator.event_logs.clear()
 
-    result = mock_input_manager.start_data_processing(
-        metadata_path=Path("mock/metadata/path"),
-        input_root=Path(""),
-        task_id="1",
-        cross_validation_file_paths=[],
-        eager_termination=eager_termination,
+    if expected_error is not None:
+        with pytest.raises(ValueError, match=expected_error):
+            mock_input_manager.start_data_processing(
+                metadata_path=Path("mock/metadata/path"),
+                input_root=Path(""),
+                task_id="1",
+                cross_validation_file_paths=[],
+                eager_termination=eager_termination,
+            )
+
+        mock_cross_validate_data.assert_not_called()
+    else:
+        result = mock_input_manager.start_data_processing(
+            metadata_path=Path("mock/metadata/path"),
+            input_root=Path(""),
+            task_id="1",
+            cross_validation_file_paths=[],
+            eager_termination=eager_termination,
+        )
+
+        assert result is expected_return
+        mock_cross_validate_data.assert_called_once_with(
+            [],
+            eager_termination,
+        )
+
+    route_logs.assert_called_once_with(
+        mock_input_manager.data_validator.event_logs
     )
-
-    assert result is expected_return
-
-    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
 
 @pytest.mark.parametrize(
