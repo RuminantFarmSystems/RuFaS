@@ -458,9 +458,7 @@ def test_start_data_processing(
             eager_termination,
         )
 
-    route_logs.assert_called_once_with(
-        mock_input_manager.data_validator.event_logs
-    )
+    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
 
 @pytest.mark.parametrize(
