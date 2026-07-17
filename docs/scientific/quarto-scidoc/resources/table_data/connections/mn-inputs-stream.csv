@@ -1,0 +1,8 @@
+Variable,Units,Description
+minutes_away_for_milking, minutes ,"The total time (minutes) per day that animals spend walking to/from the parlor, waiting in holding areas, or being actively milked. For non?lactating animals, this value may be omitted or entered as �null�. "
+first_parlor_processor,--,"The name of the processor defined in the Manure module inputs that manure from the milking parlor should enter. "
+parlor_stream_name,--,"The user-defined name of this pens parlor stream. "
+stream_name,--,"The user-defined name of this stream. "
+bedding_name,--,"The name of the specific bedding configuration used with this stream. See section 2 for more information. "
+stream_proportion, 0-1 ,The proportion of daily manure excreted outside of the parlor and while traveling to/from the parlor that enters this stream. All stream proportions within a pen must sum to 1.0. Optional if only one stream. 
+first_processor,--,"The name of the processor defined in the Manure module inputs that this ManureStream should enter. "
