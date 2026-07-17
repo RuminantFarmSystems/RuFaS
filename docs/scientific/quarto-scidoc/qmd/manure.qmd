@@ -1040,28 +1040,12 @@ Calculates the daily mass of methane emitted from the bedded pack based on daily
 The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded
 :::
 
-::: {#tbl-mn-bp-met-conv} 
-
-+-----------+-----------------------------------------------------------------------------------------------+
-|           |                                     Average Air Temp (℃)                                     |
-+-----------+------------------+-----------------+------------------+-------------------+-------------------+
-|           | $\leq$ 4.6 (℃)  | 4.7 - 5.8 (℃)  | 5.8 - 13.9 (℃)  | 14.0 - 25.1 (℃)  | $\geq$ 25.2 (℃)   |
-+-----------+------------------+-----------------+------------------+-------------------+-------------------+
-| Mixing    |        0.5       |       0.5       |        1.0       |        1.0        |        1.5        |
-+-----------+------------------+-----------------+------------------+-------------------+-------------------+
-| No mixing |        21        |        26       |        37        |         41        |         74        |
-+-----------+------------------+-----------------+------------------+-------------------+-------------------+
-
-: Methane conversion factor values for bedded pack pens, based on presence or absence of mixing and average annual air temperature. 
-::: 
-
-
 ```{python}
 #| label: tbl-mn-bp-met-conv
 #| tbl-cap: Methane conversion factor values for bedded pack pens, based on presence or absence of mixing and average annual air temperature.
 import_table(
   "../resources/table_data/manure/tbl-mn-bp-met-conv.csv",
-  colalign = ["left", "center", "center","center","center","center"]
+  colalign = ["left", "center", "center","center","center","center"],
 )
 ```
 
