@@ -187,7 +187,7 @@ class EnergyEstimator:
                 tractor.tractor_size,
                 diesel_consumption_tractor_implement_liter_per_ha,
             )
-            total_diesel_consumption_tractor_implement_liter_per_ha = diesel_consumption_tractor_implement_liter_per_ha
+            total_diesel_consumption_tractor_implement_liter_per_ha += diesel_consumption_tractor_implement_liter_per_ha
         om.add_variable(
             "total_diesel_consumption_tractor_implement",
             total_diesel_consumption_tractor_implement_liter_per_ha,

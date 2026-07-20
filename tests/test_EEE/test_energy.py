@@ -95,7 +95,7 @@ def test_estimate_all(
 
     mock_om_add_variable.assert_called_once_with(
         "total_diesel_consumption_tractor_implement",
-        10,
+        720.0,
         {
             "class": EnergyEstimator.__name__,
             "function": EnergyEstimator.estimate_all.__name__,
