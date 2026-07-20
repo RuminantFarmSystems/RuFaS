@@ -49,7 +49,7 @@ assert expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id is n
 @pytest.fixture
 def em(mocker: MockerFixture) -> EmissionsEstimator:
     mocker.patch.object(EmissionsEstimator, "__init__", return_value=None)
-    em = EmissionsEstimator()
+    em = EmissionsEstimator(simulate_animals=True, simulate_feed=True, simulate_fields=True, simulate_manure=True)
 
     em.im = InputManager()
     em.om = OutputManager()
@@ -163,7 +163,7 @@ def test_emissions_estimator_init(mocker: MockerFixture) -> None:
         "emissions": [{"50": 0.1, "51": 0.2, "52": 0.3}],
     }
 
-    def get_data_side_effect(key: str, required: bool = True) -> Any:
+    def get_data_side_effect(key: str) -> Any:
         if key == "config.FIPS_county_code":
             return county_code
         if key == "purchased_feeds_emissions":
@@ -178,7 +178,9 @@ def test_emissions_estimator_init(mocker: MockerFixture) -> None:
 
     im.get_data.side_effect = get_data_side_effect
 
-    estimator = EmissionsEstimator()
+    estimator = EmissionsEstimator(
+        simulate_animals=True, simulate_feed=True, simulate_fields=True, simulate_manure=True
+    )
 
     expected = {
         "corn_silage": ["50", "51", "52"],
@@ -188,8 +190,9 @@ def test_emissions_estimator_init(mocker: MockerFixture) -> None:
 
 
 def test_emissions_estimator_init_without_feed_storage_data(mocker: MockerFixture) -> None:
-    """Initialize EmissionsEstimator when feed storage inputs are excluded from the input
-    pool, as is the case for simulation types that do not simulate the feed module."""
+    """Initialize EmissionsEstimator with ``simulate_feed=False``, as is the case for
+    simulation types without the feed module. Feed storage inputs must not be read and
+    the crop-species mapping stays empty."""
     mocker.patch("RUFAS.EEE.emissions.OutputManager")
     im_cls = mocker.patch("RUFAS.EEE.emissions.InputManager")
     im = im_cls.return_value
@@ -202,20 +205,20 @@ def test_emissions_estimator_init_without_feed_storage_data(mocker: MockerFixtur
         side_effect=[{"50": 1.0}, {"50": 0.1}],
     )
 
-    def get_data_side_effect(key: str, required: bool = True) -> Any:
+    def get_data_side_effect(key: str) -> Any:
         if key == "config.FIPS_county_code":
             return county_code
         if key == "purchased_feeds_emissions":
             return {"county_code": [county_code], "emissions": [{"50": 1.0}]}
         if key == "purchased_feed_land_use_change_emissions":
             return {"county_code": [county_code], "emissions": [{"50": 0.1}]}
-        if key in ("feed_storage_configurations", "feed_storage_instances"):
-            return None
         raise KeyError(key)
 
     im.get_data.side_effect = get_data_side_effect
 
-    estimator = EmissionsEstimator()
+    estimator = EmissionsEstimator(
+        simulate_animals=True, simulate_feed=False, simulate_fields=False, simulate_manure=False
+    )
 
     assert estimator.crop_species_to_purchased_feed_id == {}
 

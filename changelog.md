@@ -1,6 +1,6 @@
 # Changelog
 
-## Readme
+## Readme 
 
 A **changelog** is a structured record of changes made to the codebase over time. It documents new features, bug fixes, and improvements, giving both developers and users a transparent view of how the project evolves across versions. A changelog ensures that the entire development process is **trackable**, improves **collaboration** by clearly communicating changes across team members, and offers **transparency** to users and stakeholders. Additionally, it helps with **debugging** by highlighting specific updates or changes that could potentially introduce new issues.
 
@@ -23,7 +23,15 @@ This **changelog** file keeps a record of updates included in existing version r
 
 ### Current version
 
-v1.0.2
+v1.0.3
+
+### v1.0.3
+
+- [3121](https://github.com/RuminantFarmSystems/RuFaS/pull/3121) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows. Similar changes made to `dev` branch on PR 3115
+
+- [3130](https://github.com/RuminantFarmSystems/RuFaS/pull/3020) - [minor change] [NoInputChange] [NoOutputChange] Fixes bug where stored Hay was projected to have negative dm.
+
+- [3141](https://github.com/RuminantFarmSystems/RuFaS/pull/3141) - [minor change] [Weather] [NoInputChange] [NoOutputChange] Excludes missing (NaN) daily temperatures from the average annual temperature and the seasonal temperature regression, so simulations with gaps in the weather data no longer crash. Similar changes made to `dev` branch on PR 3139
 
 ### v1.0.2
 
@@ -32,7 +40,7 @@ v1.0.2
 ### v1.0.1
 
 - [3013](https://github.com/RuminantFarmSystems/RuFaS/pull/3013) - [minor change] [NoInputChange] [OutputChange] Replicates 2998, 2997, and 2994: Adds minimums to urine nitrogen excretion, updates tractor dataset, corrects changelog typos
-
+  
 ### v1.0.0
 
 - [2081](https://github.com/RuminantFarmSystems/RuFaS/pull/2081) - [minor change] [Crop & Soil] Break down the `_setup_field()` function in `FieldManager`.

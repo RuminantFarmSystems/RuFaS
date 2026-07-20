@@ -806,7 +806,7 @@ class Storage:
         Feed Storage Scientific Documentation, equation FS.NUT.1.
 
         """
-        dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
+        dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter if initial_dry_matter > 0.0 else 0.0
         initial_nutrient_fraction = initial_nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
         if dry_matter_loss_fraction == 1.0:

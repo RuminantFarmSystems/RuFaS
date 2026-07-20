@@ -114,11 +114,6 @@ class EntericMethaneCalculator:
             - The daily mitigated enteric emissions for cows (g/day).
             - The daily unmitigated enteric emissions for cows (g/day).
 
-        Notes
-        -----
-        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
-        and nitrogen ("N") are all percentages of dry matter.
-
         """
         dry_matter_intake = nutrient_amounts.dry_matter
         neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
