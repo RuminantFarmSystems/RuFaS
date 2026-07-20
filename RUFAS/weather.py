@@ -83,8 +83,9 @@ class Weather:
                     )
                 self.weather_data[date_key] = conditions
 
-        self.long_term_average_annual_temperature = \
-            self._calculate_long_term_average_annual_temperature(weather_file["avg"])
+        self.long_term_average_annual_temperature = self._calculate_long_term_average_annual_temperature(
+            weather_file["avg"]
+        )
 
         self.set_linest_temperature_factors()
 
