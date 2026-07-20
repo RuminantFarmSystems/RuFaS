@@ -516,6 +516,38 @@ def test_preprocess_bedding_pairs_each_pen_with_its_own_price(monkeypatch: pytes
     assert set(bedding["price_data"].keys()) == {"straw", "sand"}
 
 
+def test_preprocess_bedding_total_equals_quantity_times_price(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The reported quantity (biophysical_aggregate, in head-years) times the reported
+    # price_aggregate must reconcile with the line item total, like every other item.
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "calf_straw", "bedding_type": "straw"},
+                {"name": "lac_and_growing_sand", "bedding_type": "sand"},
+            ],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+            "sand_price": {"fips": [1001], "2021": [50.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_2_GROWING": _daily(20, 365),
+        },
+        pens=[_pen(1, "calf_straw"), _pen(2, "lac_and_growing_sand")],
+        type_to_key={"straw": "straw", "sand": "sand"},
+        economics_files={"straw": "straw_price", "sand": "sand_price"},
+    )
+    # quantity = 10 + 20 = 30 head-years ; price = $50 ; total = 30 * 50 = 1500
+    assert bedding["biophysical_aggregate"] == pytest.approx(30.0)
+    assert bedding["price_aggregate"] == pytest.approx(50.0)
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(1500.0)
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(
+        bedding["biophysical_aggregate"] * bedding["price_aggregate"]
+    )
+
+
 def test_preprocess_bedding_resolves_by_pen_id_not_list_position(monkeypatch: pytest.MonkeyPatch) -> None:
     # pen_information ids [2, 0, 1] are NOT in list order; each pen's count must
     # still pair with the bedding of the entry whose ``id`` matches (issue #3088).

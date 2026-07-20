@@ -1219,6 +1219,7 @@ class EconomicPreprocessor:
 
         for scenario, pens in series_by_scenario.items():  # each simulation run
             scenario_cost = 0.0
+            scenario_head_years = 0.0  # the quantity: average head summed over pens and years
             scenario_values: list[float] = []
             for capture, payload in pens.items():  # each pen in that run
                 pen_id = capture.split("_", 1)[0]  # "0_CALF" -> "0"
@@ -1290,19 +1291,22 @@ class EconomicPreprocessor:
                     average_head = sum(daily) / days_in_year
                     price = self._annual_bedding_price(pen_price_dict, year, fips, file_key, warned_years, info_map)
                     price_values.append(price)
+                    scenario_head_years += average_head  # quantity: head-years billed
                     scenario_cost += average_head * price  # add this pen-year to the running total
 
-            # This run's total (sum of every pen and year).
+            # This run's totals. ``biophysical_aggregate`` is the QUANTITY (head-years)
+            # and ``line_item_values`` is the COST, so the reported quantity x price
+            # reconciles with the total the way every other line item does.
             line_item_values_by_scenario[scenario] = scenario_cost
             values_by_scenario[scenario] = scenario_values
-            aggregates_by_scenario[scenario] = scenario_cost
+            aggregates_by_scenario[scenario] = scenario_head_years
 
         self._warn_if_pricing_missing(item, price_data, info_map)
 
         # Package the result in the same shape the generic engine returns.
         return self._package_line_item(
             values_by_scenario=values_by_scenario,
-            aggregated_value=sum(line_item_values_by_scenario.values()),
+            aggregated_value=sum(aggregates_by_scenario.values()),  # total head-years (quantity, not cost)
             aggregates_by_scenario=aggregates_by_scenario,
             price_data=price_data,
             price_values=price_values,
