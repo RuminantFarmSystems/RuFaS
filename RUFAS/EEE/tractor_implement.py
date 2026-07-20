@@ -27,7 +27,7 @@ class TractorImplement:
     tillage_implement : TillageImplement | None
         The type of tillage implement used for the operation.
     application_depth : float | None
-        The depth of the application (cm).
+        The depth of the application (mm).
     harvest_type : HarvestOperation | None, optional
         The type of harvest operation for the operation.
 
@@ -99,7 +99,7 @@ class TractorImplement:
         Parameters
         ----------
         application_depth : float | None
-            The depth (cm) to be used for certain operations that require it, such as fertilizer application.
+            The depth (mm) to be used for certain operations that require it, such as fertilizer application.
             If not applicable, this can be ``None``.
 
         Notes

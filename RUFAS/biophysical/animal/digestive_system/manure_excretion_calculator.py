@@ -154,8 +154,6 @@ class ManureExcretionCalculator:
 
         (
             total_phosphorus_excreted,
-            inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction,
             manure_phosphorus_excreted,
             manure_phosphorus_fraction,
         ) = phosphorus_excretion_values
@@ -171,10 +169,6 @@ class ManureExcretionCalculator:
             total_solids=total_solids,
             degradable_volatile_solids=degradable_volatile_solids,
             non_degradable_volatile_solids=non_degradable_volatile_solids,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            non_water_inorganic_phosphorus_fraction=0.0,
-            non_water_organic_phosphorus_fraction=0.0,
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
             potassium=0,
@@ -294,8 +288,6 @@ class ManureExcretionCalculator:
 
         (
             total_phosphorus_excreted,
-            inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction,
             manure_phosphorus_excreted,
             manure_phosphorus_fraction,
         ) = phosphorus_excretion_values
@@ -310,10 +302,6 @@ class ManureExcretionCalculator:
             total_solids=total_solids,
             degradable_volatile_solids=degradable_volatile_solids,
             non_degradable_volatile_solids=non_degradable_volatile_solids,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            non_water_inorganic_phosphorus_fraction=0.0,
-            non_water_organic_phosphorus_fraction=0.0,
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
             potassium=potassium,
@@ -528,8 +516,6 @@ class ManureExcretionCalculator:
 
         (
             total_phosphorus_excreted,
-            inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction,
             manure_phosphorus_excreted,
             manure_phosphorus_fraction,
         ) = phosphorus_excretion_values
@@ -544,10 +530,6 @@ class ManureExcretionCalculator:
             total_solids=fecal_solids,
             degradable_volatile_solids=degradable_volatile_solids,
             non_degradable_volatile_solids=non_degradable_volatile_solids,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            non_water_inorganic_phosphorus_fraction=0.0,
-            non_water_organic_phosphorus_fraction=0.0,
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
             potassium=potassium,
@@ -702,8 +684,6 @@ class ManureExcretionCalculator:
 
         (
             total_phosphorus_excreted,
-            inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction,
             manure_phosphorus_excreted,
             manure_phosphorus_fraction,
         ) = phosphorus_excretion_values
@@ -718,10 +698,6 @@ class ManureExcretionCalculator:
             total_solids=total_solids,
             degradable_volatile_solids=degradable_volatile_solids,
             non_degradable_volatile_solids=non_degradable_volatile_solids,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            non_water_inorganic_phosphorus_fraction=0.0,
-            non_water_organic_phosphorus_fraction=0.0,
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
             potassium=potassium,
@@ -778,10 +754,6 @@ class ManureExcretionCalculator:
         else:
             manure_phosphorus_fraction = 0.0
 
-        inorganic_phosphorus_fraction = 0.50 * manure_phosphorus_fraction
-
-        organic_phosphorus_fraction = 0.05 * manure_phosphorus_fraction
-
         phosphorus_in_milk = 0.0009 * daily_milk_production * GeneralConstants.KG_TO_GRAMS
 
         manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
@@ -790,8 +762,6 @@ class ManureExcretionCalculator:
 
         return (
             total_phosphorus_excreted,
-            inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction,
             manure_phosphorus_excreted,
             manure_phosphorus_fraction,
         )
