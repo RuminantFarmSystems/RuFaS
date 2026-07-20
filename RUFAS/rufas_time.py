@@ -152,6 +152,7 @@ class RufasTime:
             "class": self.__class__.__name__,
             "function": self.record_time.__name__,
             "prefix": "RufasTime",
+            "is_daily_variable": True,
         }
         self.om.add_variable("day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.JULIAN_DAY}))
         self.om.add_variable(
