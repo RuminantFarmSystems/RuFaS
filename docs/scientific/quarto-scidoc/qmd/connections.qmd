@@ -14,7 +14,7 @@ Though animals are typically fed and managed in groups, referred to as pens in R
 
 The Animal module is responsible for calculating manure excretion mass and composition based on animal attributes, ration composition and intake, and other factors. The Animal module must then pass this manure on to the Manure module, where manure nutrient gains and losses are quantified through field application or export. The Animal module currently calculates manure excretion at the pen level (i.e., values representative of the total manure from animals in a single pen), and several additional steps must occur before manure information can be sent to the Manure module. These steps include:
 
-* Splitting manure from individual pens into one or more user\*defined manure streams
+* Splitting manure from individual pens into one or more user-defined manure streams
 * Repackaging manure information into the form and units utilized by the Manure module
 * Applying bedding mass or nutrients to manure streams
 
@@ -66,19 +66,19 @@ Instances of PenManure objects that represent manure excreted by single pens of 
 
 Instance(s) of a ManureStream for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m³ and manure methane potential, m³/kgVS):
 
-* water
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non degradable volatile solids)
-* volume
+* `mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 A PenManureData class instance for each manure stream defined by the user, that represents the attributes of the animals and pen from which the manure originated. PenManureData instances include the following variables, reported by the Animal module:
