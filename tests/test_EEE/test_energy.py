@@ -196,7 +196,7 @@ def test_report_diesel_consumption(
         diesel_consumption_data=diesel_consumption_data,
         herd_size=18,
         tractor_size=TractorSize.SMALL,
-        diesel_consumption_tractor_implement_liter_per_ton=10,
+        diesel_consumption_tractor_implement_liter_per_ha=10,
     )
 
     assert mock_om_add_variable.call_count == expected_add_variable_calls
