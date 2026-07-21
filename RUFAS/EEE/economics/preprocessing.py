@@ -723,7 +723,7 @@ class EconomicPreprocessor:
                 plant_date = None
         return periods
 
-    def _preprocess_seed_costs(self) -> dict[str, List[float]]:
+    def _preprocess_seed_costs(self) -> dict[str, list[float]]:
         """Build a daily time-series of responsible field area (m²) per seed key.
 
         For each field, each crop's planting-to-kill periods are located within
@@ -767,7 +767,7 @@ class EconomicPreprocessor:
             )
             return {}
 
-        daily_area_by_seed: dict[str, List[float]] = {}
+        daily_area_by_seed: dict[str, list[float]] = {}
 
         for field_key in field_keys:
             field_data = self.im.get_data(field_key)
@@ -799,10 +799,9 @@ class EconomicPreprocessor:
                     continue
                 seed_key = self._CROP_TO_SEED_KEY.get(crop_species, f"fallback_{crop_species}")
 
-                if seed_key not in daily_area_by_seed:
+                if seed_key not in daily_area_by_seed.keys():
                     daily_area_by_seed[seed_key] = [0.0] * total_sim_days
 
-                arr = daily_area_by_seed[seed_key]
                 growing_periods = self._growing_periods(schedule)
                 for plant_date, kill_date in growing_periods:
                     plant_idx = (plant_date - start_date).days
@@ -814,10 +813,10 @@ class EconomicPreprocessor:
                     if clipped_start >= clipped_end:
                         continue
 
-                    duration = kill_idx - plant_idx
+                    duration = clipped_end - clipped_start
                     daily_value = field_size_m2 / duration
                     for i in range(clipped_start, clipped_end):
-                        arr[i] += daily_value
+                        daily_area_by_seed[seed_key][i] += daily_value
 
         return daily_area_by_seed
 
