@@ -1,4 +1,4 @@
-`Strategy.md`
+`STRATEGY.md`
 
 ---
 
