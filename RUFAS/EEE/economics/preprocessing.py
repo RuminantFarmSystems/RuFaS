@@ -26,6 +26,7 @@ from typing import Any, Dict, Iterable, List, Set
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Aggregator, Utility
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
 from RUFAS.EEE.economics.fallback_values import (
@@ -55,6 +56,7 @@ class EconomicItem:
     dedicated_processor: str | None = None
     bedding_type_to_file_key: dict[str, str] | None = None
     bedding_configs_path: str | None = None
+    billable_pen_combinations: list[str] | None = None
 
 
 class EconomicPreprocessor:
@@ -178,6 +180,7 @@ class EconomicPreprocessor:
                     dedicated_processor = details.get("dedicated_processor")
                     bedding_type_to_file_key = details.get("bedding_type_to_file_key")
                     bedding_configs_path = details.get("bedding_configs_path")
+                    billable_pen_combinations = details.get("billable_pen_combinations")
                     if not biophysical_simulation and not input_manager and not economics_files:
                         continue
                     if isinstance(biophysical_simulation, str):
@@ -200,6 +203,11 @@ class EconomicPreprocessor:
                                 bedding_type_to_file_key if isinstance(bedding_type_to_file_key, dict) else None
                             ),
                             bedding_configs_path=bedding_configs_path,
+                            billable_pen_combinations=(
+                                list(billable_pen_combinations)
+                                if isinstance(billable_pen_combinations, (list, tuple))
+                                else None
+                            ),
                         )
                     )
         return items
@@ -1175,8 +1183,10 @@ class EconomicPreprocessor:
         canonical ``bedding_type`` and then to a price file. For each simulation year
         the cost is ``(average head present that year) * (that year's dollar-per-head
         price)``. Pens with no bedding (``bedding_type`` of ``"none"``) incur no cost.
-        The returned dict mirrors the generic engine's keys so downstream consumers are
-        unaffected.
+        When the mapping declares ``billable_pen_combinations`` (e.g. ``["LAC_COW"]``,
+        because the dollar-per-head prices are per lactating cow), pens of any other
+        animal combination are excluded from the bill. The returned dict mirrors the
+        generic engine's keys so downstream consumers are unaffected.
 
         Parameters
         ----------
@@ -1199,6 +1209,13 @@ class EconomicPreprocessor:
         type_to_key = item.bedding_type_to_file_key or {}  # type -> price-file key ("CBPB sawdust" -> "CBPB")
         normalized_type_to_key = {str(key).strip().lower(): value for key, value in type_to_key.items()}
         economics_files = item.economics_files if isinstance(item.economics_files, dict) else {}  # key -> price file
+        # Which pen types the price basis covers (e.g. only LAC_COW: the dollar-per-head
+        # bedding prices are per lactating cow). None means every pen is billable.
+        billable_combinations = (
+            {str(combination).strip().upper() for combination in item.billable_pen_combinations}
+            if item.billable_pen_combinations
+            else None
+        )
 
         _, start_date = self._get_simulation_start_date()  # simulation start date, to bucket days into years
         fips = self.im.get_data("config.FIPS_county_code")  # county, to pick the right price row
@@ -1223,6 +1240,15 @@ class EconomicPreprocessor:
             scenario_values: list[float] = []
             for capture, payload in pens.items():  # each pen in that run
                 pen_id = capture.split("_", 1)[0]  # "0_CALF" -> "0"
+                pen_combination = capture.split("_", 1)[1] if "_" in capture else ""  # "0_CALF" -> "CALF"
+
+                # Step 0: is this pen type covered by the price basis? The SME-confirmed
+                # dollar-per-head prices are per LACTATING COW, so other pens (calves,
+                # growing heifers, close-up) are excluded from the bedding bill.
+                if billable_combinations is not None and pen_combination.strip().upper() not in billable_combinations:
+                    scenario_values.extend(payload.get("values", []))  # keep for the audit trail, no cost
+                    continue
+
                 # Step 1: which bedding does this pen use?
                 bedding_name = pen_id_to_bedding_name.get(pen_id)
                 if bedding_name is None:
@@ -1303,14 +1329,37 @@ class EconomicPreprocessor:
 
         self._warn_if_pricing_missing(item, price_data, info_map)
 
+        total_cost = sum(line_item_values_by_scenario.values())
+        total_head_years = sum(aggregates_by_scenario.values())
+        price_aggregate = self._aggregate(price_values, "average")
+
+        # Small standalone reporting variables: the full line-item dict is too
+        # large for the report generator, so the headline numbers are emitted as
+        # scalars that a lightweight report filter can pick up directly.
+        self.om.add_variable(
+            "econ_bedding_total_cost",
+            total_cost,
+            dict(info_map, units=MeasurementUnits.DOLLARS),
+        )
+        self.om.add_variable(
+            "econ_bedding_billed_head_years",
+            total_head_years,
+            dict(info_map, units=MeasurementUnits.ANIMALS),
+        )
+        self.om.add_variable(
+            "econ_bedding_avg_price_per_head_year",
+            price_aggregate if price_aggregate is not None else 0.0,
+            dict(info_map, units=MeasurementUnits.DOLLARS),
+        )
+
         # Package the result in the same shape the generic engine returns.
         return self._package_line_item(
             values_by_scenario=values_by_scenario,
-            aggregated_value=sum(aggregates_by_scenario.values()),  # total head-years (quantity, not cost)
+            aggregated_value=total_head_years,  # total head-years (quantity, not cost)
             aggregates_by_scenario=aggregates_by_scenario,
             price_data=price_data,
             price_values=price_values,
-            price_aggregate=self._aggregate(price_values, "average"),
+            price_aggregate=price_aggregate,
             line_item_values_by_scenario=line_item_values_by_scenario,
             flow_type="cost",
         )

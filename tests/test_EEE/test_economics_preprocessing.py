@@ -9,6 +9,7 @@ class DummyOutputManager:
         self._pool = pool
         self.warnings = []
         self.logs = []
+        self.added_variables = []
 
     def _get_flat_variables_pool(self):
         return self._pool
@@ -25,6 +26,9 @@ class DummyOutputManager:
 
     def add_log(self, title, message, info):
         self.logs.append((title, message, info))
+
+    def add_variable(self, variable_name, value, info_map=None, **kwargs):
+        self.added_variables.append((variable_name, value))
 
 
 class DummyInputManager:
@@ -452,6 +456,7 @@ def _run_bedding(
     type_to_key: dict,
     economics_files: dict,
     configs_path: str = "animal.bedding_configs",
+    billable_pen_combinations: list | None = None,
 ):
     """Run the dedicated bedding processor and return its result item + OM.
 
@@ -463,28 +468,59 @@ def _run_bedding(
     dummy_om = DummyOutputManager(pool)
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    bedding_entry = {
+        "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
+        "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
+        "dedicated_processor": "bedding",
+        "bedding_configs_path": configs_path,
+        "bedding_type_to_file_key": type_to_key,
+        "economics_files": economics_files,
+    }
+    if billable_pen_combinations is not None:
+        bedding_entry["billable_pen_combinations"] = billable_pen_combinations
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
-        {
-            "Animal": {
-                "Costs": {
-                    "Bedding requirements": {
-                        "biophysical_simulation": [
-                            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"
-                        ],
-                        "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
-                        "dedicated_processor": "bedding",
-                        "bedding_configs_path": configs_path,
-                        "bedding_type_to_file_key": type_to_key,
-                        "economics_files": economics_files,
-                    }
-                }
-            }
-        },
+        {"Animal": {"Costs": {"Bedding requirements": bedding_entry}}},
     )
     results = preprocessing.EconomicPreprocessor().preprocess()
     return results["Animal"]["Costs"]["Bedding requirements"], dummy_om
+
+
+def test_preprocess_bedding_bills_only_billable_pen_combinations(monkeypatch: pytest.MonkeyPatch) -> None:
+    # SME-confirmed price basis: dollar-per-head prices are per LACTATING cow, so
+    # with billable_pen_combinations=["LAC_COW"] only the lactating pen is billed
+    # even though the calf pen also has real bedding.
+    bedding, dummy_om = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "calf_straw", "bedding_type": "straw"},
+                {"name": "lac_and_growing_sand", "bedding_type": "sand"},
+            ],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+            "sand_price": {"fips": [1001], "2021": [120.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_3_LAC_COW": _daily(90, 365),
+        },
+        pens=[_pen(0, "calf_straw"), _pen(3, "lac_and_growing_sand")],
+        type_to_key={"straw": "straw", "sand": "sand"},
+        economics_files={"straw": "straw_price", "sand": "sand_price"},
+        billable_pen_combinations=["LAC_COW"],
+    )
+    # only the LAC_COW pen: 90 head * $120 sand = 10800 ; the CALF pen is excluded
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(10800.0)
+    assert bedding["biophysical_aggregate"] == pytest.approx(90.0)
+    assert set(bedding["price_data"].keys()) == {"sand"}
+    # headline stats are also emitted as small standalone reporting variables
+    emitted = dict(dummy_om.added_variables)
+    assert emitted["econ_bedding_total_cost"] == pytest.approx(10800.0)
+    assert emitted["econ_bedding_billed_head_years"] == pytest.approx(90.0)
+    assert emitted["econ_bedding_avg_price_per_head_year"] == pytest.approx(120.0)
 
 
 def test_preprocess_bedding_pairs_each_pen_with_its_own_price(monkeypatch: pytest.MonkeyPatch) -> None:

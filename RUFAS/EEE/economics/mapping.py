@@ -54,6 +54,11 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 # and converted from the annual dollar-per-head price.
                 "dedicated_processor": "bedding",
                 "bedding_configs_path": "animal.bedding_configs",
+                # SME-confirmed: the dollar-per-head bedding prices are per LACTATING
+                # cow, so only lactating-cow pens are billed. Other pens still get
+                # physical bedding in the biophysical simulation; they are just not
+                # part of this economic line item.
+                "billable_pen_combinations": ["LAC_COW"],
                 # A pen's manure_stream bedding_name is a user config name; resolve
                 # it to the config's canonical bedding_type, then to an economics
                 # file key below. Types with no entry here (e.g. "none") cost nothing.
