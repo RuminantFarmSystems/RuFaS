@@ -779,7 +779,8 @@ class EconomicPreprocessor:
         Returns
         -------
         tuple[int, datetime]
-            The start year and the calendar date of the first simulation day.
+            The start year of the simulation.
+            The calendar date of the first simulation day.
 
         Notes
         -----
@@ -807,7 +808,8 @@ class EconomicPreprocessor:
         Returns
         -------
         tuple[list[float], list[Any]]
-            The numeric daily values and their corresponding info maps, index-aligned.
+            The numeric daily values.
+            The info map for each value, index-aligned with the values.
 
         Notes
         -----
