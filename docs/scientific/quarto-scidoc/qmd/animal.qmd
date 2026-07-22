@@ -189,11 +189,13 @@ Due to oscillations in the exact number of animals in each animal type, it is st
 Pens are initiated from the Pen class by the `HerdManager` at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
 
 ::: {.callout-note}
-`Remove_animals_by_ids`: This function is called when the `HerdManager` calls for: `remove_animal_from_pen_and_id_map`. 
+*Available Functions*
 
-It is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen. 
+`Remove_animals_by_ids`: This function is called when the `HerdManager` calls for: `remove_animal_from_pen_and_id_map`. It is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen. 
 
 `_add_new_animals`: This function is called by `Pen.update_animals` which is in turn called by `HerdManager._add_animal_to_pen_and_id_map`. Thus, when `HerdManager` initiates addition of animals to each pen, this function executes the addition of those animals. 
+
+`set_animal_nutritional_requirements`
 
 :::
 
