@@ -488,9 +488,6 @@ def _run_bedding(
 
 
 def test_preprocess_bedding_bills_only_billable_pen_combinations(monkeypatch: pytest.MonkeyPatch) -> None:
-    # SME-confirmed price basis: dollar-per-head prices are per LACTATING cow, so
-    # with billable_pen_combinations=["LAC_COW"] only the lactating pen is billed
-    # even though the calf pen also has real bedding.
     bedding, dummy_om = _run_bedding(
         monkeypatch,
         {
@@ -512,11 +509,9 @@ def test_preprocess_bedding_bills_only_billable_pen_combinations(monkeypatch: py
         economics_files={"straw": "straw_price", "sand": "sand_price"},
         billable_pen_combinations=["LAC_COW"],
     )
-    # only the LAC_COW pen: 90 head * $120 sand = 10800 ; the CALF pen is excluded
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(10800.0)
     assert bedding["biophysical_aggregate"] == pytest.approx(90.0)
     assert set(bedding["price_data"].keys()) == {"sand"}
-    # headline stats are also emitted as small standalone reporting variables
     emitted = dict(dummy_om.added_variables)
     assert emitted["econ_bedding_total_cost"] == pytest.approx(10800.0)
     assert emitted["econ_bedding_billed_head_years"] == pytest.approx(90.0)
@@ -524,8 +519,6 @@ def test_preprocess_bedding_bills_only_billable_pen_combinations(monkeypatch: py
 
 
 def test_preprocess_bedding_pairs_each_pen_with_its_own_price(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Each pen's animal count must pair with that pen's own bedding price, and
-    # the bedding_name (a config name) must resolve through bedding_configs.
     bedding, _ = _run_bedding(
         monkeypatch,
         {
@@ -546,15 +539,12 @@ def test_preprocess_bedding_pairs_each_pen_with_its_own_price(monkeypatch: pytes
         type_to_key={"straw": "straw", "sand": "sand"},
         economics_files={"straw": "straw_price", "sand": "sand_price"},
     )
-    # pen 1: 10 head * $50 straw = 500 ; pen 2: 20 head * $120 sand = 2400
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(2900.0)
     assert bedding["flow_type"] == "cost"
     assert set(bedding["price_data"].keys()) == {"straw", "sand"}
 
 
 def test_preprocess_bedding_total_equals_quantity_times_price(monkeypatch: pytest.MonkeyPatch) -> None:
-    # The reported quantity (biophysical_aggregate, in head-years) times the reported
-    # price_aggregate must reconcile with the line item total, like every other item.
     bedding, _ = _run_bedding(
         monkeypatch,
         {
@@ -575,7 +565,6 @@ def test_preprocess_bedding_total_equals_quantity_times_price(monkeypatch: pytes
         type_to_key={"straw": "straw", "sand": "sand"},
         economics_files={"straw": "straw_price", "sand": "sand_price"},
     )
-    # quantity = 10 + 20 = 30 head-years ; price = $50 ; total = 30 * 50 = 1500
     assert bedding["biophysical_aggregate"] == pytest.approx(30.0)
     assert bedding["price_aggregate"] == pytest.approx(50.0)
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(1500.0)
@@ -585,8 +574,6 @@ def test_preprocess_bedding_total_equals_quantity_times_price(monkeypatch: pytes
 
 
 def test_preprocess_bedding_resolves_by_pen_id_not_list_position(monkeypatch: pytest.MonkeyPatch) -> None:
-    # pen_information ids [2, 0, 1] are NOT in list order; each pen's count must
-    # still pair with the bedding of the entry whose ``id`` matches (issue #3088).
     bedding, _ = _run_bedding(
         monkeypatch,
         {
@@ -606,17 +593,14 @@ def test_preprocess_bedding_resolves_by_pen_id_not_list_position(monkeypatch: py
             "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_GROWING": _daily(20, 365),
             "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_2_CLOSE_UP": _daily(30, 365),
         },
-        # list order != id order: positions hold ids 2, 0, 1
         pens=[_pen(2, "sawdust_cfg"), _pen(0, "straw_cfg"), _pen(1, "sand_cfg")],
         type_to_key={"straw": "straw", "sand": "sand", "sawdust": "sawdust"},
         economics_files={"straw": "straw_price", "sand": "sand_price", "sawdust": "sawdust_price"},
     )
-    # pen0=straw 10*50=500 ; pen1=sand 20*120=2400 ; pen2=sawdust 30*70=2100
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(5000.0)
 
 
 def test_preprocess_bedding_normalizes_compound_types(monkeypatch: pytest.MonkeyPatch) -> None:
-    # "CBPB sawdust" -> CBPB and "manure solids" -> manure_solids.
     bedding, _ = _run_bedding(
         monkeypatch,
         {
@@ -637,14 +621,11 @@ def test_preprocess_bedding_normalizes_compound_types(monkeypatch: pytest.Monkey
         type_to_key={"CBPB sawdust": "CBPB", "manure solids": "manure_solids"},
         economics_files={"CBPB": "cbpb_price", "manure_solids": "ms_price"},
     )
-    # 10*10 + 2*5 = 110
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(110.0)
     assert set(bedding["price_data"].keys()) == {"CBPB", "manure_solids"}
 
 
 def test_preprocess_bedding_skips_none_type_with_no_cost(monkeypatch: pytest.MonkeyPatch) -> None:
-    # A pen whose bedding_type resolves to "none" must incur no cost and no
-    # $1/head fallback (the config NAME is "none (no bedding)").
     bedding, dummy_om = _run_bedding(
         monkeypatch,
         {
@@ -664,13 +645,11 @@ def test_preprocess_bedding_skips_none_type_with_no_cost(monkeypatch: pytest.Mon
         type_to_key={"straw": "straw"},
         economics_files={"straw": "straw_price"},
     )
-    # only the straw pen costs anything: 10 * 50 = 500; the "none" pen is free
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(500.0)
     assert "UnmappedBeddingType" not in [code for code, _, _ in dummy_om.warnings]
 
 
 def test_preprocess_bedding_uses_leap_year_denominator(monkeypatch: pytest.MonkeyPatch) -> None:
-    # 2020 is a leap year (366 days): 366 head-days / 366 = avg 1 head.
     bedding, _ = _run_bedding(
         monkeypatch,
         {
@@ -688,7 +667,6 @@ def test_preprocess_bedding_uses_leap_year_denominator(monkeypatch: pytest.Monke
 
 
 def test_preprocess_bedding_prorates_partial_year(monkeypatch: pytest.MonkeyPatch) -> None:
-    # 20 days of 10 head in a 365-day year -> (200/365) * price, not a full year.
     bedding, _ = _run_bedding(
         monkeypatch,
         {
@@ -702,12 +680,10 @@ def test_preprocess_bedding_prorates_partial_year(monkeypatch: pytest.MonkeyPatc
         type_to_key={"straw": "straw"},
         economics_files={"straw": "straw_price"},
     )
-    # (10*20 / 365) * 365 = 200
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(200.0)
 
 
 def test_preprocess_bedding_falls_back_to_nearest_price_year(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Price file only has a 2021 column but the sim runs in 2018.
     bedding, dummy_om = _run_bedding(
         monkeypatch,
         {
@@ -726,7 +702,6 @@ def test_preprocess_bedding_falls_back_to_nearest_price_year(monkeypatch: pytest
 
 
 def test_preprocess_bedding_warns_on_missing_fips(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Price file loads but the sim FIPS county is absent; must warn (not silent).
     bedding, dummy_om = _run_bedding(
         monkeypatch,
         {
@@ -744,8 +719,6 @@ def test_preprocess_bedding_warns_on_missing_fips(monkeypatch: pytest.MonkeyPatc
 
 
 def test_preprocess_bedding_unloadable_price_file_costs_nothing(monkeypatch: pytest.MonkeyPatch) -> None:
-    # A mapped bedding type whose price file cannot be loaded must cost $0 and
-    # warn -- not fabricate a $1/head charge -- even when another pen prices fine.
     bedding, dummy_om = _run_bedding(
         monkeypatch,
         {
@@ -755,7 +728,6 @@ def test_preprocess_bedding_unloadable_price_file_costs_nothing(monkeypatch: pyt
                 {"name": "calf_straw", "bedding_type": "straw"},
                 {"name": "lac_and_growing_sand", "bedding_type": "sand"},
             ],
-            # "straw_price" is intentionally absent from the InputManager.
             "sand_price": {"fips": [1001], "2021": [120.0]},
         },
         {
@@ -766,13 +738,11 @@ def test_preprocess_bedding_unloadable_price_file_costs_nothing(monkeypatch: pyt
         type_to_key={"straw": "straw", "sand": "sand"},
         economics_files={"straw": "straw_price", "sand": "sand_price"},
     )
-    # only the sand pen costs anything: 20 * 120 = 2400 (no $10 phantom straw charge)
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(2400.0)
     assert "MissingBeddingPriceFile" in [code for code, _, _ in dummy_om.warnings]
 
 
 def test_preprocess_bedding_pairs_each_year_with_its_own_price(monkeypatch: pytest.MonkeyPatch) -> None:
-    # A two-year sim must pair each year's average head with that year's price.
     bedding, _ = _run_bedding(
         monkeypatch,
         {
@@ -781,19 +751,15 @@ def test_preprocess_bedding_pairs_each_year_with_its_own_price(monkeypatch: pyte
             "animal.bedding_configs": [{"name": "calf_straw", "bedding_type": "straw"}],
             "straw_price": {"fips": [1001], "2020": [10.0], "2021": [20.0]},
         },
-        # 2020 (leap, 366 days) then all of 2021 (365 days)
         {"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(5, 366 + 365)},
         pens=[_pen(0, "calf_straw")],
         type_to_key={"straw": "straw"},
         economics_files={"straw": "straw_price"},
     )
-    # 2020: 5 head * $10 = 50 ; 2021: 5 head * $20 = 100 ; total 150
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(150.0)
 
 
 def test_preprocess_bedding_derives_pen_id_from_underscored_name(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Pen animal names contain underscores (e.g. CLOSE_UP); pen_id is the part
-    # before the FIRST underscore -- no hardcoded value map needed.
     bedding, _ = _run_bedding(
         monkeypatch,
         {
@@ -807,13 +773,10 @@ def test_preprocess_bedding_derives_pen_id_from_underscored_name(monkeypatch: py
         type_to_key={"straw": "straw"},
         economics_files={"straw": "straw_price"},
     )
-    # pen_id resolves to "7" -> matches pen id 7 -> 3 head * $50 = 150
     assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(150.0)
 
 
 def test_bedding_line_item_flows_into_framework_breakdown() -> None:
-    # The dedicated processor's output keys must stay compatible with the
-    # downstream line-item breakdown in EconomicFramework.
     from RUFAS.EEE.economics.framework import EconomicFramework
 
     framework = EconomicFramework.__new__(EconomicFramework)
