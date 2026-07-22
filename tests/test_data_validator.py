@@ -2674,6 +2674,40 @@ def test_get_alias_value_raises_key_error_when_missing(eager_termination: bool) 
         assert len(v._event_logs) == 1
 
 
+@pytest.mark.parametrize("relationship", ["is_null", "is_not_null"])
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_get_alias_value_allows_null_values_for_null_relationships(
+    relationship: str, eager_termination: bool
+) -> None:
+    """A null alias value is a valid evaluand for null-check relationships, not a missing alias."""
+    v = CrossValidator()
+    v._alias_pool = {"nullable_input": None}
+
+    result = v._get_alias_value("nullable_input", eager_termination, relationship)
+
+    assert result is None
+    assert v._event_logs == []
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_cross_validate_data_is_not_null_rule_fails_cleanly_on_null_value(eager_termination: bool) -> None:
+    """An is_not_null rule evaluating an actual null fails validation instead of raising 'Unknown alias name'."""
+    cv = CrossValidator()
+    block = {
+        "rules": [
+            {
+                "left_hand": {"aggregation": {"operation": "no_op", "operands": ["tractor_size"]}},
+                "right_hand": {"aggregation": {"operation": "no_op", "operands": ["true_constant"]}},
+                "relationship": "is_not_null",
+            }
+        ]
+    }
+
+    result = cv.cross_validate_data({"tractor_size": None, "true_constant": True}, block, eager_termination)
+
+    assert result is False
+
+
 def test_target_and_save(mocker: MockerFixture) -> None:
     """Test the function target_and_save()"""
     v = CrossValidator()
