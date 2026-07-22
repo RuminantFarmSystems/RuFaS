@@ -2225,7 +2225,7 @@ class CrossValidator:
 
         """
         value = self._alias_pool.get(alias_name, None)
-        if value is None and relationship != "is_null":
+        if value is None and relationship not in ("is_null", "is_not_null"):
             self._event_logs.append(
                 {
                     "error": "Alias name not found.",
