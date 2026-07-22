@@ -449,9 +449,7 @@ def test_start_data_processing(
     else:
         mock_cross_validate_data.assert_not_called()
 
-    route_logs.assert_called_once_with(
-        mock_input_manager.data_validator.event_logs
-    )
+    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 
 
 @pytest.mark.parametrize(
