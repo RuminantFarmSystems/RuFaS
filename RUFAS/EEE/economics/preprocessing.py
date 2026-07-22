@@ -1327,8 +1327,8 @@ class EconomicPreprocessor:
                 scenario_values.extend(daily_values)
 
                 counts_by_year = self._group_daily_counts_by_year(daily_values, daily_info_maps, start_date)
-                for year, daily in counts_by_year.items():
-                    if not daily:
+                for year, daily_headcount_list in counts_by_year.items():
+                    if not daily_headcount_list:
                         continue
                     # average head that year = head-days / days in that year (366 in leap years)
                     days_in_year = (
@@ -1336,7 +1336,7 @@ class EconomicPreprocessor:
                         if Utility.is_leap_year(year)
                         else GeneralConstants.YEAR_LENGTH
                     )
-                    average_head = sum(daily) / days_in_year
+                    average_head = sum(daily_headcount_list) / days_in_year
                     price = self._get_annual_bedding_price(pen_price_dict, year, fips, file_key, warned_years, info_map)
                     price_values.append(price)
                     scenario_head_years += average_head  # quantity: head-years billed
@@ -1370,7 +1370,7 @@ class EconomicPreprocessor:
 
         return self._package_line_item(
             values_by_scenario=values_by_scenario,
-            aggregated_value=total_head_years,  # total head-years (quantity, not cost)
+            aggregated_value=total_head_years,
             aggregates_by_scenario=aggregates_by_scenario,
             price_data=price_data,
             price_values=price_values,
