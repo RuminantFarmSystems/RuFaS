@@ -15,5 +15,5 @@
     "simulate_temp_stress": true,
     "simulate_nitrogen_stress": true,
     "simulate_phosphorus_stress": true,
-    "tractor_size": "small"
+    "tractor_size": null
 }
