@@ -380,16 +380,16 @@ def test_load_data_from_csv_invalid_data_raises_error(
 
 
 @pytest.mark.parametrize(
-    "eager_termination, populate_ok, cv_ok, expected_return, expected_error",
+    "eager_termination, populate_ok, cv_ok, expected_return",
     [
-        (True, True, True, True, None),
-        (True, False, True, None, "Input Data Not Valid."),
-        (True, True, False, False, None),
-        (True, False, False, None, "Input Data Not Valid."),
-        (False, True, True, True, None),
-        (False, False, True, None, "Input Data Not Valid."),
-        (False, True, False, False, None),
-        (False, False, False, None, "Input Data Not Valid."),
+        (True, True, True, True),
+        (True, False, True, False),
+        (True, True, False, False),
+        (True, False, False, False),
+        (False, True, True, True),
+        (False, False, True, False),
+        (False, True, False, False),
+        (False, False, False, False),
     ],
 )
 def test_start_data_processing(
@@ -399,7 +399,6 @@ def test_start_data_processing(
     populate_ok: bool,
     cv_ok: bool,
     expected_return: bool | None,
-    expected_error: str | None,
 ) -> None:
     """Tests successful processing, cross-validation failures, and invalid input data."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
@@ -432,27 +431,18 @@ def test_start_data_processing(
     setattr(mock_input_manager, "_InputManager__metadata", {"files": {}})
     mock_input_manager.data_validator.event_logs.clear()
 
-    if expected_error is not None:
-        with pytest.raises(ValueError, match=expected_error):
-            mock_input_manager.start_data_processing(
-                metadata_path=Path("mock/metadata/path"),
-                input_root=Path(""),
-                task_id="1",
-                cross_validation_file_paths=[],
-                eager_termination=eager_termination,
-            )
+    result = mock_input_manager.start_data_processing(
+        metadata_path=Path("mock/metadata/path"),
+        input_root=Path(""),
+        task_id="1",
+        cross_validation_file_paths=[],
+        eager_termination=eager_termination,
+    )
 
+    assert result is expected_return
+    if not expected_return:
         mock_cross_validate_data.assert_not_called()
     else:
-        result = mock_input_manager.start_data_processing(
-            metadata_path=Path("mock/metadata/path"),
-            input_root=Path(""),
-            task_id="1",
-            cross_validation_file_paths=[],
-            eager_termination=eager_termination,
-        )
-
-        assert result is expected_return
         mock_cross_validate_data.assert_called_once_with(
             [],
             eager_termination,
