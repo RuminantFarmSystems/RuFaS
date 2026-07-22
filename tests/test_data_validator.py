@@ -2676,9 +2676,7 @@ def test_get_alias_value_raises_key_error_when_missing(eager_termination: bool) 
 
 @pytest.mark.parametrize("relationship", ["is_null", "is_not_null"])
 @pytest.mark.parametrize("eager_termination", [True, False])
-def test_get_alias_value_allows_null_values_for_null_relationships(
-    relationship: str, eager_termination: bool
-) -> None:
+def test_get_alias_value_allows_null_values_for_null_relationships(relationship: str, eager_termination: bool) -> None:
     """A null alias value is a valid evaluand for null-check relationships, not a missing alias."""
     v = CrossValidator()
     v._alias_pool = {"nullable_input": None}
