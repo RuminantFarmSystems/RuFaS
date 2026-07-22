@@ -185,6 +185,7 @@ class TaskManager:
                     "variable_name_style": "verbose",
                     "logs_directory": logs_directory,
                     "suppress_log_files": suppress_log_files,
+                    "output_prefix": "task_manager",
                 },
                 input_manager=self.input_manager,
                 output_manager=self.output_manager,
@@ -248,6 +249,7 @@ class TaskManager:
                 "suppress_log_files": suppress_log_files,
                 "input_data_csv_export_path": Path(input_data_csv_export_path),
                 "input_data_csv_import_path": Path(input_data_csv_import_path),
+                "output_prefix": "task_manager",
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
@@ -1127,7 +1129,7 @@ class TaskManager:
             output_manager.load_variables_pool_from_file(args["output_pool_path"])
             output_manager.set_metadata_prefix("reload")
 
-        output_manager.print_errors_warnings_logs_counts(task_id)
+        output_manager.print_errors_warnings_logs_counts(task_id, args["output_prefix"])
         if should_flush_im_pool:
             input_manager.flush_pool()
         if args.get("task_type") == TaskType.POST_PROCESSING:
