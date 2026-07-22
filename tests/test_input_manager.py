@@ -398,7 +398,7 @@ def test_start_data_processing(
     eager_termination: bool,
     populate_ok: bool,
     cv_ok: bool,
-    expected_return: bool | None,
+    expected_return: bool,
 ) -> None:
     """Tests successful processing, cross-validation failures, and invalid input data."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
@@ -440,15 +440,18 @@ def test_start_data_processing(
     )
 
     assert result is expected_return
-    if not expected_return:
-        mock_cross_validate_data.assert_not_called()
-    else:
+
+    if populate_ok:
         mock_cross_validate_data.assert_called_once_with(
             [],
             eager_termination,
         )
+    else:
+        mock_cross_validate_data.assert_not_called()
 
-    route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
+    route_logs.assert_called_once_with(
+        mock_input_manager.data_validator.event_logs
+    )
 
 
 @pytest.mark.parametrize(
