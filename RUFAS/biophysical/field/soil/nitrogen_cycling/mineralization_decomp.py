@@ -180,8 +180,8 @@ class MineralizationDecomposition:
         phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
             carbon_phosphorus_ratio, 200
         )
-        value = min([nitrogen_term, phosphorus_term, 1])
-        return max(value, 1e-5)
+        composition_factor = min([nitrogen_term, phosphorus_term, 1])
+        return max(composition_factor, 1e-5)
 
     @staticmethod
     def _calculate_decay_rate_constant(
