@@ -78,12 +78,31 @@ class EmissionsEstimator:
     """
     Estimates the emissions and resources associated with the feeds used to feed animals.
 
+    Parameters
+    ----------
+    simulate_animals : bool
+        Whether the simulation initialized and used the AnimalManager module.
+    simulate_feed : bool
+        Whether the simulation initialized and used the FeedManager module
+    simulate_fields : bool
+        Whether the simulation initialized and used the FieldManager module.
+    simulate_manure : bool
+        Whether the simulation initialized and used the ManureManager module
+
     Attributes
     ----------
     im : InputManager
         An instance of the InputManager class.
     om : OutputManager
         An instance of the OutputManager class.
+    simulate_animals : bool
+        Whether the simulation initialized and used the AnimalManager module.
+    simulate_feed : bool
+        Whether the simulation initialized and used the FeedManager module
+    simulate_fields : bool
+        Whether the simulation initialized and used the FieldManager module.
+    simulate_manure : bool
+        Whether the simulation initialized and used the ManureManager module
     crop_species_to_purchased_feed_id : dict[str, list[str]]
         A dictionary mapping crop species to their corresponding RuFaS feed IDs.
     purchased_feed_emissions_by_location : dict[str, float]
@@ -96,12 +115,20 @@ class EmissionsEstimator:
         A set of RuFaS feed IDs that were used in the simulation but do not have purchased feed emissions data.
     _missing_land_use_ids : set[str]
         A set of RuFaS feed IDs that were used in the simulation but do not have land use change emissions data.
+
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self, simulate_animals: bool, simulate_feed: bool, simulate_fields: bool, simulate_manure: bool
+    ) -> None:
         """Initializes the EmissionsEstimator with location-specific feed emissions data and feed configurations."""
         self.im = InputManager()
         self.om = OutputManager()
+        self.simulate_animals = simulate_animals
+        self.simulate_feed = simulate_feed
+        self.simulate_fields = simulate_fields
+        self.simulate_manure = simulate_manure
+
         county_code = self.im.get_data("config.FIPS_county_code")
 
         purchased_feed_emissions_data = self.im.get_data("purchased_feeds_emissions")
@@ -115,26 +142,26 @@ class EmissionsEstimator:
         )
         self._missing_purchased_ids: set[str] = set()
         self._missing_land_use_ids: set[str] = set()
-
-        feed_storage_configs = self.im.get_data("feed_storage_configurations")
-        feed_storage_instances = self.im.get_data("feed_storage_instances")
-
-        all_configs: list[dict[str, Any]] = [
-            storage_config
-            for storage_config_list in feed_storage_configs.values()
-            for storage_config in storage_config_list
-        ]
-        instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
-
         self.crop_species_to_purchased_feed_id: dict[str, list[str]] = {}
-        for config in all_configs:
-            if config["name"] not in instance_names:
-                continue
-            else:
-                if "crop_species" in config and "rufas_ids" in config:
-                    self.crop_species_to_purchased_feed_id[config["crop_species"]] = [
-                        str(rufas_id) for rufas_id in config["rufas_ids"]
-                    ]
+
+        if self.simulate_feed:
+            feed_storage_configs = self.im.get_data("feed_storage_configurations")
+            feed_storage_instances = self.im.get_data("feed_storage_instances")
+
+            all_configs: list[dict[str, Any]] = [
+                storage_config
+                for storage_config_list in feed_storage_configs.values()
+                for storage_config in storage_config_list
+            ]
+            instance_names: list[str] = [name for names in feed_storage_instances.values() for name in names]
+            for config in all_configs:
+                if config["name"] not in instance_names:
+                    continue
+                else:
+                    if "crop_species" in config and "rufas_ids" in config:
+                        self.crop_species_to_purchased_feed_id[config["crop_species"]] = [
+                            str(rufas_id) for rufas_id in config["rufas_ids"]
+                        ]
 
     def check_available_purchased_feed_data(self, available_feed_ids: list[int]) -> None:
         """
@@ -894,7 +921,12 @@ class EmissionsEstimator:
             n2o_emissions_outputs = [
                 (
                     {f"direct_n2o_nitrogen_emissions_for_feed_{feed_id}": data_for_day["nitrous_oxide_emissions"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -903,7 +935,12 @@ class EmissionsEstimator:
             ammonia_emissions_outputs = [
                 (
                     {f"ammonia_nitrogen_emissions_for_feed_{feed_id}": data_for_day["ammonia_emissions"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -912,7 +949,12 @@ class EmissionsEstimator:
             fertilizer_N_outputs = [
                 (
                     {f"nitrogen_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_N"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -921,7 +963,12 @@ class EmissionsEstimator:
             fertilizer_P_outputs = [
                 (
                     {f"phosphorus_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_P"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -930,7 +977,12 @@ class EmissionsEstimator:
             fertilizer_K_outputs = [
                 (
                     {f"potassium_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_K"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -939,7 +991,12 @@ class EmissionsEstimator:
             manure_N_outputs = [
                 (
                     {f"manure_nitrogen_applied_for_feed_{feed_id}": data_for_day["manure_N"]},
-                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.KILOGRAMS,
+                        "simulation_day": simulation_day,
+                        "is_daily_variable": True,
+                    },
                 )
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
@@ -976,7 +1033,7 @@ class EmissionsEstimator:
                 lca_outputs = [
                     (
                         {f"lca_carbon_emissions_for_feed_{feed_id}": lca_emissions_for_day[feed_id]},
-                        {**info_map, "simulation_day": simulation_day},
+                        {**info_map, "simulation_day": simulation_day, "is_daily_variable": True},
                     )
                     for simulation_day, lca_emissions_for_day in lca_emissions_by_simulation_day.items()
                 ]
@@ -989,7 +1046,7 @@ class EmissionsEstimator:
                 luc_outputs = [
                     (
                         {f"lca_land_use_change_emissions_for_feed_{feed_id}": luc_emissions_for_day[feed_id]},
-                        {**info_map, "simulation_day": simulation_day},
+                        {**info_map, "simulation_day": simulation_day, "is_daily_variable": True},
                     )
                     for simulation_day, luc_emissions_for_day in luc_emissions_by_simulation_day.items()
                 ]

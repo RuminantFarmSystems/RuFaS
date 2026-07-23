@@ -233,7 +233,9 @@ def test_calculate_dry_matter_loss_to_gas_returns_zero_when_stored_today(
         (100, 736.123842),
     ],
 )
-def test_calculate_initial_dry_matter_loss(hay: Hay, harvested_crop: HarvestedCrop, days: int, expected: float) -> None:
+def test_calculate_initial_dry_matter_loss(
+    hay: Hay, harvested_crop: HarvestedCrop, days: int, expected: float
+) -> None:
     """Tests _calculate_initial_dry_matter_loss in Hay."""
     harvested_crop.storage_time = (storage_date := date(2024, 6, 1))
     harvested_crop.initial_dry_matter_percentage = 20.0
