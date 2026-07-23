@@ -2647,6 +2647,11 @@
           "type": "bool",
           "description": "Whether the crop configuration is a nitrogen fixer."
         },
+        "deposit_all_residue_at_harvest": {
+          "type": "bool",
+          "description": "Whether harvest operations deposit all cut biomass into the field as residue instead of removing it as harvested yield. Set to true for grazed crops such as pastures, where forage removal is handled by grazing rather than by the harvest operation.",
+          "default": false
+        },
         "minimum_temperature": {
           "type": "number",
           "description": "Minimum temperature for plant growth (Celsius)."
