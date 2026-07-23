@@ -217,7 +217,7 @@ class DataValidator:
         Returns
         -------
         tuple[bool, str]
-            - Boolean representing validation status
+            - Boolean representing validation status.
             - An error message describing the first failure encountered. The message is empty when validation succeeds.
 
         """
