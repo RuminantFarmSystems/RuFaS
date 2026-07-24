@@ -69,6 +69,9 @@ class CropData:
         grain.
     use_heat_scheduling : bool
         If heat unit scheduling is used for harvesting.
+    deposit_all_residue_at_harvest : bool, default False
+        If True, harvest operations collect no yield and deposit all cut biomass into the field as residue instead of
+        removing it as harvested yield.
     harvest_heat_fraction : float
         Fraction of potential heat units for optimal growth stage for harvest.
     optimal_harvest_index : float
@@ -235,6 +238,7 @@ class CropData:
     planting_day: int = 100
     lignin_dry_matter_percentage: float = 1.518
     use_heat_scheduling: bool = False
+    deposit_all_residue_at_harvest: bool = False
     harvest_heat_fraction: float = 1.10
     optimal_harvest_index: float = 0.5
     minimum_harvest_index: float = 0.3
