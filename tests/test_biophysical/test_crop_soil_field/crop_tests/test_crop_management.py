@@ -235,6 +235,78 @@ def test_manage_harvest(
 
 
 @pytest.mark.parametrize(
+    "harvest_op,expect_kill",
+    [
+        (HarvestOperation.HARVEST_ONLY, False),
+        (HarvestOperation.HARVEST_KILL, True),
+    ],
+)
+def test_manage_harvest_deposit_all_residue(
+    mocker: MockerFixture,
+    crop_manager: CropManagement,
+    mock_time: RufasTime,
+    harvest_op: HarvestOperation,
+    expect_kill: bool,
+) -> None:
+    """When a crop is flagged to deposit all residue (e.g. a grazed pasture), a harvest collects no yield, produces no
+    harvested crop for feed storage, and cuts the crop with a collected fraction of zero so all cut biomass is left in
+    the field as residue."""
+    crop_manager.data.deposit_all_residue_at_harvest = True
+    field_size = 3.0
+    soil_data = SoilData(field_size=field_size)
+
+    mocker.patch.object(crop_manager, "determine_harvest_index")
+    cut_crop = mocker.patch.object(crop_manager, "cut_crop")
+    get_crop = mocker.patch.object(crop_manager, "_get_harvested_crop")
+    kill = mocker.patch.object(crop_manager, "kill", wraps=crop_manager.kill)
+    record_yield = mocker.patch.object(crop_manager, "_record_yield")
+    transfer_residue = mocker.patch.object(crop_manager, "_transfer_residue")
+
+    actual = crop_manager.manage_harvest(harvest_op, "pasture_field", field_size, mock_time, soil_data)
+
+    # No yield is collected and no harvested crop is produced for feed storage.
+    cut_crop.assert_called_once_with(collected_fraction=0.0)
+    get_crop.assert_not_called()
+    assert actual is None
+
+    kill.assert_called_once() if expect_kill else kill.assert_not_called()
+    record_yield.assert_called_once()
+    transfer_residue.assert_called_once_with(soil_data, expect_kill)
+
+
+def test_manage_harvest_deposit_all_residue_leaves_biomass_in_field(
+    mocker: MockerFixture, mock_crop_data: CropData, mock_time: RufasTime
+) -> None:
+    """End-to-end check that a harvest of a deposit-all-residue crop removes no yield and instead deposits the cut
+    biomass into the field's surface soil layer as residue."""
+    mock_crop_data.deposit_all_residue_at_harvest = True
+    mock_crop_data.biomass = 5000.0
+    mock_crop_data.above_ground_biomass = 4000.0
+    mock_crop_data.root_biomass = 1000.0
+    mock_crop_data.leaf_area_index = 3.0
+    crop_manager = CropManagement(crop_data=mock_crop_data)
+
+    field_size = 2.0
+    soil_data = SoilData(field_size=field_size)
+    assert soil_data.soil_layers is not None
+    surface_layer = soil_data.soil_layers[0]
+    surface_layer.plant_residue = 0.0
+
+    # _record_yield only reports to the OutputManager and is not under test here.
+    mocker.patch.object(crop_manager, "_record_yield")
+
+    harvested = crop_manager.manage_harvest(
+        HarvestOperation.HARVEST_ONLY, "pasture_field", field_size, mock_time, soil_data
+    )
+
+    assert harvested is None
+    assert crop_manager.dry_matter_yield_collected == 0.0
+    assert crop_manager.wet_yield_collected == 0.0
+    # All cut biomass is deposited into the field's surface layer as residue.
+    assert surface_layer.plant_residue > 0.0
+
+
+@pytest.mark.parametrize(
     "efficiency,harvest,override,should_fail",
     [
         (0, 0, False, False),  # no harvest and not collection
