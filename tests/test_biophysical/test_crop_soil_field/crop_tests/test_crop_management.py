@@ -288,7 +288,9 @@ def test_manage_harvest_deposit_all_residue_leaves_biomass_in_field(
 
     field_size = 2.0
     soil_data = SoilData(field_size=field_size)
-    soil_data.soil_layers[0].plant_residue = 0.0
+    assert soil_data.soil_layers is not None
+    surface_layer = soil_data.soil_layers[0]
+    surface_layer.plant_residue = 0.0
 
     # _record_yield only reports to the OutputManager and is not under test here.
     mocker.patch.object(crop_manager, "_record_yield")
@@ -301,7 +303,7 @@ def test_manage_harvest_deposit_all_residue_leaves_biomass_in_field(
     assert crop_manager.dry_matter_yield_collected == 0.0
     assert crop_manager.wet_yield_collected == 0.0
     # All cut biomass is deposited into the field's surface layer as residue.
-    assert soil_data.soil_layers[0].plant_residue > 0.0
+    assert surface_layer.plant_residue > 0.0
 
 
 @pytest.mark.parametrize(
