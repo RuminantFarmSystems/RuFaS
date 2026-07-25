@@ -175,7 +175,6 @@ def animal_json() -> dict[str, Any]:
         },
         "methane_mitigation": {
             "methane_mitigation_method": "None",
-            "methane_mitigation_additive_amount": 0,
             "3-NOP_additive_amount": 70,
             "monensin_additive_amount": 24,
             "essential_oils_additive_amount": 0,
