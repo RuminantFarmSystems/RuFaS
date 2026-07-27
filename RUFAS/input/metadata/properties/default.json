@@ -3082,7 +3082,7 @@
       },
       "manure_type": {
         "type": "string",
-        "description": "Type of manure requested for daily spread applications.",
+        "description": "Type of manure requested for daily spread applications. DailySpread storages hold solid manure, so requesting liquid manure applies nothing.",
         "pattern": "^(liquid|solid)$",
         "default": "solid"
       },

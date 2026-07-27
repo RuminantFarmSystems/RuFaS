@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Dict, Any, List, Union, Optional, Type
 
@@ -4290,3 +4291,147 @@ def test_evaluate_condition_clause_array_returns_false_on_unsatisfied_clause(
 
     assert result is False
     assert any("Unsatisfied condition clause" in str(log) for log in cv._event_logs)
+
+
+CROP_AND_SOIL_CROSS_VALIDATION_PATH = Path("input/metadata/cross_validation/crop_and_soil_cross_validation.json")
+
+DEFAULT_DAILY_SPREAD_SETTINGS = {
+    "is_daily_spreading": False,
+    "spread_all_available_manure": False,
+    "nitrogen_spread_amount": 0.0,
+    "phosphorus_spread_amount": 0.0,
+    "potassium_spread_amount": 0.0,
+    "coverage_fraction": 1.0,
+    "application_depth": 0.0,
+    "surface_remainder_fraction": 1.0,
+    "manure_type": "solid",
+    "supplement_manure_nutrient_deficiencies": "none",
+}
+
+DEFAULT_MANURE_STORAGES = [
+    {"name": "slurry_storage_outdoor_1", "processor_type": "SlurryStorageOutdoor"},
+    {"name": "dailyspread", "processor_type": "DailySpread"},
+]
+
+
+def load_daily_spread_cross_validation_blocks(schedule: str) -> list[dict[str, Any]]:
+    """Load the shipped cross-validation blocks that target the ``daily_spread`` block of ``schedule``."""
+    with open(CROP_AND_SOIL_CROSS_VALIDATION_PATH) as cross_validation_file:
+        blocks = json.load(cross_validation_file)["cross_validation"]
+    return [
+        block
+        for block in blocks
+        if any(address.startswith(f"{schedule}.daily_spread.") for address in block["aliases"]["variables"].values())
+    ]
+
+
+def evaluate_daily_spread_cross_validation(
+    daily_spread_settings: dict[str, Any], manure_storages: list[dict[str, Any]]
+) -> list[str]:
+    """
+    Run the shipped ``manure_schedule_1`` daily spread blocks against the given inputs.
+
+    Mirrors ``InputManager._extract_target_and_save_block()`` by resolving each block's variable
+    addresses against a minimal input pool, then hands the resulting aliases to the CrossValidator.
+
+    Returns
+    -------
+    list[str]
+        The descriptions of the blocks that failed, empty when every block passed.
+    """
+    pool = {
+        "manure_schedule_1": {"daily_spread": daily_spread_settings},
+        "manure_management": {"storage": manure_storages},
+    }
+    failing_block_descriptions = []
+    for block in load_daily_spread_cross_validation_blocks("manure_schedule_1"):
+        aliases: dict[str, Any] = {}
+        for alias_name, address in block["aliases"]["variables"].items():
+            value: Any = pool
+            for key in address.split("."):
+                value = value[key]
+            aliases[alias_name] = value
+        aliases.update(block["aliases"].get("constants", {}))
+        if not CrossValidator().cross_validate_data(aliases, block, eager_termination=True):
+            failing_block_descriptions.append(block["description"])
+    return failing_block_descriptions
+
+
+@pytest.mark.parametrize(
+    "daily_spread_overrides, manure_storages, expected_failure_keyword",
+    [
+        pytest.param({}, DEFAULT_MANURE_STORAGES, None, id="daily_spreading_disabled"),
+        pytest.param(
+            {"is_daily_spreading": True, "spread_all_available_manure": True},
+            DEFAULT_MANURE_STORAGES,
+            None,
+            id="spread_all_available_manure",
+        ),
+        pytest.param(
+            {"is_daily_spreading": True, "nitrogen_spread_amount": 5.0},
+            DEFAULT_MANURE_STORAGES,
+            None,
+            id="nitrogen_target_only",
+        ),
+        pytest.param(
+            {"is_daily_spreading": True, "phosphorus_spread_amount": 2.5},
+            DEFAULT_MANURE_STORAGES,
+            None,
+            id="phosphorus_target_only",
+        ),
+        pytest.param(
+            {"is_daily_spreading": True, "spread_all_available_manure": True},
+            [DEFAULT_MANURE_STORAGES[0]],
+            "at least one DailySpread manure storage",
+            id="no_daily_spread_storage",
+        ),
+        pytest.param(
+            {"spread_all_available_manure": True},
+            DEFAULT_MANURE_STORAGES,
+            "requires is_daily_spreading to be true",
+            id="spread_all_without_master_switch",
+        ),
+        pytest.param(
+            {"is_daily_spreading": True},
+            DEFAULT_MANURE_STORAGES,
+            "must be greater than zero",
+            id="no_nitrogen_or_phosphorus_requested",
+        ),
+        pytest.param(
+            {"is_daily_spreading": True, "potassium_spread_amount": 10.0},
+            DEFAULT_MANURE_STORAGES,
+            "must be greater than zero",
+            id="potassium_target_only",
+        ),
+        pytest.param(
+            {"is_daily_spreading": True, "spread_all_available_manure": True, "manure_type": "liquid"},
+            DEFAULT_MANURE_STORAGES,
+            "manure_type must be solid",
+            id="liquid_manure_type",
+        ),
+    ],
+)
+def test_daily_spread_cross_validation_rules(
+    daily_spread_overrides: dict[str, Any], manure_storages: list[dict[str, Any]], expected_failure_keyword: str | None
+) -> None:
+    """The shipped daily spread rules reject configurations that silently apply no manure."""
+    daily_spread_settings = {**DEFAULT_DAILY_SPREAD_SETTINGS, **daily_spread_overrides}
+
+    failing_block_descriptions = evaluate_daily_spread_cross_validation(daily_spread_settings, manure_storages)
+
+    if expected_failure_keyword is None:
+        assert failing_block_descriptions == []
+    else:
+        assert len(failing_block_descriptions) == 1
+        assert expected_failure_keyword in failing_block_descriptions[0]
+
+
+def test_daily_spread_cross_validation_rules_cover_every_manure_schedule() -> None:
+    """Every manure schedule registered in the crop and soil rule file gets the same daily spread rules."""
+    schedule_1_rules = load_daily_spread_cross_validation_blocks("manure_schedule_1")
+    schedule_2_rules = load_daily_spread_cross_validation_blocks("manure_schedule_2")
+
+    assert len(schedule_1_rules) == 4
+    assert [block["description"].removeprefix("manure_schedule_1") for block in schedule_1_rules] == [
+        block["description"].removeprefix("manure_schedule_2") for block in schedule_2_rules
+    ]
