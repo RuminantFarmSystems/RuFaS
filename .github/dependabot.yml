@@ -6,9 +6,5 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-
-    reviewers:
-      - "RuminantFarmSystems/dev-team"
-
     labels:
       - "dependencies"
