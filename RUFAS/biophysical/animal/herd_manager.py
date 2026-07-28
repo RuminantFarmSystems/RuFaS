@@ -4,8 +4,6 @@ import math
 from random import random
 from typing import Any
 
-import numpy as np
-
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
@@ -15,7 +13,6 @@ from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstan
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Sex
 from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
@@ -28,7 +25,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
-from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics, SemenType
+from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -796,8 +793,8 @@ class HerdManager:
         if no_milk_cow_num > 0:
             self.om.add_warning(
                 "Warning: Lactating cows with no production.",
-                f"There are {no_milk_cow_num}/{all_milking_cow_num} lactating cows with no milking production on simulation"
-                f" day {time.simulation_day}.",
+                f"There are {no_milk_cow_num}/{all_milking_cow_num} lactating cows with no milking production "
+                f"on simulation day {time.simulation_day}.",
                 info_map={
                     "class": self.__class__.__name__,
                     "function": self.execute_daily_routines.__name__,

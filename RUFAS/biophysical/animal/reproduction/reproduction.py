@@ -1620,7 +1620,8 @@ class Reproduction:
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
-                "Setting semen_type and embryo_sex to None: Repeat estrus simulation for cows before the voluntary waiting period (VWP)",
+                "Setting semen_type and embryo_sex to None: "
+                "Repeat estrus simulation for cows before the voluntary waiting period (VWP)",
             )
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
