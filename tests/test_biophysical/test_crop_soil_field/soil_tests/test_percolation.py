@@ -8,6 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.percolation import Percolation
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 # --- Static function tests ---
@@ -22,7 +23,9 @@ from RUFAS.biophysical.field.soil.soil_data import SoilData
         (6.78, 4.56, 8.9607),
     ],
 )
-def test_determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity):
+def test_determine_percolation_travel_time(
+    saturation: float, field_capacity: float, hydraulic_conductivity: float
+) -> None:
     """tests _determine_percolation_travel_time() in percolation.py"""
     observe = Percolation._determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity)
     expect = (saturation / hydraulic_conductivity) - (field_capacity / hydraulic_conductivity)
@@ -32,14 +35,21 @@ def test_determine_percolation_travel_time(saturation, field_capacity, hydraulic
 @pytest.mark.parametrize(
     "saturation,field_capacity,hydraulic_conductivity",
     [
-        (4.3, 3.6, 0),
+        (4.3, 3.6, 0.0),
         (4.5, 4.1, -1.32),
     ],
 )
-def test_error_determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity):
+def test_error_determine_percolation_travel_time(
+    saturation: float,
+    field_capacity: float,
+    hydraulic_conductivity: float,
+    mocker: MockerFixture,
+) -> None:
     """test that _determine_percolation_travel_time() correctly raises errors when invalid input is passed"""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(Exception):
         Percolation._determine_percolation_travel_time(saturation, field_capacity, hydraulic_conductivity)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -52,7 +62,7 @@ def test_error_determine_percolation_travel_time(saturation, field_capacity, hyd
         (48, 19.5, 0.28485),
     ],
 )
-def test_determine_percolation_to_next_layer(drainable_water, time_step, travel_time):
+def test_determine_percolation_to_next_layer(drainable_water: float, time_step: float, travel_time: float) -> None:
     """tests _determine_percolation_to_next_layer() in percolation.py"""
     observe = Percolation._determine_percolation_to_next_layer(drainable_water, time_step, travel_time)
     expect = 1 - exp((-1 * time_step) / travel_time)
@@ -71,11 +81,11 @@ def test_determine_percolation_to_next_layer(drainable_water, time_step, travel_
     ],
 )
 def test_determine_if_percolation_allowed(
-    water_content,
-    field_capacity_content,
-    saturated_capacity_content,
-    high_seasonal_water_table,
-):
+    water_content: float,
+    field_capacity_content: float,
+    saturated_capacity_content: float,
+    high_seasonal_water_table: bool,
+) -> None:
     """tests _determine_if_percolation_allowed() in percolation.py"""
     observe = Percolation._determine_if_percolation_allowed(
         water_content,

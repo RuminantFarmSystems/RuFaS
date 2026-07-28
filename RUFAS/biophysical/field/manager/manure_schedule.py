@@ -4,6 +4,7 @@ from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.biophysical.field.manager.schedule import Schedule
 from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -102,15 +103,7 @@ class ManureSchedule(Schedule):
         Raises
         ------
         ValueError
-            If not all manure application years are valid.
-            If not all manure application days are valid.
-            If not all manure nitrogen masses are valid.
-            If not all manure phosphorus masses are valid.
             If not all manure types are valid.
-            If not all field coverage fractions are valid.
-            If not all manure application depths are valid.
-            If not all manure surface retention fractions are valid.
-            If not all manure application parameters have the same length.
 
         """
         error_header = f"'{self.name}': "
@@ -127,6 +120,11 @@ class ManureSchedule(Schedule):
         self._validate_parameters(non_negative_parameters, fraction_parameters, self.years, self.days, self.name)
         valid_manure_types = all(isinstance(manure_type, ManureType) for manure_type in self.manure_types)
         if not valid_manure_types:
+            OutputManager().add_error(
+                "Invalid ManureType",
+                f"expected all manure types to be valid ManureTypes, received " f"'{self.manure_types}'.",
+                info_map={"class": self.__class__.__name__, "function": self._validate_manure_parameters.__name__},
+            )
             raise ValueError(
                 error_header + f"expected all manure types to be valid ManureTypes, received " f"'{self.manure_types}'."
             )

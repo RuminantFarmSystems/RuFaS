@@ -1,6 +1,7 @@
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 FRESH_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
 """This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically."""
@@ -174,8 +175,14 @@ class ManureApplication:
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
             if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 0.95:
+                OutputManager().add_error(
+                    "Invalid water extractable inorganic phos fraction",
+                    "Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
+                    f"received '{water_extractable_inorganic_phosphorus_fraction}'.",
+                    info_map={"class": self.__class__.__name__, "function": self.apply_machine_manure.__name__},
+                )
                 raise ValueError(
-                    f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
+                    "Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
                     f"received '{water_extractable_inorganic_phosphorus_fraction}'."
                 )
         else:
@@ -512,6 +519,14 @@ class ManureApplication:
 
         """
         if not 0.0 < dry_matter_fraction <= 1.0:
+            OutputManager().add_error(
+                "Invalid dry matter content",
+                f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.",
+                info_map={
+                    "class": ManureApplication.__name__,
+                    "function": ManureApplication._determine_moisture_factor.__name__,
+                },
+            )
             raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.")
         return min(0.9, (1 - dry_matter_fraction))
 
@@ -609,4 +624,13 @@ class ManureApplication:
         elif animal_type == "POULTRY":
             return 0.20
         else:
+            fun_name = ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.__name__
+            OutputManager().add_error(
+                "Invalid animal type",
+                f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.',
+                info_map={
+                    "class": ManureApplication.__name__,
+                    "function": fun_name,
+                },
+            )
             raise ValueError(f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.')

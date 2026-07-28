@@ -268,7 +268,7 @@ class SoilData:
         """
         return sum(self.get_vectorized_layer_attribute("plant_residue"))
 
-    def __post_init__(self, field_size: float):
+    def __post_init__(self, field_size: float) -> None:
         """
         This method initializes attributes that either cannot be set to a default above or depend on other
         attributes in the object to be set before they can be set.
@@ -293,8 +293,18 @@ class SoilData:
 
         """
         if field_size is None:
+            OutputManager().add_error(
+                "NoneType field_size",
+                "'field_size' attribute is NoneType, must be given value when SoilData is initialized.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
         elif field_size <= 0:
+            OutputManager().add_error(
+                "Invalid field_size",
+                f"Expected field_size to be greater than 0, received {field_size}.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
         if self.soil_layers is None:
@@ -310,18 +320,23 @@ class SoilData:
                 LayerData(top_depth=80, bottom_depth=200, field_size=field_size),
             ]
         elif self.soil_layers[0].bottom_depth < 20:
+            OutputManager().add_error(
+                "Invalid top soil layer bottom depth",
+                "Expected bottom depth of top soil layer must be 20 mm or greater, received "
+                f"'{self.soil_layers[0].bottom_depth}'.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise ValueError(
-                f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
+                "Expected bottom depth of top soil layer must be 20 mm or greater, received "
                 f"'{self.soil_layers[0].bottom_depth}'."
             )
         elif self.soil_layers[0].bottom_depth > 20:
             self._subdivide_top_layer(field_size)
 
         if self.vadose_zone_layer is None:
-            # configures the vadose zone LayerData object based on where the soil profile ends
             self.vadose_zone_layer = LayerData(
                 top_depth=self.soil_layers[-1].bottom_depth,
-                bottom_depth=10000000,  # bottom depth is 10,000 meters by default
+                bottom_depth=10000000,
                 soil_water_concentration=0,
                 saturation_point_water_concentration=inf,
                 initial_labile_inorganic_phosphorus_concentration=0,
@@ -630,6 +645,11 @@ class SoilData:
             return 0.6667
         elif self.cover_type == "GRASSED":
             return 0.8
+        OutputManager().add_error(
+            "Invalid cover type",
+            f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', " f"received: '{self.cover_type}'.",
+            info_map={"class": self.__class__.__name__, "function": "cover_factor.property"},
+        )
         raise ValueError(
             f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', " f"received: '{self.cover_type}'."
         )

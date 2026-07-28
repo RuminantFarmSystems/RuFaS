@@ -1,0 +1,38 @@
+{
+  "cross_validation": [
+    {
+      "description": "Hay storage initial_storage_dry_matter must not exceed target_dry_matter",
+      "aliases": {
+        "variables": {
+          "hay_storages": "feed_storage_configurations.hay_storage"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "hay_storages",
+              "field": "target_dry_matter",
+              "field_to_compare": "initial_storage_dry_matter",
+              "relationship": "greater_or_equal_to"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": [
+                "true_constant"
+              ]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    }
+  ]
+}

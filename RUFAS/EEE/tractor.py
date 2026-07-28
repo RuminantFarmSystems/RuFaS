@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import Any
 from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
@@ -22,7 +22,47 @@ TRACTOR_SPEED_CONSTANT_ID = 598
 
 class Tractor:
     """
-    A class to represent the specifications of a tractor.
+    Represents the specifications of a tractor.
+
+    Parameters
+    ----------
+    operation_event : FieldOperationEvent
+        The type of field operation for which the tractor is intended.
+    crop_type : str | None, optional
+        The type of crop for which the tractor is intended.
+    tractor_size : TractorSize | None, optional
+        The size of the tractor as a ``TractorSize`` enum value.
+    herd_size : int | None, optional
+        The size of the herd, used to determine the tractor size if ``tractor_size`` is not provided.
+    application_depth : float | None, optional
+        The depth of the application (cm).
+    tillage_implement : TillageImplement | None, optional
+        The type of tillage implement used for the operation.
+    harvest_type : HarvestOperation | None, optional
+        The type of harvest operation for the operation.
+
+    Attributes
+    ----------
+    operation_event : FieldOperationEvent
+        The type of field operation for which the tractor is intended.
+    crop_type : str | None
+        The type of crop for which the tractor is intended.
+    tractor_size : TractorSize
+        The size of the tractor.
+    operation_types : list[OperationType]
+        The operation types the tractor performs for the operation event.
+    implements : list[TractorImplement]
+        The tractor implements used for each operation type.
+    constants_by_ID : dict[Any, dict[str, Any]]
+        The EEE constants data keyed by their ID.
+
+    Raises
+    ------
+    ValueError
+        If neither ``tractor_size`` nor ``herd_size`` is provided.
+
+    Notes
+    -----
     The tractor's specifications are determined based on its size or the size of the herd it is intended to work with.
     """
 
@@ -36,32 +76,7 @@ class Tractor:
         tillage_implement: TillageImplement | None = None,
         harvest_type: HarvestOperation | None = None,
     ) -> None:
-        """
-        Initializes the Tractor object with the tractor size or calculates it based on the provided herd size.
-        If `tractor_size` is not provided, the size is inferred using the `herd_size` argument.
-
-        Parameters
-        ----------
-        operation_event : FieldOperationEvent
-            The type of field operation for which the tractor is intended.
-        crop_type : str | None, optional
-            The type of crop for which the tractor is intended.
-        tractor_size : TractorSize | None, optional
-            The size of the tractor as a `TractorSize` enum value.
-        herd_size : int | None, optional
-            The size of the herd to determine the tractor size if `tractor_size` is not provided.
-        application_depth : float | None, optional
-            The depth of the application (cm).
-        tillage_implement : TillageImplement | None, optional
-            The type of tillage implement used for the operation.
-        harvest_type : HarvestOperation | None, optional
-            The type of harvest operation for the operation.
-
-        Raises
-        ------
-        ValueError
-            If neither `tractor_size` nor `herd_size` is provided.
-        """
+        """Initializes the Tractor object with the tractor size, or calculates it based on the provided herd size."""
         if not tractor_size and not herd_size:
             raise ValueError("At least one of `tractor_size` or `herd_size` must be given.")
         self.operation_event = operation_event
@@ -85,8 +100,26 @@ class Tractor:
 
     def herd_size_to_tractor_size(self, herd_size: int) -> TractorSize:
         """
-        Assign a Tractor Size based on the number of cows
-        Implements Helper Function 420 in EEE Functions file.
+        Assigns a tractor size based on the number of cows in the herd.
+
+        Parameters
+        ----------
+        herd_size : int
+            The number of cows in the herd.
+
+        Returns
+        -------
+        TractorSize
+            The tractor size assigned for the given herd size.
+
+        Raises
+        ------
+        ValueError
+            If ``herd_size`` is negative.
+
+        References
+        ----------
+        Implements Helper Function 420 in the EEE Functions file.
         """
         if herd_size < 0:
             raise ValueError("Herd size must be a positive integer.")
@@ -97,11 +130,24 @@ class Tractor:
         else:
             return TractorSize.LARGE
 
-    def determine_operation_type(self, application_depth: float | None = None) -> List[OperationType]:
+    def determine_operation_type(self, application_depth: float | None = None) -> list[OperationType]:
         """
-        Assigns a specific field operation based on the general name for the operation and the crop type for harvest
-        operations or depth for nutrient application.
-        Implements Helper Function 421 in EEE Functions file.
+        Assigns the specific field operations based on the operation event, and the crop type for harvest operations
+        or the application depth for nutrient applications.
+
+        Parameters
+        ----------
+        application_depth : float | None, optional
+            The depth of the application (cm), used for nutrient application operations.
+
+        Returns
+        -------
+        list[OperationType]
+            The operation types required for the field operation event.
+
+        References
+        ----------
+        Implements Helper Function 421 in the EEE Functions file.
         """
         if self.operation_event == FieldOperationEvent.HARVEST:
             return self._determine_harvest_operation_types()
@@ -117,6 +163,11 @@ class Tractor:
     def _determine_fertilizer_application_operation_types(self, application_depth: float | None) -> list[OperationType]:
         """
         Determines the types of fertilizer application operations required based on the application depth.
+
+        Parameters
+        ----------
+        application_depth : float | None
+            The depth of the fertilizer application (cm).
 
         Returns
         -------
@@ -134,6 +185,11 @@ class Tractor:
     def _determine_manure_application_operation_types(self, application_depth: float | None) -> list[OperationType]:
         """
         Determines the types of manure application operations required based on the application depth.
+
+        Parameters
+        ----------
+        application_depth : float | None
+            The depth of the manure application (cm).
 
         Returns
         -------
@@ -171,7 +227,13 @@ class Tractor:
 
     @property
     def PTO_kW(self) -> float:
-        """Constants 589, 592, 595 in EEE Functions file"""
+        """
+        Power take-off (PTO) power available from the tractor based on its size (kW).
+
+        References
+        ----------
+        Constants 589, 592, and 595 in the EEE Functions file.
+        """
         pto_mapping: dict[TractorSize, float] = {
             TractorSize.SMALL: self.constants_by_ID[SMALL_TRACTOR_PTO_CONSTANT_ID]["Value"],
             TractorSize.MEDIUM: self.constants_by_ID[MEDIUM_TRACTOR_PTO_CONSTANT_ID]["Value"],
@@ -181,12 +243,24 @@ class Tractor:
 
     @property
     def power_available_kW(self) -> float:
-        """Constants 590, 593, 596 in EEE Functions file, calculated based on PTO"""
+        """
+        Power available from the tractor based on its size, derived from the PTO power (kW).
+
+        References
+        ----------
+        Constants 590, 593, and 596 in the EEE Functions file.
+        """
         return self.PTO_kW / 1.4
 
     @property
     def mass_kg(self) -> float:
-        """Constants 591, 594, 597 in EEE Functions file"""
+        """
+        Mass of the tractor based on its size (kg).
+
+        References
+        ----------
+        Constants 591, 594, and 597 in the EEE Functions file.
+        """
         mass_mapping: dict[TractorSize, float] = {
             TractorSize.SMALL: self.constants_by_ID[SMALL_TRACTOR_MASS_CONSTANT_ID]["Value"],
             TractorSize.MEDIUM: self.constants_by_ID[MEDIUM_TRACTOR_MASS_CONSTANT_ID]["Value"],
@@ -196,12 +270,32 @@ class Tractor:
 
     @property
     def speed_km_hr(self) -> float:
-        """Constant 598 in EEE Functions file"""
+        """
+        Travel speed of the tractor (km/hr).
+
+        References
+        ----------
+        Constant 598 in the EEE Functions file.
+        """
         return float(self.constants_by_ID[TRACTOR_SPEED_CONSTANT_ID]["Value"])
 
     def calculate_axel_power(self, implement: TractorImplement) -> float:
         """
-        Calculates total Axle Power (kW) required by tractor wheels to move the tractor (and implement if applicable).
-        Implements Helper Function 413 in EEE Functions file.
+        Calculates the total axle power required by the tractor wheels to move the tractor and implement where
+        applicable.
+
+        Parameters
+        ----------
+        implement : TractorImplement
+            The specifications of the implement.
+
+        Returns
+        -------
+        float
+            The total axle power required to move the tractor and implement (kW).
+
+        References
+        ----------
+        Implements Helper Function 413 in the EEE Functions file.
         """
         return (self.mass_kg + implement.mass_kg) * self.speed_km_hr * 9.8 * 0.08 * 1.1 * 0.92 / 3600

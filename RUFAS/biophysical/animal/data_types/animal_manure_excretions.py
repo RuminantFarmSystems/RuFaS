@@ -4,7 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class AnimalManureExcretions:
     """
-    A TypedDict class that specifies the structure of the dictionary of animal manure excretion values.
+    Specifies the structure of the dictionary of animal manure excretion values.
 
     Attributes
     ----------

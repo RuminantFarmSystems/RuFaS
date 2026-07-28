@@ -315,10 +315,14 @@ def test_calculate_phosphorus_excretion_values(
 
 
 def test_track_and_warn_dmi_threshold_tracks_below_min_counts(mocker: MockerFixture) -> None:
-    ManureExcretionCalculator._dmi_below_min_stats = {
-        "lact": {"n_total": 0, "n_below_min": 0},
-        "dry": {"n_total": 0, "n_below_min": 0},
-    }
+    mocker.patch.object(
+        ManureExcretionCalculator,
+        "_dmi_below_min_stats",
+        {
+            "lact": {"n_total": 0, "n_below_min": 0},
+            "dry": {"n_total": 0, "n_below_min": 0},
+        },
+    )
 
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_LACT_FOR_MANURE_VS", 7.1)
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_DRY_FOR_MANURE_VS", 6.5)
@@ -346,10 +350,14 @@ def test_track_and_warn_dmi_threshold_tracks_below_min_counts(mocker: MockerFixt
 
 
 def test_emit_dmi_below_min_summary_emits_only_when_below_min(mocker: MockerFixture) -> None:
-    ManureExcretionCalculator._dmi_below_min_stats = {
-        "lact": {"n_total": 10, "n_below_min": 2},
-        "dry": {"n_total": 5, "n_below_min": 0},
-    }
+    mocker.patch.object(
+        ManureExcretionCalculator,
+        "_dmi_below_min_stats",
+        {
+            "lact": {"n_total": 10, "n_below_min": 2},
+            "dry": {"n_total": 5, "n_below_min": 0},
+        },
+    )
 
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_LACT_FOR_MANURE_VS", 7.1)
     mocker.patch.object(AnimalModuleConstants, "MINIMUM_DMI_DRY_FOR_MANURE_VS", 6.5)

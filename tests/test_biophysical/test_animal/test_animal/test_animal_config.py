@@ -45,17 +45,18 @@ def reset_animal_config_state() -> Generator[None, None, None]:
 
 
 @pytest.mark.parametrize(
-    "heifer_method, expected_subprogram_type",
+    "heifer_method, repro_sub_protocol, expected_subprogram_type",
     [
-        ("TAI", HeiferTAISubProtocol),  # if branch
-        ("SynchED", HeiferSynchEDSubProtocol),  # elif branch
-        ("ED", HeiferTAISubProtocol),  # else fallback to default TAI subprogram
+        ("TAI", "5dCG2P", HeiferTAISubProtocol),  # if branch
+        ("SynchED", "2P", HeiferSynchEDSubProtocol),  # elif branch
+        ("ED", "5dCG2P", HeiferTAISubProtocol),  # else fallback to default TAI subprogram
     ],
     ids=["heifer_tai", "heifer_synched", "heifer_other_fallback"],
 )
 def test_initialize_animal_config_heifer_subprogram_and_core_fields(
     mocker: pytest_mock.MockerFixture,
     heifer_method: str,
+    repro_sub_protocol: str,
     expected_subprogram_type: type,
 ) -> None:
     mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
@@ -72,6 +73,8 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
             "semen_type": "conventional",
             "days_in_preg_when_dry": 218,
             "heifer_repro_cull_time": 500,
+            "calf_mortality_rate": 0,
+            "heifer_mortality_rate": 0,
             "do_not_breed_time": 185,
             "cull_milk_production": 30,
             "cow_times_milked_per_day": 3,
@@ -83,6 +86,8 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
                 "male_calf_rate_sexed_semen": 0.1,
                 "male_calf_rate_conventional_semen": 0.53,
                 "keep_female_calf_rate": 1,
+                "calf_retention_method": "rate",
+                "annual_keep_female_calf_num": 0,
                 "wean_day": 60,
                 "wean_length": 7,
                 "milk_type": "whole",
@@ -99,7 +104,7 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
                 "heifers": {
                     "estrus_detection_rate": 0.9,
                     "estrus_conception_rate": 0.6,
-                    "repro_sub_protocol": "2P",
+                    "repro_sub_protocol": repro_sub_protocol,
                     "repro_sub_properties": {
                         "conception_rate": 0.6,
                         "estrus_detection_rate": 0.9,
@@ -239,6 +244,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
             "semen_type": "conventional",
             "days_in_preg_when_dry": 218,
             "heifer_repro_cull_time": 500,
+            "calf_mortality_rate": 0,
+            "heifer_mortality_rate": 0,
             "do_not_breed_time": 185,
             "cull_milk_production": 30,
             "cow_times_milked_per_day": 3,
@@ -250,6 +257,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                 "male_calf_rate_sexed_semen": 0.1,
                 "male_calf_rate_conventional_semen": 0.53,
                 "keep_female_calf_rate": 1,
+                "calf_retention_method": "rate",
+                "annual_keep_female_calf_num": 0,
                 "wean_day": 60,
                 "wean_length": 7,
                 "milk_type": "whole",

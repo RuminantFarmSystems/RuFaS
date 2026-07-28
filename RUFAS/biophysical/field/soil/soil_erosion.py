@@ -2,6 +2,7 @@ from math import atan, exp, log, sin
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 """
 This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1.1 of SWAT.
@@ -61,6 +62,11 @@ class SoilErosion:
         rainfall : float
             Amount of rain that fell on the field on the current day (mm).
 
+        Raises
+        ------
+        TypeError
+            If SoilData accumulated_runoff is NoneType.
+
         Notes
         -----
         This method calculates the mass of soil that gets eroded from the soil profile based on the content of the soil,
@@ -91,6 +97,11 @@ class SoilErosion:
         )
 
         if self.data.accumulated_runoff is None:
+            OutputManager().add_error(
+                "NoneType accumulated runoff",
+                "SoilData accumulated_runoff cannot be NoneType",
+                info_map={"class": SoilErosion.__name__, "function": SoilErosion.erode.__name__},
+            )
             raise TypeError("SoilData accumulated_runoff cannot be NoneType")
         self.data.surface_runoff_volume = self.data.accumulated_runoff / field_size
         sediment_yield = self._determine_sediment_yield(
@@ -298,12 +309,26 @@ class SoilErosion:
         float
             The cover and management factor (unitless).
 
+        Raises
+        ------
+        ValueError
+            If minimum cover and management is <= 0.
+
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.10
 
         """
         if minimum_cover_management_factor <= 0:
+            OutputManager().add_error(
+                "Invalid minimum cover",
+                "Minimum cover and management cannot be less than or equal to 0 and "
+                f"got {minimum_cover_management_factor}",
+                info_map={
+                    "class": SoilErosion.__name__,
+                    "function": SoilErosion._determine_cover_management_factor.__name__,
+                },
+            )
             raise ValueError("Minimum cover and management cannot be less than or equal to 0")
         first_multiplicative_term = log(0.8) - log(minimum_cover_management_factor)
         second_multiplicative_term = exp(-0.00115 * surface_residue)

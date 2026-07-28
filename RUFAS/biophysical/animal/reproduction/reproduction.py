@@ -2,7 +2,7 @@ from sys import maxsize
 import math
 import random
 from math import floor
-from typing import Callable, Union, Any, Optional
+from typing import Callable, Union, Any
 
 import numpy as np
 from scipy.stats import truncnorm
@@ -36,6 +36,7 @@ from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import Horm
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
@@ -51,60 +52,122 @@ class Reproduction:
     Parameters
     ----------
     heifer_reproduction_program : HeiferReproductionProtocol, optional
-        The reproduction program for heifers, by default None.
+        The reproduction program for heifers.
     heifer_reproduction_sub_program : HEIFER_REPRODUCTION_SUB_PROTOCOLS, optional
-        The sub-program for heifer reproduction, by default None.
+        The sub-program for heifer reproduction.
     cow_reproduction_program : CowReproductionProtocol, optional
-        The reproduction program for cows, by default None.
-    ai_day : int, optional
-        The day of artificial insemination, by default 0.
-    estrus_day : int, optional
-        The day estrus is expected, by default 0.
-    abortion_day : int, optional
-        The day of abortion, by default 0.
-    breeding_to_preg_time : int, optional
-        Time taken from breeding to pregnancy, by default 0.
-    conception_rate : float, optional
-        Conception rate of the animal, by default 0.0.
-    TAI_conception_rate : float, optional
-        Timed artificial insemination (TAI) conception rate, by default 0.0.
+        The reproduction program for cows.
+    cow_presynch_program: CowPreSynchSubProtocol, optional
+        The presynch program for cows.
+    cow_ovsynch_program: CowTAISubProtocol, optional
+        The ovsynch program for cows.
+    cow_resynch_program: CowReSynchSubProtocol, optional
+        The resynch program for cows.
+    ai_day : int, default=0
+        The day of artificial insemination.
+    estrus_day : int, default=0
+        The day estrus is expected.
+    abortion_day : int, default=0
+        The day of abortion.
+    breeding_to_preg_time : int, default=0
+        Time taken from breeding to pregnancy.
+    conception_rate : float, default=0.0
+        Conception rate of the animal.
+    cow_TAI_conception_rate : float, default=0.0
+        Timed artificial insemination (TAI) conception rate.
         We will only initialize the TAI conception rate for cows if this value is passed in as an input.
         The TAI conception rate for heifers will be dynamically determined later on.
-    num_conception_rate_decreases : int, optional
-        Number of times the conception rate decreases, by default 0.
+    num_conception_rate_decreases : int, default=0
+        Number of times the conception rate decreases.
     hormone_schedule : dict[int, dict[str, Any]], optional
-        The hormone schedule for the reproduction protocol, by default None.
-    gestation_length : int, optional
-        Length of the gestation period, by default 0.
-    conceptus_weight : float, optional
-        Weight of the conceptus, by default 0.0.
-    calf_birth_weight : float, optional
-        Birth weight of the calf, by default 0.0.
-    calves : int, optional
-        Number of calves, by default 0.
-    calving_interval : int, optional
-        Interval between calvings, by default 0.
+        The hormone schedule for the reproduction protocol.
+    gestation_length : int, default=0
+        Length of the gestation period.
+    conceptus_weight : float, default=0.0
+        Weight of the conceptus.
+    calf_birth_weight : float, default=0.0
+        Birth weight of the calf.
+    calves : int, default=0
+        Number of calves.
+    calving_interval : int, default=AnimalConfig.calving_interval
+        Interval between calvings.
     calving_interval_history : list[int], optional
-        History of calving intervals, by default None.
-    body_weight_at_calving : float, optional
-        Body weight of the animal at calving, by default 0.0.
-    do_not_breed : bool, optional
-        Flag indicating if the animal should not breed, by default False.
+        History of calving intervals.
+    body_weight_at_calving : float, default=0.0
+        Body weight of the animal at calving.
+    do_not_breed : bool, default=False
+        Flag indicating if the animal should not breed.
+    estrus_count : int, default=0
+        The estrus count.
+
+    Attributes
+    ----------
+    heifer_reproduction_program : HeiferReproductionProtocol
+        The reproduction program for heifers.
+    heifer_reproduction_sub_program : HEIFER_REPRODUCTION_SUB_PROTOCOLS
+        The sub-program for heifer reproduction.
+    cow_reproduction_program : CowReproductionProtocol
+        The reproduction program for cows.
+    cow_presynch_program: CowPreSynchSubProtocol
+        The presynch program for cows.
+    cow_ovsynch_program: CowTAISubProtocol
+        The ovsynch program for cows.
+    cow_resynch_program: CowReSynchSubProtocol
+        The resynch program for cows.
+    ai_day : int
+        The day of artificial insemination.
+    estrus_day : int
+        The day estrus is expected.
+    abortion_day : int
+        The day of abortion.
+    breeding_to_preg_time : int
+        Time taken from breeding to pregnancy.
+    conception_rate : float
+        Conception rate of the animal.
+    TAI_conception_rate : float
+        Timed artificial insemination (TAI) conception rate.
+        We will only initialize the TAI conception rate for cows if this value is passed in as an input.
+        The TAI conception rate for heifers will be dynamically determined later on.
+    num_conception_rate_decreases : int, default=0
+        Number of times the conception rate decreases.
+    hormone_schedule : dict[int, dict[str, Any]]
+        The hormone schedule for the reproduction protocol.
+    gestation_length : int
+        Length of the gestation period.
+    conceptus_weight : float
+        Weight of the conceptus.
+    calf_birth_weight : float
+        Birth weight of the calf.
+    calves : int
+        Number of calves.
+    calving_interval : int
+        Interval between calvings.
+    calving_interval_history : list[int]
+        History of calving intervals.
+    body_weight_at_calving : float
+        Body weight of the animal at calving.
+    do_not_breed : bool
+        Flag indicating if the animal should not breed.
+    repro_state_manager : ReproStateManager
+        An instance of the ``ReproStateManager``.
+    reproduction_statistics : AnimalReproductionStatistics
+        An instance of the ``AnimalReproductionStatistics`` initialized with the ``estrus_count`` param
 
     Notes
     -----
     This class mutates a ReproductionDataStream object during the update process, relying on the side effect. This
     could lead to potential unexpected behaviors.
+
     """
 
     def __init__(
         self,
-        heifer_reproduction_program: Optional[HeiferReproductionProtocol] = None,
-        heifer_reproduction_sub_program: Optional[HEIFER_REPRODUCTION_SUB_PROTOCOLS] = None,
-        cow_reproduction_program: Optional[CowReproductionProtocol] = None,
-        cow_presynch_program: Optional[CowPreSynchSubProtocol] = None,
-        cow_ovsynch_program: Optional[CowTAISubProtocol] = None,
-        cow_resynch_program: Optional[CowReSynchSubProtocol] = None,
+        heifer_reproduction_program: HeiferReproductionProtocol | None = None,
+        heifer_reproduction_sub_program: HEIFER_REPRODUCTION_SUB_PROTOCOLS | None = None,
+        cow_reproduction_program: CowReproductionProtocol | None = None,
+        cow_presynch_program: CowPreSynchSubProtocol | None = None,
+        cow_ovsynch_program: CowTAISubProtocol | None = None,
+        cow_resynch_program: CowReSynchSubProtocol | None = None,
         ai_day: int = 0,
         estrus_day: int = 0,
         abortion_day: int = 0,
@@ -112,13 +175,13 @@ class Reproduction:
         conception_rate: float = 0.0,
         cow_TAI_conception_rate: float = 0.0,
         num_conception_rate_decreases: int = 0,
-        hormone_schedule: Optional[dict[int, dict[str, Any]]] = None,
+        hormone_schedule: dict[int, dict[str, Any]] | None = None,
         gestation_length: int = 0,
         conceptus_weight: float = 0.0,
         calf_birth_weight: float = 0.0,
         calves: int = 0,
         calving_interval: int = AnimalConfig.calving_interval,
-        calving_interval_history: Optional[list[int]] = None,
+        calving_interval_history: list[int] | None = None,
         body_weight_at_calving: float = 0.0,
         do_not_breed: bool = False,
         estrus_count: int = 0,
@@ -138,22 +201,24 @@ class Reproduction:
         self.estrus_day = estrus_day
         self.abortion_day = abortion_day
         self.breeding_to_preg_time = breeding_to_preg_time
-        self.gestation_length = gestation_length
-
-        self.conceptus_weight = conceptus_weight
-        self.calf_birth_weight = calf_birth_weight
-        self.body_weight_at_calving = body_weight_at_calving
 
         self.conception_rate = conception_rate
         self.TAI_conception_rate = cow_TAI_conception_rate
         self.num_conception_rate_decreases = num_conception_rate_decreases
 
+        self.hormone_schedule = hormone_schedule or {}
+        self.gestation_length = gestation_length
+
+        self.conceptus_weight = conceptus_weight
+
+        self.calf_birth_weight = calf_birth_weight
         self.calves = calves
         self.calving_interval = calving_interval if calving_interval > 0 else AnimalConfig.calving_interval
 
         self.calving_interval_history = calving_interval_history or []
 
-        self.hormone_schedule = hormone_schedule or {}
+        self.body_weight_at_calving = body_weight_at_calving
+
         self.do_not_breed = do_not_breed
 
         self.repro_state_manager = ReproStateManager()
@@ -175,6 +240,12 @@ class Reproduction:
         -------
         ReproductionOutputs
             Updated reproduction outputs for the animal.
+
+        Raises
+        ------
+        TypeError
+            If unknown animal type is encountered.
+
         """
         reproduction_data_stream = ReproductionDataStream(
             animal_type=reproduction_inputs.animal_type,
@@ -201,7 +272,12 @@ class Reproduction:
         elif reproduction_data_stream.animal_type.is_cow:
             reproduction_data_stream = self.cow_reproduction_update(reproduction_data_stream, time)
         else:
-            raise TypeError(f"Unknown animal type: {reproduction_data_stream.animal_type}")
+            OutputManager().add_error(
+                "Reproduction Update Error",
+                f"Unknown animal type: {reproduction_data_stream.animal_type}.",
+                info_map={"class": self.__class__.__name__, "function": self.reproduction_update.__name__},
+            )
+            raise TypeError(f"Unknown animal type: {reproduction_data_stream.animal_type}.")
 
         return ReproductionOutputs(
             body_weight=reproduction_data_stream.body_weight,
@@ -232,6 +308,7 @@ class Reproduction:
         -------
         ReproductionDataStream
             Updated reproduction datastream for the heifer.
+
         """
         if (
             self.heifer_reproduction_program != AnimalConfig.heifer_reproduction_program
@@ -275,6 +352,7 @@ class Reproduction:
         -------
         ReproductionDataStream
             Updated reproduction datastream for the cow.
+
         """
         if reproduction_data_stream.is_pregnant and reproduction_data_stream.days_in_pregnancy == self.gestation_length:
             if time.simulation_day == 0:
@@ -313,7 +391,15 @@ class Reproduction:
             CowReproductionProtocol.TAI,
             CowReproductionProtocol.ED_TAI,
         ]:
-            raise ValueError(f"Invalid cow repro program: {self.cow_reproduction_program}")
+            OutputManager().add_error(
+                "Cow Reproduction Validation Error",
+                f"Invalid cow repro program: {self.cow_reproduction_program}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_cow_reproduction_program.__name__,
+                },
+            )
+            raise ValueError(f"Invalid cow repro program: {self.cow_reproduction_program}.")
 
     def _update_cow_repro_program_and_log_repro_stats_if_needed(
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
@@ -343,11 +429,11 @@ class Reproduction:
             )
             if not reproduction_data_stream.is_pregnant:
                 self.repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
-                reproduction_data_stream.events.add_event(
-                    reproduction_data_stream.days_born,
-                    simulation_day,
-                    f"Current repro state(s): {self.repro_state_manager}",
-                )
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                f"Current repro state(s): {self.repro_state_manager}",
+            )
         return reproduction_data_stream
 
     def _execute_cow_reproduction_protocols(
@@ -402,6 +488,14 @@ class Reproduction:
         elif self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
             return self.execute_heifer_synch_ed_protocol(reproduction_data_stream, simulation_day)
         else:
+            OutputManager().add_error(
+                "Heifer Reproduction Protocol Error",
+                f"Invalid heifer repro program: {self.heifer_reproduction_program}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._execute_heifer_reproduction_protocol.__name__,
+                },
+            )
             raise ValueError(f"Invalid heifer repro program: {self.heifer_reproduction_program}")
 
     def _add_cow_give_birth_events(
@@ -504,6 +598,11 @@ class Reproduction:
             HeiferReproductionProtocol.TAI,
             HeiferReproductionProtocol.SynchED,
         ]:
+            OutputManager().add_error(
+                "Heifer Reproduction Setter Error",
+                f"Invalid repro program: {repro_program}.",
+                info_map={"class": self.__class__.__name__, "function": self._set_heifer_reproduction_program.__name__},
+            )
             raise ValueError(f"Invalid repro program: {repro_program}")
 
         if self.heifer_reproduction_program == repro_program:
@@ -532,7 +631,12 @@ class Reproduction:
             CowReproductionProtocol.TAI,
             CowReproductionProtocol.ED_TAI,
         ]:
-            raise ValueError(f"Invalid repro program: {repro_program}")
+            OutputManager().add_error(
+                "Cow Reproduction Setter Error",
+                f"Invalid repro program: {repro_program}.",
+                info_map={"class": self.__class__.__name__, "function": self._set_cow_reproduction_program.__name__},
+            )
+            raise ValueError(f"Invalid repro program: {repro_program}.")
 
         if self.cow_reproduction_program == repro_program:
             return reproduction_data_stream
@@ -576,6 +680,7 @@ class Reproduction:
         -------
         ReproductionDataStream
             Updated reproduction datastream after estrus simulation.
+
         """
         estrus_cycle = random.randint(1, floor(avg_estrus_cycle))
         if estrus_cycle >= max_cycle_length:
@@ -618,6 +723,7 @@ class Reproduction:
         -------
         ReproductionDataStream
             Updated reproduction datastream after estrus simulation.
+
         """
         estrus_cycle: float = float(
             truncnorm.rvs(-animal_constants.STDI, animal_constants.STDI, avg_estrus_cycle, std_estrus_cycle)
@@ -756,7 +862,12 @@ class Reproduction:
                 self.reproduction_statistics.CIDR_injections += 1
                 event = animal_constants.INJECT_CIDR
             else:
-                raise ValueError(f"Invalid hormone: {hormone}")
+                OutputManager().add_error(
+                    "Hormone Delivery Error",
+                    f"Invalid hormone: {hormone}.",
+                    info_map={"class": self.__class__.__name__, "function": self._deliver_hormones.__name__},
+                )
+                raise ValueError(f"Invalid hormone: {hormone}.")
 
             reproduction_data_stream.events.add_event(
                 delivery_day,
@@ -865,6 +976,12 @@ class Reproduction:
                 "heifers", reproduction_sub_protocol, start_from
             )
             if hormone_schedule is None:
+                OutputManager().add_error(
+                    "Hormone Schedule Error",
+                    f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
+                    f"{self.heifer_reproduction_sub_program}",
+                    info_map={"class": self.__class__.__name__, "function": self._set_up_hormone_schedule.__name__},
+                )
                 raise Exception(
                     f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
                     f"{self.heifer_reproduction_sub_program}"
@@ -876,6 +993,12 @@ class Reproduction:
                 "cows", reproduction_sub_protocol, start_from
             )
             if hormone_schedule is None:
+                OutputManager().add_error(
+                    "Hormone Schedule Error",
+                    f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
+                    f"{self.cow_ovsynch_program}",
+                    info_map={"class": self.__class__.__name__, "function": self._set_up_hormone_schedule.__name__},
+                )
                 raise Exception(
                     f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
                     f"{self.cow_ovsynch_program}"
@@ -951,8 +1074,11 @@ class Reproduction:
         """
         Handle the case where estrus is not detected for heifers in the SynchED program.
 
+        Notes
+        -----
         If estrus is not detected, this method updates the reproduction program and sets up
         the next steps according to the fallback protocol.
+
         """
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,
@@ -1207,22 +1333,23 @@ class Reproduction:
 
     def _calculate_calf_birth_weight(self, breed: Breed) -> float:
         """
-         Calculates the birth weight of the calf based on the breed.
+        Calculates the birth weight of the calf based on the breed.
 
-        Notes
-        ------
+
+        Parameters
+        ----------
+        breed: Breed
+            The breed of the animal.
+
+        Returns
+        -------
+        float
+            The birth weight for the calf (kg).
+
+        References
+        ----------
         [AN.BWT.6]
 
-
-         Parameters
-         ----------
-         breed: Breed
-             The breed of the animal.
-
-         Returns
-         -------
-         float
-             The birth weight for the calf (kg).
         """
 
         average_birth_weight_by_breed = {
@@ -1748,8 +1875,38 @@ class Reproduction:
     def _should_set_up_hormone_delivery_for_presynch(
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> tuple[bool, ReproductionDataStream]:
-        """Determine if hormone delivery should be set up for presynch based on current status."""
+        """
+        Determine whether hormone delivery should be set up for a cow in presynch.
 
+        Parameters
+        ----------
+        reproduction_data_stream : ReproductionDataStream
+            Current reproduction data for the cow.
+        simulation_day : int
+            Current simulation day, used when recording reproduction events.
+
+        Returns
+        -------
+        tuple[bool, ReproductionDataStream]
+            - Whether hormone delivery should be set up for presynch.
+            - The updated reproduction data stream.
+
+        Notes
+        -----
+        The checks are ordered from broad exclusion criteria to presynch-entry criteria:
+
+        1. Pregnant cows are excluded because they should not begin presynch.
+        2. Cows not enrolled in a TAI reproduction program are excluded because presynch only applies to TAI.
+        3. Unsupported presynch subprotocols are excluded before checking animal state.
+        4. Cows with an existing hormone schedule are excluded to avoid overwriting or duplicating scheduled treatments.
+        5. Cows exactly on the configured presynch start day may enter presynch from FRESH or ENTER_HERD_FROM_INIT.
+        6. Cows already past the configured start day may enter presynch only from ENTER_HERD_FROM_INIT, which allows
+           initialized animals to catch up without reopening the normal FRESH transition window.
+
+        If the cow is already in the IN_PRESYNCH state, this method returns True even if no new state transition occurs.
+        """
+        if reproduction_data_stream.is_pregnant:
+            return False, reproduction_data_stream
         if self.cow_reproduction_program != CowReproductionProtocol.TAI:
             return False, reproduction_data_stream
 
@@ -1792,8 +1949,44 @@ class Reproduction:
     def _should_set_up_hormone_delivery_for_ovsynch(
         self, reproduction_data_stream: ReproductionDataStream, simulation_day: int
     ) -> tuple[bool, ReproductionDataStream]:
-        """Determine if hormone delivery should be set up for OvSynch based on current status."""
+        """
+        Determine whether hormone delivery should be set up for a cow in OvSynch.
 
+        Parameters
+        ----------
+        reproduction_data_stream : ReproductionDataStream
+            Current reproduction data for the cow.
+        simulation_day : int
+            Current simulation day, used when recording reproduction events.
+
+        Returns
+        -------
+        tuple[bool, ReproductionDataStream]
+            - Whether hormone delivery should be set up for OvSynch.
+            - The updated reproduction data stream.
+
+        Notes
+        -----
+        The checks are ordered from broad exclusion criteria to OvSynch-entry criteria:
+
+        1. Pregnant cows are excluded because they should not begin OvSynch.
+        2. Cows with an existing hormone schedule are excluded to avoid overwriting
+           or duplicating scheduled treatments.
+        3. Unsupported OvSynch subprotocols are excluded before checking animal state.
+        4. Cows currently in presynch are excluded because they must complete presynch
+           before transitioning to OvSynch.
+        5. Cows exactly on the configured OvSynch start day may enter OvSynch from an
+           empty state, FRESH, ENTER_HERD_FROM_INIT, or HAS_DONE_PRESYNCH.
+        6. Cows already past the configured start day may enter OvSynch only from
+           HAS_DONE_PRESYNCH or ENTER_HERD_FROM_INIT, allowing initialized animals
+           and presynch-completed animals to catch up.
+
+        If the cow is already in the IN_OVSYNCH state, this method returns True even
+        if no new state transition occurs.
+
+        """
+        if reproduction_data_stream.is_pregnant:
+            return False, reproduction_data_stream
         if self.hormone_schedule:
             return False, reproduction_data_stream
         if AnimalConfig.cow_ovsynch_method not in [

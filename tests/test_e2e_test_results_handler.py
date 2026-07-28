@@ -348,16 +348,134 @@ def test_filter_insignificant_changes(
     assert remaining_keys == expected_keys
 
 
-def test_is_significant() -> None:
+@pytest.mark.parametrize(
+    ("changes", "tolerance", "expected"),
+    [
+        # Significant numeric change
+        ({"old_value": 10.0, "new_value": 10.2}, 0.01, True),
+        # Insignificant numeric change
+        ({"old_value": 10.0, "new_value": 10.001}, 0.01, False),
+        # Non-numeric values are treated as significant
+        ({"old_value": "a", "new_value": "b"}, 0.01, True),
+        # Nested dict with only insignificant changes
+        (
+            {
+                "old_value": {
+                    "a": 100.0,
+                    "b": 200.0,
+                },
+                "new_value": {
+                    "a": 100.0001,
+                    "b": 200.0001,
+                },
+            },
+            0.01,
+            False,
+        ),
+        # Nested dict with one significant change
+        (
+            {
+                "old_value": {
+                    "a": 100.0,
+                    "b": 200.0,
+                },
+                "new_value": {
+                    "a": 100.0001,
+                    "b": 250.0,
+                },
+            },
+            0.01,
+            True,
+        ),
+        # Missing key in new_value
+        (
+            {
+                "old_value": {
+                    "a": 100.0,
+                    "b": 200.0,
+                },
+                "new_value": {
+                    "a": 100.0,
+                },
+            },
+            0.01,
+            True,
+        ),
+        # Missing key in old_value
+        (
+            {
+                "old_value": {
+                    "a": 100.0,
+                },
+                "new_value": {
+                    "a": 100.0,
+                    "b": 200.0,
+                },
+            },
+            0.01,
+            True,
+        ),
+        # Deep recursive nested dict with insignificant changes
+        (
+            {
+                "old_value": {
+                    "outer": {
+                        "inner": 50.0,
+                    }
+                },
+                "new_value": {
+                    "outer": {
+                        "inner": 50.00001,
+                    }
+                },
+            },
+            0.01,
+            False,
+        ),
+        # Deep recursive nested dict with significant changes
+        (
+            {
+                "old_value": {
+                    "outer": {
+                        "inner": 50.0,
+                    }
+                },
+                "new_value": {
+                    "outer": {
+                        "inner": 60.0,
+                    }
+                },
+            },
+            0.01,
+            True,
+        ),
+        # Nested dict with non-numeric change
+        (
+            {
+                "old_value": {
+                    "status": "active",
+                },
+                "new_value": {
+                    "status": "inactive",
+                },
+            },
+            0.01,
+            True,
+        ),
+    ],
+)
+def test_is_significant(
+    changes: dict[str, object],
+    tolerance: float,
+    expected: bool,
+) -> None:
     """Unit test for is_significant()."""
-    assert E2ETestResultsHandler.is_significant({"old_value": 10.0, "new_value": 10.2}, 0.01) is True
-    assert E2ETestResultsHandler.is_significant({"old_value": 10.0, "new_value": 10.001}, 0.01) is False
-    assert E2ETestResultsHandler.is_significant({"old_value": "a", "new_value": "b"}, 0.01) is True
+    assert E2ETestResultsHandler.is_significant(changes, tolerance) is expected
 
 
 def test_filter_nested() -> None:
     """Unit test for filter_nested()."""
-    diff = {
+    diff: dict[str, dict[str, float | str]] = {
         "key1": {"old_value": 100.0, "new_value": 100.0001},
         "key2": {"old_value": 50.0, "new_value": 51.0},
     }

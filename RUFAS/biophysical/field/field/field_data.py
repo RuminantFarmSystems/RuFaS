@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.crop.dormancy import Dormancy
+from RUFAS.output_manager import OutputManager
 
 
 @dataclass(kw_only=True)
@@ -119,8 +120,18 @@ class FieldData:
         )
         if should_water:
             if self.watering_amount_in_liters < 0.0:
+                OutputManager().add_error(
+                    "Watering amount error",
+                    f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.",
+                    info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+                )
                 raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
             elif self.watering_interval < 0:
+                OutputManager().add_error(
+                    "Watering interval error",
+                    f"Expected watering interval to be >= 0, received '{self.watering_interval}'.",
+                    info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+                )
                 raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
 
             self.watering_amount_in_mm = self.convert_liters_to_millimeters(

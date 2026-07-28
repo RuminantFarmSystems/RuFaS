@@ -11,39 +11,32 @@ from RUFAS.units import MeasurementUnits
 
 class Weather:
     """
-    The `Weather` class manages all weather data used to run a single simulation.
+    The ``Weather`` class manages all weather data used to run a single simulation.
 
     Parameters
     ----------
-    weather_file : dict[str, List[Any]]
-        The weather dictionary read from the provided weather input source.
+    weather_file : dict[str, list[int | float]]
+        The weather data file containing the weather data for the simulation.
+    time : RufasTime
+        The ``RufasTime`` instance containing time configuration information of the simulation.
 
     Attributes
     ----------
-    weather_data : dict[datetime, CurrentDayCondition]
-        A dictionary that maps a date to the corresponding CurrentDayCondition.
-    mean_annual_temperature : int
+    weather_data : dict[datetime.datetime, CurrentDayConditions]
+        A dictionary that maps a date to the corresponding ``CurrentDayConditions``.
+    mean_annual_temperature : float
         Mean of mean daily temperatures over all the weather data used by the simulation (°C).
-
     """
 
-    def __init__(self, weather_file: dict, time: RufasTime):
+    def __init__(self, weather_file: dict[str, list[int | float]], time: RufasTime):
         """
-        Initializes the `Weather` instance using user-supplied whether data and overall simulation parameters.
-
-        Parameters
-        ----------
-        weather_file : dict
-            All the weather data available to be used by the simulation.
-        time : RufasTime
-            The RufasTime instance containing time configuration information of the simulation.
+        Initializes the ``Weather`` instance using user-supplied weather data and overall simulation parameters.
 
         Notes
         -----
-        Contains daily weather information stored in 2D lists. Data lists are in the format Data[year][julian_day].
-        Allows daily information to be accessed by indexing to [time.year - 1][time.day - 1] (list indexing starts at 0,
-        time starts at 1).
-
+        Contains daily weather information stored in 2D lists. Data lists are in the format ``Data[year][julian_day]``.
+        Allows daily information to be accessed by indexing to ``[time.year - 1][time.day - 1]`` (list indexing starts
+        at 0, time starts at 1).
         """
         self.om = OutputManager()
         self.weather_data = {}
@@ -61,8 +54,8 @@ class Weather:
         self.amplitude: float = 0.0
 
         for i in range(len(weather_file["year"])):
-            year = weather_file["year"][i]
-            jday = weather_file["jday"][i]
+            year = int(weather_file["year"][i])
+            jday = int(weather_file["jday"][i])
             date_key = RufasTime.convert_year_jday_to_date(year, jday)
 
             # Only include dates within the simulation period to save on space
@@ -106,26 +99,35 @@ class Weather:
 
     def set_linest_temperature_factors(self) -> None:
         """
+        Fits a sinusoidal seasonal temperature model using least-squares regression.
+
+        Notes
+        -----
         This function performs least-squares regression using cosine and sine components to model seasonal air
         temperature. This enables determination of the amplitude and phase shift (peak) of the sinusoidal curve of
         seasonal air temperature. First, sin and cos coefficients are generated for each Julian day of the simulation.
         The function then fits the model:
 
-        T(d) = A*cos(d) + B*sin(d) + C
+        ``T(d) = A*cos(d) + B*sin(d) + C``
 
         where:
-            - T(d) is the mean air temperature for day d in the simulation
-            - A and B are coefficients
-            - C is the intercept (mean)
+            - ``T(d)`` is the mean air temperature for day d in the simulation
+            - ``A`` and ``B`` are coefficients
+            - ``C`` is the intercept (mean)
 
         From the fitted model, the method calculates and stores the fitted intercept term representing average air
         temperature, amplitude of the modeled cos/sin function, and phase shift (peak temperature). These parameters are
-        simulation-wide, i.e., only weather data utilized in the simulation is used.
-
+        simulation-wide, i.e., only weather data utilized in the simulation is used. Days with missing (NaN) mean air
+        temperatures are excluded from the regression.
         """
         mean_temperatures = np.array(self.means, dtype=float)
         cosine_components = np.array(self.cos, dtype=float)
         sine_components = np.array(self.sin, dtype=float)
+
+        valid_days = ~np.isnan(mean_temperatures)
+        mean_temperatures = mean_temperatures[valid_days]
+        cosine_components = cosine_components[valid_days]
+        sine_components = sine_components[valid_days]
 
         design_matrix = np.column_stack((cosine_components, sine_components, np.ones_like(mean_temperatures)))
 
@@ -146,12 +148,12 @@ class Weather:
 
     def get_current_day_conditions(self, time: RufasTime, latitude: float | None = None) -> CurrentDayConditions:
         """
-        Creates a CurrentDayConditions object containing all the weather conditions on the current day.
+        Creates a ``CurrentDayConditions`` object containing all the weather conditions on the current day.
 
         Parameters
         ----------
         time: RufasTime
-            RufasTime object containing the current time of the simulation.
+            ``RufasTime`` object containing the current time of the simulation.
         latitude : float | None, default None
             Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
             then the daylength will not be provided in the returned CurrentDayConditions instance.
@@ -159,12 +161,12 @@ class Weather:
         Returns
         -------
         CurrentDayConditions
-            CurrentDayConditions instance including all the weather conditions of the specified date.
+            ``CurrentDayConditions`` instance including all the weather conditions of the specified date.
 
         Raises
         ------
         KeyError
-            While attempting to collect weather conditions that are not contained in the Weather object.
+            While attempting to collect weather conditions that are not contained in the ``Weather`` object.
 
         """
         if latitude:
@@ -188,12 +190,12 @@ class Weather:
         self, time: RufasTime, starting_offset: int, ending_offset: int, latitude: float | None = None
     ) -> list[CurrentDayConditions]:
         """
-        Generates a series of CurrentDayConditions.
+        Generates a series of ``CurrentDayConditions``.
 
         Parameters
         ----------
         time : RufasTime
-            A RufasTime instance containing the current time information of the simulation.
+            A ``RufasTime`` instance containing the current time information of the simulation.
         starting_offset : int
             Number of days before or after the given date to start the weather conditions series.
         ending_offset : int
@@ -205,8 +207,7 @@ class Weather:
         Returns
         -------
         list[CurrentDayConditions]
-            Series of current day conditions in chronological order.
-
+            Series of ``CurrentDayConditions`` in chronological order.
         """
         conditions_list = []
 
@@ -224,18 +225,18 @@ class Weather:
 
     def record_weather(self, time: RufasTime) -> None:
         """
-        Records the current weather conditions in the OutputManager.
+        Records the current weather conditions in the ``OutputManager``.
 
         Parameters
         ----------
         time: RufasTime
-            RufasTime object containing the current time of the simulation.
-
+            ``RufasTime`` object containing the current time of the simulation.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.record_weather.__name__,
             "prefix": "Weather",
+            "is_daily_variable": True,
         }
         current_weather = self.get_current_day_conditions(time)
         self.om.add_variable(
@@ -282,13 +283,18 @@ class Weather:
 
         Parameters
         ----------
-        daily_average_temperatures : list(float)
-            List of daily average air temperatures in the passed to be run by the simulation (degrees C).
+        daily_average_temperatures : list[float]
+            List of daily average air temperatures in the past to be run by the simulation (degrees C).
 
         Returns
         -------
         float
             The average annual air temperature (degrees C).
+
+        Raises
+        ------
+        ValueError
+            If every daily average air temperature is missing.
 
         Notes
         -----
@@ -296,14 +302,38 @@ class Weather:
         temperatures provided in the weather input file. Previous implementations calculated the average annual
         temperature for individual years, which led to the value fluctuating more than desired.
 
+        Missing daily values (NaN) are excluded from the average, since weather stations commonly go offline for
+        short periods. A warning is recorded when any values are missing.
+
         This method is intended to approximate SWAT's method for calculating the average annual temperature. SWAT
         calculates average high and low temperatures for each month over every simulated year, then averages those
         values to get a single annual average air temperature for the entire simulation. The exact implementation for
         this can be found at in the SWAT source code file `readwgn.f
         <https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/readwgn.f>`_
-
         """
-        return np.mean(np.array(daily_average_temperatures))
+        daily_temperatures = np.array(daily_average_temperatures, dtype=float)
+        missing_count = int(np.isnan(daily_temperatures).sum())
+        info_map = {
+            "class": Weather.__name__,
+            "function": Weather._calculate_average_annual_temperature.__name__,
+            "prefix": "Weather",
+        }
+        if missing_count == daily_temperatures.size:
+            OutputManager().add_error(
+                "No temperature data",
+                "All daily average air temperatures in the weather data are missing, so the average annual air"
+                " temperature cannot be calculated.",
+                info_map,
+            )
+            raise ValueError("All daily average air temperatures in the weather data are missing")
+        if missing_count > 0:
+            OutputManager().add_warning(
+                "Missing temperature data",
+                f"{missing_count} daily average air temperature value(s) are missing from the weather data and are"
+                " excluded from the average annual air temperature.",
+                info_map,
+            )
+        return float(np.nanmean(daily_temperatures))
 
     @staticmethod
     def check_adequate_weather_data(weather_file: dict, time: RufasTime) -> None:
@@ -315,7 +345,7 @@ class Weather:
         weather_file: dict
             File containing weather data.
         time: RufasTime
-            The RufasTime instance containing time configuration information of the simulation.
+            The ``RufasTime`` instance containing time configuration information of the simulation.
 
         Raises
         ------

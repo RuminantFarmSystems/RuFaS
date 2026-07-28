@@ -293,6 +293,13 @@ class NitrogenUptake(NonWaterUptake):
         float
             The amount of nitrogen added to plant biomass through fixation, capped at the demand (kg/ha).
 
+        Raises
+        ------
+        ValueError
+            If stage_factor is not between 0 and 1.
+            If water_factor is not between 0 and 1.
+            If nitrate_factor is not between 0 and 1.
+
         References
         ----------
         SWAT 5:2.3.9
