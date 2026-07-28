@@ -683,7 +683,11 @@ class HerdFactory:
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
         if self.init_herd:
-            if AnimalConfig.semen_type == "sexed":
+            uses_sexed_semen = AnimalConfig.selective_repro_strategy and (
+                AnimalConfig.heiferII_semen_allocation_proportions["sexed_dairy"] > 0
+                or AnimalConfig.cow_semen_allocation_proportions["sexed_dairy"] > 0
+            )
+            if uses_sexed_semen:
                 om.add_warning(
                     "Longer herd generation runtime",
                     "Herd initialized with sexed semen will result in significantly longer runtime.",

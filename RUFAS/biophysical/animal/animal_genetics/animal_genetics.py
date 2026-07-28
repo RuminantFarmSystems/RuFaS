@@ -331,6 +331,9 @@ class Genetics:
 
     def _calculate_ranking_index(self) -> float:
         """Calculate ranking index."""
+        user_defined_weights: dict[str, float] = AnimalConfig.genetic_selection_index_weights
+        if user_defined_weights and user_defined_weights["fat"] > 0 and user_defined_weights["protein"] > 0:
+            return user_defined_weights["fat"] * self.EBV_fat + user_defined_weights["protein"] * self.EBV_protein
         return 0.318 * self.EBV_fat + 0.13 * self.EBV_protein
 
     @staticmethod
