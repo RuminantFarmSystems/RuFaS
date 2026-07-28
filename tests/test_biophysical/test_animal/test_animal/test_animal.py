@@ -229,182 +229,43 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
 
 
 @pytest.mark.parametrize(
-    "args, semen_type, sex, culled",
+    "sex, stillborn",
     [
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                initial_phosphorus=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-            ),
-            "conventional",
-            Sex.FEMALE,
-            False,
-        ),
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                initial_phosphorus=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-            ),
-            "sexed",
-            Sex.FEMALE,
-            False,
-        ),
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                initial_phosphorus=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-            ),
-            "conventional",
-            Sex.MALE,
-            False,
-        ),
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-                initial_phosphorus=10.0,
-            ),
-            "sexed",
-            Sex.MALE,
-            False,
-        ),
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-                initial_phosphorus=10.0,
-            ),
-            "random",
-            Sex.MALE,
-            False,
-        ),
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-                initial_phosphorus=10.0,
-            ),
-            "conventional",
-            Sex.FEMALE,
-            True,
-        ),
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-                initial_phosphorus=10.0,
-            ),
-            "sexed",
-            Sex.FEMALE,
-            True,
-        ),
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-                initial_phosphorus=10.0,
-            ),
-            "conventional",
-            Sex.MALE,
-            True,
-        ),
-        (
-            NewBornCalfValuesTypedDict(
-                id=1,
-                breed="HO",
-                animal_type="Calf",
-                birth_date="2023-01-01",
-                days_born=10,
-                birth_weight=10.0,
-                dam_tbv_fat=10.0,
-                dam_tbv_protein=10.0,
-                initial_phosphorus=10.0,
-            ),
-            "sexed",
-            Sex.MALE,
-            True,
-        ),
+        (Sex.FEMALE, False),
+        (Sex.MALE, False),
+        (Sex.FEMALE, True),
+        (Sex.MALE, True),
     ],
 )
 def test_initialize_newborn_calf(
-    args: NewBornCalfValuesTypedDict,
-    semen_type: str,
     sex: Sex,
-    culled: bool,
+    stillborn: bool,
     mocker: MockerFixture,
     mock_time: RufasTime,
 ) -> None:
-    original_semen_type = AnimalConfig.semen_type
-    AnimalConfig.semen_type = semen_type
-
-    if not (semen_type in ["conventional", "sexed"]):
-        with pytest.raises(ValueError):
-            Animal(args, mock_time)
-        return
-    male_calf_rate = (
-        AnimalConfig.male_calf_rate_conventional_semen
-        if semen_type == "conventional"
-        else AnimalConfig.male_calf_rate_sexed_semen
+    args = NewBornCalfValuesTypedDict(
+        id=1,
+        breed="HO",
+        sex=sex,
+        animal_type="Calf",
+        birth_date="2023-01-01",
+        days_born=10,
+        birth_weight=10.0,
+        initial_phosphorus=10.0,
+        dam_tbv_fat=10.0,
+        dam_tbv_protein=10.0,
     )
 
-    sex_random_value = male_calf_rate + 0.01 if sex == Sex.FEMALE else male_calf_rate - 0.01
-    culled_random_value = AnimalConfig.still_birth_rate - 0.01 if culled else AnimalConfig.still_birth_rate + 0.01
-
-    mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[sex_random_value, culled_random_value])
+    # Sex is taken directly from the newborn calf config; the only remaining
+    # random draw during initialization is the still-birth check.
+    stillbirth_random_value = (
+        AnimalConfig.still_birth_rate - 0.01 if stillborn else AnimalConfig.still_birth_rate + 0.01
+    )
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=stillbirth_random_value)
     mock_rvs = mocker.patch("RUFAS.biophysical.animal.animal.truncnorm.rvs", return_value=600)
 
     animal = Animal(args, mock_time)
+
     assert animal.sex == sex
     assert animal.sold is False
     assert animal.birth_weight == args["birth_weight"]
@@ -412,14 +273,16 @@ def test_initialize_newborn_calf(
     assert animal.wean_weight == 0.0
     assert animal.mature_body_weight == 600
     assert animal.nutrients.total_phosphorus_in_animal == args["initial_phosphorus"]
+    if stillborn:
+        assert animal.stillborn_day == mock_time.simulation_day
+    else:
+        assert animal.stillborn_day is None
     mock_rvs.assert_called_once_with(
         -animal_constants.STDI,
         animal_constants.STDI,
         AnimalConfig.average_mature_body_weight,
         AnimalConfig.std_mature_body_weight,
     )
-
-    AnimalConfig.semen_type = original_semen_type
 
 
 @pytest.mark.parametrize(
@@ -2452,13 +2315,15 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
             ),
         ),
     )
-    result = animal.daily_routines(MagicMock(RufasTime))
+    mock_time = MagicMock(RufasTime)
+    population_ranking_indexes = [1.0, 2.0, 3.0]
+    result = animal.daily_routines(mock_time, population_ranking_indexes)
 
     assert animal.days_born == 11
     assert animal.days_in_pregnancy == 1
     mock_daily_growth_update.assert_called_once()
     mock_daily_milking_update.assert_called_once()
-    mock_daily_reproduction_update.assert_called_once()
+    mock_daily_reproduction_update.assert_called_once_with(mock_time, population_ranking_indexes)
     mock_animal_life_stage_update.assert_called_once()
     mock_daily_nutrients_update.assert_called_once()
     mock_daily_digestive_system_update.assert_called_once()
@@ -2503,12 +2368,13 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
     mock_animal_life_stage_update = mocker.patch.object(
         animal, "animal_life_stage_update", return_value=(AnimalStatus.LIFE_STAGE_CHANGED, None)
     )
-    result = animal.daily_routines(MagicMock(RufasTime))
+    mock_time = MagicMock(RufasTime)
+    result = animal.daily_routines(mock_time, None)
 
     assert animal.days_born == 11
     mock_daily_growth_update.assert_called_once()
     mock_daily_milking_update.assert_called_once()
-    mock_daily_reproduction_update.assert_called_once()
+    mock_daily_reproduction_update.assert_called_once_with(mock_time, None)
     mock_animal_life_stage_update.assert_called_once()
     mock_daily_nutrients_update.assert_called_once()
     mock_daily_digestive_system_update.assert_called_once()
@@ -3810,3 +3676,40 @@ def test_update_genetic_history_duplicate_same_day_warns(mocker: MockerFixture) 
 
     mock_add_warning.assert_called_once()
     assert animal.genetic_history[0]["end_day"] == 3
+
+
+@pytest.mark.parametrize(
+    "animal_type, is_pregnant, days_in_milk, do_not_breed, expected",
+    [
+        # HeiferII: eligible whenever not pregnant, regardless of milk / do_not_breed.
+        (AnimalType.HEIFER_II, False, 0, False, True),
+        (AnimalType.HEIFER_II, True, 0, False, False),
+        # Cows: eligible only if open, past the voluntary waiting period, and not flagged do-not-breed.
+        (AnimalType.LAC_COW, False, 60, False, True),
+        (AnimalType.LAC_COW, True, 60, False, False),
+        (AnimalType.LAC_COW, False, 50, False, False),  # days_in_milk == VWP is not > VWP
+        (AnimalType.LAC_COW, False, 60, True, False),
+        (AnimalType.DRY_COW, False, 60, False, True),
+        # Neither HeiferII nor a cow (e.g. calves, HeiferIII) are never eligible for breeding.
+        (AnimalType.CALF, False, 0, False, False),
+        (AnimalType.HEIFER_III, False, 0, False, False),
+    ],
+)
+def test_is_eligible_for_breeding(
+    animal_type: AnimalType,
+    is_pregnant: bool,
+    days_in_milk: int,
+    do_not_breed: bool,
+    expected: bool,
+    mocker: MockerFixture,
+) -> None:
+    """Only open HeiferIIs and open, past-VWP, breedable cows are eligible for breeding."""
+    mocker.patch.object(AnimalConfig, "voluntary_waiting_period", 50)
+
+    mock_animal = MagicMock(spec=Animal)
+    mock_animal.animal_type = animal_type
+    mock_animal.is_pregnant = is_pregnant
+    mock_animal.days_in_milk = days_in_milk
+    mock_animal.reproduction.do_not_breed = do_not_breed
+
+    assert Animal.is_eligible_for_breeding.fget(mock_animal) is expected

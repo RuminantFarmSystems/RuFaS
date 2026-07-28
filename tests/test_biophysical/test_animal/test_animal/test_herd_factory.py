@@ -1421,7 +1421,10 @@ def test_initialize_herd_init_herd_with_sexed_semen_save_animals_false(
     mock_report_animal_population_statistics = mocker.patch.object(
         AnimalModuleReporter, "report_animal_population_statistics"
     )
-    AnimalConfig.semen_type = "sexed"
+    # Sexed semen is now expressed through the selective reproduction strategy and a
+    # non-zero sexed_dairy allocation proportion (patched for clean restoration).
+    mocker.patch.object(AnimalConfig, "selective_repro_strategy", True)
+    mocker.patch.object(AnimalConfig, "heiferII_semen_allocation_proportions", {"sexed_dairy": 0.5})
 
     mock_herd_factory.initialize_herd()
 
