@@ -24,7 +24,6 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     CowPreSynchSubProtocol,
     CowReSynchSubProtocol,
 )
-from RUFAS.biophysical.animal.data_types.animal_enums import Sex
 from RUFAS.biophysical.animal.data_types.reproduction import (
     ReproductionInputs,
     ReproductionOutputs,
