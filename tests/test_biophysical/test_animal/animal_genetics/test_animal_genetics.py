@@ -360,6 +360,41 @@ def test_calculate_ranking_index(
     assert ranking_index == pytest.approx(expected_ranking_index)
 
 
+def test_calculate_ranking_index_uses_user_defined_weights(genetics: Genetics, mocker: MockerFixture) -> None:
+    """When both user-defined selection index weights are positive, they override the default weights."""
+    mocker.patch.object(AnimalConfig, "genetic_selection_index_weights", {"fat": 0.4, "protein": 0.2})
+    genetics.EBV_fat = 5.0
+    genetics.EBV_protein = 10.0
+
+    ranking_index = genetics._calculate_ranking_index()
+
+    # 0.4 * 5.0 + 0.2 * 10.0 = 4.0 (default 0.318/0.13 weights would give 2.89).
+    assert ranking_index == pytest.approx(4.0)
+
+
+@pytest.mark.parametrize(
+    "weights",
+    [
+        {},  # no weights provided
+        {"fat": 0.0, "protein": 0.0},  # both zero
+        {"fat": 0.5, "protein": 0.0},  # protein not positive
+        {"fat": 0.0, "protein": 0.5},  # fat not positive
+    ],
+)
+def test_calculate_ranking_index_falls_back_to_default_weights(
+    weights: dict[str, float], genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """Missing, empty, or non-positive user weights fall back to the default 0.318/0.13 weighting."""
+    mocker.patch.object(AnimalConfig, "genetic_selection_index_weights", weights)
+    genetics.EBV_fat = 5.0
+    genetics.EBV_protein = 10.0
+
+    ranking_index = genetics._calculate_ranking_index()
+
+    # 0.318 * 5.0 + 0.13 * 10.0 = 2.89
+    assert ranking_index == pytest.approx(2.89)
+
+
 def test_calculate_ebv_and_ranking_index(genetics: Genetics, mocker: MockerFixture) -> None:
     """Unit test for calculate_ebv_and_ranking_index()"""
     mock_calculate_ebv_values = mocker.patch.object(genetics, "_calculate_ebv_values", return_value=(5.0, 10.0))

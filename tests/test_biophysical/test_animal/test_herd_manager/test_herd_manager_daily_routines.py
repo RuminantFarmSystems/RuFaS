@@ -580,7 +580,7 @@ def test_warn_when_lactating_cows_have_no_milk(herd_manager: HerdManager, mocker
 
     mock_add_warning.assert_called_once_with(
         "Warning: Lactating cows with no production.",
-        "There are 1 lactating cows with no milking production on simulation day 15.",
+        "There are 1/2 lactating cows with no milking production on simulation day 15.",
         info_map={
             "class": herd_manager.__class__.__name__,
             "function": herd_manager.execute_daily_routines.__name__,
