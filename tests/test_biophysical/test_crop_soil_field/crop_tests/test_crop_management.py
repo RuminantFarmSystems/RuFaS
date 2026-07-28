@@ -264,7 +264,6 @@ def test_manage_harvest_deposit_all_residue(
 
     actual = crop_manager.manage_harvest(harvest_op, "pasture_field", field_size, mock_time, soil_data)
 
-    # No yield is collected and no harvested crop is produced for feed storage.
     cut_crop.assert_called_once_with(collected_fraction=0.0)
     get_crop.assert_not_called()
     assert actual is None
@@ -292,7 +291,6 @@ def test_manage_harvest_deposit_all_residue_leaves_biomass_in_field(
     surface_layer = soil_data.soil_layers[0]
     surface_layer.plant_residue = 0.0
 
-    # _record_yield only reports to the OutputManager and is not under test here.
     mocker.patch.object(crop_manager, "_record_yield")
 
     harvested = crop_manager.manage_harvest(
@@ -302,7 +300,6 @@ def test_manage_harvest_deposit_all_residue_leaves_biomass_in_field(
     assert harvested is None
     assert crop_manager.dry_matter_yield_collected == 0.0
     assert crop_manager.wet_yield_collected == 0.0
-    # All cut biomass is deposited into the field's surface layer as residue.
     assert surface_layer.plant_residue > 0.0
 
 
