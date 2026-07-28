@@ -64,8 +64,8 @@
         "selective_repro_strategy": true,
         "ranking_method": "genetic",
         "genetic_selection_index_weights": {
-			"fat": 0.71,
-			"protein": 0.29
+			"fat": 0.318,
+			"protein": 0.13
 		},
         "heifers": {
             "estrus_detection_rate": 0.9,
