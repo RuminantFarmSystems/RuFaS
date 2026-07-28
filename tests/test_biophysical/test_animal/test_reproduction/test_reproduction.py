@@ -9,7 +9,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.data_types.animal_enums import Breed
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -29,6 +29,7 @@ from RUFAS.biophysical.animal.data_types.reproduction import (
     ReproductionOutputs,
     HerdReproductionStatistics,
     ReproductionDataStream,
+    SemenType,
 )
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
@@ -641,6 +642,7 @@ def test_cow_reproduction_update(
         days_born=days_born,
         events=mock_events,
         newborn_calf_config=NewBornCalfValuesTypedDict(
+            sex=Sex.FEMALE,
             breed=Breed.HO.name,
             animal_type=AnimalType.CALF.value,
             birth_date="",
@@ -2255,8 +2257,8 @@ def test_handle_estrus_not_detected_in_synch_ed(
 @pytest.mark.parametrize(
     "heifer_reproduction_program, abortion_day, expected_repro_program_change, expected_event_calls",
     [
-        (HeiferReproductionProtocol.ED, 50, False, 1),  # ED program, no program change
-        (HeiferReproductionProtocol.SynchED, 50, True, 2),  # Non-ED program, expect program change to ED
+        (HeiferReproductionProtocol.ED, 50, False, 2),  # ED program, no program change
+        (HeiferReproductionProtocol.SynchED, 50, True, 3),  # Non-ED program, expect program change to ED
     ],
 )
 def test_open_heifer(
@@ -2286,6 +2288,14 @@ def test_open_heifer(
     mock_outputs.events.add_event.assert_any_call(
         mock_outputs.days_born, mock_time.simulation_day, animal_constants.REBREEDING_NOTE
     )
+    # Open (non-conceiving) heifers have their semen type and embryo sex cleared.
+    mock_outputs.events.add_event.assert_any_call(
+        mock_outputs.days_born,
+        mock_time.simulation_day,
+        "Setting semen_type and embryo_sex to None due to open heifer status",
+    )
+    assert reproduction.semen_type is None
+    assert reproduction.embryo_sex is None
 
     if expected_repro_program_change:
         mock_outputs.events.add_event.assert_any_call(
@@ -2372,9 +2382,18 @@ def test_open_cow(
 
     assert reproduction.num_conception_rate_decreases == conception_rate_decrease
 
+    # Open cows have their semen type and embryo sex cleared regardless of protocol branch.
+    mock_outputs.events.add_event.assert_any_call(
+        mock_outputs.days_born,
+        mock_time.simulation_day,
+        "Setting semen_type and embryo_sex to None due to open cow",
+    )
+    assert reproduction.semen_type is None
+    assert reproduction.embryo_sex is None
+
     if cow_reproduction_program == CowReproductionProtocol.ED and days_born > estrus_day:
         mock_enter_state.assert_called_once_with(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-        assert mock_outputs.events.add_event.call_count == 2
+        assert mock_outputs.events.add_event.call_count == 3
         mock_outputs.events.add_event.assert_any_call(
             mock_outputs.days_born,
             mock_time.simulation_day,
@@ -2451,35 +2470,45 @@ def test_open_cow_sets_do_not_breed_and_returns_when_dryoff_before_third_check(
 
 
 @pytest.mark.parametrize(
-    "animal_type, conception_rate, random_value, expected_conception_success, semen_type",
+    "animal_type, conception_rate, expected_conception_success, selective_repro_strategy, assigned_semen_type",
     [
-        (AnimalType.HEIFER_II, 0.7, 0.5, True, "conventional"),
-        (AnimalType.HEIFER_II, 0.3, 0.5, False, "sexed"),
-        (AnimalType.LAC_COW, 0.8, 0.7, True, "conventional"),
-        (AnimalType.LAC_COW, 0.2, 0.5, False, "sexed"),
+        # Non-selective strategy always uses conventional dairy semen.
+        (AnimalType.HEIFER_II, 0.7, True, False, SemenType.CONVENTIONAL_DAIRY),
+        (AnimalType.LAC_COW, 0.2, False, False, SemenType.CONVENTIONAL_DAIRY),
+        # Selective strategy defers to assign_semen_type (mocked here).
+        (AnimalType.HEIFER_II, 0.3, False, True, SemenType.SEXED_DAIRY),
+        (AnimalType.LAC_COW, 0.8, True, True, SemenType.BEEF),
     ],
 )
 def test_perform_ai(
     animal_type: AnimalType,
     conception_rate: float,
-    random_value: float,
     expected_conception_success: bool,
-    semen_type: str,
+    selective_repro_strategy: bool,
+    assigned_semen_type: SemenType,
     mocker: MockerFixture,
 ) -> None:
     reproduction = Reproduction()
     reproduction.conception_rate = conception_rate
-    AnimalConfig.semen_type = semen_type
+    mocker.patch.object(AnimalConfig, "selective_repro_strategy", selective_repro_strategy)
 
     mock_outputs = mock_reproduction_data_stream(animal_type=animal_type)
 
     mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
+    # When the selective strategy is active, assign_semen_type sets the semen type;
+    # emulate that by stubbing it to set a known value.
+    def fake_assign_semen_type(**kwargs: Any) -> None:
+        reproduction.semen_type = assigned_semen_type
+
+    mock_assign_semen_type = mocker.patch.object(reproduction, "assign_semen_type", side_effect=fake_assign_semen_type)
+
     mock_add_event = mocker.patch.object(mock_outputs.events, "add_event")
     mock_compare_randomized_rate = mocker.patch(
         "RUFAS.util.Utility.compare_randomized_rate_less_than", return_value=expected_conception_success
     )
+    mock_determine_embryo_sex = mocker.patch.object(reproduction, "_determine_embryo_sex", return_value=Sex.FEMALE)
     mock_increment_heifer_ai_counts = mocker.patch.object(
         reproduction, "_increment_heifer_ai_counts", return_value=mock_outputs
     )
@@ -2507,9 +2536,21 @@ def test_perform_ai(
 
     result = reproduction._perform_ai(mock_outputs, mock_time.simulation_day)
 
+    # Semen type is chosen via assign_semen_type (selective) or defaults to conventional dairy.
+    if selective_repro_strategy:
+        mock_assign_semen_type.assert_called_once_with(
+            population_ranking_index=mock_outputs.population_ranking_indexes,
+            animal_ranking_index=mock_outputs.animal_ranking_index,
+            animal_type=mock_outputs.animal_type,
+        )
+    else:
+        mock_assign_semen_type.assert_not_called()
+
     mock_add_event.assert_any_call(mock_outputs.days_born, mock_time.simulation_day, animal_constants.AI_PERFORMED_NOTE)
     mock_add_event.assert_any_call(
-        mock_outputs.days_born, mock_time.simulation_day, f"{animal_constants.INSEMINATED_W_BASE}{semen_type}"
+        mock_outputs.days_born,
+        mock_time.simulation_day,
+        f"{animal_constants.INSEMINATED_W_BASE}{assigned_semen_type.name}",
     )
 
     assert reproduction.reproduction_statistics.semen_number == 1
@@ -2538,8 +2579,132 @@ def test_perform_ai(
             mock_increment_successful_cow_conceptions.assert_not_called()
             mock_handle_failed_cow_conception.assert_called_once_with(mock_outputs, mock_time.simulation_day)
 
+    # On success the embryo sex is determined and retained; on failure both are cleared.
+    if expected_conception_success:
+        mock_determine_embryo_sex.assert_called_once_with(mock_time.simulation_day)
+        assert reproduction.embryo_sex == Sex.FEMALE
+        mock_add_event.assert_any_call(
+            mock_outputs.days_born,
+            mock_time.simulation_day,
+            f"Embryo sex assigned {Sex.FEMALE} after successful conception",
+        )
+    else:
+        mock_determine_embryo_sex.assert_not_called()
+        assert reproduction.semen_type is None
+        assert reproduction.embryo_sex is None
+        mock_add_event.assert_any_call(
+            mock_outputs.days_born,
+            mock_time.simulation_day,
+            "Setting semen_type and embryo_sex to None due to conception failure",
+        )
+
     assert result == mock_outputs
     mock_compare_randomized_rate.assert_called_once_with(conception_rate)
+
+
+@pytest.mark.parametrize(
+    "animal_type, allocation_proportions, animal_ranking_index, expected_semen_type",
+    [
+        # Heifers: sexed_dairy=0.5, conventional_dairy=0.5, beef=0.0 over population [1,2,3,4,5].
+        # Top ranked (percentile 1.0 > 0.5) -> sexed dairy.
+        (
+            AnimalType.HEIFER_II,
+            {"sexed_dairy": 0.5, "conventional_dairy": 0.5, "beef": 0.0},
+            5.0,
+            SemenType.SEXED_DAIRY,
+        ),
+        # Middle-low ranked (percentile 0.4, not > 0.5 but > 0.0) -> conventional dairy.
+        (
+            AnimalType.HEIFER_II,
+            {"sexed_dairy": 0.5, "conventional_dairy": 0.5, "beef": 0.0},
+            2.0,
+            SemenType.CONVENTIONAL_DAIRY,
+        ),
+        # Cows: sexed_dairy=0.2, conventional_dairy=0.5, beef=0.3.
+        # Top ranked (percentile 1.0 > 0.8) -> sexed dairy.
+        (
+            AnimalType.LAC_COW,
+            {"sexed_dairy": 0.2, "conventional_dairy": 0.5, "beef": 0.3},
+            5.0,
+            SemenType.SEXED_DAIRY,
+        ),
+        # Mid ranked (percentile 0.6; not > 0.8 but > 0.3) -> conventional dairy.
+        (
+            AnimalType.LAC_COW,
+            {"sexed_dairy": 0.2, "conventional_dairy": 0.5, "beef": 0.3},
+            3.0,
+            SemenType.CONVENTIONAL_DAIRY,
+        ),
+        # Bottom ranked (percentile 0.2; not > 0.3) -> beef.
+        (
+            AnimalType.LAC_COW,
+            {"sexed_dairy": 0.2, "conventional_dairy": 0.5, "beef": 0.3},
+            1.0,
+            SemenType.BEEF,
+        ),
+    ],
+)
+def test_assign_semen_type(
+    animal_type: AnimalType,
+    allocation_proportions: dict[str, float],
+    animal_ranking_index: float,
+    expected_semen_type: SemenType,
+    mocker: MockerFixture,
+) -> None:
+    """assign_semen_type allocates semen by the animal's ranking-index percentile within the population."""
+    reproduction = Reproduction()
+    population_ranking_index = [1.0, 2.0, 3.0, 4.0, 5.0]
+
+    config_attr = (
+        "heiferII_semen_allocation_proportions"
+        if animal_type == AnimalType.HEIFER_II
+        else "cow_semen_allocation_proportions"
+    )
+    mocker.patch.object(AnimalConfig, config_attr, allocation_proportions)
+
+    reproduction.assign_semen_type(
+        population_ranking_index=population_ranking_index,
+        animal_ranking_index=animal_ranking_index,
+        animal_type=animal_type,
+    )
+
+    assert reproduction.semen_type == expected_semen_type
+
+
+@pytest.mark.parametrize(
+    "semen_type, male_calf_rate, random_value, expected_sex",
+    [
+        (SemenType.CONVENTIONAL_DAIRY, animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE, 0.0, Sex.MALE),
+        (SemenType.CONVENTIONAL_DAIRY, animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE, 0.99, Sex.FEMALE),
+        (SemenType.SEXED_DAIRY, animal_constants.SEXED_DAIRY_MALE_CALF_RATE, 0.0, Sex.MALE),
+        (SemenType.SEXED_DAIRY, animal_constants.SEXED_DAIRY_MALE_CALF_RATE, 0.99, Sex.FEMALE),
+        (SemenType.BEEF, animal_constants.BEEF_MALE_CALF_RATE, 0.0, Sex.MALE),
+        (SemenType.BEEF, animal_constants.BEEF_MALE_CALF_RATE, 0.99, Sex.FEMALE),
+    ],
+)
+def test_determine_embryo_sex(
+    semen_type: SemenType,
+    male_calf_rate: float,
+    random_value: float,
+    expected_sex: Sex,
+    mocker: MockerFixture,
+) -> None:
+    """_determine_embryo_sex maps the semen type to its male-calf rate and draws the calf sex."""
+    reproduction = Reproduction()
+    reproduction.semen_type = semen_type
+    # random_value < male_calf_rate -> MALE, otherwise FEMALE.
+    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.random.random", return_value=random_value)
+
+    assert reproduction._determine_embryo_sex(simulation_day=100) == expected_sex
+
+
+def test_determine_embryo_sex_raises_when_semen_type_unset() -> None:
+    """_determine_embryo_sex requires a semen type; an unset (None) semen type is a programming error."""
+    reproduction = Reproduction()
+    reproduction.semen_type = None
+
+    with pytest.raises(ValueError, match="Unexpected Semen Type."):
+        reproduction._determine_embryo_sex(simulation_day=100)
 
 
 @pytest.mark.parametrize(
