@@ -1171,6 +1171,7 @@ class Reproduction:
             )
         else:
             self.semen_type = SemenType.CONVENTIONAL_DAIRY
+        assert self.semen_type is not None
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,
             simulation_day,
@@ -1224,7 +1225,7 @@ class Reproduction:
 
         return reproduction_data_stream
 
-    def _determine_embryo_sex(self, simulation_day) -> Sex:
+    def _determine_embryo_sex(self, simulation_day: int) -> Sex:
 
         if self.semen_type == SemenType.CONVENTIONAL_DAIRY:
             male_calf_rate = animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE
@@ -2472,7 +2473,9 @@ class Reproduction:
     def assign_semen_type(
         self, population_ranking_index: list[float] | None, animal_ranking_index: float | None, animal_type: AnimalType
     ) -> None:
-        animal_ranking_index_percentile: float = np.mean(np.array(population_ranking_index) <= animal_ranking_index)
+        animal_ranking_index_percentile: float = float(
+            np.mean(np.array(population_ranking_index) <= animal_ranking_index)
+        )
         semen_allocation_proportions = (
             AnimalConfig.heiferII_semen_allocation_proportions
             if animal_type == AnimalType.HEIFER_II

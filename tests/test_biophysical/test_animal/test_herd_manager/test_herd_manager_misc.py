@@ -151,7 +151,6 @@ def test_assign_embryo_sex_for_pregnant_animals_entering_the_herd(
     animal_two.days_born = 512
     animals = [animal_one, animal_two]
 
-    # Method does not use `self`; a bare mock stands in for the HerdManager instance.
     HerdManager._assign_embryo_sex_for_pregnant_animals_entering_the_herd(MagicMock(), animals)
 
     expected_sex = Sex[expected_sex_name]
