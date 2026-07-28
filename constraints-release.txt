@@ -16,7 +16,7 @@
 
 black==25.1.0
 coverage==7.10.4
-deepdiff==8.6.1
+deepdiff==8.6.2
 flake8==7.3.0
 freezegun==1.5.5
 matplotlib==3.10.5
