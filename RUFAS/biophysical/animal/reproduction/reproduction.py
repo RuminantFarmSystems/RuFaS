@@ -1004,9 +1004,6 @@ class Reproduction:
                     f"{self.cow_ovsynch_program}"
                 )
             self.hormone_schedule = hormone_schedule
-            for key, value in hormone_schedule.items():
-                if value.get("set_ai_day", False) and reproduction_data_stream.is_pregnant:
-                    print(f"Setting AI day for {reproduction_data_stream.animal_type} but animal is already pregnant")
         return reproduction_data_stream
 
     def _handle_synch_ed_hormone_delivery_and_set_estrus_day(

@@ -265,7 +265,6 @@ class HerdManager:
             herd_population.cows,
             herd_population.replacement,
         )
-        # TODO: randomly assign embryo sex for animals that are already pregnant: use Conventional Dairy
         pregnant_animals = [animal for animal in (self.heiferIIs + self.heiferIIIs + self.cows) if animal.is_pregnant]
         self._assign_embryo_sex_for_pregnant_animals_entering_the_herd(pregnant_animals)
 

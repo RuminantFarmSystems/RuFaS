@@ -329,7 +329,6 @@ class TaskManager:
                     " dependencies at required minimum levels.",
                     {"class": TaskManager.__name__, "function": TaskManager.check_dependencies.__name__},
                 )
-                return
                 raise RuntimeError(
                     f"Required package '{package_name}' version does not match. Installed: {installed_version}, "
                     f"Required: {requirement.specifier}"
