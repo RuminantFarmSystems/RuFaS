@@ -29,15 +29,14 @@ event occurring to simulate if that event occurs, and
 instantiation. Probability distributions used for that purpose are Normal Gaussian or Empirical. 
 
 Each animal within the RuFaS herd progresses through five main life stages (calf, Heifer I, Heifer II, Heifer III,
-and Cow) as illustrated in the figure below. 
+and Cow). 
 
 *  Calves progress to Heifer I when their age reaches the user-defined input for weaning day.
 *  Heifer I progresses to Heifer II when their age reaches the user-defined input for breeding start day. 
 *  Heifer II animals that successfully conceive become Heifer III's when the number of days left in their pregnancy 
 is equal to the user-defined input for prefresh days (default 21).
 *  When a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm.
-*  Cows cycle through lactating and non-lactating phases until they are removed from the herd due to a failure to 
-conceive or a user-provided probability for sale or death within each parity (lactation).
+*  Cows cycle through lactating and non-lactating phases until they are removed from the herd due to low milk production or a user-provided probability for sale or death within each parity (lactation).
 
 When a Heifer III or Cow reaches full gestation length, they start lactating and a new calf object is created. The calf 
 is assigned a birthweight according to a user-informed random distribution. All male calves are recorded and removed 
@@ -75,10 +74,10 @@ import_table(
 #### Required User Inputs
 ```{python}
 #| label: tbl-an-herd-inputs
-#| tbl-cap: User inputs in the animal input file that influence the generation of the Animal Population (pre-animal-population). The inputs of this table are found in the Herd Initialization Section.
+#| tbl-cap: User inputs in the animal input file that influence the generation of the pre-animal-population and selection of the post-animal-population. The inputs of this table are found in the Herd Initialization and Herd Information sections of the animal input json.
 import_table(
   "../resources/table_data/animal/tbl-an-herd-inputs.csv",
-  colalign = ["left", "left", "center", "center", "center"]
+  colalign = ["left", "left", "left", "center", "center", "center"]
 )
 ```
 
@@ -118,7 +117,7 @@ The `_generate_animals()` method creates the `pre_animal_population`, with the o
 Calves are created according to the number specified by the user (`initial_animal_num`), some are sold based on user inputs, and those remaining proceed through select daily updates (growth, reproduction, milk, and transition through the appropriate life stages) for the user-specified number of days (`simulation_days`). The simulation occurs similarly 
 to the regular life cycle simulation process, but with an extended period and large number of animals. There are a few notable distinctions:  
 
-* After 3000 days of simulation (specified in `animal_constants`), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
+* After 3000 days of simulation (specified as `DAYS_TO_START_REPLACEMENT_HERD` in `animal_constants.py`), a copy of each heiferIII is saved to the replacement herd. The copy is made on the day when she is ready to transition to a lactating cow (ready to give birth), so that when the copy enters the herd as a purchased heiferIII during the actual simulation, she will give birth the very next day. 
 * If a cow has made it to parity six without being culled, she is removed from the herd. (The maximum parity of cows kept in the generated herd is five). After the `simulation_days` number of days, the full herd contains a mixture of calves, heifers, cows, and replacements. The core status information and life history of each animal are either saved to file or passed for random sampling to create the `post-animal-population`. 
 
 *Option 2: Point to an existing Animal Population*
