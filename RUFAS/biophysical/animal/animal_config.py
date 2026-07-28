@@ -37,10 +37,6 @@ class AnimalConfig:
         Maximum day at which a heifer is culled if not pregnant, (simulation days).
     do_not_breed_time : int
         The duration after which breeding is stopped, (simulation days).
-    male_calf_rate_conventional_semen : float
-        Proportion of male calves when conventional semen is used, (unitless).
-    male_calf_rate_sexed_semen : float
-        Proportion of male calves when sexed semen is used, (unitless).
     keep_female_calf_rate : float
         Rate at which female calves are kept, (unitless).
     still_birth_rate : float
@@ -190,13 +186,11 @@ class AnimalConfig:
     heifer_reproduction_cull_day: int = 500
     do_not_breed_time: int = 185
 
-    male_calf_rate_conventional_semen: float = 0.53
-    male_calf_rate_sexed_semen: float = 0.10
     selective_repro_strategy: bool = False
     ranking_method: str = "genetic"
     genetic_selection_index_weights: dict[str, float] = {
-        "fat": 0.71,
-        "protein": 0.29,
+        "fat": 0.318,
+        "protein": 0.13,
     }
     heiferII_semen_allocation_proportions: dict[str, float] = {
         "sexed_dairy": 0.5,

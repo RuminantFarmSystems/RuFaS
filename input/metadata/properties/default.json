@@ -339,14 +339,14 @@
               "description": "The index weight for fat",
               "minimum": 0,
               "maximum": 1,
-              "default": 0.71
+              "default": 0.318
             },
             "protein": {
               "type": "number",
               "description": "The index weight for protein",
               "minimum": 0,
               "maximum": 1,
-              "default": 0.29
+              "default": 0.13
             }
           },
           "heifers": {

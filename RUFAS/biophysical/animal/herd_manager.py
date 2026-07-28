@@ -469,7 +469,7 @@ class HerdManager:
             and all([(animal.animal_type == AnimalType.HEIFER_II or animal.animal_type.is_cow) for animal in animals])
         ):
             animal_ranking_indexes: list[float] | None = [
-                animal.genetics.ranking_index_for_breeding for animal in animals if animal.is_eligible_for_breeding
+                animal.genetics.ranking_index for animal in animals if animal.is_eligible_for_breeding
             ]
 
         for animal in animals:

@@ -327,6 +327,9 @@ class Genetics:
 
     def _calculate_ranking_index(self) -> float:
         """Calculate ranking index."""
+        user_defined_weights: dict[str, float] = AnimalConfig.genetic_selection_index_weights
+        if user_defined_weights and user_defined_weights["fat"] > 0 and user_defined_weights["protein"] > 0:
+            return user_defined_weights["fat"] * self.EBV_fat + user_defined_weights["protein"] * self.EBV_protein
         return 0.318 * self.EBV_fat + 0.13 * self.EBV_protein
 
     @staticmethod
@@ -386,14 +389,6 @@ class Genetics:
             "EBV_protein": self.EBV_protein,
             "ranking_index": self.ranking_index,
         }
-
-    @property
-    def ranking_index_for_breeding(self) -> float:
-        """Return ranking index for breeding."""
-        return (
-            self.EBV_fat * AnimalConfig.genetic_selection_index_weights["fat"]
-            + self.EBV_protein * AnimalConfig.genetic_selection_index_weights["protein"]
-        )
 
     @classmethod
     def set_top_semen_too_early_warning_raised(cls, birthdate_too_early_warning_raised: bool) -> None:

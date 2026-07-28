@@ -468,10 +468,8 @@ class Reproduction:
 
         reproduction_data_stream = self._simulate_estrus_if_eligible(reproduction_data_stream, time.simulation_day)
 
-        # assert self.embryo_sex is not None
         if self.embryo_sex is None:
             self.embryo_sex = Sex.FEMALE
-            print("setting sex manually to female")
         reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
             breed=reproduction_data_stream.breed.name,
             sex=self.embryo_sex,
@@ -1112,7 +1110,6 @@ class Reproduction:
         elif self.semen_type == SemenType.BEEF:
             male_calf_rate = animal_constants.BEEF_MALE_CALF_RATE
         else:
-            print(simulation_day, self.semen_type)
             raise ValueError("Unexpected Semen Type.")
         embryo_sex = Sex.MALE if random.random() < male_calf_rate else Sex.FEMALE
         return embryo_sex

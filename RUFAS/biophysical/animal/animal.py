@@ -1179,33 +1179,6 @@ class Animal:
                 animal_type=self.animal_type,
             )
 
-    def _assign_sex_to_newborn_calf(self) -> None:
-        """
-        Assign a sex to a newborn calf based on the semen type and male calf rate.
-
-        Determines the sex of the calf by evaluating the type of semen used (conventional
-        or sexed) and the corresponding male calf rate. Raises a ValueError if an
-        unexpected semen type is encountered.
-
-        Raises
-        ------
-        ValueError
-            If `AnimalConfig.semen_type` is not "conventional" or "sexed".
-
-        """
-        if AnimalConfig.semen_type == "conventional":
-            male_calf_rate = AnimalConfig.male_calf_rate_conventional_semen
-        elif AnimalConfig.semen_type == "sexed":
-            male_calf_rate = AnimalConfig.male_calf_rate_sexed_semen
-        else:
-            self.om.add_error(
-                "Unexpected semen type",
-                f"Unexpected semen type: {AnimalConfig.semen_type}",
-                {"class": self.__class__.__name__, "function": self._assign_sex_to_newborn_calf.__name__},
-            )
-            raise ValueError(f"Unexpected semen type: {AnimalConfig.semen_type}")
-        self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
-
     def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict, simulation_day: int) -> None:
         """
         Initialize a newborn calf with specific attributes and simulation variables.
