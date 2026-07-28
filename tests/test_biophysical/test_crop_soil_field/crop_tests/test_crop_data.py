@@ -12,6 +12,11 @@ def mock_crop_data() -> CropData:
     return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
+def test_deposit_all_residue_at_harvest_defaults_false(mock_crop_data: CropData) -> None:
+    """The deposit-all-residue flag defaults to False so ordinary crops are unaffected."""
+    assert mock_crop_data.deposit_all_residue_at_harvest is False
+
+
 @pytest.mark.parametrize("frac,expect", [(0, False), (0.5, False), (1, True), (1.5, True)])
 def test_is_mature_property(mock_crop_data: CropData, frac: float, expect: bool) -> None:
     """Check that the is_mature property is properly assigning maturity by heat fraction."""
