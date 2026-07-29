@@ -118,7 +118,7 @@ class CropManagement:
         field_size: float,
         time: RufasTime,
         soil_data: SoilData,
-    ) -> HarvestedCrop:
+    ) -> HarvestedCrop | None:
         """
         Executes the harvest operation passed on the crop that contains this module.
 
@@ -137,17 +137,21 @@ class CropManagement:
 
         Returns
         -------
-        HarvestedCrop
+        HarvestedCrop | None
             The harvested crop data structure containing mass and nutritional information associated with the
-            harvest's yield.
+            harvest's yield. This is ``None`` when no yield is collected, i.e. for a kill-only operation or for a crop
+            configured to deposit all residue into the field (see ``CropData.deposit_all_residue_at_harvest``).
 
         """
         self.determine_harvest_index()
 
         harvested_crop = None
         if harvest_operation in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
-            self.cut_crop(collected_fraction=self.harvest_efficiency)
-            harvested_crop = self._get_harvested_crop(time, field_size, field_name)
+            if self.data.deposit_all_residue_at_harvest:
+                self.cut_crop(collected_fraction=0.0)
+            else:
+                self.cut_crop(collected_fraction=self.harvest_efficiency)
+                harvested_crop = self._get_harvested_crop(time, field_size, field_name)
 
         if harvest_operation in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
