@@ -528,3 +528,85 @@ def test_preprocess_expands_input_wildcard_with_value_map(monkeypatch: pytest.Mo
         {"X": "A", "Y": "B", "Z": "C"},
     )
     assert values == [5.0, 6.0, 7.0]
+
+
+def _make_preprocessor(monkeypatch: pytest.MonkeyPatch, data=None):
+    dummy_im = DummyInputManager(data or {})
+    dummy_om = DummyOutputManager({})
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    return preprocessing.EconomicPreprocessor(), dummy_im, dummy_om
+
+
+def test_resolve_price_file_key_prefers_direct_match(monkeypatch: pytest.MonkeyPatch) -> None:
+    preprocessor, _, _ = _make_preprocessor(monkeypatch)
+    preprocessor.available_input_keys = {"commodity_prices_corn_silage_dollar_per_kilogram"}
+
+    assert preprocessor._resolve_price_file_key("corn_silage") == "commodity_prices_corn_silage_dollar_per_kilogram"
+
+
+def test_resolve_price_file_key_uses_alias(monkeypatch: pytest.MonkeyPatch) -> None:
+    preprocessor, _, _ = _make_preprocessor(monkeypatch)
+    # cereal_rye_silage has no dedicated series; it should alias to barley_silage.
+    preprocessor.available_input_keys = {"commodity_prices_barley_silage_dollar_per_kilogram"}
+
+    assert (
+        preprocessor._resolve_price_file_key("cereal_rye_silage")
+        == "commodity_prices_barley_silage_dollar_per_kilogram"
+    )
+
+
+def test_resolve_price_file_key_returns_none_when_unmapped(monkeypatch: pytest.MonkeyPatch) -> None:
+    preprocessor, _, _ = _make_preprocessor(monkeypatch)
+    preprocessor.available_input_keys = {"commodity_prices_corn_silage_dollar_per_kilogram"}
+
+    assert preprocessor._resolve_price_file_key("nonexistent_feed") is None
+
+
+def test_resolve_price_file_key_without_metadata_returns_direct(monkeypatch: pytest.MonkeyPatch) -> None:
+    preprocessor, _, _ = _make_preprocessor(monkeypatch)
+    preprocessor.available_input_keys = set()
+
+    assert (
+        preprocessor._resolve_price_file_key("cereal_rye_silage")
+        == "commodity_prices_cereal_rye_silage_dollar_per_kilogram"
+    )
+
+
+def test_homegrown_feed_price_aliases_resolve_to_available_series(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Every curated alias must point to a commodity series the resolver accepts."""
+    preprocessor, _, _ = _make_preprocessor(monkeypatch)
+    available_targets = {
+        f"commodity_prices_{target}_dollar_per_kilogram"
+        for target in preprocessing.HOMEGROWN_FEED_PRICE_ALIASES.values()
+    }
+    preprocessor.available_input_keys = available_targets
+
+    for crop_name, target in preprocessing.HOMEGROWN_FEED_PRICE_ALIASES.items():
+        assert preprocessor._resolve_price_file_key(crop_name) == f"commodity_prices_{target}_dollar_per_kilogram"
+
+
+def test_build_feed_id_map_applies_aliases_and_warns(monkeypatch: pytest.MonkeyPatch) -> None:
+    configs = {
+        "Silage": [
+            {"rufas_id": 1, "crop_name": "corn_silage"},  # direct match
+            {"rufas_id": 2, "crop_name": "cereal_rye_silage"},  # alias -> barley_silage
+        ],
+        "Grain": [
+            {"rufas_id": 3, "crop_name": "unmappable_feed"},  # no match, warns and skips
+        ],
+    }
+    preprocessor, _, dummy_om = _make_preprocessor(monkeypatch, {"feed_storage_configurations": configs})
+    preprocessor.available_input_keys = {
+        "commodity_prices_corn_silage_dollar_per_kilogram",
+        "commodity_prices_barley_silage_dollar_per_kilogram",
+    }
+
+    feed_id_map = preprocessor._build_feed_id_to_price_file_map()
+
+    assert feed_id_map == {
+        "1": "commodity_prices_corn_silage_dollar_per_kilogram",
+        "2": "commodity_prices_barley_silage_dollar_per_kilogram",
+    }
+    warning_codes = [code for code, _, _ in dummy_om.warnings]
+    assert "MissingHomegrownFeedPriceMapping" in warning_codes

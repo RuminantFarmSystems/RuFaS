@@ -22,7 +22,7 @@ from typing import Any, Dict, Iterable, List, Set
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
-from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
+from RUFAS.EEE.economics.mapping import ECONOMIC_MAP, HOMEGROWN_FEED_PRICE_ALIASES
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -641,15 +641,45 @@ class EconomicPreprocessor:
                 prices[option] = price_data
         return prices
 
+    def _resolve_price_file_key(self, crop_name: str) -> str | None:
+        """Resolve a feed ``crop_name`` to an available commodity price file key.
+
+        Prefers an exact ``commodity_prices_{crop_name}_dollar_per_kilogram``
+        match. When a feed crop has no dedicated commodity price series, falls
+        back to a curated alias (see
+        :data:`~RUFAS.EEE.economics.mapping.HOMEGROWN_FEED_PRICE_ALIASES`) that
+        points to the closest available proxy commodity, as agreed with the
+        economics SMEs. Returns ``None`` when neither a direct match nor a valid
+        alias resolves to an available InputManager key.
+        """
+        direct_key = f"commodity_prices_{crop_name}_dollar_per_kilogram"
+
+        # Without metadata we cannot validate keys; preserve the direct key so
+        # downstream lookups behave as before.
+        if not self.available_input_keys:
+            return direct_key
+
+        if direct_key in self.available_input_keys:
+            return direct_key
+
+        alias = HOMEGROWN_FEED_PRICE_ALIASES.get(crop_name)
+        if alias is not None:
+            alias_key = f"commodity_prices_{alias}_dollar_per_kilogram"
+            if alias_key in self.available_input_keys:
+                return alias_key
+
+        return None
+
     def _build_feed_id_to_price_file_map(self) -> Dict[str, str]:
         """Build a mapping of RuFaS feed ID to commodity price file key from feed storage configs.
 
         Reads ``feed_storage_configurations`` from the InputManager. Each storage entry
         carries a ``rufas_id`` integer and a ``crop_name`` string. The commodity price
-        file key is constructed as
-        ``commodity_prices_{crop_name}_dollar_per_kilogram`` and verified against the
-        set of available InputManager keys before inclusion.
+        file key is resolved via :meth:`_resolve_price_file_key`, which prefers an exact
+        ``commodity_prices_{crop_name}_dollar_per_kilogram`` match and otherwise falls
+        back to a curated alias for feeds without a dedicated price series.
         """
+        info_map = {"class": self.__class__.__name__, "function": self._build_feed_id_to_price_file_map.__name__}
         feed_id_map: Dict[str, str] = {}
         try:
             configs = self.im.get_data("feed_storage_configurations")
@@ -669,8 +699,14 @@ class EconomicPreprocessor:
                 crop_name = entry.get("crop_name")
                 if rufas_id is None or not isinstance(crop_name, str):
                     continue
-                price_file_key = f"commodity_prices_{crop_name}_dollar_per_kilogram"
-                if self.available_input_keys and price_file_key not in self.available_input_keys:
+                price_file_key = self._resolve_price_file_key(crop_name)
+                if price_file_key is None:
+                    self.om.add_warning(
+                        "MissingHomegrownFeedPriceMapping",
+                        f"No commodity price file or alias found for feed crop '{crop_name}' "
+                        f"(feed ID '{rufas_id}')",
+                        info_map,
+                    )
                     continue
                 feed_id_map[str(rufas_id)] = price_file_key
 

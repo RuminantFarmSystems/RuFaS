@@ -7,6 +7,36 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
+# Alias map for homegrown feed crops that do not have a dedicated commodity
+# price series. Each entry maps a feed_storage ``crop_name`` to the base name of
+# an existing ``commodity_prices_{base}_dollar_per_kilogram`` series that serves
+# as the closest available price proxy. These assignments were agreed with the
+# economics SMEs (see issue #3079 / PR #3119 discussion):
+#   - cereal rye / triticale grain                     -> rye_grain
+#   - cereal rye / triticale / winter wheat silage
+#     and baleage                                      -> barley_silage
+#   - tall fescue silage and baleage                   -> sundan_silage
+#   - alfalfa baleage                                  -> alfalfa_silage
+#   - any hay other than alfalfa (per USDA, grass hays
+#     and other forages)                               -> hay_excluding_alfalfa
+HOMEGROWN_FEED_PRICE_ALIASES: Dict[str, str] = {
+    "cereal_rye_grain": "rye_grain",
+    "cereal_rye_silage": "barley_silage",
+    "cereal_rye_baleage": "barley_silage",
+    "cereal_rye_hay": "hay_excluding_alfalfa",
+    "triticale_grain": "rye_grain",
+    "triticale_silage": "barley_silage",
+    "triticale_baleage": "barley_silage",
+    "triticale_hay": "hay_excluding_alfalfa",
+    "tall_fescue_silage": "sundan_silage",
+    "tall_fescue_baleage": "sundan_silage",
+    "tall_fescue_hay": "hay_excluding_alfalfa",
+    "winter_wheat_silage": "barley_silage",
+    "winter_wheat_baleage": "barley_silage",
+    "winter_wheat_hay": "hay_excluding_alfalfa",
+    "alfalfa_baleage": "alfalfa_silage",
+}
+
 ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
     "Animal": {
         "Costs": {
