@@ -292,14 +292,14 @@ def test_create_crop_data() -> None:
         assert actual_value == expected_value
 
 
-def test_create_crop_data_preserves_deposit_all_residue_flag() -> None:
-    """Test that a crop configuration's deposit_all_residue_at_harvest flag is carried into the created CropData."""
+def test_create_crop_data_preserves_grazing_harvest_efficiency() -> None:
+    """Test that a crop configuration's grazing harvest efficiency is carried into the created CropData."""
     CropDataFactory._crop_configurations = {
         "pasture": CropConfiguration(
             name="pasture",
             plant_category=PlantCategory.PERENNIAL,
             is_nitrogen_fixer=False,
-            deposit_all_residue_at_harvest=True,
+            grazing_harvest_efficiency=0.25,
             minimum_temperature=0.0,
             optimal_temperature=15.0,
             potential_heat_units=800.0,
@@ -337,7 +337,8 @@ def test_create_crop_data_preserves_deposit_all_residue_flag() -> None:
 
     actual = CropDataFactory.create_crop_data("pasture")
 
-    assert actual.deposit_all_residue_at_harvest is True
+    assert actual.grazing_harvest_efficiency == 0.25
+    assert actual.is_grazed is True
 
 
 def test_crop_crop_data_error() -> None:

@@ -139,16 +139,24 @@ class CropManagement:
         -------
         HarvestedCrop | None
             The harvested crop data structure containing mass and nutritional information associated with the
-            harvest's yield. This is ``None`` when no yield is collected, i.e. for a kill-only operation or for a crop
-            configured to deposit all residue into the field (see ``CropData.deposit_all_residue_at_harvest``).
+            harvest's yield. This is ``None`` when nothing is sent to feed storage, i.e. for a kill-only operation or
+            for a grazed crop (see ``CropData.grazing_harvest_efficiency``).
+
+        Notes
+        -----
+        A grazed crop is cut with its grazing harvest efficiency in place of the mechanical harvest efficiency, so the
+        consumed fraction is removed as grazed forage and the larger remainder is deposited into the field as residue.
+        The consumed forage is reported as the harvest's yield but is not passed to feed storage, because grazing
+        animals eat it in the field rather than it being stored. Routing that forage to the herd as a feed source
+        requires the grazing farm simulation tracked by issue #2871.
 
         """
         self.determine_harvest_index()
 
         harvested_crop = None
         if harvest_operation in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
-            if self.data.deposit_all_residue_at_harvest:
-                self.cut_crop(collected_fraction=0.0)
+            if self.data.grazing_harvest_efficiency is not None:
+                self.cut_crop(collected_fraction=self.data.grazing_harvest_efficiency)
             else:
                 self.cut_crop(collected_fraction=self.harvest_efficiency)
                 harvested_crop = self._get_harvested_crop(time, field_size, field_name)

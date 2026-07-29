@@ -69,9 +69,12 @@ class CropData:
         grain.
     use_heat_scheduling : bool
         If heat unit scheduling is used for harvesting.
-    deposit_all_residue_at_harvest : bool, default False
-        If True, harvest operations collect no yield and deposit all cut biomass into the field as residue instead of
-        removing it as harvested yield.
+    grazing_harvest_efficiency : float | None, default None
+        Fraction of the cut biomass that grazing animals consume at a harvest (unitless; [0, 1]). A value marks the
+        crop as grazed rather than mechanically harvested: that fraction is removed as grazed forage and the remainder
+        is deposited into the field as residue. ``None`` indicates a conventionally harvested crop, whose collected
+        yield is sent to feed storage instead. Reported grazer harvest efficiencies are roughly 0.25 for season-long
+        continuous grazing and 0.40 for rotational grazing.
     harvest_heat_fraction : float
         Fraction of potential heat units for optimal growth stage for harvest.
     optimal_harvest_index : float
@@ -238,7 +241,7 @@ class CropData:
     planting_day: int = 100
     lignin_dry_matter_percentage: float = 1.518
     use_heat_scheduling: bool = False
-    deposit_all_residue_at_harvest: bool = False
+    grazing_harvest_efficiency: float | None = None
     harvest_heat_fraction: float = 1.10
     optimal_harvest_index: float = 0.5
     minimum_harvest_index: float = 0.3
@@ -389,6 +392,19 @@ class CropData:
 
         """
         return not self.is_mature and not self.is_dormant and self.is_alive and self.is_growing
+
+    @property
+    def is_grazed(self) -> bool:
+        """
+        Checks whether this crop is grazed rather than mechanically harvested.
+
+        Returns
+        -------
+        bool
+            True if a grazing harvest efficiency is given, False otherwise.
+
+        """
+        return self.grazing_harvest_efficiency is not None
 
     @property
     def do_harvest_index_override(self) -> bool:
