@@ -167,12 +167,11 @@ class MineralizationDecomposition:
         References
         ----------
         SWAT Theoretical documentation eqn. 3:1.2.8
-        Current return value is a temporary fix to replace the process based method for the effect of the soil C, N,
-         and P on the decomposition rate factor. # TODO: Check if the temporary solution is till intended = issue #2990
 
         Notes
         -----
         The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.
+        A minimum value of 1e-5 is used to truncate the C:N objective function at a practical upper limit (SME #2990).
 
         """
         nitrogen_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
@@ -181,8 +180,8 @@ class MineralizationDecomposition:
         phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
             carbon_phosphorus_ratio, 200
         )
-        assert nitrogen_term is not None and phosphorus_term is not None
-        return 1
+        composition_factor = min([nitrogen_term, phosphorus_term, 1])
+        return max(composition_factor, 1e-5)
 
     @staticmethod
     def _calculate_decay_rate_constant(

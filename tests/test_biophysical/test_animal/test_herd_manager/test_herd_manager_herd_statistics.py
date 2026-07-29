@@ -431,7 +431,7 @@ def test_update_cow_milking_statistics_value_error(herd_manager: HerdManager, mo
             milk_fat_content=1,
             milk_protein_content=1,
         )
-        for _ in range(randint(0, 100))
+        for _ in range(randint(1, 100))
     ]
     all_cows = lactating_cows + dry_cows
     herd_manager.cows = all_cows
