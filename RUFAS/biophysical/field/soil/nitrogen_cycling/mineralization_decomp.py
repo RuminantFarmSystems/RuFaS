@@ -171,7 +171,7 @@ class MineralizationDecomposition:
         Notes
         -----
         The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.
-        Minimum value in the max() return was suggested by SME on issue#2990
+        A minimum value of 1e-5 is used to truncate the C:N objective function at a practical upper limit (SME #2990).
 
         """
         nitrogen_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
