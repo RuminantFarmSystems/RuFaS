@@ -82,6 +82,12 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
                 "std_gestation_len": 6,
                 "prefresh_day": 21,
                 "calving_interval": 400,
+                "selective_repro_strategy": True,
+                "ranking_method": "genetic",
+                "genetic_selection_index_weights": {
+                    "fat": 0.318,
+                    "protein": 0.13,
+                },
                 "heifers": {
                     "estrus_detection_rate": 0.9,
                     "estrus_conception_rate": 0.6,
@@ -89,6 +95,11 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
                     "repro_sub_properties": {
                         "conception_rate": 0.6,
                         "estrus_detection_rate": 0.9,
+                    },
+                    "semen_allocation_proportions": {
+                        "sexed_dairy": 0.5,
+                        "conventional_dairy": 0.5,
+                        "beef": 0.0,
                     },
                 },
                 "cows": {
@@ -100,6 +111,11 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
                     "ovsynch_program_start_day": 64,
                     "ovsynch_program_conception_rate": 0.6,
                     "resynch_program": "TAIafterPD",
+                    "semen_allocation_proportions": {
+                        "sexed_dairy": 0.2,
+                        "conventional_dairy": 0.5,
+                        "beef": 0.3,
+                    },
                 },
             },
             "bodyweight": {
@@ -213,9 +229,22 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
 
     assert AnimalConfig.wean_day == 60
     assert AnimalConfig.wean_length == 7
-    assert AnimalConfig.semen_type == "conventional"
     assert AnimalConfig.milk_fat_percent == 4
     assert AnimalConfig.milk_reduction_maximum == 1.23
+
+    assert AnimalConfig.selective_repro_strategy is True
+    assert AnimalConfig.ranking_method == "genetic"
+    assert AnimalConfig.genetic_selection_index_weights == {"fat": 0.318, "protein": 0.13}
+    assert AnimalConfig.heiferII_semen_allocation_proportions == {
+        "sexed_dairy": 0.5,
+        "conventional_dairy": 0.5,
+        "beef": 0.0,
+    }
+    assert AnimalConfig.cow_semen_allocation_proportions == {
+        "sexed_dairy": 0.2,
+        "conventional_dairy": 0.5,
+        "beef": 0.3,
+    }
 
     assert AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol(heifer_method)
     assert isinstance(AnimalConfig.heifer_reproduction_sub_program, expected_subprogram_type)
@@ -366,11 +395,22 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                 "std_gestation_len": 6,
                 "prefresh_day": 21,
                 "calving_interval": 400,
+                "selective_repro_strategy": True,
+                "ranking_method": "genetic",
+                "genetic_selection_index_weights": {
+                    "fat": 0.318,
+                    "protein": 0.13,
+                },
                 "heifers": {
                     "estrus_detection_rate": 0.9,
                     "estrus_conception_rate": 0.6,
                     "repro_sub_protocol": "2P",
                     "repro_sub_properties": {"conception_rate": 0.6, "estrus_detection_rate": 0.9},
+                    "semen_allocation_proportions": {
+                        "sexed_dairy": 0.5,
+                        "conventional_dairy": 0.5,
+                        "beef": 0.0,
+                    },
                 },
                 "cows": {
                     "estrus_detection_rate": 0.6,
@@ -381,6 +421,11 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                     "ovsynch_program_start_day": 64,
                     "ovsynch_program_conception_rate": 0.6,
                     "resynch_program": "TAIafterPD",
+                    "semen_allocation_proportions": {
+                        "sexed_dairy": 0.2,
+                        "conventional_dairy": 0.5,
+                        "beef": 0.3,
+                    },
                 },
             },
             "bodyweight": {
