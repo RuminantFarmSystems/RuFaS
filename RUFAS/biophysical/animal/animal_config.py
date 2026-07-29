@@ -546,7 +546,18 @@ class AnimalConfig:
         methane_mitigation_data = animal_data["methane_mitigation"]
         cls.methane_mitigation_method = methane_mitigation_data["methane_mitigation_method"]
         dose_field = cls._METHANE_MITIGATION_DOSE_FIELDS.get(cls.methane_mitigation_method)
-        cls.methane_mitigation_additive_amount = methane_mitigation_data[dose_field] if dose_field else 0.0
+        if dose_field is not None and dose_field not in methane_mitigation_data:
+            OutputManager().add_warning(
+                "Missing methane mitigation additive dose",
+                f"The selected methane mitigation method '{cls.methane_mitigation_method}' takes its dose from "
+                f"'{dose_field}', but that field is missing from the animal input. Defaulting the dose to 0, "
+                "which applies no mitigation.",
+                {
+                    "class": cls.__name__,
+                    "function": "initialize_animal_config",
+                },
+            )
+        cls.methane_mitigation_additive_amount = methane_mitigation_data.get(dose_field, 0.0) if dose_field else 0.0
 
         cls.milk_reduction_maximum = im.get_data("feed.ration_formulation_parameters.milk_reduction_maximum")
 

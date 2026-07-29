@@ -45,7 +45,7 @@ def reset_animal_config_state() -> Generator[None, None, None]:
 
 
 def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) -> dict[str, Any]:
-    """Builds the ``animal_config`` blob that ``AnimalConfig.set_from_data()`` reads."""
+    """Builds the ``animal_config`` blob that ``AnimalConfig.initialize_animal_config()`` reads."""
     return {
         "management_decisions": {
             "breeding_start_day_h": 380,
@@ -280,6 +280,45 @@ def test_initialize_animal_config_selects_dose_of_chosen_mitigation_method(
 
     assert AnimalConfig.methane_mitigation_method == methane_mitigation_method
     assert AnimalConfig.methane_mitigation_additive_amount == expected_additive_amount
+
+
+def test_initialize_animal_config_warns_when_selected_mitigation_dose_field_is_missing(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """A recognized method whose dose field is absent falls back to 0 and warns rather than raising."""
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
+    mock_om_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
+
+    mock_im = mock_im_cls.return_value
+    mock_om = mock_om_cls.return_value
+
+    animal_data = {
+        "animal_config": _make_base_animal_config("5dCG2P", "TAI"),
+        "methane_model": {"dummy": "model"},
+        # "3-NOP" is selected, but "3-NOP_additive_amount" is absent from the blob.
+        "methane_mitigation": {"methane_mitigation_method": "3-NOP"},
+        "herd_information": {"simulate_genetics": False},
+    }
+
+    def get_data_side_effect(key: str) -> Any:
+        if key == "animal":
+            return animal_data
+        if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
+            return 1.23
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+            return {}
+        raise KeyError(key)
+
+    mock_im.get_data.side_effect = get_data_side_effect
+
+    AnimalConfig.initialize_animal_config()
+
+    assert AnimalConfig.methane_mitigation_additive_amount == 0.0
+
+    mock_om.add_warning.assert_called_once()
+    warning_args, _ = mock_om.add_warning.call_args
+    assert "Missing methane mitigation additive dose" in warning_args[0]
+    assert "3-NOP_additive_amount" in warning_args[1]
 
 
 def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryoff(
