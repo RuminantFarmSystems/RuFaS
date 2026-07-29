@@ -367,22 +367,24 @@
         "future_expansion": "Placeholder for the future, scale to manure module outputs"
       },
       "Renewable natural gas (RNG) production": {
-        "input_manager": [
-          "economic_inputs.Manure.digester.digester_rng_produced"
+        "biophysical_simulation": [
+          "Manure\\.Digester\\.energy\\..*\\.rng_produced_megajoules"
         ],
         "economics_files": [
           "commodity_prices.natgas_industrial.dollar_per_megajoule.csv"
         ],
-        "future_expansion": "Placeholder for the future, scale to manure module outputs"
+        "aggregate_by_year": true,
+        "notes": "Daily RNG generated per digester (MJ) is summed by year and priced at the industrial natural gas rate for that year."
       },
       "Electricity production from anaerobic digester": {
-        "input_manager": [
-          "economic_inputs.Manure.digester.kwh_per_day_produced"
+        "biophysical_simulation": [
+          "Manure\\.Digester\\.energy\\..*\\.electricity_produced_kwh"
         ],
         "economics_files": [
           "commodity_prices.elec_industrial.dollar_per_kwh.csv"
         ],
-        "future_expansion": "Placeholder for the future, scale to manure module outputs"
+        "aggregate_by_year": true,
+        "notes": "Daily electricity generated per digester (kWh) is summed by year and priced at the industrial electricity rate for that year."
       },
       "Carbon credits from digester products and activities": {
         "biophysical_simulation": [

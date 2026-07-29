@@ -40,6 +40,15 @@
       "processor_name": "parlor_cleaning_handler",
       "destinations": [
         {
+          "receiving_processor_name": "anaerobic_digester_1",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "anaerobic_digester_1",
+      "destinations": [
+        {
           "receiving_processor_name": "slurry_storage_outdoor_lac",
           "proportion": 1.0
         }

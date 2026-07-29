@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import math
 import re
+from collections import defaultdict
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set
 
@@ -48,6 +50,7 @@ class EconomicItem:
     match_source: str | None
     wildcard_value_map: Dict[str, str] | None
     preprocessing: str | None
+    aggregate_by_year: bool
 
 
 class EconomicPreprocessor:
@@ -168,6 +171,7 @@ class EconomicPreprocessor:
                     economics_files = details.get("economics_files")
                     match_source = details.get("match_source")
                     wildcard_value_map = details.get("wildcard_value_map")
+                    aggregate_by_year = bool(details.get("aggregate_by_year", False))
                     if not biophysical_simulation and not input_manager and not economics_files:
                         continue
                     if isinstance(biophysical_simulation, str):
@@ -185,6 +189,7 @@ class EconomicPreprocessor:
                             match_source=match_source,
                             wildcard_value_map=wildcard_value_map if isinstance(wildcard_value_map, dict) else None,
                             preprocessing=preprocessing,
+                            aggregate_by_year=aggregate_by_year,
                         )
                     )
         return items
@@ -356,6 +361,43 @@ class EconomicPreprocessor:
 
         return expanded_paths
 
+    def _resolve_input_path(self, path: str) -> Any:
+        """Resolve an InputManager path, expanding a list ancestor into a list of field values.
+
+        A plain scalar or object path resolves exactly as ``InputManager.get_data`` would. When an
+        ancestor along the path is a list (e.g. ``economic_inputs.Manure.digester`` is now a list of
+        digesters), the trailing field is collected from every list element and returned as a list, so
+        downstream aggregation sums the field across all entries.
+        """
+        parts = path.split(".")
+        for split_index in range(len(parts), 0, -1):
+            prefix = ".".join(parts[:split_index])
+            value = self.im.get_data(prefix)
+            if value is None:
+                continue
+
+            remaining = parts[split_index:]
+            if not remaining:
+                return value
+
+            if isinstance(value, list):
+                collected: List[Any] = []
+                for element in value:
+                    current: Any = element
+                    for key in remaining:
+                        if isinstance(current, dict) and key in current:
+                            current = current[key]
+                        else:
+                            current = None
+                            break
+                    if current is not None:
+                        collected.append(current)
+                return collected
+
+            # The prefix resolved to a non-list whose remaining keys did not resolve; treat as missing.
+            return None
+        return None
+
     def _fetch_input_values(
         self,
         input_paths: Iterable[str],
@@ -384,7 +426,7 @@ class EconomicPreprocessor:
                     continue
 
             for candidate_path in candidate_paths:
-                data = self.im.get_data(candidate_path)
+                data = self._resolve_input_path(candidate_path)
                 if data is None:
                     self.om.add_warning(
                         "MissingEconomicInput",
@@ -638,6 +680,102 @@ class EconomicPreprocessor:
                 prices[option] = price_data
         return prices
 
+    def _compute_revenue_by_year(self, item: "EconomicItem") -> Dict[str, Any]:
+        """Compute revenue for a per-digester daily series by summing quantities per year and pricing each year.
+
+        For each biophysical pattern (matching one variable per digester), the daily values are summed into
+        calendar-year buckets using each value's ``simulation_day``. Every year's quantity is multiplied by that
+        year's commodity price (falling back to the average price for years without an explicit entry), and the
+        results are summed into the total revenue line item.
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._compute_revenue_by_year.__name__}
+
+        start_date_str = self.im.get_data("config.start_date")
+        end_date_str = self.im.get_data("config.end_date")
+        start_year: int | None = None
+        end_year: int | None = None
+        start_date: datetime | None = None
+        if start_date_str and end_date_str:
+            try:
+                start_year = int(str(start_date_str).split(":")[0])
+                end_year = int(str(end_date_str).split(":")[0])
+                start_date = datetime.strptime(str(start_date_str), "%Y:%j")
+            except (ValueError, AttributeError):
+                start_year = end_year = None
+                start_date = None
+
+        price_data = self._fetch_prices(item.economics_files)
+        price_values = self._extract_price_values(price_data)
+        price_by_year: Dict[int, float] = {}
+        if start_year is not None and end_year is not None:
+            for offset, year in enumerate(range(start_year, end_year + 1)):
+                if offset < len(price_values):
+                    price_by_year[year] = price_values[offset]
+        fallback_price = Aggregator.average(price_values) if price_values else None
+        if fallback_price is None:
+            fallback_price = ECONOMIC_PRICE_FALLBACK.get("revenue", 1.0)
+
+        quantity_by_year: Dict[int, float] = defaultdict(float)
+        per_digester_quantity: Dict[str, float] = defaultdict(float)
+        name_pattern = re.compile(r"energy\.(.+?)\.[^.]+$")
+
+        for path in item.biophysical_simulation:
+            filtered_pool = self.om.filter_variables_pool({"filters": [path]})
+            for variable_name, payload in filtered_pool.items():
+                if not isinstance(payload, dict):
+                    continue
+                values = payload.get("values", [])
+                info_maps = payload.get("info_maps", [])
+                name_match = name_pattern.search(variable_name)
+                digester_name = name_match.group(1) if name_match else variable_name
+                for index, value in enumerate(values):
+                    entry_info = (
+                        info_maps[index] if index < len(info_maps) and isinstance(info_maps[index], dict) else {}
+                    )
+                    simulation_day = entry_info.get("simulation_day")
+                    try:
+                        numeric_value = float(value)
+                    except (TypeError, ValueError):
+                        continue
+                    per_digester_quantity[digester_name] += numeric_value
+                    if simulation_day is None or start_date is None:
+                        # Without a day we cannot place the value in a year; fold it into the start year.
+                        year = start_year if start_year is not None else 0
+                    else:
+                        year = (start_date + timedelta(days=int(simulation_day))).year
+                    quantity_by_year[year] += numeric_value
+
+        revenue_by_year: Dict[int, float] = {}
+        total_revenue = 0.0
+        for year, quantity in quantity_by_year.items():
+            price = price_by_year.get(year, fallback_price)
+            year_revenue = quantity * price
+            revenue_by_year[year] = year_revenue
+            total_revenue += year_revenue
+
+        total_quantity = sum(quantity_by_year.values())
+        if not quantity_by_year:
+            self.om.add_warning(
+                "MissingDigesterEnergyOutputs",
+                f"No per-digester energy outputs matched patterns {item.biophysical_simulation} for '{item.name}'.",
+                info_map,
+            )
+
+        return {
+            "biophysical_values": [total_quantity],
+            "biophysical_aggregate": total_quantity,
+            "biophysical_values_by_scenario": {"baseline": [total_quantity]},
+            "biophysical_aggregate_by_scenario": {"baseline": total_quantity},
+            "price_data": price_data,
+            "price_values": price_values,
+            "price_aggregate": Aggregator.average(price_values) if price_values else None,
+            "line_item_values_by_scenario": {"baseline": total_revenue},
+            "revenue_by_year": revenue_by_year,
+            "quantity_by_year": dict(quantity_by_year),
+            "per_digester_quantity": dict(per_digester_quantity),
+            "flow_type": "revenue",
+        }
+
     def _aggregate(self, values: List[float], desc: str) -> float | None:
         """Aggregate values according to a textual description."""
         if not values:
@@ -669,6 +807,10 @@ class EconomicPreprocessor:
         for item in self.mapping:
             section_data = results.setdefault(item.section, {})
             category_data = section_data.setdefault(item.category, {})
+
+            if item.aggregate_by_year:
+                category_data[item.name] = self._compute_revenue_by_year(item)
+                continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
             wildcard_values = self._collect_biophysical_wildcards(item.biophysical_simulation)

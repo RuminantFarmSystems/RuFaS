@@ -469,30 +469,18 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "outputs",
             },
             "Electricity production from anaerobic digester": {
-                "input_manager": ["economic_inputs.Manure.digester.kwh_per_day_produced"],
+                "biophysical_simulation": [r"Manure\.Digester\.energy\..*\.electricity_produced_kwh"],
                 "economics_files": ["commodity_prices_elec_industrial_dollar_per_kwh"],
-                "future_expansion": "Placeholder "
-                "for "
-                "the "
-                "future, "
-                "scale "
-                "to "
-                "manure "
-                "module "
-                "outputs",
+                "aggregate_by_year": True,
+                "notes": "Daily electricity generated per digester (kWh) is summed by year and priced at the "
+                "industrial electricity rate for that year.",
             },
             "Renewable natural gas (RNG) production": {
-                "input_manager": ["economic_inputs.Manure.digester.digester_rng_produced"],
+                "biophysical_simulation": [r"Manure\.Digester\.energy\..*\.rng_produced_megajoules"],
                 "economics_files": ["commodity_prices_natgas_industrial_dollar_per_megajoule"],
-                "future_expansion": "Placeholder "
-                "for "
-                "the "
-                "future, "
-                "scale "
-                "to "
-                "manure "
-                "module "
-                "outputs",
+                "aggregate_by_year": True,
+                "notes": "Daily RNG generated per digester (MJ) is summed by year and priced at the industrial "
+                "natural gas rate for that year.",
             },
             "Sold manure": {
                 "input_manager": ["economic_inputs.Manure.manure_sales"],

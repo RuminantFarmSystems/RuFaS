@@ -59,6 +59,7 @@ class MeasurementUnits(Enum):
     KILOGRAMS_PER_MEGAGRAM = "kg/Mg"
     KILOGRAMS_PER_MILLIGRAM = "kg/mg"
     KILOMETERS = "km"
+    KILOWATT_HOURS = "kWh"
     L_ATM_PER_MOL_K = "L atm/mol/K"
     LITERS = "L"
     LITERS_PER_CUBIC_METER = "L/m^3"
