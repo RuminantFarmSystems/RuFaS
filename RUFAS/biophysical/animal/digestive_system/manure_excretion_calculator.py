@@ -711,7 +711,7 @@ class ManureExcretionCalculator:
         total_manure_excreted: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-    ) -> tuple[float, float, float, float, float]:
+    ) -> tuple[float, float, float]:
         """
         Calculates a set of phosphorus excretion values produced by a given animal.
 
@@ -731,8 +731,6 @@ class ManureExcretionCalculator:
         -------
         tuple[float, float, float, float, float]
             - Total amount of phosphorus excreted by the animal, (g).
-            - Fraction of extractable inorganic phosphorus, (unitless).
-            - Fraction of water extractable organic phosphorus, (unitless).
             - Amount of manure phosphorus excreted, (g).
             - Fraction of phosphorus in the manure, (unitless).
 
