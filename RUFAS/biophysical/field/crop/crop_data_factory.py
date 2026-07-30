@@ -1,4 +1,4 @@
-from typing import Any, TypedDict
+from typing import Any, NotRequired, TypedDict
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -15,6 +15,7 @@ class CropConfiguration(TypedDict):
     name: str
     plant_category: PlantCategory
     is_nitrogen_fixer: bool
+    grazing_harvest_efficiency: NotRequired[float | None]
     minimum_temperature: float
     optimal_temperature: float
     potential_heat_units: float

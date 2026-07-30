@@ -1253,7 +1253,7 @@ class Field:
         harvested_crops = []
         for crop in self.crops:
             if crop.should_harvest_based_on_heat():
-                harvested_crop: HarvestedCrop = crop.manage_crop_harvest(
+                harvested_crop: HarvestedCrop | None = crop.manage_crop_harvest(
                     HarvestOperation.HARVEST_ONLY,
                     self.field_data.name,
                     self.field_data.field_size,
@@ -1447,7 +1447,7 @@ class Field:
 
         harvested_crops = []
         for crop in crops_to_be_harvested:
-            harvested_crop: HarvestedCrop = crop.manage_crop_harvest(
+            harvested_crop: HarvestedCrop | None = crop.manage_crop_harvest(
                 harvest_operation,
                 self.field_data.name,
                 self.field_data.field_size,
