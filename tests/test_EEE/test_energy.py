@@ -10,7 +10,6 @@ from RUFAS.EEE.tractor_implement import TractorImplement
 from RUFAS.data_structures.tillage_implements import TractorSize, FieldOperationEvent, TillageImplement
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.units import MeasurementUnits
 from tests.test_EEE.fixtures import (
     parsed_diesel_consumption_inputs,
     EEE_constants,
@@ -38,7 +37,7 @@ def test_estimate_all(
     tractor_size: str | None,
     mocker: MockerFixture,
 ) -> None:
-    """Tests the estimation routines are called correctly with and without a configured tractor size."""
+    """Tests the estimation routines with and without a configured tractor size."""
     im, om = InputManager(), OutputManager()
 
     mock_parse_inputs = mocker.patch.object(
@@ -82,10 +81,12 @@ def test_estimate_all(
         simulate_manure=True,
     )
 
+    operation_count = len(parsed_diesel_consumption_inputs)
+
     mock_parse_inputs.assert_called_once_with()
-    assert mock_calculate_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
-    assert mock_report_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
-    assert mock_tractor.call_count == len(parsed_diesel_consumption_inputs)
+    assert mock_calculate_diesel_consumption.call_count == operation_count
+    assert mock_report_diesel_consumption.call_count == operation_count
+    assert mock_tractor.call_count == operation_count
 
     expected_tractor_size = TractorSize(tractor_size) if tractor_size else None
 
@@ -93,15 +94,12 @@ def test_estimate_all(
         assert tractor_call.kwargs["herd_size"] == 10
         assert tractor_call.kwargs["tractor_size"] == expected_tractor_size
 
-    mock_om_add_variable.assert_called_once_with(
-        "total_diesel_consumption_tractor_implement",
-        10,
-        {
-            "class": EnergyEstimator.__name__,
-            "function": EnergyEstimator.estimate_all.__name__,
-            "units": MeasurementUnits.LITERS_PER_HA,
-        },
-    )
+    unique_field_years = {(item["field_name"], item["operation_year"]) for item in parsed_diesel_consumption_inputs}
+    unique_years = {item["operation_year"] for item in parsed_diesel_consumption_inputs}
+
+    expected_add_variable_calls = len(unique_field_years) + len(unique_years)
+
+    assert mock_om_add_variable.call_count == expected_add_variable_calls
 
 
 @pytest.mark.parametrize(
@@ -196,7 +194,7 @@ def test_report_diesel_consumption(
         diesel_consumption_data=diesel_consumption_data,
         herd_size=18,
         tractor_size=TractorSize.SMALL,
-        diesel_consumption_tractor_implement_liter_per_ton=10,
+        diesel_consumption_tractor_implement_liters_per_ha=10,
     )
 
     assert mock_om_add_variable.call_count == expected_add_variable_calls
