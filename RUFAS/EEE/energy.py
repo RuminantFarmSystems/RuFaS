@@ -155,9 +155,9 @@ class EnergyEstimator:
         estimator = EnergyEstimator()
         diesel_consumption_data_list = estimator.parse_inputs_for_diesel_consumption_calculation()
         diesel_consumption_by_year: dict[int, float] = defaultdict(float)
-        diesel_consumption_by_field_and_year: DefaultDict[
-            str, DefaultDict[int, float]
-        ] = defaultdict(lambda: defaultdict(float))
+        diesel_consumption_by_field_and_year: DefaultDict[str, DefaultDict[int, float]] = defaultdict(
+            lambda: defaultdict(float)
+        )
         if simulate_animals:
             herd_size = im.get_data("animal.herd_information.herd_num")
         else:
@@ -200,17 +200,12 @@ class EnergyEstimator:
             )
 
             operation_diesel_consumption_liters = (
-                diesel_consumption_tractor_implement_liters_per_ha
-                * field_production_size
+                diesel_consumption_tractor_implement_liters_per_ha * field_production_size
             )
 
-            diesel_consumption_by_field_and_year[field_name][operation_year] += (
-                operation_diesel_consumption_liters
-            )
+            diesel_consumption_by_field_and_year[field_name][operation_year] += operation_diesel_consumption_liters
 
-            diesel_consumption_by_year[operation_year] += (
-                operation_diesel_consumption_liters
-            )
+            diesel_consumption_by_year[operation_year] += operation_diesel_consumption_liters
 
         for field_name, yearly_consumption in diesel_consumption_by_field_and_year.items():
             for operation_year, diesel_consumption_liters in yearly_consumption.items():

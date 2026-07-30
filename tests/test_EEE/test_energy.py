@@ -58,9 +58,7 @@ def test_estimate_all(
     mock_tractor = mocker.patch(
         f"{EnergyEstimator.__module__}.Tractor",
     )
-    mock_tractor.return_value.tractor_size = (
-        TractorSize(tractor_size) if tractor_size else TractorSize.SMALL
-    )
+    mock_tractor.return_value.tractor_size = TractorSize(tractor_size) if tractor_size else TractorSize.SMALL
 
     def mock_get_data(data_address: str) -> Any:
         if data_address == "EEE_constants.constants":
@@ -96,14 +94,8 @@ def test_estimate_all(
         assert tractor_call.kwargs["herd_size"] == 10
         assert tractor_call.kwargs["tractor_size"] == expected_tractor_size
 
-    unique_field_years = {
-        (item["field_name"], item["operation_year"])
-        for item in parsed_diesel_consumption_inputs
-    }
-    unique_years = {
-        item["operation_year"]
-        for item in parsed_diesel_consumption_inputs
-    }
+    unique_field_years = {(item["field_name"], item["operation_year"]) for item in parsed_diesel_consumption_inputs}
+    unique_years = {item["operation_year"] for item in parsed_diesel_consumption_inputs}
 
     expected_add_variable_calls = len(unique_field_years) + len(unique_years)
 
