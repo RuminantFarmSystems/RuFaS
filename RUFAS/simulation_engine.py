@@ -51,6 +51,7 @@ class SimulationType(Enum):
     FIELD_AND_FEED = "field_and_feed"
     FIELD_ONLY = "field_only"
     ANIMALS_ONLY = "animals_only"
+    FEED_ONLY = "feed_only"
 
     @property
     def simulate_animals(self) -> bool:
@@ -95,7 +96,7 @@ class SimulationType(Enum):
     @classmethod
     def _feed_simulation_types(cls) -> set["SimulationType"]:
         """Return the set of simulation types that simulate feed storage and management."""
-        return {cls.FULL_FARM, cls.FIELD_AND_FEED}
+        return {cls.FULL_FARM, cls.FIELD_AND_FEED, cls.FEED_ONLY}
 
     @classmethod
     def get_simulation_type(cls, simulation_type: str) -> "SimulationType":
@@ -196,6 +197,7 @@ class SimulationEngine:
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
             SimulationType.FIELD_ONLY: self._execute_field_only_simulation,
             SimulationType.ANIMALS_ONLY: self._execute_animals_only_daily_simulation,
+            SimulationType.FEED_ONLY: self._execute_feed_only_daily_simulation,
         }
 
         self._setup_simulation_modules()
@@ -232,6 +234,7 @@ class SimulationEngine:
                 feed_storage_configs,
                 feed_storage_instances,
             )
+            self.feed_manager.stock_initial_storage_contents(self._gather_initial_feed_storage_contents(), self.time)
             feed_manager_available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
             self.emissions_estimator.check_available_purchased_feed_data(feed_manager_available_feed_ids)
             max_daily_feed_recalculations_per_year: int = feeds_config["ration_formulation_parameters"][
@@ -262,6 +265,51 @@ class SimulationEngine:
             self.manure_manager: ManureManager = ManureManager(
                 self.weather.intercept_mean_temp, self.weather.phase_shift, self.weather.amplitude
             )
+
+    def _gather_initial_feed_storage_contents(self) -> dict[str, dict[str, float]]:
+        """
+        Gathers the initial contents that feed storages hold when the simulation starts.
+
+        All initial feed storage contents input files are combined. Logs a warning if fields are not simulated and no
+        initial contents input files are found, since without harvests the feed storages would then stay empty for the
+        whole simulation.
+
+        Returns
+        -------
+        dict[str, dict[str, float]]
+            The dry matter mass and composition each storage holds when the simulation starts, keyed by storage
+            instance name. Empty if no initial contents inputs are provided.
+        """
+        info_map = {
+            "class": SimulationEngine.__name__,
+            "function": SimulationEngine._gather_initial_feed_storage_contents.__name__,
+        }
+        initial_contents_names: list[str] = self.im.get_data_keys_by_properties(
+            "initial_feed_storage_contents_properties"
+        )
+        if not initial_contents_names and not self.simulate_fields:
+            self.om.add_warning(
+                "No initial feed storage contents input files.",
+                "All feed storages will start the simulation empty, and there are no fields to harvest crops from.",
+                info_map,
+            )
+
+        initial_contents_by_storage_name: dict[str, dict[str, float]] = {}
+        for initial_contents_name in initial_contents_names:
+            initial_contents_data: dict[str, list[dict[str, Any]]] = self.im.get_data(initial_contents_name)
+            for storage_contents in initial_contents_data["initial_contents"]:
+                storage_contents = dict(storage_contents)
+                storage_name = str(storage_contents.pop("storage_name"))
+                if storage_name in initial_contents_by_storage_name:
+                    self.om.add_warning(
+                        "Duplicate storage in initial feed storage contents",
+                        f"Initial contents for storage '{storage_name}' are specified more than once. Only the first "
+                        "specification will be stocked.",
+                        info_map,
+                    )
+                    continue
+                initial_contents_by_storage_name[storage_name] = storage_contents
+        return initial_contents_by_storage_name
 
     def _gather_field_data(self) -> dict[str, dict[str, Any]]:
         """
@@ -428,6 +476,29 @@ class SimulationEngine:
 
         self._advance_time()
 
+    def _execute_feed_only_daily_simulation(self) -> None:
+        """
+        Executes the daily simulation routines for a farm with only the feed module.
+
+        Daily Feed Only Simulation Process:
+        1. Feed storage upkeep (report storage levels, process degradations)
+        2. Record keeping (time, weather)
+        3. Advance simulation date
+
+        Notes
+        -----
+        The feed storages start the simulation holding the initial feed storage contents given in the inputs, and no
+        crops arrive after that: there is no crop and soil module to harvest any. Feed planning is not run either.
+        Without animals there is no feed demand to plan against, so the ideal feeds to hold for the planning cycle are
+        always empty and no feed is ever purchased. Nothing leaves storage other than through degradation.
+
+        """
+        self._execute_feed_storage_upkeep()
+
+        self._report_daily_records()
+
+        self._advance_time()
+
     def _execute_daily_field_operations(self) -> list[HarvestedCrop]:
         """Handles daily field operations including manure applications and crop harvesting/receiving."""
         manure_applications: list[ManureEventNutrientRequestResults] = self._generate_daily_manure_applications()
@@ -531,6 +602,19 @@ class SimulationEngine:
             else self._update_all_max_daily_feeds(total_projected_inventory, next_harvest_dates_with_rufas_ids)
         )
         self.feed_manager.manage_planning_cycle_purchases(ideal_feeds_to_purchase, self.time)
+
+        self._execute_feed_storage_upkeep()
+
+    def _execute_feed_storage_upkeep(self) -> None:
+        """
+        Reports the state of feed storage, and processes feed degradations if the degradation interval has elapsed.
+
+        Notes
+        -----
+        This is the part of feed management that does not depend on anything outside the feed module, so a feed only
+        simulation runs it on every simulated day rather than only on days that feed planning occurs.
+
+        """
         self.feed_manager.report_feed_storage_levels(self.time.simulation_day, "daily_storage_levels")
         self.feed_manager.report_cumulative_purchased_feeds(self.time.simulation_day)
 
