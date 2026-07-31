@@ -12,6 +12,17 @@ def mock_crop_data() -> CropData:
     return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
+@pytest.mark.parametrize("efficiency,expect_grazed", [(None, False), (0.25, True), (0.0, True)])
+def test_is_grazed_property(mock_crop_data: CropData, efficiency: float | None, expect_grazed: bool) -> None:
+    """A crop counts as grazed only when a grazing harvest efficiency is given; it defaults to None so ordinary crops
+    are unaffected."""
+    assert mock_crop_data.grazing_harvest_efficiency is None
+
+    mock_crop_data.grazing_harvest_efficiency = efficiency
+
+    assert mock_crop_data.is_grazed == expect_grazed
+
+
 @pytest.mark.parametrize("frac,expect", [(0, False), (0.5, False), (1, True), (1.5, True)])
 def test_is_mature_property(mock_crop_data: CropData, frac: float, expect: bool) -> None:
     """Check that the is_mature property is properly assigning maturity by heat fraction."""
