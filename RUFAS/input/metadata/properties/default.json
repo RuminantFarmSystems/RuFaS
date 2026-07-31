@@ -2645,7 +2645,7 @@
         },
         "grazing_harvest_efficiency": {
           "type": "number",
-          "description": "Fraction of cut biomass that grazing animals consume at a harvest (unitless). Providing a value marks the crop as grazed rather than mechanically harvested: that fraction is removed as grazed forage and the remainder is deposited into the field as residue. Leave null for conventionally harvested crops, whose collected yield is sent to feed storage instead. Reported grazer harvest efficiencies are roughly 0.25 for season-long continuous grazing and 0.40 for rotational grazing.",
+          "description": "Fraction of cut biomass that grazing animals consume at a harvest (unitless). Providing a value marks the crop as grazed rather than mechanically harvested: that fraction is removed as grazed forage and the remainder is deposited into the field as residue. Leave null for conventionally harvested crops, whose collected yield is sent to feed storage instead. One study found that seasonal grazers consume about 25% of above ground biomass, with another 25% returned to the field as residue",
           "minimum": 0.0,
           "maximum": 1.0,
           "nullable": true,
