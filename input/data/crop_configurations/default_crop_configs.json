@@ -522,7 +522,7 @@
             "name": "pasture",
             "plant_category": "perennial",
             "is_nitrogen_fixer": false,
-            "grazing_harvest_efficiency": 0.25,
+            "grazing_harvest_efficiency": 0.50,
             "minimum_temperature": 0.0,
             "optimal_temperature": 15.0,
             "potential_heat_units": 800.0,
