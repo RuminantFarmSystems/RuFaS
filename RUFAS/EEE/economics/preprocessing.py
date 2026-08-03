@@ -706,7 +706,7 @@ class EconomicPreprocessor:
 
         price_data = self._fetch_prices(item.economics_files)
         price_values = self._extract_price_values(price_data)
-        price_by_year: Dict[int, float] = {}
+        price_by_year: dict[int, float] = {}
         if start_year is not None and end_year is not None:
             for offset, year in enumerate(range(start_year, end_year + 1)):
                 if offset < len(price_values):
@@ -715,8 +715,8 @@ class EconomicPreprocessor:
         if fallback_price is None:
             fallback_price = ECONOMIC_PRICE_FALLBACK.get("revenue", 1.0)
 
-        quantity_by_year: Dict[int, float] = defaultdict(float)
-        per_digester_quantity: Dict[str, float] = defaultdict(float)
+        bio_values_by_digester_by_year: dict[str, dict[int, list[float]]] = {}
+        bio_values_by_digester: dict[str, list[float]] = {}
         name_pattern = re.compile(r"energy\.(.+?)\.[^.]+$")
 
         for path in item.biophysical_simulation:
@@ -728,6 +728,9 @@ class EconomicPreprocessor:
                 info_maps = payload.get("info_maps", [])
                 name_match = name_pattern.search(variable_name)
                 digester_name = name_match.group(1) if name_match else variable_name
+                if digester_name not in bio_values_by_digester:
+                    bio_values_by_digester[digester_name] = []
+                    bio_values_by_digester_by_year[digester_name] = {year: [] for year in range(start_year, end_year + 1)}
                 for index, value in enumerate(values):
                     entry_info = (
                         info_maps[index] if index < len(info_maps) and isinstance(info_maps[index], dict) else {}
@@ -737,24 +740,30 @@ class EconomicPreprocessor:
                         numeric_value = float(value)
                     except (TypeError, ValueError):
                         continue
-                    per_digester_quantity[digester_name] += numeric_value
+                    bio_values_by_digester[digester_name].append(numeric_value)
                     if simulation_day is None or start_date is None:
                         # Without a day we cannot place the value in a year; fold it into the start year.
                         year = start_year if start_year is not None else 0
                     else:
                         year = (start_date + timedelta(days=int(simulation_day))).year
-                    quantity_by_year[year] += numeric_value
+                    bio_values_by_digester_by_year[digester_name][year].append(numeric_value)
 
-        revenue_by_year: Dict[int, float] = {}
+        revenue_by_year: dict[str, dict[int, list[float]]] = {}
+        price_data_by_day: list[float] = []
         total_revenue = 0.0
-        for year, quantity in quantity_by_year.items():
-            price = price_by_year.get(year, fallback_price)
-            year_revenue = quantity * price
-            revenue_by_year[year] = year_revenue
-            total_revenue += year_revenue
+        for digester_name, year_quantities in bio_values_by_digester_by_year.items():
+            if digester_name not in revenue_by_year:
+                revenue_by_year[digester_name] = {}
+            for year, quantity in year_quantities.items():
+                if year not in revenue_by_year[digester_name]:
+                    revenue_by_year[digester_name][year] = []
+                price = price_by_year.get(year, fallback_price)
+                year_revenue: list[float] = [daily_quantity * price for daily_quantity in quantity]
+                revenue_by_year[digester_name][year] = year_revenue
+                price_data_by_day.extend([price] * len(year_revenue))
+                total_revenue += sum(year_revenue)
 
-        total_quantity = sum(quantity_by_year.values())
-        if not quantity_by_year:
+        if not bio_values_by_digester_by_year:
             self.om.add_warning(
                 "MissingDigesterEnergyOutputs",
                 f"No per-digester energy outputs matched patterns {item.biophysical_simulation} for '{item.name}'.",
@@ -762,17 +771,15 @@ class EconomicPreprocessor:
             )
 
         return {
-            "biophysical_values": [total_quantity],
-            "biophysical_aggregate": total_quantity,
-            "biophysical_values_by_scenario": {"baseline": [total_quantity]},
-            "biophysical_aggregate_by_scenario": {"baseline": total_quantity},
+            "biophysical_values": bio_values_by_digester,
+            "biophysical_aggregate": {digester_name: sum(bio_values)for digester_name, bio_values in bio_values_by_digester.items()},
+            "biophysical_values_by_scenario": {"baseline": bio_values_by_digester},
+            "biophysical_aggregate_by_scenario": {"baseline": {digester_name: sum(bio_values)for digester_name, bio_values in bio_values_by_digester.items()}},
             "price_data": price_data,
-            "price_values": price_values,
-            "price_aggregate": Aggregator.average(price_values) if price_values else None,
+            "price_values": price_by_year,
+            "price_aggregate": Aggregator.average(price_data_by_day) if price_data_by_day else None,
             "line_item_values_by_scenario": {"baseline": total_revenue},
             "revenue_by_year": revenue_by_year,
-            "quantity_by_year": dict(quantity_by_year),
-            "per_digester_quantity": dict(per_digester_quantity),
             "flow_type": "revenue",
         }
 

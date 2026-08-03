@@ -3246,7 +3246,7 @@
             "type": "string",
             "description": "Identifier of the digester. Should match the corresponding manure processor name so captured biogas can be joined."
           },
-          "rng_ratio": {
+          "kwh_electricity_to_rng_ratio": {
             "type": "number",
             "description": "Fraction of the digester's captured biogas routed to renewable natural gas (RNG); the remaining (1 - rng_ratio) is routed to electricity generation (unitless).",
             "minimum": 0,
@@ -3292,18 +3292,6 @@
           "cubic_meters_water_per_day": {
             "type": "number",
             "description": "Water used by the digester (m3/day).",
-            "minimum": 0,
-            "default": 0
-          },
-          "kwh_per_day_produced": {
-            "type": "number",
-            "description": "Electricity exported from the digester (kWh/day).",
-            "minimum": 0,
-            "default": 0
-          },
-          "digester_rng_produced": {
-            "type": "number",
-            "description": "Renewable natural gas produced (MJ/day).",
             "minimum": 0,
             "default": 0
           }

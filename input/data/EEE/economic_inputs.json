@@ -27,7 +27,6 @@
     "digester": [
       {
         "name": "anaerobic_digester_1",
-        "rng_ratio": 0.5,
         "labor_hours_per_day": 1,
         "diesel_liters_per_day": 1,
         "gasoline_liters_per_day": 1,
@@ -35,8 +34,7 @@
         "megajoules_per_day": 1,
         "kwh_per_day": 1,
         "cubic_meters_water_per_day": 1,
-        "kwh_per_day_produced": 1,
-        "digester_rng_produced": 1
+        "kwh_electricity_to_rng_ratio": 0.5
       }
     ],
     "manure_disposal_kg": 1,
