@@ -213,18 +213,18 @@ of fluctuation in the diets is less than what is expected on a commercial dairy.
 changing the compositions of the existing feeds or by adding new feeds. 
 
 Regardless of whether or not a user chooses to provide their own ration or have RuFaS build and feed a ration optimized for least-cost, 
-RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients and ingredients that 
-are in both the NASEM and NRC libraries can be used. Users interested in feeding a ration that they define, need to provide a list of ingredients 
+RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients that 
+has been adapted from the NASEM and NRC feed libraries for use with these nutrient requirement models. Users interested in feeding a ration that they define, need to provide a list of ingredients 
 and their relative % dry matter intake for each animal class (pre-weaned calves, growing heifers, close-up animals, and lactating cows). 
 
-If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, it is imperative that proper costs are inputted for each 
-ingredient listed, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in 
+If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, providing the proper costs for each 
+ingredient listed is essential, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in 
 kg/DM. RuFaS will then use all the ingredients available (based on costs and inventory available if the feed is homegrown) to create a ration that 
 meets the nutritional requirements of the animal class and is cost-optimized. 
 
 
 ::: {.callout-note}
-For the time being, only one set of feeds and ration formula can be provided for each animal class. 
+For the time being, only one set of feeds and ration recipe can be provided for each animal class. 
 :::
 
 Below are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by @nrc_2001 and more 
@@ -252,6 +252,9 @@ The maintenance requirement is calculated based on metabolic body weight ($\text
 
 * Lactating and Dry Cows
 
+First the conceptus weight ($\text{CW}$) is estimated as a function of the expected calf
+birth weight ($\text{CBW}$): 
+
 :::{#eq-an-nrc-1}
 [[**AN.NRC.1**]]{.aside .content-visible when-format="html"}
 $$
@@ -260,14 +263,20 @@ $$
 :::
 
 
+
+
 :::{#eq-an-nrc-2}
 [[**AN.NRC.2**]]{.aside .content-visible when-format="html"}
 $$
-\text{CW} = (18 + (\text{DOP} - 190) \times 0.665) \times \left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
+\text{CW} = (18 + (\text{DOP} - 190) \times 0.665) \times \left(\frac{\text{CBW}}{45}\right),  \text{ if DOP} \geq 190.0 
+$$
+$$
+\text{CW} = 0, \text{ if DOP} < 190.0 
 $$
 :::
 
-*Otherwise*
+
+Then maintenance energy requirements are estimated as a function of the metabolic bodyweight without the conceptus weight. 
 
 :::{#eq-an-nrc-3}
 [[**AN.NRC.3**]]{.aside .content-visible when-format="html"}
@@ -317,11 +326,15 @@ Activity requirement is proportional to body weight and daily walking distance. 
 :::{#eq-an-nrc-8}
 [[**AN.NRC.8**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa1} = 0.0012\times \text{BW}, \qquad \text{if Housing = Grazing = 0}
+\text{NEa1} = 0.0012\times \text{BW}, \qquad \text{if Housing = Grazing}
 $$
+$$
+\text{NEa1} = 0.0,  \qquad \text{if Housing } \neq \text{Grazing}
+$$
+
 :::
 
-*Otherwise*
+
 
 :::{#eq-an-nrc-9}
 [[**AN.NRC.9**]]{.aside .content-visible when-format="html"}
@@ -330,12 +343,11 @@ $$
 $$
 :::
 
-*Otherwise*
 
 :::{#eq-an-nrc-10}
 [[**AN.NRC.10**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEa2} = (0.00045 \times \text{Distance} \times \text{BW}) + \text{NEa1} + \text{NEa2}
+\text{NEa2} = (0.00045 \times \text{Distance} \times \text{BW}) + \text{NEa1}
 $$
 :::
 
@@ -349,20 +361,12 @@ $$
 $$
 :::
 
-*Otherwise*
 
-:::{#eq-an-nrc-12}
-[[**AN.NRC.12**]]{.aside .content-visible when-format="html"}
-$$
-\text{NEa2} = 0.006 \times \text{BW},
-\qquad \text{if Topography = Hilly}
-$$
-:::
 
-*Otherwise*
+
 
 $$
-\text{NEa2} = (0.00045 \times \text{Distance} \times \text{BW}) + \text{NEa1} + \text{NEa2}
+\text{NEa2} = (0.00045 \times \text{Distance} \times \text{BW}) + \text{NEa1}
 $$
 [See [AN.NRC.10](#eq-an-nrc-10)]{.aside .content-visible when-format="html"}
 
