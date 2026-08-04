@@ -189,5 +189,14 @@
         "Cost": 15000.0
       }
     ]
+  },
+  "roi": {
+    "compare_roi": true,
+    "roi_comparison_paths": [
+       {
+        "name": "base_freestall_costs_and_revenue",
+        "address": "output/reports/freestall_report_report_econ.json_04-Aug-2026_Tue_09-01-28.csv"
+       }
+    ]
   }
 }

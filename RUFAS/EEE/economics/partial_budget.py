@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import ast
+from pathlib import Path
+import re
 from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
 import math
 
+from RUFAS.EEE.economics.metrics import EconomicMetrics
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
@@ -244,6 +248,17 @@ class PartialBudget:
             self.om.add_variable("econ_pba_net_annual_cash_flow", net_annual_cash_flow.tolist(), info_map)
             self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
             self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
+
+            should_run_roi_comparison: bool = self.im.get_data("economic_inputs.roi.compare_roi")
+            if should_run_roi_comparison:
+                revenue = float(revenue_total.item())
+                costs = float(cost_total.item())
+                current_simulation_roi = EconomicMetrics.calculate_roi(benefits=revenue, costs=costs)
+                comparison_roi_path_data: list[dict[str, str]] = \
+                    self.im.get_data("economic_inputs.roi.roi_comparison_paths")
+                for comparison in comparison_roi_path_data:
+                    self._run_roi_comparison(comparison, current_simulation_roi)
+
             return
 
         else:
@@ -279,6 +294,100 @@ class PartialBudget:
         self.om.add_variable("econ_pba_cumulative_net_change", cumulative_change.tolist(), info_map)
         self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
         self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
+
+    def _run_roi_comparison(
+        self,
+        comparison_roi_data: dict[str, str],
+        current_simulation_roi: float,
+    ) -> None:
+        """Compare a previous simulation ROI with the current simulation ROI."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._run_roi_comparison.__name__,
+            "units": MeasurementUnits.DOLLARS
+        }
+
+        comparison_path = Path(comparison_roi_data["address"])
+        comparison_pool = self.im.load_data_from_csv(comparison_path)
+
+        comparison_revenues = self._extract_numeric_values(
+            comparison_pool,
+            r"\.RevenueTotal$",
+        )
+        comparison_costs = self._extract_numeric_values(
+            comparison_pool,
+            r"\.CostTotal$",
+        )
+
+        if len(comparison_revenues) != len(comparison_costs):
+            raise ValueError(
+                "Comparison revenue and cost data must contain the same "
+                "number of values."
+            )
+
+        comparison_roi_name = comparison_roi_data["name"]
+
+        for index, (comparison_revenue, comparison_cost) in enumerate(
+            zip(comparison_revenues, comparison_costs, strict=True)
+        ):
+            comparison_roi = EconomicMetrics.calculate_roi(
+                benefits=comparison_revenue,
+                costs=comparison_cost,
+            )
+            roi_delta = current_simulation_roi - comparison_roi
+
+            output_name = f"roi_delta_for_{comparison_roi_name}"
+            if len(comparison_revenues) > 1:
+                output_name = f"{output_name}_{index}"
+
+            self.om.add_variable(
+                output_name,
+                roi_delta,
+                info_map,
+            )
+
+    def _extract_numeric_values(
+        self,
+        data: dict[str, Any],
+        column_pattern: str,
+    ) -> list[float]:
+        """Extract numeric values from the single column matching a pattern."""
+        matching_columns = [
+            column_name
+            for column_name in data
+            if re.search(column_pattern, column_name)
+        ]
+
+        if len(matching_columns) != 1:
+            error_message = (
+                f"In prepping ROI data, expected exactly one column matching {column_pattern!r}, "
+                f"but found {matching_columns}."
+            )
+            self.om.add_error(
+                "ROI comparison error",
+                error_message,
+                {
+                    "class": self.__class__.__name__,
+                    "function": self._extract_numeric_values.__name__
+                }
+            )
+            raise ValueError(error_message)
+
+        column_values = data[matching_columns[0]]
+        extracted_values: list[float] = []
+
+        for value in column_values:
+            if isinstance(value, str):
+                parsed_value = ast.literal_eval(value)
+            else:
+                parsed_value = value
+
+            if isinstance(parsed_value, (list, tuple)):
+                extracted_values.extend(float(item) for item in parsed_value)
+            else:
+                extracted_values.append(float(parsed_value))
+
+        return extracted_values
 
     def has_partial_budget_activity(
         self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None = None
