@@ -20,9 +20,6 @@ class CropManagement:
     crop_data : CropData, optional
         The data class containing crop specifications and tracked attributes.
         If not provided, default CropData will be used.
-    harvest_efficiency : float, default 1.0
-        Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
-        (unitless; [0, 1]).
     potential_harvest_index : float, optional
         Potential harvest index for a given day (unitless).
     harvest_index : float, optional
@@ -49,9 +46,6 @@ class CropManagement:
     ----------
     data : CropData
         A reference to ``crop_data``, on which crop management operations will be conducted.
-    harvest_efficiency : float
-        Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
-        (unitless; [0, 1]).
     potential_harvest_index : float | None
         Potential harvest index for a given day (unitless).
     harvest_index : float | None
@@ -84,7 +78,6 @@ class CropManagement:
     def __init__(
         self,
         crop_data: CropData | None = None,
-        harvest_efficiency: float = 1.0,
         potential_harvest_index: float | None = None,
         harvest_index: float | None = None,
         cut_biomass: float | None = None,
@@ -99,7 +92,6 @@ class CropManagement:
         self.data = crop_data or CropData()
         self.om = OutputManager()
 
-        self.harvest_efficiency = harvest_efficiency
         self.potential_harvest_index = potential_harvest_index
         self.harvest_index = harvest_index
         self.cut_biomass = cut_biomass
@@ -139,27 +131,21 @@ class CropManagement:
         -------
         HarvestedCrop | None
             The harvested crop data structure containing mass and nutritional information associated with the
-            harvest's yield. This is ``None`` when nothing is sent to feed storage, i.e. for a kill-only operation or
-            for a grazed crop (see ``CropData.grazing_harvest_efficiency``).
+            harvest's yield. This is ``None`` for a kill-only operation, which collects no yield.
 
         Notes
         -----
-        A grazed crop is cut with its grazing harvest efficiency in place of the mechanical harvest efficiency, so the
-        consumed fraction is removed as grazed forage and the larger remainder is deposited into the field as residue.
-        The consumed forage is reported as the harvest's yield but is not passed to feed storage, because grazing
-        animals eat it in the field rather than it being stored. Routing that forage to the herd as a feed source
-        requires the grazing farm simulation tracked by issue #2871.
+        The crop's ``harvest_efficiency`` determines how much of the cut biomass is extracted from the field; the
+        remainder is deposited as residue. A forage that is only partially utilized, such as a grazed pasture,
+        therefore returns a substantial share of each cut to the field.
 
         """
         self.determine_harvest_index()
 
         harvested_crop = None
         if harvest_operation in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
-            if self.data.grazing_harvest_efficiency is not None:
-                self.cut_crop(collected_fraction=self.data.grazing_harvest_efficiency)
-            else:
-                self.cut_crop(collected_fraction=self.harvest_efficiency)
-                harvested_crop = self._get_harvested_crop(time, field_size, field_name)
+            self.cut_crop(collected_fraction=self.data.harvest_efficiency)
+            harvested_crop = self._get_harvested_crop(time, field_size, field_name)
 
         if harvest_operation in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()

@@ -241,17 +241,16 @@ def test_manage_harvest(
         (HarvestOperation.HARVEST_KILL, True),
     ],
 )
-def test_manage_harvest_grazed_crop(
+def test_manage_harvest_uses_crop_harvest_efficiency(
     mocker: MockerFixture,
     crop_manager: CropManagement,
     mock_time: RufasTime,
     harvest_op: HarvestOperation,
     expect_kill: bool,
 ) -> None:
-    """A grazed crop is cut with its grazing harvest efficiency in place of the mechanical harvest efficiency, and
-    produces no harvested crop because the consumed forage is eaten in the field rather than sent to feed storage."""
-    crop_manager.data.grazing_harvest_efficiency = 0.25
-    crop_manager.harvest_efficiency = 1.0
+    """The crop's own harvest efficiency is what decides how much of the cut biomass a harvest collects, so a partially
+    utilized forage such as a pasture leaves the rest of each cut in the field."""
+    crop_manager.data.harvest_efficiency = 0.5
     field_size = 3.0
     soil_data = SoilData(field_size=field_size)
 
@@ -262,24 +261,23 @@ def test_manage_harvest_grazed_crop(
     record_yield = mocker.patch.object(crop_manager, "_record_yield")
     transfer_residue = mocker.patch.object(crop_manager, "_transfer_residue")
 
-    actual = crop_manager.manage_harvest(harvest_op, "pasture_field", field_size, mock_time, soil_data)
+    crop_manager.manage_harvest(harvest_op, "pasture_field", field_size, mock_time, soil_data)
 
-    cut_crop.assert_called_once_with(collected_fraction=0.25)
-    get_crop.assert_not_called()
-    assert actual is None
+    cut_crop.assert_called_once_with(collected_fraction=0.5)
+    get_crop.assert_called_once()
 
     kill.assert_called_once() if expect_kill else kill.assert_not_called()
     record_yield.assert_called_once()
     transfer_residue.assert_called_once_with(soil_data, expect_kill)
 
 
-def test_manage_harvest_grazed_crop_splits_yield_and_residue(
+def test_manage_harvest_partial_efficiency_splits_yield_and_residue(
     mocker: MockerFixture, mock_crop_data: CropData, mock_time: RufasTime
 ) -> None:
-    """End-to-end check that grazing a crop consumes the grazing-harvest-efficiency share of the cut biomass and
-    deposits the larger remainder into the field's surface soil layer as residue."""
-    grazing_efficiency = 0.25
-    mock_crop_data.grazing_harvest_efficiency = grazing_efficiency
+    """End-to-end check that a harvest efficiency below 1.0 collects that share of the cut biomass and deposits the
+    remainder into the field's surface soil layer as residue."""
+    efficiency = 0.5
+    mock_crop_data.harvest_efficiency = efficiency
     mock_crop_data.biomass = 5000.0
     mock_crop_data.above_ground_biomass = 4000.0
     mock_crop_data.root_biomass = 1000.0
@@ -294,16 +292,12 @@ def test_manage_harvest_grazed_crop_splits_yield_and_residue(
 
     mocker.patch.object(crop_manager, "_record_yield")
 
-    harvested = crop_manager.manage_harvest(
-        HarvestOperation.HARVEST_ONLY, "pasture_field", field_size, mock_time, soil_data
-    )
+    crop_manager.manage_harvest(HarvestOperation.HARVEST_ONLY, "pasture_field", field_size, mock_time, soil_data)
 
-    assert harvested is None
     cut_biomass = crop_manager.cut_biomass
     assert cut_biomass is not None and cut_biomass > 0.0
-    assert crop_manager.dry_matter_yield_collected == pytest.approx(cut_biomass * grazing_efficiency)
-    assert surface_layer.plant_residue == pytest.approx(cut_biomass * (1 - grazing_efficiency))
-    assert surface_layer.plant_residue > crop_manager.dry_matter_yield_collected
+    assert crop_manager.dry_matter_yield_collected == pytest.approx(cut_biomass * efficiency)
+    assert surface_layer.plant_residue == pytest.approx(cut_biomass * (1 - efficiency))
 
 
 @pytest.mark.parametrize(

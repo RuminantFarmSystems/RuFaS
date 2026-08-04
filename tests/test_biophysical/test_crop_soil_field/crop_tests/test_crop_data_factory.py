@@ -292,14 +292,14 @@ def test_create_crop_data() -> None:
         assert actual_value == expected_value
 
 
-def test_create_crop_data_preserves_grazing_harvest_efficiency() -> None:
-    """Test that a crop configuration's grazing harvest efficiency is carried into the created CropData."""
+def test_create_crop_data_preserves_harvest_efficiency() -> None:
+    """Test that a crop configuration's harvest efficiency is carried into the created CropData."""
     CropDataFactory._crop_configurations = {
         "pasture": CropConfiguration(
             name="pasture",
             plant_category=PlantCategory.PERENNIAL,
             is_nitrogen_fixer=False,
-            grazing_harvest_efficiency=0.25,
+            harvest_efficiency=0.5,
             minimum_temperature=0.0,
             optimal_temperature=15.0,
             potential_heat_units=800.0,
@@ -337,8 +337,7 @@ def test_create_crop_data_preserves_grazing_harvest_efficiency() -> None:
 
     actual = CropDataFactory.create_crop_data("pasture")
 
-    assert actual.grazing_harvest_efficiency == 0.25
-    assert actual.is_grazed is True
+    assert actual.harvest_efficiency == 0.5
 
 
 def test_crop_crop_data_error() -> None:
