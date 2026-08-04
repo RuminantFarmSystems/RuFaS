@@ -1,5 +1,6 @@
 import datetime
 import math
+from typing import Any
 
 import numpy as np
 
@@ -24,7 +25,7 @@ class Weather:
     ----------
     weather_data : dict[datetime.datetime, CurrentDayConditions]
         A dictionary that maps a date to the corresponding ``CurrentDayConditions``.
-    mean_annual_temperature : float
+    long_term_average_annual_temperature : float
         Mean of mean daily temperatures over all the weather data used by the simulation (°C).
     """
 
@@ -39,7 +40,7 @@ class Weather:
         at 0, time starts at 1).
         """
         self.om = OutputManager()
-        self.weather_data = {}
+        self.weather_data: dict[datetime.datetime, Any] = {}
 
         self.check_adequate_weather_data(weather_file, time)
 
@@ -82,7 +83,9 @@ class Weather:
                     )
                 self.weather_data[date_key] = conditions
 
-        self.mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
+        self.long_term_average_annual_temperature = self._calculate_long_term_average_annual_temperature(
+            weather_file["avg"]
+        )
 
         self.set_linest_temperature_factors()
 
@@ -93,7 +96,7 @@ class Weather:
         }
         self.om.add_variable(
             "average_annual_temperature",
-            self.mean_annual_temperature,
+            self.long_term_average_annual_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
 
@@ -177,7 +180,7 @@ class Weather:
             daylength = None
         try:
             self.weather_data[time.current_date].daylength = daylength
-            self.weather_data[time.current_date].annual_mean_air_temperature = self.mean_annual_temperature
+            self.weather_data[time.current_date].annual_mean_air_temperature = self.long_term_average_annual_temperature
         except KeyError:
             raise KeyError(
                 f"Attempted to get weather conditions for day: {time.current_julian_day},"
@@ -218,7 +221,7 @@ class Weather:
             else:
                 daylength = None
             self.weather_data[date].daylength = daylength
-            self.weather_data[date].annual_mean_air_temperature = self.mean_annual_temperature
+            self.weather_data[date].annual_mean_air_temperature = self.long_term_average_annual_temperature
             conditions_list.append(self.weather_data[date])
 
         return conditions_list
@@ -275,11 +278,15 @@ class Weather:
         )
 
     @staticmethod
-    def _calculate_average_annual_temperature(
+    def _calculate_long_term_average_annual_temperature(
         daily_average_temperatures: list[float],
     ) -> float:
         """
-        Calculates the average annual air temperature based on the daily average air temperatures.
+        Calculates a long-term average annual air temperature from all daily average air temperatures in the simulation
+        period.
+
+        The result is a single representative annual temperature for the entire simulation rather than a separate
+        average for each simulated year.
 
         Parameters
         ----------
@@ -289,7 +296,8 @@ class Weather:
         Returns
         -------
         float
-            The average annual air temperature (degrees C).
+            The long-term average annual air temperature represented by the daily temperatures across the entire
+            simulation period (degrees C).
 
         Raises
         ------
@@ -298,24 +306,21 @@ class Weather:
 
         Notes
         -----
-        This method calculates the average annual air temperature by taking the average of all daily average air
-        temperatures provided in the weather input file. Previous implementations calculated the average annual
-        temperature for individual years, which led to the value fluctuating more than desired.
+        This method calculates one representative annual air temperature by averaging
+        all available daily average air temperatures across the simulation period.
+        It does not calculate a separate value for each simulated year.
 
-        Missing daily values (NaN) are excluded from the average, since weather stations commonly go offline for
-        short periods. A warning is recorded when any values are missing.
+        Previous implementations recalculated the annual average for individual years,
+        which caused the value to fluctuate more than desired. Using the full simulation
+        period provides a more stable approximation of the location's typical annual
+        air temperature.
 
-        This method is intended to approximate SWAT's method for calculating the average annual temperature. SWAT
-        calculates average high and low temperatures for each month over every simulated year, then averages those
-        values to get a single annual average air temperature for the entire simulation. The exact implementation for
-        this can be found at in the SWAT source code file `readwgn.f
-        <https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/readwgn.f>`_
         """
         daily_temperatures = np.array(daily_average_temperatures, dtype=float)
         missing_count = int(np.isnan(daily_temperatures).sum())
         info_map = {
             "class": Weather.__name__,
-            "function": Weather._calculate_average_annual_temperature.__name__,
+            "function": Weather._calculate_long_term_average_annual_temperature.__name__,
             "prefix": "Weather",
         }
         if missing_count == daily_temperatures.size:

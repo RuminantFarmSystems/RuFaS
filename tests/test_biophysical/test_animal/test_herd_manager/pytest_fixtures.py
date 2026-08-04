@@ -175,7 +175,6 @@ def animal_json() -> dict[str, Any]:
         },
         "methane_mitigation": {
             "methane_mitigation_method": "None",
-            "methane_mitigation_additive_amount": 0,
             "3-NOP_additive_amount": 70,
             "monensin_additive_amount": 24,
             "essential_oils_additive_amount": 0,
@@ -619,6 +618,7 @@ def mock_animal(
     animal.milk_production.daily_milk_produced = daily_milk_produced
     animal.milk_production.fat_content = milk_fat_content
     animal.milk_production.true_protein_content = milk_protein_content
+    animal.milk_production.milk_production_reduction = 0.0
     animal.milk_production.milk_305_day_yield = (
         daily_milk_produced if milk_305_day_yield is None else milk_305_day_yield
     )

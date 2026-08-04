@@ -796,10 +796,6 @@
         "default": "None",
         "pattern": "^(None|3-NOP|Monensin|Essential Oils|Seaweed)$"
       },
-      "methane_mitigation_additive_amount": {
-        "type": "number",
-        "default": 0
-      },
       "3-NOP_additive_amount": {
         "type": "number",
         "description": "3-NOP Additive Amount (mg/kg DMI) -- The dosage of the 3-NOP mitigation additive",
@@ -6175,7 +6171,7 @@
       "type": "array",
       "properties": {
         "type": "string",
-        "default": "untitled"
+        "pattern": "^[A-Za-z]+(?:[-_][A-Za-z]+)*$"
       }
     },
     "Tractor Size": {
