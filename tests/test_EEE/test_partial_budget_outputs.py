@@ -1,4 +1,5 @@
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.EEE.economics import partial_budget
 
@@ -65,41 +66,48 @@ def test_partial_budget_exports_all_series(monkeypatch: pytest.MonkeyPatch) -> N
 
 
 def test_partial_budget_exports_net_annual_cash_flow_for_single_scenario(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    preprocessed = {
-        "Section": {
-            "Revenue": {
-                "Milk": {
-                    "flow_type": "revenue",
-                    "line_item_values_by_scenario": {"baseline": 120.0},
-                }
-            },
-            "Costs": {
-                "Feed": {
-                    "flow_type": "cost",
-                    "line_item_values_by_scenario": {"baseline": 80.0},
-                }
-            },
+        monkeypatch: pytest.MonkeyPatch,
+        mocker: MockerFixture,
+    ) -> None:
+        preprocessed = {
+            "Section": {
+                "Revenue": {
+                    "Milk": {
+                        "flow_type": "revenue",
+                        "line_item_values_by_scenario": {"baseline": 120.0},
+                    }
+                },
+                "Costs": {
+                    "Feed": {
+                        "flow_type": "cost",
+                        "line_item_values_by_scenario": {"baseline": 80.0},
+                    }
+                },
+            }
         }
-    }
 
-    dummy_im = object()
-    dummy_om = DummyOutputManager()
+        dummy_im = mocker.Mock()
+        dummy_im.get_data.return_value = False
 
-    monkeypatch.setattr(partial_budget, "InputManager", lambda: dummy_im)
-    monkeypatch.setattr(partial_budget, "OutputManager", lambda: dummy_om)
+        dummy_om = DummyOutputManager()
 
-    pb = partial_budget.PartialBudget()
-    pb.calculate_partial_budget(preprocessed)
+        monkeypatch.setattr(partial_budget, "InputManager", lambda: dummy_im)
+        monkeypatch.setattr(partial_budget, "OutputManager", lambda: dummy_om)
 
-    exported = {name: value for name, value, _ in dummy_om.variables}
+        pb = partial_budget.PartialBudget()
+        pb.calculate_partial_budget(preprocessed)
 
-    assert exported["econ_pba_net_annual_cash_flow"] == [40.0]
-    assert exported["econ_pba_revenue_total"] == [120.0]
-    assert exported["econ_pba_cost_total"] == [80.0]
-    assert exported["econ_pba_additional_revenue"] == [0.0]
-    assert exported["econ_pba_reduced_costs"] == [0.0]
-    assert exported["econ_pba_additional_costs"] == [0.0]
-    assert exported["econ_pba_reduced_revenue"] == [0.0]
-    assert "econ_pba_summary" in exported
+        exported = {name: value for name, value, _ in dummy_om.variables}
+
+        assert exported["econ_pba_net_annual_cash_flow"] == [40.0]
+        assert exported["econ_pba_revenue_total"] == [120.0]
+        assert exported["econ_pba_cost_total"] == [80.0]
+        assert exported["econ_pba_additional_revenue"] == [0.0]
+        assert exported["econ_pba_reduced_costs"] == [0.0]
+        assert exported["econ_pba_additional_costs"] == [0.0]
+        assert exported["econ_pba_reduced_revenue"] == [0.0]
+        assert "econ_pba_summary" in exported
+
+        dummy_im.get_data.assert_called_once_with(
+            "economic_inputs.roi.compare_roi"
+        )
