@@ -300,7 +300,22 @@ class PartialBudget:
         comparison_roi_data: dict[str, str],
         current_simulation_roi: float,
     ) -> None:
-        """Compare a previous simulation ROI with the current simulation ROI."""
+        """
+        Compare a previous simulation ROI with the current simulation ROI.
+
+        Parameters
+        ----------
+        comparison_roi_data : dict[str, str]
+            A dictionary containing the user specified locations and names for comparison roi data.
+        current_simulation_roi : float
+            The roi calculated for the current simulation.
+
+        Raises
+        ------
+        ValueError
+            If the comparison data has a different number of revenues and costs.
+
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._run_roi_comparison.__name__,
@@ -320,10 +335,13 @@ class PartialBudget:
         )
 
         if len(comparison_revenues) != len(comparison_costs):
-            raise ValueError(
-                "Comparison revenue and cost data must contain the same "
-                "number of values."
+            error_message = "Comparison revenue and cost data must contain the same number of values."
+            self.om.add_error(
+                "ROI comparison error",
+                error_message,
+                info_map
             )
+            raise ValueError(error_message)
 
         comparison_roi_name = comparison_roi_data["name"]
 
@@ -351,7 +369,28 @@ class PartialBudget:
         data: dict[str, Any],
         column_pattern: str,
     ) -> list[float]:
-        """Extract numeric values from the single column matching a pattern."""
+        """
+        Helper function for _run_roi_comparison().
+        Extract numeric values from the single column matching a pattern.
+
+        Parameters
+        ----------
+        data : dict[str, Any]
+            The data structure from which the numeric values are extracted.
+        column_pattern : str
+            The regex pattern used to search the column name for the desired variable.
+
+        Returns
+        -------
+        list[float]
+            A list of floats extracted from the pattern-matched column of data in the data structure.
+
+        Raises
+        ------
+        ValueError
+            If there are multiple columns of matched data where we're only expecting one.
+
+        """
         matching_columns = [
             column_name
             for column_name in data
