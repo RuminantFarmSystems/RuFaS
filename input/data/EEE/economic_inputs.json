@@ -191,7 +191,7 @@
     ]
   },
   "roi": {
-    "compare_roi": true,
+    "compare_roi": false,
     "roi_comparison_paths": [
        {
         "name": "base_freestall_costs_and_revenue",
