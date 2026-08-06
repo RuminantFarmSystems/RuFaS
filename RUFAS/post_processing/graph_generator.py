@@ -15,10 +15,8 @@ class GraphGenerator:
 
     Parameters
     ----------
-    metadata_prefix : str, optional
-        Prefix applied to graph metadata. Defaults to ``""``.
-    time : RufasTime, optional
-        ``RufasTime`` object used to track simulation time. Defaults to ``None``.
+    config : GraphGeneratorConfig
+        Configuration dataclass for GraphGenerator.
 
     Attributes
     ----------

@@ -15,8 +15,8 @@ class ReportGenerator:
 
     Parameters
     ----------
-    time : RufasTime | None
-        A ``RufasTime`` object used to track the simulation time
+    config : ReportGeneratorConfig
+            Configuration dataclass for ReportGenerator.
 
     Attributes
     ----------
