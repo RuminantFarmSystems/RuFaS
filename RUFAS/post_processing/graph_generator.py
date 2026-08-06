@@ -8,6 +8,7 @@ class GraphGeneratorConfig:
     ----------
     """
 
+
 class GraphGenerator:
     """
     GraphGenerator is used to generate graphs from the simulation results.
