@@ -446,7 +446,8 @@ class EmissionsEstimator:
             for harvest_date in harvest_dates:
                 feed_id = harvest_yield_by_field[field_name][harvest_date]["feed_id"]
                 if feed_id is None:
-                    last_harvest_date = harvest_date
+                    if harvest_yield_by_field[field_name][harvest_date]["harvest_type"] != "kill_only":
+                        last_harvest_date = harvest_date
                     continue
                 if feed_id not in total_farmgrown_feed_emission_and_resource_by_feed_id:
                     total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = {
