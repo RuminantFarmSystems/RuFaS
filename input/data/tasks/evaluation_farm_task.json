@@ -1,0 +1,16 @@
+{
+  "parallel_workers": 3,
+  "tasks": [
+ 
+   
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "metadata_file_path": "input/metadata/CA_highEff_HighYield_NewFeed_metadata.json",
+      "input_root": "C:/Users/Kristan Reed/RuFaSEval/RuFaS-Evaluation/",
+      "output_prefix": "HighEff+IMIO",
+      "log_verbosity": "errors", 
+      "multi_run_counts": 10
+
+    }
+]
+}
