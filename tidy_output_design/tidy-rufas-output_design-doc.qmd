@@ -155,10 +155,10 @@ difficult to wrangle:
   **not** a variable,since many columns contain no data beyond the label (i.e., invariant). 
 
 - Each *observation* is **not** a row and each row is **not** an observation, since each row represents a time point 
-  on which multiple bservations were made (i.e., measurements of separate fields in the same row). 
+  on which multiple observations were made (i.e., measurements of separate fields in the same row). 
   
-- Each value is **not** a cell, since the same values are contained in multiple columns. It does appear that each cell
-  contains only a single value, though.
+- Each value is **not** a cell, since the same values are contained in multiple columns. In this subset, each cell
+is a single value, other RuFaS output variables contain cells contain multiple values (i.e., lists as values).
 
 ## Why tidiness matters
 
@@ -184,8 +184,8 @@ There are a number of reasons why the current structure of output data is less t
 
 RuFaS should provide tabular data to users that conforms to the "tidy data" paradigm, with consistent structure:
 
-- rows represent individual observations (a specific domain at a specific time). Exactly what constitutes an RuFaS
-  observation is debatable, but it should *not* represent the entire farm at a moment in time. 
+- Rows represent individual observations (a specific domain at a specific time). Exactly what constitutes an RuFaS
+  observation is debatable, but it should probably *not* represent the entire farm at a moment in time. 
 
 - Columns represent individual variables (attributes of the observation). This includes grouping information like which
   field or pen an observation was made from.
@@ -209,15 +209,15 @@ RuFaS should provide tabular data to users that conforms to the "tidy data" para
 
 ## Nice to Have
 
-- Utilize the benefits of tabular (and tidy) data internally with `pandas.DataFrame` objects (see sections about
+- Utilize the benefits of tabular (and tidy) data with `pandas.DataFrame` objects (see sections about
   [Data frames](#data-frames) and [Data frame memory usage](#memory-efficient)) and their corresponding
   methods. This could reduce infrastructural complexity.
 
-- Provide an *option* to separate outputs by grouping and domain: for example, produce one table of crop data that 
+- Provide an option to separate outputs by grouping and domain: for example, produce one table of crop data that 
   includes a row for each $field \times crop \times time$ combination and a column for each variable pertaining to 
   crops that was measured, and produce a separate but similar table for soil data.
 
-- Provide an *option* to utilize "look-up tables" 
+- Provide an option to utilize "look-up tables" 
   ([junction table](https://database.guide/what-is-a-junction-table-in-sql/)). Using the previous example: both the 
   crop and soil sub-tables would have a variable called "Field ID". A separate look-up table containing all the
   invariant information about each field ID (field name, location, size, soil type, etc.) would be produced present.
@@ -321,7 +321,9 @@ def fill_pool(
 def frame_variable(module:str, caller:str, variable:str, values: list[dict]):
     data_frame = pd.DataFrame(values)
     # add address columns:
-    data_frame[["module", "caller", "variable"]] = (module, caller, variable)
+    key_cols = ["module", "caller", "variable"]
+    data_frame[key_cols] = (module, caller, variable)
+    data_frame = data_frame[key_cols + [c for c in data_frame.columns if c not in key_cols]]
     return data_frame
 
 def frame_pool(filled_pool: dict):
