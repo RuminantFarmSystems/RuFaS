@@ -635,53 +635,6 @@
       ]
     },
     {
-      "description": "manure_schedule_1 daily spread manure_type must be solid because DailySpread storages hold solid manure",
-      "aliases": {
-        "variables": {
-          "is_daily_spreading": "manure_schedule_1.daily_spread.is_daily_spreading",
-          "manure_type": "manure_schedule_1.daily_spread.manure_type"
-        },
-        "constants": {
-          "true_constant": true,
-          "solid": "solid"
-        }
-      },
-      "apply_when": [
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["is_daily_spreading"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["true_constant"]
-            }
-          },
-          "relationship": "equal"
-        }
-      ],
-      "rules": [
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["manure_type"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["solid"]
-            }
-          },
-          "relationship": "equal"
-        }
-      ]
-    },
-    {
       "description": "manure_schedule_2 daily spreading requires at least one DailySpread manure storage",
       "aliases": {
         "variables": {
@@ -840,53 +793,6 @@
             }
           },
           "relationship": "greater"
-        }
-      ]
-    },
-    {
-      "description": "manure_schedule_2 daily spread manure_type must be solid because DailySpread storages hold solid manure",
-      "aliases": {
-        "variables": {
-          "is_daily_spreading": "manure_schedule_2.daily_spread.is_daily_spreading",
-          "manure_type": "manure_schedule_2.daily_spread.manure_type"
-        },
-        "constants": {
-          "true_constant": true,
-          "solid": "solid"
-        }
-      },
-      "apply_when": [
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["is_daily_spreading"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["true_constant"]
-            }
-          },
-          "relationship": "equal"
-        }
-      ],
-      "rules": [
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["manure_type"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["solid"]
-            }
-          },
-          "relationship": "equal"
         }
       ]
     }
