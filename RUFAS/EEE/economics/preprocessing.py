@@ -10,23 +10,29 @@ stores the aggregated results back into the
 :class:`~RUFAS.input_manager.InputManager` under the key
 ``economic_preprocessed``. The structure of the stored data is
 validated using the ``economic_preprocessing_properties`` metadata.
+
+Line items whose preprocessing cannot be expressed by the generic
+biophysical/input/price pipeline are delegated to dedicated
+:class:`~RUFAS.EEE.economics.special_cases.base.SpecialCaseHandler`
+subclasses. :class:`EconomicPreprocessor` builds a ``(section, name)``
+handler map from :data:`~RUFAS.EEE.economics.special_cases.SPECIAL_CASE_HANDLERS`
+and routes matching line items to them, keeping the main pipeline free of
+per-item special casing.
 """
 
 from __future__ import annotations
 
-import json
-import math
 import re
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Set, Tuple
+from typing import Any, Dict, Iterable, List, Set
 
-from RUFAS.biophysical.field.manager.schedule import Schedule
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.util import Aggregator, Utility
+from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
+from RUFAS.EEE.economics.preprocessing_context import PreprocessingContext
+from RUFAS.EEE.economics.special_cases import SpecialCaseHandler, SeedCostHandler
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -36,6 +42,10 @@ from RUFAS.EEE.economics.fallback_values import (
 # Provenance marker for pool variables computed in-memory rather than loaded
 # from an input file; used only in InputManager validation messages.
 COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
+
+SPECIAL_CASE_HANDLERS: list[type[SpecialCaseHandler]] = [
+    SeedCostHandler,
+]
 
 
 @dataclass(frozen=True)
@@ -61,96 +71,15 @@ class EconomicPreprocessor:
     ) -> None:
         self.im = InputManager()
         self.om = OutputManager()
-        self.available_input_keys: Set[str] = self._load_available_input_keys()
+        self.context = PreprocessingContext(self.im, self.om)
         self.mapping = self._build_mapping()
+        self.special_case_handlers = self._build_special_case_handlers()
 
-    def _load_available_input_keys(self) -> Set[str]:
-        """Cache the available input keys from the InputManager metadata."""
+    def _build_special_case_handlers(self) -> dict[tuple[str, str], SpecialCaseHandler]:
+        """Instantiate registered special-case handlers keyed by ``(section, name)``."""
 
-        try:
-            metadata = self.im.get_metadata("files")
-        except Exception:
-            return set()
-
-        if isinstance(metadata, dict):
-            return set(metadata.keys())
-        return set()
-
-    def _normalize_economics_key(self, path: str) -> str:
-        """Map mapping file paths to InputManager data keys."""
-
-        candidate = path.removesuffix(".csv")
-
-        if not self.available_input_keys:
-            return candidate
-
-        if candidate in self.available_input_keys:
-            return candidate
-
-        prefix_matches = sorted(key for key in self.available_input_keys if key.startswith(f"{candidate}."))
-        if prefix_matches:
-            return prefix_matches[0]
-
-        return candidate
-
-    def _get_data_with_handling(self, path: str, info_map: Dict[str, str]) -> Any:
-        """Fetch data from the InputManager while handling invalid paths."""
-
-        if not isinstance(path, str) or not path:
-            self.om.add_warning(
-                "InvalidEconomicsFilePath",
-                f"Economics pricing path '{path}' is invalid",
-                info_map,
-            )
-            return None
-
-        candidate_paths = [path]
-        normalized_path = self._normalize_economics_key(path)
-        if normalized_path != path:
-            candidate_paths.append(normalized_path)
-
-        last_error: ValueError | None = None
-        for candidate in candidate_paths:
-            # Skip InputManager access entirely for wildcard paths (e.g., "*").
-            # These selectors cannot be resolved to a concrete file and only
-            # generate validation spam inside the InputManager. Emit a single
-            # warning and continue.
-            if "*" in str(candidate):
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"Commodity pricing '{candidate}' uses wildcard and was skipped",
-                    info_map,
-                )
-                continue
-
-            if hasattr(self.im, "check_property_exists_in_pool"):
-                # Wildcard paths are handled above. For concrete paths, perform the
-                # inexpensive existence check when available to avoid repeated
-                # validation warnings from deeper get_data calls.
-                try:
-                    if not self.im.check_property_exists_in_pool(candidate):
-                        continue
-                except ValueError as exc:
-                    last_error = exc
-                    continue
-            try:
-                data = self.im.get_data(candidate)
-            except ValueError as exc:
-                last_error = exc
-                continue
-
-            if data is not None:
-                return data
-
-        if last_error is not None:
-            detail = (
-                f"Failed to retrieve '{path}'"
-                + (f" (normalized to '{normalized_path}')" if normalized_path != path else "")
-                + f": {last_error}"
-            )
-            self.om.add_warning("InvalidEconomicsFilePath", detail, info_map)
-
-        return None
+        handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
+        return {handler.key: handler for handler in handlers}
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""
@@ -239,27 +168,6 @@ class EconomicPreprocessor:
                     )
         return values
 
-    def _scenario_names(self) -> list[str]:
-        """Determine scenario names from the OutputManager variables pool.
-
-        Returns
-        -------
-        list[str]
-            Scenario names found as top-level keys of the variables pool, or
-            ``["baseline"]`` when the pool is flat (plain variable payloads)
-            or empty.
-        """
-        scenario_names: list[str] = []
-        pool = getattr(self.om, "variables_pool", {})
-        if isinstance(pool, dict) and pool:
-            if all(isinstance(value, dict) and "values" in value for value in pool.values()):
-                scenario_names = ["baseline"]
-            else:
-                scenario_names = [name for name, data in pool.items() if isinstance(data, dict) and data]
-        if not scenario_names:
-            scenario_names = ["baseline"]
-        return scenario_names
-
     def _fetch_values_by_scenario(self, sim_paths: Iterable[str]) -> Dict[str, List[float]]:
         """Collect values per scenario from the OutputManager."""
 
@@ -269,8 +177,7 @@ class EconomicPreprocessor:
         if not any(filtered_by_path.values()):
             fallback_values = self._fallback_values_by_scenario(sim_paths)
             return fallback_values
-
-        scenario_names = self._scenario_names()
+        scenario_names = self.context.scenario_names()
         values_by_scenario: Dict[str, List[float]] = {scenario: [] for scenario in scenario_names}
         info_map = {"class": self.__class__.__name__, "function": self._fetch_values_by_scenario.__name__}
 
@@ -432,7 +339,7 @@ class EconomicPreprocessor:
                     "Using fallback price.",
                     info_map,
                 )
-                values.extend(self._get_fallback_price(start_year, end_year, key))
+                values.extend(self.context.get_fallback_price(start_year, end_year, key))
                 continue
             fips_idx = value["fips"].index(fips_code)
             for year in range(start_year, end_year + 1):
@@ -446,44 +353,8 @@ class EconomicPreprocessor:
                         "Using fallback price.",
                         info_map,
                     )
-                    values.extend(self._get_fallback_price(start_year, end_year, key))
+                    values.extend(self.context.get_fallback_price(start_year, end_year, key))
                     continue
-        return values
-
-    def _get_fallback_price(self, start_year: int, end_year: int, commodity: str) -> List[float]:
-        """Get a fallback price for a commodity."""
-        info_map = {"class": self.__class__.__name__, "function": self._get_fallback_price.__name__}
-        defaults: Dict[str, List[float | str]] = self.im.get_data("_default_values")
-        defaults_fallback: Dict[str, List[float | str]] = self.im.get_data("_default_fallback_values")
-        if commodity not in defaults["commodity"] and commodity not in defaults_fallback["commodity"]:
-            self.om.add_warning(
-                "MissingFallbackPrice",
-                f"No fallback price found for commodity: {commodity}",
-                info_map,
-            )
-            return [ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)] * (end_year - start_year + 1)
-        commodity_idx = defaults["commodity"].index(commodity)
-        values: List[float] = []
-        use_fallback = False
-        for year in range(start_year, end_year + 1):
-            price = defaults[f"{year}"][commodity_idx]
-            if math.isnan(price):
-                use_fallback = True
-                break
-            values.append(price)
-        if use_fallback:
-            commodity_idx = defaults_fallback["commodity"].index(commodity)
-            values = []
-            for year in range(start_year, end_year + 1):
-                price = defaults_fallback[f"{year}"][commodity_idx]
-                if math.isnan(price):
-                    self.om.add_warning(
-                        "MissingFallbackPrice",
-                        f"No fallback price found for commodity: {commodity} in year: {year}",
-                        info_map,
-                    )
-                    price = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
-                values.append(price)
         return values
 
     def _infer_flow_type(self, item: EconomicItem) -> str | None:
@@ -513,7 +384,7 @@ class EconomicPreprocessor:
 
         if isinstance(economics_files, list):
             for file_key in economics_files:
-                price_data = self._get_data_with_handling(file_key, info_map)
+                price_data = self.context.get_data_with_handling(file_key, info_map)
                 if price_data is None:
                     self.om.add_warning(
                         "MissingEconomicsFile",
@@ -529,7 +400,7 @@ class EconomicPreprocessor:
 
         selector_path = economics_files.get("input_manager_location")
         if selector_path:
-            selection = self._get_data_with_handling(selector_path, info_map)
+            selection = self.context.get_data_with_handling(selector_path, info_map)
             if selection is None:
                 self.om.add_warning(
                     "MissingSelection",
@@ -541,7 +412,7 @@ class EconomicPreprocessor:
                         continue
                     if not isinstance(file_key, str):
                         continue
-                    price_data = self._get_data_with_handling(file_key, info_map)
+                    price_data = self.context.get_data_with_handling(file_key, info_map)
                     if price_data is not None:
                         prices[file_key] = price_data
                 if prices:
@@ -570,7 +441,7 @@ class EconomicPreprocessor:
                         continue
                     if not isinstance(file_key, str):
                         continue
-                    price_data = self._get_data_with_handling(file_key, info_map)
+                    price_data = self.context.get_data_with_handling(file_key, info_map)
                     if price_data is not None:
                         prices[file_key] = price_data
                 if prices:
@@ -580,7 +451,7 @@ class EconomicPreprocessor:
                         info_map,
                     )
                 return prices
-            price_data = self._get_data_with_handling(selected_file, info_map)
+            price_data = self.context.get_data_with_handling(selected_file, info_map)
             if price_data is None:
                 self.om.add_warning(
                     "MissingEconomicsFile",
@@ -594,7 +465,7 @@ class EconomicPreprocessor:
         for label, file_key in economics_files.items():
             if not isinstance(file_key, str):
                 continue
-            price_data = self._get_data_with_handling(file_key, info_map)
+            price_data = self.context.get_data_with_handling(file_key, info_map)
             if price_data is None:
                 self.om.add_warning(
                     "MissingEconomicsFile",
@@ -648,333 +519,10 @@ class EconomicPreprocessor:
                 continue
             if str(option).lower() not in requested or not isinstance(file_key, str):
                 continue
-            price_data = self._get_data_with_handling(file_key, info_map)
+            price_data = self.context.get_data_with_handling(file_key, info_map)
             if price_data is not None:
                 prices[option] = price_data
         return prices
-
-    _CROP_TO_SEED_KEY: Dict[str, str] = {
-        "corn_grain": "commodity_prices_corn_seed_dollar_per_square_meter",
-        "corn_silage": "commodity_prices_corn_seed_dollar_per_square_meter",
-        "soybean_grain": "commodity_prices_soybean_seed_dollar_per_square_meter",
-        "soybean_hay": "commodity_prices_soybean_seed_dollar_per_square_meter",
-        "winter_wheat_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "winter_wheat_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "winter_wheat_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "winter_wheat_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "triticale_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "triticale_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "triticale_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "triticale_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "cereal_rye_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "cereal_rye_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "cereal_rye_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
-        "cereal_rye_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
-    }
-
-    _HA_TO_M2: float = 10_000.0
-
-    # Harvest operations that terminate a crop's life in the field.
-    _FINAL_HARVEST_OPS: frozenset[str] = frozenset({"harvest_kill", "kill_only"})
-
-    def _growing_periods(
-        self, schedule: Dict[str, Any]
-    ) -> List[Tuple[datetime, datetime]]:
-        """Return (planting_date, kill_date) pairs for one crop schedule entry.
-
-        Pairs each planting event with its corresponding final harvest
-        (``harvest_kill`` or ``kill_only``).  Intermediate ``harvest_only``
-        operations are ignored.  Pattern expansion (``pattern_repeat``,
-        ``planting_skip``, ``harvesting_skip``) is applied before pairing.
-        """
-        pattern_repeat = int(schedule.get("pattern_repeat") or 0)
-        planting_skip = int(schedule.get("planting_skip") or 0)
-        harvesting_skip = int(schedule.get("harvesting_skip") or 0)
-
-        raw_p_years: list[int] = list(schedule.get("planting_years") or [])
-        raw_p_days: list[int] = list(schedule.get("planting_days") or [])
-        raw_h_years: list[int] = list(schedule.get("harvest_years") or [])
-        raw_h_days: list[int] = list(schedule.get("harvest_days") or [])
-        raw_h_ops: list[str] = list(schedule.get("harvest_operations") or [])
-
-        if not raw_p_years or not raw_h_years:
-            return []
-
-        p_years = Schedule.repeat_pattern(raw_p_years, planting_skip, pattern_repeat)
-        p_days = Utility.elongate_list(raw_p_days * (pattern_repeat + 1), len(p_years))
-        h_years = Schedule.repeat_pattern(raw_h_years, harvesting_skip, pattern_repeat)
-        h_days = Utility.elongate_list(raw_h_days * (pattern_repeat + 1), len(h_years))
-        h_ops = Utility.elongate_list(raw_h_ops * (pattern_repeat + 1), len(h_years))
-
-        events: List[Tuple[datetime, str]] = []
-        for y, d in zip(p_years, p_days):
-            events.append((datetime.strptime(f"{y}:{d}", "%Y:%j"), "plant"))
-        for y, d, op in zip(h_years, h_days, h_ops):
-            events.append((datetime.strptime(f"{y}:{d}", "%Y:%j"), op))
-        events.sort(key=lambda e: e[0])
-
-        periods: List[Tuple[datetime, datetime]] = []
-        plant_date: datetime | None = None
-        for date, op in events:
-            if op == "plant":
-                plant_date = date
-            elif op in self._FINAL_HARVEST_OPS and plant_date is not None:
-                periods.append((plant_date, date))
-                plant_date = None
-        return periods
-
-    def _preprocess_seed_costs(self) -> dict[str, list[float]]:
-        """Build a daily time-series of responsible field area (m²) per seed key.
-
-        For each field, each crop's planting-to-kill periods are located within
-        the simulation window.  The field's area in m² is spread evenly over
-        each growing period (``field_size_m² / period_duration``), then
-        accumulated into a per-simulation-day array keyed by seed commodity.
-
-        Returns
-        -------
-        dict[str, list[float]]
-            Keys are seed commodity price keys; values are lists of length
-            ``total_sim_days`` where each element is the total m² for that
-            seed on that simulation day.
-        """
-        info_map = {"class": self.__class__.__name__, "function": "_preprocess_seed_costs"}
-
-        try:
-            start_date = datetime.strptime(
-                str(self.im.get_data("config.start_date")), "%Y:%j"
-            )
-            end_date = datetime.strptime(
-                str(self.im.get_data("config.end_date")), "%Y:%j"
-            )
-        except Exception:
-            self.om.add_warning(
-                "MissingConfigDates",
-                "Could not parse simulation start/end dates for seed cost preprocessing",
-                info_map,
-            )
-            return {}
-
-        total_sim_days: int = (end_date - start_date).days + 1
-
-        try:
-            field_keys = self.im.get_data_keys_by_properties("field_properties")
-        except Exception:
-            self.om.add_warning(
-                "MissingFieldData",
-                "Could not retrieve field keys for seed cost preprocessing",
-                info_map,
-            )
-            return {}
-
-        daily_area_by_seed: dict[str, list[float]] = {}
-
-        for field_key in field_keys:
-            field_data = self.im.get_data(field_key)
-            if not isinstance(field_data, dict):
-                continue
-            crop_spec = field_data.get("crop_specification")
-            field_size_ha = field_data.get("field_size")
-            if crop_spec is None or field_size_ha is None:
-                continue
-            try:
-                field_size_m2 = float(field_size_ha) * self._HA_TO_M2
-            except (TypeError, ValueError):
-                continue
-
-            crop_schedules = self.im.get_data(f"{crop_spec}.crop_schedules")
-            if not isinstance(crop_schedules, list) or not crop_schedules:
-                self.om.add_warning(
-                    "MissingCropSchedule",
-                    f"No crop schedules found for '{crop_spec}' in field '{field_key}'",
-                    info_map,
-                )
-                continue
-
-            for schedule in crop_schedules:
-                if not isinstance(schedule, dict):
-                    continue
-                crop_species = schedule.get("crop_species")
-                if not isinstance(crop_species, str):
-                    continue
-                seed_key = self._CROP_TO_SEED_KEY.get(crop_species, f"fallback_{crop_species}")
-
-                if seed_key not in daily_area_by_seed.keys():
-                    daily_area_by_seed[seed_key] = [0.0] * total_sim_days
-
-                growing_periods = self._growing_periods(schedule)
-                for plant_date, kill_date in growing_periods:
-                    plant_idx = (plant_date - start_date).days
-                    kill_idx = (kill_date - start_date).days
-
-                    # Clip to simulation window.
-                    clipped_start = max(plant_idx, 0)
-                    clipped_end = min(kill_idx, total_sim_days)
-                    if clipped_start >= clipped_end:
-                        continue
-
-                    duration = clipped_end - clipped_start
-                    daily_value = field_size_m2 / duration
-                    for i in range(clipped_start, clipped_end):
-                        daily_area_by_seed[seed_key][i] += daily_value
-
-        return daily_area_by_seed
-
-    def _extract_daily_seed_price(self, price_data: Any) -> list[float]:
-        """Extract a per-simulation-day price series from seed pricing payloads.
-
-        Yearly prices are resolved per commodity key (with fallback prices for
-        malformed payloads or missing years), then expanded so each simulation
-        day carries its year's price.
-
-        Parameters
-        ----------
-        price_data : Any
-            Mapping of commodity price keys to pricing payloads keyed by year
-            and FIPS code.
-
-        Returns
-        -------
-        list[float]
-            One price per simulation day, matching the length of the daily
-            area series produced by ``_preprocess_seed_costs``.
-        """
-        info_map = {"class": self.__class__.__name__, "function": self._extract_daily_seed_price.__name__}
-        start_date = datetime.strptime(str(self.im.get_data("config.start_date")), "%Y:%j")
-        end_date = datetime.strptime(str(self.im.get_data("config.end_date")), "%Y:%j")
-        start_year: int = start_date.year
-        end_year: int = end_date.year
-        fips_code: int = int(self.im.get_data("config.FIPS_county_code"))
-        days_count = (end_date - start_date).days + 1
-
-        daily_seed_price: list[float] = []
-        for key, value in price_data.items():
-            fallback_prices: list[float] | None = None
-            price_by_year: dict[int, float] = {}
-            if "fallback" in key:
-                daily_seed_price = BIOPHYSICAL_FALLBACKS["seed_cost"] * days_count
-                break
-            if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
-                self.om.add_warning(
-                    "MissingPriceData",
-                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format."
-                    "Using fallback price.",
-                    info_map,
-                )
-                fallback_prices = self._get_fallback_price(start_year, end_year, key)
-                price_by_year = {start_year + i: price for i, price in enumerate(fallback_prices)}
-            else:
-                fips_idx = value["fips"].index(fips_code)
-                for year in range(start_year, end_year + 1):
-                    try:
-                        price_by_year[year] = value[f"{year}"][fips_idx]
-                    except (KeyError, IndexError):
-                        self.om.add_warning(
-                            "MissingPriceData",
-                            f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
-                            "Using fallback price.",
-                            info_map,
-                        )
-                        if fallback_prices is None:
-                            fallback_prices = self._get_fallback_price(start_year, end_year, key)
-                        price_by_year[year] = fallback_prices[year - start_year]
-            for i in range(days_count):
-                daily_seed_price.append(price_by_year[(start_date + timedelta(days=i)).year])
-        return daily_seed_price
-
-    def _process_seed_costs_item(self) -> Dict[str, Any]:
-        """Build the full preprocessing result entry for the Seeds costs line item.
-
-        Scenario names are resolved from the OutputManager variables pool the
-        same way ``preprocess`` does for regular line items. Field schedules
-        and sizes come from the InputManager and do not vary by scenario, so
-        every scenario receives the same seed cost values.
-        """
-
-        info_map = {"class": self.__class__.__name__, "function": "_process_seed_costs_item"}
-
-        scenario_names = self._scenario_names()
-
-        biophysical_values_by_scenario: dict[str, dict[str, list[float]]] = {}
-        biophysical_aggregate_by_scenario: dict[str, dict[str, float]] = {}
-        line_item_values_by_scenario: dict[str, float] = {}
-
-        for scenario_name in scenario_names:
-            daily_area_by_seed = self._preprocess_seed_costs()
-
-            biophysical_values: dict[str, list[float]] = {}
-            bio_total: dict[str, float] = {}
-            price_data: dict[str, list[float]] = {}
-            price_values: dict[str, list[float]] = {}
-            price_aggregate: dict[str, float] = {}
-            total_seed_cost = 0.0
-            for seed_key, daily_area in daily_area_by_seed.items():
-                raw_price = self._get_data_with_handling(seed_key, info_map)
-                if raw_price is None:
-                    self.om.add_warning(
-                        "MissingEconomicsFile",
-                        f"Seed commodity pricing '{seed_key}' not found in InputManager, using fallback price.",
-                        info_map,
-                    )
-
-                extracted_prices = self._extract_daily_seed_price({seed_key: raw_price})
-                if not extracted_prices:
-                    continue
-
-                daily_price_per_area = [
-                    seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area)
-                ]
-                biophysical_values[seed_key] = daily_area_by_seed[seed_key]
-                price_values[seed_key] = extracted_prices
-                bio_total[seed_key] = sum(biophysical_values[seed_key])
-                price_data[seed_key] = raw_price
-                price_aggregate[seed_key] = self._aggregate(extracted_prices, "average")
-                total_seed_cost += sum(daily_price_per_area)
-
-            biophysical_values_by_scenario[scenario_name] = biophysical_values
-            biophysical_aggregate_by_scenario[scenario_name] = bio_total
-            line_item_values_by_scenario[scenario_name] = total_seed_cost
-
-            if not daily_area_by_seed:
-                self.om.add_warning(
-                    "MissingBiophysicalData",
-                    "No field data found for seed cost preprocessing",
-                    info_map,
-                )
-
-        return {
-            "biophysical_values": biophysical_values,
-            "biophysical_aggregate": bio_total,
-            "biophysical_values_by_scenario": biophysical_values_by_scenario,
-            "biophysical_aggregate_by_scenario": biophysical_aggregate_by_scenario,
-            "price_data": price_data,
-            "price_values": price_values,
-            "price_aggregate": price_aggregate,
-            "line_item_values_by_scenario": line_item_values_by_scenario,
-            "flow_type": "cost",
-        }
-
-    def _aggregate(self, values: List[float], desc: str) -> float | None:
-        """Aggregate values according to a textual description."""
-        if not values:
-            return None
-        d = desc.lower() if isinstance(desc, str) else ""
-        if "average" in d or "mean" in d:
-            return Aggregator.average(values)
-        if "product" in d:
-            return Aggregator.product(values)
-        if "divide" in d or "ratio" in d:
-            result = Aggregator.division(values)
-            if result is not None:
-                return result
-        if "subtract" in d or "difference" in d:
-            result = Aggregator.subtraction(values)
-            if result is not None:
-                return result
-        if "standard deviation" in d or "std" in d:
-            return Aggregator.standard_deviation(values)
-        # Default aggregation is sum
-        return Aggregator.sum(values)
 
     def preprocess(self) -> Dict[str, Dict[str, Dict[str, Dict[str, Any]]]]:
         """Run preprocessing and store results in the InputManager."""
@@ -986,10 +534,9 @@ class EconomicPreprocessor:
             section_data = results.setdefault(item.section, {})
             category_data = section_data.setdefault(item.category, {})
 
-            if item.section == "Soil_and_crop" and item.name == "Seeds costs":
-                category_data[item.name] = self._process_seed_costs_item()
-                #TODO: remove this
-                json.dump(category_data[item.name], open(f"seed_cost_data.json", "w"), indent=4)
+            handler = self.special_case_handlers.get((item.section, item.name))
+            if handler is not None:
+                category_data[item.name] = handler.process()
                 continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
@@ -1013,7 +560,7 @@ class EconomicPreprocessor:
             for scenario_values in values_by_scenario.values():
                 biophysical_values.extend(scenario_values)
 
-            aggregated_value = self._aggregate(biophysical_values, item.preprocessing or "")
+            aggregated_value = self.context.aggregate(biophysical_values, item.preprocessing or "")
             if aggregated_value is None and biophysical_values:
                 aggregated_value = Aggregator.sum(biophysical_values)
             if not biophysical_values and not input_values:
@@ -1040,14 +587,14 @@ class EconomicPreprocessor:
                 )
 
             price_values = self._extract_price_values(price_data)
-            price_aggregate = self._aggregate(price_values, "average")
+            price_aggregate = self.context.aggregate(price_values, "average")
             if price_aggregate is None:
                 flow_type = self._infer_flow_type(item) or "cost"
                 if flow_type in ECONOMIC_PRICE_FALLBACK:
                     price_aggregate = ECONOMIC_PRICE_FALLBACK[flow_type]
             aggregates_by_scenario: Dict[str, float | None] = {}
             for scenario, scenario_values in values_by_scenario.items():
-                scenario_aggregate = self._aggregate(scenario_values, item.preprocessing or "")
+                scenario_aggregate = self.context.aggregate(scenario_values, item.preprocessing or "")
                 if scenario_aggregate is None and scenario_values:
                     scenario_aggregate = Aggregator.sum(scenario_values)
                 aggregates_by_scenario[scenario] = scenario_aggregate
