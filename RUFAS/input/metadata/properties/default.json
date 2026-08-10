@@ -6349,6 +6349,11 @@
             "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "must_change_variables_path": {
+            "type": "string",
+            "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6373,6 +6378,11 @@
             "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "must_change_variables_path": {
+            "type": "string",
+            "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6397,6 +6407,11 @@
             "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "must_change_variables_path": {
+            "type": "string",
+            "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6421,6 +6436,11 @@
             "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "must_change_variables_path": {
+            "type": "string",
+            "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
           }
         }
       }
