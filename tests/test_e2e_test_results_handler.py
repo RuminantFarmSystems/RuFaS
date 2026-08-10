@@ -527,7 +527,6 @@ def test_update_expected_test_results(
     get_result_paths = mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[results_path])
 
     mocker.patch.object(E2ETestResultsHandler, "_get_matching_path", return_value=matching_path)
-    mock_reset_must_change = mocker.patch.object(E2ETestResultsHandler, "_reset_must_change_variables")
 
     if matching_path:
         mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data='{"expected_results": {}}'))
@@ -557,7 +556,6 @@ def test_update_expected_test_results(
 
     # Assert
     get_result_paths.assert_called_once()
-    assert mock_reset_must_change.call_count == (0 if raise_exception else 1)
 
     if matching_path:
         if raise_exception:
@@ -811,54 +809,6 @@ def test_evaluate_must_change_variables_missing_from_actual() -> None:
 def test_extract_changed_variable_names(diff_result: dict[str, Any], expected_names: list[str]) -> None:
     """Tests _extract_changed_variable_names across DeepDiff change categories."""
     assert E2ETestResultsHandler._extract_changed_variable_names(diff_result) == expected_names
-
-
-def test_reset_must_change_variables(mocker: MockerFixture, tmp_path: Path) -> None:
-    """Tests that _reset_must_change_variables empties a populated file and preserves its other keys."""
-    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
-    add_warning = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_warning")
-    file_path = tmp_path / "must_change.json"
-    write_must_change_file(file_path, {"description": "keep me", MUST_CHANGE_VARIABLES_KEY: ["A.x", "B.z"]})
-    path_sets = [make_result_path_set(str(file_path)), make_result_path_set(str(file_path))]
-
-    E2ETestResultsHandler._reset_must_change_variables(path_sets)
-
-    with open(file_path, "r", encoding="utf-8") as file:
-        contents = json.load(file)
-    assert contents == {"description": "keep me", MUST_CHANGE_VARIABLES_KEY: []}
-    add_warning.assert_called_once()
-
-
-@pytest.mark.parametrize(
-    "file_contents",
-    [
-        {"description": "keep me", MUST_CHANGE_VARIABLES_KEY: []},
-        "{not valid json",
-    ],
-)
-def test_reset_must_change_variables_leaves_file_untouched(
-    mocker: MockerFixture, tmp_path: Path, file_contents: Any
-) -> None:
-    """Tests that _reset_must_change_variables does not rewrite empty or unparsable files."""
-    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
-    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_warning")
-    file_path = tmp_path / "must_change.json"
-    write_must_change_file(file_path, file_contents)
-    original_contents = file_path.read_text(encoding="utf-8")
-
-    E2ETestResultsHandler._reset_must_change_variables([make_result_path_set(str(file_path))])
-
-    assert file_path.read_text(encoding="utf-8") == original_contents
-
-
-def test_reset_must_change_variables_missing_file(mocker: MockerFixture, tmp_path: Path) -> None:
-    """Tests that _reset_must_change_variables ignores missing files."""
-    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
-    add_warning = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_warning")
-
-    E2ETestResultsHandler._reset_must_change_variables([make_result_path_set(str(tmp_path / "no_such_file.json"))])
-
-    add_warning.assert_not_called()
 
 
 @pytest.mark.parametrize(

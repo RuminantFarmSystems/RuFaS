@@ -485,61 +485,6 @@ class E2ETestResultsHandler:
         return sorted(changed_variable_names)
 
     @staticmethod
-    def _reset_must_change_variables(test_result_path_sets: list[ResultPathType]) -> None:
-        """
-        Empties the must-change variables files referenced by the given result path sets.
-
-        Parameters
-        ----------
-        test_result_path_sets : list[ResultPathType]
-            List of result path sets for the input set, each optionally referencing a must-change variables file
-            through its ``must_change_variables_path`` field.
-
-        Notes
-        -----
-        Called after the expected results are regenerated: at that point the recorded expected values match the
-        actual values, so the must-change flags are stale by definition and would fail the next comparison run.
-        Files that are missing, unparsable, or already empty are left untouched.
-        """
-        om = OutputManager()
-        info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
-            "function": E2ETestResultsHandler._reset_must_change_variables.__name__,
-        }
-        must_change_paths = {
-            path_set.must_change_variables_path
-            for path_set in test_result_path_sets
-            if path_set.must_change_variables_path
-        }
-        for path_str in sorted(must_change_paths):
-            path = Path(path_str)
-            if not path.exists():
-                continue
-            try:
-                with open(path, "r", encoding="utf-8") as must_change_file:
-                    file_contents = json.load(must_change_file)
-            except json.JSONDecodeError as e:
-                om.add_warning(
-                    "End-to-end testing must-change variables not cleared",
-                    f"Must-change variables file {path} is not valid JSON and was not cleared: {e}",
-                    info_map,
-                )
-                continue
-            variable_names = file_contents.get(MUST_CHANGE_VARIABLES_KEY) if isinstance(file_contents, dict) else None
-            if not variable_names:
-                continue
-            file_contents[MUST_CHANGE_VARIABLES_KEY] = []
-            with open(path, "w", encoding="utf-8") as must_change_file:
-                json.dump(file_contents, must_change_file, indent=4)
-                must_change_file.write("\n")
-            om.add_warning(
-                "End-to-end testing must-change variables cleared",
-                f"Cleared must-change variables {variable_names} from {path} after regenerating the expected "
-                "results. Re-add any variables that are still expected to change.",
-                info_map,
-            )
-
-    @staticmethod
     def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
         """
         Determines if a numerical change is significant based on if the change between the
@@ -660,9 +605,9 @@ class E2ETestResultsHandler:
 
         Notes
         -----
-        After the expected results are regenerated, the input set's must-change variables file is emptied: the
-        recorded expected values then match the actual values, so any remaining must-change flags would fail the
-        next comparison run.
+        The input set's must-change variables file is not touched: after an update, the freshly recorded expected
+        results already reflect any flagged changes, so it is the user's responsibility to empty the must-change
+        list, otherwise the leftover flags will fail the next comparison run.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -737,7 +682,6 @@ class E2ETestResultsHandler:
             finally:
                 if backup_path.exists():
                     backup_path.unlink()
-        E2ETestResultsHandler._reset_must_change_variables(test_result_path_sets)
 
     @staticmethod
     def _get_matching_path(dir_path: Path, path_set: ResultPathType) -> Path | None:
