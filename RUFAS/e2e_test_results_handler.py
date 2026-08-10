@@ -108,41 +108,17 @@ class E2ETestResultsHandler:
             )
 
             filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(diff, path_set.tolerance)
-            changed_variables = E2ETestResultsHandler._extract_changed_variable_names(filtered_diff)
             must_change_satisfied, must_change_violations = E2ETestResultsHandler._evaluate_must_change_variables(
                 expected_results, actual_results, domain_must_change_variables, path_set.tolerance
             )
-
-            is_difference_in_results: bool = False if (filtered_diff == {}) else True
-            if is_difference_in_results:
-                om.add_error(
-                    f"End-to-end testing failed for {path_set.domain}",
-                    "Identified differences between actual and expected results.",
-                    info_map,
-                )
-            if must_change_violations:
-                om.add_error(
-                    f"End-to-end testing failed for {path_set.domain}",
-                    f"Must-change variables did not change: {sorted(must_change_violations)}",
-                    info_map,
-                )
-            if not is_difference_in_results and not must_change_violations:
-                om.add_log(
-                    f"End-to-end testing succeeded for {path_set.domain}",
-                    "No differences found between actual and expected end-to-end testing results.",
-                    info_map,
-                )
-            end_to_end_testing_passing: bool = not is_difference_in_results and not must_change_violations
-            comparison_results: dict[str, Any] = dict(filtered_diff)
-            if changed_variables:
-                comparison_results["changed_variables"] = changed_variables
-            if domain_must_change_variables:
-                comparison_results["must_change_satisfied"] = must_change_satisfied
-                comparison_results["must_change_violations"] = must_change_violations
-            comparison_results["end_to_end_testing_passing"] = end_to_end_testing_passing
-            info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": path_set.domain})
-            for comparison_type, difference in comparison_results.items():
-                om.add_variable(comparison_type, difference, info_map)
+            E2ETestResultsHandler._report_domain_comparison_results(
+                domain=path_set.domain,
+                filtered_diff=filtered_diff,
+                domain_must_change_variables=domain_must_change_variables,
+                must_change_satisfied=must_change_satisfied,
+                must_change_violations=must_change_violations,
+                info_map=info_map,
+            )
 
         unknown_must_change_variables = must_change_variables - matched_must_change_variables
         if unknown_must_change_variables and all_domains_compared:
@@ -154,6 +130,73 @@ class E2ETestResultsHandler:
                 f"{sorted(unknown_must_change_variables)}",
                 info_map,
             )
+
+    @staticmethod
+    def _report_domain_comparison_results(
+        domain: str,
+        filtered_diff: dict[str, Any],
+        domain_must_change_variables: list[str],
+        must_change_satisfied: list[str],
+        must_change_violations: dict[str, str],
+        info_map: dict[str, Any],
+    ) -> None:
+        """
+        Logs the outcome of a domain's end-to-end comparison and records the comparison results as variables.
+
+        Parameters
+        ----------
+        domain : str
+            The RuFaS domain the comparison results belong to.
+        filtered_diff : dict[str, Any]
+            The domain's ``DeepDiff`` result with insignificant changes filtered out.
+        domain_must_change_variables : list[str]
+            The must-change variable names present in the domain's expected results.
+        must_change_satisfied : list[str]
+            The must-change variables whose values differ from the expected results.
+        must_change_violations : dict[str, str]
+            The violating must-change variables, mapped to the reason each one failed.
+        info_map : dict[str, Any]
+            Information about the source of the recorded variables. Updated in place with the units and the
+            ``domain`` output prefix.
+
+        Notes
+        -----
+        The domain passes when the filtered diff is empty and there are no must-change violations; each failure
+        cause is logged as an error, and the recorded results include ``changed_variables`` (the names of the
+        unflagged variables that differ) and the must-change outcomes.
+        """
+        om = OutputManager()
+        changed_variables = E2ETestResultsHandler._extract_changed_variable_names(filtered_diff)
+        is_difference_in_results: bool = False if (filtered_diff == {}) else True
+        if is_difference_in_results:
+            om.add_error(
+                f"End-to-end testing failed for {domain}",
+                "Identified differences between actual and expected results.",
+                info_map,
+            )
+        if must_change_violations:
+            om.add_error(
+                f"End-to-end testing failed for {domain}",
+                f"Must-change variables did not change: {sorted(must_change_violations)}",
+                info_map,
+            )
+        if not is_difference_in_results and not must_change_violations:
+            om.add_log(
+                f"End-to-end testing succeeded for {domain}",
+                "No differences found between actual and expected end-to-end testing results.",
+                info_map,
+            )
+        end_to_end_testing_passing: bool = not is_difference_in_results and not must_change_violations
+        comparison_results: dict[str, Any] = dict(filtered_diff)
+        if changed_variables:
+            comparison_results["changed_variables"] = changed_variables
+        if domain_must_change_variables:
+            comparison_results["must_change_satisfied"] = must_change_satisfied
+            comparison_results["must_change_violations"] = must_change_violations
+        comparison_results["end_to_end_testing_passing"] = end_to_end_testing_passing
+        info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": domain})
+        for comparison_type, difference in comparison_results.items():
+            om.add_variable(comparison_type, difference, info_map)
 
     @staticmethod
     def _convert_expected_result_variable_names(
