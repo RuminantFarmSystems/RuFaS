@@ -92,11 +92,14 @@ class E2ETestResultsHandler:
 
             domain_must_change_variables = sorted(name for name in must_change_variables if name in expected_results)
             matched_must_change_variables.update(domain_must_change_variables)
-            comparison_expected = {k: v for k, v in expected_results.items() if k not in must_change_variables}
-            comparison_actual = {k: v for k, v in actual_results.items() if k not in must_change_variables}
+            comparison_expected_not_must_change = {
+                k: v for k, v in expected_results.items() if k not in must_change_variables}
+            comparison_actual_not_must_change = {
+                k: v for k, v in actual_results.items() if k not in must_change_variables}
 
             diff = DeepDiff(
-                comparison_expected, comparison_actual, ignore_order=True, verbose_level=2, significant_digits=3
+                comparison_expected_not_must_change, comparison_actual_not_must_change,
+                ignore_order=True, verbose_level=2, significant_digits=3
             )
 
             filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(diff, path_set.tolerance)
