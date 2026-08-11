@@ -249,15 +249,14 @@ class PartialBudget:
             self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
             self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
 
-            should_run_roi_comparison: bool = self.im.get_data("economic_inputs.roi.compare_roi")
-            if should_run_roi_comparison:
+            should_calculate_roi: bool = self.im.get_data("economic_inputs.roi.should_calculate_roi")
+            if should_calculate_roi:
                 revenue = float(revenue_total.item())
                 costs = float(cost_total.item())
-                current_simulation_roi = EconomicMetrics.calculate_roi(benefits=revenue, costs=costs)
-                comparison_roi_path_data: list[dict[str, str]] = \
-                    self.im.get_data("economic_inputs.roi.roi_comparison_paths")
-                for comparison in comparison_roi_path_data:
-                    self._run_roi_comparison(comparison, current_simulation_roi)
+                comparison_roi_data: list[dict[str, str]] = \
+                    self.im.get_data("economic_inputs.roi.roi_comparison_data")
+                for comparison in comparison_roi_data:
+                    self._calculate_roi(comparison, revenue, costs)
 
             return
 
@@ -295,10 +294,11 @@ class PartialBudget:
         self.om.add_variable("econ_pba_summary", result_df.to_dict(orient="list"), info_map)
         self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
 
-    def _run_roi_comparison(
+    def _calculate_roi(
         self,
         comparison_roi_data: dict[str, str],
-        current_simulation_roi: float,
+        current_simulation_revenue: float,
+        current_simulation_costs: float
     ) -> None:
         """
         Compare a previous simulation ROI with the current simulation ROI.
@@ -307,8 +307,10 @@ class PartialBudget:
         ----------
         comparison_roi_data : dict[str, str]
             A dictionary containing the user specified locations and names for comparison roi data.
-        current_simulation_roi : float
-            The roi calculated for the current simulation.
+        current_simulation_revenue : float
+            The revenue calculated for the current simulation.
+        current_simulation_costs : float
+            The costs calculated for thecurrent simulation.
 
         Raises
         ------
@@ -318,7 +320,7 @@ class PartialBudget:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._run_roi_comparison.__name__,
+            "function": self._calculate_roi.__name__,
             "units": MeasurementUnits.DOLLARS
         }
 
@@ -348,19 +350,20 @@ class PartialBudget:
         for index, (comparison_revenue, comparison_cost) in enumerate(
             zip(comparison_revenues, comparison_costs, strict=True)
         ):
-            comparison_roi = EconomicMetrics.calculate_roi(
-                benefits=comparison_revenue,
-                costs=comparison_cost,
+            benefits = current_simulation_revenue - comparison_revenue
+            costs = current_simulation_costs - comparison_cost
+            roi = EconomicMetrics.calculate_roi(
+                benefits=benefits,
+                costs=costs,
             )
-            roi_delta = current_simulation_roi - comparison_roi
 
-            output_name = f"roi_delta_for_{comparison_roi_name}"
+            output_name = f"roi_for_{comparison_roi_name}"
             if len(comparison_revenues) > 1:
                 output_name = f"{output_name}_{index}"
 
             self.om.add_variable(
                 output_name,
-                roi_delta,
+                roi,
                 info_map,
             )
 

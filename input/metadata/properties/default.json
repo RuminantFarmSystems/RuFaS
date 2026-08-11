@@ -3539,12 +3539,12 @@
     "roi": {
       "type": "object",
       "description": "Inputs related to return on investment calculations.", 
-      "compare_roi": {
+      "should_calculate_roi": {
         "type": "bool",
-        "description": "If true, triggers loading previous simulation roi results for comparison to current simulation roi.",
+        "description": "If true, triggers loading previous simulation cost/revenue results for comparison to current simulation costs/revenue.",
         "default": false
       },
-      "roi_comparison_paths": {
+      "roi_comparison_data": {
         "type": "array",
         "description": "The list of saved roi output addresses the user wants to compare to the roi for the current simulation.",
         "properties": {
