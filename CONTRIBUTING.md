@@ -86,7 +86,7 @@ Contributions to RuFaS can fall in any of the five categories described below. T
 
 ## Shared Values and Operating Principles
 
-All participation in RuFaS is guided by the values and operating principles defined in [Strategy.md](Strategy.md).
+All participation and decision-making in RuFaS is guided by the values and operating principles, along with strategic pillars, defined in [Strategy.md](Strategy.md).
 
 Contributors, maintainers, sponsors, and PML members are expected to act in accordance with:
 
@@ -95,10 +95,6 @@ Contributors, maintainers, sponsors, and PML members are expected to act in acco
 - Inclusive Collaboration
 - Shared Stewardship
 - Systems Thinking
-
-Decision-making within RuFaS should be consistent with the operating principles described in [Strategy.md](Strategy.md).
-
-For strategic direction and project values, see [Strategy.md](Strategy.md).
 
 
 ---
