@@ -927,7 +927,9 @@ class TaskManager:
             "produce_graphics": produce_graphics,
         }
 
+        # TODO update log to reflect that it's a series of simulations
         output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
+        # TODO add loop of running single simulations, saving the results, then moving to the next simulation
         TaskManager._handle_simulation_engine_run_tasks(
             args=args,
             input_manager=input_manager,
@@ -940,7 +942,11 @@ class TaskManager:
         output_manager.add_log("End-to-end testing", "Completed simulation for end-to-end testing", info_map)
 
         output_manager.flush_pools()
+
+        # TODO this is where the loop ends
+        # TODO average results here - need new function in E2ETestResultsHandler to be called here
         output_manager.is_first_post_processing = False
+        # TODO this should be able to stay the same because it should be a single E2E comparison filter as it was before
         E2ETestResultsHandler.compare_actual_and_expected_test_results(
             args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
         )
