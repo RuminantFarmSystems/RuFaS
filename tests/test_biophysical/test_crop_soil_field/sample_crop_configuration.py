@@ -1,7 +1,6 @@
 from RUFAS.biophysical.field.crop.crop_data import PlantCategory
 from RUFAS.biophysical.field.crop.crop_data_factory import CropConfiguration
 
-
 SAMPLE_CROP_CONFIGURATION = CropConfiguration(
     name="alfalfa_silage",
     plant_category=PlantCategory.PERENNIAL_LEGUME,
