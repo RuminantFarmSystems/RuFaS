@@ -2643,6 +2643,13 @@
           "type": "bool",
           "description": "Whether the crop configuration is a nitrogen fixer."
         },
+        "harvest_efficiency": {
+          "type": "number",
+          "description": "Efficiency of the harvest operation: the proportion of cut biomass that is extracted from the field (unitless). The remainder is deposited into the field as residue. Defaults to 1.0, meaning all cut biomass is collected. Values below 1.0 represent a harvest that leaves part of what it cuts behind, such as grazing. One study found that seasonal grazers consume about 25% of above ground biomass, with another 25% returned to the field as residue.",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 1.0
+        },
         "minimum_temperature": {
           "type": "number",
           "description": "Minimum temperature for plant growth (Celsius)."
