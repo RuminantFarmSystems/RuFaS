@@ -71,7 +71,7 @@ class CropData:
         If heat unit scheduling is used for harvesting.
     harvest_efficiency : float, default 1.0
         Efficiency of the harvest operation: the proportion of the cut biomass that is extracted from the field
-        (unitless; [0, 1]).
+        (unitless; [0.0, 1.0]).
     harvest_heat_fraction : float
         Fraction of potential heat units for optimal growth stage for harvest.
     optimal_harvest_index : float
