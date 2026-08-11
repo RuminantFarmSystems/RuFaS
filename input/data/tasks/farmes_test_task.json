@@ -2,25 +2,23 @@
   "parallel_workers": 2,
   "tasks": [
    {
-      "task_type": "SIMULATION_MULTI_RUN",
+      "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",
       "input_root": "C:/Users/Kristan Reed/Documents/RuFaS- offline/FARMES/Support/CoverCrops/Baseline/",
       "output_prefix": "Baseline",
       "log_verbosity": "errors", 
-      "multi_run_counts": 1, 
-      "set_seed":true,
+      "set_seed": true,
       "random_seed": 42
     },
   {
-      "task_type": "SIMULATION_MULTI_RUN",
+      "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",
       "input_root": "C:/Users/Kristan Reed/Documents/RuFaS- offline/FARMES/Support/CoverCrops/CoverCrops/",
       "output_prefix": "CoverCrop",
       "log_verbosity": "errors", 
       "multi_run_counts": 1, 
-      "set_seed":true,
+      "set_seed": true,
       "random_seed": 42
-
     }
     
 ]
