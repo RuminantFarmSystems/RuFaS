@@ -6,6 +6,7 @@ SAMPLE_CROP_CONFIGURATION = CropConfiguration(
     name="alfalfa_silage",
     plant_category=PlantCategory.PERENNIAL_LEGUME,
     is_nitrogen_fixer=True,
+    harvest_efficiency=1.0,
     minimum_temperature=4.0,
     optimal_temperature=25.0,
     potential_heat_units=400.0,
