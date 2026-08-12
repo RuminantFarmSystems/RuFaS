@@ -119,7 +119,7 @@ def test_add_phosphorus_nutrient_request_results(
 
 @mark.parametrize("mass_one", [100, 0])
 @mark.parametrize("mass_two", [125, 0])
-@mark.parametrize("dry_frac_one", [0.5, 0.01, 0.99])  
+@mark.parametrize("dry_frac_one", [0.5, 0.01, 0.99])
 @mark.parametrize("dry_frac_two", [0.2, 0.01, 0.99])
 def test_add_matter_nutrient_request_results(
         mass_one: float, mass_two: float, dry_frac_one: float, dry_frac_two: float) -> None:
