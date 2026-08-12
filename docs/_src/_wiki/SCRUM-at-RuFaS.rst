@@ -1,7 +1,7 @@
 RuFaS Team SCRUM Process
 ========================
 
-Welcome to the RuFaS team's SCRUM process wiki page. This document
+Welcome to the RuFaS team's SCRUM process page. This document
 outlines the key aspects of our agile development process, including
 task sizing, priorities, ceremonies, and the Definition of Done (DoD).
 

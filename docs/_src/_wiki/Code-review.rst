@@ -1,6 +1,6 @@
 Code Review
 ===========
-Code review is as important as developing the code. In this wiki, we go
+Code review is as important as developing the code. In this page, we go
 over the details of the code review process in RuFaS.
 
 Before code review begins
@@ -19,7 +19,7 @@ Reviewability is achieved by ensuring that:
   tested the code under ``Test Plan`` section in the PR description.
 - The code review is NOT mixed with a design review. If the change is
   large, `its idea and design have to be reviewed and agreed
-  upon <https://github.com/RuminantFarmSystems/MASM/wiki/How-to-write-a-design-doc%3F>`__;
+  upon <https://ruminantfarmsystems.github.io/RuFaS/_wiki/How-to-write-a-design-doc.html>`__;
   before developing the code and submitting it for review.
 - The code that is being submitted for review is adequately sized, it is
   not too small nor too large. As a general rule of thumb, anything
@@ -115,7 +115,7 @@ Adding to the Changelog
 -----------------------
 
 All PRs are expected to have accompanying changelog entry in
-```changelog.md`` <https://github.com/RuminantFarmSystems/MASM/blob/dev/changelog.md>`__.
+```changelog.md`` <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/changelog.md>`__.
 The changelog entry must be placed under the section titled "*Next
 Version Updates*". Each entry must contain the following information:
 

@@ -899,7 +899,7 @@ open your Git Desktop and VS Code.
 
 #. You can borrow the files for Output Filters from other team members
    or create some on your own. For more details on how to create your
-   own, visit the GitHub wiki `Output
+   own, visit the GitHub page `Output
    Manager <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Output-Manager.html#output-filters>`__.
 
    -  Think of output filters as an opportunity to tailor the results
@@ -909,7 +909,7 @@ open your Git Desktop and VS Code.
       RuFaS,
       `Reports <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Report-Generator.html>`__
       and
-      `Graphs <https://github.com/RuminantFarmSystems/MASM/wiki/Graph-Generator>`__
+      `Graphs <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Graph-Generator.html>`__
       must be generated using filters.
 
    -  The `Output
