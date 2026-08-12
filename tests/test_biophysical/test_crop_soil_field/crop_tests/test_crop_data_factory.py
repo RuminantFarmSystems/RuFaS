@@ -18,6 +18,7 @@ def test_setup_crop_configurations(mocker: MockerFixture) -> None:
                 "name": "alfalfa_silage",
                 "plant_category": "perennial_legume",
                 "is_nitrogen_fixer": True,
+                "harvest_efficiency": 1.0,
                 "minimum_temperature": 4.0,
                 "optimal_temperature": 25.0,
                 "potential_heat_units": 400.0,
@@ -58,6 +59,7 @@ def test_setup_crop_configurations(mocker: MockerFixture) -> None:
         name="alfalfa_silage",
         plant_category=PlantCategory.PERENNIAL_LEGUME,
         is_nitrogen_fixer=True,
+        harvest_efficiency=1.0,
         minimum_temperature=4.0,
         optimal_temperature=25.0,
         potential_heat_units=400.0,
@@ -201,6 +203,7 @@ def test_get_available_crop_configurations() -> None:
         name="alfalfa_silage",
         plant_category=PlantCategory.PERENNIAL_LEGUME,
         is_nitrogen_fixer=True,
+        harvest_efficiency=1.0,
         minimum_temperature=4.0,
         optimal_temperature=25.0,
         potential_heat_units=400.0,
@@ -249,6 +252,7 @@ def test_create_crop_data() -> None:
             name="alfalfa_silage",
             plant_category=PlantCategory.PERENNIAL_LEGUME,
             is_nitrogen_fixer=True,
+            harvest_efficiency=1.0,
             minimum_temperature=4.0,
             optimal_temperature=25.0,
             potential_heat_units=400.0,
@@ -290,6 +294,54 @@ def test_create_crop_data() -> None:
         actual_value = getattr(actual, key)
 
         assert actual_value == expected_value
+
+
+def test_create_crop_data_preserves_harvest_efficiency() -> None:
+    """Test that a crop configuration's harvest efficiency is carried into the created CropData."""
+    CropDataFactory._crop_configurations = {
+        "pasture": CropConfiguration(
+            name="pasture",
+            plant_category=PlantCategory.PERENNIAL,
+            is_nitrogen_fixer=False,
+            harvest_efficiency=0.5,
+            minimum_temperature=0.0,
+            optimal_temperature=15.0,
+            potential_heat_units=800.0,
+            max_leaf_area_index=4.0,
+            first_heat_fraction_point=0.15,
+            first_leaf_fraction_point=0.01,
+            second_heat_fraction_point=0.50,
+            second_leaf_fraction_point=0.95,
+            senescent_heat_fraction=0.80,
+            light_use_efficiency=30.0,
+            emergence_nitrogen_fraction=0.0560,
+            half_mature_nitrogen_fraction=0.0210,
+            mature_nitrogen_fraction=0.0120,
+            emergence_phosphorus_fraction=0.0099,
+            half_mature_phosphorus_fraction=0.0022,
+            mature_phosphorus_fraction=0.0019,
+            max_root_depth=2000.0,
+            root_distribution_param_da=137.0,
+            root_distribution_param_c=-1.144,
+            optimal_harvest_index=0.85,
+            minimum_harvest_index=0.37,
+            dry_matter_percentage=88.331,
+            lignin_dry_matter_percentage=4.167,
+            crude_protein_percent_at_harvest=13.28,
+            non_protein_nitrogen_at_harvest=4.056,
+            starch_at_harvest=2.217,
+            adf_at_harvest=35.524,
+            ndf_at_harvest=58.007,
+            sugar_at_harvest=15.235,
+            ash_at_harvest=8.567,
+            yield_nitrogen_fraction=0.021248,
+            yield_phosphorus_fraction=0.00281,
+        )
+    }
+
+    actual = CropDataFactory.create_crop_data("pasture")
+
+    assert actual.harvest_efficiency == 0.5
 
 
 def test_crop_crop_data_error() -> None:
