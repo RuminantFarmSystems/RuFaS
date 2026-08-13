@@ -5,7 +5,14 @@ import pytest
 from unittest.mock import call
 from pytest_mock import MockerFixture
 
-from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter, CrossValidator, Modifiability
+from RUFAS.data_validator import (
+    ComparisonOperands,
+    DataValidator,
+    ElementState,
+    ElementsCounter,
+    CrossValidator,
+    Modifiability,
+)
 
 
 def mock_input_array_data_for_fix_data() -> dict[str | int, Any] | list[Any]:
@@ -3229,7 +3236,7 @@ def test_evaluate_is_type_data_type_not_str(eager_termination: bool) -> None:
     """Non-string data_type logs and optionally raises."""
     cv = CrossValidator()
     if eager_termination:
-        with pytest.raises(ValueError, match=r"Cross-validation error: Invalid type comparison\."):
+        with pytest.raises(ValueError, match=r"the type to compare against must be given as a string"):
             cv._evaluate_is_type(["x"], [123], eager_termination=True)
         assert len(cv._event_logs) == 1
     else:
@@ -3243,7 +3250,7 @@ def test_evaluate_is_type_unsupported_type_string(eager_termination: bool) -> No
     """Unsupported type string logs and optionally raises."""
     cv = CrossValidator()
     if eager_termination:
-        with pytest.raises(ValueError, match=r"Cross-validation error: Unsupported data type: weird. Supported types:"):
+        with pytest.raises(ValueError, match=r"unsupported data type weird\. Supported types:"):
             cv._evaluate_is_type(["x"], ["weird"], eager_termination=True)
         assert len(cv._event_logs) == 1
     else:
@@ -3306,12 +3313,86 @@ def test_evaluate_equal_data_length_invalid_types(left: Any, right: Any, eager_t
     cv = CrossValidator()
 
     if eager_termination:
-        with pytest.raises(ValueError, match=r"Cross-validation error: Invalid type comparison\."):
+        with pytest.raises(ValueError, match=r"both must be list type, but got"):
             cv._evaluate_equal_data_length(left, right, eager_termination=True)
         assert len(cv._event_logs) == 1
     else:
         assert cv._evaluate_equal_data_length(left, right, eager_termination=False) is False
         assert len(cv._event_logs) == 1
+
+
+def test_describe_expression_names_aggregation_operands() -> None:
+    """Aggregation expression blocks are described by their operand alias names."""
+    cv = CrossValidator()
+    block = {"aggregation": {"operation": "sum", "operands": ["weather_high", "weather_low"]}}
+    assert cv._describe_expression(block) == "weather_high, weather_low"
+
+
+def test_describe_expression_names_for_each_source_and_field() -> None:
+    """for_each expression blocks are described by their source alias and field."""
+    cv = CrossValidator()
+    block = {"for_each": {"in": "pen_information", "field": "number_of_stalls"}}
+    assert cv._describe_expression(block) == "pen_information.number_of_stalls"
+
+
+def test_describe_expression_falls_back_for_unknown_block() -> None:
+    """Expression blocks lacking known operands get generic fallback labels."""
+    cv = CrossValidator()
+    assert cv._describe_expression({"aggregation": {"operands": []}}) == "unnamed operands"
+    assert cv._describe_expression({}) == "unknown expression"
+
+
+def test_evaluate_equal_data_length_message_names_operands() -> None:
+    """The length-mismatch error names the specific operands being compared."""
+    cv = CrossValidator()
+    operands = ComparisonOperands(left="weather_high", right="weather_low")
+
+    assert cv._evaluate_equal_data_length("not a list", [1, 2], eager_termination=False, operands=operands) is False
+
+    message = cv._event_logs[-1]["message"]
+    assert "weather_high" in message
+    assert "weather_low" in message
+
+
+def test_evaluate_pairwise_condition_message_names_operands() -> None:
+    """The pairwise length-mismatch error names the specific operands being compared."""
+    cv = CrossValidator()
+    operands = ComparisonOperands(left="weather_high", right="weather_avg")
+
+    result = cv._evaluate_greater_or_equal_condition([1, 2, 3], [1, 2], eager_termination=False, operands=operands)
+
+    assert result is False
+    message = cv._event_logs[-1]["message"]
+    assert "weather_high" in message
+    assert "weather_avg" in message
+
+
+def test_evaluate_is_type_message_names_left_operand() -> None:
+    """The type-validation error names the left-hand operand being checked."""
+    cv = CrossValidator()
+    operands = ComparisonOperands(left="animal_id", right="expected_type")
+
+    assert cv._evaluate_is_type(["x"], ["weird"], eager_termination=False, operands=operands) is False
+
+    assert "animal_id" in cv._event_logs[-1]["message"]
+
+
+def test_evaluate_condition_threads_operand_names_into_message() -> None:
+    """End-to-end: a failing condition surfaces the operand alias names in the logged error."""
+    cv = CrossValidator()
+    cv._save_to_alias_pool("weather_high", [1, 2, 3])
+    cv._save_to_alias_pool("weather_low", [1, 2])
+    clause = {
+        "relationship": "greater_or_equal_to",
+        "left_hand": {"aggregation": {"operation": "no_op", "mode": "element_wise", "operands": ["weather_high"]}},
+        "right_hand": {"aggregation": {"operation": "no_op", "mode": "element_wise", "operands": ["weather_low"]}},
+    }
+
+    assert cv._evaluate_condition(clause, eager_termination=False) is False
+
+    message = cv._event_logs[-1]["message"]
+    assert "weather_high" in message
+    assert "weather_low" in message
 
 
 def test_evaluate_greater_condition_pairwise_lists() -> None:
@@ -3343,7 +3424,7 @@ def test_evaluate_condition_equal_length_branch(mocker: MockerFixture, eager_ter
     )
 
     assert result is True
-    mock_equal_length.assert_called_once_with([1, 2], [3, 4], eager_termination)
+    mock_equal_length.assert_called_once_with([1, 2], [3, 4], eager_termination, mocker.ANY)
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3386,7 +3467,7 @@ def test_evaluate_condition_equal_path(mocker: MockerFixture, eager_termination:
     valid = cv._evaluate_condition({"relationship": "equal", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_eq.assert_called_once_with("A", "B", eager_termination)
+    mock_eq.assert_called_once_with("A", "B", eager_termination, mocker.ANY)
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3402,7 +3483,7 @@ def test_evaluate_condition_greater_or_equal_path(mocker: MockerFixture, eager_t
     )
 
     assert valid
-    mock_ge.assert_called_once_with(5, 2, eager_termination)
+    mock_ge.assert_called_once_with(5, 2, eager_termination, mocker.ANY)
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3432,7 +3513,7 @@ def test_evaluate_condition_not_equal_inverts_equality(mocker: MockerFixture, ea
     valid = cv._evaluate_condition({"relationship": "not_equal", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_eq.assert_called_once_with("foo", "bar", eager_termination)
+    mock_eq.assert_called_once_with("foo", "bar", eager_termination, mocker.ANY)
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3446,7 +3527,7 @@ def test_evaluate_condition_is_of_type_passes_eager(mocker: MockerFixture, eager
     valid = cv._evaluate_condition({"relationship": "is_of_type", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_is_type.assert_called_once_with("text", "string", eager_termination)
+    mock_is_type.assert_called_once_with("text", "string", eager_termination, mocker.ANY)
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
