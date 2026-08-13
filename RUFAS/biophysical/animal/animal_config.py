@@ -20,25 +20,23 @@ class AnimalConfig:
     Attributes
     ----------
     wean_day : int
-        The number of days after birth when a calf is weaned, (simulation days).
+        The number of days after birth when a calf is weaned, (simulation day).
     wean_length : int
-        The duration required for weaning, (simulation days).
+        The duration required for weaning, (simulation day).
     target_heifer_pregnant_day : int
-        The target day for heifers to become pregnant, (simulation days).
+        The target day for heifers to become pregnant, (simulation day).
     heifer_breed_start_day : int
-        The day heifer breeding starts, , (simulation days).
+        The day heifer breeding starts, (simulation day).
     heifer_prefresh_day : int
-        The number of days for prefresh heifer preparation , (simulation days).
+        The number of days for prefresh heifer preparation , (simulation day).
     calving_interval : int
-        The targeted interval between calvings, (simulation days).
+        The targeted interval between calvings, (simulation day).
     dry_off_day_of_pregnancy : int
-        The day of pregnancy when a cow is dried off, (simulation days).
+        The day of pregnancy when a cow is dried off, (simulation day).
     heifer_reproduction_cull_day : int
-        Maximum day at which a heifer is culled if not pregnant, (simulation days).
+        Maximum day at which a heifer is culled if not pregnant, (simulation day).
     do_not_breed_time : int
-        The duration after which breeding is stopped, (simulation days).
-    cull_milk_production : int
-        The threshold milk production below which cows are culled, (simulation days).
+        The duration after which breeding is stopped, (simulation day).
     semen_type : str
         Types of semen used for reproduction, e.g., "conventional", (unitless).
     male_calf_rate_conventional_semen : float
@@ -46,13 +44,21 @@ class AnimalConfig:
     male_calf_rate_sexed_semen : float
         Proportion of male calves when sexed semen is used, (unitless).
     keep_female_calf_rate : float
-        Rate at which female calves are kept, (unitless).
+        Rate at which female calves are kept, used when ``calf_retention_method`` is
+        ``"rate"`` (unitless).
+    calf_retention_method : str
+        Method used to decide female-calf retention: ``"rate"`` (keep each live female
+        calf with probability ``keep_female_calf_rate``) or ``"count"`` (keep a target
+        number of female calves per year, ``annual_keep_female_calf_num``).
+    annual_keep_female_calf_num : int
+        Target number of female calves to keep per year, used when
+        ``calf_retention_method`` is ``"count"``, (head/year).
     still_birth_rate : float
         Probability of stillbirth occurring during calving, (unitless).
     average_gestation_length : int
-        The average gestation length, (simulation days).
+        The average gestation length, (simulation day).
     std_gestation_length : float
-        The standard deviation for gestation length, (simulation days).
+        The standard deviation for gestation length, (simulation day).
     cow_times_milked_per_day : int
         Number of times a cow is milked per day, (unitless).
     milk_fat_percent : float
@@ -86,13 +92,13 @@ class AnimalConfig:
     cow_estrus_detection_rate : float
         Probability of detecting estrus in cows.
     ovsynch_program_start_day : int
-        The starting day for the Ovsynch program, (simulation days).
+        The starting day for the Ovsynch program, (simulation day).
     ovsynch_program_conception_rate : float
         Conception rate associated with the Ovsynch program, (unitless).
     presynch_program_start_day : int
-        The starting day for the presynchronization program, (simulation days).
+        The starting day for the presynchronization program, (simulation day).
     voluntary_waiting_period : int
-        The voluntary waiting period before breeding is resumed after calving, (simulation days).
+        The voluntary waiting period before breeding is resumed after calving, (simulation day).
     birth_weight_avg_ho : float
         Average Holstein birth weight, (kg).
     birth_weight_std_ho : float
@@ -112,31 +118,31 @@ class AnimalConfig:
     should_decrease_conception_rate_by_parity : bool
         Whether to adjust conception rates based on parity number, (unitless).
     average_estrus_cycle_return : int
-        Average number of days before an estrus cycle returns, (simulation days).
+        Average number of days before an estrus cycle returns, (simulation day).
     std_estrus_cycle_return : float
-        Standard deviation for estrus cycle return time, (simulation days).
+        Standard deviation for estrus cycle return time, (simulation day).
     average_estrus_cycle_heifer : int
-        Average estrus cycle length for heifers, (simulation days).
+        Average estrus cycle length for heifers, (simulation day).
     std_estrus_cycle_heifer : float
-        Standard deviation for heifer estrus cycle length, (simulation days).
+        Standard deviation for heifer estrus cycle length, (simulation day).
     average_estrus_cycle_cow : int
-        Average estrus cycle length for cows, (simulation days).
+        Average estrus cycle length for cows, (simulation day).
     std_estrus_cycle_cow : float
-        Standard deviation for cow estrus cycle length, (simulation days).
+        Standard deviation for cow estrus cycle length, (simulation day).
     average_estrus_cycle_after_pgf : int
-        Average estrus cycle length after prostaglandin injection, (simulation days).
+        Average estrus cycle length after prostaglandin injection, (simulation day).
     std_estrus_cycle_after_pgf : float
-        Standard deviation for estrus cycle length after prostaglandin injection, (simulation days).
+        Standard deviation for estrus cycle length after prostaglandin injection, (simulation day).
     first_pregnancy_check_day : int
-        First pregnancy check day post-breeding, (simulation days).
+        First pregnancy check day post-breeding, (simulation day).
     first_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the first pregnancy check, (unitless).
     second_pregnancy_check_day : int
-        Second pregnancy check day post-breeding, (simulation days).
+        Second pregnancy check day post-breeding, (simulation day).
     second_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the second pregnancy check, (unitless).
     third_pregnancy_check_day : int
-        Third pregnancy check day post-breeding, (simulation days).
+        Third pregnancy check day post-breeding, (simulation day).
     third_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the third pregnancy check, (unitless).
     parity_death_probability : list[float]
@@ -146,7 +152,7 @@ class AnimalConfig:
     parity_cull_probability : list[float]
         List of culling probabilities based on parity number, (unitless).
     cull_day_count : list[int]
-        List of day intervals for culling analysis, (simulation days).
+        List of day intervals for culling analysis, (simulation day).
     feet_leg_cull_probability : float
         Probability of feet and leg-related culling, (unitless).
     feet_leg_cull_day_probability : list[float]
@@ -171,16 +177,21 @@ class AnimalConfig:
         Probability of culling for unknown reasons, (unitless).
     unknown_cull_day_probability : list[float]
         Cumulative distribution for unknown reasons of culling over time, (unitless).
-    methane_model : str
-        The methane emission model being used, e.g., "IPCC", (unitless).
     methane_mitigation_method : str
         The mitigation method applied for methane reduction, e.g., "None", (unitless).
     methane_mitigation_additive_amount : float
-        The amount of additive used for methane mitigation, (kg).
+        The dose of the additive selected by ``methane_mitigation_method``, taken from that
+        method's per-additive input field, (mg/kg DMI).
     milk_reduction_maximum : float
         Maximum possible milk production reduction from a given cause, (kg).
-    methane_model: dict[str, dict[str, bool]]
-        The methods to use for each animal type.
+    methane_model: dict[str, Any]
+        Methane emission model selections for each animal category and production stage.
+    average_phenotype : dict[str, dict[int, float]]
+        Average genetic phenotype values used for genetic simulations.
+    top_listing_semen : dict[str, dict[str, float]]
+        Semen sire information used for genetic simulations and breeding selection.
+    simulate_genetics : bool
+        Whether genetic simulation functionality is enabled.
 
     """
 
@@ -193,12 +204,15 @@ class AnimalConfig:
     dry_off_day_of_pregnancy: int = 218
     heifer_reproduction_cull_day: int = 500
     do_not_breed_time: int = 185
-    cull_milk_production: int = 30
+    calf_mortality_rate: float = 0.0
+    heifer_mortality_rate: float = 0.0
 
     semen_type: str = "conventional"
     male_calf_rate_conventional_semen: float = 0.53
     male_calf_rate_sexed_semen: float = 0.10
     keep_female_calf_rate: float = 1
+    calf_retention_method: str = "rate"
+    annual_keep_female_calf_num: int = 0
     still_birth_rate: float = 0.065
     average_gestation_length: int = 276
     std_gestation_length: float = 6
@@ -373,8 +387,18 @@ class AnimalConfig:
     }
     methane_mitigation_method: str = "None"
     methane_mitigation_additive_amount: float = 0.0
+    _METHANE_MITIGATION_DOSE_FIELDS: dict[str, str] = {
+        "3-NOP": "3-NOP_additive_amount",
+        "Monensin": "monensin_additive_amount",
+        "Essential Oils": "essential_oils_additive_amount",
+        "Seaweed": "seaweed_additive_amount",
+    }
 
     milk_reduction_maximum: float
+
+    average_phenotype: dict[str, dict[int, float]] = {}
+    top_listing_semen: dict[str, dict[str, float]] = {}
+    simulate_genetics: bool = False
 
     @classmethod
     def initialize_animal_config(cls) -> None:
@@ -392,7 +416,8 @@ class AnimalConfig:
         cls.dry_off_day_of_pregnancy = animal_config_data["management_decisions"]["days_in_preg_when_dry"]
         cls.heifer_reproduction_cull_day = animal_config_data["management_decisions"]["heifer_repro_cull_time"]
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
-        cls.cull_milk_production = animal_config_data["management_decisions"]["cull_milk_production"]
+        cls.calf_mortality_rate = animal_config_data["management_decisions"]["calf_mortality_rate"]
+        cls.heifer_mortality_rate = animal_config_data["management_decisions"]["heifer_mortality_rate"]
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
@@ -400,6 +425,10 @@ class AnimalConfig:
         ]
         cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
         cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
+        cls.calf_retention_method = animal_config_data["farm_level"]["calf"].get("calf_retention_method", "rate")
+        cls.annual_keep_female_calf_num = int(
+            animal_config_data["farm_level"]["calf"].get("annual_keep_female_calf_num", 0)
+        )
         cls.still_birth_rate = animal_config_data["from_literature"]["life_cycle"]["still_birth_rate"]
         cls.average_gestation_length = animal_config_data["farm_level"]["repro"]["avg_gestation_len"]
         cls.std_gestation_length = animal_config_data["farm_level"]["repro"]["std_gestation_len"]
@@ -514,10 +543,23 @@ class AnimalConfig:
         ]
 
         cls.methane_model = animal_data["methane_model"]
-        cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]
-        cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"]["methane_mitigation_additive_amount"]
+        methane_mitigation_data = animal_data["methane_mitigation"]
+        cls.methane_mitigation_method = methane_mitigation_data["methane_mitigation_method"]
+        dose_field = cls._METHANE_MITIGATION_DOSE_FIELDS.get(cls.methane_mitigation_method)
+        if dose_field is not None and dose_field not in methane_mitigation_data:
+            OutputManager().add_warning(
+                "Missing methane mitigation additive dose",
+                f"The selected methane mitigation method '{cls.methane_mitigation_method}' takes its dose from "
+                f"'{dose_field}', but that field is missing from the animal input. Defaulting the dose to 0, "
+                "which applies no mitigation.",
+                {
+                    "class": cls.__name__,
+                    "function": "initialize_animal_config",
+                },
+            )
+        cls.methane_mitigation_additive_amount = methane_mitigation_data.get(dose_field, 0.0) if dose_field else 0.0
 
-        cls.milk_reduction_maximum = im.get_data("feed.milk_reduction_maximum")
+        cls.milk_reduction_maximum = im.get_data("feed.ration_formulation_parameters.milk_reduction_maximum")
 
         if cls.third_pregnancy_check_day >= cls.dry_off_day_of_pregnancy:
             om = OutputManager()
@@ -531,3 +573,18 @@ class AnimalConfig:
                     "function": "initialize_animal_config",
                 },
             )
+
+        average_phenotype = im.get_data("animal_mean_phenotype")
+        cls.average_phenotype = {
+            trait: dict(zip(average_phenotype["birth_year"], values))
+            for trait, values in average_phenotype.items()
+            if trait != "birth_year"
+        }
+
+        top_listing_semen = im.get_data("animal_top_listing_semen")
+        cls.top_listing_semen = {
+            trait: dict(zip(top_listing_semen["year_month"], values))
+            for trait, values in top_listing_semen.items()
+            if trait != "year_month"
+        }
+        cls.simulate_genetics = animal_data["herd_information"]["simulate_genetics"]

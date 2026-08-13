@@ -35,7 +35,13 @@
       "report_directory": "output/reports/.",
       "graphics_directory": "output/graphics/.",
       "cross_validation_file_paths": [
-        "input/metadata/cross_validation/example_cross_validation.json"
+        "input/metadata/cross_validation/animal_cross_validation.json",
+        "input/metadata/cross_validation/weather_cross_validation.json",
+        "input/metadata/cross_validation/feed_storage_cross_validation.json",
+        "input/metadata/cross_validation/crop_and_soil_cross_validation.json",
+        "input/metadata/cross_validation/corn_alf_silage_cross_validation.json",
+        "input/metadata/cross_validation/corn_grain_alf_hay_cross_validation.json"
+
       ]
     },
     {
@@ -69,7 +75,9 @@
       "report_directory": "output/reports/.",
       "graphics_directory": "output/graphics/.",
       "cross_validation_file_paths": [
-        "input/metadata/cross_validation/example_cross_validation.json"
+        "input/metadata/cross_validation/animal_cross_validation.json",
+        "input/metadata/cross_validation/weather_cross_validation.json",
+        "input/metadata/cross_validation/feed_storage_cross_validation.json"
       ]
     },
     {
@@ -102,7 +110,46 @@
       "json_output_directory": "output/JSONs/.",
       "report_directory": "output/reports/.",
       "graphics_directory": "output/graphics/.",
-      "cross_validation_file_paths": []
+      "cross_validation_file_paths": [
+        "input/metadata/cross_validation/animal_cross_validation.json",
+        "input/metadata/cross_validation/weather_cross_validation.json",
+        "input/metadata/cross_validation/feed_storage_cross_validation.json",
+        "input/metadata/cross_validation/crop_and_soil_cross_validation.json",
+        "input/metadata/cross_validation/corn_alf_silage_cross_validation.json",
+        "input/metadata/cross_validation/corn_grain_alf_hay_cross_validation.json"
+      ]
+    },
+    {
+      "task_type": "END_TO_END_TESTING",
+      "metadata_file_path": "input/metadata/end_to_end_testing/animals_only_e2e_metadata.json",
+      "output_prefix": "animals_only_e2e",
+      "filters_directory": "input/data/end_to_end_testing/animals_only",
+      "log_verbosity": "logs",
+      "exclude_info_maps": true,
+      "random_seed": 42,
+      "SA_load_balancing_stop": 1,
+      "SA_load_balancing_start": 0,
+      "sampler_n": 2,
+      "skip_values": 0,
+      "sampler": "sobol",
+      "multi_run_counts": 4,
+      "maximum_memory_usage_percent": 80,
+      "maximum_memory_usage": 0,
+      "save_chunk_threshold_call_count": 0,
+      "chunkification": false,
+      "suppress_log_files": false,
+      "logs_directory": "output/logs/.",
+      "properties_file_path": "input/metadata/properties/default.json",
+      "comparison_properties_file_path": "input/metadata/properties/default.json",
+      "variable_name_style": "basic",
+      "init_herd": false,
+      "save_animals": false,
+      "save_animals_directory": "output/.",
+      "csv_output_directory": "output/CSVs/.",
+      "json_output_directory": "output/JSONs/.",
+      "report_directory": "output/reports/.",
+      "graphics_directory": "output/graphics/.",
+      "cross_validation_file_paths": ["input/metadata/cross_validation/animal_cross_validation.json"]
     }
   ]
 }

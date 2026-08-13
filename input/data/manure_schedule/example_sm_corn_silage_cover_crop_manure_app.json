@@ -10,6 +10,9 @@
     "manure_types": ["liquid"],
     "supplement_manure_nutrient_deficiencies": ["synthetic fertilizer and manure"],
     "pattern_repeat": 7,
-    "pattern_skip": 0
+    "pattern_skip": 0,
+    "daily_spread": {
+        "is_daily_spreading": false
+  }
 }
 

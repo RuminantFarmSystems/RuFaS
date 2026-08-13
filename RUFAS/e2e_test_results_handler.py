@@ -18,10 +18,7 @@ ORDERED_EXPECTED_RESULTS_FILE_KEYS = ["name", "filters", "expected_results_last_
 
 
 class E2ETestResultsHandler:
-    """
-    Handles generating and comparing actual and expected results for end-to-end testing of various
-    RuFaS modules.
-    """
+    """Handles generating and comparing actual and expected results for end-to-end testing of various RuFaS modules."""
 
     @staticmethod
     def compare_actual_and_expected_test_results(
@@ -35,11 +32,10 @@ class E2ETestResultsHandler:
         json_output_path : Path
             Path to which JSON outputs are written to.
         convert_variable_table_path : str | None
-            String path to the csv look up table to convert the variable names in the expected results to match the
+            String path to the csv lookup table to convert the variable names in the expected results to match the
             variable names in the actual results.
         output_prefix : str
             The output prefix for the current e2e run.
-
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -103,7 +99,7 @@ class E2ETestResultsHandler:
         expected_results: dict[str, Any], conversion_csv_path: Path
     ) -> dict[str, Any]:
         """
-        Convert variable names in the `expected_results` dictionary using a CSV-based conversion table.
+        Convert variable names in the ``expected_results`` dictionary using a CSV-based conversion table.
 
         Parameters
         ----------
@@ -118,23 +114,22 @@ class E2ETestResultsHandler:
         -------
         dict[str, Any]
             A dictionary with updated keys based on the conversion mappings from the CSV. If a key
-            in `expected_results` is not found in the mapping, it is preserved in the returned dictionary.
+            in ``expected_results`` is not found in the mapping, it is preserved in the returned dictionary.
 
         Raises
         ------
         KeyError
-            Raised if the conversion table CSV does not contain both 'Original' and 'New' columns.
+            Raised if the conversion table CSV does not contain both "Original" and "New" columns.
         ValueError
             Raised if the conversion table CSV contains duplicate mappings for original variable names.
 
         Notes
         -----
         Reads a CSV file containing mappings of original variable names to new variable names and applies
-        these mappings to the keys in the given dictionary `expected_results`. The conversion table must
-        contain two columns: 'Original' and 'New'. Ensures no duplicate mappings exist in the CSV and raises
+        these mappings to the keys in the given dictionary ``expected_results``. The conversion table must
+        contain two columns: "Original" and "New". Ensures no duplicate mappings exist in the CSV and raises
         appropriate errors otherwise. Returns a dictionary with updated keys while preserving their associated
         values.
-
         """
         om: OutputManager = OutputManager()
         info_map: dict[str, Any] = {
@@ -170,33 +165,32 @@ class E2ETestResultsHandler:
         mapping: pd.DataFrame, group_column_name: str, list_column_name: str
     ) -> dict[str, list[str]]:
         """
-        Identifies entries in a DataFrame where a single key maps to multiple values.
+        Identifies entries in a ``DataFrame`` where a single key maps to multiple values.
 
         Parameters
         ----------
         mapping : pd.DataFrame
-            The DataFrame containing the mapping data. Must include the specified columns.
+            The ``DataFrame`` containing the mapping data. Must include the specified columns.
         group_column_name : str
             The column to be analyzed for duplicate mappings.
         list_column_name : str
-            The column containing values that are mapped from 'group_column_name'.
+            The column containing values that are mapped from ``group_column_name``.
 
         Returns
         -------
         dict[str, list[str]]
-            A dictionary where each key is a duplicated entry from 'group_column_name',
-            and each value is a list of corresponding mapped values from 'list_column_name'.
+            A dictionary where each key is a duplicated entry from ``group_column_name``,
+            and each value is a list of corresponding mapped values from ``list_column_name``.
 
         Notes
         -----
-        This method examines a DataFrame containing mappings between two columns and
-        finds instances where a value in the 'group_column_name' column is associated
-        with more than one unique value in the 'list_column_name' column.
+        This method examines a ``DataFrame`` containing mappings between two columns and
+        finds instances where a value in the ``group_column_name`` column is associated
+        with more than one unique value in the ``list_column_name`` column.
 
         The result is a dictionary where:
-          - Keys are the duplicated values from 'group_column_name'.
-          - Values are lists of corresponding values from 'list_column_name'.
-
+          - Keys are the duplicated values from ``group_column_name``.
+          - Values are lists of corresponding values from ``list_column_name``.
         """
         grouped: dict[str, list[str]] = mapping.groupby(group_column_name)[list_column_name].apply(list).to_dict()
 
@@ -208,19 +202,19 @@ class E2ETestResultsHandler:
     @staticmethod
     def _duplicate_mappings_exist(mapping: pd.DataFrame) -> bool:
         """
-        Checks for duplicate mappings in the provided DataFrame and logs errors if any
+        Checks for duplicate mappings in the provided ``DataFrame`` and logs errors if any
         duplicates are found. This ensures that no original variable name maps to multiple new
         variable names, and no new variable name is mapped from multiple original variable names.
 
         Parameters
         ----------
         mapping : pd.DataFrame
-            A DataFrame containing the mappings between "Original" and "New" variable names.
+            A ``DataFrame`` containing the mappings between ``Original`` and ``New`` variable names.
 
         Returns
         -------
         bool
-            If any duplicate mappings are found, returns True. Otherwise, returns False.
+            If any duplicate mappings are found, returns ``True``. Otherwise, returns ``False``.
         """
         info_map: dict[str, str] = {
             "class": E2ETestResultsHandler.__class__.__name__,
@@ -251,7 +245,20 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def _get_test_result_paths(output_prefix: str) -> list[ResultPathType]:
-        """Retrieves the paths to test results and associated information from the InputManager."""
+        """
+        Retrieves the paths to test results and associated information from the InputManager.
+
+        Parameters
+        ----------
+        output_prefix : str
+            The output prefix.
+
+        Returns
+        -------
+        list[ResultPathType]
+            List of result path sets, each containing the domain, expected results path,
+            actual results path, and tolerance for one test domain.
+        """
         im = InputManager()
         result_paths: list[dict[str, str]] = im.get_data(
             f"end_to_end_testing_result_paths.end_to_end_test_result_paths.{output_prefix}"
@@ -269,14 +276,14 @@ class E2ETestResultsHandler:
         return test_result_paths
 
     @staticmethod
-    def is_significant(changes: dict[str, float | str], tolerance: float) -> bool:
+    def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
         """
-        Determines if a numerical change is significant based if the change between the
+        Determines if a numerical change is significant based on if the change between the
         "old_value" and "new_value" exceeds the specified tolerance.
 
         Parameters
         ----------
-        changes : dict[str, float | str]
+        changes : dict[str, Any]
             A dictionary representing changes with "old_value" and "new_value".
         tolerance : float
             The threshold for considering a difference as significant.
@@ -284,7 +291,7 @@ class E2ETestResultsHandler:
         Returns
         -------
         bool
-            True if the change is both numerical and significant, False otherwise.
+            ``True`` if the change is both numerical and significant, ``False`` otherwise.
 
         Notes
         -----
@@ -292,13 +299,33 @@ class E2ETestResultsHandler:
         relative to the "old_value". If the "old_value" is zero, a fallback reference value of 1 is used
         to ensure the tolerance comparison remains meaningful.
         """
-        if isinstance(changes, dict) and "old_value" in changes and "new_value" in changes:
-            old_value = changes["old_value"]
-            new_value = changes["new_value"]
-            if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
-                reference = abs(old_value) if abs(old_value) > 0 else 1
-                difference = abs(new_value - old_value)
-                return difference > tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+        if not (isinstance(changes, dict) and "old_value" in changes and "new_value" in changes):
+            return True
+
+        old_value = changes["old_value"]
+        new_value = changes["new_value"]
+
+        if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
+            reference = abs(old_value) if abs(old_value) > 0 else 1
+            difference = abs(new_value - old_value)
+            threshold = tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+            return difference > threshold
+
+        if isinstance(old_value, dict) and isinstance(new_value, dict):
+            for key in old_value.keys() | new_value.keys():
+                if key not in old_value or key not in new_value:
+                    return True
+
+                nested_change = {
+                    "old_value": old_value[key],
+                    "new_value": new_value[key],
+                }
+
+                if E2ETestResultsHandler.is_significant(nested_change, tolerance):
+                    return True
+
+            return False
+
         return True
 
     @staticmethod
@@ -309,13 +336,13 @@ class E2ETestResultsHandler:
         Parameters
         ----------
         values_changed : dict[str, dict[str, float | str]]
-            The `values_changed` section of a DeepDiff result.
+            The ``values_changed`` section of a ``DeepDiff`` result.
         tolerance : float
             The threshold for considering a difference as significant.
 
         Notes
         -----
-        This method modifies `values_changed` in place.
+        This method modifies ``values_changed`` in place.
         """
         keys_to_remove = []
         for key, change in values_changed.items():
@@ -334,19 +361,19 @@ class E2ETestResultsHandler:
         diff_result: dict[str, dict[str, dict[str, float | str]]], tolerance: float
     ) -> dict[str, dict[str, dict[str, float | str]]]:
         """
-        Removes insignificant changes from a DeepDiff `values_changed` section.
+        Removes insignificant changes from a ``DeepDiff`` ``values_changed`` section.
 
         Parameters
         ----------
         diff_result : dict[str, dict[str, dict[str, float | str]]]
-            The DeepDiff result to filter.
+            The ``DeepDiff`` result to filter.
         tolerance : float
             The threshold for considering a difference as significant.
 
         Returns
         -------
         dict[str, dict[str, dict[str, float | str]]]
-            The filtered DeepDiff result.
+            The filtered ``DeepDiff`` result.
         """
         values_changed = diff_result.get("values_changed", {})
         E2ETestResultsHandler.filter_nested(values_changed, tolerance)
@@ -362,7 +389,7 @@ class E2ETestResultsHandler:
 
         Parameters
         ----------
-        output_dir : str
+        output_dir : Path
             The directory to which the actual results are written to.
         output_prefix : str
             The prefix to give the output file names.
@@ -444,18 +471,18 @@ class E2ETestResultsHandler:
     @staticmethod
     def _get_matching_path(dir_path: Path, path_set: ResultPathType) -> Path | None:
         """
-        Returns the path that matches the path_set actual results path.
+        Returns the path that matches the ``path_set`` actual results path.
 
         Parameters
         ----------
         dir_path : Path
             The path to the directory.
         path_set : ResultPathType
-            ResultPathType object containing the domain, expected results path, actual results path, and tolerance.
+            ``ResultPathType`` object containing the domain, expected results path, actual results path, and tolerance.
 
         Returns
         -------
-        Path
+        Path | None
             The matching path.
         """
         path_to_actual_results = None
@@ -470,13 +497,13 @@ class E2ETestResultsHandler:
     @staticmethod
     def _write_formatted_json(file_path: Path, data: dict[str, str]) -> None:
         """
-        Writes a JSON file with custom serialization settings for the "expected_results" field.
+        Writes a JSON file with custom serialization settings for the ``expected_results`` field.
 
         Parameters
         ----------
         file_path : Path
             The path to the JSON file.
-        data : dict
+        data : dict[str, str]
             The data to write to the JSON file.
 
         Raises

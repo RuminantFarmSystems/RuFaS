@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -10,17 +8,17 @@ class Dormancy:
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
-        A `CropData` object containing specifications and attributes for a crop.
-        If not provided, a default `CropData` object is used.
-    minimum_lai_during_dormancy : Optional[float], default 0.75
+    crop_data : CropData, optional
+       A ``CropData`` object containing specifications and attributes for a crop.
+       If not provided, a default ``CropData`` object is used.
+    minimum_lai_during_dormancy : float, optional, default 0.75
         Minimum leaf area index for plants (perennials and trees only).
 
     Attributes
     ----------
     data : CropData
-        A reference to the `crop_data` object on which dormancy operations will be conducted.
-    minimum_lai_during_dormancy : Optional[float]
+        A reference to the ``crop_data`` object on which dormancy operations will be conducted.
+    minimum_lai_during_dormancy : float | None
         Minimum leaf area index for plants (perennials and trees only).
 
     Notes
@@ -35,8 +33,8 @@ class Dormancy:
 
     def __init__(
         self,
-        crop_data: Optional[CropData] = None,
-        minimum_lai_during_dormancy: Optional[float] = 0.75,
+        crop_data: CropData | None = None,
+        minimum_lai_during_dormancy: float | None = 0.75,
     ) -> None:
         self.data = crop_data or CropData
         self.minimum_lai_during_dormancy = minimum_lai_during_dormancy
@@ -49,17 +47,6 @@ class Dormancy:
         ----------
         soil_data : SoilData
             SoilData instance of the soil profile that this crop is growing in.
-        Methods
-        -------
-        enter_dormancy(soil_data: SoilData) -> None
-            Performs the transition of a crop from active to dormant. Warm Annuals and Warm Annual Legumes do not
-            experience dormancy. Only Trees and Perennials experience biomass loss when entering dormancy.
-
-        find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float
-            Calculates the threshold daylength for dormancy based on minimum daylength and dormancy threshold.
-
-        find_dormancy_threshold(abs_latitude: float) -> float
-            Calculates the dormancy threshold based on the absolute latitude value.
 
         Notes
         -----

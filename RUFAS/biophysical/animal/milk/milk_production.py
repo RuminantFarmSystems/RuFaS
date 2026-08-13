@@ -37,7 +37,7 @@ class MilkProduction:
     fat_content: float
     lactose_content: float
     milk_production_reduction: float
-    current_lactation_305_day_milk_produced: float
+    milk_305_day_yield: float
     crude_protein_percent: float
     true_protein_percent: float
     fat_percent: float
@@ -48,6 +48,7 @@ class MilkProduction:
     milk_production_history: list[MilkProductionRecord]
 
     def __init__(self) -> None:
+        """Init method of MilkProduction class."""
         self._daily_milk_produced = 0.0
         self._milk_production_variance = Utility.generate_random_number(
             AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
@@ -57,11 +58,12 @@ class MilkProduction:
         self.fat_content = 0.0
         self.lactose_content = 0.0
         self.milk_production_reduction = 0.0
-        self.current_lactation_305_day_milk_produced = 0.0
         self.milk_production_history = []
+        self.milk_305_day_yield = 0.0
 
     @property
     def daily_milk_produced(self) -> float:
+        """Calculated property for the amount of daily milk produced."""
         adjusted_milk_production = max(
             self._daily_milk_produced + (self._milk_production_variance - self.milk_production_reduction), 0.0
         )
@@ -69,6 +71,7 @@ class MilkProduction:
 
     @daily_milk_produced.setter
     def daily_milk_produced(self, value: float) -> None:
+        """Setter method for ``daily_milk_produced``."""
         self._daily_milk_produced = value
 
     @classmethod
@@ -79,9 +82,22 @@ class MilkProduction:
         cls.lactose_percent = lactose_percent
 
     def set_wood_parameters(self, wood_l: float, wood_m: float, wood_n: float) -> None:
+        """Setter method for wood parameters."""
         self.wood_l = wood_l
         self.wood_m = wood_m
         self.wood_n = wood_n
+
+    def _get_current_lactation_history(self) -> list[MilkProductionRecord]:
+        """Returns milk production records since this cow's most recent dry-off marker
+        (the last record with ``days_in_milk == 0``). Prior lactations are excluded."""
+        current_lactation_history: list[MilkProductionRecord] = []
+        for record in reversed(self.milk_production_history):
+            if record["days_in_milk"] == 0:
+                break
+            current_lactation_history.append(record)
+
+        current_lactation_history.reverse()
+        return current_lactation_history
 
     def perform_daily_milking_update(
         self, milk_production_inputs: MilkProductionInputs, time: RufasTime
@@ -93,15 +109,13 @@ class MilkProduction:
         ----------
         milking_properties : MilkProductionProperties
             Animal properties only used to determine milk production.
-        general_properties : GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
         time : RufasTime
             RufasTime instance containing the current time of the simulation.
 
         Returns
         -------
-        tuple[MilkingProperties, GeneralProperties]
-            Milking and general properties of the animal after milk production-related updates for the current day.
+        MilkingProperties
+            Milking properties of the animal after milk production-related updates for the current day.
 
         """
         milk_production_outputs = MilkProductionOutputs(
@@ -127,7 +141,6 @@ class MilkProduction:
             self.true_protein_content = 0.0
             self.fat_content = 0.0
             self.lactose_content = 0.0
-            self.current_lactation_305_day_milk_produced = 0.0
             self._update_milking_history(
                 days_in_milk=milk_production_outputs.days_in_milk,
                 days_born=milk_production_inputs.days_born,
@@ -161,10 +174,6 @@ class MilkProduction:
             daily_milk_produced=self.daily_milk_produced,
             time=time,
         )
-
-        if milk_production_outputs.days_in_milk == 305:
-            milk_history = [record["milk_production"] for record in self.milk_production_history[-305:]]
-            self.current_lactation_305_day_milk_produced = np.sum(milk_history)
 
         return milk_production_outputs
 
@@ -201,7 +210,6 @@ class MilkProduction:
             self.true_protein_content = 0.0
             self.fat_content = 0.0
             self.lactose_content = 0.0
-            self.current_lactation_305_day_milk_produced = 0.0
             return milk_production_outputs
 
         milk_production_outputs.days_in_milk += 1
@@ -231,10 +239,6 @@ class MilkProduction:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
 
-        Notes
-        -----
-        [AN.MLK.9]
-
         Parameters
         ----------
         days_in_milk : int
@@ -255,53 +259,103 @@ class MilkProduction:
         ----------
         Li, M., et al. "Investigating the effect of temporal, geographic, and management factors on US Holstein
         lactation curve parameters." Journal of Dairy Science 105.9 (2022): 7525-7538.
+        [AN.MLK.9]
 
         """
         return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
 
     @staticmethod
-    def calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float) -> float:
+    def calculate_predicted_305_day_milk_yield(l_param: float, m_param: float, n_param: float) -> float:
         """
-        Calculates the total milk yield from day 1 to day 305 of the lactation.
-
-        Notes
-        -----
-        [AN.MLK.10]
+        Predicted 305-day milk yield from Wood's lactation curve alone — the integral of
+        the daily-production curve from day 1 to 305, with no per-cow history involved.
 
         Parameters
         ----------
-        l_param: float
-            Wood's lactation curve parameter l.
-        m_param: float
-            Wood's lactation curve parameter m.
-        n_param: float
-            Wood's lactation curve parameter n.
+        l_param, m_param, n_param : float
+            Wood's lactation curve parameters l, m, and n.
 
         Returns
         -------
         float
-            305 day milk yield for a cow with the given lactation curve (kg).
+            305-day milk yield from Wood's curve (kg).
+
+        Notes
+        -----
+        This is the metric used when fitting Wood's l parameter to a target annual yield
+        at the start of the simulation, and is also the fallback when a cow has no
+        current-lactation history yet (e.g. dry cows at sim start).
+
+        References
+        ----------
+        [AN.MLK.10]
 
         """
-
         result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
         return result
+
+    def calculate_305_day_milk_yield(self) -> float:
+        """
+        Per-cow estimate of the cow's current-lactation 305-day milk yield, combining
+        observed daily production with Wood's-curve predictions for any unobserved DIMs
+        in 1..305.
+
+        Returns
+        -------
+        float
+            305-day milk yield estimate for the current lactation (kg).
+
+        Notes
+        -----
+        This keeps the metric meaningful early in the simulation (or for cows
+        that were mid-lactation at sim start) when actual history doesn't yet span all
+        305 days. Cows with no current-lactation history fall back to the pure predicted
+        yield from ``calculate_predicted_305_day_milk_yield``.
+
+        Use ``calculate_predicted_305_day_milk_yield`` instead when fitting Wood's
+        parameters — that's the optimization hot path and doesn't need any of the
+        per-cow logic here.
+
+        """
+        current_lactation_history = self._get_current_lactation_history()
+        observed_records = [record for record in current_lactation_history if 1 <= record["days_in_milk"] <= 305]
+
+        if not observed_records:
+            return MilkProduction.calculate_predicted_305_day_milk_yield(self.wood_l, self.wood_m, self.wood_n)
+
+        actual_production = sum(record["milk_production"] for record in observed_records)
+        observed_dims = sorted(record["days_in_milk"] for record in observed_records)
+        earliest_observed = observed_dims[0]
+        latest_observed = observed_dims[-1]
+
+        early_predicted = 0.0
+        if earliest_observed > 1:
+            early_predicted, _ = quad(
+                MilkProduction.calculate_daily_milk_production,
+                1,
+                earliest_observed,
+                args=(self.wood_l, self.wood_m, self.wood_n),
+            )
+
+        late_predicted = 0.0
+        if latest_observed < 305:
+            late_predicted, _ = quad(
+                MilkProduction.calculate_daily_milk_production,
+                latest_observed + 1,
+                305,
+                args=(self.wood_l, self.wood_m, self.wood_n),
+            )
+
+        return actual_production + early_predicted + late_predicted
 
     def _get_milk_production_adjustment(self) -> float:
         """
         Randomly adjusts the milk production on a specific day.
 
-        Parameters
-        ----------
-        milking_properties : MilkProductionProperties
-            Animal properties only used to determine milk production.
-        general_properties : GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
-
         Returns
         -------
-        general_properties : GeneralProperties
-            Animal properties with the daily_milk_produced attribute updated.
+        float
+            The milk production adjustment (kg).
 
         """
         milk_production_variance = Utility.generate_random_number(

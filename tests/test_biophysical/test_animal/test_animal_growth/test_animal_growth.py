@@ -398,12 +398,12 @@ def test_calculate_cow_conceptus_growth(
     [
         # Early pregnancy: gradual weight increase
         (276, 30, 600.0, 250.0, 0.9443902439024388),
-        # Mid-pregnancy: higher weight, lower gain
-        (276, 150, 600.0, 450.0, 0.3199999999999995),
-        # Near term: lowest growth (approaching maturity)
-        (276, 270, 600.0, 590.0, -15.680000000000007),
-        # Edge case: divisor set to 1 when `days_in_pregnancy == gestation_length`
-        (276, 276, 600.0, 600.0, -103.68000000000006),
+        # Mid-pregnancy: raw growth (0.32) below minimum, clamped to MINIMUM_HEIFER_DAILY_GROWTH_RATE
+        (276, 150, 600.0, 450.0, 0.5),
+        # Near term: negative raw growth clamped to MINIMUM_HEIFER_DAILY_GROWTH_RATE
+        (276, 270, 600.0, 590.0, 0.5),
+        # Edge case: divisor set to 1 when `days_in_pregnancy == gestation_length`, clamped to minimum
+        (276, 276, 600.0, 600.0, 0.5),
     ],
 )
 def test_calculate_pregnant_heifer_target_daily_growth(

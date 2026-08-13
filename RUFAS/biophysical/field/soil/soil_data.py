@@ -1,7 +1,7 @@
 from copy import deepcopy
 from dataclasses import InitVar, dataclass, field
 from math import inf
-from typing import List, Optional
+from typing import List, Any
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
@@ -19,12 +19,12 @@ class SoilData:
     ----------
     name : string, optional, default "generic soil configuration"
         Name of the soil configuration.
-    soil_layers : List[LayerData], optional, default None
+    soil_layers : list[LayerData], optional
         List of soil layer data objects, where the top layer is the 0th element and the bottom is the nth element.
-    field_size : InitVar[float], default None
+    field_size : InitVar[float], optional
         Size of the field (ha).
         Note: this attribute is only used for initialization. After that, it cannot be used.
-    initial_water_content : float, default None
+    initial_water_content : float, optional
         Total soil water content at the beginning of a year, for use in determining annual change (mm).
     initial_nitrates_total : float, default None
         Total soil nitrate amounts at the beginning of a year, for use in determining annual change (kg per hectare).
@@ -38,17 +38,6 @@ class SoilData:
         Cumulative total of the volume of surface runoff that occurred in a year (mm per hectare).
     annual_runoff_fertilizer_phosphorus : float, default 0
         Cumulative total of phosphorus from surface-applied fertilizer that was carried off the field by runoff (kg).
-    annual_runoff_machine_manure_inorganic_phosphorus : float, default 0
-        Cumulative total of inorganic phosphorus from machine-applied manure that was carried off the field by runoff
-        (kg).
-    annual_runoff_machine_manure_organic_phosphorus : float, default 0
-        Cumulative total of organic phosphorus from machine-applied manure that was carried off the field by runoff
-        (kg).
-    annual_runoff_grazing_manure_inorganic_phosphorus : float, default 0
-        Cumulative total of inorganic phosphorus from grazer-applied manure that was carried off the field by runoff
-        (kg).
-    annual_runoff_grazing_manure_organic_phosphorus : float, default 0
-        Cumulative total of organic phosphorus from grazer-applied manure that was carried off the field by runoff (kg).
     annual_soil_phosphorus_runoff : float, default 0
         Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg / ha).
     annual_runoff_nitrates_total : float, default 0
@@ -65,17 +54,17 @@ class SoilData:
         Amount of water evaporated from the soil profile on the current day (mm).
     second_moisture_condition_parameter : float, default 85
         'Curve number' parameter for average moisture conditions equation (unitless).
-    previous_retention_parameter : Optional[float], default None
+    previous_retention_parameter : float | None
         Retention parameter for the previous day (mm) (used in SWAT 2:1.1.9).
     average_subbasin_slope : float, default 0.05
         Average slope of the subbasin expressed as rise over run (meters/meters).
-    moisture_condition_parameter : Optional[float], default None
+    moisture_condition_parameter : float | None
         Curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11).
     accumulated_runoff : float, default 0.0
         Amount of rainfall discharged as runoff on the current day (mm).
     infiltrated_water : float, default 0.0
         Amount of water that infiltrated the soil profile on the day (mm).
-    vadose_zone_layer : Optional[LayerData], default None
+    vadose_zone_layer : LayerData | None
         LayerData object that represents the vadose zone layer, where the top depth is set equal to the bottom depth of
         the lowest soil layer and the bottom depth is arbitrary, starting with no water.
     time_step : float, default 24
@@ -89,9 +78,9 @@ class SoilData:
         Water content of the snow pack (mm H2O).
     snow_melt_amount : float, default 0.0
         Water content of the snow that melted on the current day (mm H2O).
-    previous_day_snow_temperature : Optional[float], default None
+    previous_day_snow_temperature : float | None
         Snow pack temperature on the previous day (ºC).
-    current_day_snow_temperature : Optional[float], default None
+    current_day_snow_temperature : float | None
         Snow pack temperature of the current day (ºC).
     snow_lag_factor : float, default 1.0
         Snow pack temperature lag factor (unitless).
@@ -173,9 +162,9 @@ class SoilData:
     """
 
     # ID variables
-    name: Optional[str] = "generic soil configuration"
+    name: str | None = "generic soil configuration"
 
-    soil_layers: Optional[List[LayerData]] = None
+    soil_layers: List[LayerData] | None = None
     field_size: InitVar[float] = None
 
     # Track annual soil profile totals
@@ -206,14 +195,14 @@ class SoilData:
 
     # ---- infiltration
     second_moisture_condition_parameter: float = 85
-    previous_retention_parameter: Optional[float] = None
+    previous_retention_parameter: float | None = None
     average_subbasin_slope: float = 0.05
-    moisture_condition_parameter: Optional[float] = None
+    moisture_condition_parameter: float | None = None
     accumulated_runoff: float = 0.0
     infiltrated_water: float = 0.0
 
     # ---- percolation
-    vadose_zone_layer: Optional[LayerData] = None
+    vadose_zone_layer: LayerData | None = None
     time_step: float = 24
 
     # ---- temperature
@@ -223,8 +212,8 @@ class SoilData:
     # ---- Snow
     snow_content: float = 0.0
     snow_melt_amount: float = 0.0
-    previous_day_snow_temperature: Optional[float] = None
-    current_day_snow_temperature: Optional[float] = None
+    previous_day_snow_temperature: float | None = None
+    current_day_snow_temperature: float | None = None
     snow_lag_factor: float = 1.0
     snow_coverage_fraction: float = 1.0
     snow_melt_base_temperature: float = 0.5
@@ -237,7 +226,7 @@ class SoilData:
     slope_length: float = 3
     manning: float = 0.4
     eroded_sediment: float = 0
-    surface_runoff_volume: Optional[float] = None
+    surface_runoff_volume: float | None = None
 
     # ---- Fertilizer (Phosphorus Cycling)
     cover_type: str = "BARE"
@@ -279,7 +268,7 @@ class SoilData:
         """
         return sum(self.get_vectorized_layer_attribute("plant_residue"))
 
-    def __post_init__(self, field_size: float):
+    def __post_init__(self, field_size: float) -> None:
         """
         This method initializes attributes that either cannot be set to a default above or depend on other
         attributes in the object to be set before they can be set.
@@ -304,8 +293,18 @@ class SoilData:
 
         """
         if field_size is None:
+            OutputManager().add_error(
+                "NoneType field_size",
+                "'field_size' attribute is NoneType, must be given value when SoilData is initialized.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
         elif field_size <= 0:
+            OutputManager().add_error(
+                "Invalid field_size",
+                f"Expected field_size to be greater than 0, received {field_size}.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
         if self.soil_layers is None:
@@ -321,18 +320,23 @@ class SoilData:
                 LayerData(top_depth=80, bottom_depth=200, field_size=field_size),
             ]
         elif self.soil_layers[0].bottom_depth < 20:
+            OutputManager().add_error(
+                "Invalid top soil layer bottom depth",
+                "Expected bottom depth of top soil layer must be 20 mm or greater, received "
+                f"'{self.soil_layers[0].bottom_depth}'.",
+                info_map={"class": self.__class__.__name__, "function": self.__post_init__.__name__},
+            )
             raise ValueError(
-                f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
+                "Expected bottom depth of top soil layer must be 20 mm or greater, received "
                 f"'{self.soil_layers[0].bottom_depth}'."
             )
         elif self.soil_layers[0].bottom_depth > 20:
             self._subdivide_top_layer(field_size)
 
         if self.vadose_zone_layer is None:
-            # configures the vadose zone LayerData object based on where the soil profile ends
             self.vadose_zone_layer = LayerData(
                 top_depth=self.soil_layers[-1].bottom_depth,
-                bottom_depth=10000000,  # bottom depth is 10,000 meters by default
+                bottom_depth=10000000,
                 soil_water_concentration=0,
                 saturation_point_water_concentration=inf,
                 initial_labile_inorganic_phosphorus_concentration=0,
@@ -377,9 +381,9 @@ class SoilData:
 
         This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.
 
-        `deepcopy()` is necessary here because `self.soil_layers[0]` is a mutable object.
-        A shallow copy would mean that modifying `new_top_layer`'s attributes would also
-        affect the original layer still in `self.soil_layers`.
+        ``deepcopy()`` is necessary here because ``self.soil_layers[0]`` is a mutable object.
+        A shallow copy would mean that modifying ``new_top_layer``'s attributes would also
+        affect the original layer still in ``self.soil_layers``.
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20
@@ -405,7 +409,7 @@ class SoilData:
         """
         return [getattr(layer, attribute) for layer in self.soil_layers]
 
-    def set_vectorized_layer_attribute(self, attribute: str, values: List[any]) -> None:
+    def set_vectorized_layer_attribute(self, attribute: str, values: list[Any]) -> None:
         """
         Sets a given attribute for all layers in soil_data.
 
@@ -413,7 +417,7 @@ class SoilData:
         ----------
         attribute : str
             The LayerData attribute to set.
-        values : list[any]
+        values : list[Any]
             Values of the attribute to set for each layer.
 
         """
@@ -556,7 +560,7 @@ class SoilData:
         Returns
         -------
         float
-            The total amount of nitrates in the soil (kg per hectare).
+            The total amount of nitrates in the soil (kg / ha).
 
         """
         return sum(self.get_vectorized_layer_attribute("nitrate_content"))
@@ -641,6 +645,11 @@ class SoilData:
             return 0.6667
         elif self.cover_type == "GRASSED":
             return 0.8
+        OutputManager().add_error(
+            "Invalid cover type",
+            f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', " f"received: '{self.cover_type}'.",
+            info_map={"class": self.__class__.__name__, "function": "cover_factor.property"},
+        )
         raise ValueError(
             f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', " f"received: '{self.cover_type}'."
         )
@@ -650,11 +659,6 @@ class SoilData:
         """
         Returns the fraction of fertilizer phosphorus removed from the available or recalcitrant pool based on the
         number of rain events.
-
-        Parameters
-        ----------
-        rain_events : int
-            The number of rain events.
 
         Returns
         -------
@@ -695,7 +699,7 @@ class SoilData:
         Returns
         -------
         float
-            Total amount of CO2 emitted from carbon decomposition in the soil profile (kg/ha).
+            Total amount of CO2 emitted from carbon decomposition in the soil profile (kg / ha).
 
         """
         emissions_from_active = sum(self.get_vectorized_layer_attribute("active_carbon_to_slow_loss"))

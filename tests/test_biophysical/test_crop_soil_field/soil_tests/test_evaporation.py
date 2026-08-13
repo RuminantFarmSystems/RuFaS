@@ -3,10 +3,12 @@ from typing import List
 from unittest.mock import MagicMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.soil.evaporation import Evaporation
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -19,7 +21,7 @@ from RUFAS.biophysical.field.soil.soil_data import SoilData
         (5.3256, 19),
     ],
 )
-def test_determine_depth_evaporative_demand(max_soil_water_evap, depth):
+def test_determine_depth_evaporative_demand(max_soil_water_evap: float, depth: float) -> None:
     observe = Evaporation._determine_depth_evaporative_demand(max_soil_water_evap, depth)
     expect = depth / (depth + exp(2.374 - (0.00713 * depth)))
     expect *= max_soil_water_evap
@@ -41,7 +43,9 @@ def test_determine_depth_evaporative_demand(max_soil_water_evap, depth):
         (2.1, 0, 15, 2.3),
     ],
 )
-def test_determine_layer_evaporative_demand(max_soil_water_evap, top_depth, bottom_depth, compensation):
+def test_determine_layer_evaporative_demand(
+    max_soil_water_evap: float, top_depth: float, bottom_depth: float, compensation: float
+) -> None:
     observe = Evaporation._determine_layer_evaporative_demand(
         max_soil_water_evap, top_depth, bottom_depth, compensation
     )
@@ -59,9 +63,17 @@ def test_determine_layer_evaporative_demand(max_soil_water_evap, top_depth, bott
         (1, 1, None, 1),
     ],
 )
-def test_determine_layer_evaporative_demand_error(max_soil_water_evap, top_depth, bottom_depth, compensation):
+def test_determine_layer_evaporative_demand_error(
+    max_soil_water_evap: float,
+    top_depth: float,
+    bottom_depth: float,
+    compensation: float,
+    mocker: MockerFixture,
+) -> None:
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(Exception):
         Evaporation._determine_layer_evaporative_demand(max_soil_water_evap, top_depth, bottom_depth, compensation)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -73,7 +85,9 @@ def test_determine_layer_evaporative_demand_error(max_soil_water_evap, top_depth
         (1.1, 2.3, 2.5, 0.3),
     ],
 )
-def test_determine_evaporative_demand_reduced(evap_demand, soil_water, field_water, wilting_water):
+def test_determine_evaporative_demand_reduced(
+    evap_demand: float, soil_water: float, field_water: float, wilting_water: float
+) -> None:
     observe = Evaporation._determine_evaporative_demand_reduced(evap_demand, soil_water, field_water, wilting_water)
     if soil_water < field_water:
         expect = evap_demand * exp((2.5 * (soil_water - field_water)) / (field_water - wilting_water))
@@ -91,7 +105,7 @@ def test_determine_evaporative_demand_reduced(evap_demand, soil_water, field_wat
         (1.1, 2.3, 0.3),
     ],
 )
-def test_determine_amount_water_removed(reduced_evap_demand, soil_water, wilting_water):
+def test_determine_amount_water_removed(reduced_evap_demand: float, soil_water: float, wilting_water: float) -> None:
     observe = Evaporation._determine_amount_water_removed(reduced_evap_demand, soil_water, wilting_water)
     expect = min(reduced_evap_demand, 0.8 * (soil_water - wilting_water))
     assert expect == observe

@@ -3,6 +3,7 @@ import os
 import sys
 from collections import Counter
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Sequence, Type, Union, cast
 
@@ -17,6 +18,7 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import LogVerbosity, OriginLabel, OutputManager
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -933,7 +935,10 @@ def test_add_variable(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
+
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
 
     if expected_exception:
         with pytest.raises(expected_exception):
@@ -951,7 +956,211 @@ def test_add_variable(
         )
         if isinstance(value, dict):
             for k in value.keys():
-                assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+                assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
+
+
+@pytest.mark.parametrize(
+    "manual_day, map_day, time_day, overwrite, expected",
+    [
+        (100, 80, 50, True, 100),  # case 1 - overwrite with manual entry
+        (100, 80, 50, False, 80),  # case 2 - keep what's in the map
+        (100, None, 50, True, 100),  # case 3 - use manual entry
+        (100, None, 50, False, 100),  # case 4 - still use manual entry
+        (None, None, 50, True, 50),  # case 5 - use time
+        (None, None, 50, False, 50),  # case 6 - still use time
+        (None, 80, 50, True, 50),  # case 7 - overwrite with time
+        (None, 80, 50, False, 80),  # case 8 - don't overwrite with time
+        (None, 80, None, True, 80),  # case 9 - don't overwrite valid day with None
+        (None, None, None, True, "warn"),  # No time for this
+    ],
+)
+def test_add_simulation_day_to_info_map(
+    manual_day: int | None,
+    map_day: int | None,
+    time_day: int | None,
+    overwrite: bool,
+    expected: int | str | None,
+    mocker: MockerFixture,
+):
+    # Arrange
+    om = OutputManager()
+    mocker.patch.object(om, "variables_pool", {})  # mock an empty pool
+    rt = RufasTime(datetime(year=1992, month=1, day=1), datetime(year=2026, month=1, day=1))
+    mocker.patch.object(RufasTime, "simulation_day", time_day)
+    mocker.patch.object(om, "time", rt)
+    imap: dict[str, Any] = {"class": "test", "function": "test_map_simulation_day"}
+
+    if map_day is not None:
+        imap["simulation_day"] = map_day
+
+    # Act
+    imap_copy = om._add_simulation_day_to_info_map(imap, overwrite, manual_day, "test_name")
+    observed = imap_copy.get("simulation_day")
+    # Assert
+    if expected == "warn":
+        assert observed is None
+        assert len(om.warnings_pool) == 1
+    else:
+        assert observed == expected
+        assert len(om.warnings_pool) == 0
+
+
+# fully factorial parameterization:
+@pytest.mark.parametrize("manual_day", [100, None])
+@pytest.mark.parametrize("map_day", [80, None])
+@pytest.mark.parametrize("time_day", [50, None])
+@pytest.mark.parametrize("overwrite", [True, False])
+def test_add_variable_infomap_simulation_day(
+    manual_day: int | None, map_day: int | None, time_day: int | None, overwrite: bool, mocker: MockerFixture
+):
+    """
+    Test that add_variable properly adds simulation_day to the info map and respects previously specified
+    simulation_day value, unless the overwrite_simulation_day option is used.
+    """
+    # Arrange
+    om = OutputManager()
+    mocker.patch.object(om, "variables_pool", {})  # mock an empty pool
+    rt = RufasTime(datetime(year=1992, month=1, day=1), datetime(year=2026, month=1, day=1))
+    mocker.patch.object(RufasTime, "simulation_day", time_day)
+    imap: dict[str, Any] = {"class": "test", "function": "test_map_simulation_day", "units": MeasurementUnits.UNITLESS}
+
+    if map_day is not None:
+        imap["simulation_day"] = map_day
+
+    if time_day is not None:
+        mocker.patch.object(om, "time", rt)
+    else:
+        mocker.patch.object(om, "time", None)
+
+    # Act
+    om.add_variable("test_var", "time flies!", imap, False, overwrite, manual_day)
+
+    saved_info_map = [val for val in om.variables_pool.values()][0].get("info_maps")[0]
+    observed_day = saved_info_map.get("simulation_day")
+
+    # Assertions (conditional, cascading)
+    if overwrite and manual_day is not None:
+        assert observed_day == manual_day
+        return
+
+    if overwrite and time_day is not None:
+        assert observed_day == time_day
+        return
+
+    if map_day is not None:
+        assert observed_day == map_day
+        return
+
+    if manual_day is not None:
+        assert observed_day == manual_day
+        return
+
+    if time_day is not None:
+        assert observed_day == time_day
+        return
+
+    # else
+    assert observed_day is None
+
+
+def construct_bulk_variables_list(
+    var_and_day_list=list[tuple[Any, int | None]]
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """Helper function that constructs the variables list for OutputManager.add_variable_bulk() for testing
+
+    Arguments
+    ---------
+    var_and_day_list : list[tuple[Any, dict]]
+        A simplified list from which to construct the more complex results. Each element is a tuple with two values:
+        1) the value of variable and 2) an [optional] corresponding simulation_day to include in the info_map.
+    """
+    var_values = [item[0] for item in var_and_day_list]
+    var_names = ["var_" + str(var_values.index(x)) for x in var_values]
+    var_dicts = [{k: v} for k, v in zip(var_names, var_values)]
+    days = [item[1] for item in var_and_day_list]
+
+    maps = []
+    for i in range(len(var_and_day_list)):
+        # construct an info map
+        info_map = {
+            "class": "testClass",
+            "function": "test_function",
+            "units": MeasurementUnits.UNITLESS,
+        }
+        # add simulation days if present
+        if days[i] is not None:
+            info_map["simulation_day"] = days[i]
+        maps.append(info_map)
+
+    list_of_variable_tuples = [(var, imap) for var, imap in zip(var_dicts, maps)]
+
+    return list_of_variable_tuples
+
+
+@pytest.mark.parametrize(
+    "var_day_pairs, record_day",
+    [
+        # case 1 - included simulation day matches the current (recording) day
+        ([(212.6, 132), (200.01, 132), (198.6, 132)], 132),
+        # case 2 - no day provided in info map
+        ([(212.6, None), (200.01, None), (198.6, None)], 132),
+        # case 3 - provided days different & don't match recording day
+        ([(212.6, 25), (200.01, 200), (198.6, 365)], 366),
+        # case 4 - different and complex data types
+        (
+            [
+                ([1, 2, 3, 4, 5], 115),  # list variable
+                ((1, 2, 3), 120),  # tuple variable
+                ("hello!", 100),  # string
+                ({"speak": "woof"}, 118),  # simple dict
+                ({"x": 235, "y": (1, 2), "z": [10, 9, 8]}, 45),  # complex dict
+            ],
+            132,
+        ),
+    ],
+)
+@pytest.mark.parametrize("overwrite", [True, False])
+def test_bulk_add_variable_infomap_simulation_day(
+    var_day_pairs: list,
+    record_day: int,
+    overwrite: bool,
+    mocker: MockerFixture,
+) -> None:
+    # Setup
+    om = OutputManager()
+    mocker.patch.object(om, "variables_pool", {})  # mock an empty pool
+    mocker.patch.object(om, "chunkification", False)
+    rt = RufasTime(datetime(year=1992, month=1, day=1), datetime(year=2026, month=1, day=1))
+    mocker.patch.object(om, "time", rt)
+    mocker.patch.object(
+        target=RufasTime,
+        attribute="simulation_day",
+        new_callable=PropertyMock,
+        return_value=record_day,
+    )
+
+    # Calculations
+    variables = construct_bulk_variables_list(var_day_pairs)  # use helper function to expand the parameters
+    om.add_variable_bulk(
+        variables=variables,
+        first_info_map_only=False,
+        overwrite_simulation_day=overwrite,
+    )
+
+    og_mapped_days = [x[1] for x in var_day_pairs]  # extract the provided day
+
+    if overwrite:
+        # all mapped simulation_day values equal to the recording day
+        expectation = [record_day] * len(variables)
+    else:
+        # mapped simulation days are retained where provided, otherwise recording day is filled in
+        expectation = [mapped_day if mapped_day is not None else record_day for mapped_day in og_mapped_days]
+
+    imaps = [val["info_maps"][0] for val in om.variables_pool.values()]  # extract info maps from variables pool
+    observed = [imap["simulation_day"] for imap in imaps]  # extract simulation day from info maps
+
+    # Assertions
+    assert observed == expectation
 
 
 @pytest.mark.parametrize(
@@ -986,10 +1195,13 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
+
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
 
     # Act
     output_manager.add_variable(name, value, info_map, first_map)
@@ -1003,7 +1215,7 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -1042,10 +1254,13 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
+
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
 
     # Act
     output_manager.add_variable(name, value, info_map, first_map)
@@ -1059,7 +1274,7 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 9
@@ -1099,10 +1314,13 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
+
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
 
     # Act
     output_manager.add_variable(name, value, info_map, first_map)
@@ -1116,7 +1334,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -1156,10 +1374,13 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
-    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    mocker.patch.dict(output_manager._filtered_variable_key_counter, {}, clear=True)
     patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
 
     expected_pool_size = 1024 + 1024
+
+    # added to prevent additional _add_to_pool from InputManager._add_simulation_day_to_info_map() when missing:
+    info_map["simulation_day"] = 0
 
     # Act
     output_manager.add_variable(name, value, info_map, first_map)
@@ -1173,7 +1394,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     )
     if isinstance(value, dict):
         for k in value.keys():
-            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+            assert output_manager._filtered_variable_key_counter[f"key_with_prefix.{k}"] == 0
 
     assert output_manager.current_pool_size == expected_pool_size
     assert output_manager.add_variable_call == 10
@@ -1218,7 +1439,7 @@ def test_add_variable_bulk(
     om.add_variable_bulk(inputs, first_info_map_only)
 
     assert mock_add_variable.call_args_list == [
-        call(name, value, info_maps[index], first_info_map_only)
+        call(name, value, info_maps[index], first_info_map_only, False)
         for index, (name, value) in enumerate(variables.items())
     ]
 
@@ -1294,20 +1515,20 @@ def test_stringify_units(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, exclude_info_maps_flag, first_map_only",
+    "dummy_value, exclude_info_maps_flag, first_map_only, is_daily_variable",
     [
-        ("dummy_value", False, False),
-        (2, False, False),
-        (3.45, False, True),
-        (True, False, True),
-        ({"key": "value"}, False, True),
-        ([1, 2, 3], False, False),
-        ("dummy_value", True, False),
-        (2, True, False),
-        (3.45, True, True),
-        (True, True, True),
-        ({"key": "value"}, True, True),
-        ([1, 2, 3], True, True),
+        ("dummy_value", False, False, True),
+        (2, False, False, False),
+        (3.45, False, True, True),
+        (True, False, True, False),
+        ({"key": "value"}, False, True, True),
+        ([1, 2, 3], False, False, False),
+        ("dummy_value", True, False, True),
+        (2, True, False, False),
+        (3.45, True, True, True),
+        (True, True, True, False),
+        ({"key": "value"}, True, True, True),
+        ([1, 2, 3], True, True, False),
     ],
 )
 def test_add_to_pool(
@@ -1315,6 +1536,7 @@ def test_add_to_pool(
     dummy_value: Any,
     exclude_info_maps_flag: bool,
     first_map_only: bool,
+    is_daily_variable: bool,
 ) -> None:
     """Unit test for function _add_to_pool in file output_manager.py"""
 
@@ -1324,6 +1546,7 @@ def test_add_to_pool(
         "function": "dummy_func",
         "context": "dummy_context",
         "units": MeasurementUnits.ANIMALS.value,
+        "is_daily_variable": is_daily_variable,
     }
     key = "dummy_key"
     pool: dict[str, dict[str, Any]] = {}
@@ -1344,8 +1567,12 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
+    assert pool[key]["is_daily_variable"] is is_daily_variable
 
     # Arrange
     info_map["more_context"] = "1234567890"
@@ -1364,16 +1591,65 @@ def test_add_to_pool(
         assert pool[key]["info_maps"] == []
     elif not first_map_only:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
-            {"context": "dummy_context", "more_context": "1234567890", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
+            {
+                "context": "dummy_context",
+                "more_context": "1234567890",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
     else:
         assert pool[key]["info_maps"] == [
-            {"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value},
+            {
+                "context": "dummy_context",
+                "units": MeasurementUnits.ANIMALS.value,
+            },
         ]
+    assert pool[key]["is_daily_variable"] is is_daily_variable
 
     # Cleanup
     mock_output_manager._exclude_info_maps_flag = False
+
+
+def test_add_to_pool_defaults_missing_daily_flag_to_false(mock_output_manager: OutputManager) -> None:
+    """Unit test for defaulting missing daily reporting flags to False."""
+
+    pool: dict[str, dict[str, Any]] = {}
+    info_map = {
+        "class": "dummy_class",
+        "function": "dummy_func",
+        "context": "dummy_context",
+        "units": MeasurementUnits.ANIMALS.value,
+    }
+
+    mock_output_manager._add_to_pool(pool, "dummy_key", "dummy_value", info_map)
+
+    assert pool["dummy_key"]["is_daily_variable"] is False
+    assert pool["dummy_key"]["info_maps"] == [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}]
+
+
+def test_add_to_pool_daily_flag_is_sticky_true(mock_output_manager: OutputManager) -> None:
+    """A key marked daily once stays daily even if a later call omits or unsets the flag."""
+
+    pool: dict[str, dict[str, Any]] = {}
+    base_info_map = {
+        "class": "dummy_class",
+        "function": "dummy_func",
+        "context": "dummy_context",
+        "units": MeasurementUnits.ANIMALS.value,
+    }
+
+    mock_output_manager._add_to_pool(pool, "k", "v", {**base_info_map, "is_daily_variable": True})
+    assert pool["k"]["is_daily_variable"] is True
+
+    mock_output_manager._add_to_pool(pool, "k", "v", {**base_info_map, "is_daily_variable": False})
+    assert pool["k"]["is_daily_variable"] is True
+
+    mock_output_manager._add_to_pool(pool, "k", "v", base_info_map)
+    assert pool["k"]["is_daily_variable"] is True
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
@@ -1392,6 +1668,7 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
     assert om2.variables_pool[key] == {
         "info_maps": [{"context": "dummy_context", "units": MeasurementUnits.ANIMALS.value}],
         "values": ["dummy_value"],
+        "is_daily_variable": False,
     }
 
 
@@ -1533,15 +1810,23 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     """
     Unit test for report_variables_usage_counts() method in OutputManager class.
     """
-
     # Arrange
     path = Path("/fake/directory")
     expected_file_name = "variables_usage_counts.csv"
+    expected_daily_file_name = "variables_reported_daily.csv"
+    expected_non_daily_file_name = "variables_not_reported_daily.csv"
     expected_full_path = Path(path, expected_file_name)
+    expected_daily_full_path = Path(path, expected_daily_file_name)
+    expected_non_daily_full_path = Path(path, expected_non_daily_file_name)
     output_manager = OutputManager()
+    output_manager._filtered_variable_key_counter = Counter()
+
+    mocker.patch.object(output_manager, "variables_pool", {})  # didn't work
 
     patch_for_generate_file_name = mocker.patch.object(
-        output_manager, "generate_file_name", return_value=expected_file_name
+        output_manager,
+        "generate_file_name",
+        side_effect=[expected_file_name, expected_daily_file_name, expected_non_daily_file_name],
     )
     patch_for_dict_to_file_json = mocker.patch.object(output_manager, "_dict_to_file_csv")
     data_dict: dict[str, dict[str, list[Any]]] = {
@@ -1553,8 +1838,113 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
     output_manager.report_variables_usage_counts(path)
 
     # Assert
-    patch_for_generate_file_name.assert_called_once_with("variables_usage_counts", "csv")
-    patch_for_dict_to_file_json.assert_called_once_with(data_dict, expected_full_path)
+    assert patch_for_generate_file_name.call_args_list == [
+        call("variables_usage_counts", "csv"),
+        call("variables_reported_daily", "csv"),
+        call("variables_not_reported_daily", "csv"),
+    ]
+    patch_for_dict_to_file_json.assert_has_calls(
+        [
+            call(data_dict, expected_full_path),
+            call({"variable_name": {"values": []}}, expected_daily_full_path),
+            call(
+                {
+                    "variable_name": {"values": []},
+                    "report_count": {"values": []},
+                },
+                expected_non_daily_full_path,
+            ),
+        ]
+    )
+
+
+def test_get_variables_reported_daily() -> None:
+    """Unit test for reporting variables explicitly marked as daily."""
+
+    output_manager = OutputManager()
+    output_manager._set_variables_pool(
+        {
+            "daily_variable": {
+                "values": [1, 2, 3, 4],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": True,
+            },
+            "daily_nested_variable": {
+                "values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}, {"a": 7, "b": 8}],
+                "info_maps": [{"units": {"a": "kg", "b": "kg"}}] * 4,
+                "is_daily_variable": True,
+            },
+            "non_daily_variable": {
+                "values": [10, 20, 30, 40],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": False,
+            },
+        }
+    )
+
+    actual = output_manager._get_variables_reported_daily()
+
+    assert actual == {
+        "variable_name": {"values": ["daily_nested_variable.a", "daily_nested_variable.b", "daily_variable"]}
+    }
+
+
+def test_get_variables_not_reported_daily() -> None:
+    """Unit test for reporting variables explicitly marked as non-daily."""
+
+    output_manager = OutputManager()
+    output_manager._set_variables_pool(
+        {
+            "daily_variable": {
+                "values": [1, 2],
+                "info_maps": [{"units": "kg"}] * 2,
+                "is_daily_variable": True,
+            },
+            "every_other_day_variable": {
+                "values": [10, 20, 30, 40],
+                "info_maps": [{"units": "kg"}] * 4,
+                "is_daily_variable": False,
+            },
+            "irregular_nested_variable": {
+                "values": [{"a": 1, "b": 2}, {"a": 3, "b": 4}],
+                "info_maps": [{"units": {"a": "kg", "b": "kg"}}] * 2,
+                "is_daily_variable": False,
+            },
+        }
+    )
+
+    actual = output_manager._get_variables_not_reported_daily()
+
+    assert actual == {
+        "variable_name": {
+            "values": [
+                "every_other_day_variable",
+                "irregular_nested_variable.a",
+                "irregular_nested_variable.b",
+            ]
+        },
+        "report_count": {"values": [4, 2, 2]},
+    }
+
+
+def test_missing_daily_flag_defaults_to_non_daily() -> None:
+    """Unit test for treating variables without an explicit daily flag as non-daily."""
+
+    output_manager = OutputManager()
+    output_manager._set_variables_pool(
+        {
+            "unmarked_variable": {
+                "values": [1, 2, 3],
+                "info_maps": [{"units": "kg"}] * 3,
+            },
+        }
+    )
+
+    assert output_manager._get_variables_reported_daily() == {"variable_name": {"values": []}}
+    assert output_manager._get_variables_not_reported_daily() == {
+        "variable_name": {"values": ["unmarked_variable"]},
+        "report_count": {"values": [3]},
+    }
 
 
 @pytest.mark.parametrize(
@@ -1752,6 +2142,198 @@ def test_dump_variable_names_and_contexts_no_values(
 
     mock_generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_list_to_file_txt.assert_called_once_with(expected_output, Path("dummy_path", "dummy_name"))
+
+
+def test_get_parsable_dicts_excludes_info_maps(mock_output_manager: OutputManager) -> None:
+    """Returns empty lists when exclude_info_maps is True."""
+    variable_data: dict[str, Any] = {
+        "values": [1],
+        "info_maps": [{"units": "kg"}],
+    }
+    parsable_dicts, var_data_info_maps = mock_output_manager._get_parsable_dicts(variable_data, exclude_info_maps=True)
+
+    assert parsable_dicts == []
+    assert var_data_info_maps == []
+
+
+def test_get_parsable_dicts_includes_info_maps(mock_output_manager: OutputManager) -> None:
+    """Returns info_maps key and data when exclude_info_maps is False and info_maps present."""
+    info_maps_data = [{"units": "kg"}, {"units": "lb"}]
+    variable_data: dict[str, Any] = {
+        "values": [1],
+        "info_maps": info_maps_data,
+    }
+    parsable_dicts, var_data_info_maps = mock_output_manager._get_parsable_dicts(variable_data, exclude_info_maps=False)
+
+    assert parsable_dicts == ["info_maps"]
+    assert var_data_info_maps == info_maps_data
+
+
+def test_get_parsable_dicts_no_info_maps_key(mock_output_manager: OutputManager) -> None:
+    """Returns empty lists when info_maps key is absent."""
+    variable_data: dict[str, Any] = {"values": [1]}
+    parsable_dicts, var_data_info_maps = mock_output_manager._get_parsable_dicts(variable_data, exclude_info_maps=False)
+
+    assert parsable_dicts == []
+    assert var_data_info_maps == []
+
+
+def test_format_variable_entry_no_values(mock_output_manager: OutputManager) -> None:
+    """Returns NO VARIABLES line when values key is absent."""
+    result = mock_output_manager._format_variable_entry("myvar", {"info_maps": []}, False, "verbose")
+
+    assert result == [f"myvar: **NO VARIABLES**{os.linesep}"]
+
+
+def test_format_variable_entry_flat_with_units(mock_output_manager: OutputManager) -> None:
+    """Non-nested values with units emits name-with-units line."""
+    variable_data: dict[str, Any] = {
+        "values": [1],
+        "info_maps": [{"units": "kg"}],
+    }
+    result = mock_output_manager._format_variable_entry("weight", variable_data, False, "verbose")
+
+    assert f"weight (kg){os.linesep}" in result
+
+
+def test_format_variable_entry_flat_no_units(mock_output_manager: OutputManager) -> None:
+    """Non-nested values without units emits bare name line."""
+    variable_data: dict[str, Any] = {"values": [1]}
+    result = mock_output_manager._format_variable_entry("weight", variable_data, True, "verbose")
+
+    assert f"weight{os.linesep}" in result
+    assert any("()" in line for line in result) is False
+
+
+def test_format_variable_entry_nested_values_appends_values_to_parsable_dicts(
+    mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Nested values causes values dict to be passed to _format_parsable_dict_lines."""
+    variable_data: dict[str, Any] = {
+        "values": [{"k1": 1, "k2": 2}],
+    }
+    mock_format_lines = mocker.patch.object(mock_output_manager, "_format_parsable_dict_lines", return_value=[])
+    mock_output_manager._format_variable_entry("myvar", variable_data, True, "verbose")
+
+    called_parsable_dicts = [call.args[2] for call in mock_format_lines.call_args_list]
+    assert "values" in called_parsable_dicts
+
+
+def test_format_variable_entry_block_flat_no_units_no_duplicate(
+    mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Block format with flat no-units variable: bare name line not duplicated."""
+    variable_data: dict[str, Any] = {"values": [1]}
+    mocker.patch.object(mock_output_manager, "_format_parsable_dict_lines", return_value=[])
+    result = mock_output_manager._format_variable_entry("myvar", variable_data, True, "block")
+
+    assert result.count(f"myvar{os.linesep}") == 1
+
+
+def test_format_variable_entry_block_flat_with_units_appends_bare_name(
+    mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Block format with flat variable that has units: bare name line appended after name(units) line."""
+    variable_data: dict[str, Any] = {
+        "values": [1],
+        "info_maps": [{"units": "kg"}],
+    }
+    mocker.patch.object(mock_output_manager, "_format_parsable_dict_lines", return_value=[])
+    result = mock_output_manager._format_variable_entry("myvar", variable_data, False, "block")
+
+    assert f"myvar (kg){os.linesep}" in result
+    assert f"myvar{os.linesep}" in result
+
+
+def test_format_variable_entry_block_nested_appends_bare_name(
+    mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Block format with nested values: bare name line appended (lines starts empty), prefix is spaces."""
+    variable_data: dict[str, Any] = {"values": [{"k1": 1}]}
+    mock_format_lines = mocker.patch.object(mock_output_manager, "_format_parsable_dict_lines", return_value=[])
+    result = mock_output_manager._format_variable_entry("myvar", variable_data, True, "block")
+
+    assert f"myvar{os.linesep}" in result
+    prefix_arg = mock_format_lines.call_args.args[1]
+    assert prefix_arg == " " * len("myvar")
+
+
+@pytest.mark.parametrize(
+    "keys, units, parsable_dict, expected_fragment",
+    [
+        (["k1", "k2"], "kg", "values", "myvar.values: ['k1', 'k2'] (kg)"),
+        (["k1", "k2"], "", "values", "myvar.values: ['k1', 'k2']"),
+        (["k1"], "kg", "info_maps", "myvar.info_maps: ['k1']"),
+    ],
+)
+def test_format_parsable_dict_lines_inline(
+    mock_output_manager: OutputManager,
+    keys: list[str],
+    units: str,
+    parsable_dict: str,
+    expected_fragment: str,
+) -> None:
+    """Inline format emits single line with key list."""
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "myvar", parsable_dict, keys, units, "inline")
+
+    assert len(result) == 1
+    assert expected_fragment in result[0]
+
+
+@pytest.mark.parametrize(
+    "format_option, units, key, expected_has_units",
+    [
+        ("basic", "kg", "my_key", True),
+        ("basic", "kg", "units", False),
+        ("basic", "kg", "timestep", False),
+        ("basic", "", "my_key", False),
+        ("verbose", "kg", "my_key", True),
+        ("verbose", "kg", "units", False),
+        ("verbose", "", "my_key", False),
+    ],
+)
+def test_format_parsable_dict_lines_units_suppressed_for_ignored_keys(
+    mock_output_manager: OutputManager,
+    format_option: str,
+    units: str,
+    key: str,
+    expected_has_units: bool,
+) -> None:
+    """Units omitted for keys in _VARIABLE_DUMP_KEYS_TO_IGNORE or when units empty."""
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "myvar", "values", [key], units, format_option)
+
+    assert len(result) == 1
+    has_units = f"({units})" in result[0]
+    assert has_units == expected_has_units
+
+
+def test_format_parsable_dict_lines_basic_per_key_lines(mock_output_manager: OutputManager) -> None:
+    """Basic format emits one line per key using name.key pattern."""
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "myvar", "values", ["k1", "k2"], "kg", "basic")
+
+    assert len(result) == 2
+    assert f"myvar.k1 (kg){os.linesep}" in result
+    assert f"myvar.k2 (kg){os.linesep}" in result
+
+
+def test_format_parsable_dict_lines_verbose_uses_prefix(mock_output_manager: OutputManager) -> None:
+    """Verbose/block format uses prefix and parsable_dict in each line."""
+    result = mock_output_manager._format_parsable_dict_lines("myvar", "    ", "values", ["k1"], "kg", "verbose")
+
+    assert len(result) == 1
+    assert f"    .values: k1 (kg){os.linesep}" in result
+
+
+def test_format_parsable_dict_lines_dict_units(mock_output_manager: OutputManager) -> None:
+    """Per-key dict units resolved correctly; missing key gets empty string."""
+    units_dict = {"k1": "kg", "k2": "lb"}
+    result = mock_output_manager._format_parsable_dict_lines(
+        "myvar", "myvar", "values", ["k1", "k2", "k3"], units_dict, "basic"
+    )
+
+    assert f"myvar.k1 (kg){os.linesep}" in result
+    assert f"myvar.k2 (lb){os.linesep}" in result
+    assert f"myvar.k3{os.linesep}" in result
 
 
 def test_set_variables_pool_with_override(
@@ -2461,12 +3043,12 @@ def test_parse_filtered_variables(
     expected_counter: Counter[str],
 ) -> None:
     """Tests _parse_filtered_variables in the Output Manager."""
-    mock_output_manager._variables_usage_counter = Counter()
+    mock_output_manager._filtered_variable_key_counter = Counter()
 
     actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", exclusion)
 
     assert actual == expected
-    assert mock_output_manager._variables_usage_counter == expected_counter
+    assert mock_output_manager._filtered_variable_key_counter == expected_counter
 
 
 @pytest.mark.parametrize(
@@ -3378,19 +3960,20 @@ def test_print_credits(
 
 
 @pytest.mark.parametrize(
-    "log_verbose, task_id, expected_output",
+    "log_verbose, task_id, output_prefix, expected_output",
     [
-        (LogVerbosity.NONE, "id", ""),
-        (LogVerbosity.CREDITS, "id", "Starting task: id\n"),
-        (LogVerbosity.ERRORS, "id", "Starting task: id\n"),
-        (LogVerbosity.WARNINGS, "id", "Starting task: id\n"),
-        (LogVerbosity.LOGS, "id", "Starting task: id\n"),
+        (LogVerbosity.NONE, "id", "freestall", ""),
+        (LogVerbosity.CREDITS, "id", "freestall", "Starting task: id (freestall)\n"),
+        (LogVerbosity.ERRORS, "id", "freestall", "Starting task: id (freestall)\n"),
+        (LogVerbosity.WARNINGS, "id", "freestall", "Starting task: id (freestall)\n"),
+        (LogVerbosity.LOGS, "id", "freestall", "Starting task: id (freestall)\n"),
     ],
 )
 def test_print_task_id(
     mock_output_manager: OutputManager,
     log_verbose: LogVerbosity,
     task_id: str,
+    output_prefix: str,
     expected_output: str,
     capfd: CaptureFixture[str],
 ) -> None:
@@ -3402,7 +3985,7 @@ def test_print_task_id(
         "_OutputManager__log_verbose",
         log_verbose,
     )
-    mock_output_manager.print_task_id(task_id)
+    mock_output_manager.print_task_id(task_id, output_prefix)
     captured = capfd.readouterr()
     assert captured.out == expected_output
 
@@ -3411,10 +3994,10 @@ def test_print_task_id(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
-        (LogVerbosity.CREDITS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
-        (LogVerbosity.ERRORS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
-        (LogVerbosity.WARNINGS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
-        (LogVerbosity.LOGS, "Finished task: id with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.CREDITS, "Finished task: id (freestall) with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.ERRORS, "Finished task: id (freestall) with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.WARNINGS, "Finished task: id (freestall) with 2 error(s), 1 warning(s), and 5 log(s).\n"),
+        (LogVerbosity.LOGS, "Finished task: id (freestall) with 2 error(s), 1 warning(s), and 5 log(s).\n"),
     ],
 )
 def test_print_errors_warnings_logs(
@@ -3426,8 +4009,9 @@ def test_print_errors_warnings_logs(
         log_verbose,
     )
     task_id = "id"
+    output_prefix = "freestall"
     with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
-        mock_output_manager.print_errors_warnings_logs_counts(task_id)
+        mock_output_manager.print_errors_warnings_logs_counts(task_id, output_prefix)
         captured = capfd.readouterr()
         assert captured.out == expected_output
 
@@ -3970,7 +4554,7 @@ def test_run_startup_sequence_clear_output_directory(
         is_e2e_run,
     )
 
-    mock_print_task_id.assert_called_once_with(dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id, dummy_output_prefix)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
@@ -4021,7 +4605,7 @@ def test_run_startup_sequence_not_clear_output_directory(
         False,
     )
 
-    mock_print_task_id.assert_called_once_with(dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id, dummy_output_prefix)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
@@ -4070,7 +4654,7 @@ def test_run_startup_sequence_chunkification(
         dummy_task_id,
         False,
     )
-    mock_print_task_id.assert_called_once_with(dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id, dummy_output_prefix)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)

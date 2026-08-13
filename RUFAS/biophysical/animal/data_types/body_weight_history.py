@@ -5,9 +5,6 @@ class BodyWeightHistory(TypedDict):
     """
     A class to represent the history of body weight for an individual animal on a farm.
 
-    This class is used to track the body weight of an animal over the course of a simulation.
-    It contains information about the simulation day, the age of the animal in days, and its body weight.
-
     Attributes
     ----------
     simulation_day : int

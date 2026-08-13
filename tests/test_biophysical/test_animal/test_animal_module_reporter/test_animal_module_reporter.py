@@ -1,15 +1,17 @@
 from dataclasses import asdict
-from typing import Any
 from unittest.mock import MagicMock, call
 from pytest_mock import MockerFixture
 import pytest
 
 from RUFAS.biophysical.animal import animal_constants
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
@@ -27,51 +29,10 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.user_constants import UserConstants
 
 
-@pytest.mark.parametrize(
-    "reference_variable_name, reference_variable_value, actual_variable_name, current_actual_variable_value,"
-    "actual_variable_value_to_add, simulation_day,expected_num_add_variable_calls",
-    [
-        ("ref_variable", [1, 2, 3, 4, 5], "dummy_variable", [2], 2, 1, 3),
-        ("ref_variable", [1, 2, 3], "dummy_variable", [1, 2, 3], 2, 2, 0),
-        ("ref_variable", [1, 2, 3], "dummy_variable", [], 2, 2, 2),
-        ("ref_variable", [1, 2, 3], "dummy_variable", [1, 2, 3], 2, 0, 0),
-    ],
-)
-def test_data_padder(
-    reference_variable_name: str,
-    reference_variable_value: list[Any],
-    actual_variable_name: str,
-    current_actual_variable_value: list[Any],
-    actual_variable_value_to_add: Any,
-    simulation_day: int,
-    expected_num_add_variable_calls: int,
-    mocker: MockerFixture,
-) -> None:
-    """Unit test for data_padder()"""
-    om = OutputManager()
-    mock_om_add_variable = mocker.patch.object(om, "add_variable")
-    om.variables_pool = {
-        reference_variable_name: {"values": reference_variable_value},
-    }
-    if current_actual_variable_value:
-        om.variables_pool[actual_variable_name] = {"values": current_actual_variable_value}
-
-    AnimalModuleReporter.data_padder(
-        reference_variable_name,
-        actual_variable_name,
-        actual_variable_value_to_add,
-        simulation_day,
-        info_map={},
-        first_info_map_only=True,
-        units={},
-    )
-
-    assert mock_om_add_variable.call_count == expected_num_add_variable_calls
-
-
 def test_report_milk(mocker: MockerFixture) -> None:
     """Unit test for report_milk()"""
     simulation_day = 10
+    AnimalConfig.simulate_genetics = True
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
     milk_reports = [
@@ -84,6 +45,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
             milk_fat=3.4,
             milk_lactose=5.6,
             parity=1,
+            days_born=10,
+            days_in_pregnancy=10,
+            animal_type=AnimalType.LAC_COW,
+            TBV_fat=10.0,
+            TBV_protein=10.0,
+            E_permanent_fat=10.0,
+            E_permanent_protein=10.0,
+            E_temporary_fat=10.0,
+            E_temporary_protein=10.0,
+            phenotype_fat=10.0,
+            phenotype_protein=10.0,
+            EBV_fat=10.0,
+            EBV_protein=10.0,
+            ranking_index=10.0,
         ),
         MilkProductionStatistics(
             cow_id=2,
@@ -94,6 +69,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
             milk_fat=73,
             milk_lactose=7.9,
             parity=5,
+            days_born=10,
+            days_in_pregnancy=10,
+            animal_type=AnimalType.LAC_COW,
+            TBV_fat=10.0,
+            TBV_protein=10.0,
+            E_permanent_fat=10.0,
+            E_permanent_protein=10.0,
+            E_temporary_fat=10.0,
+            E_temporary_protein=10.0,
+            phenotype_fat=10.0,
+            phenotype_protein=10.0,
+            EBV_fat=10.0,
+            EBV_protein=10.0,
+            ranking_index=10.0,
         ),
         MilkProductionStatistics(
             cow_id=12345,
@@ -104,6 +93,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
             milk_fat=0,
             milk_lactose=0,
             parity=2,
+            days_born=10,
+            days_in_pregnancy=10,
+            animal_type=AnimalType.LAC_COW,
+            TBV_fat=10.0,
+            TBV_protein=10.0,
+            E_permanent_fat=10.0,
+            E_permanent_protein=10.0,
+            E_temporary_fat=10.0,
+            E_temporary_protein=10.0,
+            phenotype_fat=10.0,
+            phenotype_protein=10.0,
+            EBV_fat=10.0,
+            EBV_protein=10.0,
+            ranking_index=10.0,
         ),
     ]
 
@@ -111,7 +114,8 @@ def test_report_milk(mocker: MockerFixture) -> None:
         "class": AnimalModuleReporter.__name__,
         "function": AnimalModuleReporter.report_milk.__name__,
         "data_origin": [("MilkProduction", "perform_daily_milking_update")],
-        "units": MilkProductionStatistics.UNITS,
+        "is_daily_variable": True,
+        "units": MilkProductionStatistics.UNITS | MilkProductionStatistics.GENETIC_UNITS,
     }
     expected_add_variable_calls = [
         call(
@@ -119,14 +123,28 @@ def test_report_milk(mocker: MockerFixture) -> None:
             {
                 "cow_id": 1,
                 "pen_id": 1,
+                "is_milking": True,
                 "days_in_milk": 10,
                 "estimated_daily_milk_produced": 88.8,
                 "milk_protein": 12.3,
                 "milk_fat": 3.4,
                 "milk_lactose": 5.6,
                 "parity": 1,
-                "is_milking": True,
+                "days_born": 10,
+                "days_in_pregnancy": 10,
                 "simulation_day": simulation_day,
+                "animal_type": AnimalType.LAC_COW.name,
+                "TBV_fat": 10.0,
+                "TBV_protein": 10.0,
+                "E_permanent_fat": 10.0,
+                "E_permanent_protein": 10.0,
+                "E_temporary_fat": 10.0,
+                "E_temporary_protein": 10.0,
+                "phenotype_fat": 10.0,
+                "phenotype_protein": 10.0,
+                "EBV_fat": 10.0,
+                "EBV_protein": 10.0,
+                "ranking_index": 10.0,
             },
             info_map,
         ),
@@ -143,6 +161,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
                 "parity": 5,
                 "is_milking": True,
                 "simulation_day": simulation_day,
+                "days_born": 10,
+                "days_in_pregnancy": 10,
+                "animal_type": AnimalType.LAC_COW.name,
+                "TBV_fat": 10.0,
+                "TBV_protein": 10.0,
+                "E_permanent_fat": 10.0,
+                "E_permanent_protein": 10.0,
+                "E_temporary_fat": 10.0,
+                "E_temporary_protein": 10.0,
+                "phenotype_fat": 10.0,
+                "phenotype_protein": 10.0,
+                "EBV_fat": 10.0,
+                "EBV_protein": 10.0,
+                "ranking_index": 10.0,
             },
             info_map,
         ),
@@ -159,6 +191,20 @@ def test_report_milk(mocker: MockerFixture) -> None:
                 "parity": 2,
                 "is_milking": False,
                 "simulation_day": simulation_day,
+                "days_born": 10,
+                "days_in_pregnancy": 10,
+                "animal_type": AnimalType.LAC_COW.name,
+                "TBV_fat": 10.0,
+                "TBV_protein": 10.0,
+                "E_permanent_fat": 10.0,
+                "E_permanent_protein": 10.0,
+                "E_temporary_fat": 10.0,
+                "E_temporary_protein": 10.0,
+                "phenotype_fat": 10.0,
+                "phenotype_protein": 10.0,
+                "EBV_fat": 10.0,
+                "EBV_protein": 10.0,
+                "ranking_index": 10.0,
             },
             info_map,
         ),
@@ -185,6 +231,7 @@ def test_ration_per_animal(mocker: MockerFixture) -> None:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_ration_per_animal.__name__,
             "simulation_day": 10,
+            "is_daily_variable": True,
             "number_animals_in_pen": 8,
             "units": {
                 "1": MeasurementUnits.KILOGRAMS,
@@ -258,6 +305,7 @@ def test_report_nutrient_amounts(mocker: MockerFixture) -> None:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_nutrient_amounts.__name__,
             "simulation_day": 8,
+            "is_daily_variable": True,
             "units": NutritionSupply.UNITS,
             "number_animals_in_pen": 10,
         },
@@ -330,6 +378,7 @@ def test_report_average_nutrient_requirements(mocker: MockerFixture) -> None:
             "function": AnimalModuleReporter.report_average_nutrient_requirements.__name__,
             "number_animals_in_pen": 10,
             "simulation_day": 8,
+            "is_daily_variable": True,
             "units": NutritionRequirements.UNITS,
         },
     )
@@ -375,6 +424,7 @@ def test_report_average_nutrient_evaluation_results(mocker: MockerFixture) -> No
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_average_nutrient_evaluation_results.__name__,
                 "simulation_day": 10,
+                "is_daily_variable": True,
                 "units": NutritionEvaluationResults.UNITS,
             },
         ),
@@ -385,6 +435,7 @@ def test_report_average_nutrient_evaluation_results(mocker: MockerFixture) -> No
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_average_nutrient_evaluation_results.__name__,
                 "simulation_day": 10,
+                "is_daily_variable": True,
                 "units": NutritionEvaluationResults.REPORT_UNITS,
             },
         ),
@@ -404,6 +455,7 @@ def test_report_me_diet(mocker: MockerFixture) -> None:
             "function": AnimalModuleReporter.report_me_diet.__name__,
             "number_animals_in_pen": 8,
             "simulation_day": 12,
+            "is_daily_variable": True,
             "units": MeasurementUnits.MEGACALORIES,
         },
     )
@@ -431,6 +483,7 @@ def test_report_daily_herd_total_ration(mocker: MockerFixture) -> None:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_herd_total_ration.__name__,
             "simulation_day": 10,
+            "is_daily_variable": True,
             "units": units,
         },
     )
@@ -455,6 +508,7 @@ def test_report_daily_ration_per_pen(mocker: MockerFixture) -> None:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_ration_per_pen.__name__,
             "simulation_day": 10,
+            "is_daily_variable": True,
             "units": {key: MeasurementUnits.KILOGRAMS for key in pen_ration.keys()},
         },
     )
@@ -564,6 +618,7 @@ def test_report_manure_streams_no_pen_manure(mocker: MockerFixture) -> None:
     """Unit test for report_manure_streams() when the input has no pen manure data."""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
+    mock_om_add_error = mocker.patch.object(om, "add_error")
 
     manure_stream = ManureStream(
         water=1.1,
@@ -586,7 +641,8 @@ def test_report_manure_streams_no_pen_manure(mocker: MockerFixture) -> None:
 
     with pytest.raises(ValueError):
         AnimalModuleReporter.report_manure_streams(manure_streams, 10)
-        mock_om_add_variable.assert_not_called()
+    mock_om_add_variable.assert_not_called()
+    mock_om_add_error.assert_called_once()
 
 
 def test_report_manure_streams(mocker: MockerFixture) -> None:
@@ -702,10 +758,9 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
 
 
 def test_report_manure_excretions(mocker: MockerFixture) -> None:
-    """Unit test for report_manure_excretions()"""
+    """Unit test for report_manure_excretions() without in-simulation padding."""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
-    mock_data_padder = mocker.patch.object(AnimalModuleReporter, "data_padder")
 
     dummy_manure_excretion_data = AnimalManureExcretions(
         urea=1.1,
@@ -717,10 +772,6 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
         total_solids=7.7,
         degradable_volatile_solids=8.8,
         non_degradable_volatile_solids=9.9,
-        inorganic_phosphorus_fraction=1.1,
-        organic_phosphorus_fraction=2.2,
-        non_water_inorganic_phosphorus_fraction=3.3,
-        non_water_organic_phosphorus_fraction=4.4,
         phosphorus=5.5,
         phosphorus_fraction=6.6,
         potassium=7.7,
@@ -734,18 +785,201 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_manure_excretions(manure_excretions_by_pen, 10)
 
-    assert mock_data_padder.call_count == 16 * len(manure_excretions_by_pen)
-    assert mock_om_add_variable.call_count == 16 * len(manure_excretions_by_pen)
+    assert mock_om_add_variable.call_count == 12 * len(manure_excretions_by_pen)
 
 
 def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
-    """Unit test for report_herd_statistics_data()"""
+    """Unit test for report_herd_statistics_data().
+
+    Verifies that every expected variable name is reported with the correct value
+    drawn from HerdStatistics, and that the total call count is correct when no
+    per-pen heifer ADG entries are present.
+    """
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
 
-    AnimalModuleReporter.report_herd_statistics_data(HerdStatistics(), 10)
+    hs = HerdStatistics()
 
-    assert mock_om_add_variable.call_count == 57
+    # Set distinct non-zero values so each assertion catches a wrong-field mapping.
+    hs.sold_cow_oversupply_num = 1
+    hs.bought_heifer_num = 2
+    hs.sold_heiferII_num = 3
+    hs.cow_herd_exit_num = 4
+    hs.sold_cow_num = 5
+    hs.GnRH_injection_num_h = 6
+    hs.GnRH_injection_num = 7
+    hs.PGF_injection_num = 8
+    hs.PGF_injection_num_h = 9
+    hs.ai_num = 10
+    hs.ai_num_h = 11
+    hs.preg_check_num = 12
+    hs.preg_check_num_h = 13
+    hs.ed_period_h = 14
+    hs.ed_period = 15
+    hs.sold_calf_num = 16
+    hs.born_calf_num = 17
+    hs.stillborn_calf_num = 18
+    hs.daily_milk_production = 100.0
+    hs.herd_milk_fat_percent = 3.5
+    hs.herd_milk_fat_kg = 3.6
+    hs.herd_milk_protein_kg = 3.7
+    hs.herd_milk_protein_percent = 3.8
+    hs.open_cow_num = 19
+    hs.vwp_cow_num = 20
+    hs.preg_cow_num = 21
+    hs.milking_cow_num = 22
+    hs.dry_cow_num = 23
+    hs.avg_days_in_milk = 120.0
+    hs.avg_days_in_preg = 90.0
+    hs.avg_cow_body_weight = 650.0
+    hs.avg_parity_num = 2.5
+    hs.avg_calving_interval = 400.0
+    hs.avg_breeding_to_preg_time = 55.0
+    hs.avg_heifer_culling_age = 800.0
+    hs.avg_cow_culling_age = 1500.0
+    hs.avg_mature_body_weight = 700.0
+    hs.num_cow_for_parity = {"1": 10, "2": 8, "3": 6, "4": 4, "5": 2, "greater_than_5": 1}
+    hs.avg_calving_to_preg_time = {"1": 50.0, "2": 55.0, "3": 60.0, "4": 65.0, "5": 70.0, "greater_than_5": 75.0}
+    hs.avg_age_for_calving = {"1": 730, "2": 740, "3": 750, "4": 760, "5": 770, "greater_than_5": 780}
+    hs.heifer_average_daily_gain_by_animal_type = {
+        AnimalType.HEIFER_I: 0.8,
+        AnimalType.HEIFER_II: 0.9,
+        AnimalType.HEIFER_III: 1.0,
+    }
+    # heifer_average_daily_gain_by_pen left empty → no per-pen calls
+
+    simulation_day = 42
+
+    AnimalModuleReporter.report_herd_statistics_data(hs, simulation_day)
+
+    # Total calls: 57 fixed + 3 heifer-by-type + 0 per-pen = 60
+    assert mock_om_add_variable.call_count == 60
+
+    # Build lookup: variable_name → value from actual calls
+    reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
+
+    # --- event counts ---
+    assert reported["sold_cow_oversupply_num"] == 1
+    assert reported["bought_heifer_num"] == 2
+    assert reported["sold_heiferII_num"] == 3
+    assert reported["cow_herd_exit_num"] == 4
+    assert reported["sold_cow_num"] == 5
+    assert reported["GnRH_injection_num_h"] == 6
+    assert reported["GnRH_injection_num"] == 7
+    assert reported["PGF_injection_num"] == 8
+    assert reported["PGF_injection_num_h"] == 9
+    assert reported["ai_num"] == 10
+    assert reported["ai_num_h"] == 11
+    assert reported["preg_check_num"] == 12
+    assert reported["preg_check_num_h"] == 13
+    assert reported["num_heiferII_in_ed_period"] == 14
+    assert reported["num_cow_in_ed_period"] == 15
+    assert reported["sold_calf_num"] == 16
+    assert reported["born_calf_num"] == 17
+    assert reported["stillborn_calf_num"] == 18
+
+    # --- milk ---
+    assert reported["daily_milk_production"] == pytest.approx(100.0)
+    assert reported["herd_milk_fat_percent"] == pytest.approx(3.5)
+    assert reported["herd_milk_fat_kg"] == pytest.approx(3.6)
+    assert reported["herd_milk_protein_kg"] == pytest.approx(3.7)
+    assert reported["herd_milk_protein_percent"] == pytest.approx(3.8)
+
+    # --- cow status ---
+    assert reported["open_cow_num"] == 19
+    assert reported["vwp_cow_num"] == 20
+    assert reported["preg_cow_num"] == 21
+    assert reported["milking_cow_num"] == 22
+    assert reported["dry_cow_num"] == 23
+
+    # --- averages ---
+    assert reported["avg_days_in_milk"] == pytest.approx(120.0)
+    assert reported["avg_days_in_preg"] == pytest.approx(90.0)
+    assert reported["avg_cow_body_weight"] == pytest.approx(650.0)
+    assert reported["avg_parity_num"] == pytest.approx(2.5)
+    assert reported["avg_calving_interval"] == pytest.approx(400.0)
+    assert reported["avg_breeding_to_preg_time"] == pytest.approx(55.0)
+    assert reported["avg_heifer_culling_age"] == pytest.approx(800.0)
+    assert reported["avg_cow_culling_age"] == pytest.approx(1500.0)
+    assert reported["avg_mature_body_weight"] == pytest.approx(700.0)
+
+    # --- simulation day ---
+    assert reported["simulation_day"] == simulation_day
+
+    # --- parity counts ---
+    assert reported["num_cow_for_parity_1"] == 10
+    assert reported["num_cow_for_parity_2"] == 8
+    assert reported["num_cow_for_parity_3"] == 6
+    assert reported["num_cow_for_parity_4"] == 4
+    assert reported["num_cow_for_parity_5"] == 2
+    assert reported["num_cow_for_parity_greater_than_5"] == 1
+
+    # --- calving-to-pregnancy times ---
+    assert reported["calving_to_preg_time_1"] == pytest.approx(50.0)
+    assert reported["calving_to_preg_time_2"] == pytest.approx(55.0)
+    assert reported["calving_to_preg_time_3"] == pytest.approx(60.0)
+    assert reported["calving_to_preg_time_4"] == pytest.approx(65.0)
+    assert reported["calving_to_preg_time_5"] == pytest.approx(70.0)
+    assert reported["calving_to_preg_time_greater_than_5"] == pytest.approx(75.0)
+
+    # --- average age at calving ---
+    assert reported["avg_age_for_calving_1"] == 730
+    assert reported["avg_age_for_calving_2"] == 740
+    assert reported["avg_age_for_calving_3"] == 750
+    assert reported["avg_age_for_calving_4"] == 760
+    assert reported["avg_age_for_calving_5"] == 770
+    assert reported["avg_age_for_calving_greater_than_5"] == 780
+
+    # --- heifer ADG by animal type ---
+    assert reported["heiferI_average_daily_gain"] == pytest.approx(0.8)
+    assert reported["heiferII_average_daily_gain"] == pytest.approx(0.9)
+    assert reported["heiferIII_average_daily_gain"] == pytest.approx(1.0)
+
+
+def test_report_herd_statistics_data_with_pen_heifer_adg(mocker: MockerFixture) -> None:
+    """Unit test for report_herd_statistics_data() when heifer ADG by pen is populated.
+
+    Verifies that one add_variable call is made per pen entry and that the correct
+    variable name and value are used for each pen.
+    """
+    om = OutputManager()
+    mock_om_add_variable = mocker.patch.object(om, "add_variable")
+
+    hs = HerdStatistics()
+    hs.heifer_average_daily_gain_by_pen = {"3": 1.1, "7": 0.95}
+
+    AnimalModuleReporter.report_herd_statistics_data(hs, 1)
+
+    # 57 fixed + 3 heifer-by-type + 2 per-pen = 62
+    assert mock_om_add_variable.call_count == 62
+
+    reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
+    assert reported["heifer_average_daily_gain_in_pen_3"] == pytest.approx(1.1)
+    assert reported["heifer_average_daily_gain_in_pen_7"] == pytest.approx(0.95)
+
+
+def test_report_daily_reproduction_statistics(mocker: MockerFixture) -> None:
+    """Unit test for report_daily_reproduction_statistics()"""
+    om = OutputManager()
+    mock_om_add_variable = mocker.patch.object(om, "add_variable")
+
+    daily_stats = HerdReproductionStatistics(
+        total_num_successful_conceptions=5,
+        heifer_num_successful_conceptions=2,
+        cow_num_successful_conceptions=3,
+    )
+    AnimalModuleReporter.report_daily_reproduction_statistics(daily_stats, 10)
+
+    info_map = {
+        "class": AnimalModuleReporter.__name__,
+        "function": AnimalModuleReporter.report_daily_reproduction_statistics.__name__,
+        "data_origin": [("HerdManager", "daily_update")],
+        "units": MeasurementUnits.CONCEPTIONS,
+    }
+    assert mock_om_add_variable.call_count == 3
+    mock_om_add_variable.assert_any_call("num_successful_conceptions", 5, info_map)
+    mock_om_add_variable.assert_any_call("heiferII_num_successful_conceptions", 2, info_map)
+    mock_om_add_variable.assert_any_call("cow_num_successful_conceptions", 3, info_map)
 
 
 def test_report_daily_pen_total(mocker: MockerFixture) -> None:
@@ -759,6 +993,7 @@ def test_report_daily_pen_total(mocker: MockerFixture) -> None:
         "function": AnimalModuleReporter.report_daily_pen_total.__name__,
         "units": MeasurementUnits.ANIMALS,
         "simulation_day": 10,
+        "is_daily_variable": True,
     }
     mock_om_add_variable.assert_called_once_with("number_of_animals_in_pen_1_GROWING", 8, info_map)
 
@@ -778,6 +1013,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=2,
@@ -787,6 +1023,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=3,
@@ -796,6 +1033,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
     ]
     herd_statistics.sold_heiferIIs_info = [
@@ -807,6 +1045,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=5,
@@ -816,6 +1055,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=6,
@@ -825,6 +1065,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
     ]
     herd_statistics.sold_heiferIIIs_info = [
@@ -836,6 +1077,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=8,
@@ -845,6 +1087,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=9,
@@ -854,6 +1097,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
     ]
     herd_statistics.sold_and_died_cows_info = [
@@ -865,6 +1109,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason=animal_constants.UDDER_CULL,
             days_in_milk=18,
             parity=2,
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=11,
@@ -874,6 +1119,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason=animal_constants.DEATH_CULL,
             days_in_milk=88,
             parity=1,
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=12,
@@ -883,11 +1129,12 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             cull_reason=animal_constants.LAMENESS_CULL,
             days_in_milk=0,
             parity=3,
+            genetic_history="",
         ),
     ]
 
     AnimalModuleReporter.report_sold_animal_information(herd_statistics)
-    assert mock_om_add_variable.call_count == 11 * 7
+    assert mock_om_add_variable.call_count == 11 * 8
 
 
 def test_report_stillborn_calves_information(mocker: MockerFixture) -> None:
@@ -942,10 +1189,24 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
     total_days = 188
     sold_animals = [
         SoldAnimalTypedDict(
-            id=1, animal_type="Calf", sold_at_day=0, body_weight=23.3, cull_reason="NA", days_in_milk="NA", parity="NA"
+            id=1,
+            animal_type="Calf",
+            sold_at_day=0,
+            body_weight=23.3,
+            cull_reason="NA",
+            days_in_milk="NA",
+            parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
-            id=2, animal_type="Calf", sold_at_day=0, body_weight=23.3, cull_reason="NA", days_in_milk="NA", parity="NA"
+            id=2,
+            animal_type="Calf",
+            sold_at_day=0,
+            body_weight=23.3,
+            cull_reason="NA",
+            days_in_milk="NA",
+            parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=3,
@@ -955,6 +1216,7 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=4,
@@ -964,6 +1226,7 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=5,
@@ -973,6 +1236,7 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=6,
@@ -982,6 +1246,7 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=7,
@@ -991,6 +1256,7 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
             id=8,
@@ -1000,12 +1266,27 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
-            id=9, animal_type="LacCow", sold_at_day=23, body_weight=23.3, cull_reason="NA", days_in_milk=10, parity=2
+            id=9,
+            animal_type="LacCow",
+            sold_at_day=23,
+            body_weight=23.3,
+            cull_reason="NA",
+            days_in_milk=10,
+            parity=2,
+            genetic_history="",
         ),
         SoldAnimalTypedDict(
-            id=10, animal_type="DryCow", sold_at_day=23, body_weight=23.3, cull_reason="NA", days_in_milk=0, parity=1
+            id=10,
+            animal_type="DryCow",
+            sold_at_day=23,
+            body_weight=23.3,
+            cull_reason="NA",
+            days_in_milk=0,
+            parity=1,
+            genetic_history="",
         ),
     ]
     AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(sold_animals, "dummy", total_days)
@@ -1034,23 +1315,59 @@ def test_report_sold_animal_information_sort_by_sell_day(mocker: MockerFixture) 
     assert mock_om_add_variable.call_count == 2 + (total_days + 1) * 2
 
 
-def test_report_305d_milk(mocker: MockerFixture) -> None:
-    """Unit test for report_305d_milk()"""
+def test_report_305_day_milk_yield(mocker: MockerFixture) -> None:
+    """Unit test for report_305_day_milk_yield()"""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
 
-    AnimalModuleReporter.report_305d_milk(101.11)
+    AnimalModuleReporter.report_305_day_milk_yield(101.11, 98.5, 102.25, 104.75)
 
-    mock_om_add_variable.assert_called_once_with(
-        "milk_production_305days_herd_mean",
-        101.11,
-        {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_305d_milk.__name__,
-            "data_origin": [("MilkProduction", "perform_daily_milking_update")],
-            "units": MeasurementUnits.KILOGRAMS,
-        },
-    )
+    assert mock_om_add_variable.call_args_list == [
+        call(
+            "milk_305_day_yield_herd_mean",
+            101.11,
+            {
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
+                "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "is_daily_variable": True,
+                "units": MeasurementUnits.KILOGRAMS,
+            },
+        ),
+        call(
+            "milk_305_day_yield_l1_mean",
+            98.5,
+            {
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
+                "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "is_daily_variable": True,
+                "units": MeasurementUnits.KILOGRAMS,
+            },
+        ),
+        call(
+            "milk_305_day_yield_l2_mean",
+            102.25,
+            {
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
+                "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "is_daily_variable": True,
+                "units": MeasurementUnits.KILOGRAMS,
+            },
+        ),
+        call(
+            "milk_305_day_yield_l3plus_mean",
+            104.75,
+            {
+                "class": AnimalModuleReporter.__name__,
+                "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
+                "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "is_daily_variable": True,
+                "units": MeasurementUnits.KILOGRAMS,
+            },
+        ),
+    ]
 
 
 def test_report_end_of_simulation_empty_sold_animal_info(mocker: MockerFixture) -> None:
@@ -1074,10 +1391,22 @@ def test_report_end_of_simulation_empty_sold_animal_info(mocker: MockerFixture) 
         mock_time := MagicMock(auto_spec=RufasTime),
         {},
         {},
+        {},
     )
 
     mock_report_sold_animal_information.assert_called_once_with(herd_statistics)
-    empty_sold_animals = [{"sold_at_day": 0, "body_weight": 0}]
+    empty_sold_animals = [
+        {
+            "id": 0,
+            "animal_type": "",
+            "sold_at_day": 0,
+            "body_weight": 0.0,
+            "cull_reason": None,
+            "days_in_milk": 0,
+            "parity": 0,
+            "genetic_history": "",
+        }
+    ]
     assert mock_report_sold_animal_information_sort_by_sell_day.call_args_list == [
         call(empty_sold_animals, report_name, mock_time.simulation_day)
         for report_name in ["sold_calves", "heiferII", "heiferIII", "sold_and_died_cows", "sold_cows"]
@@ -1111,7 +1440,14 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
     herd_statistics = HerdStatistics()
     herd_statistics.sold_calves_info = [
         SoldAnimalTypedDict(
-            id=1, animal_type="Calf", sold_at_day=0, body_weight=23.3, cull_reason="NA", days_in_milk="NA", parity="NA"
+            id=1,
+            animal_type="Calf",
+            sold_at_day=0,
+            body_weight=23.3,
+            cull_reason="NA",
+            days_in_milk="NA",
+            parity="NA",
+            genetic_history="",
         )
     ]
     herd_statistics.sold_heiferIIs_info = [
@@ -1123,6 +1459,7 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         )
     ]
     herd_statistics.sold_heiferIIIs_info = [
@@ -1134,6 +1471,7 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         )
     ]
     herd_statistics.sold_cows_info = [
@@ -1145,6 +1483,7 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         )
     ]
     herd_statistics.sold_and_died_cows_info = [
@@ -1156,6 +1495,7 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
             cull_reason="NA",
             days_in_milk="NA",
             parity="NA",
+            genetic_history="",
         )
     ]
     herd_statistics.stillborn_calf_info = [StillbornCalfTypedDict(id=1, stillborn_day=0, birth_weight=68.8)]
@@ -1164,6 +1504,7 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
         herd_statistics,
         herd_reproduction_statistics := HerdReproductionStatistics(),
         mock_time := MagicMock(auto_spec=RufasTime),
+        {},
         {},
         {},
     )
@@ -1194,13 +1535,14 @@ def test__record_animal_events(mocker: MockerFixture) -> None:
     """Unit test for _record_animal_events()"""
     om = OutputManager()
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
+    dummy_event = AnimalEvents()
     animal_events_by_id = {
-        "CALF_1": "dummy_event",
-        "HEIFER_I_2": "dummy_event",
-        "HEIFER_II_3": "dummy_event",
-        "HEIFER_III_4": "dummy_event",
-        "LAC_COW_5": "dummy_event",
-        "DRY_COW_6": "dummy_event",
+        "CALF_1": dummy_event,
+        "HEIFER_I_2": dummy_event,
+        "HEIFER_II_3": dummy_event,
+        "HEIFER_III_4": dummy_event,
+        "LAC_COW_5": dummy_event,
+        "DRY_COW_6": dummy_event,
     }
 
     AnimalModuleReporter._record_animal_events(animal_events_by_id, 123)

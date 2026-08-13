@@ -43,7 +43,7 @@ class ManureNutrients:
 
     def __post_init__(self) -> None:
         """
-        Validate the dataclass fields.
+        Validates the ManureNutrients object fields.
 
         Raises
         ------
