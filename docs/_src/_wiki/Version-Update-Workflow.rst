@@ -12,11 +12,13 @@ codebase, deliverables of this process for **Major** and **Minor**
 updates are:
 
 - A detailed technical report of the scientific review by SME Maintainers
-- A version release note that includes:
+- Version Release Notes that includes:
 
-  1. A high-level summary of the outcomes of the SME Review
+  1. A high-level summary of the outcomes of the SME Review with a link to the full report
   2. A summary of the changelog
 
+The Release Notes and full Technical Report will be posted alongside the release tag.
+(e.g. see the tag for `v1.0.0 <https://github.com/RuminantFarmSystems/RuFaS/releases/tag/v1.0.0>` ) 
 
 Before Merging ``dev`` to ``test``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
