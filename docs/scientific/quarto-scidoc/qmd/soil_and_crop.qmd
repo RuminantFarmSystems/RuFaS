@@ -1,0 +1,475 @@
+![Soil and Crop module icon](../resources/images/soc_icon.png){width=25%}
+# Soil and Crop Module
+<!-- reuse code to import functions from "../scripts/": -->
+{{< include ../scripts/_import-from-scripts.qmd >}}
+
+## Introduction 
+
+The Soil and Crop Module simulates the daily changes in soil composition and crop growth based on nutrient availability, weather and soil types. The underlying biophysical processes are drawn from existing models of soil and plant biogeochemistry including the SWAT model, Daycent, and SurPhos. The management routines execute the daily biogeochemical processes and direct simulation of the user-provided management practices including application of manure or synthetic fertilizer, tillage, planting and harvesting. As part of the whole farm biophysical simulation in RuFaS, the Soil and Crop Module receives manure from the Manure Module and sends harvested crop biomass to the Feed Storage Module.
+
+## Field Management 
+
+### Introduction 
+
+The Field Manager (`FieldManager`) is analogous to the agronomist or field manager on a real dairy farm. It coordinates and manages all the different routines and processes that are executed in Soil and Crop Module across any number of fields. To start with, the field manager interprets and integrates all of the user’s inputs about field management, crops, and soils to create a set of fields that each have their specified field and soil properties as well as schedules for each of the key management operations (manure application, fertilizer application, tillage, planting, and harvesting). 
+
+Once the fields and their schedules are set up, the `FieldManager` works through daily updates for each field. These daily updates include:
+
+* Gathering the weather conditions for that day.
+* Checking if there is a manure application needed so that it can coordinate with Manure Module to provide the manure for the application.
+* Calling each field’s daily update methods.
+* Recording the harvested crops and sending them to the Feed Storage Module.
+
+The `FieldManager` is also responsible for calling functions to record and reset any annual data records or processes for each field. Thus, the `FieldManager` is responsible for receiving and generating information from the user and other parts of the model and coordinating the simulation within the Soil and Crop Module.
+
+**Setting up Field Management**
+
+RuFaS can simulate as many fields as the user wishes to specify and requires a unique input file for each field. However, individual fields can share soil, crop, and management schedule inputs so that the user can simulate multiple fields with, for example, the same soil configuration but different crop and management schedules or different crops with the same manure application schedules without having to replicate the inputs for fields with shared characteristics.
+
+**Field Management Initialization**
+
+The `FieldManager` class, implemented in `field_manager.py`, has a series of functions to help package the user-provided configuration data and management schedule information required to initialize each field. These functions all start with the prefix `set_up` and are called by the wrapper function `set_up_field()`. There is only one instance of the `FieldManager` class as it is used to set up and coordinate processes across all the fields. The following functions within the `FieldManager``class gather information and call other functions to help initialize key data classes required for initialization of each field:
+
+* `setup_field_data`: This function sets up the field data parameters and returns an instance of the `FieldData` class populated with the values from the `field_configuration_data`.
+* `setup_soil_data`: This function sets up a Soil instance that itself contains a `SoilData` instance configured to the user-provided specifications.
+* `setup_soil_layer_data`: This function sets up a soil LayerData instance configured with provided data that is added to the `SoilData` instance.
+
+See the Individual Field Management section below for more information about the `FieldData` Class and the Soil submodule documentation for information related to the soil data classes.
+
+The next group of `set_up` functions in `FieldManager` help initialize the management schedules for each field. These functions call initialization routines for a schedule class that is used to generate an instance of a schedule with all the information that is specific to each type of management practice for each field. These schedule classes translate the user input into detailed schedules that can be read and interpreted by the `FieldManager` and instances of RuFaS Fields on a daily basis to determine the operations that need to be simulated each day. The schedule set up functions are:
+
+* `set_up_fertilizer_events`: This function generates fertilizer application event schedules based on the user-provided fertilizer schedule and returns a fertilizer schedule as well as a dictionary with the available fertilizer mixes.
+* `set_up_manure_events`: This function generates manure application event schedules based on the user-provided manure application schedules and returns a list of the planned manure applications.
+* `set_up_tillage_events`: This function generates tillage event schedules based on the user-provided tillage schedules and returns a list of the planned tillage events.
+* `set_up_crop_events`: This function generates all planting and harvest events based on the user-provided crop rotation schedule and returns a list of planting events and a list of the harvesting events that correspond to the planting events. 
+* `set_up_crop_schedules`: This function is called by `set_up_crop_events()` and returns a single list of all the cropping schedules.
+
+Outputs for each field can be identified by the character string used to define the field input blob in the metadata file. 
+
+For example, in the below excerpt from a metadata input file:
+
+![Example of the metadata input file](../resources/images/soc_icon.png){#fig-soc-metadata-input-eg}
+
+There are 2 different fields named `field_example_1` and `field_example_2` so the outputs generated by the first field would take the form:
+`Class.function.variable.field` = `field_example_1`
+
+Where the pre-fix Class.function.variable is determined by the class, function that produced the variable, and the variable being reported. As a specific illustration, the output variable for the daily surface residue from `field_example_1` would be: 
+``FieldData`Reporter.send_field_daily_variables.current_residue.field` = `field_example_1`
+
+**Field Setup and Initialization**
+
+When directed by the `FieldManager`, the Field class initializes a new Field object with the user-provided information that is packaged and shared by the `FieldManager`. These inputs include things like the field location, size, irrigation practices, pointers to the input files with management schedules, and options for turning crop growth stressors on and off. 
+
+### Required User Inputs
+
+### Expected Outputs
+
+### Methodology
+
+The first step to initializing an instance of a field is to initialize an instance of the `FieldData` class for each field which is called by the `setup_field_data()` function in `FieldManager`. Each instance of the `FieldData` class contains key information about the field from the user-provided configuration data that remains fixed throughout the simulation as well as other field attributes that are updated dynamically throughout the simulation such as the amount of crop residue that is on the surface of the field (`current_residue`), the amount of water being applied to a field in an irrigation interval (`watering_amount_in_mm`) and the number of days since the start of the current watering interval (`days_into_watering_interval`). 
+
+Once the `FieldData` is initialized, the instances of the `SoilData` and `SoilLayerData` classes for that field are initialized. Following initialization of the soils for each field, the management schedules are generated. The user has some flexibility in how they provide information about the schedule for management operations so that they can either provide a list that provides information and dates for each operation individually, or if the same operation is repeated at an annual timestep or greater, they can provide information about the pattern with which that operation is repeated via the `pattern_repeat` and `pattern_skip` inputs. For example, if a user wanted to simulate an operation such as planting corn or fertilizer application that happened every year for 5 years on May 4th starting in 2021, they could specify this schedule with either of the two following combinations of inputs in a management schedule input file:
+
+**Option 1:**
+
+* `years`: [2021, 2022, 2023, 2024, 2025],
+* `days`: [124, 124, 124, 124, 124],
+* `pattern_repeat`: 0, 
+* `pattern_skip`: 0
+
+**Option 2:**
+
+* `years`: [2021],
+* `days`: [124],
+* `pattern_repeat`: 5, 
+* `pattern_skip`: 0
+
+Similarly, if a user wanted to simulate something like cover crop planting or a manure application that happened every 4 years on September 5th starting in 1985, they could provide either of the following two inputs for that operation:
+
+**Option 1:**
+
+* `years`: [1985, 1989, 1993, 1997, 2001, 2005],
+* `days`: [218],
+* `pattern_repeat`: 0, 
+* `pattern_skip`: 0
+
+**Option 2:**
+
+* `years`: [1985],
+* `days`: [218],
+* `pattern_repeat`: 6, 
+* `pattern_skip`: 4
+
+To translate the user-provided information about field schedules into standard data formats, RuFaS generates management schedules via operation specific schedule classes. These schedule classes (`CropSchedule`, `FertilizerSchedule`, `ManureSchedule`, and `TillageSchedule`) are built as child classes from a generic parent class (`Schedule`) that contains functions to expand the user-provided information about the timing of management operations into a list with a Julian day and year for each management operation alongside any operation specific configuration data. 
+
+**Crop specific** management data includes specification of both the planting and harvesting schedule, and whether the harvest operation is a harvest only operation (meaning that the crop continues to grow after harvest) or if it is an event that kills the plant, with or without harvesting the crop. 
+
+**Tillage specific** management information includes the depth of the tillage operation, the amount of surface soil that is mixed into lower parts of the soil profile (`incorporation_fractions`), and the amount of mixing that occurs between soil layers (`mixing_fractions`). 
+
+**Fertilizer application specific** management information includes the proportions of N, P, and K in the fertilizer mixes being used, the proportion of N that is in the form of ammonium (`ammonium_fraction`), the total masses of N, P, and K applied at each application, the application depth, and the fraction of manure that remains on the surface (`surface_remainder_fraction`). 
+\vspace{0.2cm}
+
+**Manure application specific** management information includes the total masses of N, P, and K applied at each manure application, the application depth, and the fraction of fertilizer that remains on the surface (`surface_remainder_fraction`), and an indication of how the model should handle cases where there is not enough manure in storage to meet the manure application request (`supplement_manure Nutrient_Deficiencies`). 
+
+After the user information about the management schedules are translated into complete lists where each list entry is the schedule information for each operation for the entire simulation, these multi-year schedules are then translated into lists where each entry is an individual event for each operation so that the field manager can iterate over this list. The lists of events are then combined with the field and soil data to initialize an instance of a field!
+
+#### Daily Field Management
+
+Each day the main simulation engine calls on the `FieldManager` routine to run its `daily_update_routine()` function which returns a list of harvested crops that can be passed to the Feed Storage Module. The `FieldManager` `daily_update_routine()` function collects the current weather conditions and manure for application to the field where appropriate and calls the Field class `manage_field()` routine which is the primary method in the Field class that steps through all the functions that execute the field management operations. The order of operations called is:
+
+* Fertilizer Application
+* Manure Application
+* Tillage
+* Soil Nutrient Cycling + Crop Growth
+* Crop Management
+    * Transition crops to dormancy
+    * Plant crops
+    * Harvest crops
+    * Update crop and crop residue coverage
+
+Once these daily processes have been executed for each field, the `FieldManager` `daily_update_routine()` function sends all the outputs to the `OutputManager` via the `output_gatherer.send_daily_variables()` function. 
+
+#### Fertilizer Application
+
+The first step in execution of a fertilizer application is to calculate the total mass of fertilizer required to meet the minimum N, P, and K application masses requested for each fertilizer given the specified nutrient composition of the fertilizer mix using the following two methods:
+
+::: {#eq-sc-fld-1 style="font-size:90%"}
+[[**SC.FLD.1**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+&\text{fert\_mass}_\text{nitrogen} = \frac{\text{mass\_requested\_nitrogen}}{\text{fert\_nitrogen\_frac}} \\[8pt]
+&\text{fert\_mass}_\text{phosphorus} = \frac{\text{mass\_requested\_phosphorus}}{\text{fert\_phosphorus\_frac}} \\[8pt]
+&\text{fert\_mass}_\text{potassium} = \frac{\text{mass\_requested\_potassium}}{\text{fert\_potassium\_frac}} 
+\end{aligned}
+$$
+:::     
+    
+::: {#eq-sc-fld-2 style="font-size:90%"}
+[[**SC.FLD.2**]]{.aside .content-visible when-format="html"}
+$$
+\text{applied\_mass} = max(\text{fert\_max}_\text{nitrogen}, \text{fert\_max}_\text{phosphorus}, \text{fert\_max}_\text{potassium}) 
+$$
+::: 
+
+*Where*:
+
+* applied_mass (kg) is the mass of the given fertilizer required to satisfy all nutrient requests.
+* fert_mass<sub>nitrogen</sub> (kg) is the mass nitrogen requested.
+* fert_mass<sub>phosphorus</sub> (kg) is the mass of phosphorus requested.
+* fert_mass<sub>potassium</sub> (kg) is the mass of potassium requested.
+* fert_nitrogen_frac (proportion) is the fraction of nitrogen in the fertilizer mix.
+* fert_phosphorus_frac (proportion) is the fraction of phosphorus in the fertilizer mix.
+* fert_potassium_frac (proportion) is the fraction of potassium in the fertilizer mix.
+
+The mass of each nutrient applied is then calculated as:
+   
+::: {#eq-sc-fld-3 style="font-size:90%"}
+[[**SC.FLD.3**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+&\text{applied\_nitrogen} = \text{applied\_mass} \times \text{fert\_nitrogen\_frac} \\[8pt]
+&\text{applied\_phosphorus} = \text{applied\_mass} \times \text{fert\_phosphorus\_frac} \\[8pt]
+&\text{applied\_potassium} = \text{applied\_mass} \times \text{fert\_potassium\_frac} 
+\end{aligned}
+$$
+:::  
+
+*Where*:
+
+* applied_nitrogen (kg) is the mass of nitrogen applied.
+* applied_phosphorus (kg) is the mass of phosphorus applied.
+* applied_potassium (kg) is the mass of potassium applied.
+
+Once the total fertilizer mass and nutrients associated with a fertilizer application are determined, the fertilizer nitrogen and phosphorus masses are added to the appropriate soil nutrient pools via the `apply_fertilizer()` function in the `FertilizerApplication` class in the `fertilizer_application.py` file. 
+
+::: {.callout-note}
+Note that RuFaS does not currently track soil potassium cycling so the application of potassium with fertilizer is recorded solely as a means of tracking resource use. In the future, we hope to add a soil potassium cycling routine at which point potassium will be added to soil nutrient pools via the `apply_fertilizer()` method in a similar manner as nitrogen and phosphorus.
+:::
+
+Nitrogen and phosphorus are first added to the surface soil layer followed by distribution to the sub-surface layers according to the depth of application. Because soil nutrient pools are tracked in units of kg/ha, the total mass of each nutrient applied to the field is first divided by the field size.
+
+The amount of each nutrient applied to the surface is determined as:
+
+::: {#eq-sc-fld-4 style="font-size:90%"}
+[[**SC.FLD.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{surface\_applied\_nutrient} = \frac{\text{applied\_nutrient} \times \text{surface\_remainder\_fraction}}{\text{field\_size}}
+$$
+::: 
+
+*Where*:
+
+* surface_applied_nutrient (kg/ha) is the mass per ha of each nutrient applied to the surface soil layer.
+* surface_remainder_fraction (proportion) is the user-provided input defining the fraction of the fertilizer that remains on the soil surface.
+* field_size (ha) is the size of the field.
+
+The proportion of the subsurface fertilizer that is applied to each layer is calculated from the relationship between the bottom depth of each soil and the application depth. So, for each layer a “depth factor” is calculated as:
+
+if layer_depth < application_depth:
+::: {#eq-sc-fld-5 style="font-size:90%"}
+[[**SC.FLD.5**]]{.aside .content-visible when-format="html"}
+$$
+\text{depth\_factor} = \frac{\text{layer\_depth}}{\text{application\_depth}} 
+$$
+::: 
+
+Otherwise,
+
+::: {#eq-sc-fld-6 style="font-size:90%"}
+[[**SC.FLD.6**]]{.aside .content-visible when-format="html"}
+$$
+\text{depth\_factor} = 1.0 - \text{depth\_factor\_sum} 
+$$
+::: 
+
+*Where*:
+
+* depth_factor (proportion) is the fraction of subsurface fertilizer added to each soil layer.
+* layer_depth (mm) is the bottom depth of each sub-surface soil layer.
+* depth_factor_sum (proportion) is the sum of the depth factors for all layers above the deepest layer receiving fertilizer.
+
+Thus, the amount of fertilizer added to each nutrient pool in a sub-surface soil layer is: 
+
+::: {style="font-size:90%"}
+$$
+\text{sub\_surface\_applied\_nutrient} = \frac{\text{applied\_nutrient} \times (1 - \text{surface\_remainder\_fraction})}{\text{field\_size}}
+$$
+::: 
+
+::: {style="font-size:90%"}
+$$
+\text{sub\_surface\_applied\_nutrient}_\text{layer\_i} = \text{sub\_surface\_applied\_nutrient} \times \text{depth\_factor}
+$$
+::: 
+
+The soil nutrient pools that receive nitrogen are the soil nitrate and ammonium pools. The proportion of fertilizer nitrogen distributed to each of these pools is determined by the user provided `ammonium_fraction`.
+
+Fertilizer phosphorus is intended to be added to the labile inorganic phosphorus pools to be available for plant uptake. However, phosphorus applied to the surface is not immediately available in this pool and until the first precipitation or irrigation event the phosphorus is gradually sorbed by the soil. Thus, at the time of application, 75% of surface applied fertilizer P is added to the available phosphorus pool for gradual sorption and 25% of the surface applied P is added to the recalcitrant pool which is solubilized during rainfall and either added to the labile phosphorus pool or lost through runoff and leaching.
+
+::: {#eq-sc-fld-7 style="font-size:90%"}
+[[**SC.FLD.7**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+&\text{available\_phosphorus\_pool} = \text{surface\_applied\_phosphorus} \times 0.75 \\[8pt]
+&\text{recalcitrant\_phosphorus\_pool} = \text{surface\_applied\_phosphorus} \times 0.25
+\end{aligned}
+$$
+:::  
+
+#### Manure Application
+
+When the results of the manure nutrient request are passed into the `FieldManager` and then to the Field class daily update routine, the `manage_field()` function can then execute the manure application with the manure nutrients and amount provided by the `ManureModule` via the `SimulationEngine`. If there are any unmet nutrients from the initial, intended application, if the user indicated that these unmet nutrients can be met with synthetic fertilizers, these are supplied by an additional fertilizer application that is initiated by the `handle_unmet_nutrients()` function. 
+
+Once the amount of manure to be applied is known, the `apply_and_record_manure_application()` function first adds the water associated with the manure application. The amount of water in the manure application is determined by the total mass of manure applied and the dry matter fraction of the manure:
+
+::: {#eq-sc-fld-8 style="font-size:90%"}
+[[**SC.FLD.8**]]{.aside .content-visible when-format="html"}
+$$
+\text{manure\_applied\_water} = \frac{\text{manure\_mass\_applied}}{\text{manure\_dry\_matter\_fraction}}
+$$
+::: 
+            
+*Where*:
+
+* `manure_applied_water (L)` is the amount of water applied to the field with a manure application
+
+The amount of water in liters is then converted to the amount in mm by a helper function `convert_liters_to_millimeters()`. 
+
+After the water is applied, the phosphorus and nitrogen from manure are applied via the `apply_machine_manure()` function in the `ManureApplication` class which is implemented in `manure_application.py`. The manure application process is broken out into the surface application which follows methods described by the SurPhos model and the subsurface application [@vadas2007]. 
+
+**Surface Manure Application**
+
+During manure application, the amount of manure applied to the surface is assumed to stay on the surface unless it is a liquid manure with a dry matter content less than 15% in which case infiltration is assumed and the manure nutrients are assumed to be added to the sub-surface layer. Following the methods from the SurPhos model, first the manure solids remaining on the soil surface are calculated [@vadas2007]:
+
+::: {#eq-sc-fld-9 style="font-size:90%"}
+[[**SC.FLD.9**]]{.aside .content-visible when-format="html"}
+$$
+\text{surface\_dry\_matter\_mass} = \text{manure\_dry\_matter\_mass} \times \text{surface\_remainder\_fraction}
+$$
+::: 
+            
+*Where*:
+
+* surface_dry_matter_mass (kg) is the amount of manure solids or dry matter that is applied to the soil surface at that application.
+* manure_dry_matter_mass (kg) is the amount of manure solids or dry matter that is applied at that application.
+* surface_remainder_fraction (kg) is the user-provided value for the amount of the manure applied that remains on the surface.
+
+**Surface Phosphorus Application**
+
+Phosphorus is then distributed to 4 pools (water extractable inorganic phosphorus, water extractable organic phosphorus, stable inorganic phosphorus, stable organic phosphorus) according to the following methods:
+
+First the fractions of each type of phosphorus are calculated assuming that 55% of manure phosphorus is water extractable and 75% of the non-water extractable or stable phosphorus is inorganic: 
+
+::: {#eq-sc-fld-10 style="font-size:90%"}
+[[**SC.FLD.10**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+&\text{water\_extractable\_inorganic\_phosphorus\_fraction} = 0.50 \\[8pt]
+&\text{water\_extractable\_organic\_phosphorus\_fraction} = 0.50 \\[8pt]
+&\text{stable\_phosphorus\_fraction} = 1.0 - (\text{water\_extractable\_inorganic\_phosphorus\_fraction} + \text{water\_extractable\_organic\_phosphorus\_fraction}) \\[8pt]
+&\text{stable\_inorganic\_phosphorus\_fraction} = 0.75 \times \text{stable\_phosphorus\_fraction} \\[8pt]
+&\text{stable\_organic\_phosphorus\_fraction} = 0.25 \times \text{stable\_phosphorus\_fraction}
+\end{aligned}
+$$
+:::  
+
+Then these fractions are multiplied by the total phosphorus applied as well as the product of the infiltration indicator and the surface remainder fraction to obtain the mass of each phosphorus type applied to add the surface or subsurface soil phosphorus layers:
+
+::: {#eq-sc-fld-11 style="font-size:90%"}
+[[**SC.FLD.11**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+\text{mass\_to\_add\_to\_labile\_phos} &= \text{total\_phosphorus\_mass} \times (\text{water\_extractable\_inorganic\_phosphorus\_fraction} \\[8pt]
+&\qquad + (0.95 \times \text{water\_extractable\_organic\_phosphorus\_fraction}) + (0.95 \times \text{stable\_organic\_phosphorus\_fraction})) \\[8pt]
+&\qquad \times \text{soil\_infiltration} \times \text{surface\_remainder\_fraction}
+\end{aligned}
+$$
+::: 
+
+::: {#eq-sc-fld-12 style="font-size:90%"}
+[[**SC.FLD.12**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+\text{mass\_to\_add\_to\_active\_phos} &= \text{total\_phosphorus\_mass} \times \text{stable\_organic\_phosphorus\_fraction} \\[8pt]
+&\qquad \times \text{soil\_infiltration} \times \text{surface\_remainder\_fraction}
+\end{aligned}
+$$
+::: 
+
+*Where*:
+
+* mass_to_add_to_labile_phos (kg) is the phosphorus that will be added to the surface labile phosphorus pool during that application.
+* mass_to_add_to_active_phos (kg) is the phosphorus that will be added to the surface active phosphorus pool during that application.
+* total_phosphorus_mass (kg) is the total phosphorus applied during that application.
+* soil_infiltration is equal to 0.4 if the manure applied is less than 15% dry matter, and 0 otherwise.
+
+The SurPhos manure pool attributes for the manure dry matter mass, moisture factor and field coverage are then updated according to the new field coverage and surface dry matter mass for that application [@vadas2007].
+
+**Surface Nitrogen Application**
+
+The composition of manure nitrogen is provided by the manure module as the fractions that are in inorganic nitrogen, ammonium nitrogen, and organic nitrogen. These fractions are then distributed to the soil nitrate, ammonium, fresh organic nitrogen, and stable organic nitrogen pools according to the following:
+
+::: {#eq-sc-fld-13 style="font-size:90%"}
+[[**SC.FLD.13**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+&\text{mass\_nitrates\_added} = \text{manure\_dry\_matter\_mass} \times \text{inorganic\_nitrogen\_fraction} \times \frac{1-\text{ammonium\_fraction}}{\text{field\_size}} \\[8pt]
+&\text{mass\_ammonium\_added} = \text{manure\_dry\_matter\_mass} \times \text{inorganic\_nitrogen\_fraction} \times \frac{\text{ammonium\_fraction}}{\text{field\_size}} \\[8pt]
+&\text{mass\_fresh\_organic\_nitrogen\_added} = \text{manure\_dry\_matter\_mass} \times \text{organic\_nitrogen\_fraction} \times \frac{\text{fresh\_fraction\_of\_organic\_nitrogen}}{\text{field\_size}} \\[8pt]
+&\text{mass\_stable\_organic\_nitrogen\_added} = 
+\end{aligned}
+$$
+:::  
+
+*Where*:
+
+* mass_nitrates_added (kg N/ha) is the mass of nitrate nitrogen applied to relevant soil layer.
+* mass_ammonium_added (kg N/ha) is the mass of ammonium nitrogen applied to relevant soil layer.
+* mass_fresh_organic_nitrogen_added (kg N/ha) is the mass of fresh organic nitrogen applied to relevant soil layer.
+* mass_stable_organic_nitrogen_added (kg N/ha) is the mass of stable organic nitrogen applied to relevant soil layer.
+* manure_dry_matter_mass (kg) is the mass of manure dry matter added to the soil layer.
+* ammonium_fraction (proportion) is the fraction of inorganic nitrogen that is in the form of ammoniacal nitrogen and is provided by the Manure Module.
+* fresh_fraction_of_organic_nitrogen (proportion) is the fraction of organic nitrogen that is more quickly mineralized and is set to a constant of 0.9286.
+
+The manure mass that is applied to the surface layer is set to the 100% of the `surface_dry_matter_mass` calculated in [SC.FLD.9](#eq-sc-fld-9) if the manure dry matter content is greater than 15%. For liquid manure when the dry matter content is less than 15%, infiltration is assumed and the surface application is set to 60% of the `surface_dry_matter_mass` from [SC.FLD.9](#eq-sc-fld-9) and 40% of the `surface_dry_matter_mass` is assigned to be added to the first sub-surface layer.
+
+**Subsurface Manure Application**
+
+For manure applications where a fraction or all of the manure is applied below the soil surface (i.e. injection) the sub-surface manure application method is followed for the proportion of the application applied below the soil surface. 
+
+The sub-surface fraction of manure application is calculated as:
+
+::: {#eq-sc-fld-14 style="font-size:90%"}
+[[**SC.FLD.14**]]{.aside .content-visible when-format="html"}
+$$
+\text{subsurface\_fraction} = 1.0 - \text{surface\_remainder\_fraction}
+$$
+:::     
+
+to capture all the manure applied that is not accounted for in the surface application methods. 
+
+This value, along with the manure nitrogen and phosphorus compositions and the total masses of manure applied in each application is passed into the `apply_subsurface_manure()` function. 
+
+Calculation of the manure phosphorus masses to be added to different soil phosphorus pools occurs according to the equations described in [SC.FLD.9](#eq-sc-fld-9), [SC.FLD.10](#eq-sc-fld-10), and [SC.FLD.11](#eq-sc-fld-11). 
+
+Similarly, calculation of the manure N mass to be added to the subsurface layers follows the methods described in [SC.FLD.13](#eq-sc-fld-13). 
+
+The method for distributing the `total_phosphorus_mass` and `manure_mass_applied` to the subsurface layers multiplies the manure application masses by the `subsurface_fraction` calculated in [SC.FLD.9](#eq-sc-fld-9) and `depth_factors` calculated using the method described in [SC.FLD.5](#eq-sc-fld-5) and [SC.FLD.6](#eq-sc-fld-6) as in the generic equation below:
+    
+    \begin{center}
+        \(nutrient\_mass\_added\_to\_layer = mass\_applied * nutrient\_fraction
+subsurface\_fraction * depth\_factor\) 
+    \end{center}
+        \vspace{0.5cm} 
+    
+            {\raggedleft \textbf{[SC.FLD.15]}\par}
+            \vspace{0.5cm} 
+
+
+**Tillage Application**
+
+The tillage method mixes nutrient masses from the soil layers to the layers below them and ensures that the nutrients do not get mixed below the bottom of the soil profile.  The `till_soil()` function aggregates all the soil nutrient pools needed to be mixed through tillage including: 
+
+* `labile_inorganic_phosphorus_content`
+* `active_inorganic_phosphorus_content`
+* `stable_inorganic_phosphorus_content`
+* `nitrate_content`
+* `ammonium_content`
+* `active_organic_nitrogen_content`
+* `stable_organic_nitrogen_content`
+* `fresh_organic_nitrogen_content`
+* `metabolic_litter_amount`
+* `structural_litter_amount`
+* `active_carbon_amount`
+* `slow_carbon_amount`
+* `passive_carbon_amount`
+
+It then iterates through these soil nutrient pools and soil layers to redistribute nutrients between the soil pools according to the user provided tillage depth and mixing fraction.
+
+#### Initiate Daily Biophysical Processes
+
+An important step in the `Field classes manage_field()` routine is to initiate the updates to the biophysical processes that are managed by the Soil and Crop classes. This is achieved by the `execute_daily_processes()` method and initiates the following processes:
+
+* Snow accumulation and melting
+* Crop residue and canopy cover update
+* Soil temperature update
+* Soil water and nutrient cycling updates
+* Crop growth updates
+
+#### Crop Management
+
+In managing the crop cycle, the daily updates called by the Field class first check if the crop is meant to go into a dormant stage. 
+
+After initiating any dormancy where appropriate, the Field class then checks to see if any crops are scheduled to be planted that day. If so, it calls on the Crop class to initialize Crop and ensures that the `max_root_depth` attribute of that crop does not allow its roots to go below the bottom of the soil profile.
+
+The last management practice the Field class checks is the harvesting event schedule. If a harvest event is scheduled for that day, it initiates the harvest method in the Crop class and updates its list of crops to remove the harvested and killed crops from its list of crops. 
+
+
+## Soil Management 
+
+### Introduction 
+
+### Methodology
+
+### Soil Erosion
+
+### Soil Nitrogen
+
+### Soil Phosphorus Cycling
+
+### Soil Carbon Cycling
+
+#### Relevant Inputs
+
+#### Relevant Outputs
+
+
+
+
+## Crop Management 
+
+### Introduction
+
+### Methodology
+
+## References
