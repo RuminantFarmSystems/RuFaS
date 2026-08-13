@@ -1550,6 +1550,28 @@ class Animal:
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
 
+    def _is_calving_today(self) -> bool:
+        """
+        Determines whether a currently-dry cow calves during today's daily routine.
+
+        Returns
+        -------
+        bool
+            True if the cow is dry (``days_in_milk == 0``) and reaches the end of gestation today,
+            meaning the reproduction update will start a new lactation later in the routine.
+
+        Notes
+        -----
+        This mirrors the calving condition used by the reproduction update
+        (pregnant and ``days_in_pregnancy == gestation_length``). Because milking runs before
+        reproduction within a daily routine, this lets the milking update record the first day in
+        milk (DIM = 1) on the calving day instead of a dry-day record. It intentionally excludes
+        lactating cows (``days_in_milk > 0``), leaving the rare dry-off-and-calve-same-day case to
+        the existing ``_determine_days_in_milk`` handling.
+
+        """
+        return self.days_in_milk == 0 and self.is_pregnant and self.days_in_pregnancy == self.gestation_length
+
     def daily_milking_update(self, time: RufasTime) -> None:
         """
         Performs the daily milk production update.
@@ -1572,6 +1594,7 @@ class Animal:
             days_in_milk=self.days_in_milk,
             days_born=self.days_born,
             days_in_pregnancy=self.days_in_pregnancy,
+            just_calved=self._is_calving_today(),
         )
         milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
             milk_production_inputs, time
@@ -2222,6 +2245,7 @@ class Animal:
 
         wood_parameters = LactationCurve.get_wood_parameters(self.calves)
         self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
+        self.milk_production.record_first_day_in_milk(self.days_born, time)
         return newborn_calf_config
 
     def get_animal_values(

@@ -2077,6 +2077,51 @@ def test_daily_milking_update_is_cow(mock_lactating_cow: Animal, mocker: MockerF
     assert mock_lactating_cow.events.events == {}
 
 
+@pytest.mark.parametrize(
+    "days_in_milk, days_in_pregnancy, gestation_length, expected",
+    [
+        (0, 280, 280, True),  # Dry cow reaching end of gestation today -> calves
+        (0, 279, 280, False),  # Dry cow still pregnant, not yet at gestation length
+        (0, 0, 0, False),  # Dry, not pregnant
+        (10, 280, 280, False),  # Still lactating at end of gestation -> handled elsewhere
+    ],
+)
+def test_is_calving_today(
+    mock_lactating_cow: Animal,
+    days_in_milk: int,
+    days_in_pregnancy: int,
+    gestation_length: int,
+    expected: bool,
+) -> None:
+    """A dry cow that reaches the end of gestation today is detected as calving."""
+    cow = mock_lactating_cow
+    cow.days_in_milk = days_in_milk
+    cow.days_in_pregnancy = days_in_pregnancy
+    cow.gestation_length = gestation_length
+
+    assert cow._is_calving_today() is expected
+
+
+def test_daily_milking_update_passes_just_calved_flag(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    """The calving-day flag from ``_is_calving_today`` is forwarded to the milking update."""
+    cow = mock_lactating_cow
+    cow.days_in_milk = 0
+    cow.days_in_pregnancy = 280
+    cow.gestation_length = 280
+
+    mock_perform = mocker.patch.object(
+        MilkProduction,
+        "perform_daily_milking_update",
+        return_value=MilkProductionOutputs(events=AnimalEvents(), days_in_milk=0),
+    )
+    mock_time = MagicMock(RufasTime)
+
+    cow.daily_milking_update(mock_time)
+
+    inputs_arg, _time_arg = mock_perform.call_args[0]
+    assert inputs_arg.just_calved is True
+
+
 def test_daily_milking_update_without_history_non_cow_does_nothing(
     mock_calf: Animal,
     mocker: MockerFixture,
@@ -2678,6 +2723,7 @@ def test_transition_heiferIII_to_cow(mock_lactating_cow: Animal, mocker: MockerF
     mocker.patch.object(Animal, "calves", new_callable=PropertyMock, return_value=2)
     mock_time = MagicMock(spec=RufasTime)
     mock_set = mocker.patch.object(MilkProduction, "set_wood_parameters")
+    mock_record_first_day = mocker.patch.object(MilkProduction, "record_first_day_in_milk")
     mock_wood_param = mocker.patch.object(
         LactationCurve,
         "get_wood_parameters",
@@ -2713,6 +2759,7 @@ def test_transition_heiferIII_to_cow(mock_lactating_cow: Animal, mocker: MockerF
     mock_wood_param.assert_called_once_with(2)
     mock_update.assert_called_once_with(mock_time)
     mock_set.assert_called_once()
+    mock_record_first_day.assert_called_once_with(mock_lactating_cow.days_born, mock_time)
     assert result == NewBornCalfValuesTypedDict(
         breed="test_breed",
         animal_type="test_type",
