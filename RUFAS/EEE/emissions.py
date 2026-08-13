@@ -638,98 +638,110 @@ class EmissionsEstimator:
 
         harvest_dates_by_feed_id = self._calculate_harvest_dates_by_feed_id(harvest_yield_by_field)
 
-        harvest_details_by_harvest_dates = {}
+        #harvest_details_by_harvest_dates = {}
+        #for field_name, harvest_dates in harvest_yield_by_field.items():
+        #    for harvest_date in harvest_dates:
+        #        harvest_details_by_harvest_dates[harvest_date] = harvest_yield_by_field[field_name][harvest_date]
+
+
+        harvest_details_by_harvest_dates = defaultdict(list)
+
         for field_name, harvest_dates in harvest_yield_by_field.items():
             for harvest_date in harvest_dates:
-                harvest_details_by_harvest_dates[harvest_date] = harvest_yield_by_field[field_name][harvest_date]
+                harvest_details_by_harvest_dates[harvest_date].append({
+                    "field_name": field_name,
+                    "details": harvest_yield_by_field[field_name][harvest_date],
+                })
+
         last_harvest_date_by_field = {field_name: -1 for field_name in harvest_yield_by_field}
 
-        for harvest_date in sorted(harvest_details_by_harvest_dates.keys()):
-            harvest_details = harvest_details_by_harvest_dates[harvest_date]
-            feed_id = harvest_details["feed_id"]
-            field_name = harvest_details["field_name"]
-            harvest_type = harvest_details["harvest_type"]
-            last_harvest_date_for_current_field = last_harvest_date_by_field[field_name]
-            if feed_id is None:
-                if harvest_type != "kill_only":
-                    last_harvest_date_by_field[field_name] = harvest_date
-                continue
+        for harvest_date, harvest_records in sorted(harvest_details_by_harvest_dates.items()):
+            for record in harvest_records:
+                harvest_details = record['details']
+                feed_id = harvest_details["feed_id"]
+                field_name = harvest_details["field_name"]
+                harvest_type = harvest_details["harvest_type"]
+                last_harvest_date_for_current_field = last_harvest_date_by_field[field_name]
+                if feed_id is None:
+                    if harvest_type != "kill_only":
+                        last_harvest_date_by_field[field_name] = harvest_date
+                    continue
 
-            total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["nitrous_oxide_emissions"] += sum(
-                [
-                    emission_data["nitrous_oxide_emissions"][field_name][simulation_day]
-                    for simulation_day in emission_data["nitrous_oxide_emissions"][field_name]
-                    if last_harvest_date_for_current_field < simulation_day <= harvest_date
-                ],
-                start=0.0,
-            )
-            total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["ammonia_emissions"] += sum(
-                [
-                    emission_data["ammonia_emissions"][field_name][simulation_day]
-                    for simulation_day in emission_data["ammonia_emissions"][field_name]
-                    if last_harvest_date_for_current_field < simulation_day <= harvest_date
-                ],
-                start=0.0,
-            )
-            if field_name in resource_data.get("fertilizer_applications", {}):
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_N"] += sum(
+                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["nitrous_oxide_emissions"] += sum(
                     [
-                        resource_data["fertilizer_applications"][field_name][simulation_day]["nitrogen"]
-                        for simulation_day in resource_data["fertilizer_applications"][field_name]
+                        emission_data["nitrous_oxide_emissions"][field_name][simulation_day]
+                        for simulation_day in emission_data["nitrous_oxide_emissions"][field_name]
                         if last_harvest_date_for_current_field < simulation_day <= harvest_date
                     ],
                     start=0.0,
                 )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_P"] += sum(
+                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["ammonia_emissions"] += sum(
                     [
-                        resource_data["fertilizer_applications"][field_name][simulation_day]["phosphorus"]
-                        for simulation_day in resource_data["fertilizer_applications"][field_name]
+                        emission_data["ammonia_emissions"][field_name][simulation_day]
+                        for simulation_day in emission_data["ammonia_emissions"][field_name]
                         if last_harvest_date_for_current_field < simulation_day <= harvest_date
                     ],
                     start=0.0,
                 )
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_K"] += sum(
-                    [
-                        resource_data["fertilizer_applications"][field_name][simulation_day]["potassium"]
-                        for simulation_day in resource_data["fertilizer_applications"][field_name]
-                        if last_harvest_date_for_current_field < simulation_day <= harvest_date
-                    ],
-                    start=0.0,
+                if field_name in resource_data.get("fertilizer_applications", {}):
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_N"] += sum(
+                        [
+                            resource_data["fertilizer_applications"][field_name][simulation_day]["nitrogen"]
+                            for simulation_day in resource_data["fertilizer_applications"][field_name]
+                            if last_harvest_date_for_current_field < simulation_day <= harvest_date
+                        ],
+                        start=0.0,
+                    )
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_P"] += sum(
+                        [
+                            resource_data["fertilizer_applications"][field_name][simulation_day]["phosphorus"]
+                            for simulation_day in resource_data["fertilizer_applications"][field_name]
+                            if last_harvest_date_for_current_field < simulation_day <= harvest_date
+                        ],
+                        start=0.0,
+                    )
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["fertilizer_K"] += sum(
+                        [
+                            resource_data["fertilizer_applications"][field_name][simulation_day]["potassium"]
+                            for simulation_day in resource_data["fertilizer_applications"][field_name]
+                            if last_harvest_date_for_current_field < simulation_day <= harvest_date
+                        ],
+                        start=0.0,
+                    )
+                if field_name in resource_data.get("manure_applications", {}):
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["manure_N"] += sum(
+                        [
+                            resource_data["manure_applications"][field_name][simulation_day]["nitrogen"]
+                            for simulation_day in resource_data["manure_applications"][field_name]
+                            if last_harvest_date_for_current_field < simulation_day <= harvest_date
+                        ],
+                        start=0.0,
+                    )
+
+                next_harvest_date_for_feed_id = (
+                    harvest_dates_by_feed_id[feed_id][harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1]
+                    if harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1
+                    < len(harvest_dates_by_feed_id[feed_id])
+                    else max(all_simulation_days)
                 )
-            if field_name in resource_data.get("manure_applications", {}):
-                total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]["manure_N"] += sum(
-                    [
-                        resource_data["manure_applications"][field_name][simulation_day]["nitrogen"]
-                        for simulation_day in resource_data["manure_applications"][field_name]
-                        if last_harvest_date_for_current_field < simulation_day <= harvest_date
-                    ],
-                    start=0.0,
-                )
 
-            next_harvest_date_for_feed_id = (
-                harvest_dates_by_feed_id[feed_id][harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1]
-                if harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1
-                   < len(harvest_dates_by_feed_id[feed_id])
-                else max(all_simulation_days)
-            )
+                total_harvest_dry_yield_by_feed_id[feed_id] += harvest_details["dry_yield"]
+                total_dry_yield = total_harvest_dry_yield_by_feed_id[feed_id]
+                total_emission_and_resource = total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]
 
-            total_harvest_dry_yield_by_feed_id[feed_id] += harvest_details["dry_yield"]
-            total_dry_yield = total_harvest_dry_yield_by_feed_id[feed_id]
-            total_emission_and_resource = total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]
+                for simulation_day in range(harvest_date, next_harvest_date_for_feed_id + 1):
+                    daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][simulation_day] = {
+                        "nitrous_oxide_emissions": (
+                                total_emission_and_resource["nitrous_oxide_emissions"] / total_dry_yield
+                        ),
+                        "ammonia_emissions": (total_emission_and_resource["ammonia_emissions"] / total_dry_yield),
+                        "fertilizer_N": (total_emission_and_resource["fertilizer_N"] / total_dry_yield),
+                        "fertilizer_P": (total_emission_and_resource["fertilizer_P"] / total_dry_yield),
+                        "fertilizer_K": (total_emission_and_resource["fertilizer_K"] / total_dry_yield),
+                        "manure_N": (total_emission_and_resource["manure_N"] / total_dry_yield),
+                    }
 
-            for simulation_day in range(harvest_date, next_harvest_date_for_feed_id + 1):
-                daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][simulation_day] = {
-                    "nitrous_oxide_emissions": (
-                            total_emission_and_resource["nitrous_oxide_emissions"] / total_dry_yield
-                    ),
-                    "ammonia_emissions": (total_emission_and_resource["ammonia_emissions"] / total_dry_yield),
-                    "fertilizer_N": (total_emission_and_resource["fertilizer_N"] / total_dry_yield),
-                    "fertilizer_P": (total_emission_and_resource["fertilizer_P"] / total_dry_yield),
-                    "fertilizer_K": (total_emission_and_resource["fertilizer_K"] / total_dry_yield),
-                    "manure_N": (total_emission_and_resource["manure_N"] / total_dry_yield),
-                }
-
-            last_harvest_date_by_field[field_name] = harvest_date
+                last_harvest_date_by_field[field_name] = harvest_date
 
         for (
             feed_id,
