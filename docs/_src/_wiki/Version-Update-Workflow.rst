@@ -17,8 +17,9 @@ updates are:
   1. A high-level summary of the outcomes of the SME Review with a link to the full report
   2. A summary of the changelog
 
-The Release Notes and full Technical Report will be posted alongside the release tag.
-(e.g. see the tag for `v1.0.0 <https://github.com/RuminantFarmSystems/RuFaS/releases/tag/v1.0.0>` ) 
+The Release Notes and full Technical Report will be posted alongside the release tag
+(see e.g. the tag for `v1.0.0 <https://github.com/RuminantFarmSystems/RuFaS/releases/tag/v1.0.0>` ), as well as
+in the :doc: `Release Notes Section <https://ruminantfarmsystems.github.io/RuFaS/_wiki/_release_notes/index.html> ` of this site. 
 
 Before Merging ``dev`` to ``test``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
