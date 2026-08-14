@@ -637,13 +637,6 @@ class EmissionsEstimator:
         }
 
         harvest_dates_by_feed_id = self._calculate_harvest_dates_by_feed_id(harvest_yield_by_field)
-
-        #harvest_details_by_harvest_dates = {}
-        #for field_name, harvest_dates in harvest_yield_by_field.items():
-        #    for harvest_date in harvest_dates:
-        #        harvest_details_by_harvest_dates[harvest_date] = harvest_yield_by_field[field_name][harvest_date]
-
-
         harvest_details_by_harvest_dates = defaultdict(list)
 
         for field_name, harvest_dates in harvest_yield_by_field.items():
@@ -718,10 +711,12 @@ class EmissionsEstimator:
                         start=0.0,
                     )
 
+                future_harvest_dates_for_feed_id = [
+                    date for date in harvest_dates_by_feed_id[feed_id] if date > harvest_date
+                ]
                 next_harvest_date_for_feed_id = (
-                    harvest_dates_by_feed_id[feed_id][harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1]
-                    if harvest_dates_by_feed_id[feed_id].index(harvest_date) + 1
-                    < len(harvest_dates_by_feed_id[feed_id])
+                    min(future_harvest_dates_for_feed_id)
+                    if future_harvest_dates_for_feed_id
                     else max(all_simulation_days)
                 )
 
