@@ -44,6 +44,8 @@ class E2ETestResultsHandler:
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
 
+        E2ETestResultsHandler.average_test_results()
+
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
             om.add_log(
@@ -93,6 +95,174 @@ class E2ETestResultsHandler:
             info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": path_set.domain})
             for comparison_type, difference in filtered_diff.items():
                 om.add_variable(comparison_type, difference, info_map)
+
+    @staticmethod
+    def average_test_results(
+        e2e_group: str,
+        e2e_runs: list[dict[str, Any]],
+    ) -> Path:
+        if not e2e_runs:
+            raise ValueError(
+                f"Cannot average E2E results for '{e2e_group}' because no runs were provided."
+            )
+
+        json_output_directory = Path(e2e_runs[0]["json_output_directory"])
+
+        result_paths: list[Path] = []
+
+        for run in e2e_runs:
+            run_output_prefix = run["output_prefix"]
+
+            matching_paths = [
+                path
+                for path in json_output_directory.iterdir()
+                if path.name.startswith(run_output_prefix)
+            ]
+
+            if len(matching_paths) != 1:
+                raise ValueError(
+                    f"Expected exactly one E2E result file for '{run_output_prefix}', "
+                    f"but found {len(matching_paths)}."
+                )
+
+            result_paths.append(matching_paths[0])
+
+        test_results: list[dict[str, Any]] = []
+
+        for result_path in result_paths:
+            with open(result_path, "r", encoding="utf-8") as result_file:
+                test_results.append(json.load(result_file))
+
+        reference_results = test_results[0]
+        reference_keys = set(reference_results)
+
+        for result_path, result in zip(result_paths[1:], test_results[1:]):
+            result_keys = set(result)
+
+            if result_keys != reference_keys:
+                missing_keys = reference_keys - result_keys
+                unexpected_keys = result_keys - reference_keys
+
+                raise ValueError(
+                    f"E2E result structure does not match for '{result_path}'. "
+                    f"Missing keys: {sorted(missing_keys)}. "
+                    f"Unexpected keys: {sorted(unexpected_keys)}."
+                )
+
+        averaged_results: dict[str, Any] = {}
+
+        for output_name, reference_output in reference_results.items():
+            matching_outputs = [
+                result[output_name]
+                for result in test_results
+            ]
+
+            if output_name == "DISCLAIMER":
+                if not all(
+                    output == reference_output
+                    for output in matching_outputs
+                ):
+                    raise ValueError(
+                        "DISCLAIMER values differ between E2E test runs."
+                    )
+
+                averaged_results[output_name] = reference_output
+                continue
+
+            if not isinstance(reference_output, dict) or "values" not in reference_output:
+                if not all(
+                    output == reference_output
+                    for output in matching_outputs
+                ):
+                    raise ValueError(
+                        f"Non-standard E2E output '{output_name}' differs between runs."
+                    )
+
+                averaged_results[output_name] = reference_output
+                continue
+
+            reference_values = reference_output["values"]
+
+            for result_path, output in zip(result_paths, matching_outputs):
+                if not isinstance(output, dict) or "values" not in output:
+                    raise ValueError(
+                        f"E2E output '{output_name}' in '{result_path}' does not "
+                        "contain a 'values' list."
+                    )
+
+                if len(output["values"]) != len(reference_values):
+                    raise ValueError(
+                        f"E2E output '{output_name}' has {len(output['values'])} values "
+                        f"in '{result_path}', but {len(reference_values)} were expected."
+                    )
+
+            averaged_values: list[Any] = []
+
+            for index, reference_value in enumerate(reference_values):
+                matching_values = [
+                    output["values"][index]
+                    for output in matching_outputs
+                ]
+
+                is_numeric = (
+                    isinstance(reference_value, Number)
+                    and not isinstance(reference_value, bool)
+                )
+
+                if is_numeric:
+                    if not all(
+                        isinstance(value, Number) and not isinstance(value, bool)
+                        for value in matching_values
+                    ):
+                        raise ValueError(
+                            f"E2E output '{output_name}' has inconsistent value types "
+                            f"at index {index}: {matching_values}."
+                        )
+
+                    numeric_values = [
+                        float(value)
+                        for value in matching_values
+                        if not math.isnan(float(value))
+                    ]
+
+                    averaged_value = (
+                        sum(numeric_values) / len(numeric_values)
+                        if numeric_values
+                        else float("nan")
+                    )
+
+                    averaged_values.append(averaged_value)
+
+                else:
+                    if not all(
+                        value == reference_value
+                        for value in matching_values
+                    ):
+                        raise ValueError(
+                            f"Non-numeric values differ for E2E output "
+                            f"'{output_name}' at index {index}: {matching_values}."
+                        )
+
+                    averaged_values.append(reference_value)
+
+            averaged_results[output_name] = {
+                **reference_output,
+                "values": averaged_values,
+            }
+
+        averaged_result_path = (
+            json_output_directory
+            / f"{e2e_group}_averaged.json"
+        )
+
+        with open(averaged_result_path, "w", encoding="utf-8") as averaged_file:
+            json.dump(
+                averaged_results,
+                averaged_file,
+                separators=(",", ":"),
+            )
+
+        return averaged_result_path
 
     @staticmethod
     def _convert_expected_result_variable_names(

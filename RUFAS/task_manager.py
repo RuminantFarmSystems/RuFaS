@@ -1,3 +1,4 @@
+from collections import defaultdict
 from importlib.metadata import PackageNotFoundError, version as get_installed_version
 import multiprocessing
 import random
@@ -88,7 +89,7 @@ class TaskType(Enum):
         bool
             Whether the task type involves multiple runs.
         """
-        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS]
+        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS, TaskType.END_TO_END_TESTING]
 
 
 class TaskManager:
@@ -231,6 +232,16 @@ class TaskManager:
                 " JSON.\n"
             )
         if is_end_to_end_test_task:
+            e2e_groups = self._group_end_to_end_testing_runs(runnable_args)
+            for e2e_group, e2e_runs in e2e_groups.items():
+                self._process_end_to_end_testing_group(
+                    e2e_group,
+                    e2e_runs,
+                    produce_graphics,
+                    metadata_depth_limit,
+                    output_directory,
+                    verbosity,
+                )
             output_prefixes: list[str] = [runnable_args[i]["output_prefix"] for i in range(len(runnable_args))]
             self.output_manager.add_log(
                 "Summarizing e2e test results",
@@ -452,6 +463,7 @@ class TaskManager:
         task_type_to_expander_map = {
             TaskType.SIMULATION_MULTI_RUN: self._expand_simulation_multi_run_args,
             TaskType.SENSITIVITY_ANALYSIS: self._expand_sensitivity_analysis_args,
+            TaskType.END_TO_END_TESTING: self._expand_end_to_end_testing_args,
         }
         for multi_run_arg in multi_run_args:
             task_type = multi_run_arg["task_type"]
@@ -483,7 +495,7 @@ class TaskManager:
         for i in range(multi_run_args["multi_run_counts"]):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
-            new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
+            new_args["random_seeds"] = [random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)]
             new_args["output_prefix"] = f"{new_args['output_prefix']} run {i + 1}"
             single_run_args.append(new_args)
 
@@ -523,7 +535,8 @@ class TaskManager:
           ``"morris"`` samplers.
         - ``skip_values`` : int — number of initial Sobol sequence values to skip;
           required for ``"sobol"`` sampler.
-        - ``random_seed`` : int — seed for the sampler.
+        - ``random_seeds`` : list[int] — Random seeds available to the task. The first seed is used to initialize
+            the sensitivity analysis sampler..
         - ``SA_load_balancing_start`` : float — fractional start of the sample
           range to process (0.0–1.0).
         - ``SA_load_balancing_stop`` : float — fractional end of the sample range
@@ -556,18 +569,18 @@ class TaskManager:
 
         if multi_run_args["sampler"] == "fractional_factorial":
             sampled_values = fractional_factorial_sampler.sample(
-                parsed_SA_input_variables, seed=multi_run_args["random_seed"]
+                parsed_SA_input_variables, seed=multi_run_args["random_seeds"][0]
             )
         elif multi_run_args["sampler"] == "sobol":
             sampled_values = sobol_sampler.sample(
                 parsed_SA_input_variables,
                 multi_run_args["sampler_n"],
                 skip_values=multi_run_args["skip_values"],
-                seed=multi_run_args["random_seed"],
+                seed=multi_run_args["random_seeds"][0],
             )
         elif multi_run_args["sampler"] == "morris":
             sampled_values = morris_sampler.sample(
-                parsed_SA_input_variables, multi_run_args["sampler_n"], seed=multi_run_args["random_seed"]
+                parsed_SA_input_variables, multi_run_args["sampler_n"], seed=multi_run_args["random_seeds"][0]
             )
         else:
             self.output_manager.add_log(
@@ -601,6 +614,27 @@ class TaskManager:
             single_run_args.append(new_args)
 
         return single_run_args
+
+    def _expand_end_to_end_testing_args(
+        self,
+        e2e_args: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Expand one E2E scenario into one runnable task per random seed."""
+        expanded_args = []
+
+        base_output_prefix = e2e_args["output_prefix"]
+
+        for run_number, random_seed in enumerate(e2e_args["random_seeds"], start=1):
+            new_args = e2e_args.copy()
+
+            new_args["random_seed"] = random_seed
+            new_args["e2e_group"] = base_output_prefix
+            new_args["e2e_run_number"] = run_number
+            new_args["output_prefix"] = f"{base_output_prefix}_run_{run_number}"
+
+            expanded_args.append(new_args)
+
+        return expanded_args
 
     def _run_tasks(
         self,
@@ -711,7 +745,7 @@ class TaskManager:
             ``output_prefix``, ``log_verbosity``, ``exclude_info_maps``,
             ``chunkification``, ``maximum_memory_usage_percent``,
             ``maximum_memory_usage``, ``save_chunk_threshold_call_count``,
-            ``filters_directory``, ``random_seed``, and ``logs_directory``.
+            ``filters_directory``, ``random_seeds``, and ``logs_directory``.
         produce_graphics : bool
             Whether to produce graphics output for the task.
         workers : int
@@ -813,7 +847,7 @@ class TaskManager:
             filters_path = Path(args["filters_directory"])
             output_manager.validate_filter_constant_content(filters_path)
 
-            TaskManager.set_random_seed(args["random_seed"], output_manager)
+            TaskManager.set_random_seed(args["random_seeds"][0], output_manager)
 
             handler = simulation_and_analysis_handlers.get(task_type)
             if handler:
@@ -909,6 +943,34 @@ class TaskManager:
         simulator.simulate()
 
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
+
+    def _group_end_to_end_testing_runs(self, runnable_args: dict[str, Any]) -> dict[str, list[dict[str, Any]]]
+        """Helper function to group together end to end testing runs by simulation type."""
+        e2e_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for args in runnable_args:
+            if args["task_type"] == TaskType.END_TO_END_TESTING:
+                e2e_groups[args["e2e_group"]].append(args)
+        return e2e_groups
+
+    def _process_end_to_end_testing_group(
+            self,
+            e2e_group: str,
+            e2e_runs: list[dict[str, Any]],
+            produce_graphics: bool,
+            metadata_depth_limit: int,
+            output_directory: Path,
+            verbosity: LogVerbosity,
+        ) -> None:
+        """Handles averaging of e2e results by simulation type and e2e results comparison."""
+        comparison_output_manager = OutputManager()
+        averaged_results_path = E2ETestResultsHandler.average_test_results(
+            e2e_group=e2e_group,
+            e2e_runs=e2e_runs
+        )
+        E2ETestResultsHandler.compare_actual_and_expected_test_results(
+            actual_results_path=averaged_results_path,
+            ...
+        )
 
     @staticmethod
     def _handle_end_to_end_testing(

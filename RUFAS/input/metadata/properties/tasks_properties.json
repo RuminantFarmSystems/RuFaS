@@ -175,12 +175,16 @@
           "description": "The path to a JSON files to load the Output Manager's pool from for post processing",
           "default": ""
         },
-        "random_seed": {
-          "type": "number",
-          "description": "The random seed, set it to 0 to auto-generate it",
-          "minimum": 0,
-          "maximum": 4294967295,
-          "default": 0
+        "random_seeds": {
+          "type": "array",
+          "description": "The random seeds used for single or multi simulation runs.",
+          "properties": {
+            "type": "number",
+            "description": "The random seed, set it to 0 to auto-generate it",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "default": 0
+          }
         },
         "chunkification": {
           "type": "bool",
