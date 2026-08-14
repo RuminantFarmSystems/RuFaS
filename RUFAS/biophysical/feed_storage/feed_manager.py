@@ -300,6 +300,40 @@ class FeedManager:
                 next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
         return next_harvest_dates_rufas_ids
 
+    def stock_initial_storage_contents(
+        self, initial_contents_by_storage_name: dict[str, dict[str, float]], time: RufasTime
+    ) -> None:
+        """
+        Stocks storages with the initial contents specified for them, if any.
+
+        Parameters
+        ----------
+        initial_contents_by_storage_name : dict[str, dict[str, float]]
+            The dry matter mass and composition each storage holds when the simulation starts, keyed by storage
+            instance name. Storages that are not named start empty.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation. This should be called at the start of
+            the simulation, before any daily routines run.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.stock_initial_storage_contents.__name__,
+        }
+        storage_time = time.current_date.date()
+        for storage_name, initial_contents in initial_contents_by_storage_name.items():
+            if storage_name not in self.active_storages:
+                self._om.add_warning(
+                    "Unknown storage in initial feed storage contents",
+                    f"Storage '{storage_name}' has initial contents specified, but no active storage with that name "
+                    "exists. These contents will not be stocked.",
+                    info_map,
+                )
+                continue
+            self.active_storages[storage_name].stock_initial_contents(
+                initial_contents, storage_time, time.simulation_day
+            )
+
     def receive_crop(
         self,
         harvested_crop: HarvestedCrop,
