@@ -21,7 +21,7 @@
 	  "coverage_fraction": 1.0,
 	  "application_depth": 0.0,
 	  "surface_remainder_fraction": 1.0,
-	  "manure_type": "liquid",
+	  "manure_type": "solid",
 	  "supplement_manure_nutrient_deficiencies": "none"
 	}
 }
