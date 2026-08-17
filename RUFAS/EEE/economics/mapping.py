@@ -471,14 +471,12 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             "Electricity production from anaerobic digester": {
                 "biophysical_simulation": [r"Manure\.Digester\.energy\..*\.electricity_produced_kwh"],
                 "economics_files": ["commodity_prices_elec_industrial_dollar_per_kwh"],
-                "aggregate_by_year": True,
                 "notes": "Daily electricity generated per digester (kWh) is summed by year and priced at the "
                 "industrial electricity rate for that year.",
             },
             "Renewable natural gas (RNG) production": {
                 "biophysical_simulation": [r"Manure\.Digester\.energy\..*\.rng_produced_megajoules"],
                 "economics_files": ["commodity_prices_natgas_industrial_dollar_per_megajoule"],
-                "aggregate_by_year": True,
                 "notes": "Daily RNG generated per digester (MJ) is summed by year and priced at the industrial "
                 "natural gas rate for that year.",
             },

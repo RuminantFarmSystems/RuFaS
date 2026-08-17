@@ -23,9 +23,7 @@ per-item special casing.
 from __future__ import annotations
 
 import re
-from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set
 
@@ -34,7 +32,10 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
 from RUFAS.EEE.economics.preprocessing_context import PreprocessingContext
-from RUFAS.EEE.economics.special_cases import SpecialCaseHandler, SeedCostHandler
+from RUFAS.EEE.economics.special_cases import (
+    SpecialCaseHandler,
+    DigesterRevenueHandler,
+)
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -46,7 +47,7 @@ from RUFAS.EEE.economics.fallback_values import (
 COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
 
 SPECIAL_CASE_HANDLERS: list[type[SpecialCaseHandler]] = [
-    SeedCostHandler,
+    DigesterRevenueHandler,
 ]
 
 
@@ -63,7 +64,6 @@ class EconomicItem:
     match_source: str | None
     wildcard_value_map: Dict[str, str] | None
     preprocessing: str | None
-    aggregate_by_year: bool
 
 
 class EconomicPreprocessor:
@@ -78,11 +78,19 @@ class EconomicPreprocessor:
         self.mapping = self._build_mapping()
         self.special_case_handlers = self._build_special_case_handlers()
 
-    def _build_special_case_handlers(self) -> dict[tuple[str, str], SpecialCaseHandler]:
-        """Instantiate registered special-case handlers keyed by ``(section, name)``."""
+    def _build_special_case_handlers(self) -> Dict[tuple[str, str], SpecialCaseHandler]:
+        """Instantiate registered special-case handlers keyed by ``(section, name)``.
 
-        handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
-        return {handler.key: handler for handler in handlers}
+        A handler that owns several line items contributes one entry per pair in
+        its :attr:`~RUFAS.EEE.economics.special_cases.base.SpecialCaseHandler.keys`.
+        """
+
+        handlers: Dict[tuple[str, str], SpecialCaseHandler] = {}
+        for handler_cls in SPECIAL_CASE_HANDLERS:
+            handler = handler_cls(self.context)
+            for key in handler.keys:
+                handlers[key] = handler
+        return handlers
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""
@@ -103,7 +111,6 @@ class EconomicPreprocessor:
                     economics_files = details.get("economics_files")
                     match_source = details.get("match_source")
                     wildcard_value_map = details.get("wildcard_value_map")
-                    aggregate_by_year = bool(details.get("aggregate_by_year", False))
                     if not biophysical_simulation and not input_manager and not economics_files:
                         continue
                     if isinstance(biophysical_simulation, str):
@@ -121,7 +128,6 @@ class EconomicPreprocessor:
                             match_source=match_source,
                             wildcard_value_map=wildcard_value_map if isinstance(wildcard_value_map, dict) else None,
                             preprocessing=preprocessing,
-                            aggregate_by_year=aggregate_by_year,
                         )
                     )
         return items
@@ -365,40 +371,6 @@ class EconomicPreprocessor:
                 self._append_from_payload(values, data)
         return values, exact_match_values
 
-    def _extract_price_values(self, price_data: Any) -> List[float]:
-        """Extract numeric price values from pricing payloads."""
-
-        info_map = {"class": self.__class__.__name__, "function": self._extract_price_values.__name__}
-        start_year: int = int(self.im.get_data("config.start_date").split(":")[0])
-        end_year: int = int(self.im.get_data("config.end_date").split(":")[0])
-        fips_code: int = self.im.get_data("config.FIPS_county_code")
-        values: List[float] = []
-        for key, value in price_data.items():
-            if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
-                self.om.add_warning(
-                    "MissingPriceData",
-                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format."
-                    "Using fallback price.",
-                    info_map,
-                )
-                values.extend(self.context.get_fallback_price(start_year, end_year, key))
-                continue
-            fips_idx = value["fips"].index(fips_code)
-            for year in range(start_year, end_year + 1):
-                try:
-                    price = value[f"{year}"][fips_idx]
-                    values.append(price)
-                except (KeyError, IndexError):
-                    self.om.add_warning(
-                        "MissingPriceData",
-                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
-                        "Using fallback price.",
-                        info_map,
-                    )
-                    values.extend(self.context.get_fallback_price(start_year, end_year, key))
-                    continue
-        return values
-
     def _infer_flow_type(self, item: EconomicItem) -> str | None:
         """Infer if an item is a revenue or cost based on naming conventions."""
 
@@ -414,109 +386,6 @@ class EconomicPreprocessor:
         if "_inputs" in haystack:
             return "cost"
         return None
-
-    def _fetch_prices(self, economics_files: Any) -> Dict[str, Any]:
-        """Collect commodity pricing using the InputManager."""
-
-        prices: Dict[str, Any] = {}
-        info_map = {"class": self.__class__.__name__, "function": self._fetch_prices.__name__}
-
-        if economics_files is None:
-            return prices
-
-        if isinstance(economics_files, list):
-            for file_key in economics_files:
-                price_data = self.context.get_data_with_handling(file_key, info_map)
-                if price_data is None:
-                    self.om.add_warning(
-                        "MissingEconomicsFile",
-                        f"Commodity pricing '{file_key}' not found in InputManager",
-                        info_map,
-                    )
-                    continue
-                prices[file_key] = price_data
-            return prices
-
-        if not isinstance(economics_files, dict):
-            return prices
-
-        selector_path = economics_files.get("input_manager_location")
-        if selector_path:
-            selection = self.context.get_data_with_handling(selector_path, info_map)
-            if selection is None:
-                self.om.add_warning(
-                    "MissingSelection",
-                    f"Selector value not found at '{selector_path}'",
-                    info_map,
-                )
-                for option, file_key in economics_files.items():
-                    if option == "input_manager_location":
-                        continue
-                    if not isinstance(file_key, str):
-                        continue
-                    price_data = self.context.get_data_with_handling(file_key, info_map)
-                    if price_data is not None:
-                        prices[file_key] = price_data
-                if prices:
-                    self.om.add_warning(
-                        "MissingSelectionFallback",
-                        f"No selector match; using all available pricing options for '{selector_path}'.",
-                        info_map,
-                    )
-                return prices
-            selection_key = str(selection).lower()
-            selected_file = None
-            for option, file_key in economics_files.items():
-                if option == "input_manager_location":
-                    continue
-                if option.lower() == selection_key:
-                    selected_file = file_key
-                    break
-            if selected_file is None:
-                self.om.add_warning(
-                    "UnknownSelection",
-                    f"No price file matched selection '{selection}' at '{selector_path}'",
-                    info_map,
-                )
-                for option, file_key in economics_files.items():
-                    if option == "input_manager_location":
-                        continue
-                    if not isinstance(file_key, str):
-                        continue
-                    price_data = self.context.get_data_with_handling(file_key, info_map)
-                    if price_data is not None:
-                        prices[file_key] = price_data
-                if prices:
-                    self.om.add_warning(
-                        "UnknownSelectionFallback",
-                        f"No matching selection; using all available pricing options for '{selector_path}'.",
-                        info_map,
-                    )
-                return prices
-            price_data = self.context.get_data_with_handling(selected_file, info_map)
-            if price_data is None:
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"Commodity pricing '{selected_file}' not found in InputManager",
-                    info_map,
-                )
-                return prices
-            prices[selected_file] = price_data
-            return prices
-
-        for label, file_key in economics_files.items():
-            if not isinstance(file_key, str):
-                continue
-            price_data = self.context.get_data_with_handling(file_key, info_map)
-            if price_data is None:
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"Commodity pricing '{file_key}' not found in InputManager",
-                    info_map,
-                )
-                continue
-            prices[label] = price_data
-        return prices
 
     def _extract_selector_values(self, selection: Any) -> List[str]:
         """Normalize selector values into lowercase keys."""
@@ -541,18 +410,18 @@ class EconomicPreprocessor:
         """Collect pricing by exact key match against mapping options when requested."""
 
         if not isinstance(economics_files, dict):
-            return self._fetch_prices(economics_files)
+            return self.context.fetch_prices(economics_files)
 
         source = str(match_source or "").lower()
         if source not in {"input_manager", "biophysical_simulation"}:
-            return self._fetch_prices(economics_files)
+            return self.context.fetch_prices(economics_files)
 
         requested_values = (
             list(input_match_values or []) if source == "input_manager" else list(biophysical_match_values or [])
         )
         requested = {str(value).lower() for value in requested_values if str(value).strip()}
         if not requested:
-            return self._fetch_prices(economics_files)
+            return self.context.fetch_prices(economics_files)
 
         info_map = {"class": self.__class__.__name__, "function": self._fetch_prices_with_exact_matches.__name__}
         prices: Dict[str, Any] = {}
@@ -566,131 +435,6 @@ class EconomicPreprocessor:
                 prices[option] = price_data
         return prices
 
-    def _compute_revenue_by_year(self, item: "EconomicItem") -> Dict[str, Any]:
-        """Compute revenue for a per-digester daily series by summing quantities per year and pricing each year.
-
-        For each biophysical pattern (matching one variable per digester), the daily values are summed into
-        calendar-year buckets using each value's ``simulation_day``. Every year's quantity is multiplied by that
-        year's commodity price (falling back to the average price for years without an explicit entry), and the
-        results are summed into the total revenue line item.
-        """
-        info_map = {"class": self.__class__.__name__, "function": self._compute_revenue_by_year.__name__}
-
-        start_date_str = self.im.get_data("config.start_date")
-        end_date_str = self.im.get_data("config.end_date")
-        start_year: int | None = None
-        end_year: int | None = None
-        start_date: datetime | None = None
-        if start_date_str and end_date_str:
-            try:
-                start_year = int(str(start_date_str).split(":")[0])
-                end_year = int(str(end_date_str).split(":")[0])
-                start_date = datetime.strptime(str(start_date_str), "%Y:%j")
-            except (ValueError, AttributeError):
-                start_year = end_year = None
-                start_date = None
-
-        price_data = self._fetch_prices(item.economics_files)
-        price_values = self._extract_price_values(price_data)
-        price_by_year: dict[int, float] = {}
-        if start_year is not None and end_year is not None:
-            for offset, year in enumerate(range(start_year, end_year + 1)):
-                if offset < len(price_values):
-                    price_by_year[year] = price_values[offset]
-        fallback_price = Aggregator.average(price_values) if price_values else None
-        if fallback_price is None:
-            fallback_price = ECONOMIC_PRICE_FALLBACK.get("revenue", 1.0)
-
-        bio_values_by_digester_by_year: dict[str, dict[int, list[float]]] = {}
-        bio_values_by_digester: dict[str, list[float]] = {}
-        name_pattern = re.compile(r"energy\.(.+?)\.[^.]+$")
-
-        for path in item.biophysical_simulation:
-            filtered_pool = self.om.filter_variables_pool({"filters": [path]})
-            for variable_name, payload in filtered_pool.items():
-                if not isinstance(payload, dict):
-                    continue
-                values = payload.get("values", [])
-                info_maps = payload.get("info_maps", [])
-                name_match = name_pattern.search(variable_name)
-                digester_name = name_match.group(1) if name_match else variable_name
-                if digester_name not in bio_values_by_digester:
-                    bio_values_by_digester[digester_name] = []
-                    bio_values_by_digester_by_year[digester_name] = {year: [] for year in range(start_year, end_year + 1)}
-                for index, value in enumerate(values):
-                    entry_info = (
-                        info_maps[index] if index < len(info_maps) and isinstance(info_maps[index], dict) else {}
-                    )
-                    simulation_day = entry_info.get("simulation_day")
-                    try:
-                        numeric_value = float(value)
-                    except (TypeError, ValueError):
-                        continue
-                    bio_values_by_digester[digester_name].append(numeric_value)
-                    if simulation_day is None or start_date is None:
-                        # Without a day we cannot place the value in a year; fold it into the start year.
-                        year = start_year if start_year is not None else 0
-                    else:
-                        year = (start_date + timedelta(days=int(simulation_day))).year
-                    bio_values_by_digester_by_year[digester_name][year].append(numeric_value)
-
-        revenue_by_year: dict[str, dict[int, list[float]]] = {}
-        price_data_by_day: list[float] = []
-        total_revenue = 0.0
-        for digester_name, year_quantities in bio_values_by_digester_by_year.items():
-            if digester_name not in revenue_by_year:
-                revenue_by_year[digester_name] = {}
-            for year, quantity in year_quantities.items():
-                if year not in revenue_by_year[digester_name]:
-                    revenue_by_year[digester_name][year] = []
-                price = price_by_year.get(year, fallback_price)
-                year_revenue: list[float] = [daily_quantity * price for daily_quantity in quantity]
-                revenue_by_year[digester_name][year] = year_revenue
-                price_data_by_day.extend([price] * len(year_revenue))
-                total_revenue += sum(year_revenue)
-
-        if not bio_values_by_digester_by_year:
-            self.om.add_warning(
-                "MissingDigesterEnergyOutputs",
-                f"No per-digester energy outputs matched patterns {item.biophysical_simulation} for '{item.name}'.",
-                info_map,
-            )
-
-        return {
-            "biophysical_values": bio_values_by_digester,
-            "biophysical_aggregate": {digester_name: sum(bio_values)for digester_name, bio_values in bio_values_by_digester.items()},
-            "biophysical_values_by_scenario": {"baseline": bio_values_by_digester},
-            "biophysical_aggregate_by_scenario": {"baseline": {digester_name: sum(bio_values)for digester_name, bio_values in bio_values_by_digester.items()}},
-            "price_data": price_data,
-            "price_values": price_by_year,
-            "price_aggregate": Aggregator.average(price_data_by_day) if price_data_by_day else None,
-            "line_item_values_by_scenario": {"baseline": total_revenue},
-            "revenue_by_year": revenue_by_year,
-            "flow_type": "revenue",
-        }
-
-    def _aggregate(self, values: List[float], desc: str) -> float | None:
-        """Aggregate values according to a textual description."""
-        if not values:
-            return None
-        d = desc.lower() if isinstance(desc, str) else ""
-        if "average" in d or "mean" in d:
-            return Aggregator.average(values)
-        if "product" in d:
-            return Aggregator.product(values)
-        if "divide" in d or "ratio" in d:
-            result = Aggregator.division(values)
-            if result is not None:
-                return result
-        if "subtract" in d or "difference" in d:
-            result = Aggregator.subtraction(values)
-            if result is not None:
-                return result
-        if "standard deviation" in d or "std" in d:
-            return Aggregator.standard_deviation(values)
-        # Default aggregation is sum
-        return Aggregator.sum(values)
-
     def preprocess(self) -> Dict[str, Dict[str, Dict[str, Dict[str, Any]]]]:
         """Run preprocessing and store results in the InputManager."""
 
@@ -701,11 +445,9 @@ class EconomicPreprocessor:
             section_data = results.setdefault(item.section, {})
             category_data = section_data.setdefault(item.category, {})
 
-            if item.aggregate_by_year:
-                category_data[item.name] = self._compute_revenue_by_year(item)
             handler = self.special_case_handlers.get((item.section, item.name))
             if handler is not None:
-                category_data[item.name] = handler.process()
+                category_data[item.name] = handler.process(item)
                 continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
@@ -755,7 +497,7 @@ class EconomicPreprocessor:
                     info_map,
                 )
 
-            price_values = self._extract_price_values(price_data)
+            price_values = self.context.extract_price_values(price_data)
             price_aggregate = self.context.aggregate(price_values, "average")
             if price_aggregate is None:
                 flow_type = self._infer_flow_type(item) or "cost"

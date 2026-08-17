@@ -1,3 +1,4 @@
+import json
 import re
 from typing import Any
 
@@ -183,7 +184,6 @@ class EnergyEstimator:
             {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_HA}},
         )
         estimator.estimate_digester_energy_production()
-        print("a")
 
     def estimate_digester_energy_production(self) -> None:
         """
@@ -239,6 +239,17 @@ class EnergyEstimator:
                     captured_biogas_volume, rng_ratio, conversion
                 )
                 self._report_digester_energy_production(name, electricity_kwh, rng_megajoules, simulation_day)
+
+            with open("electricity_produced_kwh.json", "w") as f:
+                electricity = om.filter_variables_pool(
+                    {"filters": ["Manure\\.Digester\\.energy\\..*\\.electricity_produced_kwh"]}
+                )
+                json.dump(electricity, f, indent=4)
+            with open("rng_produced_megajoules.json", "w") as f:
+                rng = om.filter_variables_pool(
+                    {"filters": ["Manure\\.Digester\\.energy\\..*\\.rng_produced_megajoules"]}
+                )
+                json.dump(rng, f, indent=4)
 
     def _get_daily_captured_biogas(self, digester_name: str) -> dict[str, Any] | None:
         """
