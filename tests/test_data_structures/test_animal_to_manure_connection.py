@@ -1,15 +1,22 @@
 from typing import Optional, Type
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream, StreamType, PenManureData
+from RUFAS.data_structures.animal_to_manure_connection import (
+    DailyManureSupplier,
+    ManureStream,
+    StreamType,
+    PenManureData,
+)
 
 
 @pytest.fixture
 def manure_stream(mocker: MockerFixture) -> ManureStream:
-    return ManureStream(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 8.8, 7.7, 10, 9.9, 10, 0.24,
-                        mocker.MagicMock(autospec=PenManureData))
+    return ManureStream(
+        1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 8.8, 7.7, 10, 9.9, 10, 0.24, mocker.MagicMock(autospec=PenManureData)
+    )
 
 
 def test_total_volatile_solids(manure_stream: ManureStream) -> None:
@@ -52,7 +59,7 @@ def manure_stream_1() -> ManureStream:
         volume=1.0,
         methane_production_potential=0.24,
         pen_manure_data=pen_data,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -82,7 +89,7 @@ def manure_stream_1() -> ManureStream:
                     manure_urine_nitrogen=3.0,
                     stream_type=StreamType.PARLOR,
                 ),
-                bedding_non_degradable_volatile_solids=2
+                bedding_non_degradable_volatile_solids=2,
             ),
             None,
             {
@@ -113,7 +120,7 @@ def manure_stream_1() -> ManureStream:
                 volume=0.5,
                 methane_production_potential=0.17,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=2
+                bedding_non_degradable_volatile_solids=2,
             ),
             None,
             {
@@ -336,7 +343,7 @@ def sample_manure_stream(pen_data_2: PenManureData) -> ManureStream:
         volume=1.0,
         methane_production_potential=0.24,
         pen_manure_data=pen_data_2,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -380,10 +387,112 @@ def test_split_stream_without_pen_manure_data() -> None:
         volume=0.5,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
     split = stream.split_stream(0.5, stream_type=StreamType.GENERAL)
     assert split.pen_manure_data is None
     assert split.water == 25.0
     assert split.methane_production_potential == stream.methane_production_potential
+
+
+def make_daily_manure_stream_config(**overrides: object) -> dict[str, object]:
+    """Builds a valid daily manure stream configuration, with optional field overrides."""
+    stream_config: dict[str, object] = {
+        "stream_name": "lac_pen",
+        "first_processor": "lac_alley_scraper",
+        "stream_type": "GENERAL",
+        "animal_combination": "LAC_COW",
+        "num_animals": 88,
+        "manure_deposition_surface_area": 500.0,
+        "total_manure_mass": 1000.0,
+        "total_solids": 150.0,
+        "nitrogen": 6.0,
+        "ammoniacal_nitrogen": 2.4,
+        "phosphorus": 1.1,
+        "potassium": 1.6,
+        "ash": 20.0,
+        "degradable_volatile_solids": 60.0,
+        "non_degradable_volatile_solids": 38.0,
+        "bedding_non_degradable_volatile_solids": 4.0,
+        "urine_mass": 310.0,
+        "urine_nitrogen": 3.1,
+        "methane_production_potential": 0.24,
+    }
+    stream_config.update(overrides)
+    return stream_config
+
+
+def test_daily_manure_supplier_builds_streams() -> None:
+    """Checks that the supplier builds a ManureStream with PenManureData from a stream configuration."""
+    supplier = DailyManureSupplier([make_daily_manure_stream_config()])
+
+    daily_manure_streams = supplier.get_daily_manure_streams()
+
+    assert list(daily_manure_streams.keys()) == ["lac_pen"]
+    stream = daily_manure_streams["lac_pen"]
+    assert stream.water == 850.0
+    assert stream.total_solids == 150.0
+    assert stream.volume == pytest.approx(1000.0 / ManureConstants.SLURRY_MANURE_DENSITY)
+    assert stream.nitrogen == 6.0
+    assert stream.ammoniacal_nitrogen == 2.4
+    assert stream.phosphorus == 1.1
+    assert stream.potassium == 1.6
+    assert stream.ash == 20.0
+    assert stream.degradable_volatile_solids == 60.0
+    assert stream.non_degradable_volatile_solids == 38.0
+    assert stream.bedding_non_degradable_volatile_solids == 4.0
+    assert stream.methane_production_potential == 0.24
+    assert stream.pen_manure_data is not None
+    assert stream.pen_manure_data.num_animals == 88
+    assert stream.pen_manure_data.manure_deposition_surface_area == 500.0
+    assert stream.pen_manure_data.animal_combination == AnimalCombination.LAC_COW
+    assert stream.pen_manure_data.pen_type is None
+    assert stream.pen_manure_data.manure_urine_mass == 310.0
+    assert stream.pen_manure_data.manure_urine_nitrogen == 3.1
+    assert stream.pen_manure_data.stream_type == StreamType.GENERAL
+    assert stream.pen_manure_data.first_processor == "lac_alley_scraper"
+
+
+def test_daily_manure_supplier_builds_fresh_streams_every_day() -> None:
+    """Checks that the supplier builds new ManureStream instances on every call."""
+    supplier = DailyManureSupplier([make_daily_manure_stream_config()])
+
+    first_day_stream = supplier.get_daily_manure_streams()["lac_pen"]
+    second_day_stream = supplier.get_daily_manure_streams()["lac_pen"]
+
+    assert first_day_stream is not second_day_stream
+    assert first_day_stream.pen_manure_data is not second_day_stream.pen_manure_data
+    assert first_day_stream == second_day_stream
+
+
+def test_daily_manure_supplier_duplicate_stream_names(mocker: MockerFixture) -> None:
+    """Checks that only the first configuration is kept, with a warning, when stream names are duplicated."""
+    mock_output_manager = mocker.MagicMock()
+    mocker.patch("RUFAS.data_structures.animal_to_manure_connection.OutputManager", return_value=mock_output_manager)
+    duplicate_stream_config = make_daily_manure_stream_config(num_animals=1)
+
+    supplier = DailyManureSupplier([make_daily_manure_stream_config(), duplicate_stream_config])
+
+    daily_manure_streams = supplier.get_daily_manure_streams()
+    assert list(daily_manure_streams.keys()) == ["lac_pen"]
+    pen_manure_data = daily_manure_streams["lac_pen"].pen_manure_data
+    assert pen_manure_data is not None
+    assert pen_manure_data.num_animals == 88
+    mock_output_manager.add_warning.assert_called_once()
+
+
+def test_daily_manure_supplier_parlor_stream_requires_lactating_cows() -> None:
+    """Checks that a parlor stream for a non-lactating animal combination fails validation."""
+    parlor_stream_config = make_daily_manure_stream_config(stream_type="PARLOR", animal_combination="CALF")
+
+    with pytest.raises(ValueError, match="must use the LAC_COW animal combination"):
+        DailyManureSupplier([parlor_stream_config])
+
+
+def test_daily_manure_supplier_total_solids_cannot_exceed_total_manure_mass() -> None:
+    """Checks that a stream whose total solids exceed its total manure mass fails validation."""
+    invalid_stream_config = make_daily_manure_stream_config(total_solids=1200.0)
+
+    with pytest.raises(ValueError, match="total solids cannot exceed its total manure mass"):
+        DailyManureSupplier([invalid_stream_config])

@@ -17,7 +17,7 @@
       "type": "string",
       "description": "The type of daily simulation to run. Will determine daily simulation function in SimulationEngine.",
       "default": "full_farm",
-      "pattern": "^(full_farm|field_and_feed|field_only|animals_only)$"
+      "pattern": "^(full_farm|field_and_feed|field_only|animals_only|manure_only)$"
     },
     "nutrient_standard": {
       "type": "string",
@@ -6905,6 +6905,114 @@
       "type": "array",
       "properties": {
         "type": "number"
+      }
+    }
+  },
+  "daily_manure_supply_properties": {
+    "data_collection_app_compatible": false,
+    "daily_manure_streams": {
+      "type": "array",
+      "description": "The manure streams that enter the manure system on every simulation day. Stated directly because a simulation without the animal module has no pens to produce manure streams.",
+      "minimum_length": 0,
+      "properties": {
+        "type": "object",
+        "description": "The daily manure production and origin information for one manure stream.",
+        "stream_name": {
+          "type": "string",
+          "description": "Unique name of the manure stream, used to label outputs."
+        },
+        "first_processor": {
+          "type": "string",
+          "description": "Name of the first manure processor that receives this stream. Must match the name of a handler, open lot, or bedded pack from the manure processor configurations."
+        },
+        "stream_type": {
+          "type": "string",
+          "description": "The type of the manure stream. PARLOR represents manure deposited in or traveling to/from the milking parlor and is only valid for the LAC_COW animal combination. GENERAL represents all other manure.",
+          "pattern": "^(GENERAL|PARLOR)$",
+          "default": "GENERAL"
+        },
+        "animal_combination": {
+          "type": "string",
+          "description": "The combination of animals that produces this manure stream. CALF = Calves; GROWING = HeiferI's and HeiferII's; CLOSE_UP = HeiferIII's and Dry Cows; LAC_COW = Lactating Cows.",
+          "pattern": "^(CALF|GROWING|CLOSE_UP|LAC_COW)$"
+        },
+        "num_animals": {
+          "type": "number",
+          "description": "The number of animals that produces this manure stream (animals).",
+          "minimum": 0
+        },
+        "manure_deposition_surface_area": {
+          "type": "number",
+          "description": "The surface area of the area the manure stream is deposited on (m^2). Use 0.0 for parlor streams, since manure deposition in the parlor is accounted for in the source methodology.",
+          "minimum": 0.0
+        },
+        "total_manure_mass": {
+          "type": "number",
+          "description": "Total wet mass of manure entering the stream per day, including feces, urine, and any bedding (kg/day).",
+          "minimum": 0.0
+        },
+        "total_solids": {
+          "type": "number",
+          "description": "Mass of total solids in the manure stream per day (kg/day). Cannot exceed the total manure mass; the remainder of the total manure mass is water.",
+          "minimum": 0.0
+        },
+        "nitrogen": {
+          "type": "number",
+          "description": "Mass of total nitrogen in the manure stream per day (kg/day).",
+          "minimum": 0.0
+        },
+        "ammoniacal_nitrogen": {
+          "type": "number",
+          "description": "Mass of total ammoniacal nitrogen in the manure stream per day (kg/day).",
+          "minimum": 0.0
+        },
+        "phosphorus": {
+          "type": "number",
+          "description": "Mass of phosphorus in the manure stream per day (kg/day).",
+          "minimum": 0.0
+        },
+        "potassium": {
+          "type": "number",
+          "description": "Mass of potassium in the manure stream per day (kg/day).",
+          "minimum": 0.0
+        },
+        "ash": {
+          "type": "number",
+          "description": "Mass of ash in the manure stream per day, including ash added by mineral bedding such as sand (kg/day).",
+          "minimum": 0.0,
+          "default": 0.0
+        },
+        "degradable_volatile_solids": {
+          "type": "number",
+          "description": "Mass of degradable volatile solids in the manure stream per day (kg/day).",
+          "minimum": 0.0
+        },
+        "non_degradable_volatile_solids": {
+          "type": "number",
+          "description": "Mass of non-degradable volatile solids in the manure stream per day (kg/day).",
+          "minimum": 0.0
+        },
+        "bedding_non_degradable_volatile_solids": {
+          "type": "number",
+          "description": "Mass of non-degradable volatile solids added to the manure stream by organic bedding per day (kg/day).",
+          "minimum": 0.0,
+          "default": 0.0
+        },
+        "urine_mass": {
+          "type": "number",
+          "description": "Mass of urine in the manure stream per day (kg/day).",
+          "minimum": 0.0
+        },
+        "urine_nitrogen": {
+          "type": "number",
+          "description": "Mass of nitrogen in the urine in the manure stream per day (kg/day).",
+          "minimum": 0.0
+        },
+        "methane_production_potential": {
+          "type": "number",
+          "description": "Achievable emission of methane from the manure in the stream (m^3 methane / kg volatile solids). The 2024 USDA method for entity scale inventory suggests 0.24 for manure from lactating, dry, and close up animals and 0.17 for manure from calves and heifers.",
+          "minimum": 0.0
+        }
       }
     }
   }

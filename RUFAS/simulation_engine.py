@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import DailyManureSupplier, ManureStream
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
@@ -45,12 +45,15 @@ class SimulationType(Enum):
         Represents a simulation that includes only field and feed modules, no animal and manure modules.
     ANIMALS_ONLY : str
         Represents a simulation that only simulates animals, no other biophysical modules.
+    MANURE_ONLY : str
+        Represents a simulation that only simulates manure processing, no other biophysical modules.
     """
 
     FULL_FARM = "full_farm"
     FIELD_AND_FEED = "field_and_feed"
     FIELD_ONLY = "field_only"
     ANIMALS_ONLY = "animals_only"
+    MANURE_ONLY = "manure_only"
 
     @property
     def simulate_animals(self) -> bool:
@@ -85,6 +88,7 @@ class SimulationType(Enum):
         """Return the set of simulation types that simulate manure processing."""
         return {
             cls.FULL_FARM,
+            cls.MANURE_ONLY,
         }
 
     @classmethod
@@ -161,6 +165,9 @@ class SimulationEngine:
     manure_manager: ManureManager
         The ManureManager object that sets up and manages different manure management components including manure
         handlers, reception pits, manure separators, and manure storage treatments.
+    daily_manure_supplier : DailyManureSupplier
+        The supplier of the user-defined manure streams that enter the manure module every day when animals are
+        not simulated.
     available_feeds : list[Feed]
         The feeds set to be available for the simulation in the feed input.
     max_daily_feed_recalculation_interval : timedelta
@@ -196,6 +203,7 @@ class SimulationEngine:
             SimulationType.FIELD_AND_FEED: self._execute_field_and_feed_daily_simulation,
             SimulationType.FIELD_ONLY: self._execute_field_only_simulation,
             SimulationType.ANIMALS_ONLY: self._execute_animals_only_daily_simulation,
+            SimulationType.MANURE_ONLY: self._execute_manure_only_daily_simulation,
         }
 
         self._setup_simulation_modules()
@@ -262,6 +270,40 @@ class SimulationEngine:
             self.manure_manager: ManureManager = ManureManager(
                 self.weather.intercept_mean_temp, self.weather.phase_shift, self.weather.amplitude
             )
+            if not self.simulate_animals:
+                self.daily_manure_supplier: DailyManureSupplier = DailyManureSupplier(
+                    self._gather_daily_manure_supply()
+                )
+
+    def _gather_daily_manure_supply(self) -> list[dict[str, Any]]:
+        """
+        Gathers the configurations of the manure streams that enter the manure module on every simulation day.
+
+        All daily manure supply input files are combined. Logs a warning if no daily manure supply input files are
+        found, since without the animal module no manure would then enter the manure system for the whole simulation.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            The configurations of the daily manure streams. Empty if no daily manure supply inputs are provided.
+        """
+        info_map = {
+            "class": SimulationEngine.__name__,
+            "function": SimulationEngine._gather_daily_manure_supply.__name__,
+        }
+        daily_manure_supply_names: list[str] = self.im.get_data_keys_by_properties("daily_manure_supply_properties")
+        if not daily_manure_supply_names:
+            self.om.add_warning(
+                "No daily manure supply input files.",
+                "No manure will enter the manure system, and there are no animals to produce manure.",
+                info_map,
+            )
+
+        daily_manure_stream_configs: list[dict[str, Any]] = []
+        for daily_manure_supply_name in daily_manure_supply_names:
+            daily_manure_supply_data: dict[str, list[dict[str, Any]]] = self.im.get_data(daily_manure_supply_name)
+            daily_manure_stream_configs.extend(daily_manure_supply_data["daily_manure_streams"])
+        return daily_manure_stream_configs
 
     def _gather_field_data(self) -> dict[str, dict[str, Any]]:
         """
@@ -425,6 +467,29 @@ class SimulationEngine:
         _, daily_purchased_feeds_fed = self._execute_daily_animal_operations()
 
         self._report_daily_records(daily_purchased_feeds_fed)
+
+        self._advance_time()
+
+    def _execute_manure_only_daily_simulation(self) -> None:
+        """
+        Executes the daily simulation routines for a farm with only the manure module.
+
+        Daily Manure Only Simulation Process:
+        1. Manure operations (collect the user-defined daily manure streams and process manure)
+        2. Record keeping (time, weather)
+        3. Advance simulation date
+
+        Notes
+        -----
+        There is no animal module to produce manure, so the manure that enters the manure system every day comes
+        from the daily manure supply inputs instead.
+
+        """
+        daily_manure_data = self.daily_manure_supplier.get_daily_manure_streams()
+
+        self._execute_daily_manure_operations(daily_manure_data)
+
+        self._report_daily_records()
 
         self._advance_time()
 
