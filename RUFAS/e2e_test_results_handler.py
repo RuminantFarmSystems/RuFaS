@@ -1,5 +1,7 @@
 import json
 from collections import namedtuple
+import math
+from numbers import Number
 from pathlib import Path
 import shutil
 from typing import Any
@@ -43,8 +45,6 @@ class E2ETestResultsHandler:
             "function": E2ETestResultsHandler.compare_actual_and_expected_test_results.__name__,
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
-
-        E2ETestResultsHandler.average_test_results()
 
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
@@ -108,66 +108,24 @@ class E2ETestResultsHandler:
 
         json_output_directory = Path(e2e_runs[0]["json_output_directory"])
 
-        result_paths: list[Path] = []
+        result_paths = E2ETestResultsHandler._extract_results_paths(e2e_runs, json_output_directory)
 
-        for run in e2e_runs:
-            run_output_prefix = run["output_prefix"]
-
-            matching_paths = [
-                path
-                for path in json_output_directory.iterdir()
-                if path.name.startswith(run_output_prefix)
-            ]
-
-            if len(matching_paths) != 1:
-                raise ValueError(
-                    f"Expected exactly one E2E result file for '{run_output_prefix}', "
-                    f"but found {len(matching_paths)}."
-                )
-
-            result_paths.append(matching_paths[0])
-
-        test_results: list[dict[str, Any]] = []
-
-        for result_path in result_paths:
-            with open(result_path, "r", encoding="utf-8") as result_file:
-                test_results.append(json.load(result_file))
+        test_results = E2ETestResultsHandler._load_results(result_paths)
 
         reference_results = test_results[0]
         reference_keys = set(reference_results)
 
-        for result_path, result in zip(result_paths[1:], test_results[1:]):
-            result_keys = set(result)
-
-            if result_keys != reference_keys:
-                missing_keys = reference_keys - result_keys
-                unexpected_keys = result_keys - reference_keys
-
-                raise ValueError(
-                    f"E2E result structure does not match for '{result_path}'. "
-                    f"Missing keys: {sorted(missing_keys)}. "
-                    f"Unexpected keys: {sorted(unexpected_keys)}."
-                )
+        E2ETestResultsHandler._validate_results(result_paths, test_results, reference_keys)
 
         averaged_results: dict[str, Any] = {}
 
         for output_name, reference_output in reference_results.items():
+            if output_name == "DISCLAIMER":
+                continue
             matching_outputs = [
                 result[output_name]
                 for result in test_results
             ]
-
-            if output_name == "DISCLAIMER":
-                if not all(
-                    output == reference_output
-                    for output in matching_outputs
-                ):
-                    raise ValueError(
-                        "DISCLAIMER values differ between E2E test runs."
-                    )
-
-                averaged_results[output_name] = reference_output
-                continue
 
             if not isinstance(reference_output, dict) or "values" not in reference_output:
                 if not all(
@@ -183,18 +141,7 @@ class E2ETestResultsHandler:
 
             reference_values = reference_output["values"]
 
-            for result_path, output in zip(result_paths, matching_outputs):
-                if not isinstance(output, dict) or "values" not in output:
-                    raise ValueError(
-                        f"E2E output '{output_name}' in '{result_path}' does not "
-                        "contain a 'values' list."
-                    )
-
-                if len(output["values"]) != len(reference_values):
-                    raise ValueError(
-                        f"E2E output '{output_name}' has {len(output['values'])} values "
-                        f"in '{result_path}', but {len(reference_values)} were expected."
-                    )
+            E2ETestResultsHandler._validate_values(result_paths, output_name, matching_outputs, reference_values)
 
             averaged_values: list[Any] = []
 
@@ -263,6 +210,69 @@ class E2ETestResultsHandler:
             )
 
         return averaged_result_path
+
+    @staticmethod
+    def _validate_values(result_paths: list[Path], output_name, matching_outputs, reference_values) -> None:
+        for result_path, output in zip(result_paths, matching_outputs):
+            if not isinstance(output, dict) or "values" not in output:
+                raise ValueError(
+                        f"E2E output '{output_name}' in '{result_path}' does not "
+                        "contain a 'values' list."
+                    )
+
+            if len(output["values"]) != len(reference_values):
+                raise ValueError(
+                        f"E2E output '{output_name}' has {len(output['values'])} values "
+                        f"in '{result_path}', but {len(reference_values)} were expected."
+                    )
+
+    @staticmethod
+    def _validate_results(
+        result_paths: list[Path], test_results: list[dict[str, Any]], reference_keys: set[str]
+    ) -> None:
+        for result_path, result in zip(result_paths[1:], test_results[1:]):
+            result_keys = set(result)
+
+            if result_keys != reference_keys:
+                missing_keys = reference_keys - result_keys
+                unexpected_keys = result_keys - reference_keys
+
+                raise ValueError(
+                    f"E2E result structure does not match for '{result_path}'. "
+                    f"Missing keys: {sorted(missing_keys)}. "
+                    f"Unexpected keys: {sorted(unexpected_keys)}."
+                )
+
+    @staticmethod
+    def _load_results(result_paths: list[Path]) -> list[dict[str, Any]]:
+        test_results: list[dict[str, Any]] = []
+
+        for result_path in result_paths:
+            with open(result_path, "r", encoding="utf-8") as result_file:
+                test_results.append(json.load(result_file))
+        return test_results
+
+    @staticmethod
+    def _extract_results_paths(e2e_runs: list[dict[str, Any]], json_output_directory: Path) -> list[Path]:
+        result_paths: list[Path] = []
+
+        for run in e2e_runs:
+            run_output_prefix = run["output_prefix"]
+
+            matching_paths = [
+                path
+                for path in json_output_directory.iterdir()
+                if path.name.startswith(run_output_prefix)
+            ]
+
+            if len(matching_paths) != 1:
+                raise ValueError(
+                    f"Expected exactly one E2E result file for '{run_output_prefix}', "
+                    f"but found {len(matching_paths)}."
+                )
+
+            result_paths.append(matching_paths[0])
+        return result_paths
 
     @staticmethod
     def _convert_expected_result_variable_names(
