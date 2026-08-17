@@ -195,7 +195,7 @@
     "roi_comparison_data": [
        {
         "name": "base_freestall_costs_and_revenue",
-        "address": "output/reports/freestall_report_report_econ.json_11-Aug-2026_Tue_10-13-03.csv"
+        "address": "path/to/saved/roi/results.csv"
        }
     ]
   }

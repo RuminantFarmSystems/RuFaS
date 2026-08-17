@@ -329,11 +329,11 @@ class PartialBudget:
 
         comparison_revenues = self._extract_numeric_values(
             comparison_pool,
-            r"\.RevenueTotal$",
+            r"\.RevenueTotal(?: \(\$\))?$",
         )
         comparison_costs = self._extract_numeric_values(
             comparison_pool,
-            r"\.CostTotal$",
+            r"\.CostTotal(?: \(\$\))?$",
         )
 
         if len(comparison_revenues) != len(comparison_costs):
