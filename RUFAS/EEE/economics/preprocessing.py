@@ -10,11 +10,18 @@ stores the aggregated results back into the
 :class:`~RUFAS.input_manager.InputManager` under the key
 ``economic_preprocessed``. The structure of the stored data is
 validated using the ``economic_preprocessing_properties`` metadata.
+
+Line items whose preprocessing cannot be expressed by the generic
+biophysical/input/price pipeline are delegated to dedicated
+:class:`~RUFAS.EEE.economics.special_cases.base.SpecialCaseHandler`
+subclasses. :class:`EconomicPreprocessor` builds a ``(section, name)``
+handler map from :data:`~RUFAS.EEE.economics.special_cases.SPECIAL_CASE_HANDLERS`
+and routes matching line items to them, keeping the main pipeline free of
+per-item special casing.
 """
 
 from __future__ import annotations
 
-import math
 import re
 from collections import defaultdict
 from dataclasses import dataclass
@@ -26,6 +33,8 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
+from RUFAS.EEE.economics.preprocessing_context import PreprocessingContext
+from RUFAS.EEE.economics.special_cases import SpecialCaseHandler, SeedCostHandler
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -35,6 +44,10 @@ from RUFAS.EEE.economics.fallback_values import (
 # Provenance marker for pool variables computed in-memory rather than loaded
 # from an input file; used only in InputManager validation messages.
 COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
+
+SPECIAL_CASE_HANDLERS: list[type[SpecialCaseHandler]] = [
+    SeedCostHandler,
+]
 
 
 @dataclass(frozen=True)
@@ -61,96 +74,15 @@ class EconomicPreprocessor:
     ) -> None:
         self.im = InputManager()
         self.om = OutputManager()
-        self.available_input_keys: Set[str] = self._load_available_input_keys()
+        self.context = PreprocessingContext(self.im, self.om)
         self.mapping = self._build_mapping()
+        self.special_case_handlers = self._build_special_case_handlers()
 
-    def _load_available_input_keys(self) -> Set[str]:
-        """Cache the available input keys from the InputManager metadata."""
+    def _build_special_case_handlers(self) -> dict[tuple[str, str], SpecialCaseHandler]:
+        """Instantiate registered special-case handlers keyed by ``(section, name)``."""
 
-        try:
-            metadata = self.im.get_metadata("files")
-        except Exception:
-            return set()
-
-        if isinstance(metadata, dict):
-            return set(metadata.keys())
-        return set()
-
-    def _normalize_economics_key(self, path: str) -> str:
-        """Map mapping file paths to InputManager data keys."""
-
-        candidate = path.removesuffix(".csv")
-
-        if not self.available_input_keys:
-            return candidate
-
-        if candidate in self.available_input_keys:
-            return candidate
-
-        prefix_matches = sorted(key for key in self.available_input_keys if key.startswith(f"{candidate}."))
-        if prefix_matches:
-            return prefix_matches[0]
-
-        return candidate
-
-    def _get_data_with_handling(self, path: str, info_map: Dict[str, str]) -> Any:
-        """Fetch data from the InputManager while handling invalid paths."""
-
-        if not isinstance(path, str) or not path:
-            self.om.add_warning(
-                "InvalidEconomicsFilePath",
-                f"Economics pricing path '{path}' is invalid",
-                info_map,
-            )
-            return None
-
-        candidate_paths = [path]
-        normalized_path = self._normalize_economics_key(path)
-        if normalized_path != path:
-            candidate_paths.append(normalized_path)
-
-        last_error: ValueError | None = None
-        for candidate in candidate_paths:
-            # Skip InputManager access entirely for wildcard paths (e.g., "*").
-            # These selectors cannot be resolved to a concrete file and only
-            # generate validation spam inside the InputManager. Emit a single
-            # warning and continue.
-            if "*" in str(candidate):
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"Commodity pricing '{candidate}' uses wildcard and was skipped",
-                    info_map,
-                )
-                continue
-
-            if hasattr(self.im, "check_property_exists_in_pool"):
-                # Wildcard paths are handled above. For concrete paths, perform the
-                # inexpensive existence check when available to avoid repeated
-                # validation warnings from deeper get_data calls.
-                try:
-                    if not self.im.check_property_exists_in_pool(candidate):
-                        continue
-                except ValueError as exc:
-                    last_error = exc
-                    continue
-            try:
-                data = self.im.get_data(candidate)
-            except ValueError as exc:
-                last_error = exc
-                continue
-
-            if data is not None:
-                return data
-
-        if last_error is not None:
-            detail = (
-                f"Failed to retrieve '{path}'"
-                + (f" (normalized to '{normalized_path}')" if normalized_path != path else "")
-                + f": {last_error}"
-            )
-            self.om.add_warning("InvalidEconomicsFilePath", detail, info_map)
-
-        return None
+        handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
+        return {handler.key: handler for handler in handlers}
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""
@@ -250,17 +182,7 @@ class EconomicPreprocessor:
         if not any(filtered_by_path.values()):
             fallback_values = self._fallback_values_by_scenario(sim_paths)
             return fallback_values
-
-        scenario_names: List[str] = []
-        pool = getattr(self.om, "variables_pool", {})
-        if isinstance(pool, dict) and pool:
-            if all(isinstance(value, dict) and "values" in value for value in pool.values()):
-                scenario_names = ["baseline"]
-            else:
-                scenario_names = [name for name, data in pool.items() if isinstance(data, dict) and data]
-        if not scenario_names:
-            scenario_names = ["baseline"]
-
+        scenario_names = self.context.scenario_names()
         values_by_scenario: Dict[str, List[float]] = {scenario: [] for scenario in scenario_names}
         info_map = {"class": self.__class__.__name__, "function": self._fetch_values_by_scenario.__name__}
 
@@ -459,7 +381,7 @@ class EconomicPreprocessor:
                     "Using fallback price.",
                     info_map,
                 )
-                values.extend(self._get_fallback_price(start_year, end_year, key))
+                values.extend(self.context.get_fallback_price(start_year, end_year, key))
                 continue
             fips_idx = value["fips"].index(fips_code)
             for year in range(start_year, end_year + 1):
@@ -473,44 +395,8 @@ class EconomicPreprocessor:
                         "Using fallback price.",
                         info_map,
                     )
-                    values.extend(self._get_fallback_price(start_year, end_year, key))
+                    values.extend(self.context.get_fallback_price(start_year, end_year, key))
                     continue
-        return values
-
-    def _get_fallback_price(self, start_year: int, end_year: int, commodity: str) -> List[float]:
-        """Get a fallback price for a commodity."""
-        info_map = {"class": self.__class__.__name__, "function": self._get_fallback_price.__name__}
-        defaults: Dict[str, List[float | str]] = self.im.get_data("_default_values")
-        defaults_fallback: Dict[str, List[float | str]] = self.im.get_data("_default_fallback_values")
-        if commodity not in defaults["commodity"] and commodity not in defaults_fallback["commodity"]:
-            self.om.add_warning(
-                "MissingFallbackPrice",
-                f"No fallback price found for commodity: {commodity}",
-                info_map,
-            )
-            return [ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)] * (end_year - start_year + 1)
-        commodity_idx = defaults["commodity"].index(commodity)
-        values: List[float] = []
-        use_fallback = False
-        for year in range(start_year, end_year + 1):
-            price = defaults[f"{year}"][commodity_idx]
-            if math.isnan(price):
-                use_fallback = True
-                break
-            values.append(price)
-        if use_fallback:
-            commodity_idx = defaults_fallback["commodity"].index(commodity)
-            values = []
-            for year in range(start_year, end_year + 1):
-                price = defaults_fallback[f"{year}"][commodity_idx]
-                if math.isnan(price):
-                    self.om.add_warning(
-                        "MissingFallbackPrice",
-                        f"No fallback price found for commodity: {commodity} in year: {year}",
-                        info_map,
-                    )
-                    price = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
-                values.append(price)
         return values
 
     def _infer_flow_type(self, item: EconomicItem) -> str | None:
@@ -540,7 +426,7 @@ class EconomicPreprocessor:
 
         if isinstance(economics_files, list):
             for file_key in economics_files:
-                price_data = self._get_data_with_handling(file_key, info_map)
+                price_data = self.context.get_data_with_handling(file_key, info_map)
                 if price_data is None:
                     self.om.add_warning(
                         "MissingEconomicsFile",
@@ -556,7 +442,7 @@ class EconomicPreprocessor:
 
         selector_path = economics_files.get("input_manager_location")
         if selector_path:
-            selection = self._get_data_with_handling(selector_path, info_map)
+            selection = self.context.get_data_with_handling(selector_path, info_map)
             if selection is None:
                 self.om.add_warning(
                     "MissingSelection",
@@ -568,7 +454,7 @@ class EconomicPreprocessor:
                         continue
                     if not isinstance(file_key, str):
                         continue
-                    price_data = self._get_data_with_handling(file_key, info_map)
+                    price_data = self.context.get_data_with_handling(file_key, info_map)
                     if price_data is not None:
                         prices[file_key] = price_data
                 if prices:
@@ -597,7 +483,7 @@ class EconomicPreprocessor:
                         continue
                     if not isinstance(file_key, str):
                         continue
-                    price_data = self._get_data_with_handling(file_key, info_map)
+                    price_data = self.context.get_data_with_handling(file_key, info_map)
                     if price_data is not None:
                         prices[file_key] = price_data
                 if prices:
@@ -607,7 +493,7 @@ class EconomicPreprocessor:
                         info_map,
                     )
                 return prices
-            price_data = self._get_data_with_handling(selected_file, info_map)
+            price_data = self.context.get_data_with_handling(selected_file, info_map)
             if price_data is None:
                 self.om.add_warning(
                     "MissingEconomicsFile",
@@ -621,7 +507,7 @@ class EconomicPreprocessor:
         for label, file_key in economics_files.items():
             if not isinstance(file_key, str):
                 continue
-            price_data = self._get_data_with_handling(file_key, info_map)
+            price_data = self.context.get_data_with_handling(file_key, info_map)
             if price_data is None:
                 self.om.add_warning(
                     "MissingEconomicsFile",
@@ -675,7 +561,7 @@ class EconomicPreprocessor:
                 continue
             if str(option).lower() not in requested or not isinstance(file_key, str):
                 continue
-            price_data = self._get_data_with_handling(file_key, info_map)
+            price_data = self.context.get_data_with_handling(file_key, info_map)
             if price_data is not None:
                 prices[option] = price_data
         return prices
@@ -817,6 +703,9 @@ class EconomicPreprocessor:
 
             if item.aggregate_by_year:
                 category_data[item.name] = self._compute_revenue_by_year(item)
+            handler = self.special_case_handlers.get((item.section, item.name))
+            if handler is not None:
+                category_data[item.name] = handler.process()
                 continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
@@ -840,7 +729,7 @@ class EconomicPreprocessor:
             for scenario_values in values_by_scenario.values():
                 biophysical_values.extend(scenario_values)
 
-            aggregated_value = self._aggregate(biophysical_values, item.preprocessing or "")
+            aggregated_value = self.context.aggregate(biophysical_values, item.preprocessing or "")
             if aggregated_value is None and biophysical_values:
                 aggregated_value = Aggregator.sum(biophysical_values)
             if not biophysical_values and not input_values:
@@ -867,14 +756,14 @@ class EconomicPreprocessor:
                 )
 
             price_values = self._extract_price_values(price_data)
-            price_aggregate = self._aggregate(price_values, "average")
+            price_aggregate = self.context.aggregate(price_values, "average")
             if price_aggregate is None:
                 flow_type = self._infer_flow_type(item) or "cost"
                 if flow_type in ECONOMIC_PRICE_FALLBACK:
                     price_aggregate = ECONOMIC_PRICE_FALLBACK[flow_type]
             aggregates_by_scenario: Dict[str, float | None] = {}
             for scenario, scenario_values in values_by_scenario.items():
-                scenario_aggregate = self._aggregate(scenario_values, item.preprocessing or "")
+                scenario_aggregate = self.context.aggregate(scenario_values, item.preprocessing or "")
                 if scenario_aggregate is None and scenario_values:
                     scenario_aggregate = Aggregator.sum(scenario_values)
                 aggregates_by_scenario[scenario] = scenario_aggregate
