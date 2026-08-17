@@ -14,10 +14,11 @@ implementation.
 """
 
 import math
-from typing import TYPE_CHECKING, Any
+import re
+from typing import TYPE_CHECKING, Any, Iterable
 
 from RUFAS.util import Aggregator
-from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
+from RUFAS.EEE.economics.fallback_values import BIOPHYSICAL_FALLBACKS, ECONOMIC_PRICE_FALLBACK
 
 if TYPE_CHECKING:
     from RUFAS.input_manager import InputManager
@@ -206,6 +207,225 @@ class PreprocessingContext:
             return Aggregator.standard_deviation(values)
         # Default aggregation is sum
         return Aggregator.sum(values)
+
+    def append_numeric(self, container: list[float], value: Any) -> None:
+        """Append ``value`` to ``container`` as a float when possible."""
+        try:
+            container.append(float(value))
+        except (TypeError, ValueError):
+            pass
+
+    def append_from_payload(self, container: list[float], payload: Any) -> None:
+        """Append every numeric value found in an OutputManager payload."""
+
+        if isinstance(payload, dict) and "values" in payload:
+            for value in payload.get("values", []):
+                self.append_from_payload(container, value)
+            return
+        if isinstance(payload, dict):
+            for value in payload.values():
+                self.append_from_payload(container, value)
+            return
+        if isinstance(payload, (list, tuple)):
+            for value in payload:
+                self.append_from_payload(container, value)
+            return
+        self.append_numeric(container, payload)
+
+    def fetch_values(self, sim_paths: Iterable[str]) -> list[float]:
+        """Collect flattened numeric values from the OutputManager for the given patterns."""
+
+        values: list[float] = []
+        info_map = {"class": self.__class__.__name__, "function": self.fetch_values.__name__}
+        for path in sim_paths:
+            filtered_pool = self.om.filter_variables_pool({"filters": [path]})
+            matched = False
+            for payload in filtered_pool.values():
+                matched = True
+                self.append_from_payload(values, payload)
+            if not matched:
+                fallback_values = BIOPHYSICAL_FALLBACKS.get(path)
+                if fallback_values:
+                    values.extend(fallback_values)
+                else:
+                    self.om.add_warning(
+                        "MissingBiophysicalData",
+                        f"No biophysical outputs matched pattern '{path}'",
+                        info_map,
+                    )
+        return values
+
+    def collect_biophysical_wildcards(self, sim_paths: Iterable[str]) -> list[tuple[str, ...]]:
+        """Collect wildcard values from matched biophysical variable names."""
+
+        captures: list[tuple[str, ...]] = []
+        seen: set[tuple[str, ...]] = set()
+
+        for path in sim_paths:
+            capture_pattern = re.compile(f"^{path.replace('.*', '(.+)')}$")
+            filtered_pool = self.om.filter_variables_pool({"filters": [path]})
+            for variable_name in filtered_pool:
+                capture_match = capture_pattern.fullmatch(variable_name)
+                if capture_match is None:
+                    continue
+                groups = capture_match.groups()
+                groups = tuple(group for group in groups if group != "")
+                if not groups:
+                    continue
+                if groups in seen:
+                    continue
+                seen.add(groups)
+                captures.append(groups)
+
+        return captures
+
+    def fetch_prices(self, economics_files: Any) -> dict[str, Any]:
+        """Collect commodity pricing using the InputManager.
+
+        Accepts the ``economics_files`` mapping value in any of its supported
+        forms (a list of file keys, a selector dict with
+        ``input_manager_location``, or a plain label/file-key dict) and returns
+        the resolved pricing payloads keyed by file key or label.
+        """
+
+        prices: dict[str, Any] = {}
+        info_map = {"class": self.__class__.__name__, "function": self.fetch_prices.__name__}
+
+        if economics_files is None:
+            return prices
+
+        if isinstance(economics_files, list):
+            for file_key in economics_files:
+                price_data = self.get_data_with_handling(file_key, info_map)
+                if price_data is None:
+                    self.om.add_warning(
+                        "MissingEconomicsFile",
+                        f"Commodity pricing '{file_key}' not found in InputManager",
+                        info_map,
+                    )
+                    continue
+                prices[file_key] = price_data
+            return prices
+
+        if not isinstance(economics_files, dict):
+            return prices
+
+        selector_path = economics_files.get("input_manager_location")
+        if selector_path:
+            selection = self.get_data_with_handling(selector_path, info_map)
+            if selection is None:
+                self.om.add_warning(
+                    "MissingSelection",
+                    f"Selector value not found at '{selector_path}'",
+                    info_map,
+                )
+                for option, file_key in economics_files.items():
+                    if option == "input_manager_location":
+                        continue
+                    if not isinstance(file_key, str):
+                        continue
+                    price_data = self.get_data_with_handling(file_key, info_map)
+                    if price_data is not None:
+                        prices[file_key] = price_data
+                if prices:
+                    self.om.add_warning(
+                        "MissingSelectionFallback",
+                        f"No selector match; using all available pricing options for '{selector_path}'.",
+                        info_map,
+                    )
+                return prices
+            selection_key = str(selection).lower()
+            selected_file = None
+            for option, file_key in economics_files.items():
+                if option == "input_manager_location":
+                    continue
+                if option.lower() == selection_key:
+                    selected_file = file_key
+                    break
+            if selected_file is None:
+                self.om.add_warning(
+                    "UnknownSelection",
+                    f"No price file matched selection '{selection}' at '{selector_path}'",
+                    info_map,
+                )
+                for option, file_key in economics_files.items():
+                    if option == "input_manager_location":
+                        continue
+                    if not isinstance(file_key, str):
+                        continue
+                    price_data = self.get_data_with_handling(file_key, info_map)
+                    if price_data is not None:
+                        prices[file_key] = price_data
+                if prices:
+                    self.om.add_warning(
+                        "UnknownSelectionFallback",
+                        f"No matching selection; using all available pricing options for '{selector_path}'.",
+                        info_map,
+                    )
+                return prices
+            price_data = self.get_data_with_handling(selected_file, info_map)
+            if price_data is None:
+                self.om.add_warning(
+                    "MissingEconomicsFile",
+                    f"Commodity pricing '{selected_file}' not found in InputManager",
+                    info_map,
+                )
+                return prices
+            prices[selected_file] = price_data
+            return prices
+
+        for label, file_key in economics_files.items():
+            if not isinstance(file_key, str):
+                continue
+            price_data = self.get_data_with_handling(file_key, info_map)
+            if price_data is None:
+                self.om.add_warning(
+                    "MissingEconomicsFile",
+                    f"Commodity pricing '{file_key}' not found in InputManager",
+                    info_map,
+                )
+                continue
+            prices[label] = price_data
+        return prices
+
+    def extract_price_values(self, price_data: Any) -> list[float]:
+        """Extract numeric price values from pricing payloads.
+
+        Prices are read for the configured FIPS county across every year in the
+        simulation window, falling back to default prices when a payload is
+        malformed or a year is missing.
+        """
+
+        info_map = {"class": self.__class__.__name__, "function": self.extract_price_values.__name__}
+        start_year: int = int(self.im.get_data("config.start_date").split(":")[0])
+        end_year: int = int(self.im.get_data("config.end_date").split(":")[0])
+        fips_code: int = self.im.get_data("config.FIPS_county_code")
+        values: list[float] = []
+        for key, value in price_data.items():
+            if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
+                self.om.add_warning(
+                    "MissingPriceData",
+                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format."
+                    "Using fallback price.",
+                    info_map,
+                )
+                values.extend(self.get_fallback_price(start_year, end_year, key))
+                continue
+            fips_idx = value["fips"].index(fips_code)
+            for year in range(start_year, end_year + 1):
+                try:
+                    price = value[f"{year}"][fips_idx]
+                    values.append(price)
+                except (KeyError, IndexError):
+                    self.om.add_warning(
+                        "MissingPriceData",
+                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
+                        "Using fallback price.",
+                        info_map,
+                    )
+                    values.extend(self.get_fallback_price(start_year, end_year, key))
+                    continue
+        return values
 
 
 __all__ = ["PreprocessingContext"]

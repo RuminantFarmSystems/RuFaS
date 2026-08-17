@@ -159,7 +159,6 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             },
             "Homegrown feed fed": {
                 "biophysical_simulation": ["FeedManager._log_feed_deductions.farmgrown_feed_.*_fed_dm"],
-                "use_feed_config_price_map": True,
                 "notes": "Cost of homegrown feed fed to animals, valued at commodity price per kg DM. "
                 "Wildcard matches each RuFaS feed ID; price is resolved automatically from feed_storage_configurations.",
             },
@@ -307,7 +306,6 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
         "Revenue": {
             "Homegrown feed received": {
                 "biophysical_simulation": ["FeedManager.receive_crop.farmgrown_feed_.*_received"],
-                "use_feed_config_price_map": True,
                 "notes": "Revenue from homegrown crops received into storage, valued at commodity price per kg DM. "
                 "Wildcard matches each RuFaS feed ID; price is resolved automatically from feed_storage_configurations.",
             },

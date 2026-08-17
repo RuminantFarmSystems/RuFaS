@@ -2,6 +2,12 @@ import pytest
 import re
 
 from RUFAS.EEE.economics import preprocessing
+from RUFAS.EEE.economics.mapping import HOMEGROWN_FEED_PRICE_ALIASES
+
+
+def _homegrown_handler(preprocessor):
+    """Return the HomegrownFeedHandler instance built by the preprocessor."""
+    return preprocessor.special_case_handlers[("Feed_storage", "Homegrown feed fed")]
 
 
 class DummyOutputManager:
@@ -486,7 +492,7 @@ def test_collect_biophysical_wildcards_does_not_return_empty_groups(monkeypatch:
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
     preprocessor = preprocessing.EconomicPreprocessor()
-    captures = preprocessor._collect_biophysical_wildcards(
+    captures = preprocessor.context.collect_biophysical_wildcards(
         ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"]
     )
     assert captures == [("1",), ("2",)]
@@ -543,35 +549,39 @@ def _make_preprocessor(monkeypatch: pytest.MonkeyPatch, data=None):
 
 def test_resolve_price_file_key_prefers_direct_match(monkeypatch: pytest.MonkeyPatch) -> None:
     preprocessor, _, _ = _make_preprocessor(monkeypatch)
-    preprocessor.available_input_keys = {"commodity_prices_corn_silage_dollar_per_kilogram"}
+    handler = _homegrown_handler(preprocessor)
+    preprocessor.context.available_input_keys = {"commodity_prices_corn_silage_dollar_per_kilogram"}
 
-    assert preprocessor._resolve_price_file_key("corn_silage") == "commodity_prices_corn_silage_dollar_per_kilogram"
+    assert handler._resolve_price_file_key("corn_silage") == "commodity_prices_corn_silage_dollar_per_kilogram"
 
 
 def test_resolve_price_file_key_uses_alias(monkeypatch: pytest.MonkeyPatch) -> None:
     preprocessor, _, _ = _make_preprocessor(monkeypatch)
+    handler = _homegrown_handler(preprocessor)
     # cereal_rye_silage has no dedicated series; it should alias to barley_silage.
-    preprocessor.available_input_keys = {"commodity_prices_barley_silage_dollar_per_kilogram"}
+    preprocessor.context.available_input_keys = {"commodity_prices_barley_silage_dollar_per_kilogram"}
 
     assert (
-        preprocessor._resolve_price_file_key("cereal_rye_silage")
+        handler._resolve_price_file_key("cereal_rye_silage")
         == "commodity_prices_barley_silage_dollar_per_kilogram"
     )
 
 
 def test_resolve_price_file_key_returns_none_when_unmapped(monkeypatch: pytest.MonkeyPatch) -> None:
     preprocessor, _, _ = _make_preprocessor(monkeypatch)
-    preprocessor.available_input_keys = {"commodity_prices_corn_silage_dollar_per_kilogram"}
+    handler = _homegrown_handler(preprocessor)
+    preprocessor.context.available_input_keys = {"commodity_prices_corn_silage_dollar_per_kilogram"}
 
-    assert preprocessor._resolve_price_file_key("nonexistent_feed") is None
+    assert handler._resolve_price_file_key("nonexistent_feed") is None
 
 
 def test_resolve_price_file_key_without_metadata_returns_direct(monkeypatch: pytest.MonkeyPatch) -> None:
     preprocessor, _, _ = _make_preprocessor(monkeypatch)
-    preprocessor.available_input_keys = set()
+    handler = _homegrown_handler(preprocessor)
+    preprocessor.context.available_input_keys = set()
 
     assert (
-        preprocessor._resolve_price_file_key("cereal_rye_silage")
+        handler._resolve_price_file_key("cereal_rye_silage")
         == "commodity_prices_cereal_rye_silage_dollar_per_kilogram"
     )
 
@@ -579,14 +589,15 @@ def test_resolve_price_file_key_without_metadata_returns_direct(monkeypatch: pyt
 def test_homegrown_feed_price_aliases_resolve_to_available_series(monkeypatch: pytest.MonkeyPatch) -> None:
     """Every curated alias must point to a commodity series the resolver accepts."""
     preprocessor, _, _ = _make_preprocessor(monkeypatch)
+    handler = _homegrown_handler(preprocessor)
     available_targets = {
         f"commodity_prices_{target}_dollar_per_kilogram"
-        for target in preprocessing.HOMEGROWN_FEED_PRICE_ALIASES.values()
+        for target in HOMEGROWN_FEED_PRICE_ALIASES.values()
     }
-    preprocessor.available_input_keys = available_targets
+    preprocessor.context.available_input_keys = available_targets
 
-    for crop_name, target in preprocessing.HOMEGROWN_FEED_PRICE_ALIASES.items():
-        assert preprocessor._resolve_price_file_key(crop_name) == f"commodity_prices_{target}_dollar_per_kilogram"
+    for crop_name, target in HOMEGROWN_FEED_PRICE_ALIASES.items():
+        assert handler._resolve_price_file_key(crop_name) == f"commodity_prices_{target}_dollar_per_kilogram"
 
 
 def test_build_feed_id_map_applies_aliases_and_warns(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -600,12 +611,13 @@ def test_build_feed_id_map_applies_aliases_and_warns(monkeypatch: pytest.MonkeyP
         ],
     }
     preprocessor, _, dummy_om = _make_preprocessor(monkeypatch, {"feed_storage_configurations": configs})
-    preprocessor.available_input_keys = {
+    handler = _homegrown_handler(preprocessor)
+    preprocessor.context.available_input_keys = {
         "commodity_prices_corn_silage_dollar_per_kilogram",
         "commodity_prices_barley_silage_dollar_per_kilogram",
     }
 
-    feed_id_map = preprocessor._build_feed_id_to_price_file_map()
+    feed_id_map = handler._build_feed_id_to_price_file_map()
 
     assert feed_id_map == {
         "1": "commodity_prices_corn_silage_dollar_per_kilogram",
