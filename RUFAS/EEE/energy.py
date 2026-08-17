@@ -218,7 +218,7 @@ class EnergyEstimator:
                     info_map,
                 )
                 continue
-            rng_ratio = digester.get("rng_ratio", 0.0)
+            rng_ratio = digester.get("kwh_electricity_to_rng_ratio", 0.0)
 
             biogas_payload = self._get_daily_captured_biogas(name)
             if biogas_payload is None:
