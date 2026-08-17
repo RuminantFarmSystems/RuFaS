@@ -30,7 +30,7 @@ from typing import Any, Dict, Iterable, List, Set
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
-from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
+from RUFAS.EEE.economics.mapping import ECONOMIC_MAP, HOMEGROWN_FEED_PRICE_ALIASES
 from RUFAS.EEE.economics.preprocessing_context import PreprocessingContext
 from RUFAS.EEE.economics.special_cases import SpecialCaseHandler, SeedCostHandler
 from RUFAS.EEE.economics.fallback_values import (
@@ -61,6 +61,7 @@ class EconomicItem:
     match_source: str | None
     wildcard_value_map: Dict[str, str] | None
     preprocessing: str | None
+    use_feed_config_price_map: bool
 
 
 class EconomicPreprocessor:
@@ -100,7 +101,13 @@ class EconomicPreprocessor:
                     economics_files = details.get("economics_files")
                     match_source = details.get("match_source")
                     wildcard_value_map = details.get("wildcard_value_map")
-                    if not biophysical_simulation and not input_manager and not economics_files:
+                    use_feed_config_price_map = bool(details.get("use_feed_config_price_map", False))
+                    if (
+                        not biophysical_simulation
+                        and not input_manager
+                        and not economics_files
+                        and not use_feed_config_price_map
+                    ):
                         continue
                     if isinstance(biophysical_simulation, str):
                         biophysical_simulation = [biophysical_simulation]
@@ -117,6 +124,7 @@ class EconomicPreprocessor:
                             match_source=match_source,
                             wildcard_value_map=wildcard_value_map if isinstance(wildcard_value_map, dict) else None,
                             preprocessing=preprocessing,
+                            use_feed_config_price_map=use_feed_config_price_map,
                         )
                     )
         return items
@@ -524,11 +532,150 @@ class EconomicPreprocessor:
                 prices[option] = price_data
         return prices
 
+    def _resolve_price_file_key(self, crop_name: str) -> str | None:
+        """Resolve a feed ``crop_name`` to an available commodity price file key.
+
+        Prefers an exact ``commodity_prices_{crop_name}_dollar_per_kilogram``
+        match. When a feed crop has no dedicated commodity price series, falls
+        back to a curated alias (see
+        :data:`~RUFAS.EEE.economics.mapping.HOMEGROWN_FEED_PRICE_ALIASES`) that
+        points to the closest available proxy commodity, as agreed with the
+        economics SMEs. Returns ``None`` when neither a direct match nor a valid
+        alias resolves to an available InputManager key.
+        """
+        direct_key = f"commodity_prices_{crop_name}_dollar_per_kilogram"
+
+        # Without metadata we cannot validate keys; preserve the direct key so
+        # downstream lookups behave as before.
+        if not self.available_input_keys:
+            return direct_key
+
+        if direct_key in self.available_input_keys:
+            return direct_key
+
+        alias = HOMEGROWN_FEED_PRICE_ALIASES.get(crop_name)
+        if alias is not None:
+            alias_key = f"commodity_prices_{alias}_dollar_per_kilogram"
+            if alias_key in self.available_input_keys:
+                return alias_key
+
+        return None
+
+    def _build_feed_id_to_price_file_map(self) -> Dict[str, str]:
+        """Build a mapping of RuFaS feed ID to commodity price file key from feed storage configs.
+
+        Reads ``feed_storage_configurations`` from the InputManager. Each storage entry
+        carries a ``rufas_id`` integer and a ``crop_name`` string. The commodity price
+        file key is resolved via :meth:`_resolve_price_file_key`, which prefers an exact
+        ``commodity_prices_{crop_name}_dollar_per_kilogram`` match and otherwise falls
+        back to a curated alias for feeds without a dedicated price series.
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._build_feed_id_to_price_file_map.__name__}
+        feed_id_map: Dict[str, str] = {}
+        try:
+            configs = self.im.get_data("feed_storage_configurations")
+        except Exception:
+            return feed_id_map
+
+        if not isinstance(configs, dict):
+            return feed_id_map
+
+        for storage_type_entries in configs.values():
+            if not isinstance(storage_type_entries, list):
+                continue
+            for entry in storage_type_entries:
+                if not isinstance(entry, dict):
+                    continue
+                rufas_id = entry.get("rufas_id")
+                crop_name = entry.get("crop_name")
+                if rufas_id is None or not isinstance(crop_name, str):
+                    continue
+                price_file_key = self._resolve_price_file_key(crop_name)
+                if price_file_key is None:
+                    self.om.add_warning(
+                        "MissingHomegrownFeedPriceMapping",
+                        f"No commodity price file or alias found for feed crop '{crop_name}' "
+                        f"(feed ID '{rufas_id}')",
+                        info_map,
+                    )
+                    continue
+                feed_id_map[str(rufas_id)] = price_file_key
+
+        return feed_id_map
+
+    def _compute_line_items_by_wildcard(
+        self,
+        item: "EconomicItem",
+        wildcard_values: List[tuple],
+        feed_id_to_price_file: Dict[str, str],
+    ) -> Dict[str, float]:
+        """Compute per-wildcard-match line items using the feed config price map.
+
+        For each captured wildcard group (i.e. a RuFaS feed ID), the method:
+        1. Fetches the biophysical quantity for that specific feed ID.
+        2. Resolves the commodity price CSV key from ``feed_id_to_price_file``.
+        3. Returns a mapping of feed ID string to ``quantity * price`` line item.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._compute_line_items_by_wildcard.__name__,
+        }
+        line_items: Dict[str, float] = {}
+
+        for groups in wildcard_values:
+            if not groups:
+                continue
+            wildcard_value = str(groups[0])
+
+            specific_patterns = [re.sub(r"\.\*", wildcard_value, p) for p in item.biophysical_simulation]
+            quantity_values = self._fetch_values(specific_patterns)
+            quantity = self._aggregate(quantity_values, item.preprocessing or "") or 0.0
+
+            price_file_key = feed_id_to_price_file.get(wildcard_value)
+            if not price_file_key:
+                self.om.add_warning(
+                    "MissingHomegrownFeedPriceMapping",
+                    f"No commodity price file found for feed ID '{wildcard_value}' in feed storage configurations",
+                    info_map,
+                )
+                continue
+
+            price_data = self._fetch_prices([price_file_key])
+            price_values = self._extract_price_values(price_data)
+            price = self._aggregate(price_values, "average") or 0.0
+
+            line_items[wildcard_value] = quantity * price
+
+        return line_items
+
+    def _aggregate(self, values: List[float], desc: str) -> float | None:
+        """Aggregate values according to a textual description."""
+        if not values:
+            return None
+        d = desc.lower() if isinstance(desc, str) else ""
+        if "average" in d or "mean" in d:
+            return Aggregator.average(values)
+        if "product" in d:
+            return Aggregator.product(values)
+        if "divide" in d or "ratio" in d:
+            result = Aggregator.division(values)
+            if result is not None:
+                return result
+        if "subtract" in d or "difference" in d:
+            result = Aggregator.subtraction(values)
+            if result is not None:
+                return result
+        if "standard deviation" in d or "std" in d:
+            return Aggregator.standard_deviation(values)
+        # Default aggregation is sum
+        return Aggregator.sum(values)
+
     def preprocess(self) -> Dict[str, Dict[str, Dict[str, Dict[str, Any]]]]:
         """Run preprocessing and store results in the InputManager."""
 
         results: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {}
         info_map = {"class": self.__class__.__name__, "function": self.preprocess.__name__}
+        feed_id_to_price_file: Dict[str, str] = self._build_feed_id_to_price_file_map()
 
         for item in self.mapping:
             section_data = results.setdefault(item.section, {})
@@ -541,6 +688,26 @@ class EconomicPreprocessor:
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
             wildcard_values = self._collect_biophysical_wildcards(item.biophysical_simulation)
+
+            if item.use_feed_config_price_map and wildcard_values:
+                per_wildcard_items = self._compute_line_items_by_wildcard(item, wildcard_values, feed_id_to_price_file)
+                if per_wildcard_items:
+                    total = sum(per_wildcard_items.values())
+                    flow_type = self._infer_flow_type(item) or "cost"
+                    category_data[item.name] = {
+                        "biophysical_values": list(per_wildcard_items.values()),
+                        "biophysical_aggregate": total,
+                        "biophysical_values_by_scenario": {"baseline": list(per_wildcard_items.values())},
+                        "biophysical_aggregate_by_scenario": {"baseline": total},
+                        "price_data": {},
+                        "price_values": [],
+                        "price_aggregate": None,
+                        "line_item_values_by_scenario": {"baseline": total},
+                        "per_wildcard_line_items": per_wildcard_items,
+                        "flow_type": flow_type,
+                    }
+                    continue
+
             input_values, input_match_values = self._fetch_input_values(
                 item.input_manager,
                 wildcard_values,
