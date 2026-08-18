@@ -3,32 +3,8 @@
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/example_freestall_dairy_no_CC_1field_metadata.json",
-      "output_prefix": "NoCC-1field",
-      "log_verbosity": "errors",
-      "random_seed": 42,
-      "exclude_info_maps": false
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/example_freestall_CC_1field_dairy_metadata.json",
-      "output_prefix": "CC-1field",
-      "log_verbosity": "errors",
-      "random_seed": 42,
-      "exclude_info_maps": false
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/example_freestall_no_CC_dairy_metadata.json",
-      "output_prefix": "NO-CC-2field",
-      "log_verbosity": "errors",
-      "random_seed": 42,
-      "exclude_info_maps": false
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/example_freestall_CC_dairy_metadata.json",
-      "output_prefix": "CC-2field",
+      "metadata_file_path": "input/metadata/example_freestall_dairy_metadata.json",
+      "output_prefix": "freestall",
       "log_verbosity": "errors",
       "random_seed": 42,
       "exclude_info_maps": false

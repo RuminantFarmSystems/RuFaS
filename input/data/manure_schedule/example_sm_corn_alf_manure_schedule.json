@@ -53,7 +53,7 @@
     "liquid",
     "liquid"
   ],
-  "supplement_manure_nutrient_deficiencies": ["none", "none", "none", "none"],
+  "supplement_manure_nutrient_deficiencies": ["synthetic fertilizer and manure", "manure", "manure", "manure"],
   "pattern_repeat": 1,
   "pattern_skip": 4
 }
