@@ -15,6 +15,7 @@ Adding a new special case is a three-step operation:
 2. Add the subclass to ``SPECIAL_CASE_HANDLERS`` in the package ``__init__``.
 3. Resolve shared InputManager/OutputManager needs through ``self.context``.
 """
+
 from abc import ABC, abstractmethod
 from typing import Any, ClassVar
 
