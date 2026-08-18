@@ -530,13 +530,103 @@ def test_calculate_daily_farmgrown_feed_emissions_and_resources(
         expected_harvest_yield_data,
         all_simulation_days,
     )
-    assert actual_data.keys() == expected_daily_farmgrown_feed_emissions_and_resources.keys()
-    for feed_id, emissions_and_resources in actual_data.items():
-        assert emissions_and_resources.keys() == expected_daily_farmgrown_feed_emissions_and_resources[feed_id].keys()
-        for day in all_simulation_days:
-            assert emissions_and_resources[day] == pytest.approx(
-                expected_daily_farmgrown_feed_emissions_and_resources[feed_id][day], rel=1e-3
-            )
+    assert set(actual_data.keys()) == set(expected_daily_farmgrown_feed_emissions_and_resources.keys())
+    for feed_id, day_data in actual_data.items():
+        assert set(day_data.keys()) == set(expected_daily_farmgrown_feed_emissions_and_resources[feed_id].keys())
+        for simulation_day, day_emissions_and_resources in day_data.items():
+            for key, value in day_emissions_and_resources.items():
+                assert (
+                    pytest.approx(actual_data[feed_id][simulation_day][key])
+                    == expected_daily_farmgrown_feed_emissions_and_resources[feed_id][simulation_day][key]
+                )
+
+
+def test_calculate_daily_farmgrown_feed_emissions_and_resources_duplicate_harvest_dates(
+    em: EmissionsEstimator,
+) -> None:
+    # Two fields harvest the same feed on the same day (day 10); the daily values must
+    # combine both fields' yields and emissions, and the allocation window must extend
+    # to the next distinct harvest date (day 20), not the duplicate date itself.
+    emission_data = {
+        "nitrous_oxide_emissions": {"field_1": {5: 1.0, 15: 2.0}, "field_2": {5: 3.0}},
+        "ammonia_emissions": {"field_1": {}, "field_2": {}},
+    }
+    resource_data = {
+        "fertilizer_applications": {"field_1": {}, "field_2": {}},
+        "manure_applications": {"field_1": {}, "field_2": {}},
+    }
+    harvest_yield_by_field = {
+        "field_1": {
+            10: {"field_name": "field_1", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_only"},
+            20: {"field_name": "field_1", "feed_id": 7, "dry_yield": 200.0, "harvest_type": "harvest_only"},
+        },
+        "field_2": {
+            10: {"field_name": "field_2", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_only"},
+        },
+    }
+    all_simulation_days = list(range(0, 26))
+
+    actual_data = em._calculate_daily_farmgrown_feed_emissions_and_resources(
+        emission_data,
+        resource_data,
+        harvest_yield_by_field,
+        all_simulation_days,
+    )
+
+    assert set(actual_data.keys()) == {7}
+    assert set(actual_data[7].keys()) == set(all_simulation_days)
+    for simulation_day in range(0, 10):
+        assert actual_data[7][simulation_day]["nitrous_oxide_emissions"] == 0.0
+    # Days 10-19: (1.0 + 3.0) kg over (100 + 100) kg harvested across both fields.
+    for simulation_day in range(10, 20):
+        assert pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == 0.02
+    # Days 20-25: (4.0 + 2.0) kg over (200 + 200) kg after the second field_1 harvest.
+    for simulation_day in range(20, 26):
+        assert pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == 0.015
+
+
+@pytest.mark.parametrize(
+    "no_feed_harvest_type, expected_nitrous_oxide_emissions",
+    [
+        # A kill-only harvest does not advance the field's last harvest date, so the
+        # emission window for the day-10 harvest spans (-1, 10] and includes day 3.
+        ("kill_only", 0.03),
+        # Any other no-feed harvest advances the window, so only day 8 is included.
+        ("harvest_kill", 0.02),
+    ],
+)
+def test_calculate_daily_farmgrown_feed_emissions_and_resources_no_feed_harvests(
+    em: EmissionsEstimator,
+    no_feed_harvest_type: str,
+    expected_nitrous_oxide_emissions: float,
+) -> None:
+    emission_data = {
+        "nitrous_oxide_emissions": {"field_1": {3: 1.0, 8: 2.0}},
+        "ammonia_emissions": {"field_1": {}},
+    }
+    resource_data = {
+        "fertilizer_applications": {"field_1": {}},
+        "manure_applications": {"field_1": {}},
+    }
+    harvest_yield_by_field = {
+        "field_1": {
+            5: {"field_name": "field_1", "feed_id": None, "dry_yield": 0.0, "harvest_type": no_feed_harvest_type},
+            10: {"field_name": "field_1", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_only"},
+        },
+    }
+    all_simulation_days = list(range(0, 16))
+
+    actual_data = em._calculate_daily_farmgrown_feed_emissions_and_resources(
+        emission_data,
+        resource_data,
+        harvest_yield_by_field,
+        all_simulation_days,
+    )
+
+    for simulation_day in range(10, 16):
+        assert (
+            pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == expected_nitrous_oxide_emissions
+        )
 
 
 def test_calculate_daily_farmgrown_feed_fed_emissions_and_resources(
