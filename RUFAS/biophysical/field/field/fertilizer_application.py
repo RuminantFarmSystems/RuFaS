@@ -174,13 +174,9 @@ class FertilizerApplication:
                 depth_factor = layer_depth / application_depth
                 depth_factors_sum += depth_factor
                 depth_factors.append(depth_factor)
-                if depth_factor < 0:
-                    print("depth_error")
             else:
                 depth_factor = 1.0 - depth_factors_sum
                 depth_factors.append(depth_factor)
-                if depth_factor < 0:
-                    print("depth_error")
                 break
         print(depth_factors)
         return depth_factors
