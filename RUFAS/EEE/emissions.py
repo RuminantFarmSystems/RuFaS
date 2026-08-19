@@ -405,6 +405,29 @@ class EmissionsEstimator:
 
         return harvest_data
 
+    def _group_harvest_details_by_date(
+        self, harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
+    ) -> dict[int, list[dict[str, str | dict[str, Any]]]]:
+        """
+        Regroups harvest data keyed by field name into data keyed by harvest simulation day, collecting the
+        harvests from every field that share the same simulation day into a single list.
+
+        Parameters
+        ----------
+        harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
+            The harvest details for farmgrown feeds keyed by field name.
+
+        Returns
+        -------
+        dict[int, list[dict[str, str | dict[str, Any]]]]
+            The harvest details for farmgrown feeds across all fields keyed by harvest date.
+        """
+        harvest_details_by_harvest_dates = defaultdict(list)
+        for field_name, harvest_dates in harvest_yield_by_field.items():
+            for harvest_date, details in harvest_dates.items():
+                harvest_details_by_harvest_dates[harvest_date].append({"field_name": field_name, "details": details})
+        return harvest_details_by_harvest_dates
+
     def _calculate_daily_farmgrown_feed_emissions_and_resources(
         self,
         emission_data: dict[str, dict[str, dict[int, float]]],
@@ -445,7 +468,8 @@ class EmissionsEstimator:
                 "fertilizer_P": 0.0,
                 "fertilizer_K": 0.0,
                 "manure_N": 0.0,
-            } for feed_id in all_feed_ids
+            }
+            for feed_id in all_feed_ids
         }
         total_harvest_dry_yield_by_feed_id: dict[RUFAS_ID, float] = {feed_id: 0.0 for feed_id in all_feed_ids}
         daily_farmgrown_feed_emission_and_resource_by_feed_id: dict[RUFAS_ID, dict[int, dict[str, float]]] = {
@@ -453,22 +477,14 @@ class EmissionsEstimator:
         }
 
         harvest_dates_by_feed_id = self._calculate_harvest_dates_by_feed_id(harvest_yield_by_field)
-        harvest_details_by_harvest_dates = defaultdict(list)
-
-        for field_name, harvest_dates in harvest_yield_by_field.items():
-            for harvest_date in harvest_dates:
-                harvest_details_by_harvest_dates[harvest_date].append({
-                    "field_name": field_name,
-                    "details": harvest_yield_by_field[field_name][harvest_date],
-                })
-
+        harvest_details_by_harvest_dates = self._group_harvest_details_by_date(harvest_yield_by_field)
         last_harvest_date_by_field = {field_name: -1 for field_name in harvest_yield_by_field}
 
         for harvest_date, harvest_records in sorted(harvest_details_by_harvest_dates.items()):
             for record in harvest_records:
-                harvest_details = record['details']
+                harvest_details = record["details"]
                 feed_id = harvest_details["feed_id"]
-                field_name = harvest_details["field_name"]
+                field_name = record["field_name"]
                 harvest_type = harvest_details["harvest_type"]
                 last_harvest_date_for_current_field = last_harvest_date_by_field[field_name]
                 if feed_id is None:
@@ -543,7 +559,7 @@ class EmissionsEstimator:
                 for simulation_day in range(harvest_date, next_harvest_date_for_feed_id + 1):
                     daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][simulation_day] = {
                         "nitrous_oxide_emissions": (
-                                total_emission_and_resource["nitrous_oxide_emissions"] / total_dry_yield
+                            total_emission_and_resource["nitrous_oxide_emissions"] / total_dry_yield
                         ),
                         "ammonia_emissions": (total_emission_and_resource["ammonia_emissions"] / total_dry_yield),
                         "fertilizer_N": (total_emission_and_resource["fertilizer_N"] / total_dry_yield),
@@ -611,8 +627,6 @@ class EmissionsEstimator:
                         harvest_dates.append(harvest_date)
             harvest_dates_by_feed_id[feed_id] = sorted(harvest_dates)
         return harvest_dates_by_feed_id
-
-
 
     def _calculate_daily_farmgrown_feed_fed_emissions_and_resources(
         self,

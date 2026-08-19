@@ -452,6 +452,32 @@ def test_parse_harvest_data(
     mock_om_filter_variables_pool.assert_called_once()
 
 
+def test_group_harvest_details_by_date(
+    expected_harvest_yield_data: dict[str, dict[int, dict[str, int | str | float]]],
+    em: EmissionsEstimator,
+) -> None:
+    """Regroups harvest details keyed by field name into details keyed by harvest date, collecting harvests
+    from every field sharing a date into a single list."""
+    actual_data = em._group_harvest_details_by_date(expected_harvest_yield_data)
+
+    expected_data: dict[int, list[dict[str, str | dict[str, Any]]]] = defaultdict(list)
+    for field_name, harvest_dates in expected_harvest_yield_data.items():
+        for harvest_date, details in harvest_dates.items():
+            expected_data[harvest_date].append({"field_name": field_name, "details": details})
+    assert actual_data == expected_data
+
+    assert [entry["field_name"] for entry in actual_data[262]] == ["field_1"]
+    assert [entry["field_name"] for entry in actual_data[297]] == ["field_2"]
+    assert [entry["field_name"] for entry in actual_data[514]] == ["field_1", "field_2"]
+    assert actual_data[514][0]["details"] == expected_harvest_yield_data["field_1"][514]
+    assert actual_data[514][1]["details"] == expected_harvest_yield_data["field_2"][514]
+
+
+def test_group_harvest_details_by_date_empty(em: EmissionsEstimator) -> None:
+    """An empty harvest mapping regroups to an empty result."""
+    assert em._group_harvest_details_by_date({}) == defaultdict(list)
+
+
 def test_parse_farmgrown_feed_deductions_data(
     raw_farmgrown_feed_deductions_data: dict[str, dict[str, list[Any]]],
     expected_farmgrown_feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
@@ -508,9 +534,11 @@ def test_calculate_daily_farmgrown_feed_emissions_and_resources(
 def test_calculate_daily_farmgrown_feed_emissions_and_resources_duplicate_harvest_dates(
     em: EmissionsEstimator,
 ) -> None:
-    # Two fields harvest the same feed on the same day (day 10); the daily values must
-    # combine both fields' yields and emissions, and the allocation window must extend
-    # to the next distinct harvest date (day 20), not the duplicate date itself.
+    """
+    Unit test for the case where Two fields harvest the same feed on the same day (day 10);
+    the daily values must combine both fields' yields and emissions, and the allocation
+    window must extend to the next distinct harvest date (day 20), not the duplicate date itself.
+    """
     emission_data = {
         "nitrous_oxide_emissions": {"field_1": {5: 1.0, 15: 2.0}, "field_2": {5: 3.0}},
         "ammonia_emissions": {"field_1": {}, "field_2": {}},
