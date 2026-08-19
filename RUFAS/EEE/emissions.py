@@ -14,7 +14,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "name": "Farmgrown Feeds Yields",
         "description": "Collects all crop harvests that occurred in the simulation.",
         "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
-        "variables": ["dry_yield", "crop", "harvest_year", "harvest_day", "field_name", "harvest_type"],
+        "variables": ["dry_yield", "crop", "harvest_year", "harvest_day", "field_name", "harvest_type", "field_size"],
         "date_fields": ("harvest_year", "harvest_day"),
     },
     "nitrous_oxide_emissions": {
@@ -292,7 +292,9 @@ class EmissionsEstimator:
         simulation_end_date: datetime = datetime.strptime(str(config_data["end_date"]), "%Y:%j")
         all_simulation_days = list(range(0, (simulation_end_date - simulation_start_date).days + 1))
 
-        emission_data = self._parse_farmgrown_feeds_emission_data()
+        field_details = self._build_field_details()
+
+        emission_data = self._parse_farmgrown_feeds_emission_data(field_details)
 
         resource_data = self._parse_manure_and_fertilizer_application_data(simulation_start_date)
 
@@ -319,7 +321,10 @@ class EmissionsEstimator:
         farm_grown_feeds_fed_to_animals = list(daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id.keys())
         self._calculate_and_report_lca_emissions(farm_grown_feeds_fed_to_animals, feed_deductions_data)
 
-    def _parse_farmgrown_feeds_emission_data(self) -> dict[str, dict[str, dict[int, float]]]:
+    def _parse_farmgrown_feeds_emission_data(
+            self,
+            field_details: dict[str, dict[str, Any]],
+    ) -> dict[str, dict[str, dict[int, float]]]:
         """
         Parses farmgrown feeds emission data from the OutputManager and returns a
         dictionary with emission data for each field on every simulation day.
@@ -327,6 +332,9 @@ class EmissionsEstimator:
         Emission values across all soil layers for a given field are aggregated by
         summing layer-level values for each simulation day.
 
+        Notes
+        -----
+        The farmgrown feeds Nitrous Oxide and Ammonia emission data has unit kg.
         Returns
         -------
         dict[str, dict[str, dict[int, float]]]
@@ -359,10 +367,11 @@ class EmissionsEstimator:
 
                 all_fields_by_layer[field_name][layer_number] = dict(zip(simulation_days, values["values"]))
             for field_name in all_fields_by_layer:
+                field_size = field_details[field_name]["field_size"]
                 emission_data[filter_key][field_name] = {
-                    simulation_day: sum(
+                    simulation_day: (sum(
                         layer_data.get(simulation_day, 0) for layer_data in all_fields_by_layer[field_name].values()
-                    )
+                    ) * field_size)
                     for simulation_day in simulation_days
                 }
         return emission_data
@@ -387,7 +396,7 @@ class EmissionsEstimator:
             A nested dictionary structured as
             ``{application_type: {field_name: {simulation_day: {variable: value}}}}``,
             where application types are ``"manure_applications"`` and
-            ``"fertilizer_applications"``. Application values are in kg/ha.
+            ``"fertilizer_applications"``. Application values are in kg.
         """
         resource_data: dict[str, dict[str, dict[int, dict[str, float]]]] = defaultdict(dict)
         for filter_key in ["manure_applications", "fertilizer_applications"]:
@@ -397,35 +406,25 @@ class EmissionsEstimator:
             if len(filtered_data) == 0:
                 continue
 
-            filtered_data_by_field: dict[str, dict[str, list[int | float]]] = {}
-            for full_variable_name, variable_contents in filtered_data.items():
-                field_name = ""
-                field_name_matches = re.search(r"field='([^']+)'", full_variable_name)
-                if field_name_matches:
-                    field_name = field_name_matches.group(1)
-                variable_name = full_variable_name.split(".")[-1]
-                filtered_data_by_field.setdefault(field_name, {})[variable_name] = variable_contents["values"]
-
-            for field_name, field_data in filtered_data_by_field.items():
-                date_field: tuple[str, str] = resource_filter["date_fields"]
-                year_key, day_key = date_field[0], date_field[1]
-                dates = list(
-                    map(
-                        RufasTime.convert_year_jday_to_date,
-                        field_data[year_key],
-                        field_data[day_key],
-                    )
+            date_field: tuple[str, str] = resource_filter["date_fields"]
+            year_key, day_key = date_field[0], date_field[1]
+            dates = list(
+                map(
+                    RufasTime.convert_year_jday_to_date,
+                    filtered_data[year_key]["values"],
+                    filtered_data[day_key]["values"],
                 )
-                simulation_days = [(event_date - simulation_start_date).days for event_date in dates]
-                for i, simulation_day in enumerate(simulation_days):
-                    field_size: float = field_data["field_size"][i]
-                    if field_name not in resource_data[filter_key]:
-                        resource_data[filter_key][field_name] = {}
-                    resource_data[filter_key][field_name][simulation_day] = {
-                        variable: field_data[variable][i] / field_size
-                        for variable in field_data
-                        if variable not in [year_key, day_key, "field_name", "field_size", "DISCLAIMER"]
-                    }
+            )
+            simulation_days = [(event_date - simulation_start_date).days for event_date in dates]
+            for i, simulation_day in enumerate(simulation_days):
+                field_name = filtered_data["field_name"]["values"][i]
+                if field_name not in resource_data[filter_key]:
+                    resource_data[filter_key][field_name] = {}
+                resource_data[filter_key][field_name][simulation_day] = {
+                    variable: filtered_data[variable]["values"][i]
+                    for variable in filtered_data
+                    if variable not in [year_key, day_key, "field_name", "field_size", "DISCLAIMER"]
+                }
 
         return resource_data
 
@@ -479,6 +478,20 @@ class EmissionsEstimator:
             feed_deduction_by_feed_id[feed_id] = dict(sorted(feed_deduction_by_feed_id[feed_id].items()))
 
         return feed_deduction_by_feed_id
+
+    def _build_field_details(self) -> dict[str, dict[str, Any]]:
+        """Builds a dictionary of field details including field name, and field size."""
+        field_details: dict[str, dict[str, Any]] = {}
+        filtered_data = self.om.filter_variables_pool(
+            FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
+        )
+        if len(filtered_data) == 0:
+            return field_details
+        for i, field_name in enumerate(filtered_data["field_name"]["values"]):
+            field_size = filtered_data["field_size"]["values"][i]
+            if field_name not in field_details:
+                field_details[field_name] = {"field_size": field_size}
+        return field_details
 
     def _parse_crop_to_feed_id_mapping(self) -> dict[tuple[str, str], RUFAS_ID]:
         """
@@ -546,34 +559,24 @@ class EmissionsEstimator:
             return harvest_data
         date_field: tuple[str, str] = harvest_filter["date_fields"]
         year_key, day_key = date_field[0], date_field[1]
+        for i, field_name in enumerate(filtered_data["field_name"]["values"]):
+            crop_name = filtered_data["crop"]["values"][i]
+            feed_id = crop_to_feed_id_mapping.get((field_name, crop_name), None)
+            harvest_dry_yield_data = filtered_data["dry_yield"]["values"][i]
+            harvest_type = filtered_data["harvest_type"]["values"][i]
+            field_size = filtered_data["field_size"]["values"][i]
+            harvest_year, harvest_day = filtered_data[year_key]["values"][i], filtered_data[day_key]["values"][i]
+            harvest_simulation_day = (
+                RufasTime.convert_year_jday_to_date(harvest_year, harvest_day) - simulation_start_date
+            ).days
 
-        filtered_data_by_field: dict[str, dict[str, list[int | float | str]]] = {}
-        for full_variable_name, variable_contents in filtered_data.items():
-            field_name = ""
-            field_name_matches = re.search(r"field='([^']+)'", full_variable_name)
-            if field_name_matches:
-                field_name = field_name_matches.group(1)
-            variable_name = full_variable_name.split(".")[-1]
-            filtered_data_by_field.setdefault(field_name, {})[variable_name] = variable_contents["values"]
-
-        for field_name, field_data in filtered_data_by_field.items():
-            for i in range(len(field_data[year_key])):
-                harvest_year, harvest_day = int(field_data[year_key][i]), int(field_data[day_key][i])
-                harvest_simulation_day = (
-                    RufasTime.convert_year_jday_to_date(harvest_year, harvest_day) - simulation_start_date
-                ).days
-
-                crop_name = field_data["crop"][i]
-                feed_id = crop_to_feed_id_mapping.get((str(field_name), str(crop_name)), None)
-                harvest_dry_yield_data = field_data["dry_yield"][i]
-                harvest_type = field_data["harvest_type"][i]
-                harvest_data[field_name][harvest_simulation_day] = {
-                    "field_name": field_name,
-                    "crop": crop_name,
-                    "feed_id": feed_id,
-                    "dry_yield": harvest_dry_yield_data,
-                    "harvest_type": harvest_type,
-                }
+            harvest_data[field_name][harvest_simulation_day] = {
+                "field_name": field_name,
+                "crop": crop_name,
+                "feed_id": feed_id,
+                "dry_yield": harvest_dry_yield_data * field_size,
+                "harvest_type": harvest_type,
+            }
 
         return harvest_data
 
