@@ -32,7 +32,10 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
 from RUFAS.EEE.economics.preprocessing_context import PreprocessingContext
-from RUFAS.EEE.economics.special_cases import SpecialCaseHandler, SeedCostHandler
+from RUFAS.EEE.economics.special_cases import (
+    SpecialCaseHandler,
+    DigesterRevenueHandler,
+)
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -44,7 +47,7 @@ from RUFAS.EEE.economics.fallback_values import (
 COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
 
 SPECIAL_CASE_HANDLERS: list[type[SpecialCaseHandler]] = [
-    SeedCostHandler,
+    DigesterRevenueHandler,
 ]
 
 
@@ -75,11 +78,19 @@ class EconomicPreprocessor:
         self.mapping = self._build_mapping()
         self.special_case_handlers = self._build_special_case_handlers()
 
-    def _build_special_case_handlers(self) -> dict[tuple[str, str], SpecialCaseHandler]:
-        """Instantiate registered special-case handlers keyed by ``(section, name)``."""
+    def _build_special_case_handlers(self) -> Dict[tuple[str, str], SpecialCaseHandler]:
+        """Instantiate registered special-case handlers keyed by ``(section, name)``.
 
-        handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
-        return {handler.key: handler for handler in handlers}
+        A handler that owns several line items contributes one entry per pair in
+        its :attr:`~RUFAS.EEE.economics.special_cases.base.SpecialCaseHandler.keys`.
+        """
+
+        handlers: Dict[tuple[str, str], SpecialCaseHandler] = {}
+        for handler_cls in SPECIAL_CASE_HANDLERS:
+            handler = handler_cls(self.context)
+            for key in handler.keys:
+                handlers[key] = handler
+        return handlers
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""
@@ -278,6 +289,43 @@ class EconomicPreprocessor:
 
         return expanded_paths
 
+    def _resolve_input_path(self, path: str) -> Any:
+        """Resolve an InputManager path, expanding a list ancestor into a list of field values.
+
+        A plain scalar or object path resolves exactly as ``InputManager.get_data`` would. When an
+        ancestor along the path is a list (e.g. ``economic_inputs.Manure.digester`` is now a list of
+        digesters), the trailing field is collected from every list element and returned as a list, so
+        downstream aggregation sums the field across all entries.
+        """
+        parts = path.split(".")
+        for split_index in range(len(parts), 0, -1):
+            prefix = ".".join(parts[:split_index])
+            value = self.im.get_data(prefix)
+            if value is None:
+                continue
+
+            remaining = parts[split_index:]
+            if not remaining:
+                return value
+
+            if isinstance(value, list):
+                collected: List[Any] = []
+                for element in value:
+                    current: Any = element
+                    for key in remaining:
+                        if isinstance(current, dict) and key in current:
+                            current = current[key]
+                        else:
+                            current = None
+                            break
+                    if current is not None:
+                        collected.append(current)
+                return collected
+
+            # The prefix resolved to a non-list whose remaining keys did not resolve; treat as missing.
+            return None
+        return None
+
     def _fetch_input_values(
         self,
         input_paths: Iterable[str],
@@ -306,7 +354,7 @@ class EconomicPreprocessor:
                     continue
 
             for candidate_path in candidate_paths:
-                data = self.im.get_data(candidate_path)
+                data = self._resolve_input_path(candidate_path)
                 if data is None:
                     self.om.add_warning(
                         "MissingEconomicInput",
@@ -323,40 +371,6 @@ class EconomicPreprocessor:
                 self._append_from_payload(values, data)
         return values, exact_match_values
 
-    def _extract_price_values(self, price_data: Any) -> List[float]:
-        """Extract numeric price values from pricing payloads."""
-
-        info_map = {"class": self.__class__.__name__, "function": self._extract_price_values.__name__}
-        start_year: int = int(self.im.get_data("config.start_date").split(":")[0])
-        end_year: int = int(self.im.get_data("config.end_date").split(":")[0])
-        fips_code: int = self.im.get_data("config.FIPS_county_code")
-        values: List[float] = []
-        for key, value in price_data.items():
-            if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
-                self.om.add_warning(
-                    "MissingPriceData",
-                    f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format."
-                    "Using fallback price.",
-                    info_map,
-                )
-                values.extend(self.context.get_fallback_price(start_year, end_year, key))
-                continue
-            fips_idx = value["fips"].index(fips_code)
-            for year in range(start_year, end_year + 1):
-                try:
-                    price = value[f"{year}"][fips_idx]
-                    values.append(price)
-                except (KeyError, IndexError):
-                    self.om.add_warning(
-                        "MissingPriceData",
-                        f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
-                        "Using fallback price.",
-                        info_map,
-                    )
-                    values.extend(self.context.get_fallback_price(start_year, end_year, key))
-                    continue
-        return values
-
     def _infer_flow_type(self, item: EconomicItem) -> str | None:
         """Infer if an item is a revenue or cost based on naming conventions."""
 
@@ -372,109 +386,6 @@ class EconomicPreprocessor:
         if "_inputs" in haystack:
             return "cost"
         return None
-
-    def _fetch_prices(self, economics_files: Any) -> Dict[str, Any]:
-        """Collect commodity pricing using the InputManager."""
-
-        prices: Dict[str, Any] = {}
-        info_map = {"class": self.__class__.__name__, "function": self._fetch_prices.__name__}
-
-        if economics_files is None:
-            return prices
-
-        if isinstance(economics_files, list):
-            for file_key in economics_files:
-                price_data = self.context.get_data_with_handling(file_key, info_map)
-                if price_data is None:
-                    self.om.add_warning(
-                        "MissingEconomicsFile",
-                        f"Commodity pricing '{file_key}' not found in InputManager",
-                        info_map,
-                    )
-                    continue
-                prices[file_key] = price_data
-            return prices
-
-        if not isinstance(economics_files, dict):
-            return prices
-
-        selector_path = economics_files.get("input_manager_location")
-        if selector_path:
-            selection = self.context.get_data_with_handling(selector_path, info_map)
-            if selection is None:
-                self.om.add_warning(
-                    "MissingSelection",
-                    f"Selector value not found at '{selector_path}'",
-                    info_map,
-                )
-                for option, file_key in economics_files.items():
-                    if option == "input_manager_location":
-                        continue
-                    if not isinstance(file_key, str):
-                        continue
-                    price_data = self.context.get_data_with_handling(file_key, info_map)
-                    if price_data is not None:
-                        prices[file_key] = price_data
-                if prices:
-                    self.om.add_warning(
-                        "MissingSelectionFallback",
-                        f"No selector match; using all available pricing options for '{selector_path}'.",
-                        info_map,
-                    )
-                return prices
-            selection_key = str(selection).lower()
-            selected_file = None
-            for option, file_key in economics_files.items():
-                if option == "input_manager_location":
-                    continue
-                if option.lower() == selection_key:
-                    selected_file = file_key
-                    break
-            if selected_file is None:
-                self.om.add_warning(
-                    "UnknownSelection",
-                    f"No price file matched selection '{selection}' at '{selector_path}'",
-                    info_map,
-                )
-                for option, file_key in economics_files.items():
-                    if option == "input_manager_location":
-                        continue
-                    if not isinstance(file_key, str):
-                        continue
-                    price_data = self.context.get_data_with_handling(file_key, info_map)
-                    if price_data is not None:
-                        prices[file_key] = price_data
-                if prices:
-                    self.om.add_warning(
-                        "UnknownSelectionFallback",
-                        f"No matching selection; using all available pricing options for '{selector_path}'.",
-                        info_map,
-                    )
-                return prices
-            price_data = self.context.get_data_with_handling(selected_file, info_map)
-            if price_data is None:
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"Commodity pricing '{selected_file}' not found in InputManager",
-                    info_map,
-                )
-                return prices
-            prices[selected_file] = price_data
-            return prices
-
-        for label, file_key in economics_files.items():
-            if not isinstance(file_key, str):
-                continue
-            price_data = self.context.get_data_with_handling(file_key, info_map)
-            if price_data is None:
-                self.om.add_warning(
-                    "MissingEconomicsFile",
-                    f"Commodity pricing '{file_key}' not found in InputManager",
-                    info_map,
-                )
-                continue
-            prices[label] = price_data
-        return prices
 
     def _extract_selector_values(self, selection: Any) -> List[str]:
         """Normalize selector values into lowercase keys."""
@@ -499,18 +410,18 @@ class EconomicPreprocessor:
         """Collect pricing by exact key match against mapping options when requested."""
 
         if not isinstance(economics_files, dict):
-            return self._fetch_prices(economics_files)
+            return self.context.fetch_prices(economics_files)
 
         source = str(match_source or "").lower()
         if source not in {"input_manager", "biophysical_simulation"}:
-            return self._fetch_prices(economics_files)
+            return self.context.fetch_prices(economics_files)
 
         requested_values = (
             list(input_match_values or []) if source == "input_manager" else list(biophysical_match_values or [])
         )
         requested = {str(value).lower() for value in requested_values if str(value).strip()}
         if not requested:
-            return self._fetch_prices(economics_files)
+            return self.context.fetch_prices(economics_files)
 
         info_map = {"class": self.__class__.__name__, "function": self._fetch_prices_with_exact_matches.__name__}
         prices: Dict[str, Any] = {}
@@ -536,7 +447,7 @@ class EconomicPreprocessor:
 
             handler = self.special_case_handlers.get((item.section, item.name))
             if handler is not None:
-                category_data[item.name] = handler.process()
+                category_data[item.name] = handler.process(item)
                 continue
 
             values_by_scenario = self._fetch_values_by_scenario(item.biophysical_simulation)
@@ -586,7 +497,7 @@ class EconomicPreprocessor:
                     info_map,
                 )
 
-            price_values = self._extract_price_values(price_data)
+            price_values = self.context.extract_price_values(price_data)
             price_aggregate = self.context.aggregate(price_values, "average")
             if price_aggregate is None:
                 flow_type = self._infer_flow_type(item) or "cost"

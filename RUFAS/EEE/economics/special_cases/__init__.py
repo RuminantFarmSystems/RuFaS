@@ -1,18 +1,20 @@
 """Special-case handlers for economics preprocessing.
 
-Each handler owns the bespoke preprocessing for one ``ECONOMIC_MAP`` line item
-that the generic pipeline cannot express. The main
-:class:`~RUFAS.EEE.economics.preprocessing.EconomicPreprocessor` builds a
-``(section, name) -> handler`` map from :data:`SPECIAL_CASE_HANDLERS` and
-delegates matching line items to them.
+Each handler owns the bespoke preprocessing for one or more ``ECONOMIC_MAP``
+line items that the generic pipeline cannot express. The main
+:class:`~RUFAS.EEE.economics.preprocessing.EconomicPreprocessor` instantiates
+the registered handlers and, for each mapping item, delegates to the first
+handler whose :meth:`~RUFAS.EEE.economics.special_cases.base.SpecialCaseHandler.matches`
+returns ``True``.
 
 To register a new special case, implement a
 :class:`~RUFAS.EEE.economics.special_cases.base.SpecialCaseHandler` subclass and
-append it to :data:`SPECIAL_CASE_HANDLERS`.
+append it to ``SPECIAL_CASE_HANDLERS`` in
+:mod:`RUFAS.EEE.economics.preprocessing`.
 """
 
 from RUFAS.EEE.economics.special_cases.base import SpecialCaseHandler
-from RUFAS.EEE.economics.special_cases.seed_costs import SeedCostHandler
+from RUFAS.EEE.economics.special_cases.digester_revenue import DigesterRevenueHandler
 
 
-__all__ = ["SpecialCaseHandler", "SeedCostHandler",]
+__all__ = ["SpecialCaseHandler", "DigesterRevenueHandler"]

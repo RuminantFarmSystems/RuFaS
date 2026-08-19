@@ -47,6 +47,41 @@ class DigesterSystemCostProfile:
         }
 
 
+@dataclass(frozen=True)
+class BiogasEnergyConversion:
+    """Conversion factors for turning captured biogas into usable energy.
+
+    Parameters
+    ----------
+    methane_content_fraction : float
+        Fraction of the total biogas volume that is methane (unitless).
+    methane_density_kg_per_m3 : float
+        Density used to convert methane volume to mass (kg CH4 / m^3 CH4).
+    methane_energy_content_kwh_per_kg : float
+        Energy content of methane fed into a combined heat and power unit (kWh / kg CH4).
+    chp_electrical_efficiency : float
+        Fraction of the methane energy input converted to electricity by the combined heat and power unit (unitless).
+    chp_thermal_efficiency : float
+        Fraction of the methane energy input recovered as heat by the combined heat and power unit (unitless).
+    rng_leakage_loss_fraction : float
+        Fraction of methane lost to leakage during renewable natural gas upgrading (unitless).
+    rng_process_heat_loss_fraction : float
+        Fraction of methane combusted to supply process heat for renewable natural gas upgrading (unitless).
+    rng_energy_yield_kwh_per_kg : float
+        Energy content of the upgraded renewable natural gas (kWh / kg RNG).
+
+    """
+
+    methane_content_fraction: float = 0.60
+    methane_density_kg_per_m3: float = 0.68
+    methane_energy_content_kwh_per_kg: float = 13.89
+    chp_electrical_efficiency: float = 0.33
+    chp_thermal_efficiency: float = 0.43
+    rng_leakage_loss_fraction: float = 0.02
+    rng_process_heat_loss_fraction: float = 0.03
+    rng_energy_yield_kwh_per_kg: float = 13.10
+
+
 class DigesterCostCalculator:
     """Collection of digester-related economic calculations."""
 
@@ -273,3 +308,78 @@ class DigesterCostCalculator:
         """Estimate the RNG trucking and injection cost for the herd size."""
 
         return cls._TRANSPORT_COST.evaluate(cows)
+
+    @staticmethod
+    def estimate_biogas_electricity(
+        biogas_volume_m3: float,
+        conversion: BiogasEnergyConversion = BiogasEnergyConversion(),
+    ) -> Dict[str, float]:
+        """Estimate electricity and heat produced from biogas by a combined heat and power unit.
+
+        Parameters
+        ----------
+        biogas_volume_m3 : float
+            Volume of captured biogas routed to the combined heat and power unit (m^3).
+        conversion : BiogasEnergyConversion
+            Conversion factors governing the methane content, energy content, and combined heat and power
+            efficiencies.
+
+        Returns
+        -------
+        Dict[str, float]
+            Mapping with the methane volume (m^3), methane mass (kg), methane energy input (kWh), electricity
+            output (kWh), and heat output (kWh).
+
+        """
+
+        if biogas_volume_m3 < 0:
+            raise ValueError("biogas_volume_m3 must be non-negative")
+
+        methane_volume = biogas_volume_m3 * conversion.methane_content_fraction
+        methane_mass = methane_volume * conversion.methane_density_kg_per_m3
+        energy_input = methane_mass * conversion.methane_energy_content_kwh_per_kg
+        return {
+            "methane_volume_m3": methane_volume,
+            "methane_mass_kg": methane_mass,
+            "energy_input_kwh": energy_input,
+            "electricity_output_kwh": energy_input * conversion.chp_electrical_efficiency,
+            "heat_output_kwh": energy_input * conversion.chp_thermal_efficiency,
+        }
+
+    @staticmethod
+    def estimate_biogas_rng(
+        biogas_volume_m3: float,
+        conversion: BiogasEnergyConversion = BiogasEnergyConversion(),
+    ) -> Dict[str, float]:
+        """Estimate renewable natural gas produced from biogas after upgrading.
+
+        Parameters
+        ----------
+        biogas_volume_m3 : float
+            Volume of captured biogas routed to renewable natural gas upgrading (m^3).
+        conversion : BiogasEnergyConversion
+            Conversion factors governing the methane content, upgrading losses, and renewable natural gas energy
+            yield.
+
+        Returns
+        -------
+        Dict[str, float]
+            Mapping with the methane volume before upgrading (m^3), the renewable natural gas volume (m^3), the
+            renewable natural gas mass (kg), and the renewable natural gas energy yield (kWh).
+
+        """
+
+        if biogas_volume_m3 < 0:
+            raise ValueError("biogas_volume_m3 must be non-negative")
+
+        methane_volume = biogas_volume_m3 * conversion.methane_content_fraction
+        methane_mass = methane_volume * conversion.methane_density_kg_per_m3
+        retained_fraction = 1 - conversion.rng_leakage_loss_fraction - conversion.rng_process_heat_loss_fraction
+        rng_volume = methane_volume * retained_fraction
+        rng_mass = methane_mass * retained_fraction
+        return {
+            "methane_volume_m3": methane_volume,
+            "rng_volume_m3": rng_volume,
+            "rng_mass_kg": rng_mass,
+            "rng_energy_kwh": rng_mass * conversion.rng_energy_yield_kwh_per_kg,
+        }
