@@ -255,6 +255,12 @@ class PartialBudget:
                 costs = float(cost_total.item())
                 comparison_roi_data: list[dict[str, str]] = \
                     self.im.get_data("economic_inputs.roi.roi_comparison_data")
+                if comparison_roi_data is None:
+                    self.om.add_warning(
+                        "ROI calculation warning",
+                        "No comparison ROI data found, please check roi comparison data filter.",
+                        info_map
+                    )
                 for comparison in comparison_roi_data:
                     self._calculate_roi(comparison, revenue, costs)
 
