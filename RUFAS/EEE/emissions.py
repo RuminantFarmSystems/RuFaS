@@ -615,11 +615,11 @@ class EmissionsEstimator:
             contains the per-unit nitrous oxide emissions, ammonia emissions,
             fertilizer N, fertilizer P, fertilizer K, and manure N for that day.
         """
-        all_feed_ids = set(
-            harvest_yield_by_field[field_name][harvest_date]["feed_id"]
-            for field_name in harvest_yield_by_field
-            for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys()))
-        )
+        all_feed_ids = {
+            details["feed_id"]
+            for harvest_dates in harvest_yield_by_field.values()
+            for details in harvest_dates.values()
+        }
 
         total_farmgrown_feed_emission_and_resource_by_feed_id: dict[RUFAS_ID, dict[str, float]] = {
             feed_id: {
@@ -837,11 +837,11 @@ class EmissionsEstimator:
             A dictionary mapping each feed ID to a sorted list of harvest dates
             associated with that feed ID.
         """
-        all_feed_ids = set(
-            harvest_yield_by_field[field_name][harvest_date]["feed_id"]
-            for field_name in harvest_yield_by_field
-            for harvest_date in sorted(list(harvest_yield_by_field[field_name].keys()))
-        )
+        all_feed_ids = {
+            details["feed_id"]
+            for harvest_dates in harvest_yield_by_field.values()
+            for details in harvest_dates.values()
+        }
         harvest_dates_by_feed_id = {}
         for feed_id in all_feed_ids:
             harvest_dates = []
