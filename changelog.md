@@ -28,7 +28,8 @@ v1.0.4
 ### v1.0.4
 
 - [3202](https://github.com/RuminantFarmSystems/RuFaS/pull/3202) - [minor change] [EEE] [NoInputChange] [OutputChange] Corrects errors in emissions and resource allocation logic
-- [3201](https://github.com/RuminantFarmSystems/RuFaS/pull/3202) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds check to hormone delivery during animal initialization
+- [3201](https://github.com/RuminantFarmSystems/RuFaS/pull/3201) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds check to hormone delivery during animal initialization
+- [3214](https://github.com/RuminantFarmSystems/RuFaS/pull/3214) - [minor change] [SoilCrop] [NoInputChange] [OutputChange] Updates method to distribute fertilizer between soil layers
 
 ### v1.0.3
 
