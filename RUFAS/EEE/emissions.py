@@ -238,6 +238,7 @@ class EmissionsEstimator:
         daily_farmgrown_feed_emissions_and_resources = self._calculate_daily_farmgrown_feed_emissions_and_resources(
             emission_data, resource_data, harvest_yield_data, all_simulation_days
         )
+        self._report_daily_farmgrown_feed_emissions_and_resource_intensity(daily_farmgrown_feed_emissions_and_resources)
 
         daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id = (
             self._calculate_daily_farmgrown_feed_fed_emissions_and_resources(
@@ -694,6 +695,37 @@ class EmissionsEstimator:
                 for simulation_day, data_for_day in daily_data_for_feed_id.items()
             ]
             self.om.add_variable_bulk(fertilizer_K_outputs, first_info_map_only=False)
+
+            manure_N_outputs = [
+                (
+                    {f"manure_nitrogen_applied_for_feed_{feed_id}": data_for_day["manure_N"]},
+                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                )
+                for simulation_day, data_for_day in daily_data_for_feed_id.items()
+            ]
+            self.om.add_variable_bulk(manure_N_outputs, first_info_map_only=False)
+
+
+    def _report_daily_farmgrown_feed_emissions_and_resource_intensity(
+        self,
+        daily_farmgrown_feed_emissions_and_resource_intensity: dict[RUFAS_ID, dict[int, dict[str, float]]],
+    ) -> None:
+        """Reports the emissions and resources for daily farmgrown feeds fed to the animals."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._report_daily_farmgrown_feed_emissions_and_resource_intensity.__name__,
+        }
+
+        for feed_id, daily_data_for_feed_id in daily_farmgrown_feed_emissions_and_resource_intensity.items():
+
+            fertilizer_N_outputs = [
+                (
+                    {f"nitrogen_fertilizer_applied_for_feed_{feed_id}": data_for_day["fertilizer_N"]},
+                    {**info_map, "units": MeasurementUnits.KILOGRAMS, "simulation_day": simulation_day},
+                )
+                for simulation_day, data_for_day in daily_data_for_feed_id.items()
+            ]
+            self.om.add_variable_bulk(fertilizer_N_outputs, first_info_map_only=False)
 
             manure_N_outputs = [
                 (
