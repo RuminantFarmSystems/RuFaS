@@ -141,7 +141,6 @@ class NutrientRequestResults:
         combined_total_dry_matter = self.dry_matter + other.dry_matter
 
         if combined_total_nitrogen > 0:
-        
             combined_organic_nitrogen_fraction = (
                 self.organic_nitrogen_fraction * self.nitrogen
                 + other.organic_nitrogen_fraction * other.nitrogen
