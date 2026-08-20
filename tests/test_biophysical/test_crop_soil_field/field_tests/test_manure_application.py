@@ -421,11 +421,20 @@ def test_apply_subsurface_manure(
 ) -> None:
     """Tests that nutrients from injection manure applications are correctly distributed between soil layers."""
     manure_app = ManureApplication(field_size=area)
+
+    top_depths = [0.0, 20.0, 50.0, 200.0]
+    bottom_depths = [20.0, 50.0, 200.0, 400.0]
+
+    def get_layer_attribute(attribute: str) -> list[float]:
+        if attribute == "top_depth":
+            return top_depths
+        return bottom_depths
+
     with (
         patch(
             "RUFAS.biophysical.field.soil.soil_data.SoilData.get_vectorized_layer_attribute",
             new_callable=MagicMock,
-            return_value=[20.0, 50.0, 200.0, 400.0],
+            side_effect=get_layer_attribute,
         ) as layer,
         patch(
             "RUFAS.biophysical.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
@@ -460,8 +469,20 @@ def test_apply_subsurface_manure(
             area,
         )
 
-        layer.assert_called_once_with("bottom_depth")
-        depth_factors.assert_called_once_with(depth, [20.0, 50.0, 200.0, 400.0])
+        layer.assert_has_calls(
+            [
+                call("top_depth"),
+                call("bottom_depth"),
+            ]
+        )
+        assert layer.call_count == 2
+
+        depth_factors.assert_called_once_with(
+            depth,
+            top_depths,
+            bottom_depths,
+        )
+
         labile.assert_has_calls(expected_labile_calls)
         active.assert_has_calls(expected_active_calls)
         nitrogen.assert_has_calls(expected_nitrogen_calls)
