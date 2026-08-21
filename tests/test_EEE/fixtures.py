@@ -7975,25 +7975,25 @@ def raw_manure_application_data() -> dict[str, dict[str, list[Any]]]:
 def parsed_fertilizer_and_manure_application_data() -> dict[str, dict[str, dict[int, dict[str, float]]]]:
     return {
         "manure_applications": {
-            "field_1": {123: {"nitrogen": 5.71}, 675: {"nitrogen": 8.57}},
-            "field_2": {123: {"nitrogen": 5.71}, 675: {"nitrogen": 8.57}},
+            "field_1": {123: {"nitrogen": 571}, 675: {"nitrogen": 857}},
+            "field_2": {123: {"nitrogen": 571}, 675: {"nitrogen": 857}},
         },
         "fertilizer_applications": {
             "field_1": {
                 123: {
-                    "nitrogen": 0.52871123969561054,
-                    "phosphorus": 0.8811840892012549,
-                    "potassium": 1.7623681784025098,
+                    "nitrogen": 52.871123969561054,
+                    "phosphorus": 88.11840892012549,
+                    "potassium": 176.23681784025098,
                 },
-                125: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                125: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
             },
             "field_2": {
                 123: {
-                    "nitrogen": 0.3084580509652931,
-                    "phosphorus": 0.5140959871651896,
-                    "potassium": 1.0281919743303791,
+                    "nitrogen": 30.84580509652931,
+                    "phosphorus": 51.40959871651896,
+                    "potassium": 102.81919743303791,
                 },
-                125: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                125: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
             },
         },
     }
@@ -8180,6 +8180,19 @@ def expected_crop_to_feed_id_mapping() -> dict[tuple[str, str], RUFAS_ID]:
 @pytest.fixture
 def raw_harvest_data() -> dict[str, dict[str, list[Any]]]:
     return {
+        "field_size": {
+            "values": [
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0]
+            },
         "crop": {
             "values": [
                 "corn_silage",
@@ -8210,16 +8223,16 @@ def raw_harvest_data() -> dict[str, dict[str, list[Any]]]:
         },
         "dry_yield": {
             "values": [
-                12958.851795252069,
-                2302.807712970885,
-                3101.0788300377967,
-                3234.487471643309,
-                3125.8532063690864,
-                10202.238523552687,
-                1953.2691077836596,
-                2879.148563971437,
-                2925.6916183957055,
-                2905.9679829564298,
+                129.58851795252069,
+                23.02807712970885,
+                31.010788300377967,
+                32.34487471643309,
+                31.258532063690864,
+                102.02238523552687,
+                19.532691077836596,
+                28.79148563971437,
+                29.256916183957055,
+                29.059679829564298,
             ]
         },
         "harvest_year": {"values": [2013, 2014, 2014, 2014, 2014, 2013, 2014, 2014, 2014, 2014]},
@@ -8249,7 +8262,7 @@ def expected_harvest_yield_data() -> dict[str, dict[int, dict[str, int | str | f
                 "field_name": "field_1",
                 "crop": "corn_silage",
                 "feed_id": 51,
-                "dry_yield": 12958.851795252069,
+                "dry_yield": 12958.85179525207,
                 "harvest_type": "harvest_kill",
             },
             514: {
