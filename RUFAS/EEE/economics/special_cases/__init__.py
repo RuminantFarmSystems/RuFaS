@@ -12,7 +12,7 @@ append it to :data:`SPECIAL_CASE_HANDLERS`.
 """
 
 from RUFAS.EEE.economics.special_cases.base import SpecialCaseHandler
-from RUFAS.EEE.economics.special_cases.seed_costs import SeedCostHandler
+from RUFAS.EEE.economics.special_cases.bedding_requirements import BeddingRequirementsHandler
 
 
-__all__ = ["SpecialCaseHandler", "SeedCostHandler",]
+__all__ = ["SpecialCaseHandler", "BeddingRequirementsHandler"]

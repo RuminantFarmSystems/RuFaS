@@ -32,7 +32,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
 from RUFAS.EEE.economics.preprocessing_context import PreprocessingContext
-from RUFAS.EEE.economics.special_cases import SpecialCaseHandler, SeedCostHandler
+from RUFAS.EEE.economics.special_cases import SpecialCaseHandler, BeddingRequirementsHandler
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -44,7 +44,7 @@ from RUFAS.EEE.economics.fallback_values import (
 COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
 
 SPECIAL_CASE_HANDLERS: list[type[SpecialCaseHandler]] = [
-    SeedCostHandler,
+    BeddingRequirementsHandler,
 ]
 
 
