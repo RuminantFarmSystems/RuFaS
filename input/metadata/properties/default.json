@@ -3535,6 +3535,30 @@
           }
         }
       }
+    },
+    "roi": {
+      "type": "object",
+      "description": "Inputs related to return on investment calculations.", 
+      "should_calculate_roi": {
+        "type": "bool",
+        "description": "If true, triggers loading previous simulation cost/revenue results for comparison to current simulation costs/revenue.",
+        "default": false
+      },
+      "roi_comparison_data": {
+        "type": "array",
+        "description": "The list of saved roi output addresses the user wants to compare to the roi for the current simulation.",
+        "properties": {
+          "type": "object",
+          "name": {
+            "type": "string",
+            "description": "The user-specified name for the roi being used for comparison to the current simulation roi."
+          },
+          "address": {
+            "type": "string",
+            "description": "The user-specified directory location of the saved roi comparison result."
+          }
+        }
+      }
     }
   },
   "emissions_properties": {
