@@ -1229,14 +1229,13 @@ def test_handle_nutrient_request_for_storages_pools_daily_spread(
     assert pool.dry_matter == pytest.approx(10.0)
 
 
-def test_effective_storage_manure_type(mocker: MockerFixture) -> None:
+def test_effective_storage_manure_type() -> None:
     """DailySpread storages resolve to the requested type; other storages resolve through the class map."""
     daily_storage = MagicMock(spec=DailySpread)
     assert ManureManager._effective_storage_manure_type(daily_storage, ManureType.LIQUID) is ManureType.LIQUID
     assert ManureManager._effective_storage_manure_type(daily_storage, ManureType.SOLID) is ManureType.SOLID
 
-    mocker.patch.object(Composting, "__init__", return_value=None)
-    composting = Composting()
+    composting = Composting(name="compost", composting_type="intensive windrow", storage_time_period=1)
     assert ManureManager._effective_storage_manure_type(composting, ManureType.LIQUID) is ManureType.SOLID
     assert ManureManager._effective_storage_manure_type(composting, ManureType.SOLID) is ManureType.SOLID
 

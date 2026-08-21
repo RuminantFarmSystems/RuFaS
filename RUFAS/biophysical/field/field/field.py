@@ -591,6 +591,7 @@ class Field:
             field_coverage=field_coverage,
             nitrogen=requested_nitrogen,
             phosphorus=requested_phosphorus,
+            manure_type=requested_manure_type,
             potassium=None,
             application_depth=application_summary["application_depth"],
             surface_remainder_fraction=application_summary["surface_remainder_fraction"],
@@ -677,6 +678,7 @@ class Field:
             field_coverage=field_coverage,
             nitrogen=supplied_nitrogen,
             phosphorus=supplied_phosphorus,
+            manure_type=manure_type,
             potassium=None,
             application_depth=application_depth,
             surface_remainder_fraction=surface_remainder_fraction,
@@ -861,6 +863,7 @@ class Field:
         field_coverage: float,
         nitrogen: float,
         phosphorus: float,
+        manure_type: ManureType,
         application_depth: float,
         surface_remainder_fraction: float,
         year: int,
@@ -883,6 +886,8 @@ class Field:
             Mass of nitrogen in the manure applied (kg).
         phosphorus : float
             Mass of phosphorus in the manure applied (kg).
+        manure_type : ManureType
+            Enum option indicating whether the manure is solid or liquid.
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
@@ -904,6 +909,7 @@ class Field:
             "nitrogen": MeasurementUnits.KILOGRAMS,
             "phosphorus": MeasurementUnits.KILOGRAMS,
             "potassium": MeasurementUnits.KILOGRAMS,
+            "manure_type": MeasurementUnits.UNITLESS,
             "day": MeasurementUnits.ORDINAL_DAY,
             "year": MeasurementUnits.CALENDAR_YEAR,
             "field_size": MeasurementUnits.HECTARE,
@@ -925,6 +931,7 @@ class Field:
             "nitrogen": nitrogen,
             "phosphorus": phosphorus,
             "potassium": potassium,
+            "manure_type": manure_type.value,
             "day": day,
             "year": year,
             "field_size": self.field_data.field_size,
