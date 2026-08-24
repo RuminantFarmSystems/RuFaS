@@ -1,4 +1,5 @@
 import json
+import re
 from collections import namedtuple
 from pathlib import Path
 import shutil
@@ -13,8 +14,14 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-ResultPathType = namedtuple("ResultPathType", ["domain", "expected_results_path", "actual_results_path", "tolerance"])
+ResultPathType = namedtuple(
+    "ResultPathType",
+    ["domain", "expected_results_path", "actual_results_path", "tolerance", "must_change_variables_path"],
+    defaults=[""],
+)
 ORDERED_EXPECTED_RESULTS_FILE_KEYS = ["name", "filters", "expected_results_last_updated", "expected_results"]
+MUST_CHANGE_VARIABLES_KEY = "must_change_variables"
+TOP_LEVEL_DIFF_PATH_PATTERN = re.compile(r"^root\['([^']+)'\]")
 
 
 class E2ETestResultsHandler:
@@ -36,6 +43,14 @@ class E2ETestResultsHandler:
             variable names in the actual results.
         output_prefix : str
             The output prefix for the current e2e run.
+
+        Notes
+        -----
+        Variables flagged in the input set's must-change variables file are held to the opposite assertion of the
+        regular comparison: each flagged variable must differ from its recorded expected value beyond the domain
+        tolerance, and its differences are not reported as regular failures. The comparison results additionally
+        report ``changed_variables``, the names of the unflagged variables whose values differ from the expected
+        results, so a subject matter expert can evaluate them and flag the ones that are expected to change.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -43,6 +58,9 @@ class E2ETestResultsHandler:
             "function": E2ETestResultsHandler.compare_actual_and_expected_test_results.__name__,
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
+        must_change_variables = E2ETestResultsHandler._load_must_change_variables(test_result_path_sets)
+        matched_must_change_variables: set[str] = set()
+        all_domains_compared: bool = True
 
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
@@ -60,6 +78,7 @@ class E2ETestResultsHandler:
                     "Could not find actual end-to-end testing results",
                     info_map,
                 )
+                all_domains_compared = False
                 continue
             with open(path_to_actual_results, "r", encoding="utf-8") as results:
                 actual_results = json.load(results)
@@ -71,28 +90,113 @@ class E2ETestResultsHandler:
                         expected_results=expected_results, conversion_csv_path=Path(convert_variable_table_path)
                     )
 
-            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=3)
+            domain_must_change_variables = sorted(name for name in must_change_variables if name in expected_results)
+            matched_must_change_variables.update(domain_must_change_variables)
+            comparison_expected_not_must_change = {
+                k: v for k, v in expected_results.items() if k not in must_change_variables
+            }
+            comparison_actual_not_must_change = {
+                k: v for k, v in actual_results.items() if k not in must_change_variables
+            }
+
+            diff = DeepDiff(
+                comparison_expected_not_must_change,
+                comparison_actual_not_must_change,
+                ignore_order=True,
+                verbose_level=2,
+                significant_digits=3,
+            )
 
             filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(diff, path_set.tolerance)
+            must_change_satisfied, must_change_violations = E2ETestResultsHandler._evaluate_must_change_variables(
+                expected_results, actual_results, domain_must_change_variables, path_set.tolerance
+            )
+            E2ETestResultsHandler._report_domain_comparison_results(
+                domain=path_set.domain,
+                filtered_diff=filtered_diff,
+                domain_must_change_variables=domain_must_change_variables,
+                must_change_satisfied=must_change_satisfied,
+                must_change_violations=must_change_violations,
+                info_map=info_map,
+            )
 
-            is_difference_in_results: bool = False if (filtered_diff == {}) else True
-            if is_difference_in_results:
-                om.add_error(
-                    f"End-to-end testing failed for {path_set.domain}",
-                    "Identified differences between actual and expected results.",
-                    info_map,
-                )
-            else:
-                om.add_log(
-                    f"End-to-end testing succeeded for {path_set.domain}",
-                    "No differences found between actual and expected end-to-end testing results.",
-                    info_map,
-                )
-            end_to_end_testing_passing: bool = not is_difference_in_results
-            filtered_diff.update({"end_to_end_testing_passing": end_to_end_testing_passing})
-            info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": path_set.domain})
-            for comparison_type, difference in filtered_diff.items():
-                om.add_variable(comparison_type, difference, info_map)
+        unknown_must_change_variables = must_change_variables - matched_must_change_variables
+        if unknown_must_change_variables and all_domains_compared:
+            info_map.pop("domain", None)
+            info_map.pop("prefix", None)
+            om.add_error(
+                "End-to-end testing must-change configuration error",
+                "Must-change variables not found in the expected results of any domain: "
+                f"{sorted(unknown_must_change_variables)}",
+                info_map,
+            )
+
+    @staticmethod
+    def _report_domain_comparison_results(
+        domain: str,
+        filtered_diff: dict[str, Any],
+        domain_must_change_variables: list[str],
+        must_change_satisfied: list[str],
+        must_change_violations: dict[str, str],
+        info_map: dict[str, Any],
+    ) -> None:
+        """
+        Logs the outcome of a domain's end-to-end comparison and records the comparison results as variables.
+
+        Parameters
+        ----------
+        domain : str
+            The RuFaS domain the comparison results belong to.
+        filtered_diff : dict[str, Any]
+            The domain's ``DeepDiff`` result with insignificant changes filtered out.
+        domain_must_change_variables : list[str]
+            The must-change variable names present in the domain's expected results.
+        must_change_satisfied : list[str]
+            The must-change variables whose values differ from the expected results.
+        must_change_violations : dict[str, str]
+            The violating must-change variables, mapped to the reason each one failed.
+        info_map : dict[str, Any]
+            Information about the source of the recorded variables. Updated in place with the units and the
+            ``domain`` output prefix.
+
+        Notes
+        -----
+        The domain passes when the filtered diff is empty and there are no must-change violations; each failure
+        cause is logged as an error, and the recorded results include ``changed_variables`` (the names of the
+        unflagged variables that differ) and the must-change outcomes.
+        """
+        om = OutputManager()
+        changed_variables = E2ETestResultsHandler._extract_changed_variable_names(filtered_diff)
+        is_difference_in_results: bool = False if (filtered_diff == {}) else True
+        if is_difference_in_results:
+            om.add_error(
+                f"End-to-end testing failed for {domain}",
+                "Identified differences between actual and expected results.",
+                info_map,
+            )
+        if must_change_violations:
+            om.add_error(
+                f"End-to-end testing failed for {domain}",
+                f"Must-change variables did not change: {sorted(must_change_violations)}",
+                info_map,
+            )
+        if not is_difference_in_results and not must_change_violations:
+            om.add_log(
+                f"End-to-end testing succeeded for {domain}",
+                "No differences found between actual and expected end-to-end testing results.",
+                info_map,
+            )
+        end_to_end_testing_passing: bool = not is_difference_in_results and not must_change_violations
+        comparison_results: dict[str, Any] = dict(filtered_diff)
+        if changed_variables:
+            comparison_results["changed_variables"] = changed_variables
+        if domain_must_change_variables:
+            comparison_results["must_change_satisfied"] = must_change_satisfied
+            comparison_results["must_change_violations"] = must_change_violations
+        comparison_results["end_to_end_testing_passing"] = end_to_end_testing_passing
+        info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": domain})
+        for comparison_type, difference in comparison_results.items():
+            om.add_variable(comparison_type, difference, info_map)
 
     @staticmethod
     def _convert_expected_result_variable_names(
@@ -271,9 +375,162 @@ class E2ETestResultsHandler:
                     path_set["expected_results_path"],
                     path_set["actual_results_path"],
                     path_set["tolerance"],
+                    path_set.get("must_change_variables_path", ""),
                 )
             )
         return test_result_paths
+
+    @staticmethod
+    def _load_must_change_variables(test_result_path_sets: list[ResultPathType]) -> set[str]:
+        """
+        Loads the names of the variables flagged as must change for an end-to-end testing input set.
+
+        Parameters
+        ----------
+        test_result_path_sets : list[ResultPathType]
+            List of result path sets for the input set, each optionally referencing a must-change variables file
+            through its ``must_change_variables_path`` field.
+
+        Returns
+        -------
+        set[str]
+            The union of the variable names listed in the referenced must-change variables files. Path sets with an
+            empty ``must_change_variables_path`` are skipped.
+
+        Raises
+        ------
+        FileNotFoundError
+            If a referenced must-change variables file does not exist.
+        ValueError
+            If a referenced file is not valid JSON, or does not contain a list of strings under the
+            ``must_change_variables`` key.
+        """
+        om = OutputManager()
+        info_map: dict[str, Any] = {
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._load_must_change_variables.__name__,
+        }
+        must_change_variables: set[str] = set()
+        must_change_paths = {
+            path_set.must_change_variables_path
+            for path_set in test_result_path_sets
+            if path_set.must_change_variables_path
+        }
+        for path_str in sorted(must_change_paths):
+            path = Path(path_str)
+            if not path.exists():
+                om.add_error(
+                    "End-to-end testing must-change configuration error",
+                    f"Must-change variables file not found: {path}",
+                    info_map,
+                )
+                raise FileNotFoundError(f"E2E testing error: Must-change variables file not found: {path}")
+            try:
+                with open(path, "r", encoding="utf-8") as must_change_file:
+                    file_contents = json.load(must_change_file)
+            except json.JSONDecodeError as e:
+                om.add_error(
+                    "End-to-end testing must-change configuration error",
+                    f"Must-change variables file {path} is not valid JSON: {e}",
+                    info_map,
+                )
+                raise ValueError(f"E2E testing error: Must-change variables file {path} is not valid JSON.") from e
+            variable_names = file_contents.get(MUST_CHANGE_VARIABLES_KEY) if isinstance(file_contents, dict) else None
+            if not isinstance(variable_names, list) or not all(isinstance(name, str) for name in variable_names):
+                om.add_error(
+                    "End-to-end testing must-change configuration error",
+                    f"Must-change variables file {path} must contain a list of variable names under the "
+                    f"'{MUST_CHANGE_VARIABLES_KEY}' key.",
+                    info_map,
+                )
+                raise ValueError(
+                    f"E2E testing error: Must-change variables file {path} must contain a list of variable names "
+                    f"under the '{MUST_CHANGE_VARIABLES_KEY}' key."
+                )
+            must_change_variables.update(variable_names)
+        return must_change_variables
+
+    @staticmethod
+    def _evaluate_must_change_variables(
+        expected_results: dict[str, Any],
+        actual_results: dict[str, Any],
+        must_change_variable_names: list[str],
+        tolerance: float,
+    ) -> tuple[list[str], dict[str, str]]:
+        """
+        Checks that each variable flagged as must change actually differs from its recorded expected value.
+
+        Parameters
+        ----------
+        expected_results : dict[str, Any]
+            The expected results for a domain, keyed by variable name.
+        actual_results : dict[str, Any]
+            The actual results for a domain, keyed by variable name.
+        must_change_variable_names : list[str]
+            The must-change variable names present in ``expected_results``.
+        tolerance : float
+            The threshold (expressed as a percent) below which a difference is considered no change.
+
+        Returns
+        -------
+        tuple[list[str], dict[str, str]]
+            A list of the must-change variables whose values differ from the expected results, and a dictionary
+            mapping each violating must-change variable to the reason it failed: either its value still matches the
+            expected results, or it is missing from the actual results.
+        """
+        must_change_satisfied: list[str] = []
+        must_change_violations: dict[str, str] = {}
+        for variable_name in must_change_variable_names:
+            if variable_name not in actual_results:
+                must_change_violations[variable_name] = (
+                    "Flagged as must change but the variable is missing from the actual results."
+                )
+                continue
+            pair_diff = DeepDiff(
+                {variable_name: expected_results[variable_name]},
+                {variable_name: actual_results[variable_name]},
+                ignore_order=True,
+                verbose_level=2,
+                significant_digits=3,
+            )
+            filtered_pair_diff = E2ETestResultsHandler.filter_insignificant_changes(pair_diff, tolerance)
+            if filtered_pair_diff == {}:
+                must_change_violations[variable_name] = (
+                    "Flagged as must change but the value still matches the expected results within the tolerance."
+                )
+            else:
+                must_change_satisfied.append(variable_name)
+        return must_change_satisfied, must_change_violations
+
+    @staticmethod
+    def _extract_changed_variable_names(diff_result: dict[str, Any]) -> list[str]:
+        """
+        Compiles the names of the variables that a ``DeepDiff`` result reports as different.
+
+        Parameters
+        ----------
+        diff_result : dict[str, Any]
+            A ``DeepDiff`` result mapping change categories (e.g. ``values_changed``) to changed paths.
+
+        Returns
+        -------
+        list[str]
+            The sorted, deduplicated top-level variable names extracted from the changed paths. Paths that do not
+            start with a top-level dictionary key (e.g. a change to the results root) are skipped.
+        """
+        changed_variable_names: set[str] = set()
+        for changed_entries in diff_result.values():
+            if isinstance(changed_entries, dict):
+                changed_paths = list(changed_entries.keys())
+            elif isinstance(changed_entries, (list, set, tuple)):
+                changed_paths = list(changed_entries)
+            else:
+                continue
+            for changed_path in changed_paths:
+                match = TOP_LEVEL_DIFF_PATH_PATTERN.match(str(changed_path))
+                if match:
+                    changed_variable_names.add(match.group(1))
+        return sorted(changed_variable_names)
 
     @staticmethod
     def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
@@ -393,6 +650,12 @@ class E2ETestResultsHandler:
             The directory to which the actual results are written to.
         output_prefix : str
             The prefix to give the output file names.
+
+        Notes
+        -----
+        The input set's must-change variables file is not touched: after an update, the freshly recorded expected
+        results already reflect any flagged changes, so it is the user's responsibility to empty the must-change
+        list, otherwise the leftover flags will fail the next comparison run.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
