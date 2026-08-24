@@ -1,0 +1,4 @@
+{
+    "description": "Variables listed in 'must_change_variables' are expected to differ from the recorded expected results, e.g. because of a known model change whose new values are not yet known. During an end-to-end testing run, each listed variable must differ from its recorded expected value beyond the domain tolerance: a matching value is reported as a failure, and differences in listed variables are not. Variable names must exactly match keys in the 'expected_results' of this input set's e2e_json_*_filter.json files; the 'changed_variables' list in the end-to-end comparison results shows which variables currently differ. Managing this list is the user's responsibility and it defaults to empty: after updating the expected results (UPDATE_E2E_TEST_RESULTS), empty this list yourself, since the freshly recorded expected results already reflect the change and leftover entries will fail the next run.",
+    "must_change_variables": []
+}
