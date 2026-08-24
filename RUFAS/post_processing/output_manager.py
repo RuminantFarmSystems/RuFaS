@@ -15,6 +15,7 @@ class OutputManager:
     logs, warnings, and errors into separate pools, and populates requested
     output channels from the pools once the simulation is done.
     """
+
     __instance = None
     pool_element_type = dict[str, Any]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
