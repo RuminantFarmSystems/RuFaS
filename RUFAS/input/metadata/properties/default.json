@@ -218,11 +218,43 @@
           "default": 500,
           "minimum": 0
         },
+        "calf_mortality_rate": {
+          "type": "number",
+          "description": "Calf Mortality Rate (decimal fraction) -- Cumulative probability that a live-born calf dies before weaning. Enter 0 to disable; e.g., 0.05 = 5%",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "heifer_mortality_rate": {
+          "type": "number",
+          "description": "Heifer Mortality Rate (decimal fraction) -- Cumulative probability that a post-wean heifer dies before calving. Deaths split 2/3 in HeiferI, 1/3 in HeiferII. Enter 0 to disable; e.g., 0.05 = 5%",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
         "do_not_breed_time": {
           "type": "number",
           "description": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant",
           "default": 185,
           "minimum": 0
+        },
+        "cull_eligibility_minimum_days_in_milk": {
+          "type": "number",
+          "description": "Minimum days in milk a cow must have reached to be eligible for an oversupply cull (protects fresh cows).",
+          "minimum": 0,
+          "default": 60
+        },
+        "cull_eligibility_maximum_days_carried_calf": {
+          "type": "number",
+          "description": "Maximum days carrying a calf (days pregnant) a cow may have to remain eligible for an oversupply cull (protects late-pregnant cows).",
+          "minimum": 0,
+          "default": 180
+        },
+        "cull_ranking_criteria": {
+          "type": "string",
+          "description": "Attribute used to rank eligible cows when selecting which to sell for an oversupply cull. One of 'milk' (daily milk production) or '305_day_milk' (305-day milk yield).",
+          "pattern": "^(milk|305_day_milk)$",
+          "default": "milk"
         },
         "cow_times_milked_per_day": {
           "type": "number",
@@ -265,10 +297,22 @@
           },
           "keep_female_calf_rate": {
             "type": "number",
-            "description": "Female Calf Retention Rate (percent) -- The percentage of female calves kept and raised on-farm",
+            "description": "Female Calf Retention Rate (fraction) -- The fraction of female calves kept and raised on-farm; used when Female Calf Retention Method is 'rate'",
             "default": 1,
             "minimum": 0,
             "maximum": 1
+          },
+          "calf_retention_method": {
+            "type": "string",
+            "default": "rate",
+            "pattern": "^(rate|count)$",
+            "description": "Female Calf Retention Method (select one) -- 'rate' keeps each live female calf with probability Female Calf Retention Rate; 'count' keeps a target number of female calves per year (Female Calves Kept Per Year)"
+          },
+          "annual_keep_female_calf_num": {
+            "type": "number",
+            "description": "Female Calves Kept Per Year (head/year) -- Target number of dairy female calves to keep per year; used when Female Calf Retention Method is 'count'",
+            "default": 0,
+            "minimum": 0
           },
           "wean_day": {
             "type": "number",
@@ -751,10 +795,6 @@
         "description": "Methane Mitigation Method (select one) -- The type of enteric methane mitigation supplement that is fed to the lactating cows. Note that default values given are not implemented unless the specific supplement is selected here",
         "default": "None",
         "pattern": "^(None|3-NOP|Monensin|Essential Oils|Seaweed)$"
-      },
-      "methane_mitigation_additive_amount": {
-        "type": "number",
-        "default": 0
       },
       "3-NOP_additive_amount": {
         "type": "number",
@@ -2603,6 +2643,13 @@
           "type": "bool",
           "description": "Whether the crop configuration is a nitrogen fixer."
         },
+        "harvest_efficiency": {
+          "type": "number",
+          "description": "Efficiency of the harvest operation: the proportion of cut biomass that is extracted from the field (unitless). The remainder is deposited into the field as residue. Defaults to 1.0, meaning all cut biomass is collected. Values below 1.0 represent a harvest that leaves part of what it cuts behind, such as grazing. One study found that seasonal grazers consume about 25% of above ground biomass, with another 25% returned to the field as residue.",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 1.0
+        },
         "minimum_temperature": {
           "type": "number",
           "description": "Minimum temperature for plant growth (Celsius)."
@@ -2983,6 +3030,70 @@
       "properties": {
         "type": "string",
         "pattern": "^(manure|synthetic fertilizer|none|synthetic fertilizer and manure)$"
+      }
+    },
+    "daily_spread": {
+      "type": "object",
+      "description": "Configuration for daily spread manure application sourced from DailySpread processors.",
+      "is_daily_spreading": {
+        "type": "bool",
+        "description": "Whether this field uses daily spread manure applications.",
+        "default": false
+      },
+      "spread_all_available_manure": {
+        "type": "bool",
+        "description": "If true, spread all manure available in DailySpread processors that day, ignoring nutrient targets, caps, manure type, and supplemental manure settings.",
+        "default": false
+      },
+      "nitrogen_spread_amount": {
+        "type": "number",
+        "description": "Target nitrogen amount for this field's daily spread request (kg).",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "phosphorus_spread_amount": {
+        "type": "number",
+        "description": "Target phosphorus amount for this field's daily spread request (kg).",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "potassium_spread_amount": {
+        "type": "number",
+        "description": "Target potassium amount for this field's daily spread request (kg).",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "coverage_fraction": {
+        "type": "number",
+        "description": "Fraction of field area covered by each daily spread manure application.",
+        "minimum": 0.01,
+        "maximum": 1.0,
+        "default": 1.0
+      },
+      "application_depth": {
+        "type": "number",
+        "description": "Depth of daily spread manure application (mm).",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "surface_remainder_fraction": {
+        "type": "number",
+        "description": "Fraction of daily spread manure remaining on soil surface.",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 1.0
+      },
+      "manure_type": {
+        "type": "string",
+        "description": "Type of manure requested for daily spread applications.",
+        "pattern": "^(liquid|solid)$",
+        "default": "solid"
+      },
+      "supplement_manure_nutrient_deficiencies": {
+        "type": "string",
+        "description": "Whether daily spread nutrient shortfalls can be supplemented.",
+        "pattern": "^(manure|synthetic fertilizer|none|synthetic fertilizer and manure)$",
+        "default": "none"
       }
     },
     "pattern_repeat": {
@@ -4293,7 +4404,7 @@
       },
       "user_defined_ration_tolerance": {
         "type": "number",
-        "description": "Allowable +/- fractional variance for each defined ration inclusion percentage values.",
+        "description": "Allowable +/- fractional variance for each defined ration inclusion percentage values. As an example: a feed with a user defined ration percentage value of 20% and tolerance of 0.1 would correspond to an allowable range of 18% to 22%.",
         "minimum": 0,
         "maximum": 1,
         "default": 0.0
@@ -5973,6 +6084,13 @@
       "type": "bool",
       "description": "Whether phosphrorus stress affects crops grown in this field.",
       "default": true
+    },
+    "tractor_size": {
+      "type": "string",
+      "description": "The categorical size of the tractor for this field.",
+      "pattern": "^(small|medium|large)$",
+      "nullable": true,
+      "default": "medium"
     }
   },
   "weather_properties": {
@@ -6060,7 +6178,7 @@
       "type": "array",
       "properties": {
         "type": "string",
-        "default": "untitled"
+        "pattern": "^[A-Za-z]+(?:[-_][A-Za-z]+)*$"
       }
     },
     "Tractor Size": {
@@ -6173,7 +6291,7 @@
       "description": "The maximum throughput of the implement (tons dm/hour)",
       "properties": {
         "type": "number",
-        "default": 0
+        "default": 0.0
       }
     }
   },
@@ -6238,6 +6356,11 @@
             "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "must_change_variables_path": {
+            "type": "string",
+            "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6262,6 +6385,11 @@
             "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "must_change_variables_path": {
+            "type": "string",
+            "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6286,6 +6414,40 @@
             "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "must_change_variables_path": {
+            "type": "string",
+            "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
+          }
+        }
+      },
+      "animals_only_e2e": {
+        "type": "array",
+        "properties": {
+          "type": "object",
+          "domain": {
+            "type": "string",
+            "description": "Indicates which domain of RuFaS is being tested with the associated paths."
+          },
+          "expected_results_path": {
+            "type": "string",
+            "description": "Path to the file with the expected results for the specified domain."
+          },
+          "actual_results_path": {
+            "type": "string",
+            "description": "Path to the file with the actual results for the specified domain."
+          },
+          "tolerance": {
+            "type": "number",
+            "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
+            "default": 0.0,
+            "minimum": 0.0
+          },
+          "must_change_variables_path": {
+            "type": "string",
+            "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
           }
         }
       }

@@ -48,7 +48,7 @@ class ProcessorType(Enum):
     @classmethod
     def get_processor_class(cls, processor_type: str) -> Type["Processor"]:
         """
-        Get the corresponding processor class directly from the Enum.
+        Gets the corresponding processor class directly from the Enum.
 
         Parameters
         ----------
@@ -64,6 +64,7 @@ class ProcessorType(Enum):
         ------
         ValueError
             If the processor type is not recognized.
+
         """
         try:
             processor: Type["Processor"] = cls[processor_type].value

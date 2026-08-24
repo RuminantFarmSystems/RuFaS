@@ -1,8 +1,10 @@
 # Changelog
 
-## Readme
+## Readme 
 
 A **changelog** is a structured record of changes made to the codebase over time. It documents new features, bug fixes, and improvements, giving both developers and users a transparent view of how the project evolves across versions. A changelog ensures that the entire development process is **trackable**, improves **collaboration** by clearly communicating changes across team members, and offers **transparency** to users and stakeholders. Additionally, it helps with **debugging** by highlighting specific updates or changes that could potentially introduce new issues.
+
+This **changelog** file keeps a record of updates included in existing version releases.
 
 ### Each changelog entry must include
 
@@ -21,82 +23,24 @@ A **changelog** is a structured record of changes made to the codebase over time
 
 ### Current version
 
-v1.0.0
+v1.0.3
 
-### Next Version Updates
-- [2793](https://github.com/RuminantFarmSystems/RuFaS/pull/2793) - [minor change] [Animal] [OutputManager] [NoInputChange] [OutputChange] Track and summarize when effective DMI falls below the empirical domain of manure equations for lactating and dry cows at end of simulation.
-- [2865](https://github.com/RuminantFarmSystems/RuFaS/pull/2865) - [minor change] [NoInputChange] [NoOutputChange] Update to tables and formatting in scientific documentation.
-- [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
-- [2728](https://github.com/RuminantFarmSystems/RuFaS/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
-- [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
-- [2757](https://github.com/RuminantFarmSystems/RuFaS/pull/2757) - [minor change] [NoInputChange] [NoOutputChange] Updates version number in `pyproject.toml`.
-- [2737](https://github.com/RuminantFarmSystems/RuFaS/pull/2737) - [minor change] [NoInputChange] [NoOutputChange] Update CONTRIBUTING.md file to provide forking guidelines for contributors.
-- [2690](https://github.com/RuminantFarmSystems/RuFaS/pull/2690) - [minor change] [TaskManager] [NoInputChange] [NoOutputChange] Remove hard-coded name for output folder, use user-defined name instead.
-- [2720](https://github.com/RuminantFarmSystems/RuFaS/pull/2720) - [minor change] [Emissions] [NoInputChange] [NoOutputChange] Adds FGF emissions reset when there's a harvest-kill operation and there's none of that feed left in storage.
-- [2772](https://github.com/RuminantFarmSystems/RuFaS/pull/2772) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Refactors `SimulationEngine`.`_daily_simulation()` to accommodate isolating modules.
-- [2791](https://github.com/RuminantFarmSystems/RuFaS/pull/2791) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Updates ration percentage values in example feed files to sum to exactly 100.
-- [2813](https://github.com/RuminantFarmSystems/RuFaS/pull/2813) - [minor change] [Docs] [NoInputChange] [NoOutputChange] Updates branching and versioning policy docs.
-- [2833](https://github.com/RuminantFarmSystems/RuFaS/pull/2833) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Remove unused animal_requirements.py file.
-- [2815](https://github.com/RuminantFarmSystems/RuFaS/pull/2815) - [minor change] [All Non-Biophysical Modules] [NoInputChange] [NoOutputChange] Updates error messages raised to be clearer and more helpful for diagnosis and fixing.
-- [2804](https://github.com/RuminantFarmSystems/RuFaS/pull/2804) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field.py.
-- [2828](https://github.com/RuminantFarmSystems/RuFaS/pull/2828) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Refactors `validate_metadata()` to be less complex.
-- [2819](https://github.com/RuminantFarmSystems/RuFaS/pull/2819) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_input_manager.py.
-- [2836](https://github.com/RuminantFarmSystems/RuFaS/pull/2836) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_output_manager.py.
-- [2826](https://github.com/RuminantFarmSystems/RuFaS/pull/2826) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds functionality to data_padder, removes unecessary use of method in ration reporting.
-- [2827](https://github.com/RuminantFarmSystems/RuFaS/pull/2827) - [minor change] [Metadata] [NoInputChange] [NoOutputChange] Updates ration-related metadata descriptions.
-- [2849](https://github.com/RuminantFarmSystems/RuFaS/pull/2849) - [minor change] [Crop and Soil] [NoInputChange] [NoOutputChange] Update the property definition of dry matter percent.
-- [2848](https://github.com/RuminantFarmSystems/RuFaS/pull/2848) - [minor change] [NoInputChange] [NoOutputChange] Justify `deepcopy()` usage.
-- [2843](https://github.com/RuminantFarmSystems/RuFaS/pull/2843) - [minor change] [NoInputChange] [NoOutputChange] Fix Simple `#noqa`s in codebase.
-- [2852](https://github.com/RuminantFarmSystems/RuFaS/pull/2852) - [minor change] [NoInputChange] [NoOutputChange] Fix AssertionError on `dev`.
-- [2866](https://github.com/RuminantFarmSystems/RuFaS/pull/2866) - [minor change] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field_manager.py.
-- [2863](https://github.com/RuminantFarmSystems/RuFaS/pull/2863) - [minor change] [NoInputChange] [NoOutputChange] Updates TaskManager to avoid using multiprocessing when running single tasks.
-- [2867](https://github.com/RuminantFarmSystems/RuFaS/pull/2867) - [minor change] [NoInputChange] [NoOutputChange] Updates expand_data_temporally() util function to offer options of full simulation expansion and front-padding data.
-- [2854](https://github.com/RuminantFarmSystems/RuFaS/pull/2854) - [minor change] [Emissions][OutputManager] [NoInputChange] [NoOutputChange] Update `emissions.py` filtering process and remove `use_filter_key_name` option in the OM filter.
-- [2872](https://github.com/RuminantFarmSystems/RuFaS/pull/2872) - [minor change] [NoInputChange] [NoOutputChange] Adds information and links for onboarding videos.
-- [2850](https://github.com/RuminantFarmSystems/RuFaS/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
-- [2902](https://github.com/RuminantFarmSystems/RuFaS/pull/2902) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
-- [2909](https://github.com/RuminantFarmSystems/RuFaS/pull/2909) - [minor change] [pyproject.toml][NoInputChange] [NoOutputChange] Separate dependencies by category in `pyproject.toml` file and create a RuFaS v1.0.0 pinned `constraints-release.txt` file.
-- [2740](https://github.com/RuminantFarmSystems/RuFaS/pull/2740) - [minor change] [NoInputChange] [NoOutputChange] Added warnings for feed purchases exceeding advance purchase allowance/
-- [2740](https://github.com/RuminantFarmSystems/RuFaS/pull/2740) - [minor change] [NoInputChange] [NoOutputChange] Added warnings for feed purchases exceeding advance purchase allowance.
-- [2921](https://github.com/RuminantFarmSystems/RuFaS/pull/2921) - [minor change] [OutputManager][NoInputChange] [NoOutputChange] Override incorrect fill type for complex data structure data padding.
-- [2924](https://github.com/RuminantFarmSystems/RuFaS/pull/2924) - [minor change] [NoInputChange] [NoOutputChange] Updated advance purchase allowance to prevent excessive warnings for example run.
-- [2929](https://github.com/RuminantFarmSystems/RuFaS/pull/2929) - [minor change] [GraphGenerator] [NoInputChange] [NoOutputChange] Sanitizes non-numerical data sent to graph generator to allow graphing to occur despite.
-- [2932](https://github.com/RuminantFarmSystems/RuFaS/pull/2932) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Enabled Field only simulation.
-- [2916](https://github.com/RuminantFarmSystems/RuFaS/pull/2916) - [minor change] [Cross Validation] [NoInputChange] [NoOutputChange] Added cross validation rules for the Crop and Soil module.
-- [2925](https://github.com/RuminantFarmSystems/RuFaS/pull/2925) - [minor change] [NoInputChange] [NoOutputChange] Fix the `graph_and_report` option in report_generation.py.
-- [2907](https://github.com/RuminantFarmSystems/RuFaS/pull/2907) - [minor change] [NoInputChange] [OutputChange] Fix the FarmGrownFeed Emissions unit issue. The mirror issue of [Fix FarmGrownFeed Emissions Unit on test #2908](https://github.com/RuminantFarmSystems/RuFaS/pull/2908) to update `dev`.
-- [2934](https://github.com/RuminantFarmSystems/RuFaS/pull/2934) - [minor change] [NoInputChange] [NoOutputChange] [Animal][Reproduction] Refactor `Reproduction.execute_cow_ed_protocol()`.
-- [2949](https://github.com/RuminantFarmSystems/RuFaS/pull/2949) - [minor change] [NoInputChange] [NoOutputChange] [Verbosity] Updates CLI verbosity arg to override verbosity of full run including task manager verbosity.
-- [2947](https://github.com/RuminantFarmSystems/RuFaS/pull/2947) - [minor change] [NoInputChange] [NoOutputChange] [Animal][Reproduction] Created weather data cross validation rules.
-- [2948](https://github.com/RuminantFarmSystems/RuFaS/pull/2948) - [minor change] [Feeds][NoInputChange] [NoOutputChange] Removes feed id maximums in metadata properties.
-- [2960](https://github.com/RuminantFarmSystems/RuFaS/pull/2960) - [minor change] [Docs][NoInputChange] [NoOutputChange] Adds SME evaluation report for v1.0.
-- [2734](https://github.com/RuminantFarmSystems/RuFaS/pull/2734) - [minor change] [InputChange][OutputChange][Animal] Implements the Genetics submodule.
-- [2939](https://github.com/RuminantFarmSystems/RuFaS/pull/2939) - [minor change] [InputChange][OutputChange][SimulationEngine] Disentangles data sharing between biophysical modules in SimulationEngine.
-- [2971](https://github.com/RuminantFarmSystems/RuFaS/pull/2971) - [minor change] [InputChange][OutputChange][Feed] Reorganizes feed input structure and adapts feed input handling to accommodate new structure.
-- [2968](https://github.com/RuminantFarmSystems/RuFaS/pull/2968) - [minor change] [InputChange][OutputChange][Animal] Refactored HerdManager's daily_routine.
-- [2809](https://github.com/RuminantFarmSystems/RuFaS/pull/2809) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Reorders grouping of attributes in some HerdStatistics methods, updates docstrings.
-- [2983](https://github.com/RuminantFarmSystems/RuFaS/pull/2983) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Deleted data padder function in AnimalModuleReporter.
-- [2984](https://github.com/RuminantFarmSystems/RuFaS/pull/2984) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds manure stream compatibility check to Separators to enforce that Separators cannot be first processors in a chain.
-- [2931](https://github.com/RuminantFarmSystems/RuFaS/pull/2931) - [minor change] [NoInputChange] [OutputChange] automatically add "simulation_day" to info_maps when variables are added to OutputManager, improves data padding usability.
-- [2991](https://github.com/RuminantFarmSystems/RuFaS/pull/2991) - [minor change] [NoInputChange] [NoOutputChange] Updated the docstrings in the Crop and Soil module.
-- [3002](https://github.com/RuminantFarmSystems/RuFaS/pull/3002) - [minor change] [InputChange] [NoOutputChange] Adds animals-only simulation type.
-- [3004](https://github.com/RuminantFarmSystems/RuFaS/pull/3004) - [minor change] [NoInputChange] [NoOutputChange] Removes public `available_feeds` property from FeedManager.
-- [3000](https://github.com/RuminantFarmSystems/RuFaS/pull/3000) - [minor change] [NoInputChange] [NoOutputChange] Updated the error messages for all biophysical modules.
-- [2715](https://github.com/RuminantFarmSystems/RuFaS/pull/2715) - [minor change] [Animal] [NoInputChange] [OutputChange] Renames the 305-day milk yield output from `milk_production_305days_herd_mean` to `milk_305_day_yield_herd_mean`, splits the calculation into a pure Wood's-curve integral and a per-cow simulation estimate, and adds L1/L2/L3+ herd-level reporting.
-- [3022](https://github.com/RuminantFarmSystems/RuFaS/pull/3022) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Adds missing changelog entry for #2715 and fixes the one mypy error it introduced by typing the `history` parameter of `_make_milk_production` in `test_milk_production.py`.
-- [3032](https://github.com/RuminantFarmSystems/RuFaS/pull/3032) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Updates and fixes docstrings to be more consistently formatted.
-- [3027](https://github.com/RuminantFarmSystems/RuFaS/pull/3027) - [minor change] [SimulationEngine] [NoInputChange] [NoOutputChange] Moves daily animal update earlier in day to align feed reporting across `HerdManager` and `FeedManager` modules.
-- [3026](https://github.com/RuminantFarmSystems/RuFaS/pull/3026) - [minor change] [E2ETesting] [NoInputChange] [NoOutputChange] Fixes E2E test results comparison tolerence.
-- [2999](https://github.com/RuminantFarmSystems/RuFaS/pull/2999) - [minor change] [Cross Validation] [Feed Storage] [NoInputChange] [NoOutputChange] Added cross validation rules for feed storage inputs.
-- [3024](https://github.com/RuminantFarmSystems/RuFaS/pull/3024) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Adds path to input to error/warning messages in `DataValidator` for easier invalid input fixing.
-- [3033](https://github.com/RuminantFarmSystems/RuFaS/pull/3033) - [minor change] [Tests] [pyproject.toml] [NoInputChange] [NoOutputChange] Bumps `pytest` from `==7.4.4` to `>=9.0.3`, swaps the unmaintained `pytest-lazy-fixture` for the maintained `pytest-lazy-fixtures` fork.
-- [3046](https://github.com/RuminantFarmSystems/RuFaS/pull/3046) - [minor change] [Feed Storage] [NoInputChange] [NoOutputChange] Updates and fixes docstrings to be more consistently formatted.
-- [3048](https://github.com/RuminantFarmSystems/RuFaS/pull/3048) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Updates and fixes the EEE module docstrings to be more consistently formatted.
-- [3052](https://github.com/RuminantFarmSystems/RuFaS/pull/3052) - [minor change] [e2e-testing] [NoInputChange] [NoOutputChange] Updates and e2e-testing filters.
-- [3041](https://github.com/RuminantFarmSystems/RuFaS/pull/3041) - [minor change] [NoInputChange] [NoOutputChange] [OutputManager] [GraphGenerator] [ReportGenerator] Updates docstrings in post-processing modules to follow NumPy-style format.
-- [3050](https://github.com/RuminantFarmSystems/RuFaS/pull/3050) - [minor change] [FieldManager] [SimulationEngine] [NoInputChange] [NoOutputChange] Moves the field config data gathering out of `FieldManager.__init__()` into `SimulationEngine`, passing field data as a parameter instead.
-- [3054](https://github.com/RuminantFarmSystems/RuFaS/pull/3054) - [minor change] [Animal] [Reproduction] [NoInputChange] [NoOutputChange] Adds early-exit guard in presynch and OvSynch hormone schedule setup to skip already-pregnant cows.
+### v1.0.3
 
+- [3121](https://github.com/RuminantFarmSystems/RuFaS/pull/3121) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows. Similar changes made to `dev` branch on PR 3115
+
+- [3130](https://github.com/RuminantFarmSystems/RuFaS/pull/3020) - [minor change] [NoInputChange] [NoOutputChange] Fixes bug where stored Hay was projected to have negative dm.
+
+- [3141](https://github.com/RuminantFarmSystems/RuFaS/pull/3141) - [minor change] [Weather] [NoInputChange] [NoOutputChange] Excludes missing (NaN) daily temperatures from the average annual temperature and the seasonal temperature regression, so simulations with gaps in the weather data no longer crash. Similar changes made to `dev` branch on PR 3139
+
+### v1.0.2
+
+- [3018](https://github.com/RuminantFarmSystems/RuFaS/pull/3018) - [minor change]  [NoInputChange] [OutputChange] Replicates 3020 on dev to correct manure application composition calculations
+
+### v1.0.1
+
+- [3013](https://github.com/RuminantFarmSystems/RuFaS/pull/3013) - [minor change] [NoInputChange] [OutputChange] Replicates 2998, 2997, and 2994: Adds minimums to urine nitrogen excretion, updates tractor dataset, corrects changelog typos
+  
 ### v1.0.0
 
 - [2081](https://github.com/RuminantFarmSystems/RuFaS/pull/2081) - [minor change] [Crop & Soil] Break down the `_setup_field()` function in `FieldManager`.
@@ -212,7 +156,7 @@ v1.0.0
 - [2282](https://github.com/RuminantFarmSystems/RuFaS/pull/2282) - [minor change] [Manure] Establishes manure Processor enum class.
 - [2320](https://github.com/RuminantFarmSystems/RuFaS/pull/2320) - [minor change] [Manure] Fix determine_handler_cleaning_water_volume to be static.
 - [2316](https://github.com/RuminantFarmSystems/RuFaS/pull/2316) - [minor change] [Animal][HerdFactory] Create User-defined directory for saving generated herd if not already exists.
-- [2311](https://github.com/RuminantFarmSystems/RuFaS/pull/2311) - [minor change] [Project Build][Dependencies] Set the minimum required versions for all RuFaS dependencies specified in requirements.txt.
+- [2312](https://github.com/RuminantFarmSystems/RuFaS/pull/2312) - [minor change] [Project Build][Dependencies] Set the minimum required versions for all RuFaS dependencies specified in requirements.txt.
 - [2315](https://github.com/RuminantFarmSystems/RuFaS/pull/2315) - [minor change] [Time] Rename `Time` to `RufasTime`.
 - [2325](https://github.com/RuminantFarmSystems/RuFaS/pull/2325) - [minor change] [OutputManager] Fix class-name-reporting to Output Manager for a handful of variables.
 - [2321](https://github.com/RuminantFarmSystems/RuFaS/pull/2321) - [minor change] [Animal] Fix ZeroDivision Error when No Calf in Pen .
@@ -255,8 +199,8 @@ v1.0.0
 - [2415](https://github.com/RuminantFarmSystems/RuFaS/pull/2415) - [minor change] [Animal] Add "None" as valid cow repro sub methods.
 - [2421](https://github.com/RuminantFarmSystems/RuFaS/pull/2421) - [minor change] [Soil and Crop] Update Canopy Water handling.
 - [2420](https://github.com/RuminantFarmSystems/RuFaS/pull/2420) - [minor change] [Crop and Soil] Update Root Depth for Perennial Crops in Establishment Year.
-- [2414](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Fixes Sphinx Github Action so that it fully updates the website to also reflect new/removed/renamed file; change the theme to sphinx-awesome; added logo.
-- [2435](https://github.com/RuminantFarmSystems/RuFaS/pull/2414) - [minor change] [GitHub Actions] Adds scientific documentation equation IDs to Animal Module
+- [2418](https://github.com/RuminantFarmSystems/RuFaS/pull/2418) - [minor change] [GitHub Actions] Fixes Sphinx Github Action so that it fully updates the website to also reflect new/removed/renamed file; change the theme to sphinx-awesome; added logo.
+- [2435](https://github.com/RuminantFarmSystems/RuFaS/pull/2435) - [minor change] [GitHub Actions] Adds scientific documentation equation IDs to Animal Module
 - [2442](https://github.com/RuminantFarmSystems/RuFaS/pull/2442) - [minor change] [FeedManager][FeedStorage] Finishes up version 1 of the Feed Storage/Manager modules.
 - [2317](https://github.com/RuminantFarmSystems/RuFaS/pull/2317) - [minor change] [Animal][Manure] Moves the bedding calculations into the Animal module.
 - [2388](https://github.com/RuminantFarmSystems/RuFaS/pull/2388) - [minor change] [Manure] Enacts and incorporates refreshed daily manure processing functionality.
@@ -276,7 +220,6 @@ v1.0.0
 - [2369](https://github.com/RuminantFarmSystems/RuFaS/pull/2369) - [minor change] [Licensing] Addition of licensing documents to repository.
 - [2462](https://github.com/RuminantFarmSystems/RuFaS/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking
 - [2381](https://github.com/RuminantFarmSystems/RuFaS/pull/2381) - [minor change] [Animal] Refactor ration formulation.
-- [2462](https://github.com/RuminantFarmSystems/RuFaS/pull/2462) - [minor change] [Feed] Bug fix to prevent rounding error in feed inventory tracking.
 - [2472](https://github.com/RuminantFarmSystems/RuFaS/pull/2472) - [minor change] [Animal] Removed duplicate logics to filter animals.
 - [2464](https://github.com/RuminantFarmSystems/RuFaS/pull/2464) - [minor change] [E2E] Removes temporary Feed/Storage E2E testing setup files and functions.
 - [2392](https://github.com/RuminantFarmSystems/RuFaS/pull/2392) - [minor change] [Animal] Tracks rate related to each life stage's deaths.
@@ -344,7 +287,7 @@ v1.0.0
 - [2634](https://github.com/RuminantFarmSystems/RuFaS/pull/2634) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
 - [2639](https://github.com/RuminantFarmSystems/RuFaS/pull/2639) - [minor change] [InputChange][NoOutputChange][EEE] Add Economics prices dataset.
 - [2640](https://github.com/RuminantFarmSystems/RuFaS/pull/2640) - [minor change] [InputChange][NoOutputChange][Input Manager] Add functionality to load data anad metadata lazily.
-- [2643](https://github.com/RuminantFarmSystems/RuFaS/pull/2643) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
+- [2634](https://github.com/RuminantFarmSystems/RuFaS/pull/2634) - [minor change] [NoInputChange][NoOutputChange][Animal] Reinstates functionality of report_daily_herd_total_ration method.
 - [2641](https://github.com/RuminantFarmSystems/RuFaS/pull/2641) - [minor change] [NoInputChange][NoOutputChange][ReadMe] Fix Readme badges.
 - [2644](https://github.com/RuminantFarmSystems/RuFaS/pull/2644) - [minor change] [NoInputChange][NoOutputChange] Ensures a particular crop-field pair can only match one particular storage.
 - [2643](https://github.com/RuminantFarmSystems/RuFaS/pull/2643) - [minor change] [InputChange][NoOutputChange] Expand task file and dir regex pattern matching.
@@ -357,11 +300,10 @@ v1.0.0
 - [2655](https://github.com/RuminantFarmSystems/RuFaS/pull/2655) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated RationManager class to allow for more flexibility in user inputs in Feed input file.
 - [2670](https://github.com/RuminantFarmSystems/RuFaS/pull/2670) - [minor change] [Animal] [InputChange] [NoOutputChange] Updated Animal module unit testing to 100% coverage.
 - [2673](https://github.com/RuminantFarmSystems/RuFaS/pull/2673) - [minor change] [Feed] [InputChange] [NoOutputChange] Adds a default for purchased feed buffer of 0.15.
-- [2678](https://github.com/RuminantFarmSystems/RuFaS/pull/2678) - [minor change] [Feed] [InputChange] [OutputChange] Removes default reporting 0.0s for FGFs that aren't grown during a simulation.
+- [2679](https://github.com/RuminantFarmSystems/RuFaS/pull/2679) - [minor change] [Feed] [InputChange] [OutputChange] Removes default reporting 0.0s for FGFs that aren't grown during a simulation.
 - [2675](https://github.com/RuminantFarmSystems/RuFaS/pull/2675) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Fixes and clarifies data fixing error messaging for IM.
-- [2676](https://github.com/RuminantFarmSystems/RuFaS/pull/2673) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
+- [2673](https://github.com/RuminantFarmSystems/RuFaS/pull/2673) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
 - [2674](https://github.com/RuminantFarmSystems/RuFaS/pull/2674) - [minor change] [Feed] [NoInputChange] [NoOutputChange] Prevent simulation fails when metadata blobs for fields/manure/harvest does not exist.
-- [2676](https://github.com/RuminantFarmSystems/RuFaS/pull/2676) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Corrects a bug in Separators and adds a check to prevent a bug in Slurry Storage Outdoor, Slurry Storage Underfloor, and Anaerobic Lagoon.
 - [2688](https://github.com/RuminantFarmSystems/RuFaS/pull/2688) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Hot fix to correct the missing part of 2640.
 - [2689](https://github.com/RuminantFarmSystems/RuFaS/pull/2689) - [minor change] [InputManager] [InputChange] [NoOutputChange] Add support for multiple properties files.
 - [2701](https://github.com/RuminantFarmSystems/RuFaS/pull/2701) - [minor change] [EEEManager] [NoInputChange] [NoOutputChange] Hot fix to correct the failure in EEEManager..
@@ -381,13 +323,38 @@ v1.0.0
 - [2739](https://github.com/RuminantFarmSystems/RuFaS/pull/2739) - [minor change] [NoInputChange] [NoOutputChange] Fixes manure outputs and updates E2E expected results accordingly.
 - [2763](https://github.com/RuminantFarmSystems/RuFaS/pull/2763) - [minor change] [NoInputChange] [NoOutputChange] Fixes feed order issue by sorting user feed inputs.
 - [2760](https://github.com/RuminantFarmSystems/RuFaS/pull/2760) - [minor change] [NoInputChange] [OutputChange] [Feed][Emission] Implement dictionary reporting structure for feed deduction data
-- [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
-- [2728](https://github.com/RuminantFarmSystems/RuFaS/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
+- [2873](https://github.com/RuminantFarmSystems/RuFaS/pull/2873) - [minor change] [NoInputChange] [NoOutputChange] Updated ration percentage error message and corrected behavior.
 - [2743](https://github.com/RuminantFarmSystems/RuFaS/pull/2743) - [minor change] [NoInputChange] [NoOutputChange] Fix broken IM unit test.
 - [2744](https://github.com/RuminantFarmSystems/RuFaS/pull/2744) - [minor change] [NoInputChange] [NoOutputChange] Update the OM and RG wiki with new report filter options.
 - [2881](https://github.com/RuminantFarmSystems/RuFaS/pull/2881) - [minor change] [NoInputChange] [NoOutputChange] Add v1.0.0 release notes.
+- [2917](https://github.com/RuminantFarmSystems/RuFaS/pull/2917) - [minor change] [Metadata] [NoInputChange] [NoOutputChange] Updates ration-related metadata descriptions.
+- [2865](https://github.com/RuminantFarmSystems/RuFaS/pull/2865) - [minor change] [NoInputChange] [NoOutputChange] Update to tables and formatting in scientific documentation.
+- [2727](https://github.com/RuminantFarmSystems/RuFaS/pull/2727) - [minor change] [NoInputChange] [NoOutputChange] Update the TaskType in Wiki, and fix the broken Sphinx action.
+- [2728](https://github.com/RuminantFarmSystems/RuFaS/pull/2728) - [minor change] [InputManager] [NoInputChange] [NoOutputChange] Enforces the required file blobs.
+- [2757](https://github.com/RuminantFarmSystems/RuFaS/pull/2757) - [minor change] [NoInputChange] [NoOutputChange] Updates version number in `pyproject.toml`.
+- [2737](https://github.com/RuminantFarmSystems/RuFaS/pull/2737) - [minor change] [NoInputChange] [NoOutputChange] Update CONTRIBUTING.md file to provide forking guidelines for contributors.
+- [2690](https://github.com/RuminantFarmSystems/RuFaS/pull/2690) - [minor change] [TaskManager] [NoInputChange] [NoOutputChange] Remove hard-coded name for output folder, use user-defined name instead.
+- [2720](https://github.com/RuminantFarmSystems/RuFaS/pull/2720) - [minor change] [Emissions] [NoInputChange] [NoOutputChange] Adds FGF emissions reset when there's a harvest-kill operation and there's none of that feed left in storage.
+- [2791](https://github.com/RuminantFarmSystems/RuFaS/pull/2791) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Updates ration percentage values in example feed files to sum to exactly 100.
+- [2833](https://github.com/RuminantFarmSystems/RuFaS/pull/2833) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Remove unused animal_requirements.py file.
+- [2815](https://github.com/RuminantFarmSystems/RuFaS/pull/2815) - [minor change] [All Non-Biophysical Modules] [NoInputChange] [NoOutputChange] Updates error messages raised to be clearer and more helpful for diagnosis and fixing.
+- [2804](https://github.com/RuminantFarmSystems/RuFaS/pull/2804) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field.py.
+- [2828](https://github.com/RuminantFarmSystems/RuFaS/pull/2828) - [minor change] [DataValidator] [NoInputChange] [NoOutputChange] Refactors `validate_metadata()` to be less complex.
+- [2819](https://github.com/RuminantFarmSystems/RuFaS/pull/2819) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_input_manager.py.
+- [2836](https://github.com/RuminantFarmSystems/RuFaS/pull/2836) - [minor change] [Tests] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_output_manager.py.
+- [2826](https://github.com/RuminantFarmSystems/RuFaS/pull/2826) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds functionality to data_padder, removes unecessary use of method in ration reporting.
+- [2827](https://github.com/RuminantFarmSystems/RuFaS/pull/2827) - [minor change] [Metadata] [NoInputChange] [NoOutputChange] Updates ration-related metadata descriptions.
+- [2849](https://github.com/RuminantFarmSystems/RuFaS/pull/2849) - [minor change] [Crop and Soil] [NoInputChange] [NoOutputChange] Update the property definition of dry matter percent.
+- [2848](https://github.com/RuminantFarmSystems/RuFaS/pull/2848) - [minor change] [NoInputChange] [NoOutputChange] Justify `deepcopy()` usage.
+- [2843](https://github.com/RuminantFarmSystems/RuFaS/pull/2843) - [minor change] [NoInputChange] [NoOutputChange] Fix Simple `#noqa`s in codebase.
+- [2852](https://github.com/RuminantFarmSystems/RuFaS/pull/2852) - [minor change] [NoInputChange] [NoOutputChange] Fix AssertionError on `dev`.
+- [2866](https://github.com/RuminantFarmSystems/RuFaS/pull/2866) - [minor change] [NoInputChange] [NoOutputChange] Clears all mypy errors in test_field_manager.py.
+- [2863](https://github.com/RuminantFarmSystems/RuFaS/pull/2863) - [minor change] [NoInputChange] [NoOutputChange] Updates TaskManager to avoid using multiprocessing when running single tasks.
+- [2854](https://github.com/RuminantFarmSystems/RuFaS/pull/2854) - [minor change] [NoInputChange] [NoOutputChange] Update `emissions.py` filtering process and remove `use_filter_key_name` option in the OM filter.
+- [2872](https://github.com/RuminantFarmSystems/RuFaS/pull/2872) - [minor change] [NoInputChange] [NoOutputChange] Adds information and links for onboarding videos.
+- [2850](https://github.com/RuminantFarmSystems/RuFaS/pull/2850) - [minor change] [NoInputChange] [NoOutputChange] Refactor `Pen.get_manure_stream()`.
+- [2908](https://github.com/RuminantFarmSystems/RuFaS/pull/2908) - [minor change] [NoInputChange] [OutputChange] Fix the FarmGrownFeed Emissions Unit issue on `test` branch.
 - [2964](https://github.com/RuminantFarmSystems/RuFaS/pull/2964) - [minor change] [NoInputChange] [NoOutputChange] Patched a missing comma in freestall task input
-
 
 ### v0.9.2
 

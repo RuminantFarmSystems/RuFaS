@@ -109,7 +109,7 @@ class OutputManager(object):
 
     Class Attributes
     ----------------
-    pool_element_type : dict[str, list[Any]]
+    pool_element_type : dict[str, Any]
         Type alias for the pool elements
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH : int
         Maximum depth for recursive serialization in JSON output files (default: 4)
@@ -128,8 +128,12 @@ class OutputManager(object):
         A ``RufasTime`` object used to track the simulation time
     _exclude_info_maps_flag : bool
         Set to ``True`` to exclude ``info_maps`` when adding variables to the ``variables_pool``
-    _variables_usage_counter : Counter[str]
-        A ``Counter`` object used to keep track of the number of times a variables in the ``variables_pool`` is used.
+    _filtered_variable_key_counter : Counter[str]
+        A ``Counter``-like registry of filtered variable keys. Dictionary-valued variables pre-seed subkeys at 0, and
+        counts increase when post-processing filters select matching variables or subkeys. The pre-seeding exists
+        because dictionary-valued variables can later be filtered by subkey (for example ``variable.min``), even though
+        those subkeys are not stored as standalone top-level variables in the pool. Non-dictionary variables are not
+        pre-seeded; they only appear here once a filter actually selects them.
     is_end_to_end_testing_run : bool, default False
         Indicates if end-to-end testing is being run.
     is_first_post_processing : bool, default True
@@ -153,10 +157,18 @@ class OutputManager(object):
         The current size of the variable pool, bytes.
     maximum_pool_size : float
         The maximum allowed variable pool size, bytes.
+
+    Notes
+    -----
+    ``report_variables_usage_counts()`` writes three diagnostic CSVs for new users inspecting output behavior:
+    ``variables_usage_counts`` reports how often variables were selected by configured filters,
+    ``variables_reported_daily`` lists variables marked as daily for reporting diagnostics, and
+    ``variables_not_reported_daily`` lists variables marked as non-daily for reporting diagnostics and summarizes how
+    many times each variable was reported.
     """
 
     __instance = None
-    pool_element_type = dict[str, list[Any]]
+    pool_element_type = dict[str, Any]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
     _VARIABLE_DUMP_KEYS_TO_IGNORE = frozenset(
         ["units", "timestep", "info_maps", "prefix", "suffix", "data_origin", "number_animals_in_pen", "simulation_day"]
@@ -208,7 +220,7 @@ class OutputManager(object):
                 },
             )
             self.time = None
-            self._variables_usage_counter: Counter[str] = collections.Counter()
+            self._filtered_variable_key_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
             self.is_first_post_processing: bool = True
 
@@ -325,8 +337,14 @@ class OutputManager(object):
             pool[key] = self._pool_element_factory()
             discard_info_map = False
 
+        new_daily_flag = info_map.get("is_daily_variable", False)
+        new_daily_flag = new_daily_flag if isinstance(new_daily_flag, bool) else False
+        pool[key]["is_daily_variable"] = bool(pool[key].get("is_daily_variable", False)) or new_daily_flag
+
         if not self._exclude_info_maps_flag and not discard_info_map:
-            reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
+            reduced_info_map = {
+                k: v for k, v in info_map.items() if k not in ["class", "function", "is_daily_variable"]
+            }
             pool[key]["info_maps"].append(reduced_info_map)
 
         if isinstance(value, (int, bool, float, str)):
@@ -451,6 +469,9 @@ class OutputManager(object):
             Has no effect on manual prefix overrides.
         - ``suffix`` : str, optional
             If present, gets appended to the key
+        - ``is_daily_variable`` : bool, optional
+            If present, marks whether the variable should be treated as daily for reporting diagnostics. Defaults to
+            ``False``, and is persisted on the stored variable entry before ``info_maps`` may be excluded.
         """
         self.add_variable_call += 1
         units = info_map.get("units")
@@ -469,7 +490,7 @@ class OutputManager(object):
 
         if isinstance(value, dict):
             for k, v in value.items():
-                self._variables_usage_counter[f"{key}.{k}"] = 0
+                self._filtered_variable_key_counter[f"{key}.{k}"] = 0
 
         if self.chunkification:
             self.current_pool_size += self.average_add_variable_call_addition
@@ -502,6 +523,7 @@ class OutputManager(object):
         overwrite_simulation_day: bool, default False
             Passed to ``add_variable()``. If ``True``, any ``simulation_day`` value provided in the ``info_maps`` is
             overwritten.
+
         """
         for variable, info_map in variables:
             name, value = list(variable.items())[0]
@@ -1371,12 +1393,10 @@ class OutputManager(object):
         Returns
         -------
         tuple[list[dict[str, str|int]], str | None]
-            1. list[dict[str, str|int]]
-                A list of dictionaries, each containing the loaded filter content, with keys and values depending on the
-                file type.
-            2. str | None
-                A string representing the output CSV direction, either "portrait" or "landscape". If no direction is
-                specified, ``None`` is returned.
+            - A list of dictionaries, each containing the loaded filter content, with keys and values depending on the
+            file type.
+            - A string representing the output CSV direction, either "portrait" or "landscape". If no direction is
+            specified, ``None`` is returned.
 
         Raises
         ------
@@ -1575,7 +1595,7 @@ class OutputManager(object):
             is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
                 results[key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
-                self._variables_usage_counter.update([key])
+                self._filtered_variable_key_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
@@ -1595,7 +1615,7 @@ class OutputManager(object):
                         results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {
                             "values": filtered_value
                         }
-                    self._variables_usage_counter.update([f"{key}.{filtered_key}"])
+                    self._filtered_variable_key_counter.update([f"{key}.{filtered_key}"])
             counter += 1
         return results
 
@@ -1977,7 +1997,16 @@ class OutputManager(object):
 
     def report_variables_usage_counts(self, path: Path) -> None:
         """
-        Reports the usage counts of variables in the ``variables_pool`` to a CSV file in the given path to a directory.
+        Reports variable filter usage and daily/non-daily reporting diagnostics to CSV files.
+
+        The ``variables_usage_counts`` CSV contains counts of how often each variable was used by ``OutputManager``
+        filters during post-processing. These counts do not represent how often a variable was reported to
+        ``OutputManager`` during the simulation.
+
+        The ``variables_reported_daily`` CSV lists variables treated as daily for reporting diagnostics.
+
+        The ``variables_not_reported_daily`` CSV lists variables treated as non-daily for reporting diagnostics with
+        columns ``variable_name`` and ``report_count``.
 
         Parameters
         ----------
@@ -1986,13 +2015,78 @@ class OutputManager(object):
         """
         filename = self.generate_file_name("variables_usage_counts", "csv")
         file_path_csv = path / filename
-        sorted_variables_usage_counter_desc = self._variables_usage_counter.most_common()
+        sorted_variables_usage_counter_desc = self._filtered_variable_key_counter.most_common()
         variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
         usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
         data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
         self._dict_to_file_csv(data_dict, file_path_csv)
 
-    def dump_variable_names_and_contexts(
+        daily_filename = self.generate_file_name("variables_reported_daily", "csv")
+        daily_file_path_csv = path / daily_filename
+        daily_data_dict = self._get_variables_reported_daily()
+        self._dict_to_file_csv(daily_data_dict, daily_file_path_csv)
+
+        non_daily_filename = self.generate_file_name("variables_not_reported_daily", "csv")
+        non_daily_file_path_csv = path / non_daily_filename
+        non_daily_data_dict = self._get_variables_not_reported_daily()
+        self._dict_to_file_csv(non_daily_data_dict, non_daily_file_path_csv)
+
+    def _get_variables_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
+        """Builds a CSV-ready dictionary listing variables treated as daily for reporting diagnostics."""
+
+        variable_names: set[str] = set()
+        for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
+            values = variable_data.get("values", [])
+            if not isinstance(values, list):
+                continue
+
+            if not self._is_reported_daily(variable_data):
+                continue
+
+            variable_names.update(self._get_reported_variable_names(variable_name, values))
+
+        return {"variable_name": {"values": sorted(variable_names)}}
+
+    def _get_variables_not_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
+        """Builds a CSV-ready dictionary listing variables treated as non-daily for reporting diagnostics."""
+        rows: set[tuple[str, int]] = set()
+
+        for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
+            values = variable_data.get("values", [])
+            if not isinstance(values, list):
+                continue
+
+            if self._is_reported_daily(variable_data):
+                continue
+
+            for reported_name in self._get_reported_variable_names(variable_name, values):
+                rows.add((reported_name, len(values)))
+
+        sorted_rows = sorted(rows)
+        return {
+            "variable_name": {"values": [name for name, _ in sorted_rows]},
+            "report_count": {"values": [count for _, count in sorted_rows]},
+        }
+
+    def _is_reported_daily(self, variable_data: dict[str, Any]) -> bool:
+        """Determines whether a variable should be treated as daily for reporting diagnostics."""
+
+        is_daily_variable = variable_data.get("is_daily_variable", False)
+        return is_daily_variable if isinstance(is_daily_variable, bool) else False
+
+    def _get_reported_variable_names(self, variable_name: str, values: list[Any]) -> list[str]:
+        """Returns nested variable names for dictionary-valued variables, otherwise the variable name."""
+
+        if not values or not all(isinstance(value, dict) for value in values):
+            return [variable_name]
+
+        nested_variable_names = sorted({subkey for value in values for subkey in value.keys()})
+        if not nested_variable_names:
+            return [variable_name]
+
+        return [f"{variable_name}.{nested_variable_name}" for nested_variable_name in nested_variable_names]
+
+    def dump_variable_names_and_contexts(  # noqa: C901
         self,
         path: Path,
         exclude_info_maps: bool,
@@ -2260,6 +2354,7 @@ class OutputManager(object):
             An iterable of pool descriptors. Each descriptor must provide a pool name and the
             path to the JSON file containing the pool to load. When dicts are provided they
             must include ``"name"`` and ``"path"`` keys.
+
         """
         info_map_base = {
             "class": self.__class__.__name__,
@@ -2376,12 +2471,10 @@ class OutputManager(object):
         Returns
         -------
         tuple[int, int, int]
-            1. int
-                Total number of errors in the ``OutputManager``'s errors pool.
-            2. int
-                Total number of warnings in the ``OutputManager``'s warnings pool.
-            3. int
-                Total number of logs in the ``OutputManager``'s logs pool.
+            - Total number of errors in the ``OutputManager``'s errors pool.
+            - Total number of warnings in the ``OutputManager``'s warnings pool.
+            - Total number of logs in the ``OutputManager``'s logs pool.
+
         """
 
         errors_count = sum([len(value_dict["values"]) for value_dict in self.errors_pool.values()])
@@ -2401,7 +2494,7 @@ class OutputManager(object):
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model. Version: {version_number}\n{DISCLAIMER_MESSAGE}\n")
 
-    def print_task_id(self, task_id: str) -> None:
+    def print_task_id(self, task_id: str, output_prefix: str) -> None:
         """
         Prints out the ``task_id`` when ``LogVerbosity`` is set to any level except ``NONE``.
 
@@ -2409,11 +2502,14 @@ class OutputManager(object):
         ----------
         task_id : str
             Identifier of the task.
+        output_prefix : str
+            The output prefix for the task.
+
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
-            sys.stdout.write(f"Starting task: {task_id}\n")
+            sys.stdout.write(f"Starting task: {task_id} ({output_prefix})\n")
 
-    def print_errors_warnings_logs_counts(self, task_id: str) -> None:
+    def print_errors_warnings_logs_counts(self, task_id: str, output_prefix: str) -> None:
         """
         Prints out the logs, warnings, and errors counts when ``LogVerbosity`` is set to any level except ``NONE``.
 
@@ -2421,11 +2517,14 @@ class OutputManager(object):
         ----------
         task_id : str
             Identifier of the task.
+        output_prefix : str
+            The output prefix for the task.
+
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             errors_count, warnings_count, logs_count = self._get_errors_warnings_logs_counts()
             sys.stdout.write(
-                f"Finished task: {task_id} with {errors_count} error(s), "
+                f"Finished task: {task_id} ({output_prefix}) with {errors_count} error(s), "
                 f"{warnings_count} warning(s), and {logs_count} log(s).\n"
             )
 
@@ -2617,7 +2716,7 @@ class OutputManager(object):
         is_end_to_end_testing_run : bool
             Whether the current run is an end-to-end testing run.
         """
-        self.print_task_id(task_id)
+        self.print_task_id(task_id, output_prefix)
         self.flush_pools()
         self.set_exclude_info_maps_flag(exclude_info_maps)
         self.set_log_verbose(verbosity)

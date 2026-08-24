@@ -19,6 +19,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
 )
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
 
@@ -398,12 +399,24 @@ def test_select_constraints_growing_and_close_up() -> None:
     assert result == optimizer.heifer_constraints
 
 
-def test_select_constraints_invalid_combination() -> None:
-    """Tests that ValueError is raised for an invalid combination."""
+def test_select_constraints_invalid_combination(mocker: MockerFixture) -> None:
+    """Tests that ValueError is raised and an error is logged for an invalid combination."""
     optimizer = RationOptimizer()
     invalid_combination = MagicMock()
+
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+
     with pytest.raises(ValueError, match="Invalid animal combination"):
         optimizer._select_constraints(invalid_combination)
+
+    mock_add_error.assert_called_once_with(
+        "Ration Optimization Error",
+        f"Invalid animal combination: {invalid_combination}",
+        info_map={
+            "class": optimizer.__class__.__name__,
+            "function": optimizer._select_constraints.__name__,
+        },
+    )
 
 
 def test_objective(nrc_ration_config: RationConfig) -> None:

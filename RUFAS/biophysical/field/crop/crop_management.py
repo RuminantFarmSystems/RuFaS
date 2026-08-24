@@ -20,9 +20,6 @@ class CropManagement:
     crop_data : CropData, optional
         The data class containing crop specifications and tracked attributes.
         If not provided, default CropData will be used.
-    harvest_efficiency : float, default 1.0
-        Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
-        (unitless; [0, 1]).
     potential_harvest_index : float, optional
         Potential harvest index for a given day (unitless).
     harvest_index : float, optional
@@ -49,9 +46,6 @@ class CropManagement:
     ----------
     data : CropData
         A reference to ``crop_data``, on which crop management operations will be conducted.
-    harvest_efficiency : float
-        Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
-        (unitless; [0, 1]).
     potential_harvest_index : float | None
         Potential harvest index for a given day (unitless).
     harvest_index : float | None
@@ -84,7 +78,6 @@ class CropManagement:
     def __init__(
         self,
         crop_data: CropData | None = None,
-        harvest_efficiency: float = 1.0,
         potential_harvest_index: float | None = None,
         harvest_index: float | None = None,
         cut_biomass: float | None = None,
@@ -99,7 +92,6 @@ class CropManagement:
         self.data = crop_data or CropData()
         self.om = OutputManager()
 
-        self.harvest_efficiency = harvest_efficiency
         self.potential_harvest_index = potential_harvest_index
         self.harvest_index = harvest_index
         self.cut_biomass = cut_biomass
@@ -118,7 +110,7 @@ class CropManagement:
         field_size: float,
         time: RufasTime,
         soil_data: SoilData,
-    ) -> HarvestedCrop:
+    ) -> HarvestedCrop | None:
         """
         Executes the harvest operation passed on the crop that contains this module.
 
@@ -137,16 +129,22 @@ class CropManagement:
 
         Returns
         -------
-        HarvestedCrop
+        HarvestedCrop | None
             The harvested crop data structure containing mass and nutritional information associated with the
-            harvest's yield.
+            harvest's yield. This is ``None`` for a kill-only operation, which collects no yield.
+
+        Notes
+        -----
+        The crop's ``harvest_efficiency`` determines how much of the cut biomass is extracted from the field; the
+        remainder is deposited as residue. A forage that is only partially utilized, such as a grazed pasture,
+        therefore returns a substantial share of each cut to the field.
 
         """
         self.determine_harvest_index()
 
         harvested_crop = None
         if harvest_operation in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
-            self.cut_crop(collected_fraction=self.harvest_efficiency)
+            self.cut_crop(collected_fraction=self.data.harvest_efficiency)
             harvested_crop = self._get_harvested_crop(time, field_size, field_name)
 
         if harvest_operation in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
@@ -474,13 +472,15 @@ class CropManagement:
 
         """
         surface_layer = soil_data.soil_layers[0]
-        surface_fraction = (self.yield_residue - self.data.root_biomass) / self.yield_residue
+        surface_fraction = (
+            ((self.yield_residue - self.data.root_biomass) / self.yield_residue) if self.yield_residue > 0.0 else 0.0
+        )
         self._add_yield_residue_to_layer(
-            surface_layer,
-            surface_fraction,
-            self.yield_residue,
-            self.residue_nitrogen,
-            self.residue_phosphorus,
+            layer=surface_layer,
+            layer_fraction=surface_fraction,
+            crop_biomass=self.yield_residue,
+            nitrogen=self.residue_nitrogen,
+            phosphorus=self.residue_phosphorus,
         )
 
         subsurface_residue = self.yield_residue * (1 - surface_fraction)

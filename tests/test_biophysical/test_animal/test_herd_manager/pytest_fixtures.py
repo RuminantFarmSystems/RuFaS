@@ -65,7 +65,12 @@ def animal_json() -> dict[str, Any]:
                 "semen_type": "conventional",
                 "days_in_preg_when_dry": 218,
                 "heifer_repro_cull_time": 500,
+                "calf_mortality_rate": 0,
+                "heifer_mortality_rate": 0,
                 "do_not_breed_time": 185,
+                "cull_eligibility_minimum_days_in_milk": 60,
+                "cull_eligibility_maximum_days_carried_calf": 180,
+                "cull_ranking_criteria": "milk",
                 "cull_milk_production": 30,
                 "cow_times_milked_per_day": 3,
                 "milk_fat_percent": 4,
@@ -76,6 +81,8 @@ def animal_json() -> dict[str, Any]:
                     "male_calf_rate_sexed_semen": 0.1,
                     "male_calf_rate_conventional_semen": 0.53,
                     "keep_female_calf_rate": 1,
+                    "calf_retention_method": "rate",
+                    "annual_keep_female_calf_num": 0,
                     "wean_day": 60,
                     "wean_length": 7,
                     "milk_type": "whole",
@@ -168,7 +175,6 @@ def animal_json() -> dict[str, Any]:
         },
         "methane_mitigation": {
             "methane_mitigation_method": "None",
-            "methane_mitigation_additive_amount": 0,
             "3-NOP_additive_amount": 70,
             "monensin_additive_amount": 24,
             "essential_oils_additive_amount": 0,
@@ -612,6 +618,7 @@ def mock_animal(
     animal.milk_production.daily_milk_produced = daily_milk_produced
     animal.milk_production.fat_content = milk_fat_content
     animal.milk_production.true_protein_content = milk_protein_content
+    animal.milk_production.milk_production_reduction = 0.0
     animal.milk_production.milk_305_day_yield = (
         daily_milk_produced if milk_305_day_yield is None else milk_305_day_yield
     )

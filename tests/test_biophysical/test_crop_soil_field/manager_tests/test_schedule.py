@@ -1,8 +1,10 @@
 from typing import List
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.manager.schedule import Schedule
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -46,8 +48,9 @@ def test_validate_equal_lengths_valid() -> None:
     )
 
 
-def test_validate_equal_lengths_invalid() -> None:
+def test_validate_equal_lengths_invalid(mocker: MockerFixture) -> None:
     """Test that the validation for invalid parameter length are valid."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     try:
         Schedule.validate_equal_lengths("invalid tests", year=[2023, 2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2])
         assert False
@@ -57,6 +60,7 @@ def test_validate_equal_lengths_invalid() -> None:
             "2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2]. Lengths are: {'year': 3, 'day': 3, "
             "'depth': 2}."
         )
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -149,3 +153,91 @@ def test_prepare_events() -> None:
         (1, 3, 2024, 100),
         (2, 4, 2025, 200),
     ]
+
+
+@pytest.mark.parametrize(
+    "non_negative_parameters, fraction_parameters, years, days, name, expected_error_title, expected_message",
+    [
+        (
+            [("amounts", [1.0, 2.0])],
+            [("fractions", [0.25, 0.75])],
+            [0, 1],
+            [100, 200],
+            "bad_years_schedule",
+            None,
+            "'bad_years_schedule': expected all years to be > 0 and in non-descending order, received '[0, 1]'.",
+        ),
+        (
+            [("amounts", [1.0, 2.0])],
+            [("fractions", [0.25, 0.75])],
+            [1, 2],
+            [0, 200],
+            "bad_days_schedule",
+            "Days not valid",
+            "'bad_days_schedule': expected all days to be in range [1, 366], received '[0, 200]'.",
+        ),
+        (
+            [("amounts", [1.0, -2.0])],
+            [("fractions", [0.25, 0.75])],
+            [1, 2],
+            [100, 200],
+            "bad_non_negative_schedule",
+            "All values not non-negative",
+            "'bad_non_negative_schedule': expected all amounts to be in >= 0, received '[1.0, -2.0]'.",
+        ),
+        (
+            [("amounts", [1.0, 2.0])],
+            [("fractions", [0.25, 1.25])],
+            [1, 2],
+            [100, 200],
+            "bad_fraction_schedule",
+            "Invalid fractions",
+            "'bad_fraction_schedule': expected all fractions to be in range [0.0, 1.0], received '[0.25, 1.25]'.",
+        ),
+    ],
+)
+def test_validate_parameters_errors(
+    non_negative_parameters: list[tuple[str, list[float]]],
+    fraction_parameters: list[tuple[str, list[float]]],
+    years: list[int],
+    days: list[int],
+    name: str,
+    expected_error_title: str | None,
+    expected_message: str,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that _validate_parameters raises errors and logs expected OutputManager errors."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+
+    with pytest.raises(ValueError, match=expected_message.replace("[", r"\[").replace("]", r"\]")):
+        Schedule._validate_parameters(
+            non_negative_parameters=non_negative_parameters,
+            fraction_parameters=fraction_parameters,
+            years=years,
+            days=days,
+            name=name,
+        )
+
+    if expected_error_title is None:
+        mock_add_error.assert_not_called()
+    else:
+        mock_add_error.assert_called_once_with(
+            expected_error_title,
+            expected_message,
+            info_map={"class": Schedule.__name__, "function": Schedule._validate_parameters.__name__},
+        )
+
+
+def test_validate_parameters_valid_parameters(mocker: MockerFixture) -> None:
+    """Tests that _validate_parameters does not raise for valid parameters."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+
+    Schedule._validate_parameters(
+        non_negative_parameters=[("amounts", [0.0, 1.0, 2.0])],
+        fraction_parameters=[("fractions", [0.0, 0.5, 1.0])],
+        years=[1, 2, 3],
+        days=[1, 200, 365],
+        name="valid_schedule",
+    )
+
+    mock_add_error.assert_not_called()

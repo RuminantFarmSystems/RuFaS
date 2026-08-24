@@ -114,6 +114,11 @@ def test_task_manager_start(
         },
     )
 
+    mock_handle_post_processing = mocker.patch.object(
+        TaskManager,
+        "handle_post_processing",
+    )
+
     mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
     mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
@@ -247,23 +252,68 @@ def test_task_manager_start(
             " JSON.\n"
         )
 
-    mock_print_credits.assert_called_once_with("1.0.0")
+    mock_print_credits.assert_called_once_with(
+        "1.0.0",
+    )
     mock_check_dependencies.assert_called_once()
     mock_check_python_version.assert_called_once()
+    mock_handle_post_processing.assert_called_once_with(
+        args={
+            "exclude_info_maps": exclude_info_maps,
+            "variable_name_style": "verbose",
+            "logs_directory": Path("logs/directory"),
+            "suppress_log_files": suppress_log_files,
+            "input_data_csv_export_path": Path(""),
+            "input_data_csv_import_path": Path(""),
+            "output_prefix": "task_manager",
+        },
+        input_manager=mock_im,
+        output_manager=mock_output_manager,
+        task_id="TASK_MANAGER",
+        should_flush_im_pool=False,
+        export_input_data_to_csv=False,
+    )
 
 
-def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_manager: OutputManager) -> None:
+def test_task_manager_start_invalid_data(
+    mocker: MockerFixture,
+    mock_output_manager: OutputManager,
+) -> None:
     """Test TaskManager.start() with invalid input data."""
     mock_task_manager = TaskManager()
-    mocker.patch.object(mock_task_manager, "check_python_version")
-    mocker.patch.object(mock_task_manager, "check_dependencies")
+
+    mock_check_python_version = mocker.patch.object(
+        mock_task_manager,
+        "check_python_version",
+    )
+    mock_check_dependencies = mocker.patch.object(
+        mock_task_manager,
+        "check_dependencies",
+    )
+
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
-    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mock_start_data_processing = mocker.patch.object(
+        mock_input_manager,
+        "start_data_processing",
+        return_value=False,
+    )
+    mocker.patch(
+        "RUFAS.task_manager.InputManager",
+        return_value=mock_input_manager,
+    )
+
     mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     mock_task_manager.output_manager = mock_output_manager
 
-    with pytest.raises(Exception, match="Task Manager's input data is invalid."):
+    mock_handle_post_processing = mocker.patch.object(
+        TaskManager,
+        "handle_post_processing",
+    )
+
+    with pytest.raises(
+        Exception,
+        match="Task Manager's input data is invalid.",
+    ):
         mock_task_manager.start(
             Path("metadata/path"),
             LogVerbosity.NONE,
@@ -276,11 +326,38 @@ def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_mana
             8,
         )
 
-    mock_add_log.assert_called_with(
-        "Validation counts",
-        mocker.ANY,
-        {"class": "TaskManager", "function": "handle_post_processing", "units": MeasurementUnits.UNITLESS},
+    mock_add_log.assert_called_once_with(
+        "Task Manager Start",
+        "Task Manager Started.",
+        {
+            "class": "TaskManager",
+            "function": "start",
+        },
     )
+
+    mock_start_data_processing.assert_called_once_with(
+        metadata_path=Path("metadata/path"),
+        input_root=Path(""),
+        task_id="TASK MANAGER",
+        cross_validation_file_paths=None,
+    )
+
+    mock_handle_post_processing.assert_called_once_with(
+        args={
+            "exclude_info_maps": False,
+            "variable_name_style": "verbose",
+            "logs_directory": Path("logs/directory"),
+            "suppress_log_files": False,
+            "output_prefix": "task_manager",
+        },
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id="TASK_MANAGER",
+        should_flush_im_pool=True,
+    )
+
+    mock_check_dependencies.assert_called_once()
+    mock_check_python_version.assert_called_once()
 
 
 def test_set_random_seed(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
@@ -413,6 +490,7 @@ def test_handle_post_processing(
         "output_pool_path": Path("/fake/pool"),
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": suppress_logs,
+        "output_prefix": "output_prefix",
     }
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_flush_pool = mocker.patch.object(mock_input_manager, "flush_pool", return_value=None)
@@ -463,6 +541,7 @@ def test_handle_post_processing_export_input_tocsv(
         "suppress_log_files": True,
         "input_data_csv_export_path": Path("/fake/saved_input"),
         "input_data_csv_import_path": Path("/fake/saved_input"),
+        "output_prefix": "output_prefix",
     }
     task_manager.handle_post_processing(
         args=args,
@@ -583,6 +662,7 @@ def test_handle_post_processing_load_pool(
         "output_pool_path": Path("/fake/pool"),
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": True,
+        "output_prefix": "output_prefix",
     }
     task_manager.handle_post_processing(
         args=args,
@@ -622,6 +702,7 @@ def test_handle_post_processing_save_result(
         "output_pool_path": Path("/fake/pool"),
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": True,
+        "output_prefix": "output_prefix",
     }
     task_manager.handle_post_processing(
         args=args,

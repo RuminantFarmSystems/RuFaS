@@ -12,6 +12,24 @@ from RUFAS.units import MeasurementUnits
 
 
 class SlurryStorageUnderfloor(Storage):
+    """
+    The slurry storage underfloor manure storage class.
+
+    Parameters
+    ----------
+    name : str
+        The name of the storage.
+    cover : StorageCover
+        The type of cover used with the specified storage.
+    storage_time_period : int | None
+        The length of time (days) manure is stored for between emptying events.
+    surface_area : float
+        The surface area of the manure storage (m^2).
+    capacity : float, default=inf
+        The volumetric capacity of the storage (m^3).
+
+    """
+
     def __init__(
         self,
         name: str,
@@ -206,7 +224,7 @@ class SlurryStorageUnderfloor(Storage):
         Returns
         -------
         float
-            The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day, (kg).
+            The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day (kg).
 
         """
         storage_nitrous_oxide_nitrogen = self._calculate_nitrous_oxide_emissions(

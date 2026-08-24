@@ -72,3 +72,57 @@ def test_request_nutrients(nutrients: NutrientRequest, expected_result: Nutrient
     assert pytest.approx(actual.dry_matter) == expected_result.dry_matter
     assert pytest.approx(actual.total_manure_mass) == expected_result.total_manure_mass
     assert pytest.approx(actual.dry_matter_fraction) == expected_result.dry_matter_fraction
+
+
+def test_nutrient_request_results_add_tolerates_floating_point_imprecision() -> None:
+    """Adding two NutrientRequestResults with default fractions can round just above 1.0; clamp must absorb it."""
+    on_farm = NutrientRequestResults(nitrogen=810.217426, phosphorus=10.0, total_manure_mass=1000.0)
+    off_farm = NutrientRequestResults(nitrogen=902.166048, phosphorus=10.0, total_manure_mass=1000.0)
+
+    combined = on_farm + off_farm
+
+    assert combined.ammonium_nitrogen_fraction == pytest.approx(1.0)
+    assert combined.nitrogen == pytest.approx(810.217426 + 902.166048)
+
+
+def test_nutrient_request_empty_without_flags_raises() -> None:
+    """A request with no nutrients and no flags is genuinely empty and must raise."""
+    with pytest.raises(ValueError, match="At least one nutrient must be requested and positive"):
+        NutrientRequest(
+            nitrogen=0.0,
+            phosphorus=0.0,
+            manure_type=ManureType.SOLID,
+            use_supplemental_manure=False,
+        )
+
+
+def test_nutrient_request_accepts_positive_nutrient_with_flags() -> None:
+    """A genuine positive nutrient still validates, regardless of the boolean flags."""
+    request = NutrientRequest(
+        nitrogen=10.0,
+        phosphorus=0.0,
+        manure_type=ManureType.SOLID,
+        use_supplemental_manure=True,
+    )
+    assert request.nitrogen == 10.0
+
+
+def test_nutrient_request_flag_driven_requests_allow_zero_nutrients() -> None:
+    """Flag-driven requests (spread-all, supplemental top-up) may legitimately carry zero nutrients."""
+    spread_all = NutrientRequest(
+        nitrogen=0.0,
+        phosphorus=0.0,
+        manure_type=ManureType.SOLID,
+        use_supplemental_manure=False,
+        spread_all_available_manure=True,
+    )
+    assert spread_all.spread_all_available_manure is True
+
+    # Mirrors the zero-shortfall request built by ManureManager._calculate_supplemental_manure_needed.
+    supplemental_sentinel = NutrientRequest(
+        nitrogen=0.0,
+        phosphorus=0.0,
+        manure_type=ManureType.SOLID,
+        use_supplemental_manure=True,
+    )
+    assert supplemental_sentinel.use_supplemental_manure is True

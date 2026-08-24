@@ -10,10 +10,18 @@ class ParlorCleaningHandler(Handler):
     """
     Handles the reception and processing of manure from parlor cleaning operations.
 
-        Parameters
-        ----------
-        name : str
-            Unique identifier of the processor.
+    Parameters
+    ----------
+    name : str
+        Unique identifier of the processor.
+    processor_type : str
+        The type of processor as a string.
+    cleaning_water_use_amount : float
+        Amount of cleaning water used per animal per day (L).
+    cleaning_water_recycle_fraction : float
+        Fraction of cleaning water that is from recycled (not fresh) water sources.
+    use_parlor_flush : bool
+        Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
     """
 
@@ -98,7 +106,7 @@ class ParlorCleaningHandler(Handler):
         Returns
         -------
         float
-                The volume of fresh water used for milking (L).
+            The volume of fresh water used for milking (L).
 
         """
         return num_animals * ManureConstants.MILKING_FRESH_WATER_USE_RATE

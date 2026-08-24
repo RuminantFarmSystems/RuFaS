@@ -53,13 +53,13 @@ def valid_ration_config() -> dict[str, Any]:
 def invalid_ration_config() -> dict[str, Any]:
     return {
         "ration_formulation_parameters": {
-            "user_defined_ration_tolerance": 0.1,
+            "user_defined_ration_tolerance": 0.05,
         },
         "rations": [
             {
                 "animal_combination": "calf",
                 "feeds": [
-                    {"feed_type": 101, "ration_percentage": 55.0},
+                    {"feed_type": 101, "ration_percentage": 65.0},
                     {"feed_type": 102, "ration_percentage": 50.0},
                 ],
             },

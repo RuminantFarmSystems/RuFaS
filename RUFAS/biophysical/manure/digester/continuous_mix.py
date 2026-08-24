@@ -110,7 +110,7 @@ class ContinuousMix(Digester):
 
     def _calculate_generated_carbon_dioxide(self, generated_methane_volume: float) -> tuple[float, float]:
         """
-        Calculate the mass and volume of carbon dioxide generated based on the generated methane volume.
+        Calculates the mass and volume of carbon dioxide generated based on the generated methane volume.
 
         Parameters
         ----------
@@ -120,16 +120,14 @@ class ContinuousMix(Digester):
         Returns
         -------
         tuple[float, float]
-            A tuple containing:
-            - generated_carbon_dioxide_mass : float
-                The calculated mass of generated carbon dioxide.
-            - generated_carbon_dioxide_volume : float
-                The calculated volume of generated carbon dioxide.
+            - The calculated mass of generated carbon dioxide.
+            - The calculated volume of generated carbon dioxide.
 
         Notes
         -----
         The calculation uses the ideal gas law and the ratio of carbon dioxide to methane to determine
         the density, mass, and volume of the generated carbon dioxide.
+
         """
         carbon_dioxide_density = ManureConstants.CARBON_DIOXIDE_MOLAR_MASS / (
             GeneralConstants.IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
@@ -144,15 +142,17 @@ class ContinuousMix(Digester):
         """
         Calculates the generated methane mass and volume.
 
-        Uses the supplied temperature set point and volatile solids in the digester
-        to compute the density of methane and its corresponding volume and mass.
-
         Returns
         -------
         tuple[float, float]
-            A tuple containing:
-            - generated_methane_mass (float): The mass of generated methane.
-            - generated_methane_volume (float): The volume of generated methane.
+            - The mass of generated methane.
+            - The volume of generated methane.
+
+        Notes
+        -----
+        Uses the supplied temperature set point and volatile solids in the digester to compute the density of methane
+        and its corresponding volume and mass.
+
         """
         methane_density = ManureConstants.METHANE_MOLAR_MASS / (
             GeneralConstants.IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)

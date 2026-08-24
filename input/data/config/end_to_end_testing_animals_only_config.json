@@ -1,0 +1,9 @@
+{
+    "start_date": "2013:20",
+    "end_date": "2014:20",
+    "set_seed": true,
+    "simulation_type": "animals_only",
+    "nutrient_standard": "NASEM",
+    "FIPS_county_code": 55025,
+    "include_detailed_values": false
+}

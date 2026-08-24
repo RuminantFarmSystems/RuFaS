@@ -466,7 +466,7 @@ def test_manure_event_equality(manure_event1, manure_event2, expected: bool) -> 
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
-            hash((1, 65, 9.24, 7.7, ManureType.LIQUID, 1.30, 7.4, 0.75)),
+            hash((1, 65, 9.24, 7.7, ManureType.LIQUID, 1.30, 7.4, 0.75, False, False)),
         )
     ],
 )

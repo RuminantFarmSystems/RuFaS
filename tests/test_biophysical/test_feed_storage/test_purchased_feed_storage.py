@@ -82,6 +82,7 @@ def test_report_stored_purchased_feeds(
         "class": "PurchasedFeedStorage",
         "function": "report_stored_purchased_feeds",
         "simulation_day": time.simulation_day,
+        "is_daily_variable": True,
         "units": MeasurementUnits.KILOGRAMS,
         "suffix": "mock_suffix",
     }

@@ -43,8 +43,8 @@ jobs:
             BASE_BRANCH="dev"
             git fetch origin $BASE_BRANCH
           fi
-          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -v 'changelog.md' | tr '\n' ' ')
-          echo "All Changed Files (excluding changelog.md): $ALL_CHANGED_FILES"
+          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -v -e 'changelog.md' -e 'changelog_WIP.md' | tr '\n' ' ')
+          echo "All Changed Files (excluding changelog.md and changelog_WIP.md): $ALL_CHANGED_FILES"
           echo "ALL_CHANGED_FILES=\"$ALL_CHANGED_FILES\"" >> $GITHUB_ENV
 
           MODIFIED_FILES_ONLY=$(git diff --name-only --diff-filter=ACM origin/$BASE_BRANCH HEAD)
@@ -138,11 +138,11 @@ jobs:
       - name: Record if changelog has been updated
         id: record_if_changelog_updated
         run: |
-          if echo "${OTHER_FILES}" | grep -q "changelog.md"; then
-            echo "changelog.md has been updated."
+          if echo "${OTHER_FILES}" | grep -q "changelog_WIP.md"; then
+            echo "changelog_WIP.md has been updated."
             echo "is_changelog_updated=true" >> $GITHUB_OUTPUT
           else
-            echo "Error: changelog.md must be updated for this PR."
+            echo "Error: changelog_WIP.md must be updated for this PR."
             echo "is_changelog_updated=false" >> $GITHUB_OUTPUT
           fi
 
@@ -351,7 +351,7 @@ jobs:
           CURRENT_BRANCH="${GITHUB_REF##*/}"
           echo "Current branch: $CURRENT_BRANCH"
           if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ]; then
-            MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
+            MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog_WIP.md\` is updated."
           fi
           if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
             MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."

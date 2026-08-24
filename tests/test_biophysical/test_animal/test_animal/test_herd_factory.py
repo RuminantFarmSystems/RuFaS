@@ -212,8 +212,11 @@ def test_animal_update_functions(
 
     for function_call, should_raise_type_error in type_error_to_function_call_map_by_animal_type[animal_type].items():
         if should_raise_type_error:
+            om = OutputManager()
+            mock_om_add_error = mocker.patch.object(om, "add_error")
             with pytest.raises(TypeError):
                 function_call(animal)
+            mock_om_add_error.assert_called_once()
         else:
             result = function_call(animal)
             assert animal.days_born == 16

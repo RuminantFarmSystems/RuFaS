@@ -204,10 +204,15 @@ class SimulationEngine:
         """
         Instantiates the requested biophysical modules based on simulation type.
         """
-        weather_data = self.im.get_data("weather")
+        weather_data: dict[str, list[int | float]] = self.im.get_data("weather")
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
-        self.emissions_estimator: EmissionsEstimator = EmissionsEstimator()
+        self.emissions_estimator: EmissionsEstimator = EmissionsEstimator(
+            simulate_animals=self.simulate_animals,
+            simulate_feed=self.simulate_feed,
+            simulate_fields=self.simulate_fields,
+            simulate_manure=self.simulate_manure,
+        )
 
         if self.simulate_fields:
             field_data = self._gather_field_data()
@@ -290,6 +295,21 @@ class SimulationEngine:
 
         self._run_simulation_main_loop()
 
+        self._post_simulation_processing()
+
+        t_end_sim = timer.time()
+        total_simulation_time = t_end_sim - t_start_sim
+
+        self._post_simulation_reporting()
+
+        self._post_simulation_logging(total_simulation_time, info_map)
+
+    def _post_simulation_processing(self) -> None:
+        """Runs end-of-simulation calculations for all active modules."""
+        EEEManager.estimate_all(self.simulate_animals, self.simulate_feed, self.simulate_fields, self.simulate_manure)
+
+    def _post_simulation_reporting(self) -> None:
+        """Runs end-of-simulation reporting for all active modules."""
         if self.simulate_animals:
             AnimalModuleReporter.report_end_of_simulation(
                 self.herd_manager.herd_statistics,
@@ -300,14 +320,12 @@ class SimulationEngine:
                 self.herd_manager.animal_genetic_history_by_id,
             )
 
+    def _post_simulation_logging(self, total_simulation_time: float, info_map: dict[str, str]) -> None:
+        """Logs end-of-simulation warnings and timing for all active modules."""
         if self.simulate_manure:
             ManureExcretionCalculator.emit_dmi_below_min_summary(info_map)
 
-        EEEManager.estimate_all()
-        t_end_sim = timer.time()
-
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
-        total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
@@ -437,7 +455,9 @@ class SimulationEngine:
                 manure_request_results = None
                 if manure_request is not None:
                     if self.simulate_manure:
-                        manure_request_results = self.manure_manager.request_nutrients(manure_request, self.time)
+                        manure_request_results = self.manure_manager.request_nutrients(
+                            manure_request, field_name, self.time
+                        )
                     else:
                         manure_request_results = FieldManureSupplier.request_nutrients(manure_request)
                 manure_applications.append(ManureEventNutrientRequestResults(field_name, event, manure_request_results))
@@ -567,10 +587,10 @@ class SimulationEngine:
         Returns
         -------
         tuple[dict[str, ManureStream] | None, dict[str, float]]
-            A tuple containing:
             - A dictionary mapping pens to their corresponding ManureStream objects generated
               from the daily routines. If animals are not being simulated, this will be None.
             - A dictionary mapping feed types to the amount of purchased feed fed to the herd.
+
         """
         all_manure_data = self.herd_manager.execute_daily_routines(
             self.available_feeds,

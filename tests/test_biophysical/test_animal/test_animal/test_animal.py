@@ -58,6 +58,7 @@ from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequire
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 
 
@@ -228,7 +229,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
 
 
 @pytest.mark.parametrize(
-    "args, semen_type, sex, culled, sold",
+    "args, semen_type, sex, culled",
     [
         (
             NewBornCalfValuesTypedDict(
@@ -245,7 +246,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "conventional",
             Sex.FEMALE,
             False,
-            False,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -261,7 +261,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "sexed",
             Sex.FEMALE,
-            False,
             False,
         ),
         (
@@ -279,7 +278,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "conventional",
             Sex.MALE,
             False,
-            True,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -296,7 +294,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "sexed",
             Sex.MALE,
             False,
-            True,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -313,7 +310,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "random",
             Sex.MALE,
             False,
-            True,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -330,7 +326,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "conventional",
             Sex.FEMALE,
             True,
-            False,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -347,7 +342,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "sexed",
             Sex.FEMALE,
             True,
-            False,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -364,7 +358,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             "conventional",
             Sex.MALE,
             True,
-            True,
         ),
         (
             NewBornCalfValuesTypedDict(
@@ -380,7 +373,6 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
             ),
             "sexed",
             Sex.MALE,
-            True,
             True,
         ),
     ],
@@ -390,7 +382,6 @@ def test_initialize_newborn_calf(
     semen_type: str,
     sex: Sex,
     culled: bool,
-    sold: bool,
     mocker: MockerFixture,
     mock_time: RufasTime,
 ) -> None:
@@ -409,16 +400,13 @@ def test_initialize_newborn_calf(
 
     sex_random_value = male_calf_rate + 0.01 if sex == Sex.FEMALE else male_calf_rate - 0.01
     culled_random_value = AnimalConfig.still_birth_rate - 0.01 if culled else AnimalConfig.still_birth_rate + 0.01
-    sold_random_value = AnimalConfig.keep_female_calf_rate + 0.01 if sold else AnimalConfig.keep_female_calf_rate - 0.01
 
-    mocker.patch(
-        "RUFAS.biophysical.animal.animal.random", side_effect=[sex_random_value, culled_random_value, sold_random_value]
-    )
+    mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[sex_random_value, culled_random_value])
     mock_rvs = mocker.patch("RUFAS.biophysical.animal.animal.truncnorm.rvs", return_value=600)
 
     animal = Animal(args, mock_time)
     assert animal.sex == sex
-    assert animal.sold == sold
+    assert animal.sold is False
     assert animal.birth_weight == args["birth_weight"]
     assert animal.body_weight == args["birth_weight"]
     assert animal.wean_weight == 0.0
@@ -1102,17 +1090,22 @@ def test_days_in_pregnancy(animal_type: AnimalType, expected_days: int, mock_lac
         (AnimalType.LAC_COW, True),
     ],
 )
-def test_days_in_pregnancy_setter(animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal) -> None:
+def test_days_in_pregnancy_setter(
+    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
+) -> None:
     animal = mock_lactating_cow
     animal._days_in_pregnancy = 15
     animal.animal_type = animal_type
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         mock_lactating_cow.days_in_pregnancy = 25
         assert mock_lactating_cow._days_in_pregnancy == 25
         assert mock_lactating_cow.days_in_pregnancy == 25
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             mock_lactating_cow.days_in_pregnancy = 25
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1131,6 +1124,30 @@ def test_is_pregnant(
     animal.animal_type = animal_type
     animal._days_in_pregnancy = days_in_pregnancy
     assert animal.is_pregnant == expected
+
+
+@pytest.mark.parametrize(
+    "animal_fixture_name, expected_methane",
+    [
+        ("mock_calf", 9.0),
+        ("mock_heiferI", 9.0),
+        ("mock_heiferII", 9.0),
+        ("mock_heiferIII", 9.0),
+        ("mock_lactating_cow", 8.0),
+    ],
+)
+def test_enteric_methane_uses_correct_digestive_system_value(
+    request: pytest.FixtureRequest,
+    animal_fixture_name: str,
+    expected_methane: float,
+) -> None:
+    """enteric_methane returns unmitigated methane for cows and mitigated methane otherwise."""
+    animal: Animal = request.getfixturevalue(animal_fixture_name)
+
+    animal.digestive_system.enteric_methane_for_energy = 8.0
+    animal.digestive_system.enteric_methane_emission = 9.0
+
+    assert animal.enteric_methane == pytest.approx(expected_methane)
 
 
 @pytest.mark.parametrize(
@@ -1180,51 +1197,47 @@ def test_future_cull_date_setter(
     animal = mock_lactating_cow
     animal._future_cull_date = 999
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.future_cull_date = 2000
         assert animal._future_cull_date == 2000
         assert animal.future_cull_date == 2000
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.future_cull_date = 2000
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
-    "is_cow, future_death_value, expected",
+    "animal_type, future_death_value, expected",
     [
-        (False, 1000, sys.maxsize),
-        (True, 1000, 1000),
+        # A future death date may be scheduled for any life stage (youngstock mortality or
+        # cow death). The getter returns the stored value, or sys.maxsize when none is set.
+        (AnimalType.CALF, None, sys.maxsize),
+        (AnimalType.CALF, 1000, 1000),
+        (AnimalType.HEIFER_I, 1000, 1000),
+        (AnimalType.LAC_COW, None, sys.maxsize),
+        (AnimalType.LAC_COW, 1000, 1000),
     ],
 )
 def test_future_death_date(
-    is_cow: bool, future_death_value: int, expected: int, mock_lactating_cow: Animal, mocker: MockerFixture
+    animal_type: AnimalType, future_death_value: int | None, expected: int, mock_lactating_cow: Animal
 ) -> None:
     animal = mock_lactating_cow
+    animal.animal_type = animal_type
     animal._future_death_date = future_death_value
-    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
     assert animal.future_death_date == expected
 
 
-@pytest.mark.parametrize(
-    "is_cow, setter_allowed",
-    [
-        (False, False),
-        (True, True),
-    ],
-)
-def test_future_death_date_setter(
-    is_cow: bool, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
-) -> None:
+@pytest.mark.parametrize("animal_type", [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.LAC_COW])
+def test_future_death_date_setter(animal_type: AnimalType, mock_lactating_cow: Animal) -> None:
+    # The setter accepts a future death date for any life stage (no longer cow-only).
     animal = mock_lactating_cow
-    animal._future_death_date = 999
-    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
-    if setter_allowed:
-        animal.future_death_date = 2000
-        assert animal._future_death_date == 2000
-        assert animal.future_death_date == 2000
-    else:
-        with pytest.raises(TypeError):
-            animal.future_death_date = 2000
+    animal.animal_type = animal_type
+    animal.future_death_date = 2000
+    assert animal._future_death_date == 2000
+    assert animal.future_death_date == 2000
 
 
 @pytest.mark.parametrize(
@@ -1245,9 +1258,11 @@ def test_daily_horizontal_distance_success(
 def test_daily_horizontal_distance_typeerror(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
     animal._daily_horizontal_distance = 5.5
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
     with pytest.raises(TypeError):
         _ = animal.daily_horizontal_distance
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1267,14 +1282,17 @@ def test_daily_horizontal_distance_setter(
 ) -> None:
     animal = mock_lactating_cow
     animal._daily_horizontal_distance = 5.5
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
     if setter_allowed:
         animal.daily_horizontal_distance = new_distance
         assert animal._daily_horizontal_distance == expected
         assert animal.daily_horizontal_distance == expected
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.daily_horizontal_distance = new_distance
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1296,8 +1314,10 @@ def test_daily_vertical_distance_typeerror(mock_lactating_cow: Animal, mocker: M
     animal = mock_lactating_cow
     animal._daily_vertical_distance = 8.2
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(TypeError):
         _ = animal.daily_vertical_distance
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1317,14 +1337,17 @@ def test_daily_vertical_distance_setter(
 ) -> None:
     animal = mock_lactating_cow
     animal._daily_vertical_distance = 7.0
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
     if setter_allowed:
         animal.daily_vertical_distance = new_distance
         assert animal._daily_vertical_distance == expected
         assert animal.daily_vertical_distance == expected
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.daily_vertical_distance = new_distance
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1369,13 +1392,16 @@ def test_daily_distance_setter(
     animal = mock_lactating_cow
     animal._daily_distance = 50.0
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.daily_distance = new_distance
         assert animal._daily_distance == expected
         assert animal.daily_distance == expected
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.daily_distance = new_distance
+        mock_add_error.assert_called_once()
 
 
 def test_reproduction_getter(mock_lactating_cow: Animal) -> None:
@@ -1393,17 +1419,25 @@ def test_reproduction_getter(mock_lactating_cow: Animal) -> None:
         (AnimalType.LAC_COW, True),
     ],
 )
-def test_reproduction_setter(animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal) -> None:
+def test_reproduction_setter(
+    animal_type: AnimalType,
+    setter_allowed: bool,
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+) -> None:
     reproduction_obj = Reproduction()
     animal = mock_lactating_cow
     animal.animal_type = animal_type
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.reproduction = reproduction_obj
         assert animal._reproduction == reproduction_obj
         assert animal.reproduction == reproduction_obj
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.reproduction = reproduction_obj
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1443,12 +1477,15 @@ def test_calves_setter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.calves = new_calves
         assert animal.reproduction.calves == expected
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.calves = new_calves
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1478,19 +1515,27 @@ def test_calving_interval_getter(
         (AnimalType.LAC_COW, True),
     ],
 )
-def test_calving_interval_setter(animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal) -> None:
+def test_calving_interval_setter(
+    animal_type: AnimalType,
+    setter_allowed: bool,
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.calving_interval = 300
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.calving_interval = 450
         assert animal.reproduction.calving_interval == 450
         assert animal.calving_interval == 450
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.calving_interval = 450
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1550,19 +1595,27 @@ def test_gestation_length_getter(
         (AnimalType.LAC_COW, True),
     ],
 )
-def test_gestation_length_setter(animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal) -> None:
+def test_gestation_length_setter(
+    animal_type: AnimalType,
+    setter_allowed: bool,
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.gestation_length = 300
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.gestation_length = 320
         assert animal.reproduction.gestation_length == 320
         assert animal.gestation_length == 320
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.gestation_length = 320
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1592,19 +1645,27 @@ def test_calf_birth_weight_getter(
         (AnimalType.LAC_COW, True),
     ],
 )
-def test_calf_birth_weight_setter(animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal) -> None:
+def test_calf_birth_weight_setter(
+    animal_type: AnimalType,
+    setter_allowed: bool,
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.calf_birth_weight = 40.0
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
     new_weight = 45.0
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.calf_birth_weight = new_weight
         assert animal.reproduction.calf_birth_weight == new_weight
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.calf_birth_weight = new_weight
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1633,8 +1694,10 @@ def test_calving_interval_history_getter_type_error(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(TypeError):
         _ = animal.calving_interval_history
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1646,18 +1709,24 @@ def test_calving_interval_history_getter_type_error(
     ],
 )
 def test_heifer_reproduction_program_getter(
-    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal
+    animal_type: AnimalType,
+    setter_allowed: bool,
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.heifer_reproduction_program = HeiferReproductionProtocol.TAI
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         assert animal.heifer_reproduction_program == reproduction_obj.heifer_reproduction_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.heifer_reproduction_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1669,7 +1738,7 @@ def test_heifer_reproduction_program_getter(
     ],
 )
 def test_heifer_reproduction_program_setter(
-    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal
+    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.heifer_reproduction_program = HeiferReproductionProtocol.TAI
@@ -1677,12 +1746,15 @@ def test_heifer_reproduction_program_setter(
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
     new_program = HeiferReproductionProtocol.TAI
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.heifer_reproduction_program = new_program
         assert animal.reproduction.heifer_reproduction_program == new_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.heifer_reproduction_program = new_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1694,18 +1766,21 @@ def test_heifer_reproduction_program_setter(
     ],
 )
 def test_heifer_reproduction_sub_program_getter(
-    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal
+    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     reproduction_obj = Reproduction()
     reproduction_obj.heifer_reproduction_sub_program = HeiferTAISubProtocol.TAI_5dCG2P
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         assert animal.heifer_reproduction_sub_program == reproduction_obj.heifer_reproduction_sub_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.heifer_reproduction_sub_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1717,20 +1792,23 @@ def test_heifer_reproduction_sub_program_getter(
     ],
 )
 def test_heifer_reproduction_sub_program_setter(
-    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal
+    animal_type: AnimalType, setter_allowed: bool, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     reproduction_obj = Reproduction()
-    reproduction_obj.heifer_reproduction_sub_program = HeiferTAISubProtocol.SynchED_CP
+    reproduction_obj.heifer_reproduction_sub_program = HeiferTAISubProtocol.TAI_5dCG2P
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     animal.animal_type = animal_type
     new_sub_program = HeiferSynchEDSubProtocol.SynchED_2P
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if setter_allowed:
         animal.heifer_reproduction_sub_program = new_sub_program
         assert animal.reproduction.heifer_reproduction_sub_program == new_sub_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.heifer_reproduction_sub_program = new_sub_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1749,11 +1827,14 @@ def test_cow_reproduction_program_getter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         assert animal.cow_reproduction_program == cow_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.cow_reproduction_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1770,13 +1851,16 @@ def test_cow_reproduction_program_setter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     new_program = CowReproductionProtocol.TAI
     if allowed:
         animal.cow_reproduction_program = new_program
         assert animal.reproduction.cow_reproduction_program == new_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.cow_reproduction_program = new_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1795,11 +1879,14 @@ def test_cow_presynch_program_getter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         assert animal.cow_presynch_program == presynch_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.cow_presynch_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1816,13 +1903,16 @@ def test_cow_presynch_program_setter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     new_presynch = CowPreSynchSubProtocol.Presynch_PreSynch
     if allowed:
         animal.cow_presynch_program = new_presynch
         assert animal.reproduction.cow_presynch_program == new_presynch
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.cow_presynch_program = new_presynch
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1841,11 +1931,14 @@ def test_cow_ovsynch_program_getter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         assert animal.cow_ovsynch_program == ovsynch_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.cow_ovsynch_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1863,12 +1956,15 @@ def test_cow_ovsynch_program_setter(
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
     new_ovsynch = CowTAISubProtocol.TAI_OvSynch_48
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         animal.cow_ovsynch_program = new_ovsynch
         assert animal.reproduction.cow_ovsynch_program == new_ovsynch
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.cow_ovsynch_program = new_ovsynch
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1887,11 +1983,14 @@ def test_cow_resynch_program_getter(
     animal = mock_lactating_cow
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         assert animal.cow_resynch_program == cow_resynch
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             _ = animal.cow_resynch_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1909,12 +2008,15 @@ def test_cow_resynch_program_setter(
     animal._reproduction = reproduction_obj
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
     new_program = CowReSynchSubProtocol.Resynch_TAIafterPD
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if allowed:
         animal.cow_resynch_program = new_program
         assert animal.reproduction.cow_resynch_program == new_program
+        mock_add_error.assert_not_called()
     else:
         with pytest.raises(TypeError):
             animal.cow_resynch_program = new_program
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1962,10 +2064,12 @@ def test_dead_property(dead_at_day: int | None, expected: bool, mock_lactating_c
     assert animal.dead == expected
 
 
-def test_milk_statistics_raises_for_non_cow(mock_calf: Animal) -> None:
+def test_milk_statistics_raises_for_non_cow(mock_calf: Animal, mocker: MockerFixture) -> None:
     """milk_statistics should raise TypeError when called on a non-cow animal."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(TypeError):
         _ = mock_calf.milk_statistics
+    mock_add_error.assert_called_once()
 
 
 def test_milk_statistics_returns_expected_values_for_cow(mock_lactating_cow: Animal) -> None:
@@ -2206,15 +2310,17 @@ def test_determine_days_in_milk_valid(
     ],
 )
 def test_determine_days_in_milk_invalid(
-    current_days_in_milk: int, reproduction_output: int, mock_lactating_cow: Animal
+    current_days_in_milk: int, reproduction_output: int, mock_lactating_cow: Animal, mocker: MockerFixture
 ) -> None:
     animal = mock_lactating_cow
     animal.days_in_milk = current_days_in_milk
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         animal._determine_days_in_milk(reproduction_output)
+    mock_add_error.assert_called_once()
 
 
-def test_daily_reproduction_update_not_eligible(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+def test_daily_reproduction_update_not_eligible(mock_lactating_cow: Animal) -> None:
     mock_lactating_cow.animal_type = AnimalType.CALF
     result, _ = mock_lactating_cow.daily_reproduction_update(MagicMock(spec=RufasTime))
     assert result is None
@@ -2746,9 +2852,11 @@ def test_transition_heiferIII_to_cow_error(mock_lactating_cow: Animal, mocker: M
     mock_update = mocker.patch.object(
         Animal, "daily_reproduction_update", return_value=(None, HerdReproductionStatistics())
     )
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
 
     try:
         mock_lactating_cow.transition_heiferIII_to_cow(mock_time)
+        mock_add_error.assert_not_called()
         assert False
     except ValueError:
         assert mock_lactating_cow.animal_type == AnimalType.LAC_COW
@@ -2760,6 +2868,7 @@ def test_transition_heiferIII_to_cow_error(mock_lactating_cow: Animal, mocker: M
         mock_update.assert_called_once_with(mock_time)
         mock_wood_param.assert_not_called()
         mock_set.assert_not_called()
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -2946,6 +3055,166 @@ def test_determine_future_death_date_with_death(mock_lactating_cow: Animal, mock
     mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.0005)
     result = animal.determine_future_death_date()
     assert result == 12
+
+
+def test_setup_calf_mortality_disabled_when_rate_zero(mock_calf: Animal, mocker: MockerFixture) -> None:
+    """A zero calf_mortality_rate schedules no death and never touches the RNG."""
+    animal = mock_calf
+    animal._future_death_date = None
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.0)
+    mock_random = mocker.patch("RUFAS.biophysical.animal.animal.random")
+
+    animal._setup_calf_mortality()
+
+    assert animal._future_death_date is None
+    mock_random.assert_not_called()
+
+
+def test_setup_calf_mortality_survives_roll(mock_calf: Animal, mocker: MockerFixture) -> None:
+    """A roll of random() >= rate means the calf survives and no death is scheduled."""
+    animal = mock_calf
+    animal._future_death_date = None
+    animal.days_born = 10
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.9)
+
+    animal._setup_calf_mortality()
+
+    assert animal._future_death_date is None
+
+
+def test_setup_calf_mortality_schedules_death(mock_calf: Animal, mocker: MockerFixture) -> None:
+    """A roll of random() < rate schedules a death day in [1, wean_day - 1] with the calf tag."""
+    animal = mock_calf
+    animal._future_death_date = None
+    animal.days_born = 10
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.1)
+    mock_randint = mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=30)
+
+    animal._setup_calf_mortality()
+
+    mock_randint.assert_called_once_with(1, 59)
+    assert animal.future_death_date == 30
+    assert animal._future_death_reason == animal_constants.CALF_MORTALITY_LOSS
+
+
+@pytest.mark.parametrize("stillborn_day, sold_at_day", [(5, None), (None, 0)])
+def test_setup_calf_mortality_skips_non_eligible_calves(
+    stillborn_day: int | None, sold_at_day: int | None, mock_calf: Animal, mocker: MockerFixture
+) -> None:
+    """Stillborn calves and calves sold at birth are not eligible for pre-wean mortality."""
+    animal = mock_calf
+    animal._future_death_date = None
+    animal.stillborn_day = stillborn_day
+    animal.sold_at_day = sold_at_day
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.5)
+    mock_random = mocker.patch("RUFAS.biophysical.animal.animal.random")
+
+    animal._setup_calf_mortality()
+
+    assert animal._future_death_date is None
+    mock_random.assert_not_called()
+
+
+def test_setup_calf_mortality_not_committed_when_day_already_passed(mock_calf: Animal, mocker: MockerFixture) -> None:
+    """A calf loaded past the drawn death day has already survived it, so nothing is scheduled."""
+    animal = mock_calf
+    animal._future_death_date = None
+    animal.days_born = 40
+    mocker.patch.object(AnimalConfig, "calf_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.1)
+    mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=30)
+
+    animal._setup_calf_mortality()
+
+    assert animal._future_death_date is None
+
+
+def test_setup_heifer_mortality_disabled_when_rate_zero(mock_heiferI: Animal, mocker: MockerFixture) -> None:
+    """A zero heifer_mortality_rate schedules no death and never touches the RNG."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.0)
+    mock_random = mocker.patch("RUFAS.biophysical.animal.animal.random")
+
+    animal._setup_heifer_mortality()
+
+    assert animal._future_death_date is None
+    mock_random.assert_not_called()
+
+
+def test_setup_heifer_mortality_survives_roll(mock_heiferI: Animal, mocker: MockerFixture) -> None:
+    """A roll of random() >= rate means the heifer survives and no death is scheduled."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.5)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.9)
+
+    animal._setup_heifer_mortality()
+
+    assert animal._future_death_date is None
+
+
+def test_setup_heifer_mortality_schedules_in_heiferI_window(mock_heiferI: Animal, mocker: MockerFixture) -> None:
+    """When the stage roll falls in the HeiferI fraction, the death day is drawn from the HeiferI window."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    animal.days_born = 10
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch.object(AnimalConfig, "heifer_breed_start_day", 380)
+    # First roll 0.1 (< 0.5 -> dies); second roll 0.5 (< 2/3 -> HeiferI bucket).
+    mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[0.1, 0.5])
+    mock_randint = mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=200)
+
+    animal._setup_heifer_mortality()
+
+    mock_randint.assert_called_once_with(61, 379)
+    assert animal.future_death_date == 200
+    assert animal._future_death_reason == animal_constants.HEIFER_MORTALITY_LOSS
+
+
+def test_setup_heifer_mortality_schedules_in_heiferII_window(mock_heiferI: Animal, mocker: MockerFixture) -> None:
+    """When the stage roll falls outside the HeiferI fraction, the death day is drawn from the HeiferII window."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    animal.days_born = 10
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch.object(AnimalConfig, "heifer_breed_start_day", 380)
+    mocker.patch.object(AnimalConfig, "average_gestation_length", 276)
+    mocker.patch.object(AnimalConfig, "heifer_prefresh_day", 21)
+    # First roll 0.1 (< 0.5 -> dies); second roll 0.9 (>= 2/3 -> HeiferII bucket).
+    mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[0.1, 0.9])
+    mock_randint = mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=500)
+
+    animal._setup_heifer_mortality()
+
+    mock_randint.assert_called_once_with(381, 635)
+    assert animal.future_death_date == 500
+    assert animal._future_death_reason == animal_constants.HEIFER_MORTALITY_LOSS
+
+
+def test_setup_heifer_mortality_not_committed_when_day_already_passed(
+    mock_heiferI: Animal, mocker: MockerFixture
+) -> None:
+    """A heifer loaded past the drawn death day has already survived it, so nothing is scheduled."""
+    animal = mock_heiferI
+    animal._future_death_date = None
+    animal.days_born = 400
+    mocker.patch.object(AnimalConfig, "heifer_mortality_rate", 0.5)
+    mocker.patch.object(AnimalConfig, "wean_day", 60)
+    mocker.patch.object(AnimalConfig, "heifer_breed_start_day", 380)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=[0.1, 0.5])
+    mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=379)
+
+    animal._setup_heifer_mortality()
+
+    assert animal._future_death_date is None
 
 
 def patch_random_first_call(mocker: MockerFixture, first_value: float, second_value: float) -> None:
@@ -3340,8 +3609,10 @@ def test_set_daily_walking_distance_success(mock_lactating_cow: Animal) -> None:
 def test_set_daily_walking_distance_non_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         animal.set_daily_walking_distance(1.0, 2.0)
+    mock_add_error.assert_called_once()
 
 
 def test_initialize_newborn_calf_genetics_with_dam_tbv(mocker: MockerFixture) -> None:

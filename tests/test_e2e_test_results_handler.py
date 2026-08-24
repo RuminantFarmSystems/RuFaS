@@ -6,7 +6,16 @@ import pandas as pd
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.e2e_test_results_handler import E2ETestResultsHandler, ResultPathType
+from RUFAS.e2e_test_results_handler import E2ETestResultsHandler, MUST_CHANGE_VARIABLES_KEY, ResultPathType
+
+
+def write_must_change_file(path: Path, contents: Any) -> None:
+    """Writes a must-change variables file used by the must-change tests."""
+    with open(path, "w", encoding="utf-8") as file:
+        if isinstance(contents, str):
+            file.write(contents)
+        else:
+            json.dump(contents, file)
 
 
 @pytest.mark.parametrize(
@@ -40,6 +49,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     add_var = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
+    mocker.patch.object(E2ETestResultsHandler, "_load_must_change_variables", return_value=set())
     mock_convert_variable_name = mocker.patch(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names"
     )
@@ -654,3 +664,212 @@ def test_write_formatted_json(data: dict[str, dict[str, str]], should_raise: boo
         assert "expected_results_last_updated" in parsed_json
         expected_results_str = json.dumps(data["expected_results"], separators=(",", ":"))
         assert written_data.count(expected_results_str) == 1
+
+
+def make_result_path_set(must_change_variables_path: str) -> ResultPathType:
+    """Returns a ResultPathType with dummy paths and the given must-change variables path."""
+    return ResultPathType("domain", "expected", "actual_", 0.1, must_change_variables_path)
+
+
+def test_load_must_change_variables(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that _load_must_change_variables unions the files referenced by the path sets."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    file_one = tmp_path / "must_change_one.json"
+    file_two = tmp_path / "must_change_two.json"
+    write_must_change_file(file_one, {"description": "ignored", MUST_CHANGE_VARIABLES_KEY: ["A.x", "A.y"]})
+    write_must_change_file(file_two, {MUST_CHANGE_VARIABLES_KEY: ["A.y", "B.z"]})
+    path_sets = [
+        make_result_path_set(str(file_one)),
+        make_result_path_set(str(file_one)),
+        make_result_path_set(str(file_two)),
+        make_result_path_set(""),
+    ]
+
+    result = E2ETestResultsHandler._load_must_change_variables(path_sets)
+
+    assert result == {"A.x", "A.y", "B.z"}
+    add_error.assert_not_called()
+
+
+def test_load_must_change_variables_without_configured_paths(mocker: MockerFixture) -> None:
+    """Tests that _load_must_change_variables returns an empty set when no paths are configured."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+
+    assert E2ETestResultsHandler._load_must_change_variables([make_result_path_set("")]) == set()
+
+
+def test_load_must_change_variables_missing_file(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that _load_must_change_variables raises when a referenced file does not exist."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    path_sets = [make_result_path_set(str(tmp_path / "no_such_file.json"))]
+
+    with pytest.raises(FileNotFoundError):
+        E2ETestResultsHandler._load_must_change_variables(path_sets)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "file_contents",
+    [
+        "{not valid json",
+        ["A.x"],
+        {"wrong_key": ["A.x"]},
+        {MUST_CHANGE_VARIABLES_KEY: "A.x"},
+        {MUST_CHANGE_VARIABLES_KEY: ["A.x", 3]},
+    ],
+)
+def test_load_must_change_variables_invalid_contents(mocker: MockerFixture, tmp_path: Path, file_contents: Any) -> None:
+    """Tests that _load_must_change_variables raises for unparsable or malformed files."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    file_path = tmp_path / "must_change.json"
+    write_must_change_file(file_path, file_contents)
+
+    with pytest.raises(ValueError):
+        E2ETestResultsHandler._load_must_change_variables([make_result_path_set(str(file_path))])
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "expected_value, actual_value, tolerance, expect_satisfied",
+    [
+        # Change well beyond the tolerance
+        ({"values": [1.0]}, {"values": [5.0]}, 0.1, True),
+        # Identical values
+        ({"values": [1.0]}, {"values": [1.0]}, 0.1, False),
+        # Change within the tolerance counts as no change
+        ({"values": [100.0]}, {"values": [100.5]}, 1.0, False),
+        # Non-numerical change
+        ({"values": [["Holstein"]]}, {"values": [["Jersey"]]}, 0.1, True),
+        # Structural change
+        (
+            {"values": [{"field_name": "field_1"}]},
+            {"values": [{"field_name": "field_1"}, {"field_name": "f2"}]},
+            0.1,
+            True,
+        ),
+    ],
+)
+def test_evaluate_must_change_variables(
+    expected_value: dict[str, Any], actual_value: dict[str, Any], tolerance: float, expect_satisfied: bool
+) -> None:
+    """Tests _evaluate_must_change_variables against real DeepDiff comparisons."""
+    expected_results = {"A.x": expected_value, "A.y": {"values": [2.0]}}
+    actual_results = {"A.x": actual_value, "A.y": {"values": [2.0]}}
+
+    satisfied, violations = E2ETestResultsHandler._evaluate_must_change_variables(
+        expected_results, actual_results, ["A.x"], tolerance
+    )
+
+    if expect_satisfied:
+        assert satisfied == ["A.x"]
+        assert violations == {}
+    else:
+        assert satisfied == []
+        assert list(violations.keys()) == ["A.x"]
+
+
+def test_evaluate_must_change_variables_missing_from_actual() -> None:
+    """Tests that a must-change variable missing from the actual results is reported as a violation."""
+    satisfied, violations = E2ETestResultsHandler._evaluate_must_change_variables(
+        {"A.x": {"values": [1.0]}}, {}, ["A.x"], 0.1
+    )
+
+    assert satisfied == []
+    assert list(violations.keys()) == ["A.x"]
+    assert "missing" in violations["A.x"]
+
+
+@pytest.mark.parametrize(
+    "diff_result, expected_names",
+    [
+        ({}, []),
+        (
+            {
+                "values_changed": {
+                    "root['A.x']['values'][0]": {"old_value": 1.0, "new_value": 2.0},
+                    "root['A.y']['values'][3]": {"old_value": 1.0, "new_value": 2.0},
+                    "root['A.x']['values'][7]": {"old_value": 3.0, "new_value": 4.0},
+                }
+            },
+            ["A.x", "A.y"],
+        ),
+        (
+            {
+                "dictionary_item_added": {"root['B.z']": {"values": [1.0]}},
+                "dictionary_item_removed": ["root['C.w']", "root"],
+            },
+            ["B.z", "C.w"],
+        ),
+        ({"end_to_end_testing_passing": True}, []),
+    ],
+)
+def test_extract_changed_variable_names(diff_result: dict[str, Any], expected_names: list[str]) -> None:
+    """Tests _extract_changed_variable_names across DeepDiff change categories."""
+    assert E2ETestResultsHandler._extract_changed_variable_names(diff_result) == expected_names
+
+
+@pytest.mark.parametrize(
+    "actual_results, must_change_names, expect_passing, expect_error_count, expect_changed, expect_satisfied,"
+    " expect_violations",
+    [
+        # Must-change variable changed, everything else matches: the run passes.
+        ({"A.x": {"values": [5.0]}, "A.y": {"values": [2.0]}}, ["A.x"], True, 0, None, ["A.x"], set()),
+        # Must-change variable did not change: the run fails.
+        ({"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}, ["A.x"], False, 1, None, [], {"A.x"}),
+        # Must-change variable missing from the actual results: the run fails.
+        ({"A.y": {"values": [2.0]}}, ["A.x"], False, 1, None, [], {"A.x"}),
+        # Unflagged variable changed: the run fails and the variable is compiled into changed_variables.
+        ({"A.x": {"values": [1.0]}, "A.y": {"values": [9.0]}}, [], False, 1, ["A.y"], None, None),
+        # Flagged variable does not exist in the expected results: configuration error.
+        ({"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}, ["A.z"], True, 1, None, None, None),
+    ],
+)
+def test_compare_actual_and_expected_results_with_must_change(
+    mocker: MockerFixture,
+    tmp_path: Path,
+    actual_results: dict[str, Any],
+    must_change_names: list[str],
+    expect_passing: bool,
+    expect_error_count: int,
+    expect_changed: list[str] | None,
+    expect_satisfied: list[str] | None,
+    expect_violations: set[str] | None,
+) -> None:
+    """End-to-end tests of compare_actual_and_expected_test_results with must-change variables, on real files."""
+    expected_results = {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}
+    json_output_path = tmp_path / "output"
+    json_output_path.mkdir()
+    with open(json_output_path / "actual_prefix_results.json", "w", encoding="utf-8") as file:
+        json.dump(actual_results, file)
+    expected_results_path = tmp_path / "e2e_json_test_filter.json"
+    with open(expected_results_path, "w", encoding="utf-8") as file:
+        json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
+    must_change_path = tmp_path / "must_change_variables.json"
+    write_must_change_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
+    path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1, str(must_change_path))
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
+
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(json_output_path, None, "dummy_prefix")
+
+    reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
+    assert reported["end_to_end_testing_passing"] is expect_passing
+    assert add_error.call_count == expect_error_count
+    if expect_changed is None:
+        assert "changed_variables" not in reported
+    else:
+        assert reported["changed_variables"] == expect_changed
+    if expect_satisfied is None:
+        assert "must_change_satisfied" not in reported
+    else:
+        assert reported["must_change_satisfied"] == expect_satisfied
+    if expect_violations is None:
+        assert "must_change_violations" not in reported
+    else:
+        assert set(reported["must_change_violations"].keys()) == expect_violations

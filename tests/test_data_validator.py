@@ -2674,6 +2674,38 @@ def test_get_alias_value_raises_key_error_when_missing(eager_termination: bool) 
         assert len(v._event_logs) == 1
 
 
+@pytest.mark.parametrize("relationship", ["is_null", "is_not_null"])
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_get_alias_value_allows_null_values_for_null_relationships(relationship: str, eager_termination: bool) -> None:
+    """A null alias value is a valid evaluand for null-check relationships, not a missing alias."""
+    v = CrossValidator()
+    v._alias_pool = {"nullable_input": None}
+
+    result = v._get_alias_value("nullable_input", eager_termination, relationship)
+
+    assert result is None
+    assert v._event_logs == []
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_cross_validate_data_is_not_null_rule_fails_cleanly_on_null_value(eager_termination: bool) -> None:
+    """An is_not_null rule evaluating an actual null fails validation instead of raising 'Unknown alias name'."""
+    cv = CrossValidator()
+    block = {
+        "rules": [
+            {
+                "left_hand": {"aggregation": {"operation": "no_op", "operands": ["tractor_size"]}},
+                "right_hand": {"aggregation": {"operation": "no_op", "operands": ["true_constant"]}},
+                "relationship": "is_not_null",
+            }
+        ]
+    }
+
+    result = cv.cross_validate_data({"tractor_size": None, "true_constant": True}, block, eager_termination)
+
+    assert result is False
+
+
 def test_target_and_save(mocker: MockerFixture) -> None:
     """Test the function target_and_save()"""
     v = CrossValidator()
@@ -3099,6 +3131,70 @@ def test_evaluate_is_null(value: Any, expected: bool) -> None:
     """_evaluate_is_null checks identity to None."""
     cv = CrossValidator()
     assert cv._evaluate_is_null(value) is expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ([None], False),
+        ([0], True),
+        ([""], True),
+        ([1, 2], True),
+        ([1, None], False),
+    ],
+)
+def test_evaluate_is_not_null(value: Any, expected: bool) -> None:
+    """_evaluate_is_not_null returns True iff every element is non-None."""
+    cv = CrossValidator()
+    assert cv._evaluate_is_not_null(value) is expected
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_is_not_null_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_not_null' dispatches to _evaluate_is_not_null with the left-hand value."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(42, True), ("ignored", True)])
+    mock_is_not_null = mocker.patch.object(cv, "_evaluate_is_not_null", return_value=True)
+
+    valid = cv._evaluate_condition(
+        {"relationship": "is_not_null", "left_hand": {}, "right_hand": {}}, eager_termination
+    )
+
+    assert valid
+    mock_is_not_null.assert_called_once_with(42)
+
+
+@pytest.mark.parametrize(
+    "left_hand_value,right_hand_value,expected",
+    [
+        (["2P"], ["2P", "CP"], True),
+        (["CP"], ["2P", "CP"], True),
+        (["TAI"], ["ED", "ED-TAI"], False),
+        (["ED"], ["ED", "ED-TAI", "TAI"], True),
+        (["x", "y"], ["x", "y", "z"], True),
+        (["x", "w"], ["x", "y", "z"], False),
+        ([], ["a", "b"], True),
+    ],
+)
+def test_evaluate_is_in(left_hand_value: Any, right_hand_value: Any, expected: bool) -> None:
+    """_evaluate_is_in returns True iff every left element is in right list."""
+    cv = CrossValidator()
+    assert cv._evaluate_is_in(left_hand_value, right_hand_value) is expected
+
+
+@pytest.mark.parametrize("eager_termination", [True, False])
+def test_evaluate_condition_is_in_branch(mocker: MockerFixture, eager_termination: bool) -> None:
+    """'is_in' dispatches to _evaluate_is_in with left and right."""
+    cv = CrossValidator()
+    mocker.patch.object(cv, "_validate_condition_clause", return_value=True)
+    mocker.patch.object(cv, "_evaluate_expression", side_effect=[(["2P"], True), (["2P", "CP"], True)])
+    mock_is_in = mocker.patch.object(cv, "_evaluate_is_in", return_value=True)
+
+    valid = cv._evaluate_condition({"relationship": "is_in", "left_hand": {}, "right_hand": {}}, eager_termination)
+
+    assert valid
+    mock_is_in.assert_called_once_with(["2P"], ["2P", "CP"])
 
 
 @pytest.mark.parametrize(
@@ -3533,6 +3629,54 @@ def test_log_missing_condition_clause_field_only() -> None:
                 "ok",
             ],
             [False],
+        ),
+        # mode="filter" + field_to_save: return extracted field values, not full dicts
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "A", "val": 10}, {"type": "B", "val": 20}, {"type": "A", "val": 30}],
+                "A",
+            ],
+            [10, 30],
+        ),
+        # mode="filter" + field_to_save: no matches → empty list
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "X", "val": 1}],
+                "Z",
+            ],
+            [],
+        ),
+        # mode="filter" + field_to_save: field missing in some entries → None in result
+        (
+            {
+                "mode": "filter",
+                "in": "items",
+                "field": "type",
+                "value_to_compare": "target_type",
+                "relationship": "equal",
+                "field_to_save": "val",
+            },
+            [
+                [{"type": "A", "val": 5}, {"type": "A"}],
+                "A",
+            ],
+            [5, None],
         ),
     ],
 )
@@ -3978,17 +4122,13 @@ def test_validate_expression_block_dispatches_to_for_each_validator(mocker: Mock
 def test_validate_aggregation_block_structure_multi_operand_no_op(
     aggregation_block: dict[str, Any], eager_termination: bool
 ) -> None:
-    """_validate_aggregation_block_structure rejects multi-operand blocks with no_op or missing function."""
+    """_validate_aggregation_block_structure accepts multi-operand blocks with no_op or missing operation."""
     cv = CrossValidator()
 
-    if eager_termination:
-        with pytest.raises(ValueError, match="cannot be 'no_op'"):
-            cv._validate_aggregation_block_structure(aggregation_block, eager_termination=True)
-    else:
-        result = cv._validate_aggregation_block_structure(aggregation_block, eager_termination=False)
-        assert result is False
+    result = cv._validate_aggregation_block_structure(aggregation_block, eager_termination=eager_termination)
 
-    assert len(cv._event_logs) == 1
+    assert result is True
+    assert len(cv._event_logs) == 0
 
 
 def test_validate_aggregation_block_structure_returns_true_when_valid() -> None:

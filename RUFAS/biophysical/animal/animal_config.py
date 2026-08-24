@@ -44,7 +44,15 @@ class AnimalConfig:
     male_calf_rate_sexed_semen : float
         Proportion of male calves when sexed semen is used, (unitless).
     keep_female_calf_rate : float
-        Rate at which female calves are kept, (unitless).
+        Rate at which female calves are kept, used when ``calf_retention_method`` is
+        ``"rate"`` (unitless).
+    calf_retention_method : str
+        Method used to decide female-calf retention: ``"rate"`` (keep each live female
+        calf with probability ``keep_female_calf_rate``) or ``"count"`` (keep a target
+        number of female calves per year, ``annual_keep_female_calf_num``).
+    annual_keep_female_calf_num : int
+        Target number of female calves to keep per year, used when
+        ``calf_retention_method`` is ``"count"``, (head/year).
     still_birth_rate : float
         Probability of stillbirth occurring during calving, (unitless).
     average_gestation_length : int
@@ -172,7 +180,8 @@ class AnimalConfig:
     methane_mitigation_method : str
         The mitigation method applied for methane reduction, e.g., "None", (unitless).
     methane_mitigation_additive_amount : float
-        The amount of additive used for methane mitigation, (kg).
+        The dose of the additive selected by ``methane_mitigation_method``, taken from that
+        method's per-additive input field, (mg/kg DMI).
     milk_reduction_maximum : float
         Maximum possible milk production reduction from a given cause, (kg).
     methane_model: dict[str, Any]
@@ -195,11 +204,15 @@ class AnimalConfig:
     dry_off_day_of_pregnancy: int = 218
     heifer_reproduction_cull_day: int = 500
     do_not_breed_time: int = 185
+    calf_mortality_rate: float = 0.0
+    heifer_mortality_rate: float = 0.0
 
     semen_type: str = "conventional"
     male_calf_rate_conventional_semen: float = 0.53
     male_calf_rate_sexed_semen: float = 0.10
     keep_female_calf_rate: float = 1
+    calf_retention_method: str = "rate"
+    annual_keep_female_calf_num: int = 0
     still_birth_rate: float = 0.065
     average_gestation_length: int = 276
     std_gestation_length: float = 6
@@ -374,6 +387,12 @@ class AnimalConfig:
     }
     methane_mitigation_method: str = "None"
     methane_mitigation_additive_amount: float = 0.0
+    _METHANE_MITIGATION_DOSE_FIELDS: dict[str, str] = {
+        "3-NOP": "3-NOP_additive_amount",
+        "Monensin": "monensin_additive_amount",
+        "Essential Oils": "essential_oils_additive_amount",
+        "Seaweed": "seaweed_additive_amount",
+    }
 
     milk_reduction_maximum: float
 
@@ -397,6 +416,8 @@ class AnimalConfig:
         cls.dry_off_day_of_pregnancy = animal_config_data["management_decisions"]["days_in_preg_when_dry"]
         cls.heifer_reproduction_cull_day = animal_config_data["management_decisions"]["heifer_repro_cull_time"]
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
+        cls.calf_mortality_rate = animal_config_data["management_decisions"]["calf_mortality_rate"]
+        cls.heifer_mortality_rate = animal_config_data["management_decisions"]["heifer_mortality_rate"]
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
@@ -404,6 +425,10 @@ class AnimalConfig:
         ]
         cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
         cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
+        cls.calf_retention_method = animal_config_data["farm_level"]["calf"].get("calf_retention_method", "rate")
+        cls.annual_keep_female_calf_num = int(
+            animal_config_data["farm_level"]["calf"].get("annual_keep_female_calf_num", 0)
+        )
         cls.still_birth_rate = animal_config_data["from_literature"]["life_cycle"]["still_birth_rate"]
         cls.average_gestation_length = animal_config_data["farm_level"]["repro"]["avg_gestation_len"]
         cls.std_gestation_length = animal_config_data["farm_level"]["repro"]["std_gestation_len"]
@@ -518,8 +543,21 @@ class AnimalConfig:
         ]
 
         cls.methane_model = animal_data["methane_model"]
-        cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]
-        cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"]["methane_mitigation_additive_amount"]
+        methane_mitigation_data = animal_data["methane_mitigation"]
+        cls.methane_mitigation_method = methane_mitigation_data["methane_mitigation_method"]
+        dose_field = cls._METHANE_MITIGATION_DOSE_FIELDS.get(cls.methane_mitigation_method)
+        if dose_field is not None and dose_field not in methane_mitigation_data:
+            OutputManager().add_warning(
+                "Missing methane mitigation additive dose",
+                f"The selected methane mitigation method '{cls.methane_mitigation_method}' takes its dose from "
+                f"'{dose_field}', but that field is missing from the animal input. Defaulting the dose to 0, "
+                "which applies no mitigation.",
+                {
+                    "class": cls.__name__,
+                    "function": "initialize_animal_config",
+                },
+            )
+        cls.methane_mitigation_additive_amount = methane_mitigation_data.get(dose_field, 0.0) if dose_field else 0.0
 
         cls.milk_reduction_maximum = im.get_data("feed.ration_formulation_parameters.milk_reduction_maximum")
 

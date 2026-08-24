@@ -1,6 +1,8 @@
 import pytest
 from typing import Type
 
+from pytest_mock import MockerFixture
+
 from RUFAS.biophysical.manure.digester.continuous_mix import ContinuousMix
 from RUFAS.biophysical.manure.handler.parlor_cleaning import ParlorCleaningHandler
 from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamHandler
@@ -13,6 +15,7 @@ from RUFAS.biophysical.manure.storage.composting import Composting
 from RUFAS.biophysical.manure.storage.open_lot import OpenLot
 from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurryStorageUnderfloor
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -37,6 +40,8 @@ def test_get_processor_class_valid(input_str: str, expected_class: Type["Process
     assert ProcessorType.get_processor_class(input_str) is expected_class
 
 
-def test_get_processor_class_invalid() -> None:
+def test_get_processor_class_invalid(mocker: MockerFixture) -> None:
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError, match="Unknown manure processor type: invalid_processor."):
         ProcessorType.get_processor_class("invalid_processor")
+    mock_add_error.assert_called_once()

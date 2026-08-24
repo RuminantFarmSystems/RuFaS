@@ -112,7 +112,7 @@
       "type": "json",
       "properties": "crop_configuration_properties"
     },
-    "field_1": {
+    "no_field": {
       "title": "Field specification",
       "description": "Field characteristics and references to field management specifications.",
       "path": "input/data/field/no_field.json",

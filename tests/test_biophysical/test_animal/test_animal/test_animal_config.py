@@ -44,34 +44,18 @@ def reset_animal_config_state() -> Generator[None, None, None]:
         setattr(AnimalConfig, name, value)
 
 
-@pytest.mark.parametrize(
-    "heifer_method, expected_subprogram_type",
-    [
-        ("TAI", HeiferTAISubProtocol),  # if branch
-        ("SynchED", HeiferSynchEDSubProtocol),  # elif branch
-        ("ED", HeiferTAISubProtocol),  # else fallback to default TAI subprogram
-    ],
-    ids=["heifer_tai", "heifer_synched", "heifer_other_fallback"],
-)
-def test_initialize_animal_config_heifer_subprogram_and_core_fields(
-    mocker: pytest_mock.MockerFixture,
-    heifer_method: str,
-    expected_subprogram_type: type,
-) -> None:
-    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
-    mock_om_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
-
-    mock_im = mock_im_cls.return_value
-    mock_om = mock_om_cls.return_value
-
-    base_animal_config = {
+def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) -> dict[str, Any]:
+    """Builds the ``animal_config`` blob that ``AnimalConfig.initialize_animal_config()`` reads."""
+    return {
         "management_decisions": {
             "breeding_start_day_h": 380,
-            "heifer_repro_method": "SynchED",
+            "heifer_repro_method": heifer_repro_method,
             "cow_repro_method": "TAI",
             "semen_type": "conventional",
             "days_in_preg_when_dry": 218,
             "heifer_repro_cull_time": 500,
+            "calf_mortality_rate": 0,
+            "heifer_mortality_rate": 0,
             "do_not_breed_time": 185,
             "cull_milk_production": 30,
             "cow_times_milked_per_day": 3,
@@ -83,6 +67,8 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
                 "male_calf_rate_sexed_semen": 0.1,
                 "male_calf_rate_conventional_semen": 0.53,
                 "keep_female_calf_rate": 1,
+                "calf_retention_method": "rate",
+                "annual_keep_female_calf_num": 0,
                 "wean_day": 60,
                 "wean_length": 7,
                 "milk_type": "whole",
@@ -99,7 +85,7 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
                 "heifers": {
                     "estrus_detection_rate": 0.9,
                     "estrus_conception_rate": 0.6,
-                    "repro_sub_protocol": "2P",
+                    "repro_sub_protocol": repro_sub_protocol,
                     "repro_sub_properties": {
                         "conception_rate": 0.6,
                         "estrus_detection_rate": 0.9,
@@ -177,14 +163,35 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
         },
     }
 
-    base_animal_config["management_decisions"]["heifer_repro_method"] = heifer_method
+
+@pytest.mark.parametrize(
+    "heifer_method, repro_sub_protocol, expected_subprogram_type",
+    [
+        ("TAI", "5dCG2P", HeiferTAISubProtocol),  # if branch
+        ("SynchED", "2P", HeiferSynchEDSubProtocol),  # elif branch
+        ("ED", "5dCG2P", HeiferTAISubProtocol),  # else fallback to default TAI subprogram
+    ],
+    ids=["heifer_tai", "heifer_synched", "heifer_other_fallback"],
+)
+def test_initialize_animal_config_heifer_subprogram_and_core_fields(
+    mocker: pytest_mock.MockerFixture,
+    heifer_method: str,
+    repro_sub_protocol: str,
+    expected_subprogram_type: type,
+) -> None:
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
+    mock_om_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
+
+    mock_im = mock_im_cls.return_value
+    mock_om = mock_om_cls.return_value
+
+    base_animal_config = _make_base_animal_config(repro_sub_protocol, heifer_method)
 
     animal_data = {
         "animal_config": base_animal_config,
         "methane_model": {"dummy": "model"},
         "methane_mitigation": {
             "methane_mitigation_method": "None",
-            "methane_mitigation_additive_amount": 0.0,
         },
         "herd_information": {"simulate_genetics": False},
     }
@@ -222,6 +229,98 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
     mock_om.add_warning.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    "methane_mitigation_method, expected_additive_amount",
+    [
+        ("None", 0.0),
+        ("3-NOP", 90),
+        ("Monensin", 30),
+        ("Essential Oils", 50),
+        ("Seaweed", 55),
+        ("Unrecognized Additive", 0.0),
+    ],
+    ids=["none", "3nop", "monensin", "essential_oils", "seaweed", "unrecognized"],
+)
+def test_initialize_animal_config_selects_dose_of_chosen_mitigation_method(
+    mocker: pytest_mock.MockerFixture,
+    methane_mitigation_method: str,
+    expected_additive_amount: float,
+) -> None:
+    """The dose fed to the mitigation equations comes from the selected method's own field."""
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
+    mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
+
+    mock_im = mock_im_cls.return_value
+
+    animal_data = {
+        "animal_config": _make_base_animal_config("5dCG2P", "TAI"),
+        "methane_model": {"dummy": "model"},
+        "methane_mitigation": {
+            "methane_mitigation_method": methane_mitigation_method,
+            "3-NOP_additive_amount": 90,
+            "monensin_additive_amount": 30,
+            "essential_oils_additive_amount": 50,
+            "seaweed_additive_amount": 55,
+        },
+        "herd_information": {"simulate_genetics": False},
+    }
+
+    def get_data_side_effect(key: str) -> Any:
+        if key == "animal":
+            return animal_data
+        if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
+            return 1.23
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+            return {}
+        raise KeyError(key)
+
+    mock_im.get_data.side_effect = get_data_side_effect
+
+    AnimalConfig.initialize_animal_config()
+
+    assert AnimalConfig.methane_mitigation_method == methane_mitigation_method
+    assert AnimalConfig.methane_mitigation_additive_amount == expected_additive_amount
+
+
+def test_initialize_animal_config_warns_when_selected_mitigation_dose_field_is_missing(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """A recognized method whose dose field is absent falls back to 0 and warns rather than raising."""
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
+    mock_om_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
+
+    mock_im = mock_im_cls.return_value
+    mock_om = mock_om_cls.return_value
+
+    animal_data = {
+        "animal_config": _make_base_animal_config("5dCG2P", "TAI"),
+        "methane_model": {"dummy": "model"},
+        # "3-NOP" is selected, but "3-NOP_additive_amount" is absent from the blob.
+        "methane_mitigation": {"methane_mitigation_method": "3-NOP"},
+        "herd_information": {"simulate_genetics": False},
+    }
+
+    def get_data_side_effect(key: str) -> Any:
+        if key == "animal":
+            return animal_data
+        if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
+            return 1.23
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+            return {}
+        raise KeyError(key)
+
+    mock_im.get_data.side_effect = get_data_side_effect
+
+    AnimalConfig.initialize_animal_config()
+
+    assert AnimalConfig.methane_mitigation_additive_amount == 0.0
+
+    mock_om.add_warning.assert_called_once()
+    warning_args, _ = mock_om.add_warning.call_args
+    assert "Missing methane mitigation additive dose" in warning_args[0]
+    assert "3-NOP_additive_amount" in warning_args[1]
+
+
 def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryoff(
     mocker: pytest_mock.MockerFixture,
 ) -> None:
@@ -239,6 +338,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
             "semen_type": "conventional",
             "days_in_preg_when_dry": 218,
             "heifer_repro_cull_time": 500,
+            "calf_mortality_rate": 0,
+            "heifer_mortality_rate": 0,
             "do_not_breed_time": 185,
             "cull_milk_production": 30,
             "cow_times_milked_per_day": 3,
@@ -250,6 +351,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                 "male_calf_rate_sexed_semen": 0.1,
                 "male_calf_rate_conventional_semen": 0.53,
                 "keep_female_calf_rate": 1,
+                "calf_retention_method": "rate",
+                "annual_keep_female_calf_num": 0,
                 "wean_day": 60,
                 "wean_length": 7,
                 "milk_type": "whole",
@@ -346,7 +449,6 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
         "methane_model": {"cow": {"lactating": "IPCC"}},
         "methane_mitigation": {
             "methane_mitigation_method": "None",
-            "methane_mitigation_additive_amount": 0.0,
         },
         "herd_information": {"simulate_genetics": False},
     }

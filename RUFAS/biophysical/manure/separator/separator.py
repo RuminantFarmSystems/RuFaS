@@ -31,15 +31,13 @@ class Separator(Processor):
         The efficiency of the separator in removing volatile solids from the manure.
     total_solids_efficiency : float
         The efficiency of the separator in removing total solids from the manure.
+    processor_type : str
+        The type of separator processor.
 
     Attributes
     ----------
-    is_housing_emissions_calculator : bool = False
-        A flag to indicate if the processor is a housing emissions calculator. Will always be false for a separator.
-    name : str
-        The name of the separator.
-    prefix : str
-        The prefix to be used for naming output variables.
+    held_manure : ManureStream | None
+        Manure currently stored by the separator awaiting processing.
     separated_solids_dry_matter : float
         The dry matter content (percent DM) of separated manure solids.
     ammoniacal_nitrogen_efficiency : float
@@ -56,8 +54,10 @@ class Separator(Processor):
         The efficiency of the separator in removing volatile solids from the manure.
     total_solids_efficiency : float
         The efficiency of the separator in removing total solids from the manure.
-    om : OutputManager
-        The output manager instance used to store and manage output data.
+    separator_type : str
+        The type of separator it is.
+    _prefix : str
+        The prefix to be used for naming output variables.
 
     """
 
@@ -85,7 +85,7 @@ class Separator(Processor):
         self.ash_efficiency: float = ash_efficiency
         self.volatile_solids_efficiency: float = volatile_solids_efficiency
         self.total_solids_efficiency: float = total_solids_efficiency
-        self.separator_type = processor_type
+        self.separator_type: str = processor_type
         self._prefix = f"Manure.{self.__class__.__name__}.{self.separator_type}.{self.name}"
 
     def receive_manure(self, manure: ManureStream) -> None:

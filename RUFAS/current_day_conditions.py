@@ -9,8 +9,8 @@ from RUFAS.util import Utility
 @dataclass
 class CurrentDayConditions:
     """
-    The purpose of this class is to combine and covert infos from weather data and field data and creates a
-    current weather class that have all the needed attributes to allow field and field manager to work properly.
+    Combines and converts weather and field data into a single object exposing all attributes needed by field and
+    field manager logic.
 
     Attributes
     ----------
@@ -34,12 +34,6 @@ class CurrentDayConditions:
         Amount of irrigation that is applied to the field on that day (mm).
     precipitation: float, default=0.0
         Amount of precipitation that occurs on the day (mm).
-
-    Notes
-    -------
-    _deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this
-    will be revisited for a more accurate implementation post v1
-
     """
 
     incoming_light: float
@@ -54,7 +48,7 @@ class CurrentDayConditions:
     precipitation: float = 0.0
 
     def __post_init__(self) -> None:
-        """Sets precipitation as snow_fall or rainfall depending on mean air temperature"""
+        """Sets precipitation as ``snowfall`` or ``rainfall`` depending on mean air temperature"""
         is_freezing = self.mean_air_temperature < 0.0
         if is_freezing:
             self.snowfall = self.precipitation
@@ -107,7 +101,7 @@ class CurrentDayConditions:
     @staticmethod
     def calculate_solar_declination_radians(day_number: int) -> float:
         """
-        Helper method to determine the solar declination in radians.
+        Calculates the solar declination in radians.
 
         Parameters
         ----------

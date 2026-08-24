@@ -255,6 +255,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_feed_manager_balance.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.KILOGRAMS,
         }
         for rufas_id, amount in self._cumulative_feed_requests.items():
@@ -377,6 +378,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_cumulative_purchased_feeds.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.KILOGRAMS,
         }
         for rufas_id, amount in self._cumulative_purchased_feeds.items():
@@ -412,6 +414,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_stored_farmgrown_feeds.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "suffix": reporting_suffix,
         }
@@ -449,9 +452,9 @@ class FeedManager:
         Returns
         -------
         tuple[bool, FeedFulfillmentResults]
-            A tuple where the first element is ``True`` if the feed request can be fulfilled (``False`` otherwise), and
-            the second element is a ``FeedFulfillmentResults`` object containing the amounts of feed deducted from
-            purchased and farm-grown sources.
+            - ``True`` if the feed request can be fulfilled (``False`` otherwise).
+            - A ``FeedFulfillmentResults`` object containing the amounts of feed deducted from purchased and farm-grown
+            sources.
 
         """
         current_feed_totals = self._query_available_feed_totals(list(requested_feed.requested_feed.keys()))
@@ -475,6 +478,7 @@ class FeedManager:
                     "function": self.manage_daily_feed_request.__name__,
                     "units": MeasurementUnits.DRY_KILOGRAMS,
                     "simulation_day": time.simulation_day,
+                    "is_daily_variable": True,
                 },
             )
             self._cumulative_feed_requests[feed_id] += amount_requested
@@ -486,6 +490,7 @@ class FeedManager:
                     "function": self.manage_daily_feed_request.__name__,
                     "units": MeasurementUnits.DRY_KILOGRAMS,
                     "simulation_day": time.simulation_day,
+                    "is_daily_variable": True,
                 },
             )
             feeds_to_remove_from_inventory[feed_id] = amount_requested
@@ -838,6 +843,7 @@ class FeedManager:
             "function": self._log_feed_deductions.__name__,
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         for feed_id, amount in total_purchased.items():
             self._om.add_variable(
@@ -945,7 +951,6 @@ class FeedManager:
         Returns
         -------
         tuple[dict[RUFAS_ID, list[HarvestedCrop]], dict[RUFAS_ID, list[PurchasedFeed]]]
-            A tuple of:
             - ``farmgrown_by_id``: ``{feed_id: [HarvestedCrop]}``, sorted by ``storage_time`` oldest to newest.
             - ``purchased_by_id``: ``{feed_id: [PurchasedFeed]}``, storage time not considered.
 

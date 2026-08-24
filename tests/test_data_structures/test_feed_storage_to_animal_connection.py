@@ -1,8 +1,12 @@
+from RUFAS.input_manager import InputManager
 import pytest
 from pytest_mock import MockerFixture
 from typing import Any
 
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    ON_FARM_TO_PURCHASED_PRICE_RATIO,
+    AvailableFeedsBuilder,
+    Feed,
     FeedCategorization,
     FeedComponentType,
     NASEMFeed,
@@ -129,6 +133,45 @@ def mock_NRC_feed() -> dict[str, Any]:
     return {"non_fiber_carb": 0.97, "PAF": 0.98, "buffer": 0.0}
 
 
+@pytest.fixture
+def valid_feed_config() -> dict[str, Any]:
+    return {
+        "feeds": [
+            {"feed_type": 23},
+            {"feed_type": 44},
+        ],
+        "rations": [
+            {
+                "animal_combination": "lac_cow",
+                "feeds": [
+                    {"feed_type": 23},
+                    {"feed_type": 44},
+                ],
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def feed_library() -> dict[int, dict[str, Any]]:
+    return {
+        23: {},
+        44: {},
+    }
+
+
+def test_validate_feed_config_accepts_valid_config(
+    valid_feed_config: dict[str, Any],
+    feed_library: dict[int, dict[str, Any]],
+) -> None:
+    """Tests that no error is raised when all configured feed types are valid."""
+    AvailableFeedsBuilder._validate_feed_config(
+        valid_feed_config,
+        feed_library,
+        NutrientStandard.NASEM,
+    )
+
+
 def test_feed_categorization() -> None:
     """Tests that FeedCategorization enum works correctly."""
 
@@ -177,3 +220,237 @@ def test_NRC_feed(mock_feed: MockerFixture, mock_NRC_feed: MockerFixture) -> Non
     nrc_feed = NRCFeed(**mock_feed, **mock_NRC_feed)
 
     assert nrc_feed.non_fiber_carb == 0.97
+
+
+@pytest.mark.parametrize(
+    "nutrient_standard, nutrient_fixture_name, expected_feed_type",
+    [
+        (NutrientStandard.NASEM, "mock_NASEM_feed", NASEMFeed),
+        (NutrientStandard.NRC, "mock_NRC_feed", NRCFeed),
+    ],
+)
+def test_setup_available_feeds(
+    mocker: MockerFixture,
+    request: pytest.FixtureRequest,
+    mock_feed: dict[str, Any],
+    nutrient_standard: NutrientStandard,
+    nutrient_fixture_name: str,
+    expected_feed_type: type[Feed],
+) -> None:
+    """Tests setup_available_feeds builds sorted feed objects using the selected nutrient standard."""
+    # Arrange
+    nutritive_properties = {
+        **mock_feed,
+        **request.getfixturevalue(nutrient_fixture_name),
+    }
+    nutritive_properties.pop("rufas_id")
+    nutritive_properties.pop("amount_available")
+    nutritive_properties.pop("on_farm_cost")
+    nutritive_properties.pop("purchase_cost")
+    nutritive_properties.pop("buffer")
+
+    feed_library = {
+        44: {**nutritive_properties},
+        23: {**nutritive_properties},
+    }
+    feed_config = {
+        "feeds": [
+            {"feed_type": 44, "purchased_feed_cost": 0.20, "buffer": 1.5},
+            {"feed_type": 23, "purchased_feed_cost": 0.10, "buffer": 2.5},
+        ]
+    }
+
+    mock_process_feed_library = mocker.patch.object(
+        AvailableFeedsBuilder,
+        "_process_feed_library",
+        return_value=feed_library,
+    )
+    mock_validate_feed_config = mocker.patch.object(
+        AvailableFeedsBuilder,
+        "_validate_feed_config",
+    )
+
+    # Act
+    actual = AvailableFeedsBuilder.setup_available_feeds(feed_config, nutrient_standard)
+
+    # Assert
+    mock_process_feed_library.assert_called_once_with(nutrient_standard)
+    mock_validate_feed_config.assert_called_once_with(feed_config, feed_library, nutrient_standard)
+
+    assert [feed.rufas_id for feed in actual] == [23, 44]
+    assert all(isinstance(feed, expected_feed_type) for feed in actual)
+
+    assert actual[0].amount_available == 0.0
+    assert actual[0].purchase_cost == 0.10
+    assert actual[0].on_farm_cost == 0.10 * ON_FARM_TO_PURCHASED_PRICE_RATIO
+    assert actual[0].buffer == 2.5
+
+    assert actual[1].amount_available == 0.0
+    assert actual[1].purchase_cost == 0.20
+    assert actual[1].on_farm_cost == 0.20 * ON_FARM_TO_PURCHASED_PRICE_RATIO
+    assert actual[1].buffer == 1.5
+
+
+def test_validate_feed_config_raises_error_for_feed_missing_from_library(
+    valid_feed_config: dict[str, Any],
+    feed_library: dict[int, dict[str, Any]],
+) -> None:
+    """Tests that configured feeds must exist in the selected feed library."""
+    valid_feed_config["feeds"].append({"feed_type": 50})
+
+    with pytest.raises(
+        ValueError,
+        match=r"The following feed_type values are not present in the selected .* feed library: \[50\]\.",
+    ):
+        AvailableFeedsBuilder._validate_feed_config(
+            valid_feed_config,
+            feed_library,
+            NutrientStandard.NASEM,
+        )
+
+
+def test_validate_feed_config_raises_error_for_duplicate_top_level_feed_types(
+    valid_feed_config: dict[str, Any],
+    feed_library: dict[int, dict[str, Any]],
+) -> None:
+    """Tests that duplicate top-level feed definitions are rejected."""
+    valid_feed_config["feeds"].append({"feed_type": 23})
+
+    with pytest.raises(
+        ValueError,
+        match=r"repeated feed_type entries in the top-level 'feeds' section: \[23\]\.",
+    ):
+        AvailableFeedsBuilder._validate_feed_config(
+            valid_feed_config,
+            feed_library,
+            NutrientStandard.NASEM,
+        )
+
+
+def test_validate_feed_config_raises_error_for_duplicate_ration_feed_types(
+    valid_feed_config: dict[str, Any],
+    feed_library: dict[int, dict[str, Any]],
+) -> None:
+    """Tests that duplicate feed types within a ration are rejected."""
+    valid_feed_config["rations"][0]["feeds"].append({"feed_type": 23})
+
+    with pytest.raises(
+        ValueError,
+        match=r"repeated feed_type entries in the ration for animal_combination 'lac_cow': \[23\]\.",
+    ):
+        AvailableFeedsBuilder._validate_feed_config(
+            valid_feed_config,
+            feed_library,
+            NutrientStandard.NASEM,
+        )
+
+
+def test_validate_feed_config_raises_error_for_ration_feed_missing_from_top_level_feeds(
+    valid_feed_config: dict[str, Any],
+    feed_library: dict[int, dict[str, Any]],
+) -> None:
+    """Tests that ration feeds must be defined in the top-level feeds section."""
+    valid_feed_config["rations"][0]["feeds"].append({"feed_type": 50})
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"ration feed_type entries that are not defined in the top-level 'feeds' section "
+            r"for animal_combination 'lac_cow': \[50\]\."
+        ),
+    ):
+        AvailableFeedsBuilder._validate_feed_config(
+            valid_feed_config,
+            feed_library,
+            NutrientStandard.NASEM,
+        )
+
+
+@pytest.mark.parametrize(
+    "values, expected",
+    [
+        ([23, 44, 50], set()),
+        ([23, 44, 23], {23}),
+        ([23, 44, 23, 44], {23, 44}),
+        ([23, 23, 23], {23}),
+        ([], set()),
+    ],
+)
+def test_find_feed_repeats(
+    values: list[int],
+    expected: set[int],
+) -> None:
+    """Tests that repeated feed IDs are correctly identified."""
+    actual = AvailableFeedsBuilder._find_feed_repeats(values)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "nutrient_standard, expected_get_data_key",
+    [
+        (NutrientStandard.NASEM, "NASEM_Comp"),
+        (NutrientStandard.NRC, "NRC_Comp"),
+    ],
+)
+def test_process_feed_library(
+    mocker: MockerFixture,
+    nutrient_standard: NutrientStandard,
+    expected_get_data_key: str,
+) -> None:
+    """Tests that the selected feed library is loaded, converted, indexed, and enum fields are processed."""
+    # Arrange
+    mock_input_manager = mocker.MagicMock()
+    mocker.patch.object(InputManager, "__new__", return_value=mock_input_manager)
+
+    feed_library = {
+        "rufas_id": [23, 44],
+        "feed_type": ["conc", "forage"],
+        "Fd_Category": ["energy_source", "protein_source"],
+        "units": ["kg", "kg"],
+        "DM": [90.0, 88.0],
+        "CP": [0.11, 0.12],
+    }
+    mock_input_manager.get_data.return_value = feed_library
+
+    converted_feed_library = [
+        {
+            "rufas_id": 23,
+            "feed_type": FeedComponentType.CONC.value,
+            "Fd_Category": FeedCategorization.ENERGY_SOURCE.value,
+            "units": MeasurementUnits.KILOGRAMS.value,
+            "DM": 90.0,
+            "CP": 0.11,
+        },
+        {
+            "rufas_id": 44,
+            "feed_type": FeedComponentType.FORAGE.value,
+            "Fd_Category": FeedCategorization.PLANT_PROTEIN.value,
+            "units": MeasurementUnits.KILOGRAMS.value,
+            "DM": 88.0,
+            "CP": 0.12,
+        },
+    ]
+
+    mock_convert = mocker.patch(
+        "RUFAS.util.Utility.convert_dict_of_lists_to_list_of_dicts",
+        return_value=converted_feed_library,
+    )
+
+    # Act
+    actual = AvailableFeedsBuilder._process_feed_library(nutrient_standard)
+
+    # Assert
+    mock_input_manager.get_data.assert_called_once_with(expected_get_data_key)
+    mock_convert.assert_called_once_with(feed_library)
+
+    assert set(actual) == {23, 44}
+    assert "rufas_id" not in actual[23]
+    assert "rufas_id" not in actual[44]
+
+    assert actual[23]["feed_type"] == FeedComponentType.CONC
+    assert actual[23]["Fd_Category"] is FeedCategorization.ENERGY_SOURCE
+    assert actual[44]["Fd_Category"] is FeedCategorization.PLANT_PROTEIN
+    assert actual[23]["units"] == MeasurementUnits.KILOGRAMS
+    assert actual[23]["DM"] == 90.0
+    assert actual[23]["CP"] == 0.11

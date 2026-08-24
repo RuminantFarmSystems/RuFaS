@@ -151,7 +151,8 @@ class RationManager:
             info_map["ration"] = ration
             info_map["animal_combination"] = animal_combo.value
             info_map["units"] = MeasurementUnits.PERCENT
-            if abs(total_percentage_of_ration - 100.0) > tolerance:
+
+            if abs(total_percentage_of_ration - 100.0) > tolerance * 100:
                 error_msg = (
                     f"Invalid user-defined ration for {animal_combo.value}. "
                     f"Ration percentages sum to {total_percentage_of_ration}. "

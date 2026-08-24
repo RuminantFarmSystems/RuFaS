@@ -156,7 +156,10 @@ class HerdStatistics:
         Total quantity of milk protein in the herd's milk production, (kg).
     herd_milk_protein_percent : float
         Percentage of milk protein in the herd's milk production, (unitless).
-
+    heifer_average_daily_gain_by_pen: dict[str, float | None]
+        The average daily bodyweight gain for heifers in pens by pen id, (kg).
+    heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
+        The average daily bodyweight gain for heifers by animal type, (kg).
     """
 
     avg_calving_to_preg_time: dict[str, float]
@@ -246,6 +249,9 @@ class HerdStatistics:
     herd_milk_protein_kg = 0.0
     herd_milk_protein_percent = 0.0
 
+    heifer_average_daily_gain_by_pen: dict[str, float | None]
+    heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
+
     def __init__(self) -> None:
         """
         Initializes a HerdStatistics object and set the default values for all dictionary and list attributes.
@@ -305,6 +311,13 @@ class HerdStatistics:
             AnimalType.HEIFER_III: 0,
             AnimalType.LAC_COW: 0,
             AnimalType.DRY_COW: 0,
+        }
+
+        self.heifer_average_daily_gain_by_pen = {}
+        self.heifer_average_daily_gain_by_animal_type = {
+            AnimalType.HEIFER_I: None,
+            AnimalType.HEIFER_II: None,
+            AnimalType.HEIFER_III: None,
         }
 
     def reset_daily_stats(self) -> None:
@@ -381,6 +394,14 @@ class HerdStatistics:
         self.herd_milk_fat_percent = 0.0
         self.herd_milk_protein_kg = 0.0
         self.herd_milk_protein_percent = 0.0
+
+        for pen_id in self.heifer_average_daily_gain_by_pen:
+            self.heifer_average_daily_gain_by_pen[pen_id] = None
+        self.heifer_average_daily_gain_by_animal_type = {
+            AnimalType.HEIFER_I: None,
+            AnimalType.HEIFER_II: None,
+            AnimalType.HEIFER_III: None,
+        }
 
     def reset_parity(self) -> None:
         """Resets parity-based attributes."""

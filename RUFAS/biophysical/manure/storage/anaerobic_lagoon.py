@@ -69,6 +69,7 @@ class AnaerobicLagoon(Storage):
         -------
         dict[str, ManureStream]
             The processed manure stream. Will be empty if it is not time to empty the storage.
+
         """
         if self._cover in [StorageCover.NO_COVER, StorageCover.CRUST]:
             precipitation_volume = current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
@@ -147,7 +148,6 @@ class AnaerobicLagoon(Storage):
         Returns
         -------
         tuple[float, float]
-            A tuple containing:
             - The methane burned from manure storage on the current day, (kg).
             - The methane emitted from manure storage on the current day, (kg).
 

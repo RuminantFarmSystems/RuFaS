@@ -10,6 +10,7 @@ from RUFAS.biophysical.field.soil.carbon_cycling.residue_partition import Residu
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
+from RUFAS.output_manager import OutputManager
 from tests.test_biophysical.test_crop_soil_field.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
@@ -60,6 +61,7 @@ def test_determine_plant_lignin_nitrogen_fraction(
     total_residue: float,
     crop_yield_nitrogen: float,
     expected_result: float,
+    mocker: MockerFixture,
 ) -> None:
     """Test that metabolic plant residue ration is correctly determined under current nitrogen_fraction_plant_residue"""
     if total_residue:
@@ -67,16 +69,19 @@ def test_determine_plant_lignin_nitrogen_fraction(
     else:
         nitrogen_fraction_plant_residue = 0.0
 
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if 0 < nitrogen_fraction_plant_residue <= 1.0:
         assert expected_result == pytest.approx(
             ResiduePartition._determine_plant_lignin_nitrogen_fraction(
                 plant_residue_lignin_composition, total_residue, crop_yield_nitrogen
             )
         )
+        mock_add_error.assert_not_called()
     elif nitrogen_fraction_plant_residue == 0:
         assert expected_result == ResiduePartition._determine_plant_lignin_nitrogen_fraction(
             plant_residue_lignin_composition, total_residue, crop_yield_nitrogen
         )
+        mock_add_error.assert_not_called()
     else:
         # case of invalid input
         with pytest.raises(ValueError) as e:
@@ -87,6 +92,7 @@ def test_determine_plant_lignin_nitrogen_fraction(
             nitrogen_fraction_plant_residue
         )
         assert expected == str(e.value)
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -339,8 +345,10 @@ def test_determine_soil_lignin_to_nitrogen_ratio(
     weighted_residue_dry_matter_lignin_fraction: float,
     soil_residue_lignin_fraction: float,
     nitrogen_fraction_plant_residue: float,
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the soil lignin to nitrogen fraction is calculated correctly"""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if 0 < nitrogen_fraction_plant_residue <= 1:
         expected = plant_lignin_nitrogen_ratio * weighted_residue_dry_matter_lignin_fraction + (
             ((soil_residue_lignin_fraction / 100) / nitrogen_fraction_plant_residue) / 100
@@ -351,6 +359,7 @@ def test_determine_soil_lignin_to_nitrogen_ratio(
             soil_residue_lignin_fraction,
             nitrogen_fraction_plant_residue,
         )
+        mock_add_error.assert_not_called()
     elif nitrogen_fraction_plant_residue == 0:
         expected = 0
         assert expected == ResiduePartition._determine_soil_lignin_to_nitrogen_fraction(
@@ -359,6 +368,7 @@ def test_determine_soil_lignin_to_nitrogen_ratio(
             soil_residue_lignin_fraction,
             nitrogen_fraction_plant_residue,
         )
+        mock_add_error.assert_not_called()
     else:
         # case of invalid input
         with pytest.raises(ValueError) as e:
@@ -372,6 +382,7 @@ def test_determine_soil_lignin_to_nitrogen_ratio(
             nitrogen_fraction_plant_residue
         )
         assert expected == str(e.value)
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

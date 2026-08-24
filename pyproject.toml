@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RuFaS"
-version = "1.0.0"
+version = "1.0.3"
 description = "Ruminant Farm Systems Model"
 readme = "README.md"
 license = "GPL-3.0-only"
@@ -33,7 +33,7 @@ build_docs = [
 ]
 
 dev = [
-    "black>=25.1.0",
+    "black>=26.5.1",
     "flake8>=7.1.1",
     "mypy>=1.15.0",
     "coverage>=7.6.11",
@@ -45,6 +45,9 @@ dev = [
     "sphinxawesome-theme>=5.3.2",
     "sphinxcontrib-mermaid>=2.0.1",
 ]
+
+[project.scripts]
+rufas = "RUFAS.main:main"
 
 [project.urls]
 Homepage = "https://rufas.org"
