@@ -10,6 +10,21 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize, TillageImplement, OperationType
 from RUFAS.input_manager import InputManager
 
+_FARMGROWN_FEED_FIXTURE_FIELD_SIZE = 100
+
+
+def _scale_farmgrown_feed_values(
+    data: dict[Any, dict[Any, dict[Any, float]]], field_size: float = _FARMGROWN_FEED_FIXTURE_FIELD_SIZE
+) -> dict[Any, dict[Any, dict[Any, float]]]:
+    """Scales the innermost float values of a depth-3 nested dict by ``field_size`` (kg/ha -> kg)."""
+    return {
+        outer_key: {
+            middle_key: {inner_key: value * field_size for inner_key, value in inner.items()}
+            for middle_key, inner in middle.items()
+        }
+        for outer_key, middle in data.items()
+    }
+
 
 @pytest.fixture
 def EEE_constants() -> list[dict[str, Any]]:
@@ -4888,7 +4903,7 @@ def raw_ammonia_emissions_data() -> dict[str, dict[str, list[Any]]]:
 
 @pytest.fixture
 def parsed_emissions_data() -> dict[str, dict[str, dict[int, float]]]:
-    return {
+    return _scale_farmgrown_feed_values({
         "nitrous_oxide_emissions": {
             "field_1": {0: 0.000410670737296303, 1: 0.0, 2: 0.0},
             "field_2": {0: 0.005314772487262718, 1: 0.006126406634630361, 2: 0.0020535431716768022},
@@ -4897,12 +4912,12 @@ def parsed_emissions_data() -> dict[str, dict[str, dict[int, float]]]:
             "field_1": {0: 0.029237270321431974, 1: 0.023865112447750098, 2: 0.002724880353196001},
             "field_2": {0: 0.019219655955911727, 1: 0.015461878496265263, 2: 0.0014533783916523774},
         },
-    }
+    })
 
 
 @pytest.fixture
 def test_emissions_data() -> dict[str, dict[str, dict[int, float]]]:
-    return {
+    return _scale_farmgrown_feed_values({
         "nitrous_oxide_emissions": {
             "field_1": {
                 0: 0.000410670737296303,
@@ -7915,7 +7930,7 @@ def test_emissions_data() -> dict[str, dict[str, dict[int, float]]]:
                 749: 0.0,
             },
         },
-    }
+    })
 
 
 @pytest.fixture
@@ -7975,25 +7990,25 @@ def raw_manure_application_data() -> dict[str, dict[str, list[Any]]]:
 def parsed_fertilizer_and_manure_application_data() -> dict[str, dict[str, dict[int, dict[str, float]]]]:
     return {
         "manure_applications": {
-            "field_1": {123: {"nitrogen": 5.71}, 675: {"nitrogen": 8.57}},
-            "field_2": {123: {"nitrogen": 5.71}, 675: {"nitrogen": 8.57}},
+            "field_1": {123: {"nitrogen": 571}, 675: {"nitrogen": 857}},
+            "field_2": {123: {"nitrogen": 571}, 675: {"nitrogen": 857}},
         },
         "fertilizer_applications": {
             "field_1": {
                 123: {
-                    "nitrogen": 0.52871123969561054,
-                    "phosphorus": 0.8811840892012549,
-                    "potassium": 1.7623681784025098,
+                    "nitrogen": 52.871123969561054,
+                    "phosphorus": 88.11840892012549,
+                    "potassium": 176.23681784025098,
                 },
-                125: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                125: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
             },
             "field_2": {
                 123: {
-                    "nitrogen": 0.3084580509652931,
-                    "phosphorus": 0.5140959871651896,
-                    "potassium": 1.0281919743303791,
+                    "nitrogen": 30.84580509652931,
+                    "phosphorus": 51.40959871651896,
+                    "potassium": 102.81919743303791,
                 },
-                125: {"nitrogen": 4.9999999999999994, "phosphorus": 0.0, "potassium": 0.0},
+                125: {"nitrogen": 499.99999999999994, "phosphorus": 0.0, "potassium": 0.0},
             },
         },
     }
@@ -8180,6 +8195,19 @@ def expected_crop_to_feed_id_mapping() -> dict[tuple[str, str], RUFAS_ID]:
 @pytest.fixture
 def raw_harvest_data() -> dict[str, dict[str, list[Any]]]:
     return {
+        "field_size": {
+            "values": [
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0,
+                100.0]
+            },
         "crop": {
             "values": [
                 "corn_silage",
@@ -8210,16 +8238,16 @@ def raw_harvest_data() -> dict[str, dict[str, list[Any]]]:
         },
         "dry_yield": {
             "values": [
-                12958.851795252069,
-                2302.807712970885,
-                3101.0788300377967,
-                3234.487471643309,
-                3125.8532063690864,
-                10202.238523552687,
-                1953.2691077836596,
-                2879.148563971437,
-                2925.6916183957055,
-                2905.9679829564298,
+                129.58851795252069,
+                23.02807712970885,
+                31.010788300377967,
+                32.34487471643309,
+                31.258532063690864,
+                102.02238523552687,
+                19.532691077836596,
+                28.79148563971437,
+                29.256916183957055,
+                29.059679829564298,
             ]
         },
         "harvest_year": {"values": [2013, 2014, 2014, 2014, 2014, 2013, 2014, 2014, 2014, 2014]},
@@ -8249,7 +8277,7 @@ def expected_harvest_yield_data() -> dict[str, dict[int, dict[str, int | str | f
                 "field_name": "field_1",
                 "crop": "corn_silage",
                 "feed_id": 51,
-                "dry_yield": 12958.851795252069,
+                "dry_yield": 12958.85179525207,
                 "harvest_type": "harvest_kill",
             },
             514: {
@@ -10604,7 +10632,7 @@ def expected_farmgrown_feed_deductions_data() -> dict[RUFAS_ID, dict[int, float]
 
 @pytest.fixture
 def expected_daily_farmgrown_feed_emissions_and_resources() -> dict[RUFAS_ID, dict[int, dict[str, float]]]:
-    return {
+    return _scale_farmgrown_feed_values({
         51: {
             0: {
                 "nitrous_oxide_emissions": 0.0,
@@ -34613,14 +34641,14 @@ def expected_daily_farmgrown_feed_emissions_and_resources() -> dict[RUFAS_ID, di
                 "manure_N": 0.0,
             },
         },
-    }
+    })
 
 
 @pytest.fixture
 def expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id() -> (
     dict[RUFAS_ID, dict[int, dict[str, float]]]
 ):
-    return {
+    _data = {
         44: {
             0: {
                 "nitrous_oxide_emissions": 0.0,
@@ -46626,3 +46654,4 @@ def expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id() -> (
             },
         },
     }
+    return _scale_farmgrown_feed_values(_data)
