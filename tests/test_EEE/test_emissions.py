@@ -428,7 +428,8 @@ def test_parse_farmgrown_feeds_emission_data(
     mock_om_filter_variables_pool = mocker.patch.object(
         em.om, "filter_variables_pool", side_effect=[raw_nitrous_oxide_emissions_data, raw_ammonia_emissions_data]
     )
-    actual_data = em._parse_farmgrown_feeds_emission_data()
+    field_details = {"field_1": {"field_size": 100}, "field_2": {"field_size": 100}}
+    actual_data = em._parse_farmgrown_feeds_emission_data(field_details)
     assert actual_data == parsed_emissions_data
     assert mock_om_filter_variables_pool.call_count == 2
 
