@@ -322,8 +322,8 @@ class EmissionsEstimator:
         self._calculate_and_report_lca_emissions(farm_grown_feeds_fed_to_animals, feed_deductions_data)
 
     def _parse_farmgrown_feeds_emission_data(
-            self,
-            field_details: dict[str, dict[str, Any]],
+        self,
+        field_details: dict[str, dict[str, Any]],
     ) -> dict[str, dict[str, dict[int, float]]]:
         """
         Parses farmgrown feeds emission data from the OutputManager and returns a
@@ -369,9 +369,12 @@ class EmissionsEstimator:
             for field_name in all_fields_by_layer:
                 field_size = field_details[field_name]["field_size"]
                 emission_data[filter_key][field_name] = {
-                    simulation_day: (sum(
-                        layer_data.get(simulation_day, 0) for layer_data in all_fields_by_layer[field_name].values()
-                    ) * field_size)
+                    simulation_day: (
+                        sum(
+                            layer_data.get(simulation_day, 0) for layer_data in all_fields_by_layer[field_name].values()
+                        )
+                        * field_size
+                    )
                     for simulation_day in simulation_days
                 }
         return emission_data
@@ -482,9 +485,7 @@ class EmissionsEstimator:
     def _build_field_details(self) -> dict[str, dict[str, Any]]:
         """Builds a dictionary of field details including field name, and field size."""
         field_details: dict[str, dict[str, Any]] = {}
-        filtered_data = self.om.filter_variables_pool(
-            FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"]
-        )
+        filtered_data = self.om.filter_variables_pool(FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["harvest_yield"])
         if len(filtered_data) == 0:
             return field_details
         for i, field_name in enumerate(filtered_data["field_name"]["values"]):
@@ -632,7 +633,8 @@ class EmissionsEstimator:
                 "fertilizer_P": 0.0,
                 "fertilizer_K": 0.0,
                 "manure_N": 0.0,
-            } for feed_id in all_feed_ids
+            }
+            for feed_id in all_feed_ids
         }
         total_harvest_dry_yield_by_feed_id: dict[RUFAS_ID, float] = {feed_id: 0.0 for feed_id in all_feed_ids}
         daily_farmgrown_feed_emission_and_resource_by_feed_id: dict[RUFAS_ID, dict[int, dict[str, float]]] = {
@@ -644,16 +646,18 @@ class EmissionsEstimator:
 
         for field_name, harvest_dates in harvest_yield_by_field.items():
             for harvest_date in harvest_dates:
-                harvest_details_by_harvest_dates[harvest_date].append({
-                    "field_name": field_name,
-                    "details": harvest_yield_by_field[field_name][harvest_date],
-                })
+                harvest_details_by_harvest_dates[harvest_date].append(
+                    {
+                        "field_name": field_name,
+                        "details": harvest_yield_by_field[field_name][harvest_date],
+                    }
+                )
 
         last_harvest_date_by_field = {field_name: -1 for field_name in harvest_yield_by_field}
 
         for harvest_date, harvest_records in sorted(harvest_details_by_harvest_dates.items()):
             for record in harvest_records:
-                harvest_details = record['details']
+                harvest_details = record["details"]
                 feed_id = harvest_details["feed_id"]
                 field_name = harvest_details["field_name"]
                 harvest_type = harvest_details["harvest_type"]
@@ -730,7 +734,7 @@ class EmissionsEstimator:
                 for simulation_day in range(harvest_date, next_harvest_date_for_feed_id + 1):
                     daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][simulation_day] = {
                         "nitrous_oxide_emissions": (
-                                total_emission_and_resource["nitrous_oxide_emissions"] / total_dry_yield
+                            total_emission_and_resource["nitrous_oxide_emissions"] / total_dry_yield
                         ),
                         "ammonia_emissions": (total_emission_and_resource["ammonia_emissions"] / total_dry_yield),
                         "fertilizer_N": (total_emission_and_resource["fertilizer_N"] / total_dry_yield),
@@ -854,8 +858,6 @@ class EmissionsEstimator:
                         harvest_dates.append(harvest_date)
             harvest_dates_by_feed_id[feed_id] = sorted(harvest_dates)
         return harvest_dates_by_feed_id
-
-
 
     def _calculate_daily_farmgrown_feed_fed_emissions_and_resources(
         self,

@@ -86,9 +86,8 @@ def test_apply_subsurface_fertilizer(
         )
 
         for index, expected_result in enumerate(expected):
-            assert (
-                fert_app.soil.data.soil_layers[index].labile_inorganic_phosphorus_content
-                == pytest.approx(expected_result)
+            assert fert_app.soil.data.soil_layers[index].labile_inorganic_phosphorus_content == pytest.approx(
+                expected_result
             )
             assert fert_app.soil.data.soil_layers[index].nitrate_content == pytest.approx(expected_result)
             assert fert_app.soil.data.soil_layers[index].ammonium_content == pytest.approx(expected_result)
