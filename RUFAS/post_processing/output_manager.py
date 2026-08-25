@@ -3,6 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from RUFAS.post_processing.file_manager import FileManager
+from RUFAS.post_processing.output_config_validator import OutputConfigValidator
+from RUFAS.post_processing.pool_manager import PoolManager
 from RUFAS.rufas_time import RufasTime
 
 
@@ -61,6 +64,9 @@ class OutputManager:
         self.is_end_to_end_testing_run: bool = False
         self.is_first_post_processing: bool = True
         self._exclude_info_maps_flag: bool = False
+        self.file_manager = FileManager(self.__metadata_prefix, self._filter_prefixes)
+        self.pool_manager = PoolManager(self.file_manager)
+        self.output_config_validator = OutputConfigValidator()
 
     @property
     def config(self) -> OutputManagerConfig:
