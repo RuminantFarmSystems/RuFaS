@@ -135,9 +135,9 @@ class FertilizerApplication:
             self.soil.data.soil_layers[index].ammonium_content += ammonium * depth_factor * subsurface_fraction
 
     @staticmethod
-    def generate_depth_factors(application_depth: float,
-                               soil_layer_top_depths: list[float],
-                               soil_layer_bottom_depths: list[float]) -> list[float]:
+    def generate_depth_factors(
+        application_depth: float, soil_layer_top_depths: list[float], soil_layer_bottom_depths: list[float]
+    ) -> list[float]:
         """
         Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.
 
