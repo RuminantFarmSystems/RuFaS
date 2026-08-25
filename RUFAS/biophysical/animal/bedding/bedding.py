@@ -49,7 +49,7 @@ class Bedding:
     sand_removal_efficiency : float | None, default=None
         The efficiency rate of sand removal from the bedding.
     bedding_lignin_fraction : float, default=0.0
-        The bedding lignin content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).
+        The bedding lignin content as a fraction of total mass, on a wet weight basis (unitless).
 
     Methods
     -------
