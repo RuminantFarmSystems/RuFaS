@@ -44,7 +44,7 @@ In RuFaS, the user provides the desired amount of manure N and P for each manure
 
 **Implementation in RuFaS**
 
-In RuFaS, manure accumulates in storage until it is removed for field application, transferred to another storage, or exported off-farm. This accumulated manure represents the manure available for field application. Manure applications, referred to as *manure nutrient requests*, originate from the Crop and Soil Module and are scheduled by year and Julian day. Each request contains a specified quantity of manure N and P.
+In RuFaS, manure accumulates in storage until it is removed for field application, transferred to another storage, or exported off-farm. This accumulated manure represents the manure available for field application. Manure applications, referred to as *manure nutrient requests*, originate from the Soil and Crop Module and are scheduled by year and Julian day. Each request contains a specified quantity of manure N and P.
 
 Nutrient requests may be made for either solid or liquid manure. Manure is designated as liquid or solid based on storage type: slurry storage and anaerobic lagoons contain liquid manure, while all other storage types contain solid manure.
 

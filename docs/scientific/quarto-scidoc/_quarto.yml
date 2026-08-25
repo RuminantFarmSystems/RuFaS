@@ -14,7 +14,7 @@ book:
     - qmd/example_structures.qmd
     - qmd/animal.qmd
     - qmd/manure.qmd
-    - qmd/crop_and_soil.qmd
+    - qmd/soil_and_crop.qmd
     - qmd/feed_storage.qmd
     - qmd/economics.qmd
     - qmd/connections.qmd

@@ -525,7 +525,6 @@ The equation below is used to calculate the quantity of net, captured gas accord
 $$
 \text{captured\_methane\_volume}(\text{m}^3) = \text{generated\_methane\_volume} - \text{methane\_leakage\_volume}
 $$
-
 :::
 
 *Where*:
@@ -550,7 +549,6 @@ Microbial processes during anaerobic digestion are known to increase the proport
 $$
 \text{updated\_ammoniacal\_nitrogen (kg)} = min(\text{ammoniacal\_nitrogen} \times \text{TAN\_INCREASE\_FACTOR},\text{nitrogen})
 $$
-
 :::
 
 *Where*:
@@ -915,7 +913,7 @@ For slurry storage and all other storage processor types, the stored manure valu
 
 **Emptied Manure**
 
-Manure may be removed from storage via requests made by the Crop and Soil module. The user specifies the days and years for manure removal (i.e. application), as well as the application type (liquid or solid) and quantity of N or P required for each application date within year. Note that these actions are the responsibility of the Crop and Soil module; more information on manure application inputs and methodology can be found in the Crop and Soil module documentation. When manure is removed from storage by the Crop and Soil module, emptied manure outputs report the quantity of manure and nutrients removed on that day, and Manure Stream attributes representing stored manure are updated accordingly to reflect post-removal amounts remaining in storage.
+Manure may be removed from storage via requests made by the Soil and Crop module. The user specifies the days and years for manure removal (i.e. application), as well as the application type (liquid or solid) and quantity of N or P required for each application date within year. Note that these actions are the responsibility of the Soil and Crop module; more information on manure application inputs and methodology can be found in the Soil and Crop module documentation. When manure is removed from storage by the Soil and Crop module, emptied manure outputs report the quantity of manure and nutrients removed on that day, and Manure Stream attributes representing stored manure are updated accordingly to reflect post-removal amounts remaining in storage.
 
 ### Manure Composition Update
 
@@ -1099,7 +1097,7 @@ $$
 
 *Where*:
 
-* `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless): The effectiveness of microbial decomposition rate per day, set to 0.00237
+* `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless): the effectiveness of microbial decomposition rate per day, set to 0.00237
 * `DEFAULT_LAYER_TEMPERATURE`: temperature of the pack layer, set to 30℃ Setting the layer temperature to a constant value is a simplification as manure pack temperature is not modeled dynamically at this time
 
 Second, we calculate the carbon decomposition rate per day (`calculate_carbon_decomposition_rate`). The value of this parameter is equal to 0.03876, but the equation and set values are included below for reference. 
@@ -1297,7 +1295,7 @@ For bedded pack and all other storage processor types, the stored manure values 
 
 **Emptied Manure**
 
-Manure may be removed from storage via requests made by the Crop and Soil module. The user specifies the days and years for manure removal (i.e. application), as well as the application type (liquid or solid) and quantity of N or P required for each application date within year. Note that these actions are the responsibility of the Crop and Soil module; more information on manure application inputs and methodology can be found in the Crop and Soil module documentation. When manure is removed from storage by the Crop and Soil module, emptied manure outputs report the quantity of manure and nutrients removed on that day, and `ManureStream` attributes representing stored manure are updated accordingly to reflect post-removal amounts remaining in storage.
+Manure may be removed from storage via requests made by the Soil and Crop module. The user specifies the days and years for manure removal (i.e. application), as well as the application type (liquid or solid) and quantity of N or P required for each application date within year. Note that these actions are the responsibility of the Soil and Crop module; more information on manure application inputs and methodology can be found in the Soil and Crop module documentation. When manure is removed from storage by the Soil and Crop module, emptied manure outputs report the quantity of manure and nutrients removed on that day, and `ManureStream` attributes representing stored manure are updated accordingly to reflect post-removal amounts remaining in storage.
 
 ### Manure Composition Update
 
@@ -1661,7 +1659,7 @@ For open lot and all other storage processor types, the stored manure values (no
 
 **Emptied Manure**
 
-Manure may be removed from storage via requests made by the Crop and Soil module. The user specifies the days and years for manure removal (i.e. application), as well as the application type (liquid or solid) and quantity of N or P required for each application date within year. Note that these actions are the responsibility of the Crop and Soil module; more information on manure application inputs and methodology can be found in the Crop and Soil module documentation. When manure is removed from storage by the Crop and Soil module, emptied manure outputs report the quantity of manure and nutrients removed on that day, and Manure Stream attributes representing stored manure are updated accordingly to reflect post-removal amounts remaining in storage.
+Manure may be removed from storage via requests made by the Soil and Crop module. The user specifies the days and years for manure removal (i.e. application), as well as the application type (liquid or solid) and quantity of N or P required for each application date within year. Note that these actions are the responsibility of the Soil and Crop module; more information on manure application inputs and methodology can be found in the Soil and Crop module documentation. When manure is removed from storage by the Soil and Crop module, emptied manure outputs report the quantity of manure and nutrients removed on that day, and Manure Stream attributes representing stored manure are updated accordingly to reflect post-removal amounts remaining in storage.
 
 ### Manure Composition Update
 
@@ -2052,7 +2050,7 @@ For composting and all other storage processor types, the stored manure values (
 
 **Emptied Manure**
 
-Manure may be removed from storage via requests made by the Crop and Soil module. The user specifies the days and years for manure removal (i.e. application), as well as the application type (liquid or solid) and quantity of N or P required for each application date within year. Note that these actions are the responsibility of the Crop and Soil module; more information on manure application inputs and methodology can be found in the Crop and Soil module documentation. When manure is removed from storage by the Crop and Soil module, emptied manure outputs report the quantity of manure and nutrients removed on that day, and Manure Stream attributes representing stored manure are updated accordingly to reflect post-removal amounts remaining in storage.
+Manure may be removed from storage via requests made by the Soil and Crop module. The user specifies the days and years for manure removal (i.e. application), as well as the application type (liquid or solid) and quantity of N or P required for each application date within year. Note that these actions are the responsibility of the Soil and Crop module; more information on manure application inputs and methodology can be found in the Soil and Crop module documentation. When manure is removed from storage by the Soil and Crop module, emptied manure outputs report the quantity of manure and nutrients removed on that day, and Manure Stream attributes representing stored manure are updated accordingly to reflect post-removal amounts remaining in storage.
 
 ### Manure Composition Update
 
@@ -2097,7 +2095,7 @@ Daily spread is a method of manure management in which manure is collected daily
 Daily spread in RuFaS is implemented as essentially a "blank" manure processor. It receives manure but does not estimate any gas emissions, nutrient losses, or changes to manure composition. 
 
 ::: {.callout-note}
-Note that this section covers strictly the Manure Module daily spread functionality; the actual daily application of manure from the manure module occurs in the Crop and Soil module and is thus covered in the Crop and Soil documentation.
+Note that this section covers strictly the Manure Module daily spread functionality; the actual daily application of manure from the manure module occurs in the Soil and Crop module and is thus covered in the Soil and Crop documentation.
 :::
 
 **Classes**
