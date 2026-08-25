@@ -49,21 +49,8 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             "Bedding requirements": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
                 "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
-                # Handled by special_cases.bedding_requirements.BeddingRequirementsHandler
-                # (issue #3088): each pen's bedding price is paired with that pen's
-                # animal count and converted from the annual dollar-per-head price.
                 "bedding_configs_path": "animal.bedding_configs",
-                # SME-confirmed: the dollar-per-head bedding prices are per LACTATING
-                # cow, so only lactating-cow pens are billed. Other pens still get
-                # physical bedding in the biophysical simulation; they are just not
-                # part of this economic line item.
                 "billable_pen_combinations": ["LAC_COW"],
-                # A pen's manure_stream bedding_name is a user config name; resolve
-                # it to the config's canonical bedding_type, then to an economics
-                # file key. This table is the COMPLETE registry of billable bedding
-                # types: identity entries (e.g. "sand" -> "sand") are deliberate so
-                # the supported set is explicit in one place. A type absent here
-                # (e.g. "none") incurs no cost.
                 "bedding_type_to_file_key": {
                     "sand": "sand",
                     "sawdust": "sawdust",

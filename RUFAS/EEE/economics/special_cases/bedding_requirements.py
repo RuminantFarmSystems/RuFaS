@@ -299,8 +299,6 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
                 if baseline_mode:
                     scenario = "baseline"
                 else:
-                    # Mirror the generic engine: only accept a discovered scenario
-                    # name, otherwise fall back to "baseline".
                     candidate = variable_name.split(".", 1)[0]
                     scenario = candidate if candidate in scenario_names else "baseline"
                 values, info_maps = self._extract_output_data(output_data)
@@ -459,27 +457,23 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
 
         """
 
-        # Step one key at a time, descending deeper into the entry each pass.
         data = pen_entry
         for key in bedding_name_keys:
             if isinstance(data, (list, tuple)):
-                # A list step: the key must be a usable integer index.
                 try:
-                    index = int(key)  # e.g. "0" -> 0
+                    index = int(key)
                 except (TypeError, ValueError):
-                    return None  # key wasn't a number, so it can't index a list
+                    return None
                 if not 0 <= index < len(data):
-                    return None  # index off the end of the list
+                    return None
                 data = data[index]
             elif isinstance(data, dict):
-                # A dict step: the key must be present.
                 if key not in data:
                     return None
                 data = data[key]
             else:
-                # Ran out of nesting before running out of keys (e.g. hit a str/int).
                 return None
-        return data  # the bedding name at the end of the path
+        return data
 
     def _build_pen_id_to_bedding_name(self, details: dict[str, Any]) -> dict[str, Any]:
         """
@@ -509,16 +503,12 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
 
         info_map = {"class": self.__class__.__name__, "function": self._build_pen_id_to_bedding_name.__name__}
         input_paths = details.get("input_manager") or []
-        # The mapping path, e.g. "animal.pen_information.*.manure_streams.0.bedding_name".
-        # The "*" stands for "each pen"; everything before it locates the pen list,
-        # everything after it locates the bedding name inside one pen entry.
         template = input_paths[0] if input_paths else "animal.pen_information.*.manure_streams.0.bedding_name"
         if "*" not in template:
-            return {}  # nothing per-pen to resolve
+            return {}
 
-        # Split on ".*." -> prefix="animal.pen_information", suffix="manure_streams.0.bedding_name".
         prefix, _, suffix = template.partition(".*.")
-        pens = self.context.im.get_data(prefix)  # the whole pen_information list
+        pens = self.context.im.get_data(prefix)
 
         pen_map: dict[str, Any] = {}
         if not isinstance(pens, (list, tuple)):
@@ -528,10 +518,8 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
                 info_map,
             )
             return pen_map
-        bedding_name_keys = suffix.split(".") if suffix else []  # ["manure_streams", "0", "bedding_name"]
+        bedding_name_keys = suffix.split(".") if suffix else []
         for entry in pens:
-            # Key the map by the pen's own "id" field (NOT its list position), so a
-            # reordered or non-contiguous pen list still pairs correctly (issue #3088).
             if isinstance(entry, dict) and "id" in entry:
                 pen_map[str(entry["id"])] = self._get_pen_bedding_name(entry, bedding_name_keys)
         return pen_map
@@ -566,17 +554,12 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
         info_map = {"class": self.__class__.__name__, "function": self.process.__name__}
         details = self._get_mapping_details()
 
-        # Lookup tables built once up front:
-        name_to_type = self._build_bedding_name_to_type(details)  # bedding name -> type ("calf_straw" -> "straw")
-        pen_id_to_bedding_name = self._build_pen_id_to_bedding_name(details)  # pen id -> its bedding name
-        # type -> price-file key ("CBPB sawdust" -> "CBPB"); the complete registry
-        # of billable bedding types, so lookups are strict (no fallback).
+        name_to_type = self._build_bedding_name_to_type(details)
+        pen_id_to_bedding_name = self._build_pen_id_to_bedding_name(details)
         type_to_key = details.get("bedding_type_to_file_key") or {}
         normalized_type_to_key = {str(key).strip().lower(): value for key, value in type_to_key.items()}
         economics_files_details = details.get("economics_files")
         economics_files = economics_files_details if isinstance(economics_files_details, dict) else {}
-        # Which pen types the price basis covers (e.g. only LAC_COW: the dollar-per-head
-        # bedding prices are per lactating cow). None means every pen is billable.
         billable_pen_combinations = details.get("billable_pen_combinations")
         billable_combinations = (
             {str(combination).strip().upper() for combination in billable_pen_combinations}
@@ -584,46 +567,40 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
             else None
         )
 
-        start_date = self._get_simulation_start_date()  # simulation start date, to bucket days into years
-        fips = self.context.im.get_data("config.FIPS_county_code")  # county, to pick the right price row
+        start_date = self._get_simulation_start_date()
+        fips = self.context.im.get_data("config.FIPS_county_code")
 
-        # Each pen's daily head counts, grouped by scenario (= one simulation run; usually just "baseline").
         sim_paths = [str(path) for path in details.get("biophysical_simulation") or []]
         pen_data_by_scenario = self._collect_pen_data(sim_paths)
         if not pen_data_by_scenario:
             pen_data_by_scenario = {"baseline": {}}
 
-        price_cache: dict[str, Any] = {}  # avoid re-loading the same price file twice
+        price_cache: dict[str, Any] = {}
         price_data: dict[str, Any] = {}
-        warned_years: set[str] = set()  # so a missing-price warning fires once, not per day
+        warned_years: set[str] = set()
         price_values: list[float] = []
 
         line_item_values_by_scenario: dict[str, float] = {}
         values_by_scenario: dict[str, list[float]] = {}
         aggregates_by_scenario: dict[str, float] = {}
 
-        for scenario, pens in pen_data_by_scenario.items():  # each simulation run
+        for scenario, pens in pen_data_by_scenario.items():
             scenario_cost = 0.0
-            scenario_head_years = 0.0  # the quantity: average head summed over pens and years
+            scenario_head_years = 0.0
             scenario_values: list[float] = []
-            for capture, daily_data in pens.items():  # each pen in that run
-                pen_id = capture.split("_", 1)[0]  # "0_CALF" -> "0"
-                pen_combination = capture.split("_", 1)[1] if "_" in capture else ""  # "0_CALF" -> "CALF"
+            for capture, daily_data in pens.items():
+                pen_id = capture.split("_", 1)[0]
+                pen_combination = capture.split("_", 1)[1] if "_" in capture else ""
 
-                # Step 0: is this pen type covered by the price basis? The SME-confirmed
-                # dollar-per-head prices are per LACTATING COW, so other pens (calves,
-                # growing heifers, close-up) are excluded from the bedding bill.
                 if billable_combinations is not None and pen_combination.strip().upper() not in billable_combinations:
-                    scenario_values.extend(daily_data.get("values", []))  # keep for the audit trail, no cost
+                    scenario_values.extend(daily_data.get("values", []))
                     continue
 
-                # Step 1: which bedding does this pen use?
                 bedding_name = pen_id_to_bedding_name.get(pen_id)
                 if bedding_name is None:
                     self.context.om.add_warning("MissingBeddingName", f"No bedding_name for pen '{pen_id}'", info_map)
                     continue
 
-                # Step 2: bedding name -> its type.
                 bedding_type = name_to_type.get(str(bedding_name))
                 if bedding_type is None:
                     self.context.om.add_warning(
@@ -633,13 +610,11 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
                     )
                     continue
 
-                # No bedding -> pen is free, skip it.
                 normalized_type = str(bedding_type).strip().lower()
                 if not normalized_type or normalized_type == "none":
                     scenario_values.extend(daily_data.get("values", []))
                     continue
 
-                # Step 3: type -> price-file key -> price file path.
                 file_key = normalized_type_to_key.get(normalized_type)
                 economics_file = economics_files.get(file_key) if file_key else None
                 if file_key is None or economics_file is None:
@@ -651,7 +626,6 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
                     )
                     continue
 
-                # Step 4: load that price file (cached), skip the pen if it can't be read.
                 if file_key not in price_cache:
                     fetched = self.context.get_data_with_handling(economics_file, info_map)
                     price_cache[file_key] = fetched
@@ -668,7 +642,6 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
                     scenario_values.extend(daily_data.get("values", []))
                     continue
 
-                # Step 5: cost this pen, one calendar year at a time.
                 daily_values = daily_data.get("values", [])
                 daily_info_maps = daily_data.get("info_maps", [])
                 scenario_values.extend(daily_values)
@@ -677,7 +650,6 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
                 for year, daily in counts_by_year.items():
                     if not daily:
                         continue
-                    # average head that year = head-days / days in that year (366 in leap years)
                     days_in_year = (
                         GeneralConstants.LEAP_YEAR_LENGTH
                         if Utility.is_leap_year(year)
@@ -686,12 +658,9 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
                     average_head = sum(daily) / days_in_year
                     price = self._get_annual_bedding_price(pen_price_dict, year, fips, file_key, warned_years, info_map)
                     price_values.append(price)
-                    scenario_head_years += average_head  # quantity: head-years billed
-                    scenario_cost += average_head * price  # add this pen-year to the running total
+                    scenario_head_years += average_head
+                    scenario_cost += average_head * price
 
-            # This run's totals. ``biophysical_aggregate`` is the QUANTITY (head-years)
-            # and ``line_item_values`` is the COST, so the reported quantity x price
-            # reconciles with the total the way every other line item does.
             line_item_values_by_scenario[scenario] = scenario_cost
             values_by_scenario[scenario] = scenario_values
             aggregates_by_scenario[scenario] = scenario_head_years
@@ -707,9 +676,6 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
         total_head_years = sum(aggregates_by_scenario.values())
         price_aggregate = self.context.aggregate(price_values, "average")
 
-        # Small standalone reporting variables: the full line-item dict is too
-        # large for the report generator, so the headline numbers are emitted as
-        # scalars that a lightweight report filter can pick up directly.
         self.context.om.add_variable(
             "econ_bedding_total_cost",
             total_cost,
@@ -726,11 +692,10 @@ class BeddingRequirementsHandler(SpecialCaseHandler):
             dict(info_map, units=MeasurementUnits.DOLLARS),
         )
 
-        # Package the result in the same shape the generic pipeline returns.
         biophysical_values = [value for scenario_values in values_by_scenario.values() for value in scenario_values]
         return {
             "biophysical_values": biophysical_values,
-            "biophysical_aggregate": total_head_years,  # total head-years (quantity, not cost)
+            "biophysical_aggregate": total_head_years,
             "biophysical_values_by_scenario": values_by_scenario,
             "biophysical_aggregate_by_scenario": aggregates_by_scenario,
             "price_data": price_data,

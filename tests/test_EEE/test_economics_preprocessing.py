@@ -584,8 +584,6 @@ def _run_bedding(
     if billable_pen_combinations is not None:
         bedding_entry["billable_pen_combinations"] = billable_pen_combinations
     economic_map = {"Animal": {"Costs": {"Bedding requirements": bedding_entry}}}
-    # The preprocessor iterates its own ECONOMIC_MAP binding, while the bedding
-    # handler reads its entry from the mapping module; patch both.
     monkeypatch.setattr(preprocessing, "ECONOMIC_MAP", economic_map)
     monkeypatch.setattr(economics_mapping, "ECONOMIC_MAP", economic_map)
     results = preprocessing.EconomicPreprocessor().preprocess()
