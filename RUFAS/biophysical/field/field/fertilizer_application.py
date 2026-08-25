@@ -124,8 +124,9 @@ class FertilizerApplication:
         injection applications occurred.
 
         """
+        top_depths = self.soil.data.get_vectorized_layer_attribute("top_depth")
         bottom_depths = self.soil.data.get_vectorized_layer_attribute("bottom_depth")
-        depth_factors = self.generate_depth_factors(application_depth, bottom_depths)
+        depth_factors = self.generate_depth_factors(application_depth, top_depths, bottom_depths)
         for index, depth_factor in enumerate(depth_factors):
             self.soil.data.soil_layers[index].labile_inorganic_phosphorus_content += (
                 phosphorus * depth_factor * subsurface_fraction
@@ -134,7 +135,9 @@ class FertilizerApplication:
             self.soil.data.soil_layers[index].ammonium_content += ammonium * depth_factor * subsurface_fraction
 
     @staticmethod
-    def generate_depth_factors(application_depth: float, soil_layer_bottom_depths: list[float]) -> list[float]:
+    def generate_depth_factors(application_depth: float,
+                               soil_layer_top_depths: list[float],
+                               soil_layer_bottom_depths: list[float]) -> list[float]:
         """
         Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.
 
@@ -142,6 +145,8 @@ class FertilizerApplication:
         ----------
         application_depth : float
             Bottom depth of nutrient application (mm).
+        soil_layer_top_depths : list[float]
+            List of top depths of soil layers in the soil profile (mm).
         soil_layer_bottom_depths : list[float]
             List of bottom depths of soil layers in the soil profile (mm).
 
@@ -163,13 +168,15 @@ class FertilizerApplication:
         """
         depth_factors_sum = 0.0
         depth_factors = []
-        for depth in soil_layer_bottom_depths:
-            if depth < application_depth:
-                depth_factor = depth / application_depth
+        for top_depth, bottom_depth in zip(soil_layer_top_depths, soil_layer_bottom_depths):
+            layer_depth = bottom_depth - top_depth
+            if bottom_depth < application_depth:
+                depth_factor = layer_depth / application_depth
                 depth_factors_sum += depth_factor
                 depth_factors.append(depth_factor)
             else:
                 depth_factor = 1.0 - depth_factors_sum
                 depth_factors.append(depth_factor)
                 break
+        print(depth_factors)
         return depth_factors
