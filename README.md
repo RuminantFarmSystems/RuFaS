@@ -12,29 +12,28 @@
 
 ### 🌍 Vision
 
-To support research and sustainable decision-making in ruminant animal production through a state-of-the-art, open-source modeling environment that evolves with scientific and technological advances.
+A world where the continuous generation and sharing of knowledge about ruminant production systems [^note] empower understanding and decision making to achieve socio-economic well-being and environmental sustainability.
+[^note]:  **RuFaS** is currently focused on dairy cattle production systems.
+
 
 ---
 
 ### 🎯 Mission
 
-To build an integrated, whole-farm modeling platform that simulates:
-- Milk, meat, and crop production  
-- Greenhouse gas emissions  
-- Water quality impacts  
-- Soil health  
-- Other sustainability outcomes  
-
-We aim for the highest standards in:
-- Prediction accuracy  
-- Code structure and clarity  
-- Documentation and accessibility  
+To develop, maintain, and share an open, modular simulation platform that connects scientific research with real world decision making. Equip scientists, farmers, and other stakeholders with tools to understand, evaluate, and improve the environmental, economic, and social outcomes of ruminant farming systems by integrating transparent models, diverse data, and collaborative contributions.
+ 
 
 ---
 
 ### 🧪 Scientific Foundation
 
 RuFaS is grounded in peer-reviewed science and collaborative development. It is maintained by a diverse community of researchers, developers, and stakeholders committed to transparency, reproducibility, and continuous improvement.
+
+---
+
+### ♟️ Strategy
+
+The strategic direction of RuFaS, including its vision, mission, strategic pillars, values, and operating principles, is described in [Strategy.md](Strategy.md).
 
 ---
 
