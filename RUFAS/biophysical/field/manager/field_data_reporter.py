@@ -630,6 +630,28 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
+            "manure_carbon_to_metabolic_amount",
+            layer.manure_carbon_to_metabolic_amount,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("ResiduePartition", "partition_manure_residue")],
+                },
+            ),
+        )
+        self.om.add_variable(
+            "manure_carbon_to_structural_amount",
+            layer.manure_carbon_to_structural_amount,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("ResiduePartition", "partition_manure_residue")],
+                },
+            ),
+        )
+        self.om.add_variable(
             "plant_structural_active_carbon_remaining",
             layer.plant_structural_active_carbon_remaining,
             dict(
@@ -1491,6 +1513,28 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.UNITLESS, "data_origin": [("SoilData", "")]}),
         )
         self.om.add_variable(
+            "manure_lignin_nitrogen_ratio",
+            field.soil.data.manure_lignin_nitrogen_ratio,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.UNITLESS,
+                    "data_origin": [("ResiduePartition", "partition_manure_residue")],
+                },
+            ),
+        )
+        self.om.add_variable(
+            "manure_residue_metabolic_fraction",
+            field.soil.data.manure_residue_metabolic_fraction,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.FRACTION,
+                    "data_origin": [("ResiduePartition", "partition_manure_residue")],
+                },
+            ),
+        )
+        self.om.add_variable(
             "full_available_phosphorus_pool",
             field.soil.data.full_available_phosphorus_pool,
             dict(
@@ -2156,6 +2200,21 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("FieldDataReporter", "send_soil_annual_variables")],
+                },
+            ),
+        )
+
+        self.om.add_variable(
+            "annual_manure_carbon_applied_total",
+            field.soil.data.annual_manure_carbon_applied_total,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [
+                        ("ManureApplication", "apply_machine_manure"),
+                        ("SoilData", "do_annual_reset"),
+                    ],
                 },
             ),
         )
