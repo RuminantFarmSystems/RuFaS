@@ -221,8 +221,6 @@ class OutputManager(object):
             )
             self.time = None
             self._filtered_variable_key_counter: Counter[str] = collections.Counter()
-            self.is_end_to_end_testing_run: bool = False
-            self.is_first_post_processing: bool = True
 
     @property
     def _filter_prefixes(self) -> dict[str, str]:
