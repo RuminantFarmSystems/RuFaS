@@ -1167,8 +1167,16 @@ def test_request_nutrients_daily_spread_with_supplement(mocker: MockerFixture) -
     mock_off_farm.assert_called_once_with("daily_shortfall")
 
 
-def test_handle_nutrient_request_for_storages_pools_daily_spread(mocker: MockerFixture) -> None:
-    """Aggregate each DailySpread storage's available manure into an isolated subset manager."""
+@pytest.mark.parametrize("manure_type", [ManureType.SOLID, ManureType.LIQUID])
+def test_handle_nutrient_request_for_storages_pools_daily_spread(
+    mocker: MockerFixture, manure_type: ManureType
+) -> None:
+    """
+    Aggregate each DailySpread storage's available manure into an isolated subset manager.
+
+    Parametrized over both manure types: daily-spread manure takes the user-input type carried on the
+    request, so a liquid request must pool DailySpread manure the same way a solid one does.
+    """
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
     manure_manager = ManureManager(0.5, 0.5, 0.5)
 
@@ -1191,12 +1199,11 @@ def test_handle_nutrient_request_for_storages_pools_daily_spread(mocker: MockerF
     daily_storage.available_for_field_application = available_stream
     # If the wrong branch were taken, the empty stored_manure stream would zero out the pool below.
     daily_storage.stored_manure = ManureStream.make_empty_manure_stream()
-    STORAGE_CLASS_TO_TYPE[type(daily_storage)] = ManureType.SOLID
 
     request = NutrientRequest(
         nitrogen=4.0,
         phosphorus=2.0,
-        manure_type=ManureType.SOLID,
+        manure_type=manure_type,
         use_supplemental_manure=False,
     )
     expected_result = (NutrientRequestResults(nitrogen=4.0, phosphorus=2.0, total_manure_mass=30.0), True)
@@ -1214,7 +1221,7 @@ def test_handle_nutrient_request_for_storages_pools_daily_spread(mocker: MockerF
     mock_add.assert_called_once()
     pool = mock_add.call_args.args[0]
     assert isinstance(pool, ManureNutrients)
-    assert pool.manure_type == ManureType.SOLID
+    assert pool.manure_type == manure_type
     assert pool.nitrogen == pytest.approx(6.0)
     assert pool.phosphorus == pytest.approx(3.0)
     assert pool.potassium == pytest.approx(2.0)
@@ -1222,8 +1229,25 @@ def test_handle_nutrient_request_for_storages_pools_daily_spread(mocker: MockerF
     assert pool.dry_matter == pytest.approx(10.0)
 
 
-def test_remove_nutrients_from_storage_daily_spread(mocker: MockerFixture) -> None:
-    """For daily-spread requests, draw down a DailySpread storage's availability stream, not the farm pool."""
+def test_effective_storage_manure_type() -> None:
+    """DailySpread storages resolve to the requested type; other storages resolve through the class map."""
+    daily_storage = MagicMock(spec=DailySpread)
+    assert ManureManager._effective_storage_manure_type(daily_storage, ManureType.LIQUID) is ManureType.LIQUID
+    assert ManureManager._effective_storage_manure_type(daily_storage, ManureType.SOLID) is ManureType.SOLID
+
+    composting = Composting(name="compost", composting_type="intensive windrow", storage_time_period=1)
+    assert ManureManager._effective_storage_manure_type(composting, ManureType.LIQUID) is ManureType.SOLID
+    assert ManureManager._effective_storage_manure_type(composting, ManureType.SOLID) is ManureType.SOLID
+
+
+@pytest.mark.parametrize("manure_type", [ManureType.SOLID, ManureType.LIQUID])
+def test_remove_nutrients_from_storage_daily_spread(mocker: MockerFixture, manure_type: ManureType) -> None:
+    """
+    For daily-spread requests, draw down a DailySpread storage's availability stream, not the farm pool.
+
+    Parametrized over both manure types: DailySpread storages match the user-input type carried on the
+    request, so a liquid request must draw them down the same way a solid one does.
+    """
     mocker.patch("RUFAS.biophysical.manure.manure_manager.ManureManager.__init__", return_value=None)
     manure_manager = ManureManager(0.5, 0.5, 0.5)
     manure_manager._manure_nutrient_manager = ManureNutrientManager()
@@ -1256,12 +1280,11 @@ def test_remove_nutrients_from_storage_daily_spread(mocker: MockerFixture) -> No
         pen_manure_data=None,
         bedding_non_degradable_volatile_solids=0.0,
     )
-    STORAGE_CLASS_TO_TYPE[type(daily_storage)] = ManureType.SOLID
     mocker.patch.object(manure_manager, "_split_storages_by_daily_spread", return_value=([daily_storage], []))
 
     manure_manager._remove_nutrients_from_storage(
         NutrientRequestResults(nitrogen=10, phosphorus=20),
-        ManureType.SOLID,
+        manure_type,
         include_daily_spread=True,
         update_nutrient_manager_pool=False,
     )
