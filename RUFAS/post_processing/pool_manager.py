@@ -421,7 +421,8 @@ class PoolManager:
 
     def _set_variables_pool(
         self,
-        new_pool: dict[str, PoolManager.pool_element_type],
+        # new_pool: dict[str, PoolManager.pool_element_type],
+        # TODO figure out where pool_element_type type should reside
         *,
         pool_size_override: int | None = None,
     ) -> None:
