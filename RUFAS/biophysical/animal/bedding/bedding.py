@@ -25,6 +25,8 @@ class Bedding:
         The type of bedding material as a string.
     sand_removal_efficiency : float | None, default=None
         The efficiency rate of sand removal from the bedding.
+    bedding_lignin_fraction : float, default=0.0
+        The bedding lignin content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).
 
     Attributes
     ----------
@@ -46,6 +48,8 @@ class Bedding:
         The type of bedding material as a string.
     sand_removal_efficiency : float | None, default=None
         The efficiency rate of sand removal from the bedding.
+    bedding_lignin_fraction : float, default=0.0
+        The bedding lignin content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).
 
     Methods
     -------
@@ -78,6 +82,7 @@ class Bedding:
         bedding_phosphorus_content: float,
         bedding_type: BeddingType,
         sand_removal_efficiency: float | None = None,
+        bedding_lignin_fraction: float = 0.0,
     ) -> None:
         """Initialize the base bedding class with specific configuration data."""
         self.name = name
@@ -87,6 +92,7 @@ class Bedding:
         self.bedding_carbon_fraction = bedding_carbon_fraction
         self.bedding_phosphorus_content = bedding_phosphorus_content
         self.bedding_type = bedding_type
+        self.bedding_lignin_fraction = bedding_lignin_fraction
         self.sand_removal_efficiency = (
             sand_removal_efficiency
             if (self.bedding_type == BeddingType.SAND and sand_removal_efficiency is not None)

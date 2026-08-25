@@ -180,6 +180,15 @@ class LayerData:
         The amount of transfer of structural carbon during tillage (kg/ha).
     plant_residue : float, default 0.0
         Residue added to the soil which is to be transferred to the metabolic and structural litter pools (kg/ha).
+    manure_carbon_residue : float, default 0.0
+        Manure carbon added to the soil layer by manure applications which is to be transferred to the metabolic
+        and structural litter pools (kg/ha). Analogous to ``plant_residue``, but for manure organic carbon.
+    manure_carbon_to_metabolic_amount : float, default 0.0
+        Manure carbon transferred from the manure carbon residue pool of this layer into the metabolic litter
+        pool on the current day (kg/ha).
+    manure_carbon_to_structural_amount : float, default 0.0
+        Manure carbon transferred from the manure carbon residue pool of this layer into the structural litter
+        pool on the current day (kg/ha).
     soil_dry_matter_residue_amount : float, default 0.0
         The amount of soil dry matter residue at harvest (kg/ha).
     plant_dry_matter_residue_amount : float, default 0.0
@@ -367,6 +376,9 @@ class LayerData:
     tillage_fraction: float = 0.0
     structural_carbon_transfer_amount: float = 0.0
     plant_residue: float = 0.0
+    manure_carbon_residue: float = 0.0
+    manure_carbon_to_metabolic_amount: float = 0.0
+    manure_carbon_to_structural_amount: float = 0.0
     soil_dry_matter_residue_amount: float = 0.0
     plant_dry_matter_residue_amount: float = 0.0
     plant_residue_metabolic_fraction: float = 0.0

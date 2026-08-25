@@ -173,6 +173,58 @@ class ResiduePartition:
                 layer.structural_litter_amount,
             )
 
+    def partition_manure_residue(self) -> None:
+        """
+        Partitions the manure carbon residue pool of each soil layer into the metabolic and structural litter
+        pools.
+
+        This method is the manure analog of ``_add_litter_to_pools`` and should be called daily (by the carbon
+        cycling routine) so manure carbon added by manure applications enters the litter pools, where the
+        existing decomposition framework routes the metabolic fraction to the active carbon pool and the
+        structural fraction to the slow carbon pool.
+
+        The fraction of the manure carbon residue that is metabolic is determined from the lignin to nitrogen
+        ratio of the applied manure, in the same way as for plant residue. The lignin and nitrogen accumulated
+        from manure applications since the previous partitioning define that ratio and are reset afterwards.
+
+        References
+        ----------
+        DayCent (Parton et al. 1987): above and below ground non-woody plant residues and organic animal
+        excreta are partitioned into structural and metabolic pools as a function of the lignin to N ratio in
+        the residue.
+
+        """
+        assert self.data.soil_layers is not None
+        for layer in self.data.soil_layers:
+            layer.manure_carbon_to_metabolic_amount = 0.0
+            layer.manure_carbon_to_structural_amount = 0.0
+
+        manure_carbon_residue = self.data.get_vectorized_layer_attribute("manure_carbon_residue")
+        if not any(manure_carbon_residue):
+            return
+
+        self.data.manure_lignin_nitrogen_ratio = self._determine_manure_lignin_nitrogen_ratio(
+            self.data.manure_residue_lignin, self.data.manure_residue_nitrogen
+        )
+        self.data.manure_residue_metabolic_fraction = self._determine_manure_residue_metabolic_fraction(
+            self.data.manure_lignin_nitrogen_ratio
+        )
+
+        for layer in self.data.soil_layers:
+            layer.manure_carbon_to_metabolic_amount = (
+                self.data.manure_residue_metabolic_fraction * layer.manure_carbon_residue
+            )
+            layer.manure_carbon_to_structural_amount = (
+                1 - self.data.manure_residue_metabolic_fraction
+            ) * layer.manure_carbon_residue
+            layer.metabolic_litter_amount += layer.manure_carbon_to_metabolic_amount
+            layer.structural_litter_amount += layer.manure_carbon_to_structural_amount
+            layer.manure_carbon_residue = 0.0
+        self._set_soil_structural_litter_decomposition_rate(self.data.manure_residue_metabolic_fraction)
+
+        self.data.manure_residue_lignin = 0.0
+        self.data.manure_residue_nitrogen = 0.0
+
     def _add_litter_to_pools(self) -> None:
         """
         Partitions residue between metabolic and structural pools in all layers of the soil profile.
@@ -184,15 +236,20 @@ class ResiduePartition:
                 layer.metabolic_litter_amount += self.data.plant_residue_metabolic_fraction * layer.plant_residue
                 layer.structural_litter_amount += (1 - self.data.plant_residue_metabolic_fraction) * layer.plant_residue
                 layer.plant_residue = 0.0
-            self._set_soil_structural_litter_decomposition_rate()
+            self._set_soil_structural_litter_decomposition_rate(self.data.plant_residue_metabolic_fraction)
 
-    def _set_soil_structural_litter_decomposition_rate(self) -> None:
+    def _set_soil_structural_litter_decomposition_rate(self, residue_metabolic_fraction: float) -> None:
         """
         Sets the soil structural litter decomposition rate using the same methodology as the
         ``_determine_plant_structural_to_slow_or_active_rate``.
 
+        Parameters
+        ----------
+        residue_metabolic_fraction : float
+            Metabolic fraction of the residue most recently added to the litter pools (unitless).
+
         """
-        structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - self.data.plant_residue_metabolic_fraction)
+        structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - residue_metabolic_fraction)
         rates = [structural_litter_decomposition_rate] * len(self.data.soil_layers)
         self.data.set_vectorized_layer_attribute("soil_structural_to_slow_or_active_rate", rates)
 
@@ -276,6 +333,61 @@ class ResiduePartition:
                 "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
                 + str(nitrogen_fraction_plant_residue)
             )
+
+    @staticmethod
+    def _determine_manure_lignin_nitrogen_ratio(manure_residue_lignin: float, manure_residue_nitrogen: float) -> float:
+        """
+        This method calculates the manure lignin to nitrogen ratio of applied manure.
+
+        Parameters
+        ----------
+        manure_residue_lignin : float
+            Lignin in the applied manure awaiting partitioning (kg/ha).
+        manure_residue_nitrogen : float
+            Nitrogen in the applied manure awaiting partitioning (kg/ha).
+
+        Returns
+        -------
+        float
+            Manure lignin to nitrogen ratio (unitless). Zero when the applied manure contains no nitrogen.
+
+        Notes
+        -----
+        Follows the same formulation as ``_determine_plant_lignin_nitrogen_fraction``, where the residue lignin
+        composition is divided by 100 before being divided by the residue nitrogen fraction. Because both the
+        lignin and nitrogen fractions share the applied manure dry matter as their basis, the ratio reduces to
+        the lignin mass divided by 100 times the nitrogen mass.
+
+        """
+        if manure_residue_nitrogen <= 0.0:
+            return 0.0
+        return (manure_residue_lignin / 100) / manure_residue_nitrogen
+
+    @staticmethod
+    def _determine_manure_residue_metabolic_fraction(
+        manure_lignin_nitrogen_ratio: float,
+    ) -> float:
+        """
+        This method calculates the fraction of manure carbon residue that is metabolic.
+
+        Parameters
+        ----------
+        manure_lignin_nitrogen_ratio : float
+            Manure lignin to nitrogen ratio (unitless).
+
+        Returns
+        -------
+        float
+            Manure carbon residue fraction that is metabolic, bounded below at zero (unitless).
+
+        Notes
+        -----
+        Uses the same relationship as ``_determine_plant_residue_metabolic_fraction``, following the DayCent
+        treatment of organic animal excreta, which partitions it into structural and metabolic pools as a
+        function of the lignin to N ratio in the same way as non-woody plant residues.
+
+        """
+        return max(0.0, 0.85 - 0.18 * manure_lignin_nitrogen_ratio)
 
     @staticmethod
     def _determine_plant_residue_metabolic_fraction(
