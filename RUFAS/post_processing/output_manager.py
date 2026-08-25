@@ -19,6 +19,7 @@ class OutputManagerConfig:
     __end_to_end_testing_filter_prefixes: dict[str, str]
         A map of allowed filter type prefixes for e2e testing filters.
     """
+
     __supported_filter_types_prefixes: dict[str, str] = {
         "csv": "csv_",
         "graph": "graph_",
@@ -38,6 +39,7 @@ class OutputManager:
     logs, warnings, and errors into separate pools, and populates requested
     output channels from the pools once the simulation is done.
     """
+
     __instance: OutputManager | None = None
     pool_element_type = dict[str, Any]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
@@ -55,9 +57,7 @@ class OutputManager:
             return
 
         if config is None:
-            raise RuntimeError(
-                "OutputManager must be configured when it is first instantiated."
-            )
+            raise RuntimeError("OutputManager must be configured when it is first instantiated.")
 
         self._config = config
         self.__metadata_prefix: str = ""

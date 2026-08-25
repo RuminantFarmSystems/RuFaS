@@ -221,7 +221,6 @@ class OutputManager(object):
             )
             self.time = None
             self._filtered_variable_key_counter: Counter[str] = collections.Counter()
-            
 
     @property
     def _filter_prefixes(self) -> dict[str, str]:

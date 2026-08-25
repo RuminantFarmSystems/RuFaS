@@ -31,6 +31,7 @@ class FileManager:
     """
     Class overseeing file management activities in RuFaS.
     """
+
     def __init__(self, metadata_prefix: str, supported_prefixes: dict[str, str]) -> None:
         self.metadata_prefix = metadata_prefix
         # TODO Since this can be 1 of 2 things based on whether it's an e2e run or regular simulation, maybe this should

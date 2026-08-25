@@ -6,6 +6,7 @@ class OutputConfigValidator:
     """
     Class in charge of validating output filters including graphing and reporting.
     """
+
     def __init__(self) -> None:
         # TODO add logger when implemented
         pass
@@ -194,5 +195,3 @@ class OutputConfigValidator:
             Name of the filter to validate.
         """
         pass
-
-    

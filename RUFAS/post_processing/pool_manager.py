@@ -12,6 +12,7 @@ class PoolManager:
     """
     Class overseeing the management of the variables pool including chunkification.
     """
+
     pool_element_type = dict[str, list[Any]]
 
     def __init__(self, file_manager: FileManager) -> None:
