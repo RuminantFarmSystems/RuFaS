@@ -3,25 +3,30 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from RUFAS.rufas_time import RufasTime
+
 
 @dataclass
 class OutputManagerConfig:
     """
     Attributes
     ----------
-    __metadata_prefix: str
-        The prefix of the metadata used for the simulation.
-    _exclude_info_maps_flag: bool
-        A flag indicating whether ``info_maps`` should be exlcuded when adding variables to pool.
-    time: RufasTime | None
-        A ``RufasTime`` object used to track the simulation time.
     __supported_filter_types_prefixes: dict[str, str]
         A map of allowed filter type prefixes for output filters.
     __end_to_end_testing_filter_prefixes: dict[str, str]
         A map of allowed filter type prefixes for e2e testing filters.
     """
-    __metadata_prefix: str = ""
-    
+    __supported_filter_types_prefixes: dict[str, str] = {
+        "csv": "csv_",
+        "graph": "graph_",
+        "json": "json_",
+        "report": "report_",
+    }
+    __end_to_end_testing_filter_prefixes: dict[str, str] = {
+        "json": "e2e_json_",
+        "comparison": "e2e_comparison_",
+    }
+    time: RufasTime | None = None
 
 
 class OutputManager:
@@ -52,9 +57,62 @@ class OutputManager:
             )
 
         self._config = config
+        self.__metadata_prefix: str = ""
         self.is_end_to_end_testing_run: bool = False
         self.is_first_post_processing: bool = True
+        self._exclude_info_maps_flag: bool = False
 
     @property
     def config(self) -> OutputManagerConfig:
         return self._config
+
+    @property
+    def _filter_prefixes(self) -> dict[str, str]:
+        """Returns the appropriate set of acceptable filter prefixes."""
+        if self.is_end_to_end_testing_run:
+            return self.config.__end_to_end_testing_filter_prefixes
+        else:
+            return self.config.__supported_filter_types_prefixes
+
+    def run_startup_sequence() -> None:
+        pass
+
+    def set_metadata_prefix(self, metadata_prefix: str) -> None:
+        """Sets the metadata_prefix attribute."""
+        self.__metadata_prefix = metadata_prefix
+        pass
+
+    def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
+        """
+        Sets the ``exclude_info_maps`` flag to the given value.
+        Parameters
+        ----------
+        exclude_info_maps : bool
+            The value to set the ``exclude_info_maps`` flag to.
+        """
+
+        self._exclude_info_maps_flag = exclude_info_maps
+
+    def save_results() -> None:
+        pass
+
+    def _route_save_functions() -> None:
+        pass
+
+    def dump_all_nondata_pools() -> None:
+        pass
+
+    def summarize_e2e_test_results() -> None:
+        pass
+
+    def _exclude_info_maps() -> None:
+        pass
+
+    def filter_variables_pool() -> None:
+        pass
+
+    def _parse_filtered_variables() -> None:
+        pass
+
+    def _list_filter_files_in_dir() -> None:
+        pass
