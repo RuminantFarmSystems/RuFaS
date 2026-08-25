@@ -16,6 +16,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
         "variables": ["dry_yield", "crop", "harvest_year", "harvest_day", "field_name", "harvest_type", "field_size"],
         "date_fields": ("harvest_year", "harvest_day"),
+        "use_filter_key_name": True,
     },
     "nitrous_oxide_emissions": {
         "name": "Nitrous Oxide Emissions",
@@ -25,6 +26,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
             ".*RufasTime.simulation_day.*",
         ],
         "date_fields": "simulation_day",
+        "use_filter_key_name": True,
     },
     "ammonia_emissions": {
         "name": "Ammonia Emissions",
@@ -34,6 +36,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
             ".*RufasTime.simulation_day.*",
         ],
         "date_fields": "simulation_day",
+        "use_filter_key_name": True,
     },
     "fertilizer_applications": {
         "name": "Fertilizer Applications",
@@ -41,6 +44,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
         "variables": ["nitrogen", "phosphorus", "potassium", "field_name", "field_size", "year", "day"],
         "date_fields": ("year", "day"),
+        "use_filter_key_name": True,
     },
     "manure_applications": {
         "name": "Manure Applications",
@@ -48,6 +52,7 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
         "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
         "variables": ["nitrogen", "field_name", "field_size", "year", "day"],
         "date_fields": ("year", "day"),
+        "use_filter_key_name": True,
     },
     "crop_received": {
         "name": "Crop Received",
@@ -58,18 +63,21 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
             "crop_name",
             "feed_id",
         ],
+        "use_filter_key_name": True,
     },
     "farmgrown_feed_deductions": {
         "name": "Farmgrown Feed Deductions",
         "description": "Collects all farmgrown feeds fed to animals in the simulation.",
         "filters": ["FeedManager._log_feed_deductions.farmgrown_feed_.*_fed"],
         "date_fields": "simulation_day",
+        "use_filter_key_name": True,
     },
     "farmgrown_feed_inventory": {
         "name": "Farmgrown Feed Inventory",
         "description": "Collects the inventory of all farmgrown feeds in the simulation.",
         "filters": ["FeedManager.report_stored_farmgrown_feeds.stored_feed_.*_dm.daily_storage_levels.*"],
         "date_fields": "simulation_day",
+        "use_filter_key_name": True,
     },
 }
 
@@ -508,21 +516,11 @@ class EmissionsEstimator:
         raw_received_crop_data = self.om.filter_variables_pool(
             FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS["crop_received"]
         )
-        filtered_data_by_storage: dict[str, dict[str, list[str | RUFAS_ID]]] = {}
-        for full_variable_name, variable_contents in raw_received_crop_data.items():
-            storage_name = full_variable_name.split("Feed.")[-1].split(".crop_received")[0]
-
-            variable_name = full_variable_name.split(".")[-1]
-            filtered_data_by_storage.setdefault(storage_name, {})[variable_name] = variable_contents["values"]
-
-        crop_to_feed_id_mapping: dict[tuple[str, str], RUFAS_ID] = {}
-        for storage_name, storage_data in filtered_data_by_storage.items():
-            field_names = storage_data["field_name"]
-            crop_names = storage_data["crop_name"]
-            feed_ids = storage_data["feed_id"]
-            for field_name, crop_name, feed_id in zip(field_names, crop_names, feed_ids):
-                if (field_name, crop_name) not in crop_to_feed_id_mapping:
-                    crop_to_feed_id_mapping[(str(field_name), str(crop_name))] = int(feed_id)
+        received_crop_dict = {key: values["values"] for key, values in raw_received_crop_data.items()}
+        received_crop_list = Utility.convert_dict_of_lists_to_list_of_dicts(received_crop_dict)
+        crop_to_feed_id_mapping = {
+            (datapoint["field_name"], datapoint["crop_name"]): datapoint["feed_id"] for datapoint in received_crop_list
+        }
 
         return crop_to_feed_id_mapping
 
@@ -581,6 +579,29 @@ class EmissionsEstimator:
 
         return harvest_data
 
+    def _group_harvest_details_by_date(
+        self, harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
+    ) -> dict[int, list[dict[str, str | dict[str, Any]]]]:
+        """
+        Regroups harvest data keyed by field name into data keyed by harvest simulation day, collecting the
+        harvests from every field that share the same simulation day into a single list.
+
+        Parameters
+        ----------
+        harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]
+            The harvest details for farmgrown feeds keyed by field name.
+
+        Returns
+        -------
+        dict[int, list[dict[str, str | dict[str, Any]]]]
+            The harvest details for farmgrown feeds across all fields keyed by harvest date.
+        """
+        harvest_details_by_harvest_dates = defaultdict(list)
+        for field_name, harvest_dates in harvest_yield_by_field.items():
+            for harvest_date, details in harvest_dates.items():
+                harvest_details_by_harvest_dates[harvest_date].append({"field_name": field_name, "details": details})
+        return harvest_details_by_harvest_dates
+
     def _calculate_daily_farmgrown_feed_emissions_and_resources(
         self,
         emission_data: dict[str, dict[str, dict[int, float]]],
@@ -601,13 +622,13 @@ class EmissionsEstimator:
         ----------
         emission_data : dict[str, dict[str, dict[int, float]]]
             Nitrous oxide and ammonia emission data for farmgrown feeds, keyed by
-            emission type, field name, and simulation day (kg/ha).
+            emission type, field name, and simulation day (kg).
         resource_data : dict[str, dict[str, dict[int, dict[str, float]]]]
             Manure and fertilizer application data for farmgrown feeds, keyed by
-            application type, field name, simulation day, and nutrient variable (kg/ha).
+            application type, field name, simulation day, and nutrient variable (kg).
         harvest_yield_by_field : dict[str, dict[int, dict[str, Any]]]
             Harvest dry yield data for farmgrown feeds, keyed by field name and
-            simulation day (kg/ha).
+            simulation day (kg).
         all_simulation_days : list[int]
             A list of all simulation days in the simulation.
 
@@ -643,16 +664,6 @@ class EmissionsEstimator:
 
         harvest_dates_by_feed_id = self._calculate_harvest_dates_by_feed_id(harvest_yield_by_field)
         harvest_details_by_harvest_dates = defaultdict(list)
-
-        for field_name, harvest_dates in harvest_yield_by_field.items():
-            for harvest_date in harvest_dates:
-                harvest_details_by_harvest_dates[harvest_date].append(
-                    {
-                        "field_name": field_name,
-                        "details": harvest_yield_by_field[field_name][harvest_date],
-                    }
-                )
-
         last_harvest_date_by_field = {field_name: -1 for field_name in harvest_yield_by_field}
 
         for harvest_date, harvest_records in sorted(harvest_details_by_harvest_dates.items()):

@@ -178,5 +178,4 @@ class FertilizerApplication:
                 depth_factor = 1.0 - depth_factors_sum
                 depth_factors.append(depth_factor)
                 break
-        print(depth_factors)
         return depth_factors
