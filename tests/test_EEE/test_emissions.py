@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.EEE.emissions import EmissionsEstimator
+from RUFAS.EEE.emissions import EmissionsEstimator, FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES
 from RUFAS.units import MeasurementUnits
 
 from tests.test_EEE.fixtures import (
@@ -537,6 +537,48 @@ def test_calculate_daily_farmgrown_feed_emissions_and_resources(
             assert emissions_and_resources[day] == pytest.approx(
                 expected_daily_farmgrown_feed_emissions_and_resources[feed_id][day], rel=1e-3
             )
+
+
+def test_get_daily_emission_and_resource_values_for_field(em: EmissionsEstimator) -> None:
+    emission_data: dict[str, dict[str, dict[int, float]]] = {
+        "nitrous_oxide_emissions": {"field_1": {0: 1.0, 1: 2.0}, "field_2": {0: 5.0}},
+        "ammonia_emissions": {"field_1": {0: 3.0, 1: 4.0}, "field_2": {0: 6.0}},
+    }
+    resource_data: dict[str, dict[str, dict[int, dict[str, float]]]] = {
+        "fertilizer_applications": {
+            "field_1": {
+                5: {"nitrogen": 10.0, "phosphorus": 11.0, "potassium": 12.0},
+                8: {"nitrogen": 13.0, "phosphorus": 14.0, "potassium": 15.0},
+            },
+        },
+        "manure_applications": {"field_1": {7: {"nitrogen": 20.0}}},
+    }
+    actual_data = em._get_daily_emission_and_resource_values_for_field(emission_data, resource_data, "field_1")
+    assert tuple(actual_data.keys()) == FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES
+    assert actual_data == {
+        "nitrous_oxide_emissions": {0: 1.0, 1: 2.0},
+        "ammonia_emissions": {0: 3.0, 1: 4.0},
+        "fertilizer_N": {5: 10.0, 8: 13.0},
+        "fertilizer_P": {5: 11.0, 8: 14.0},
+        "fertilizer_K": {5: 12.0, 8: 15.0},
+        "manure_N": {7: 20.0},
+    }
+
+
+def test_get_daily_emission_and_resource_values_for_field_no_applications(em: EmissionsEstimator) -> None:
+    emission_data: dict[str, dict[str, dict[int, float]]] = {
+        "nitrous_oxide_emissions": {"field_1": {0: 1.0}},
+        "ammonia_emissions": {"field_1": {0: 3.0}},
+    }
+    actual_data = em._get_daily_emission_and_resource_values_for_field(emission_data, {}, "field_1")
+    assert actual_data == {
+        "nitrous_oxide_emissions": {0: 1.0},
+        "ammonia_emissions": {0: 3.0},
+        "fertilizer_N": {},
+        "fertilizer_P": {},
+        "fertilizer_K": {},
+        "manure_N": {},
+    }
 
 
 def test_calculate_daily_farmgrown_feed_fed_emissions_and_resources(
