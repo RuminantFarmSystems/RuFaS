@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed, Sex
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -452,6 +452,8 @@ def test_cow_give_birth(is_calf_sold: bool, mock_herd_factory: HerdFactory, mock
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_herd_factory.time = mock_time
 
+    mocker.patch("RUFAS.biophysical.animal.herd_factory.random.random", return_value=0.99)
+
     mock_pre_animal_population = AnimalPopulation(
         calves=[],
         heiferIs=[],
@@ -473,6 +475,7 @@ def test_cow_give_birth(is_calf_sold: bool, mock_herd_factory: HerdFactory, mock
 
     mock_calf_init.assert_called_once_with(
         NewBornCalfValuesTypedDict(
+            sex=Sex.FEMALE,
             id=AnimalPopulation.current_animal_id,
             breed=Breed.HO.name,
             birth_date="",
@@ -718,6 +721,7 @@ def test_cow_update_culled_false_new_born_true(
         return_value=DailyRoutinesOutput(
             animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
             newborn_calf_config=NewBornCalfValuesTypedDict(
+                sex=Sex.FEMALE,
                 id=1,
                 breed=Breed.HO.name,
                 birth_date="",
@@ -1421,7 +1425,10 @@ def test_initialize_herd_init_herd_with_sexed_semen_save_animals_false(
     mock_report_animal_population_statistics = mocker.patch.object(
         AnimalModuleReporter, "report_animal_population_statistics"
     )
-    AnimalConfig.semen_type = "sexed"
+    # Sexed semen is now expressed through the selective reproduction strategy and a
+    # non-zero sexed_dairy allocation proportion (patched for clean restoration).
+    mocker.patch.object(AnimalConfig, "selective_repro_strategy", True)
+    mocker.patch.object(AnimalConfig, "heiferII_semen_allocation_proportions", {"sexed_dairy": 0.5})
 
     mock_herd_factory.initialize_herd()
 

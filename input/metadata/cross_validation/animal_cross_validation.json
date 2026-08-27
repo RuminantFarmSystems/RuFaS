@@ -1254,6 +1254,116 @@
           "relationship": "greater_or_equal_to"
         }
       ]
+    },
+    {
+      "description": "When selective_repro_strategy is false, ranking_method must be null",
+      "aliases": {
+        "variables": {
+          "selective_repro_strategy": "animal.animal_config.farm_level.repro.selective_repro_strategy",
+          "ranking_method": "animal.animal_config.farm_level.repro.ranking_method"
+        },
+        "constants": {
+          "true_constant": true,
+          "false_constant": false
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["selective_repro_strategy"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["false_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ranking_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        }
+      ]
+    },
+    {
+      "description": "When selective_repro_strategy is true and ranking_method is 'genetic', simulate_genetics must be true",
+      "aliases": {
+        "variables": {
+          "selective_repro_strategy": "animal.animal_config.farm_level.repro.selective_repro_strategy",
+          "ranking_method": "animal.animal_config.farm_level.repro.ranking_method",
+          "simulate_genetics": "animal.herd_information.simulate_genetics"
+        },
+        "constants": {
+          "genetic": "genetic",
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["selective_repro_strategy"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ranking_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["genetic"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["simulate_genetics"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
     }
   ]
 }

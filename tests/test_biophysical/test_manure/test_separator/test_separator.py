@@ -185,6 +185,43 @@ def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator:
     )
 
 
+def test_process_manure_zero_mass_held_manure(mocker: MockerFixture, mock_separator: Separator) -> None:
+    """
+    A held manure stream with zero mass (e.g. from an empty pen) must be treated like an
+    empty separator rather than triggering the "more water into solids than present" ValueError.
+
+    Regression test: an all-zero ManureStream is still a truthy object, so guarding only on
+    ``held_manure is None`` let a zero stream through and produced liquid_manure_water == 0.0.
+    """
+    # Arrange: a fully zero-valued stream (water == 0, total_solids == 0 -> mass == 0).
+    zero_stream = ManureStream.make_empty_manure_stream()
+    assert zero_stream.mass == 0.0
+    mock_separator.held_manure = zero_stream
+    mock_conditions = mocker.MagicMock()
+    mock_time = mocker.MagicMock()
+    mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
+    mock_report_manure_stream = mocker.patch.object(mock_separator, "_report_manure_stream", autospec=True)
+
+    # Act
+    result = mock_separator.process_manure(mock_conditions, mock_time)
+
+    # Assert: handled as an empty separator, no separation attempted, no error raised.
+    assert result == {}
+    mock_report_manure_stream.assert_not_called()
+    mock_om.add_error.assert_not_called()
+    mock_om.add_variable.assert_called_once_with(
+        "empty_separator_output",
+        {},
+        {
+            "class": "Separator",
+            "function": "process_manure",
+            "prefix": "Manure.Separator.ScrewPress.TestSeparator",
+            "simulation_day": mock_time.simulation_day,
+            "units": MeasurementUnits.UNITLESS,
+        },
+    )
+
+
 def test_clear_held_manure(mock_separator: Separator) -> None:
     """Test that held_manure is cleared after calling clear_held_manure."""
     mock_separator.held_manure = ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, 0.24, None, 10)

@@ -125,3 +125,37 @@ def test_set_animal_grouping_scenario(
 
     HerdManager.set_animal_grouping_scenario(new_grouping_scenario)
     assert HerdManager.ANIMAL_GROUPING_SCENARIO == new_grouping_scenario
+
+
+@pytest.mark.parametrize(
+    "random_value, expected_sex_name",
+    [
+        (0.1, "MALE"),  # random < CONVENTIONAL_DAIRY_MALE_CALF_RATE (0.5) -> male
+        (0.9, "FEMALE"),  # random >= CONVENTIONAL_DAIRY_MALE_CALF_RATE -> female
+    ],
+)
+def test_assign_embryo_sex_for_pregnant_animals_entering_the_herd(
+    random_value: float, expected_sex_name: str, mocker: MockerFixture
+) -> None:
+    """
+    Pregnant animals imported into the herd (initial herd load or replacement purchases) have no
+    recorded conception event, so their embryo sex is assigned at conventional-dairy odds on import.
+    """
+    from RUFAS.biophysical.animal.data_types.animal_enums import Sex
+
+    mocker.patch("RUFAS.biophysical.animal.herd_manager.random", return_value=random_value)
+
+    animal_one = MagicMock()
+    animal_one.days_born = 400
+    animal_two = MagicMock()
+    animal_two.days_born = 512
+    animals = [animal_one, animal_two]
+
+    HerdManager._assign_embryo_sex_for_pregnant_animals_entering_the_herd(MagicMock(), animals)
+
+    expected_sex = Sex[expected_sex_name]
+    for animal in animals:
+        assert animal.reproduction.embryo_sex == expected_sex
+        animal.events.add_event.assert_called_once_with(
+            animal.days_born, 0, f"Assigning embryo_sex {expected_sex} upon import."
+        )
