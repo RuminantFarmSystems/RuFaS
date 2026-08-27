@@ -842,12 +842,7 @@ class AnimalModuleReporter:
         cull_reason_stats_units = {
             animal_constants.DEATH_CULL: MeasurementUnits.UNITLESS,
             animal_constants.OVERSUPPLY_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.LAMENESS_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.INJURY_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.MASTITIS_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.DISEASE_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.UDDER_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.UNKNOWN_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.ACUTE_SALE_CULL: MeasurementUnits.UNITLESS,
         }
         om.add_variable(
             "cull_reason_stats",

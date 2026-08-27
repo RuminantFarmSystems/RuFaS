@@ -146,37 +146,10 @@ class AnimalConfig:
     third_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the third pregnancy check, (unitless).
     parity_death_probability : list[float]
-        List of probabilities of death based on parity number, (unitless).
-    death_day_probability : list[float]
-        Cumulative probability of cow death as a function of days in production, (unitless).
-    parity_cull_probability : list[float]
-        List of culling probabilities based on parity number, (unitless).
-    cull_day_count : list[int]
-        List of day intervals for culling analysis, (simulation day).
-    feet_leg_cull_probability : float
-        Probability of feet and leg-related culling, (unitless).
-    feet_leg_cull_day_probability : list[float]
-        Feet and leg-related culling probability over time, (unitless).
-    injury_cull_probability : float
-        Probability of culling due to injuries, (unitless).
-    injury_cull_day_probability : list[float]
-        Cumulative distribution for injury-related culling over time, (unitless).
-    mastitis_cull_probability : float
-        Probability of culling due to mastitis, (unitless).
-    mastitis_cull_day_probability : list[float]
-        Cumulative distribution for mastitis-related culling over time, (unitless).
-    disease_cull_probability : float
-        Probability of culling due to diseases, (unitless).
-    disease_cull_day_probability : list[float]
-        Cumulative distribution for disease-related culling over time, (unitless).
-    udder_cull_probability : float
-        Probability of culling due to udder-related issues, (unitless).
-    udder_cull_day_probability : list[float]
-        Cumulative distribution for udder-related culling over time, (unitless).
-    unknown_cull_probability : float
-        Probability of culling for unknown reasons, (unitless).
-    unknown_cull_day_probability : list[float]
-        Cumulative distribution for unknown reasons of culling over time, (unitless).
+        Annual, parity-indexed probability that a cow dies during a given year, (unitless).
+    parity_acute_sale_probability : list[float]
+        Annual, parity-indexed probability that a cow is sold for an acute / involuntary
+        reason during a given year, (unitless).
     methane_mitigation_method : str
         The mitigation method applied for methane reduction, e.g., "None", (unitless).
     methane_mitigation_additive_amount : float
@@ -267,113 +240,11 @@ class AnimalConfig:
     third_pregnancy_check_day: int = 200
     third_pregnancy_check_loss_rate: float = 0.017
 
+    # Annual, parity-indexed probabilities that a cow dies (parity_death_probability) or is sold
+    # for an acute / involuntary reason (parity_acute_sale_probability) during a given year. See
+    # issue #2694: these were formerly evaluated once per lactation and are now evaluated annually.
     parity_death_probability: list[float] = [0.039, 0.056, 0.085, 0.117]
-    death_day_probability: list[float] = [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1]
-
-    parity_cull_probability: list[float] = [0.169, 0.233, 0.301, 0.408]
-    cull_day_count: list[int] = [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530]
-    feet_leg_cull_probability: float = 0.1633
-    feet_leg_cull_day_probability: list[float] = [
-        0,
-        0.03,
-        0.08,
-        0.16,
-        0.25,
-        0.36,
-        0.48,
-        0.59,
-        0.69,
-        0.78,
-        0.85,
-        0.90,
-        0.95,
-        1,
-    ]
-    injury_cull_probability: float = 0.2883
-    injury_cull_day_probability: list[float] = [
-        0,
-        0.08,
-        0.18,
-        0.28,
-        0.38,
-        0.47,
-        0.56,
-        0.64,
-        0.71,
-        0.78,
-        0.85,
-        0.90,
-        0.95,
-        1,
-    ]
-    mastitis_cull_probability: float = 0.2439
-    mastitis_cull_day_probability: list[float] = [
-        0,
-        0.06,
-        0.12,
-        0.19,
-        0.30,
-        0.43,
-        0.56,
-        0.68,
-        0.78,
-        0.85,
-        0.90,
-        0.94,
-        0.97,
-        1,
-    ]
-    disease_cull_probability: float = 0.1391
-    disease_cull_day_probability: list[float] = [
-        0,
-        0.04,
-        0.12,
-        0.24,
-        0.34,
-        0.42,
-        0.50,
-        0.57,
-        0.64,
-        0.72,
-        0.81,
-        0.89,
-        0.95,
-        1,
-    ]
-    udder_cull_probability: float = 0.0645
-    udder_cull_day_probability: list[float] = [
-        0,
-        0.12,
-        0.24,
-        0.33,
-        0.41,
-        0.48,
-        0.55,
-        0.62,
-        0.68,
-        0.76,
-        0.82,
-        0.89,
-        0.95,
-        1,
-    ]
-    unknown_cull_probability: float = 0.1009
-    unknown_cull_day_probability: list[float] = [
-        0,
-        0.05,
-        0.11,
-        0.18,
-        0.27,
-        0.37,
-        0.45,
-        0.54,
-        0.62,
-        0.70,
-        0.77,
-        0.84,
-        0.92,
-        1,
-    ]
+    parity_acute_sale_probability: list[float] = [0.169, 0.233, 0.301, 0.408]
 
     methane_model: dict[str, Any] = {
         "calves": "Pattanaik",
@@ -515,32 +386,7 @@ class AnimalConfig:
         cls.third_pregnancy_check_loss_rate = animal_config_data["from_literature"]["repro"]["preg_loss_rate_3"]
 
         cls.parity_death_probability = animal_config_data["from_literature"]["culling"]["parity_death_prob"]
-        cls.death_day_probability = animal_config_data["from_literature"]["culling"]["death_day_prob"]
-
-        cls.parity_cull_probability = animal_config_data["from_literature"]["culling"]["parity_cull_prob"]
-        cls.cull_day_count = animal_config_data["from_literature"]["culling"]["cull_day_count"]
-        cls.feet_leg_cull_probability = animal_config_data["from_literature"]["culling"]["feet_leg_cull"]["probability"]
-        cls.feet_leg_cull_day_probability = animal_config_data["from_literature"]["culling"]["feet_leg_cull"][
-            "cull_day_prob"
-        ]
-        cls.injury_cull_probability = animal_config_data["from_literature"]["culling"]["injury_cull"]["probability"]
-        cls.injury_cull_day_probability = animal_config_data["from_literature"]["culling"]["injury_cull"][
-            "cull_day_prob"
-        ]
-        cls.mastitis_cull_probability = animal_config_data["from_literature"]["culling"]["mastitis_cull"]["probability"]
-        cls.mastitis_cull_day_probability = animal_config_data["from_literature"]["culling"]["mastitis_cull"][
-            "cull_day_prob"
-        ]
-        cls.disease_cull_probability = animal_config_data["from_literature"]["culling"]["disease_cull"]["probability"]
-        cls.disease_cull_day_probability = animal_config_data["from_literature"]["culling"]["disease_cull"][
-            "cull_day_prob"
-        ]
-        cls.udder_cull_probability = animal_config_data["from_literature"]["culling"]["udder_cull"]["probability"]
-        cls.udder_cull_day_probability = animal_config_data["from_literature"]["culling"]["udder_cull"]["cull_day_prob"]
-        cls.unknown_cull_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"]["probability"]
-        cls.unknown_cull_day_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"][
-            "cull_day_prob"
-        ]
+        cls.parity_acute_sale_probability = animal_config_data["from_literature"]["culling"]["parity_acute_sale_prob"]
 
         cls.methane_model = animal_data["methane_model"]
         methane_mitigation_data = animal_data["methane_mitigation"]
