@@ -31,6 +31,7 @@ from RUFAS.biophysical.animal.data_types.reproduction import (
     HerdReproductionStatistics,
     AnimalReproductionStatistics,
 )
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
@@ -91,6 +92,8 @@ class Animal:
         The unique identifier of the animal, (unitless).
     breed: Breed
         The breed of the animal.
+    bred_from_semen: SemenType | None
+        The type of semen used to breed the animal, if applicable.
     animal_type: AnimalType
         The current life stage of the animal.
     days_born: int
@@ -188,6 +191,7 @@ class Animal:
         }
         self.id = args.get("id", 0)
         self.breed: Breed = Breed(Breed[args.get("breed")])
+        self.bred_from_semen: SemenType | None = None
         self.animal_type = AnimalType(args.get("animal_type"))
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
@@ -1300,29 +1304,6 @@ class Animal:
             else self.digestive_system.enteric_methane_emission
         )
 
-    def _assign_sex_to_newborn_calf(self) -> None:
-        """
-        Assign a sex to a newborn calf based on the semen type and male calf rate.
-
-        Raises
-        ------
-        ValueError
-            If `AnimalConfig.semen_type` is not "conventional" or "sexed".
-
-        """
-        if AnimalConfig.semen_type == "conventional":
-            male_calf_rate = AnimalConfig.male_calf_rate_conventional_semen
-        elif AnimalConfig.semen_type == "sexed":
-            male_calf_rate = AnimalConfig.male_calf_rate_sexed_semen
-        else:
-            self.om.add_error(
-                "Unexpected semen type",
-                f"Unexpected semen type: {AnimalConfig.semen_type}",
-                {"class": self.__class__.__name__, "function": self._assign_sex_to_newborn_calf.__name__},
-            )
-            raise ValueError(f"Unexpected semen type: {AnimalConfig.semen_type}")
-        self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
-
     def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict, simulation_day: int) -> None:
         """
         Initialize a newborn calf with specific attributes and simulation variables.
@@ -1336,7 +1317,8 @@ class Animal:
             The current day in the simulation, used for event logging and status evaluation.
 
         """
-        self._assign_sex_to_newborn_calf()
+        self.sex = args["sex"]
+        self.bred_from_semen = args["bred_from_semen"]
 
         if random() < AnimalConfig.still_birth_rate:
             self.stillborn_day = simulation_day
@@ -1699,7 +1681,9 @@ class Animal:
             raise ValueError(f"Unexpected days in milk value: {self.days_in_milk}")
 
     def daily_reproduction_update(
-        self, time: RufasTime
+        self,
+        time: RufasTime,
+        population_ranking_indexes: list[float] | None = None,
     ) -> tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]:
         """
         Handles the daily reproduction state update for an animal.
@@ -1733,6 +1717,8 @@ class Animal:
                 dam_tbv_fat=self.genetics.TBV_fat,
                 dam_tbv_protein=self.genetics.TBV_protein,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+                population_ranking_indexes=population_ranking_indexes,
+                animal_ranking_index=self.genetics.ranking_index,
             )
         else:
             reproduction_inputs = ReproductionInputs(
@@ -1743,6 +1729,8 @@ class Animal:
                 days_in_pregnancy=self.days_in_pregnancy,
                 days_in_milk=self.days_in_milk,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+                population_ranking_indexes=None,
+                animal_ranking_index=None,
             )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
 
@@ -1775,7 +1763,7 @@ class Animal:
 
         return newborn_calf_config, reproduction_outputs.herd_reproduction_statistics
 
-    def daily_routines(self, time: RufasTime) -> DailyRoutinesOutput:
+    def daily_routines(self, time: RufasTime, population_ranking_indexes: list[float] | None) -> DailyRoutinesOutput:
         """
         Perform daily routines for the animal, updating its status and outputs.
 
@@ -1805,7 +1793,9 @@ class Animal:
 
         self.daily_growth_update(time)
 
-        newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
+        newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(
+            time, population_ranking_indexes
+        )
 
         daily_routines_output.animal_status, daily_routines_output.newborn_calf_config = self.animal_life_stage_update(
             time
@@ -2773,3 +2763,16 @@ class Animal:
                 self.genetic_history[-1]["end_day"] = simulation_day
         else:
             return
+
+    @property
+    def is_eligible_for_breeding(self) -> bool:
+        if self.animal_type is AnimalType.HEIFER_II:
+            return not self.is_pregnant
+        elif self.animal_type.is_cow:
+            return (
+                not self.is_pregnant
+                and self.days_in_milk > AnimalConfig.voluntary_waiting_period
+                and not self.reproduction.do_not_breed
+            )
+        else:
+            return False

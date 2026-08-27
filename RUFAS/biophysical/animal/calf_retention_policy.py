@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_enums import Sex
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -131,6 +132,9 @@ class CalfRetentionPolicy:
         when the calf is kept.
 
         """
+        if calf.bred_from_semen == SemenType.BEEF:
+            calf.sold_at_day = simulation_day
+            return
         is_sold = self._is_sold_count_based(calf) if self.is_count_based else self._is_sold_rate_based(calf)
         if is_sold:
             calf.sold_at_day = simulation_day
