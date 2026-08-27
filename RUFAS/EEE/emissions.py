@@ -82,8 +82,6 @@ FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES: dict[str, str] = {
     "manure_N": "manure_nitrogen_applied_for_feed",
 }
 
-FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES: tuple[str, ...] = tuple(FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES)
-
 
 class EmissionsEstimator:
     """
@@ -642,7 +640,6 @@ class EmissionsEstimator:
             )
             harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
             last_harvest_date = -1
-            last_harvest_operation = None
             for harvest_date in harvest_dates:
                 feed_id = harvest_yield_by_field[field_name][harvest_date]["feed_id"]
                 if feed_id is None:
@@ -663,7 +660,7 @@ class EmissionsEstimator:
                     and last_harvest_operation == "harvest_kill"
                 ) or feed_id not in total_farmgrown_feed_emission_and_resource_by_feed_id:
                     total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = {
-                        variable: 0.0 for variable in FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES
+                        variable: 0.0 for variable in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.keys()
                     }
                 for variable, daily_values in daily_values_by_variable.items():
                     total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][variable] += sum(
@@ -704,7 +701,7 @@ class EmissionsEstimator:
             ]
             for remaining_day in remaining_days:
                 daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][remaining_day] = {
-                    variable: 0.0 for variable in FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES
+                    variable: 0.0 for variable in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.keys()
                 }
             daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = dict(
                 sorted(daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id].items())
@@ -736,7 +733,7 @@ class EmissionsEstimator:
         -------
         dict[str, dict[int, float]]
             A nested dictionary structured as ``{variable: {simulation_day: value}}``
-            for each variable in ``FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES``.
+            for each variable in ``FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES``.
             Variables whose application type has no data for the field map to empty
             dictionaries.
         """

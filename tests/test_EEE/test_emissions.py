@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.EEE.emissions import EmissionsEstimator, FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES
+from RUFAS.EEE.emissions import EmissionsEstimator, FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES
 from RUFAS.units import MeasurementUnits
 
 from tests.test_EEE.fixtures import (
@@ -554,7 +554,7 @@ def test_get_daily_emission_and_resource_values_for_field(em: EmissionsEstimator
         "manure_applications": {"field_1": {7: {"nitrogen": 20.0}}},
     }
     actual_data = em._get_daily_emission_and_resource_values_for_field(emission_data, resource_data, "field_1")
-    assert tuple(actual_data.keys()) == FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES
+    assert actual_data.keys() == FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.keys()
     assert actual_data == {
         "nitrous_oxide_emissions": {0: 1.0, 1: 2.0},
         "ammonia_emissions": {0: 3.0, 1: 4.0},
