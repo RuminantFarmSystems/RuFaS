@@ -772,10 +772,6 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
         total_solids=7.7,
         degradable_volatile_solids=8.8,
         non_degradable_volatile_solids=9.9,
-        inorganic_phosphorus_fraction=1.1,
-        organic_phosphorus_fraction=2.2,
-        non_water_inorganic_phosphorus_fraction=3.3,
-        non_water_organic_phosphorus_fraction=4.4,
         phosphorus=5.5,
         phosphorus_fraction=6.6,
         potassium=7.7,
@@ -789,7 +785,7 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_manure_excretions(manure_excretions_by_pen, 10)
 
-    assert mock_om_add_variable.call_count == 16 * len(manure_excretions_by_pen)
+    assert mock_om_add_variable.call_count == 12 * len(manure_excretions_by_pen)
 
 
 def test_report_herd_statistics_data(mocker: MockerFixture) -> None:

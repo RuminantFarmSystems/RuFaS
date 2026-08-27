@@ -76,7 +76,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
         ),
     }
     mock_weather.weather_data = weather_data
-    mock_weather.mean_annual_temperature = 77
+    mock_weather.long_term_average_annual_temperature = 77
 
     return mock_weather
 
@@ -85,7 +85,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
 def weather_original_method_states(mock_weather: Weather) -> dict[str, Callable]:
     """Fixture to store unmocked methods of Weather."""
     return {
-        "_calculate_average_annual_temperature": mock_weather._calculate_average_annual_temperature,
+        "_calculate_long_term_average_annual_temperature": mock_weather._calculate_long_term_average_annual_temperature,
         "get_current_day_conditions": mock_weather.get_current_day_conditions,
     }
 
@@ -112,7 +112,7 @@ def test_weather_init(mock_weather_input: dict, mock_time: RufasTime, mocker: Mo
     with (
         patch("RUFAS.weather.Weather.check_adequate_weather_data") as check,
         patch("RUFAS.output_manager.OutputManager.add_variable") as add,
-        patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg,
+        patch("RUFAS.weather.Weather._calculate_long_term_average_annual_temperature") as avg,
     ):
         mock_time.start_date = datetime(2023, 11, 1)
         mock_time.end_date = datetime(2023, 11, 5)
@@ -133,27 +133,27 @@ def test_weather_init(mock_weather_input: dict, mock_time: RufasTime, mocker: Mo
         ([float("nan"), -3.22, -1.05], -2.135),
     ],
 )
-def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float], expected: float) -> None:
+def test_calculate_long_term_average_annual_temperature(avg_daily_temperatures: list[float], expected: float) -> None:
     """Tests that the annual average air temperature is correctly calculated based on average daily temperatures."""
-    actual = Weather._calculate_average_annual_temperature(avg_daily_temperatures)
+    actual = Weather._calculate_long_term_average_annual_temperature(avg_daily_temperatures)
     assert actual == pytest.approx(expected)
 
 
-def test_calculate_average_annual_temperature_warns_on_missing_values(mocker: MockerFixture) -> None:
+def test_calculate_long_term_average_annual_temperature_warns_on_missing_values(mocker: MockerFixture) -> None:
     """Tests that a warning is recorded when some daily average temperatures are missing."""
     patch_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
-    Weather._calculate_average_annual_temperature([12.3, float("nan"), 15.6])
+    Weather._calculate_long_term_average_annual_temperature([12.3, float("nan"), 15.6])
 
     patch_add_warning.assert_called_once()
 
 
-def test_calculate_average_annual_temperature_all_missing_error(mocker: MockerFixture) -> None:
+def test_calculate_long_term_average_annual_temperature_all_missing_error(mocker: MockerFixture) -> None:
     """Tests that an error is raised when all daily average temperatures are missing."""
     patch_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
     with pytest.raises(ValueError) as e:
-        Weather._calculate_average_annual_temperature([float("nan"), float("nan")])
+        Weather._calculate_long_term_average_annual_temperature([float("nan"), float("nan")])
 
     assert str(e.value) == "All daily average air temperatures in the weather data are missing"
     patch_add_error.assert_called_once()

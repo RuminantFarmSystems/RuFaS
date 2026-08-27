@@ -1,4 +1,5 @@
-from typing import Any
+from collections import defaultdict
+from typing import Any, DefaultDict
 
 from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize
@@ -153,16 +154,25 @@ class EnergyEstimator:
         }
         estimator = EnergyEstimator()
         diesel_consumption_data_list = estimator.parse_inputs_for_diesel_consumption_calculation()
-        total_diesel_consumption_tractor_implement_liter_per_ha: float = 0.0
+        diesel_consumption_by_year: dict[int, float] = defaultdict(float)
+        diesel_consumption_by_field_and_year: DefaultDict[str, DefaultDict[int, float]] = defaultdict(
+            lambda: defaultdict(float)
+        )
         if simulate_animals:
             herd_size = im.get_data("animal.herd_information.herd_num")
         else:
             herd_size = None
         for diesel_consumption_data_item in diesel_consumption_data_list:
+            field_production_size = diesel_consumption_data_item["field_production_size"]
+            field_name = diesel_consumption_data_item["field_name"]
+            operation_year = diesel_consumption_data_item["operation_year"]
+
             harvest_type: HarvestOperation | None = None
             if harvest_type_str := diesel_consumption_data_item.get("harvest_type"):
                 harvest_type = HarvestOperation(harvest_type_str)
+
             tractor_size = im.get_data(f"{diesel_consumption_data_item.get("field_name")}.tractor_size")
+
             tractor = Tractor(
                 operation_event=diesel_consumption_data_item["operation_event"],
                 crop_type=diesel_consumption_data_item.get("crop_type"),
@@ -173,33 +183,57 @@ class EnergyEstimator:
                 harvest_type=harvest_type,
             )
 
-            diesel_consumption_tractor_implement_liter_per_ha = estimator.calculate_diesel_consumption(
+            diesel_consumption_tractor_implement_liters_per_ha = estimator.calculate_diesel_consumption(
                 diesel_consumption_data_item.get("crop_yield", 0),
-                diesel_consumption_data_item["field_production_size"],
+                field_production_size,
                 tractor,
                 diesel_consumption_data_item.get("clay_percent", 0),
                 diesel_consumption_data_item.get("mass"),
                 diesel_consumption_data_item.get("dry_matter_fraction"),
             )
+
             estimator.report_diesel_consumption(
                 diesel_consumption_data_item,
                 herd_size,
                 tractor.tractor_size,
-                diesel_consumption_tractor_implement_liter_per_ha,
+                diesel_consumption_tractor_implement_liters_per_ha,
             )
-            total_diesel_consumption_tractor_implement_liter_per_ha = diesel_consumption_tractor_implement_liter_per_ha
-        om.add_variable(
-            "total_diesel_consumption_tractor_implement",
-            total_diesel_consumption_tractor_implement_liter_per_ha,
-            {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_HA}},
-        )
+
+            operation_diesel_consumption_liters = (
+                diesel_consumption_tractor_implement_liters_per_ha * field_production_size
+            )
+
+            diesel_consumption_by_field_and_year[field_name][operation_year] += operation_diesel_consumption_liters
+
+            diesel_consumption_by_year[operation_year] += operation_diesel_consumption_liters
+
+        for field_name, yearly_consumption in diesel_consumption_by_field_and_year.items():
+            for operation_year, diesel_consumption_liters in yearly_consumption.items():
+                om.add_variable(
+                    f"annual_{field_name}_tractor_implement_diesel_consumption_for_{operation_year}",
+                    diesel_consumption_liters,
+                    {
+                        **base_info_map,
+                        "units": MeasurementUnits.LITERS,
+                    },
+                )
+
+        for operation_year, diesel_consumption_liters in diesel_consumption_by_year.items():
+            om.add_variable(
+                f"annual_total_tractor_implement_diesel_consumption_for_{operation_year}",
+                diesel_consumption_liters,
+                {
+                    **base_info_map,
+                    "units": MeasurementUnits.LITERS,
+                },
+            )
 
     def report_diesel_consumption(
         self,
         diesel_consumption_data: dict[str, Any],
         herd_size: int,
         tractor_size: TractorSize,
-        diesel_consumption_tractor_implement_liter_per_ton: float,
+        diesel_consumption_tractor_implement_liters_per_ha: float,
     ) -> None:
         """
         Reports diesel consumption data for a specific tractor-implement operation.
@@ -212,8 +246,8 @@ class EnergyEstimator:
             Number of animals in the herd.
         tractor_size : TractorSize
             Size of the tractor used.
-        diesel_consumption_tractor_implement_liter_per_ton : float
-            Diesel consumption for the tractor-implement operation (l/ton).
+        diesel_consumption_tractor_implement_liters_per_ha : float
+            Diesel consumption rate for the tractor-implement operation (l/ha).
         """
         base_info_map = {
             "class": EnergyEstimator.__name__,
@@ -260,7 +294,7 @@ class EnergyEstimator:
             om.add_variable(
                 f"application_depth_for_{suffix}",
                 diesel_consumption_data.get("application_depth"),
-                {**base_info_map, **{"units": MeasurementUnits.CENTIMETERS}},
+                {**base_info_map, **{"units": MeasurementUnits.MILLIMETERS}},
             )
         if operation_event in [FieldOperationEvent.MANURE_APPLICATION, FieldOperationEvent.FERTILIZER_APPLICATION]:
             om.add_variable(
@@ -277,9 +311,9 @@ class EnergyEstimator:
                 {**base_info_map, **{"units": MeasurementUnits.UNITLESS}},
             )
         om.add_variable(
-            f"diesel_consumption_for_{suffix}",
-            diesel_consumption_tractor_implement_liter_per_ton,
-            {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_TON}},
+            f"diesel_consumption_rate_for_{suffix}",
+            diesel_consumption_tractor_implement_liters_per_ha,
+            {**base_info_map, **{"units": MeasurementUnits.LITERS_PER_HA}},
         )
 
     def parse_inputs_for_diesel_consumption_calculation(self) -> list[dict[str, Any]]:
