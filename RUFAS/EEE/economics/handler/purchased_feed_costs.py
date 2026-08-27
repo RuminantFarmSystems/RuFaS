@@ -18,10 +18,10 @@ from typing import Any, ClassVar
 
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_QUANTITY_FALLBACK
-from RUFAS.EEE.economics.special_cases.base import SpecialCaseHandler
+from RUFAS.EEE.economics.handler.base import Handler
 
 
-class PurchasedFeedCostHandler(SpecialCaseHandler):
+class PurchasedFeedCostHandler(Handler):
     """Owner of the preprocessing for the ``Purchased feed costs`` line item."""
 
     section: ClassVar[str] = "Feed_storage"
