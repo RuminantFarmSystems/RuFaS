@@ -1,30 +1,13 @@
-"""Shared services for economics preprocessing.
-
-Houses :class:`PreprocessingContext`, a small facade over the
-:class:`~RUFAS.input_manager.InputManager` and
-:class:`~RUFAS.output_manager.OutputManager` that exposes the data-access,
-pricing, scenario, and aggregation helpers shared by the main
-:class:`~RUFAS.EEE.economics.preprocessing.EconomicPreprocessor` and by the
-special-case handlers in :mod:`RUFAS.EEE.economics.special_cases`.
-
-Keeping these helpers in one place lets the main preprocessor and every
-special-case handler resolve InputManager data, fall back to default prices,
-enumerate scenarios, and aggregate value series through a single, tested
-implementation.
-"""
-
 import math
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
-
-if TYPE_CHECKING:
-    from RUFAS.input_manager import InputManager
-    from RUFAS.output_manager import OutputManager
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 
 
-class PreprocessingContext:
+class EconomicDataProcessor:
     """Shared InputManager/OutputManager services for economics preprocessing.
 
     Parameters
@@ -35,9 +18,9 @@ class PreprocessingContext:
         Output manager used to read biophysical outputs and record warnings.
     """
 
-    def __init__(self, im: "InputManager", om: "OutputManager") -> None:
-        self.im = im
-        self.om = om
+    def __init__(self) -> None:
+        self.im = InputManager()
+        self.om = OutputManager()
         self.available_input_keys: set[str] = self._load_available_input_keys()
 
     def _load_available_input_keys(self) -> set[str]:
@@ -87,10 +70,6 @@ class PreprocessingContext:
 
         last_error: ValueError | None = None
         for candidate in candidate_paths:
-            # Skip InputManager access entirely for wildcard paths (e.g., "*").
-            # These selectors cannot be resolved to a concrete file and only
-            # generate validation spam inside the InputManager. Emit a single
-            # warning and continue.
             if "*" in str(candidate):
                 self.om.add_warning(
                     "MissingEconomicsFile",
@@ -100,9 +79,6 @@ class PreprocessingContext:
                 continue
 
             if hasattr(self.im, "check_property_exists_in_pool"):
-                # Wildcard paths are handled above. For concrete paths, perform the
-                # inexpensive existence check when available to avoid repeated
-                # validation warnings from deeper get_data calls.
                 try:
                     if not self.im.check_property_exists_in_pool(candidate):
                         continue
@@ -204,8 +180,7 @@ class PreprocessingContext:
                 return result
         if "standard deviation" in d or "std" in d:
             return Aggregator.standard_deviation(values)
-        # Default aggregation is sum
         return Aggregator.sum(values)
 
 
-__all__ = ["PreprocessingContext"]
+__all__ = ["EconomicDataProcessor"]

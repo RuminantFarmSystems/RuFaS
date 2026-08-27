@@ -13,9 +13,9 @@ validated using the ``economic_preprocessing_properties`` metadata.
 
 Line items whose preprocessing cannot be expressed by the generic
 biophysical/input/price pipeline are delegated to dedicated
-:class:`~RUFAS.EEE.economics.special_cases.base.SpecialCaseHandler`
+:class:`~RUFAS.EEE.economics.handler.base.SpecialCaseHandler`
 subclasses. :class:`EconomicPreprocessor` builds a ``(section, name)``
-handler map from :data:`~RUFAS.EEE.economics.special_cases.SPECIAL_CASE_HANDLERS`
+handler map from :data:`~RUFAS.EEE.economics.handler.SPECIAL_CASE_HANDLERS`
 and routes matching line items to them, keeping the main pipeline free of
 per-item special casing.
 """
@@ -31,8 +31,8 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
-from RUFAS.EEE.economics.preprocessing_context import PreprocessingContext
-from RUFAS.EEE.economics.special_cases import SpecialCaseHandler, SeedCostHandler
+from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
+from RUFAS.EEE.economics.handler import Handler, SPECIAL_CASE_HANDLERS
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -42,11 +42,6 @@ from RUFAS.EEE.economics.fallback_values import (
 # Provenance marker for pool variables computed in-memory rather than loaded
 # from an input file; used only in InputManager validation messages.
 COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
-
-SPECIAL_CASE_HANDLERS: list[type[SpecialCaseHandler]] = [
-    SeedCostHandler,
-]
-
 
 @dataclass(frozen=True)
 class EconomicItem:
@@ -71,15 +66,15 @@ class EconomicPreprocessor:
     ) -> None:
         self.im = InputManager()
         self.om = OutputManager()
-        self.context = PreprocessingContext(self.im, self.om)
+        self.context = EconomicDataProcessor()
         self.mapping = self._build_mapping()
         self.special_case_handlers = self._build_special_case_handlers()
 
-    def _build_special_case_handlers(self) -> dict[tuple[str, str], SpecialCaseHandler]:
+    def _build_special_case_handlers(self) -> dict[tuple[str, str], Handler]:
         """Instantiate registered special-case handlers keyed by ``(section, name)``."""
 
         handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
-        return {handler.key: handler for handler in handlers}
+        return {handler.economic_map_key: handler for handler in handlers}
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""
