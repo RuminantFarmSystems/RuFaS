@@ -26,7 +26,7 @@ This **changelog** file keeps a record of updates included in existing version r
 v1.0.5
 
 ### v1.0.5
-- [3242](https://github.com/RuminantFarmSystems/RuFaS/pull/3242) - [minor change] [NoInputChange] [NoOutputChange] Corrects version number
+- [3243](https://github.com/RuminantFarmSystems/RuFaS/pull/3243) - [minor change] [NoInputChange] [NoOutputChange] Corrects version number
 
 ### v1.0.4
 
