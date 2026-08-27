@@ -1,9 +1,9 @@
 from RUFAS.EEE.economics.handler.base import Handler
-from RUFAS.EEE.economics.handler.seed_costs import SeedCostHandler
+from RUFAS.EEE.economics.handler.bedding_requirements import BeddingRequirementsHandler
 
 
 SPECIAL_CASE_HANDLERS: list[type[Handler]] = [
-    SeedCostHandler,
+    BeddingRequirementsHandler,
 ]
 
-__all__ = ["Handler", "SeedCostHandler", ]
+__all__ = ["SPECIAL_CASE_HANDLERS", "Handler", "BeddingRequirementsHandler", ]

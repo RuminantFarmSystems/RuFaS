@@ -32,7 +32,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
 from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
-from RUFAS.EEE.economics.handler import Handler, SeedCostHandler
+from RUFAS.EEE.economics.handler import Handler, SPECIAL_CASE_HANDLERS
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -42,7 +42,6 @@ from RUFAS.EEE.economics.fallback_values import (
 # Provenance marker for pool variables computed in-memory rather than loaded
 # from an input file; used only in InputManager validation messages.
 COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
-
 
 @dataclass(frozen=True)
 class EconomicItem:
@@ -67,7 +66,7 @@ class EconomicPreprocessor:
     ) -> None:
         self.im = InputManager()
         self.om = OutputManager()
-        self.context = EconomicDataProcessor(self.im, self.om)
+        self.context = EconomicDataProcessor()
         self.mapping = self._build_mapping()
         self.special_case_handlers = self._build_special_case_handlers()
 
@@ -75,7 +74,7 @@ class EconomicPreprocessor:
         """Instantiate registered special-case handlers keyed by ``(section, name)``."""
 
         handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
-        return {handler.ecomonic_map_key: handler for handler in handlers}
+        return {handler.economic_map_key: handler for handler in handlers}
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""

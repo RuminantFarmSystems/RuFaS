@@ -29,7 +29,7 @@ class Handler(ABC):
         self.context = context
 
     @property
-    def key(self) -> tuple[str, str]:
+    def economic_map_key(self) -> tuple[str, str]:
         """Return the ``(section, name)`` pair this handler is keyed on."""
         return (self.section, self.name)
 
