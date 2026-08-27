@@ -79,14 +79,14 @@ class EconomicPreprocessor:
         self.mapping = self._build_mapping()
         self.special_case_handlers = self._build_special_case_handlers()
 
-    def _build_special_case_handlers(self) -> Dict[tuple[str, str], SpecialCaseHandler]:
+    def _build_special_case_handlers(self) -> dict[tuple[str, str], SpecialCaseHandler]:
         """Instantiate registered special-case handlers keyed by ``(section, name)``.
 
         A handler that owns several line items contributes one entry per pair in
         its :attr:`~RUFAS.EEE.economics.special_cases.base.SpecialCaseHandler.keys`.
         """
 
-        handlers: Dict[tuple[str, str], SpecialCaseHandler] = {}
+        handlers: dict[tuple[str, str], SpecialCaseHandler] = {}
         for handler_cls in SPECIAL_CASE_HANDLERS:
             handler = handler_cls(self.context)
             for key in handler.keys:

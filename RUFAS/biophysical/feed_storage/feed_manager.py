@@ -867,11 +867,6 @@ class FeedManager:
                 },
                 info_map,
             )
-            self._om.add_variable(
-                f"farmgrown_feed_{feed_id}_fed_dm",
-                amount,
-                info_map,
-            )
 
     def _deduct_from_storage(
         self,

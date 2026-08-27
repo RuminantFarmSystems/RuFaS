@@ -158,7 +158,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
             },
             "Homegrown feed fed": {
-                "biophysical_simulation": ["FeedManager._log_feed_deductions.farmgrown_feed_.*_fed_dm"],
+                "biophysical_simulation": ["FeedManager._log_feed_deductions.farmgrown_feed_.*_fed"],
                 "notes": "Cost of homegrown feed fed to animals, valued at commodity price per kg DM. "
                 "Wildcard matches each RuFaS feed ID; price is resolved automatically from feed_storage_configurations.",
             },
