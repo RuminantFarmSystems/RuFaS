@@ -73,8 +73,6 @@ FARMGROWN_FEEDS_EMISSIONS_AND_RESOURCES_FILTERS: dict[str, dict[str, Any]] = {
     },
 }
 
-# Maps each emission and resource variable tracked for farmgrown feeds to the prefix of the
-# output variable name it is reported under (reported as "<prefix>_<feed_id>").
 FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES: dict[str, str] = {
     "nitrous_oxide_emissions": "direct_n2o_nitrogen_emissions_for_feed",
     "ammonia_emissions": "ammonia_nitrogen_emissions_for_feed",
@@ -84,7 +82,6 @@ FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES: dict[str, str] = {
     "manure_N": "manure_nitrogen_applied_for_feed",
 }
 
-# The emission and resource variables tracked for each farmgrown feed.
 FARMGROWN_FEED_EMISSION_AND_RESOURCE_VARIABLES: tuple[str, ...] = tuple(FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES)
 
 
