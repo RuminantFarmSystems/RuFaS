@@ -37,12 +37,6 @@ class AnimalConfig:
         Maximum day at which a heifer is culled if not pregnant, (simulation day).
     do_not_breed_time : int
         The duration after which breeding is stopped, (simulation day).
-    semen_type : str
-        Types of semen used for reproduction, e.g., "conventional", (unitless).
-    male_calf_rate_conventional_semen : float
-        Proportion of male calves when conventional semen is used, (unitless).
-    male_calf_rate_sexed_semen : float
-        Proportion of male calves when sexed semen is used, (unitless).
     keep_female_calf_rate : float
         Rate at which female calves are kept, used when ``calf_retention_method`` is
         ``"rate"`` (unitless).
@@ -207,9 +201,22 @@ class AnimalConfig:
     calf_mortality_rate: float = 0.0
     heifer_mortality_rate: float = 0.0
 
-    semen_type: str = "conventional"
-    male_calf_rate_conventional_semen: float = 0.53
-    male_calf_rate_sexed_semen: float = 0.10
+    selective_repro_strategy: bool = False
+    ranking_method: str = "genetic"
+    genetic_selection_index_weights: dict[str, float] = {
+        "fat": 0.318,
+        "protein": 0.13,
+    }
+    heiferII_semen_allocation_proportions: dict[str, float] = {
+        "sexed_dairy": 0.5,
+        "conventional_dairy": 0.5,
+        "beef": 0.0,
+    }
+    cow_semen_allocation_proportions: dict[str, float] = {
+        "sexed_dairy": 0.2,
+        "conventional_dairy": 0.5,
+        "beef": 0.3,
+    }
     keep_female_calf_rate: float = 1
     calf_retention_method: str = "rate"
     annual_keep_female_calf_num: int = 0
@@ -419,11 +426,32 @@ class AnimalConfig:
         cls.calf_mortality_rate = animal_config_data["management_decisions"]["calf_mortality_rate"]
         cls.heifer_mortality_rate = animal_config_data["management_decisions"]["heifer_mortality_rate"]
 
-        cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
-        cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
-            "male_calf_rate_conventional_semen"
-        ]
-        cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
+        cls.selective_repro_strategy = animal_config_data["farm_level"]["repro"]["selective_repro_strategy"]
+        cls.ranking_method = animal_config_data["farm_level"]["repro"]["ranking_method"]
+        cls.genetic_selection_index_weights["fat"] = animal_config_data["farm_level"]["repro"][
+            "genetic_selection_index_weights"
+        ]["fat"]
+        cls.genetic_selection_index_weights["protein"] = animal_config_data["farm_level"]["repro"][
+            "genetic_selection_index_weights"
+        ]["protein"]
+        cls.heiferII_semen_allocation_proportions["sexed_dairy"] = animal_config_data["farm_level"]["repro"]["heifers"][
+            "semen_allocation_proportions"
+        ]["sexed_dairy"]
+        cls.heiferII_semen_allocation_proportions["conventional_dairy"] = animal_config_data["farm_level"]["repro"][
+            "heifers"
+        ]["semen_allocation_proportions"]["conventional_dairy"]
+        cls.heiferII_semen_allocation_proportions["beef"] = animal_config_data["farm_level"]["repro"]["heifers"][
+            "semen_allocation_proportions"
+        ]["beef"]
+        cls.cow_semen_allocation_proportions["sexed_dairy"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["sexed_dairy"]
+        cls.cow_semen_allocation_proportions["conventional_dairy"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["conventional_dairy"]
+        cls.cow_semen_allocation_proportions["beef"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["beef"]
         cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
         cls.calf_retention_method = animal_config_data["farm_level"]["calf"].get("calf_retention_method", "rate")
         cls.annual_keep_female_calf_num = int(
