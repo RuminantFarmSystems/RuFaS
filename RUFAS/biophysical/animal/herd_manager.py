@@ -2457,6 +2457,15 @@ class HerdManager:
                     }
 
     def _assign_embryo_sex_for_pregnant_animals_entering_the_herd(self, animals: list[Animal]) -> None:
+        """
+        Assign a random embryo sex to pregnant animals imported into the herd.
+
+        Parameters
+        ----------
+        animals : list[Animal]
+            Pregnant animals entering the herd whose embryo sex has not yet
+            been determined.
+        """
         for animal in animals:
             animal.reproduction.embryo_sex = (
                 Sex.MALE if random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE

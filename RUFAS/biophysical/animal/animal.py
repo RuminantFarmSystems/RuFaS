@@ -31,6 +31,7 @@ from RUFAS.biophysical.animal.data_types.reproduction import (
     HerdReproductionStatistics,
     AnimalReproductionStatistics,
 )
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
@@ -91,6 +92,8 @@ class Animal:
         The unique identifier of the animal, (unitless).
     breed: Breed
         The breed of the animal.
+    bred_from_semen: SemenType | None
+        The type of semen used to breed the animal, if applicable.
     animal_type: AnimalType
         The current life stage of the animal.
     days_born: int
@@ -188,6 +191,7 @@ class Animal:
         }
         self.id = args.get("id", 0)
         self.breed: Breed = Breed(Breed[args.get("breed")])
+        self.bred_from_semen: SemenType | None = None
         self.animal_type = AnimalType(args.get("animal_type"))
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
@@ -1314,6 +1318,7 @@ class Animal:
 
         """
         self.sex = args["sex"]
+        self.bred_from_semen = args["bred_from_semen"]
 
         if random() < AnimalConfig.still_birth_rate:
             self.stillborn_day = simulation_day

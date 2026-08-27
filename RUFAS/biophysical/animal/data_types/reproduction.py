@@ -334,9 +334,3 @@ class ReproductionDataStream:
     @property
     def is_milking(self) -> bool:
         return self.days_in_milk > 0
-
-
-class SemenType(Enum):
-    BEEF = "beef"
-    SEXED_DAIRY = "sexed_dairy"
-    CONVENTIONAL_DAIRY = "conventional_dairy"

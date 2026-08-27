@@ -29,8 +29,8 @@ from RUFAS.biophysical.animal.data_types.reproduction import (
     ReproductionDataStream,
     AnimalReproductionStatistics,
     HerdReproductionStatistics,
-    SemenType,
 )
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 
 from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import HormoneDeliverySchedule
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
@@ -566,6 +566,7 @@ class Reproduction:
             self.embryo_sex = Sex.FEMALE
         reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
             breed=reproduction_data_stream.breed.name,
+            bred_from_semen=self.semen_type,
             sex=self.embryo_sex,
             animal_type=AnimalType.CALF.value,
             birth_date=time.current_date.strftime("%Y-%m-%d"),
@@ -1170,7 +1171,7 @@ class Reproduction:
                 animal_type=reproduction_data_stream.animal_type,
             )
         else:
-            self.semen_type = SemenType.CONVENTIONAL_DAIRY
+            self.semen_type = SemenType.USER_DEFINED
         assert self.semen_type is not None
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,
@@ -1233,6 +1234,8 @@ class Reproduction:
             male_calf_rate = animal_constants.SEXED_DAIRY_MALE_CALF_RATE
         elif self.semen_type == SemenType.BEEF:
             male_calf_rate = animal_constants.BEEF_MALE_CALF_RATE
+        elif self.semen_type == SemenType.USER_DEFINED:
+            male_calf_rate = AnimalConfig.user_defined_male_calf_rate
         else:
             raise ValueError("Unexpected Semen Type.")
         embryo_sex = Sex.MALE if random.random() < male_calf_rate else Sex.FEMALE

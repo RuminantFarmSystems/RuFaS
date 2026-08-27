@@ -5,6 +5,7 @@ from typing_extensions import NotRequired
 from RUFAS.biophysical.animal.data_types.animal_enums import Sex
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 
 
 class CalfValuesTypedDict(TypedDict):
@@ -31,6 +32,7 @@ class NewBornCalfValuesTypedDict(TypedDict):
 
     id: NotRequired[int]
     breed: str
+    bred_from_semen: SemenType | None
     sex: Sex
     animal_type: str
     birth_date: str

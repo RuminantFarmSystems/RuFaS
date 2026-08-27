@@ -37,6 +37,8 @@ class AnimalConfig:
         Maximum day at which a heifer is culled if not pregnant, (simulation day).
     do_not_breed_time : int
         The duration after which breeding is stopped, (simulation day).
+    user_defined_male_calf_rate : float
+        Proportion of male calves, (unitless).
     keep_female_calf_rate : float
         Rate at which female calves are kept, used when ``calf_retention_method`` is
         ``"rate"`` (unitless).
@@ -201,6 +203,7 @@ class AnimalConfig:
     calf_mortality_rate: float = 0.0
     heifer_mortality_rate: float = 0.0
 
+    user_defined_male_calf_rate: float = 0.1
     selective_repro_strategy: bool = False
     ranking_method: str = "genetic"
     genetic_selection_index_weights: dict[str, float] = {
@@ -426,6 +429,7 @@ class AnimalConfig:
         cls.calf_mortality_rate = animal_config_data["management_decisions"]["calf_mortality_rate"]
         cls.heifer_mortality_rate = animal_config_data["management_decisions"]["heifer_mortality_rate"]
 
+        cls.user_defined_male_calf_rate = animal_config_data["farm_level"]["calf"]["user_defined_male_calf_rate"]
         cls.selective_repro_strategy = animal_config_data["farm_level"]["repro"]["selective_repro_strategy"]
         cls.ranking_method = animal_config_data["farm_level"]["repro"]["ranking_method"]
         cls.genetic_selection_index_weights["fat"] = animal_config_data["farm_level"]["repro"][

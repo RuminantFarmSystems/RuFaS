@@ -45,6 +45,7 @@
     },
     "farm_level": {
       "calf": {
+        "user_defined_male_calf_rate": 0.53,
         "keep_female_calf_rate": 1,
         "calf_retention_method": "rate",
         "annual_keep_female_calf_num": 0,

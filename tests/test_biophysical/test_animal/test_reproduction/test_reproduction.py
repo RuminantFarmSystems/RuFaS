@@ -29,8 +29,8 @@ from RUFAS.biophysical.animal.data_types.reproduction import (
     ReproductionOutputs,
     HerdReproductionStatistics,
     ReproductionDataStream,
-    SemenType,
 )
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction, HEIFER_REPRODUCTION_SUB_PROTOCOLS

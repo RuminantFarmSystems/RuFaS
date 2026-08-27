@@ -275,6 +275,13 @@
         "calf": {
           "type": "object",
           "description": "Calf Management",
+          "user_defined_male_calf_rate": {
+            "type": "number",
+            "description": "Male Calf Rate (percent) -- The rate of male calves",
+            "default": 0.53,
+            "minimum": 0,
+            "maximum": 1
+          },
           "keep_female_calf_rate": {
             "type": "number",
             "description": "Female Calf Retention Rate (fraction) -- The fraction of female calves kept and raised on-farm; used when Female Calf Retention Method is 'rate'",
