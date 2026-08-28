@@ -92,7 +92,7 @@ def test_send_soil_layer_daily_variables(
         residue=1,
         top_depth=1,
         bottom_depth=2,
-        plant_metabolic_active_carbon_usage=3,
+        residue_metabolic_active_carbon_usage=3,
         evaporated_water_content=4,
         temperature=5,
         percolated_water=6,
@@ -110,7 +110,7 @@ def test_send_soil_layer_daily_variables(
     ] == [4]
     assert pool[
         (
-            "FieldDataReporter.send_soil_layer_daily_variables.plant_metabolic_active_carbon_usage.field='name 1',"
+            "FieldDataReporter.send_soil_layer_daily_variables.residue_metabolic_active_carbon_usage.field='name 1',"
             "layer='1'"
         )
     ]["values"] == [3]

@@ -65,24 +65,24 @@ class LayerData:
         Rock content expressed as fraction of soil in this layer (unitless).
     decomposition_moisture_effect : float, default 0.0
         Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).
-    plant_metabolic_active_carbon_usage : float, default 0.0
-        Plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.).
-    plant_metabolic_active_carbon_loss : float, default 0.0
-        Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
-    plant_metabolic_active_carbon_remaining : float, default 0.0
-        Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
-    plant_structural_active_carbon_usage : float, default 0.0
-        Plant structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.11).
-    plant_structural_active_carbon_loss : float, default 0.0
-        Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
-    plant_structural_active_carbon_remaining : float, default 0.0
-        Plant structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
-    plant_structural_slow_carbon_usage : float, default 0.0
-        Plant structural carbon decomposed into slow carbon (kg/ha) (pseudocode_soil S.6.B.I.11).
-    plant_structural_slow_carbon_loss : float, default 0.0
-        Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
-    plant_structural_slow_carbon_remaining : float, default 0.0
-        Plant structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
+    residue_metabolic_active_carbon_usage : float, default 0.0
+        Residue metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.).
+    residue_metabolic_active_carbon_loss : float, default 0.0
+        Residue metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+    residue_metabolic_active_carbon_remaining : float, default 0.0
+        Residue metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+    residue_structural_active_carbon_usage : float, default 0.0
+        Residue structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.11).
+    residue_structural_active_carbon_loss : float, default 0.0
+        Residue structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+    residue_structural_active_carbon_remaining : float, default 0.0
+        Residue structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+    residue_structural_slow_carbon_usage : float, default 0.0
+        Residue structural carbon decomposed into slow carbon (kg/ha) (pseudocode_soil S.6.B.I.11).
+    residue_structural_slow_carbon_loss : float, default 0.0
+        Residue structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
+    residue_structural_slow_carbon_remaining : float, default 0.0
+        Residue structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
     soil_metabolic_active_carbon_usage : float, default 0.0
         Soil metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.8).
     soil_metabolic_active_carbon_loss : float, default 0.0
@@ -134,8 +134,8 @@ class LayerData:
         Passive carbon decomposed into active carbon (kg/ha).
     passive_carbon_co2_lost_amount : float, default 0.0
         Passive carbon lost as CO2 during decomposition (kg/ha).
-    plant_active_decompose_carbon : float, default 0.0
-        Plant carbon decomposed into the active carbon pool (kg/ha).
+    residue_active_decompose_carbon : float, default 0.0
+        Residue carbon decomposed into the active carbon pool (kg/ha).
     soil_active_decompose_carbon : float, default 0.0
         Soil carbon decomposed into the active carbon pool (kg/ha).
     initial_labile_inorganic_phosphorus_concentration : float, optional
@@ -168,14 +168,12 @@ class LayerData:
         The phosphorus balance on the previous day (unitless).
     percolated_phosphorus : float, default 0.0
         Amount of phosphorus removed from the layer by water percolating out (kg/ha).
-    plant_metabolic_to_soil_carbon_amount : float, default 0.0
+    residue_metabolic_to_soil_carbon_amount : float, default 0.0
         Metabolic carbon incorporated into soil during tillage (kg/ha).
     structural_litter_amount : float, default 0.0
-        Amount of plant structural carbon (kg/ha).
+        Amount of residue structural carbon (kg/ha).
     metabolic_litter_amount : float, default 0.0
-        Plant metabolic carbon amount (hg/ha).
-    tillage_fraction : float, default 0.0
-        Fraction of metabolic carbon incorporated into soil during tillage (unitless).
+        Residue metabolic carbon amount (hg/ha).
     structural_carbon_transfer_amount : float, default 0.0
         The amount of transfer of structural carbon during tillage (kg/ha).
     plant_residue : float, default 0.0
@@ -195,7 +193,7 @@ class LayerData:
         The amount of plant dry matter residue at harvest (kg/ha).
     plant_residue_metabolic_fraction : float, default 0.0
         Fraction of plant residue that is metabolic (unitless).
-    plant_structural_to_slow_or_active_rate : float, default 0.0
+    residue_structural_to_slow_or_active_rate : float, default 0.0
         The rate at which above-ground structural carbon decomposes into slow or active carbon (unitless).
     weighted_residue_dry_matter_lignin_fraction : float, default 0.0
         The weighted fraction of lignin amount in residue dry matter (unitless).
@@ -205,10 +203,6 @@ class LayerData:
         Soil lignin to nitrogen fraction (unitless).
     soil_residue_metabolic_fraction : float, default 0.0
         The fraction of soil residue that is metabolic (unitless).
-    soil_metabolic_carbon_amount : float, default 0.0
-        Soil metabolic carbon amount (kg/ha).
-    soil_structural_carbon_amount : float, default 0.0
-        Amount of soil structural carbon decomposed into slow or active carbon (kg/ha).
     soil_structural_to_slow_or_active_rate : float, default 0.0
         The rate at which below-ground structural carbon decomposes into slow or active carbon (unitless).
     initial_soil_nitrate_concentration : float, optional
@@ -296,17 +290,17 @@ class LayerData:
 
     # --- pool_gas_partition
     # (pseudocode_soil S.6.A.1)
-    plant_metabolic_active_carbon_usage: float = 0.0
-    plant_metabolic_active_carbon_loss: float = 0.0
-    plant_metabolic_active_carbon_remaining: float = 0.0
+    residue_metabolic_active_carbon_usage: float = 0.0
+    residue_metabolic_active_carbon_loss: float = 0.0
+    residue_metabolic_active_carbon_remaining: float = 0.0
 
-    plant_structural_active_carbon_usage: float = 0.0
-    plant_structural_active_carbon_loss: float = 0.0
-    plant_structural_active_carbon_remaining: float = 0.0
+    residue_structural_active_carbon_usage: float = 0.0
+    residue_structural_active_carbon_loss: float = 0.0
+    residue_structural_active_carbon_remaining: float = 0.0
 
-    plant_structural_slow_carbon_usage: float = 0.0
-    plant_structural_slow_carbon_loss: float = 0.0
-    plant_structural_slow_carbon_remaining: float = 0.0
+    residue_structural_slow_carbon_usage: float = 0.0
+    residue_structural_slow_carbon_loss: float = 0.0
+    residue_structural_slow_carbon_remaining: float = 0.0
 
     soil_metabolic_active_carbon_usage: float = 0.0
     soil_metabolic_active_carbon_loss: float = 0.0
@@ -352,7 +346,7 @@ class LayerData:
     passive_carbon_co2_lost_amount: float = 0.0
 
     # pseudocode_soil S.6.C.11
-    plant_active_decompose_carbon: float = 0.0
+    residue_active_decompose_carbon: float = 0.0
     soil_active_decompose_carbon: float = 0.0
 
     # --- Phosphorus
@@ -370,10 +364,9 @@ class LayerData:
     percolated_phosphorus: float = 0.0
 
     # --- Residue partition
-    plant_metabolic_to_soil_carbon_amount: float = 0.0
+    residue_metabolic_to_soil_carbon_amount: float = 0.0
     structural_litter_amount: float = 0.0
     metabolic_litter_amount: float = 0.0
-    tillage_fraction: float = 0.0
     structural_carbon_transfer_amount: float = 0.0
     plant_residue: float = 0.0
     manure_carbon_residue: float = 0.0
@@ -382,13 +375,11 @@ class LayerData:
     soil_dry_matter_residue_amount: float = 0.0
     plant_dry_matter_residue_amount: float = 0.0
     plant_residue_metabolic_fraction: float = 0.0
-    plant_structural_to_slow_or_active_rate: float = 0.0
+    residue_structural_to_slow_or_active_rate: float = 0.0
     weighted_residue_dry_matter_lignin_fraction: float = 0.0
     soil_residue_lignin_fraction: float = 0.17
     soil_lignin_to_nitrogen_fraction: float = 0.0
     soil_residue_metabolic_fraction: float = 0.0
-    soil_metabolic_carbon_amount: float = 0.0
-    soil_structural_carbon_amount: float = 0.0
     soil_structural_to_slow_or_active_rate: float = 0.0
 
     # ---- Nitrogen

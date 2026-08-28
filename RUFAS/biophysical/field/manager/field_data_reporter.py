@@ -554,8 +554,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_metabolic_active_carbon_usage",
-            layer.plant_metabolic_active_carbon_usage,
+            "residue_metabolic_active_carbon_usage",
+            layer.residue_metabolic_active_carbon_usage,
             dict(
                 info_map,
                 **{
@@ -565,8 +565,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_metabolic_active_carbon_loss",
-            layer.plant_metabolic_active_carbon_loss,
+            "residue_metabolic_active_carbon_loss",
+            layer.residue_metabolic_active_carbon_loss,
             dict(
                 info_map,
                 **{
@@ -576,8 +576,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_metabolic_active_carbon_remaining",
-            layer.plant_metabolic_active_carbon_remaining,
+            "residue_metabolic_active_carbon_remaining",
+            layer.residue_metabolic_active_carbon_remaining,
             dict(
                 info_map,
                 **{
@@ -587,8 +587,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_active_carbon_usage",
-            layer.plant_structural_active_carbon_usage,
+            "residue_structural_active_carbon_usage",
+            layer.residue_structural_active_carbon_usage,
             dict(
                 info_map,
                 **{
@@ -652,8 +652,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_active_carbon_remaining",
-            layer.plant_structural_active_carbon_remaining,
+            "residue_structural_active_carbon_remaining",
+            layer.residue_structural_active_carbon_remaining,
             dict(
                 info_map,
                 **{
@@ -663,8 +663,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_slow_carbon_usage",
-            layer.plant_structural_slow_carbon_usage,
+            "residue_structural_slow_carbon_usage",
+            layer.residue_structural_slow_carbon_usage,
             dict(
                 info_map,
                 **{
@@ -674,8 +674,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_slow_carbon_loss",
-            layer.plant_structural_slow_carbon_loss,
+            "residue_structural_slow_carbon_loss",
+            layer.residue_structural_slow_carbon_loss,
             dict(
                 info_map,
                 **{
@@ -685,8 +685,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_slow_carbon_remaining",
-            layer.plant_structural_slow_carbon_remaining,
+            "residue_structural_slow_carbon_remaining",
+            layer.residue_structural_slow_carbon_remaining,
             dict(
                 info_map,
                 **{
@@ -950,8 +950,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_active_decompose_carbon",
-            layer.plant_active_decompose_carbon,
+            "residue_active_decompose_carbon",
+            layer.residue_active_decompose_carbon,
             dict(
                 info_map,
                 **{
