@@ -15,10 +15,18 @@
 
 ## Patterns
 
-- **Mocking**: `pytest-mock` (`mocker.patch.object(...)`). Prefer patching
-  estimator/manager methods over rewiring whole objects.
+- **Mocking**: `mocker.patch.object(Cls, "attr", ...)` ONLY — never string-path
+  `mocker.patch("pkg.mod.Name")` / `with patch("...")`, never direct assignment
+  `Class.method = MagicMock()`. Prefer patching estimator/manager methods over
+  rewiring whole objects.
+- **Floats**: compare with `pytest.approx(...)`, never `==` — even for
+  pass-through or literal-zero values. Justify the tolerance by the reference
+  value's origin (`rel=1e-6` algebraic identity; `rel=0.03`–`0.05` published /
+  validation-workbook value).
 - **Fixtures**: per-package fixture modules (e.g. `tests/test_EEE/fixtures.py`),
-  imported explicitly into test files. `pytest-lazy-fixtures` is available — use
+  imported explicitly into test files. If two test files in the same package
+  build the same object (`__new__` + attribute-list builders), move the builder
+  into that package's `fixtures.py` instead of copying it. `pytest-lazy-fixtures` is available — use
   `from pytest_lazy_fixtures import lf` to reference a fixture inside
   `@pytest.mark.parametrize` (the maintained successor of `pytest-lazy-fixture`,
   which broke on pytest ≥ 8).
@@ -35,9 +43,15 @@
 - The suite must cover **normal operation, edge cases, AND invalid inputs** — not
   just the happy path. See the
   [Code review](https://github.com/RuminantFarmSystems/RuFaS/wiki/Code-review) wiki.
-- **Patch via `mocker` / `with patch(...)`, never `Class.method = MagicMock()`** —
-  direct class-attribute assignment leaks across tests (no teardown) and breaks
-  under pytest's collection order. `mocker.patch.object` auto-restores.
+- **Patch via `mocker.patch.object` only** (see Patterns above) — direct
+  class-attribute assignment leaks across tests (no teardown) and breaks under
+  pytest's collection order; string-path patches silently break on refactors.
+- **One benchmark scenario = one home** — never pin the same reference value
+  (e.g. an NRC scenario) in two test files: duplicated pins drift and their
+  derivation comments contradict each other. Before adding a `*_benchmarks.py`
+  file, fold the scenarios into the existing calculator test file. Pin expected
+  values as named module attributes with unit + conditions, and cite the source
+  workbook by filename in the module header.
 
 ## End-to-end (E2E) tests
 

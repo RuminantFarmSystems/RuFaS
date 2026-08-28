@@ -21,5 +21,10 @@ and holds its state. Material crosses domains through typed objects in
 `RUFAS/data_structures/` (e.g. field→feed_storage, feed_storage→animal,
 animal→manure, manure→crop_soil) — don't pass raw dicts between subsystems.
 
-Constants live in dedicated `*_constants.py` modules per domain; don't inline
-magic numbers — add or reuse a constant.
+Constants live in dedicated `*_constants.py` modules per domain. Never inline
+a numeric literal in a formula — **including bounds/clamps** like
+`max(x, 0.95)`: name it. Give EVERY constant a docstring UNDER the assignment
+stating its unit and bibliographic source (canonical style: `ACTIVATION_ENERGY`
+in `manure/manure_constants.py`). A constant without a documented source blocks
+review. If a formula clamps or bounds a value, say so in the function's
+docstring (`Notes`) and cover the clamped branch with a test.
