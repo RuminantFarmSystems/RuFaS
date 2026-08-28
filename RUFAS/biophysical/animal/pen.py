@@ -1454,22 +1454,13 @@ class Pen:
         """
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
         total_pen_calf_intake = {"whole_milk_intake": 0.0, "milk_replacer_intake": 0.0, "starter_intake": 0.0}
-        # wean_day = AnimalBase.config["wean_day"]
-        # wean_length = AnimalBase.config["wean_length"]
-        # if 202 in pen_available_feeds["feed_id"]:
-        #     milk_type = "whole"
-        # else:
-        #     milk_type = "replacer"
         for calf in list(self.animals_in_pen.values()):
             total_pen_calf_intake["whole_milk_intake"] += calf.calf_nutrition_requirements["whole_milk_intake"]
             total_pen_calf_intake["milk_replacer_intake"] + calf.calf_nutrition_requirements["milk_replacer_intake"]
             total_pen_calf_intake["starter_intake"] += calf.calf_nutrition_requirements["starter_intake"]
             # TODO consider reporting the below in AnimalReporter
             # TODO if reported: report for individual, or avg?
-            # calf_requirements = CalfRationManager.calc_requirements(
-            #     pen.animals_in_pen[calf_id], feed, temp=15, animal_intake=animal_intake
-            # )
-            # TODO Check if we should average the intake, or formulated individual rations
+            # TODO Check if we should average the intake, or use formulated individual rations
         total_calves = len(list(self.animals_in_pen.values()))
         average_calf_intake = {intake: value / total_calves for intake, value in total_pen_calf_intake.items()}
         ration_per_calf = CalfRationManager.formulate_ration(
@@ -1482,12 +1473,6 @@ class Pen:
             ration_per_calf = RationManager.get_user_defined_ration(
                 animal_combination=self.animal_combination, dry_matter_intake_requirement=dry_matter_intake_requirement
             )
-        # TODO deprecate method below if not used here
-        # ration_per_animal = CalfRationManager.get_average_calf_ration(individual_calf_rations)
-        # udrm = udr.UserDefinedRationManager()
-        # if udrm.use_user_defined_ration:
-        #     ration_per_animal = CalfRationManager.make_ration_from_user_values(ration_per_animal)
-        # ration_vals = {"ME_total": animal_intake["me_intake"]}
         self.ration = ration_per_calf
         self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration_per_calf)
 
