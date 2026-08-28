@@ -772,3 +772,121 @@ def test_partition_residue(layers: list[LayerData], mock_crop_data: CropData) ->
         assert layer.soil_structural_active_carbon_usage == 2.9
         assert layer.soil_structural_slow_carbon_usage == 2.9
         assert layer.soil_structural_carbon_amount == 0.0
+
+
+@pytest.mark.parametrize(
+    "manure_residue_lignin, manure_residue_nitrogen, expected_ratio",
+    [
+        (24.0, 6.0, (24.0 / 100) / 6.0),  # default
+        (0.0, 6.0, 0.0),  # no lignin
+        (24.0, 0.0, 0.0),  # no nitrogen
+    ],
+)
+def test_determine_manure_lignin_nitrogen_ratio(
+    manure_residue_lignin: float, manure_residue_nitrogen: float, expected_ratio: float
+) -> None:
+    """Tests that the manure lignin to nitrogen ratio follows the plant residue formulation."""
+    actual = ResiduePartition._determine_manure_lignin_nitrogen_ratio(manure_residue_lignin, manure_residue_nitrogen)
+
+    assert actual == expected_ratio
+
+
+@pytest.mark.parametrize(
+    "manure_lignin_nitrogen_ratio, expected_fraction",
+    [
+        (0.0, 0.85),  # no lignin relative to nitrogen
+        (0.04, 0.85 - 0.18 * 0.04),  # default
+        (5.0, 0.0),  # bounded below at zero
+    ],
+)
+def test_determine_manure_residue_metabolic_fraction(
+    manure_lignin_nitrogen_ratio: float, expected_fraction: float
+) -> None:
+    """Tests that the manure residue metabolic fraction uses the plant residue relationship, bounded at zero."""
+    actual = ResiduePartition._determine_manure_residue_metabolic_fraction(manure_lignin_nitrogen_ratio)
+
+    assert pytest.approx(actual) == expected_fraction
+
+
+def test_partition_manure_residue() -> None:
+    """Tests that manure carbon residue is partitioned into the litter pools by the manure lignin:N ratio."""
+    data = SoilData(field_size=1.0)
+    assert data.soil_layers is not None
+    partition = ResiduePartition(data)
+
+    manure_carbon_residue = [100.0, 50.0, 0.0, 0.0]
+    data.set_vectorized_layer_attribute("manure_carbon_residue", manure_carbon_residue)
+    initial_metabolic = data.get_vectorized_layer_attribute("metabolic_litter_amount")
+    initial_structural = data.get_vectorized_layer_attribute("structural_litter_amount")
+    data.manure_residue_lignin = 24.0
+    data.manure_residue_nitrogen = 6.0
+
+    partition.partition_manure_residue()
+
+    expected_ratio = (24.0 / 100) / 6.0
+    expected_metabolic_fraction = 0.85 - 0.18 * expected_ratio
+    assert pytest.approx(data.manure_lignin_nitrogen_ratio) == expected_ratio
+    assert pytest.approx(data.manure_residue_metabolic_fraction) == expected_metabolic_fraction
+
+    expected_structural_rate = 0.094 * math.exp(-3) * (1 - expected_metabolic_fraction)
+    for layer, residue, metabolic_before, structural_before in zip(
+        data.soil_layers, manure_carbon_residue, initial_metabolic, initial_structural
+    ):
+        expected_to_metabolic = expected_metabolic_fraction * residue
+        expected_to_structural = (1 - expected_metabolic_fraction) * residue
+        assert pytest.approx(layer.manure_carbon_to_metabolic_amount) == expected_to_metabolic
+        assert pytest.approx(layer.manure_carbon_to_structural_amount) == expected_to_structural
+        assert pytest.approx(layer.metabolic_litter_amount) == metabolic_before + expected_to_metabolic
+        assert pytest.approx(layer.structural_litter_amount) == structural_before + expected_to_structural
+        # All the manure carbon leaves the residue pool and is conserved in the litter pools.
+        assert layer.manure_carbon_residue == 0.0
+        assert pytest.approx(expected_to_metabolic + expected_to_structural) == residue
+        assert pytest.approx(layer.soil_structural_to_slow_or_active_rate) == expected_structural_rate
+
+    # The lignin and nitrogen awaiting partitioning are consumed by the partition.
+    assert data.manure_residue_lignin == 0.0
+    assert data.manure_residue_nitrogen == 0.0
+
+
+def test_partition_manure_residue_without_residue() -> None:
+    """Tests that partitioning is a no-op that resets daily trackers when no manure carbon is present."""
+    data = SoilData(field_size=1.0)
+    assert data.soil_layers is not None
+    partition = ResiduePartition(data)
+
+    data.set_vectorized_layer_attribute("manure_carbon_to_metabolic_amount", [3.0] * len(data.soil_layers))
+    data.set_vectorized_layer_attribute("manure_carbon_to_structural_amount", [4.0] * len(data.soil_layers))
+    initial_metabolic = data.get_vectorized_layer_attribute("metabolic_litter_amount")
+    initial_structural = data.get_vectorized_layer_attribute("structural_litter_amount")
+    initial_rates = data.get_vectorized_layer_attribute("soil_structural_to_slow_or_active_rate")
+    data.manure_residue_lignin = 5.0
+    data.manure_residue_nitrogen = 2.0
+
+    partition.partition_manure_residue()
+
+    assert data.get_vectorized_layer_attribute("manure_carbon_to_metabolic_amount") == [0.0] * len(data.soil_layers)
+    assert data.get_vectorized_layer_attribute("manure_carbon_to_structural_amount") == [0.0] * len(data.soil_layers)
+    assert data.get_vectorized_layer_attribute("metabolic_litter_amount") == initial_metabolic
+    assert data.get_vectorized_layer_attribute("structural_litter_amount") == initial_structural
+    assert data.get_vectorized_layer_attribute("soil_structural_to_slow_or_active_rate") == initial_rates
+    # The accumulated lignin and nitrogen await the next application that carries carbon.
+    assert data.manure_residue_lignin == 5.0
+    assert data.manure_residue_nitrogen == 2.0
+
+
+def test_partition_manure_residue_without_nitrogen_is_mostly_metabolic() -> None:
+    """Tests that manure carbon with no accompanying nitrogen partitions at the maximum metabolic fraction."""
+    data = SoilData(field_size=1.0)
+    assert data.soil_layers is not None
+    partition = ResiduePartition(data)
+
+    data.soil_layers[0].manure_carbon_residue = 10.0
+    data.manure_residue_lignin = 3.0
+    data.manure_residue_nitrogen = 0.0
+
+    partition.partition_manure_residue()
+
+    assert data.manure_lignin_nitrogen_ratio == 0.0
+    assert data.manure_residue_metabolic_fraction == 0.85
+    assert pytest.approx(data.soil_layers[0].manure_carbon_to_metabolic_amount) == 8.5
+    assert pytest.approx(data.soil_layers[0].manure_carbon_to_structural_amount) == 1.5

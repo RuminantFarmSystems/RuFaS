@@ -18,6 +18,7 @@ def test_calculate_calf_manure(mocker: MockerFixture) -> None:
     mock_nutrition = mocker.MagicMock(spec=NutritionSupply)
     mock_nutrition.dry_matter = 10.0
     mock_nutrition.crude_protein_percentage = 15.0
+    mock_nutrition.lignin_supply = 0.4
 
     mock_phosphorus_values = (5.0, 4.5, 0.5)
 
@@ -40,6 +41,7 @@ def test_calculate_calf_manure(mocker: MockerFixture) -> None:
     assert isinstance(manure_excretion, AnimalManureExcretions)
     assert manure_excretion.urine == 2.0
     assert manure_excretion.manure_nitrogen > 0
+    assert manure_excretion.manure_lignin == 0.4
 
     mock_phosphorus_excretion.assert_called_once()
 
@@ -66,6 +68,7 @@ def test_calculate_heifer_manure(
     mock_nutrition.dry_matter = dry_matter
     mock_nutrition.crude_protein_percentage = crude_protein
     mock_nutrition.potassium_percentage = potassium
+    mock_nutrition.lignin_supply = 0.6
 
     mock_phosphorus_values = (expected_phosphorus, 4.5, 0.5)
 
@@ -92,6 +95,7 @@ def test_calculate_heifer_manure(
     assert manure_excretion.urine > 0
     assert manure_excretion.manure_nitrogen > 0
     assert manure_excretion.potassium > 0
+    assert manure_excretion.manure_lignin == 0.6
 
     mock_phosphorus_excretion.assert_called_once()
 
@@ -178,6 +182,7 @@ def test_calculate_lactating_cow_manure(
     mock_nutrition.crude_protein_percentage = crude_protein
     mock_nutrition.potassium_percentage = potassium
     mock_nutrition.ash_supply = ash_supply
+    mock_nutrition.lignin_supply = 0.8
 
     mock_phosphorus_values = (expected_phosphorus, 4.5, 0.5)
 
@@ -207,6 +212,7 @@ def test_calculate_lactating_cow_manure(
     assert manure_excretion.urine > 0
     assert manure_excretion.manure_nitrogen > 0
     assert manure_excretion.potassium > 0
+    assert manure_excretion.manure_lignin == 0.8
 
     mock_phosphorus_excretion.assert_called_once()
 
@@ -237,6 +243,7 @@ def test_calculate_dry_cow_manure(
     mock_nutrition.potassium_percentage = potassium
     mock_nutrition.ash_percentage = ash_percentage
     mock_nutrition.ndf_percentage = 1.0
+    mock_nutrition.lignin_supply = 0.7
 
     mock_phosphorus_values = (expected_phosphorus, 4.5, 0.5)
 
@@ -266,6 +273,7 @@ def test_calculate_dry_cow_manure(
     assert manure_excretion.urine > 0
     assert manure_excretion.manure_nitrogen > 0
     assert manure_excretion.potassium > 0
+    assert manure_excretion.manure_lignin == 0.7
 
     mock_phosphorus_excretion.assert_called_once()
 

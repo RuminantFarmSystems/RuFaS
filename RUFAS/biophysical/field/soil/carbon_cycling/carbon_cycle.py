@@ -60,6 +60,7 @@ class CarbonCycling:
 
         """
         self.decomposition.decompose()
+        self.residue_partition.partition_manure_residue()
         self.residue_partition.partition_residue(rainfall)
         self.pool_gas_partition.partition_pool_gas()
         self._soil_carbon_aggregation(field_size)
