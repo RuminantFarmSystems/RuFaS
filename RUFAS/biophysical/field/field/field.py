@@ -670,6 +670,9 @@ class Field:
             organic_nitrogen_fraction=(supplied_nitrogen / manure_supplied.dry_matter)
             * manure_supplied.organic_nitrogen_fraction,
             water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction,
+            carbon_mass=manure_supplied.carbon,
+            lignin_mass=manure_supplied.lignin,
+            total_nitrogen_mass=supplied_nitrogen,
         )
 
         self._record_manure_application(
@@ -685,6 +688,8 @@ class Field:
             year=year,
             day=day,
             output_name="manure_application",
+            carbon=manure_supplied.carbon,
+            lignin=manure_supplied.lignin,
         )
 
         return {
@@ -870,6 +875,8 @@ class Field:
         day: int,
         output_name: str,
         potassium: float | None = None,
+        carbon: float = 0.0,
+        lignin: float = 0.0,
     ) -> None:
         """
         Records the amount of manure and related values for an individual manure application.
@@ -898,6 +905,10 @@ class Field:
             Julian day on which this manure application occurs.
         potassium : float, optional
             Mass of potassium in the manure applied (kg).
+        carbon : float, default 0.0
+            Mass of organic carbon in the manure applied (kg).
+        lignin : float, default 0.0
+            Mass of lignin in the manure applied (kg).
 
         """
         units = {
@@ -909,6 +920,8 @@ class Field:
             "nitrogen": MeasurementUnits.KILOGRAMS,
             "phosphorus": MeasurementUnits.KILOGRAMS,
             "potassium": MeasurementUnits.KILOGRAMS,
+            "carbon": MeasurementUnits.KILOGRAMS,
+            "lignin": MeasurementUnits.KILOGRAMS,
             "manure_type": MeasurementUnits.UNITLESS,
             "day": MeasurementUnits.ORDINAL_DAY,
             "year": MeasurementUnits.CALENDAR_YEAR,
@@ -931,6 +944,8 @@ class Field:
             "nitrogen": nitrogen,
             "phosphorus": phosphorus,
             "potassium": potassium,
+            "carbon": carbon,
+            "lignin": lignin,
             "manure_type": manure_type.value,
             "day": day,
             "year": year,
