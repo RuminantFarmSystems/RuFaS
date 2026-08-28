@@ -233,6 +233,7 @@ def test_annual_reset() -> None:
     soil_data.annual_eroded_fresh_organic_nitrogen_total = 13
     soil_data.annual_eroded_stable_organic_nitrogen_total = 14
     soil_data.annual_eroded_active_organic_nitrogen_total = 15
+    soil_data.annual_manure_carbon_applied_total = 16
 
     with patch.multiple(
         "RUFAS.biophysical.field.soil.soil_data.SoilData",
@@ -258,6 +259,7 @@ def test_annual_reset() -> None:
         assert soil_data.annual_eroded_fresh_organic_nitrogen_total == 0
         assert soil_data.annual_eroded_stable_organic_nitrogen_total == 0
         assert soil_data.annual_eroded_active_organic_nitrogen_total == 0
+        assert soil_data.annual_manure_carbon_applied_total == 0
 
 
 def test_profile_soil_water_content() -> None:
