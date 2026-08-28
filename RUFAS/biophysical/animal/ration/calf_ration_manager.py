@@ -326,34 +326,3 @@ class CalfRationManager:
         ration_per_animal["status"] = "Optimal"
         ration_per_animal["objective"] = 4.5
         return ration_per_animal
-
-    @classmethod
-    def make_ration_from_user_values(cls, average_calf_ration: dict[str, float]) -> dict[str, float]:
-        """
-        Generate ration dict from user ration percents input,
-        scaled to their estimated dry matter intake (DMI)
-
-        Parameters
-        ----------
-        average_calf_ration : Dict[str, float]
-            Formulated ration on a per animal basis using automated methods, for reference to dm total.
-
-        Returns
-        -------
-        Dict[str, float]
-            dictionary of formulated ration
-
-        """
-        ration_per_animal: dict[str, float | str] = {}
-        total_dm = 0.0
-        for key in average_calf_ration:
-            if key not in ["status", "objective"]:
-                total_dm += average_calf_ration[key]
-        # TODO get this working
-        udrm = udr.UserDefinedRationManager()
-        for key in udrm.calf_ration:
-            ration_per_animal[key] = udrm.calf_ration[key] / 100 * total_dm
-        # TODO check if this needs to be added back
-        # ration_per_animal["status"] = "Optimal"
-        # ration_per_animal["objective"] = 0.0
-        return ration_per_animal
