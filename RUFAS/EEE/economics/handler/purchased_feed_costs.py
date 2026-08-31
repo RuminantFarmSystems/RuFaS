@@ -1,18 +1,3 @@
-"""Special-case preprocessing for the ``Purchased feed costs`` line item.
-
-The feed module reports ration interval purchases per feed as
-``ration_interval_{rufas_id}_amount_purchased`` (kg) and
-``ration_interval_{rufas_id}_cost`` ($, priced from the feed input file's
-``purchased_feed_cost``). The generic pipeline cannot express this line item
-because its dollar total comes from the simulation itself rather than from
-commodity price files: the handler reports the purchased amounts as the
-biophysical quantity, derives the per-feed prices actually paid, and uses the
-purchase-amount-weighted average price so that
-``biophysical_aggregate * price_aggregate == line_item_value`` holds.
-"""
-
-from __future__ import annotations
-
 import re
 from typing import Any, ClassVar
 
