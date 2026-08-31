@@ -26,6 +26,9 @@ class OpenLot(Storage):
         The surface area of the manure storage (m^2).
     cover : StorageCover, default=StorageCover.NO_COVER
         The type of cover used with the specified storage.
+    emptying_fraction : float | None, default None
+        Fraction of the stored manure that is removed at each emptying event (unitless, 0.0-1.0). If None, the
+        storage is fully emptied.
 
     """
 
@@ -35,6 +38,7 @@ class OpenLot(Storage):
         storage_time_period: int | None,
         surface_area: float = inf,
         cover: StorageCover = StorageCover.NO_COVER,
+        emptying_fraction: float | None = None,
     ):
         super().__init__(
             name=name,
@@ -42,6 +46,7 @@ class OpenLot(Storage):
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
+            emptying_fraction=emptying_fraction,
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:

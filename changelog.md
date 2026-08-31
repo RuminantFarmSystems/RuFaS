@@ -26,6 +26,7 @@ This **changelog** file keeps a record of updates included in existing version r
 v1.0.5
 
 ### v1.0.5
+- [3246](https://github.com/RuminantFarmSystems/RuFaS/pull/3246) - [minor change] [Manure] [InputChange] [OutputChange] Adds an optional emptying_fraction input for partial emptying of manure storages, and fixes partial emptying to route the emptied manure downstream instead of the retained manure
 - [3242](https://github.com/RuminantFarmSystems/RuFaS/pull/3242) - [minor change] [NoInputChange] [NoOutputChange] Corrects version number
 
 
