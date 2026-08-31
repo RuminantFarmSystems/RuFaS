@@ -24,7 +24,7 @@ This **changelog** file keeps a record of updates included in existing version r
 ### Current version
 
 v1.0.4
-
+- [3247](https://github.com/RuminantFarmSystems/RuFaS/pull/3247) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Fix for edge case error introduced in 3202.
 ### v1.0.4
 
 - [3202](https://github.com/RuminantFarmSystems/RuFaS/pull/3202) - [minor change] [EEE] [NoInputChange] [OutputChange] Corrects errors in emissions and resource allocation logic
