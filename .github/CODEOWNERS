@@ -1,2 +1,3 @@
 # Request the dev team on Dependabot configuration changes
-/.github/dependabot.yml @RuminantFarmSystems/dev-team
+/pyproject.toml @RuminantFarmSystems/dev-team
+/constraints-release.txt @RuminantFarmSystems/dev-team
