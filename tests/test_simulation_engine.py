@@ -488,6 +488,7 @@ def test_execute_feed_storage_upkeep(
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     mock_time.simulation_day = 42
     simulation_engine.weather = MagicMock(auto_spec=Weather)
+    simulation_engine.feed_manager = MagicMock()
     simulation_engine.feed_degradations_interval_length = timedelta(days=30)
     mocker.patch.object(
         SimulationEngine,
