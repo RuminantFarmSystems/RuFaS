@@ -92,7 +92,7 @@ def test_send_soil_layer_daily_variables(
         residue=1,
         top_depth=1,
         bottom_depth=2,
-        plant_metabolic_active_carbon_usage=3,
+        residue_metabolic_active_carbon_usage=3,
         evaporated_water_content=4,
         temperature=5,
         percolated_water=6,
@@ -110,7 +110,7 @@ def test_send_soil_layer_daily_variables(
     ] == [4]
     assert pool[
         (
-            "FieldDataReporter.send_soil_layer_daily_variables.plant_metabolic_active_carbon_usage.field='name 1',"
+            "FieldDataReporter.send_soil_layer_daily_variables.residue_metabolic_active_carbon_usage.field='name 1',"
             "layer='1'"
         )
     ]["values"] == [3]
@@ -118,7 +118,7 @@ def test_send_soil_layer_daily_variables(
         "values"
     ] == [6]
 
-    assert mock_add.call_count == 60
+    assert mock_add.call_count == 62
 
 
 def test_send_vadose_zone_layer_daily_variables(
@@ -197,7 +197,7 @@ def test_send_soil_daily_variables(mocker: MockerFixture, mock_time: RufasTime, 
 
     pool = output_manager.variables_pool
 
-    assert mock_add.call_count == 48
+    assert mock_add.call_count == 50
 
     assert pool["FieldDataReporter.send_soil_daily_variables.water_evaporated.field='name 1'"]["values"] == [1]
     assert pool["FieldDataReporter.send_soil_daily_variables.water_sublimated.field='name 1'"]["values"] == [2]
@@ -359,7 +359,7 @@ def test_send_soil_annual_variables(mocker: MockerFixture, output_manager: Outpu
 
     pool = output_manager.variables_pool
 
-    assert mock_add.call_count == 18
+    assert mock_add.call_count == 19
 
     assert pool["FieldDataReporter.send_soil_annual_variables.annual_water_content_change.field='name 1'"][
         "values"
