@@ -20,6 +20,7 @@ BIOPHYSICAL_FALLBACKS: Dict[str, List[float]] = {
     "field.crop_specification": [20.0],
     "field.field_size": [30.0],
     "Waiting on tractor_implement and other parts of EEE outputs": [6.0],
+    "seed_cost": [0.0],
 }
 
 # Default quantity used when no biophysical or input values are available.
