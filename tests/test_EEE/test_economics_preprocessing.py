@@ -1,13 +1,17 @@
 import pytest
 import re
+from types import SimpleNamespace
 
 from RUFAS.EEE.economics import mapping as economics_mapping
 from RUFAS.EEE.economics import preprocessing
+from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
+from RUFAS.util import Utility
 
 
 class DummyOutputManager:
-    def __init__(self, pool):
+    def __init__(self, pool, time=None):
         self._pool = pool
+        self.time = time
         self.warnings = []
         self.logs = []
         self.added_variables = []
@@ -20,7 +24,14 @@ class DummyOutputManager:
         if not filters:
             return {}
         pattern = re.compile(filters[0])
-        return {name: data for name, data in self._pool.items() if pattern.search(name)}
+        results = {name: data for name, data in self._pool.items() if pattern.search(name)}
+        if filter_content.get("expand_data", False) and results:
+            results, _ = Utility.expand_data_temporally(
+                results,
+                simulation_length=self.time.simulation_length_days,
+                fill_value=filter_content.get("fill_value", 0.0),
+            )
+        return results
 
     def add_warning(self, code, message, info):
         self.warnings.append((code, message, info))
@@ -536,6 +547,211 @@ def test_preprocess_expands_input_wildcard_with_value_map(monkeypatch: pytest.Mo
         {"X": "A", "Y": "B", "Z": "C"},
     )
     assert values == [5.0, 6.0, 7.0]
+
+
+def test_preprocess_purchased_feed_costs_derives_weighted_price(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_1_amount_purchased": {"values": [100000.0]},
+            "FeedManager.purchase_feed.ration_interval_1_cost": {"values": [10000.0]},
+            "FeedManager.purchase_feed.ration_interval_2_amount_purchased": {"values": [50000.0]},
+            "FeedManager.purchase_feed.ration_interval_2_cost": {"values": [25000.0]},
+        }
+    )
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Feed_storage": {
+                "Costs": {
+                    "Purchased feed costs": {
+                        "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_.*_amount_purchased"],
+                        "cost_simulation": ["FeedManager.purchase_feed.ration_interval_.*_cost"],
+                        "economics_files": ["feed_prices"],
+                    }
+                }
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Feed_storage"]["Costs"]["Purchased feed costs"]
+    # Quantities are the purchased amounts; prices are the per-feed prices actually paid.
+    assert item["biophysical_aggregate"] == 150000.0
+    assert item["price_values"] == [pytest.approx(0.1), pytest.approx(0.5)]
+    assert item["price_aggregate"] == pytest.approx(35000.0 / 150000.0)
+    assert item["line_item_values_by_scenario"] == {"baseline": 35000.0}
+    # The commodity reference prices are not fetched for the special-cased item.
+    assert item["price_data"] == {}
+    assert item["biophysical_aggregate"] * item["price_aggregate"] == pytest.approx(
+        item["line_item_values_by_scenario"]["baseline"]
+    )
+
+
+def test_context_expands_interval_values_to_daily() -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_1_cost": {
+                "values": [100.0, 200.0],
+                "info_maps": [
+                    {"units": "dollars", "simulation_day": 0},
+                    {"units": "dollars", "simulation_day": 3},
+                ],
+            }
+        },
+        time=SimpleNamespace(simulation_length_days=5),
+    )
+
+    context = EconomicDataProcessor(dummy_im, dummy_om)
+    values_by_scenario = context.fetch_values_by_scenario(
+        ["FeedManager.purchase_feed.ration_interval_.*_cost"], expand_interval_to_daily=True
+    )
+
+    assert values_by_scenario == {"baseline": [100.0, 0.0, 0.0, 200.0, 0.0]}
+
+
+def test_context_interval_expansion_skipped_without_time() -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_1_cost": {
+                "values": [100.0, 200.0],
+                "info_maps": [
+                    {"units": "dollars", "simulation_day": 0},
+                    {"units": "dollars", "simulation_day": 3},
+                ],
+            }
+        }
+    )
+
+    context = EconomicDataProcessor(dummy_im, dummy_om)
+    values_by_scenario = context.fetch_values_by_scenario(
+        ["FeedManager.purchase_feed.ration_interval_.*_cost"], expand_interval_to_daily=True
+    )
+
+    assert values_by_scenario == {"baseline": [100.0, 200.0]}
+    warning_codes = [code for code, _, _ in dummy_om.warnings]
+    assert "MissingTimeForIntervalExpansion" in warning_codes
+
+
+def test_purchased_feed_costs_handler_registration_and_fallback_keys() -> None:
+    from RUFAS.EEE.economics.fallback_values import BIOPHYSICAL_FALLBACKS
+    from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
+    from RUFAS.EEE.economics.handler import PurchasedFeedCostHandler
+
+    assert PurchasedFeedCostHandler in preprocessing.SPECIAL_CASE_HANDLERS
+
+    entry = ECONOMIC_MAP["Feed_storage"]["Costs"]["Purchased feed costs"]
+    assert entry["biophysical_simulation"] == PurchasedFeedCostHandler.amount_patterns
+    assert entry["cost_simulation"] == PurchasedFeedCostHandler.cost_patterns
+
+    assert PurchasedFeedCostHandler.amount_patterns[0] in BIOPHYSICAL_FALLBACKS
+    assert PurchasedFeedCostHandler.cost_patterns[0] in BIOPHYSICAL_FALLBACKS
+
+
+def test_preprocess_purchased_feed_costs_uses_fallback_when_no_data(monkeypatch: pytest.MonkeyPatch) -> None:
+    from RUFAS.EEE.economics.mapping import ECONOMIC_MAP as REAL_MAP
+
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager({}, time=SimpleNamespace(simulation_length_days=5))
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Feed_storage": {
+                "Costs": {"Purchased feed costs": REAL_MAP["Feed_storage"]["Costs"]["Purchased feed costs"]}
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Feed_storage"]["Costs"]["Purchased feed costs"]
+    assert item["biophysical_values"] == [100.0]
+    assert item["line_item_values_by_scenario"] == {"baseline": 100.0}
+    # No purchases in the pool means no derived price.
+    assert item["price_values"] == []
+    assert item["price_aggregate"] is None
+
+
+def test_preprocess_purchased_feed_costs_real_mapping_entry(monkeypatch: pytest.MonkeyPatch) -> None:
+    from RUFAS.EEE.economics.mapping import ECONOMIC_MAP as REAL_MAP
+
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_1_amount_purchased": {
+                "values": [1000.0, 500.0],
+                "info_maps": [
+                    {"units": "kilograms", "simulation_day": 0},
+                    {"units": "kilograms", "simulation_day": 3},
+                ],
+            },
+            "FeedManager.purchase_feed.ration_interval_1_cost": {
+                "values": [100.0, 50.0],
+                "info_maps": [
+                    {"units": "dollars", "simulation_day": 0},
+                    {"units": "dollars", "simulation_day": 3},
+                ],
+            },
+            "FeedManager.purchase_feed.ration_interval_2_amount_purchased": {
+                "values": [200.0, 100.0],
+                "info_maps": [
+                    {"units": "kilograms", "simulation_day": 0},
+                    {"units": "kilograms", "simulation_day": 3},
+                ],
+            },
+            "FeedManager.purchase_feed.ration_interval_2_cost": {
+                "values": [100.0, 50.0],
+                "info_maps": [
+                    {"units": "dollars", "simulation_day": 0},
+                    {"units": "dollars", "simulation_day": 3},
+                ],
+            },
+        },
+        time=SimpleNamespace(simulation_length_days=5),
+    )
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Feed_storage": {
+                "Costs": {"Purchased feed costs": REAL_MAP["Feed_storage"]["Costs"]["Purchased feed costs"]}
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Feed_storage"]["Costs"]["Purchased feed costs"]
+    # Each feed's purchased amounts are expanded to one value per simulation day, zero-filled.
+    assert len(item["biophysical_values"]) == 10
+    assert item["biophysical_aggregate"] == 1800.0
+    # Prices come from the feed input file via the simulation's cost outputs: the
+    # per-feed prices paid and their purchase-amount-weighted average.
+    assert item["price_values"] == [pytest.approx(0.1), pytest.approx(0.5)]
+    assert item["price_aggregate"] == pytest.approx(300.0 / 1800.0)
+    assert item["price_data"] == {}
+    assert item["line_item_values_by_scenario"] == {"baseline": 300.0}
+    assert item["biophysical_aggregate"] * item["price_aggregate"] == pytest.approx(
+        item["line_item_values_by_scenario"]["baseline"]
+    )
+    assert item["flow_type"] == "cost"
 
 
 def _daily(head_per_day: int, days: int, start_day: int = 0) -> dict:

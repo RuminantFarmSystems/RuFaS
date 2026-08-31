@@ -1,8 +1,8 @@
 import math
-from typing import Any
+from typing import Any, Iterable
 
 from RUFAS.util import Aggregator
-from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
+from RUFAS.EEE.economics.fallback_values import BIOPHYSICAL_FALLBACKS, ECONOMIC_PRICE_FALLBACK
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -12,15 +12,17 @@ class EconomicDataProcessor:
 
     Parameters
     ----------
-    im : InputManager
+    im : InputManager, optional
         Input manager used to resolve economic inputs and commodity pricing.
-    om : OutputManager
+        Defaults to the ``InputManager`` singleton.
+    om : OutputManager, optional
         Output manager used to read biophysical outputs and record warnings.
+        Defaults to the ``OutputManager`` singleton.
     """
 
-    def __init__(self) -> None:
-        self.im = InputManager()
-        self.om = OutputManager()
+    def __init__(self, im: InputManager | None = None, om: OutputManager | None = None) -> None:
+        self.im = im if im is not None else InputManager()
+        self.om = om if om is not None else OutputManager()
         self.available_input_keys: set[str] = self._load_available_input_keys()
 
     def _load_available_input_keys(self) -> set[str]:
@@ -160,6 +162,106 @@ class EconomicDataProcessor:
         if not scenario_names:
             scenario_names = ["baseline"]
         return scenario_names
+
+    def append_numeric(self, container: list[float], value: Any) -> None:
+        """Append numeric value to container if possible."""
+        try:
+            container.append(float(value))
+        except (TypeError, ValueError):
+            pass
+
+    def append_from_payload(self, container: list[float], payload: Any) -> None:
+        """Append numeric values from an OutputManager payload."""
+
+        if isinstance(payload, dict) and "values" in payload:
+            for value in payload.get("values", []):
+                self.append_from_payload(container, value)
+            return
+        if isinstance(payload, dict):
+            for value in payload.values():
+                self.append_from_payload(container, value)
+            return
+        if isinstance(payload, (list, tuple)):
+            for value in payload:
+                self.append_from_payload(container, value)
+            return
+        self.append_numeric(container, payload)
+
+    def build_filter_content(self, path: str, expand_interval_to_daily: bool) -> dict[str, Any]:
+        """Build OutputManager filter options, requesting daily expansion when applicable."""
+
+        filter_content: dict[str, Any] = {"filters": [path]}
+        if not expand_interval_to_daily:
+            return filter_content
+
+        if getattr(self.om, "time", None) is None:
+            self.om.add_warning(
+                "MissingTimeForIntervalExpansion",
+                f"Cannot expand interval data to daily for '{path}' because the OutputManager time is not initialized",
+                {"class": self.__class__.__name__, "function": self.build_filter_content.__name__},
+            )
+            return filter_content
+
+        # Interval-reported variables (e.g. ration interval feed purchases) are only recorded on the days
+        # they occur; pad the gap days with zeros so the series aligns with daily-reported data.
+        filter_content["expand_data"] = True
+        filter_content["fill_value"] = 0.0
+        return filter_content
+
+    def fetch_values_by_scenario(
+        self, sim_paths: Iterable[str], expand_interval_to_daily: bool = False
+    ) -> dict[str, list[float]]:
+        """Collect values per scenario from the OutputManager."""
+
+        filtered_by_path: dict[str, dict[str, Any]] = {
+            path: self.om.filter_variables_pool(self.build_filter_content(path, expand_interval_to_daily))
+            for path in sim_paths
+        }
+        if not any(filtered_by_path.values()):
+            fallback_values = self._fallback_values_by_scenario(sim_paths)
+            return fallback_values
+        scenario_names = self.scenario_names()
+        values_by_scenario: dict[str, list[float]] = {scenario: [] for scenario in scenario_names}
+        info_map = {"class": self.__class__.__name__, "function": self.fetch_values_by_scenario.__name__}
+
+        for path in sim_paths:
+            matched = False
+            for variable_name, payload in filtered_by_path.get(path, {}).items():
+                matched = True
+                if scenario_names == ["baseline"]:
+                    scenario_key = "baseline"
+                else:
+                    scenario_key = variable_name.split(".", 1)[0]
+                    if scenario_key not in values_by_scenario:
+                        scenario_key = "baseline"
+                        values_by_scenario.setdefault(scenario_key, [])
+                self.append_from_payload(values_by_scenario[scenario_key], payload)
+            if not matched:
+                fallback_values = BIOPHYSICAL_FALLBACKS.get(path)
+                if fallback_values:
+                    scenario_key = scenario_names[0] if scenario_names else "baseline"
+                    values_by_scenario.setdefault(scenario_key, [])
+                    values_by_scenario[scenario_key].extend(fallback_values)
+                else:
+                    self.om.add_warning(
+                        "MissingBiophysicalData",
+                        f"No biophysical outputs matched pattern '{path}'",
+                        info_map,
+                    )
+        return values_by_scenario
+
+    def _fallback_values_by_scenario(self, sim_paths: Iterable[str]) -> dict[str, list[float]]:
+        """Build fallback values when no OutputManager data is available."""
+
+        values_by_scenario: dict[str, list[float]] = {"baseline": []}
+        for path in sim_paths:
+            fallback_values = BIOPHYSICAL_FALLBACKS.get(path)
+            if fallback_values:
+                values_by_scenario["baseline"].extend(fallback_values)
+
+        if values_by_scenario["baseline"]:
+            return values_by_scenario
+        return {}
 
     def aggregate(self, values: list[float], desc: str) -> float | None:
         """Aggregate values according to a textual description."""
