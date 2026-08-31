@@ -27,6 +27,9 @@ class AnaerobicLagoon(Storage):
         The surface area of the storage.
     capacity : float
         The capacity of the storage.
+    emptying_fraction : float | None, default None
+        Fraction of the stored manure that is removed at each emptying event (unitless, 0.0-1.0). If None, the
+        lagoon retains ``ManureConstants.ANAEROBIC_LAGOON_MANURE_RETENTION`` of the stored manure at each emptying.
 
     """
 
@@ -37,6 +40,7 @@ class AnaerobicLagoon(Storage):
         storage_time_period: int | None,
         surface_area: float,
         capacity: float,
+        emptying_fraction: float | None = None,
     ):
         """Initialize Anaerobic Lagoon object."""
         super().__init__(
@@ -46,13 +50,18 @@ class AnaerobicLagoon(Storage):
             storage_time_period=storage_time_period,
             surface_area=surface_area,
             capacity=capacity,
+            emptying_fraction=emptying_fraction,
         )
 
     @property
     def _emptying_fraction(self) -> float:
         """
         The fraction of the accumulated stored manure that is removed from storage when the emptying time is reached.
+        Uses the user-configured emptying fraction if one was provided, and defaults to emptying everything except
+        the retained sludge fraction otherwise.
         """
+        if self._configured_emptying_fraction is not None:
+            return self._configured_emptying_fraction
         return 1.0 - ManureConstants.ANAEROBIC_LAGOON_MANURE_RETENTION
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:

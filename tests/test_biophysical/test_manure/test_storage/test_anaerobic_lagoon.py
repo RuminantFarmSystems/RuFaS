@@ -85,7 +85,29 @@ def test_anaerobic_lagoon_init(mocker: MockerFixture) -> None:
         storage_time_period=dummy_storage_time_period,
         surface_area=dummy_surface_area,
         capacity=dummy_capacity,
+        emptying_fraction=None,
     )
+
+
+@pytest.mark.parametrize(
+    "configured_emptying_fraction, expected_emptying_fraction",
+    [
+        (None, 1.0 - ManureConstants.ANAEROBIC_LAGOON_MANURE_RETENTION),
+        (0.5, 0.5),
+    ],
+)
+def test_emptying_fraction(configured_emptying_fraction: float | None, expected_emptying_fraction: float) -> None:
+    """Tests that a user-configured emptying fraction overrides the lagoon's default retention behavior."""
+    lagoon = AnaerobicLagoon(
+        name="dummy_name",
+        cover="no_crust_or_cover",
+        storage_time_period=18,
+        surface_area=6.6,
+        capacity=123456.789,
+        emptying_fraction=configured_emptying_fraction,
+    )
+
+    assert lagoon._emptying_fraction == expected_emptying_fraction
 
 
 @pytest.mark.parametrize(
