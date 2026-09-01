@@ -9,30 +9,6 @@ from RUFAS.post_processing.pool_manager import PoolManager
 from RUFAS.rufas_time import RufasTime
 
 
-@dataclass
-class OutputManagerConfig:
-    """
-    Attributes
-    ----------
-    __supported_filter_types_prefixes: dict[str, str]
-        A map of allowed filter type prefixes for output filters.
-    __end_to_end_testing_filter_prefixes: dict[str, str]
-        A map of allowed filter type prefixes for e2e testing filters.
-    """
-
-    __supported_filter_types_prefixes: dict[str, str] = {
-        "csv": "csv_",
-        "graph": "graph_",
-        "json": "json_",
-        "report": "report_",
-    }
-    __end_to_end_testing_filter_prefixes: dict[str, str] = {
-        "json": "e2e_json_",
-        "comparison": "e2e_comparison_",
-    }
-    time: RufasTime | None = None
-
-
 class OutputManager:
     """
     Output manager for RuFaS simulation results. Works by collecting variables,
@@ -47,38 +23,40 @@ class OutputManager:
         ["units", "timestep", "info_maps", "prefix", "suffix", "data_origin", "number_animals_in_pen", "simulation_day"]
     )
 
-    def __new__(cls, config: OutputManagerConfig | None = None) -> OutputManager:
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
+    def __new__(cls) -> OutputManager:
+        if not hasattr(cls, "instance"):
+            cls.instance = super(OutputManager, cls).__new__(cls)
+        return cls.instance
 
-    def __init__(self, config: OutputManagerConfig | None = None) -> None:
-        if hasattr(self, "_config"):
-            return
-
-        if config is None:
-            raise RuntimeError("OutputManager must be configured when it is first instantiated.")
-
-        self._config = config
-        self.__metadata_prefix: str = ""
-        self.is_end_to_end_testing_run: bool = False
-        self.is_first_post_processing: bool = True
-        self._exclude_info_maps_flag: bool = False
-        self.file_manager = FileManager(self.__metadata_prefix, self._filter_prefixes)
-        self.pool_manager = PoolManager(self.file_manager)
-        self.output_config_validator = OutputConfigValidator()
-
-    @property
-    def config(self) -> OutputManagerConfig:
-        return self._config
+    def __init__(self) -> None:
+        if OutputManager.__instance is None:
+            OutputManager.__instance = self
+            self.__metadata_prefix: str = ""
+            self.is_end_to_end_testing_run: bool = False
+            self.is_first_post_processing: bool = True
+            self._exclude_info_maps_flag: bool = False
+            self.__supported_filter_types_prefixes: dict[str, str] = {
+                "csv": "csv_",
+                "graph": "graph_",
+                "json": "json_",
+                "report": "report_",
+            }
+            self.__end_to_end_testing_filter_prefixes: dict[str, str] = {
+                "json": "e2e_json_",
+                "comparison": "e2e_comparison_",
+            }
+            self.time: RufasTime | None = None
+            self.file_manager = FileManager(self.__metadata_prefix, self._filter_prefixes)
+            self.pool_manager = PoolManager(self.file_manager)
+            self.output_config_validator = OutputConfigValidator()
 
     @property
     def _filter_prefixes(self) -> dict[str, str]:
         """Returns the appropriate set of acceptable filter prefixes."""
         if self.is_end_to_end_testing_run:
-            return self.config.__end_to_end_testing_filter_prefixes
+            return self.__end_to_end_testing_filter_prefixes
         else:
-            return self.config.__supported_filter_types_prefixes
+            return self.__supported_filter_types_prefixes
 
     def run_startup_sequence() -> None:
         pass

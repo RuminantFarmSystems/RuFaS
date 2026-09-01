@@ -39,7 +39,7 @@ class OutputConfigValidator:
         """
         Validate the CSV filter.
 
-        Parameters=
+        Parameters
         ----------
         filter_content : dict[Any, Any]
             The report filter to validate.
