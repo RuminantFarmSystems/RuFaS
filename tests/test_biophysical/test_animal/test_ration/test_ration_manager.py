@@ -1,13 +1,22 @@
 import math
-from typing import Any
+from types import SimpleNamespace
+from typing import Any, Iterator
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
-from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
+from RUFAS.biophysical.animal.data_types.intake_option import IntakeOption
+
+
+@pytest.fixture(autouse=True)
+def _reset_intake_options() -> Iterator[None]:
+    """Restores the RationManager intake option state after each test."""
+    yield
+    RationManager.intake_options = None
+    RationManager.intake_values = None
 
 
 @pytest.fixture
@@ -199,33 +208,11 @@ def test_set_user_defined_rations_invalid(
 
 
 @pytest.mark.parametrize(
-    "animal_combination, requirements, user_defined_rations, expected_output",
+    "animal_combination, target_dry_matter_intake, user_defined_rations, expected_output",
     [
         (
             AnimalCombination.CALF,
-            NutritionRequirements(
-                maintenance_energy=10.0,
-                growth_energy=5.0,
-                pregnancy_energy=0.0,
-                lactation_energy=8.0,
-                metabolizable_protein=600.0,
-                calcium=100.0,
-                phosphorus=50.0,
-                process_based_phosphorus=50.0,
-                dry_matter=8.0,
-                activity_energy=2.0,
-                essential_amino_acids=EssentialAminoAcidRequirements(
-                    histidine=2.0,
-                    isoleucine=2.0,
-                    leucine=2.0,
-                    lysine=2.0,
-                    methionine=2.0,
-                    phenylalanine=2.0,
-                    threonine=2.0,
-                    thryptophan=2.0,
-                    valine=2.0,
-                ),
-            ),
+            3.0,
             {
                 AnimalCombination.CALF: {202: 33.3, 216: 66.7},
                 AnimalCombination.GROWING: {201: 60.0, 202: 40.0},
@@ -239,29 +226,7 @@ def test_set_user_defined_rations_invalid(
         ),
         (
             AnimalCombination.GROWING,
-            NutritionRequirements(
-                maintenance_energy=10.0,
-                growth_energy=5.0,
-                pregnancy_energy=0.0,
-                lactation_energy=8.0,
-                metabolizable_protein=600.0,
-                calcium=100.0,
-                phosphorus=50.0,
-                process_based_phosphorus=50.0,
-                dry_matter=10.0,
-                activity_energy=2.0,
-                essential_amino_acids=EssentialAminoAcidRequirements(
-                    histidine=2.0,
-                    isoleucine=2.0,
-                    leucine=2.0,
-                    lysine=2.0,
-                    methionine=2.0,
-                    phenylalanine=2.0,
-                    threonine=2.0,
-                    thryptophan=2.0,
-                    valine=2.0,
-                ),
-            ),
+            10.0,
             {
                 AnimalCombination.CALF: {101: 50.0, 102: 50.0},
                 AnimalCombination.GROWING: {201: 60.0, 202: 40.0},
@@ -275,29 +240,7 @@ def test_set_user_defined_rations_invalid(
         ),
         (
             AnimalCombination.LAC_COW,
-            NutritionRequirements(
-                maintenance_energy=10.0,
-                growth_energy=5.0,
-                pregnancy_energy=0.0,
-                lactation_energy=8.0,
-                metabolizable_protein=600.0,
-                calcium=100.0,
-                phosphorus=50.0,
-                process_based_phosphorus=50.0,
-                dry_matter=12.0,
-                activity_energy=2.0,
-                essential_amino_acids=EssentialAminoAcidRequirements(
-                    histidine=2.0,
-                    isoleucine=2.0,
-                    leucine=2.0,
-                    lysine=2.0,
-                    methionine=2.0,
-                    phenylalanine=2.0,
-                    threonine=2.0,
-                    thryptophan=2.0,
-                    valine=2.0,
-                ),
-            ),
+            12.0,
             {
                 AnimalCombination.CALF: {101: 50.0, 102: 50.0},
                 AnimalCombination.GROWING: {201: 60.0, 202: 40.0},
@@ -313,13 +256,13 @@ def test_set_user_defined_rations_invalid(
 )
 def test_get_user_defined_ration(
     animal_combination: AnimalCombination,
-    requirements: NutritionRequirements,
+    target_dry_matter_intake: float,
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]],
     expected_output: dict[RUFAS_ID, float],
 ) -> None:
     RationManager.user_defined_rations = user_defined_rations
 
-    result = RationManager.get_user_defined_ration(animal_combination, requirements)
+    result = RationManager.get_user_defined_ration(animal_combination, target_dry_matter_intake)
 
     for key, expected_value in expected_output.items():
         assert math.isclose(result[key], expected_value, rel_tol=1e-3)
@@ -337,3 +280,202 @@ def test_get_user_defined_ration_feeds_returns_keys_for_combination() -> None:
 
     assert result == [101, 202]
     assert RationManager.get_user_defined_ration_feeds(AnimalCombination.GROWING) == [303]
+
+
+def _mock_pen(dry_matter: float = 20.0, milk: float = 40.0, growth: float = 0.9) -> SimpleNamespace:
+    """Builds a lightweight pen stand-in with the attributes resolve_target_dmi reads."""
+    return SimpleNamespace(
+        average_nutrition_requirements=SimpleNamespace(dry_matter=dry_matter),
+        average_milk_production=milk,
+        average_growth=growth,
+    )
+
+
+def test_set_intake_options_defaults_to_predict(mocker: MockerFixture, valid_ration_config: dict[str, Any]) -> None:
+    """Rations without intake keys default to the predict DMI option with no intake value."""
+    mocker.patch.object(RationManager._om, "add_variable")
+
+    RationManager.set_intake_options(valid_ration_config)
+
+    assert RationManager.intake_options is not None
+    assert RationManager.intake_values is not None
+    for combination in AnimalCombination:
+        assert RationManager.intake_options[combination] is IntakeOption.PREDICT_DMI
+        assert RationManager.intake_values[combination] is None
+
+
+def test_set_intake_options_parses_options_and_values(
+    mocker: MockerFixture, valid_ration_config: dict[str, Any]
+) -> None:
+    """Intake options and values are parsed per animal combination and mirrored for mixed pens."""
+    mock_variable = mocker.patch.object(RationManager._om, "add_variable")
+    for ration in valid_ration_config["rations"]:
+        if ration["animal_combination"] == "calf":
+            ration["intake_option"] = "set_DMI"
+            ration["intake_value"] = 3.5
+        elif ration["animal_combination"] == "growing":
+            ration["intake_option"] = "set_DMI_per_X"
+            ration["intake_value"] = 12.0
+        elif ration["animal_combination"] == "close_up":
+            ration["intake_option"] = "set_DMI"
+            ration["intake_value"] = 13.0
+        elif ration["animal_combination"] == "lac_cow":
+            ration["intake_option"] = "set_DMI_per_X"
+            ration["intake_value"] = 0.682
+
+    RationManager.set_intake_options(valid_ration_config)
+
+    assert RationManager.intake_options[AnimalCombination.CALF] is IntakeOption.SET_DMI
+    assert RationManager.intake_values[AnimalCombination.CALF] == 3.5
+    assert RationManager.intake_options[AnimalCombination.GROWING] is IntakeOption.SET_DMI_PER_X
+    assert RationManager.intake_values[AnimalCombination.GROWING] == 12.0
+    assert RationManager.intake_options[AnimalCombination.CLOSE_UP] is IntakeOption.SET_DMI
+    assert RationManager.intake_values[AnimalCombination.CLOSE_UP] == 13.0
+    assert RationManager.intake_options[AnimalCombination.LAC_COW] is IntakeOption.SET_DMI_PER_X
+    assert RationManager.intake_values[AnimalCombination.LAC_COW] == 0.682
+    assert (
+        RationManager.intake_options[AnimalCombination.GROWING_AND_CLOSE_UP]
+        is RationManager.intake_options[AnimalCombination.CLOSE_UP]
+    )
+    assert (
+        RationManager.intake_values[AnimalCombination.GROWING_AND_CLOSE_UP]
+        == RationManager.intake_values[AnimalCombination.CLOSE_UP]
+    )
+    assert mock_variable.call_count == 4
+
+
+def test_set_intake_options_missing_value_raises(mocker: MockerFixture, valid_ration_config: dict[str, Any]) -> None:
+    """A DMI input option without an intake value halts the simulation."""
+    mock_error = mocker.patch.object(RationManager._om, "add_error")
+    valid_ration_config["rations"][3]["intake_option"] = "set_DMI"
+
+    with pytest.raises(ValueError):
+        RationManager.set_intake_options(valid_ration_config)
+
+    mock_error.assert_called_once()
+
+
+def test_set_intake_options_per_x_invalid_combination_raises(
+    mocker: MockerFixture, valid_ration_config: dict[str, Any]
+) -> None:
+    """The DMI per X option is rejected for animal combinations without an X metric."""
+    mock_error = mocker.patch.object(RationManager._om, "add_error")
+    for ration in valid_ration_config["rations"]:
+        if ration["animal_combination"] == "close_up":
+            ration["intake_option"] = "set_DMI_per_X"
+            ration["intake_value"] = 10.0
+
+    with pytest.raises(ValueError):
+        RationManager.set_intake_options(valid_ration_config)
+
+    mock_error.assert_called_once()
+
+
+def test_set_ration_feeds_resets_intake_options() -> None:
+    """Configuring automated rations resets any previously configured intake options."""
+    RationManager.intake_options = {AnimalCombination.LAC_COW: IntakeOption.SET_DMI}
+    RationManager.intake_values = {AnimalCombination.LAC_COW: 24.0}
+
+    RationManager.set_ration_feeds({"rations": []})
+
+    assert RationManager.intake_options is None
+    assert RationManager.intake_values is None
+
+
+def test_get_intake_option_defaults_to_predict_when_unset() -> None:
+    """Without configured intake options, every animal combination predicts DMI."""
+    RationManager.intake_options = None
+
+    assert RationManager.get_intake_option(AnimalCombination.LAC_COW) is IntakeOption.PREDICT_DMI
+    assert RationManager.get_intake_option(None) is IntakeOption.PREDICT_DMI
+    assert not RationManager.uses_dmi_input_option(AnimalCombination.LAC_COW)
+
+
+@pytest.mark.parametrize(
+    "option, expected_fraction, expected_boost, expected_retry",
+    [
+        (
+            IntakeOption.PREDICT_DMI,
+            AnimalModuleConstants.DMI_CONSTRAINT_FRACTION,
+            AnimalModuleConstants.DMI_REQUIREMENT_BOOST,
+            AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR,
+        ),
+        (IntakeOption.SET_DMI, 0.0, 1.0, 1.0),
+        (IntakeOption.SET_DMI_PER_X, 0.0, 1.0, 1.0),
+    ],
+)
+def test_effective_dmi_constants(
+    option: IntakeOption, expected_fraction: float, expected_boost: float, expected_retry: float
+) -> None:
+    """DMI input options neutralize the internal DMI adjustment constants."""
+    RationManager.intake_options = {AnimalCombination.LAC_COW: option}
+    RationManager.intake_values = {AnimalCombination.LAC_COW: 24.0}
+
+    assert RationManager.effective_dmi_constraint_fraction(AnimalCombination.LAC_COW) == expected_fraction
+    assert RationManager.effective_dmi_requirement_boost(AnimalCombination.LAC_COW) == expected_boost
+    assert RationManager.effective_dmi_retry_increase_factor(AnimalCombination.LAC_COW) == expected_retry
+
+
+def test_resolve_target_dmi_predict_uses_pen_requirements() -> None:
+    """The predict DMI option keeps the pen's predicted dry matter requirement."""
+    RationManager.intake_options = None
+
+    target = RationManager.resolve_target_dmi(AnimalCombination.GROWING, _mock_pen(dry_matter=11.5))
+
+    assert target == 11.5
+
+
+def test_resolve_target_dmi_predict_calf_uses_constant() -> None:
+    """Calf pens keep the fixed calf dry matter intake under the predict DMI option."""
+    RationManager.intake_options = None
+
+    target = RationManager.resolve_target_dmi(AnimalCombination.CALF, _mock_pen())
+
+    assert target == RationManager.CALF_DRY_MATTER_INTAKE
+
+
+def test_resolve_target_dmi_set_dmi_uses_intake_value() -> None:
+    """The set DMI option returns the user-provided intake value for every animal combination."""
+    RationManager.intake_options = {
+        AnimalCombination.LAC_COW: IntakeOption.SET_DMI,
+        AnimalCombination.CALF: IntakeOption.SET_DMI,
+    }
+    RationManager.intake_values = {AnimalCombination.LAC_COW: 24.0, AnimalCombination.CALF: 3.5}
+
+    assert RationManager.resolve_target_dmi(AnimalCombination.LAC_COW, _mock_pen()) == 24.0
+    assert RationManager.resolve_target_dmi(AnimalCombination.CALF, _mock_pen()) == 3.5
+
+
+def test_resolve_target_dmi_per_x_scales_by_milk_or_growth() -> None:
+    """The DMI per X option multiplies the intake value by milk production or average daily gain."""
+    RationManager.intake_options = {
+        AnimalCombination.LAC_COW: IntakeOption.SET_DMI_PER_X,
+        AnimalCombination.GROWING: IntakeOption.SET_DMI_PER_X,
+    }
+    RationManager.intake_values = {AnimalCombination.LAC_COW: 0.5, AnimalCombination.GROWING: 10.0}
+    pen = _mock_pen(milk=40.0, growth=0.9)
+
+    assert RationManager.resolve_target_dmi(AnimalCombination.LAC_COW, pen) == pytest.approx(20.0)
+    assert RationManager.resolve_target_dmi(AnimalCombination.GROWING, pen) == pytest.approx(9.0)
+
+
+def test_resolve_target_dmi_missing_value_raises() -> None:
+    """A DMI input option without an intake value cannot be resolved."""
+    RationManager.intake_options = {AnimalCombination.LAC_COW: IntakeOption.SET_DMI}
+    RationManager.intake_values = {AnimalCombination.LAC_COW: None}
+
+    with pytest.raises(ValueError):
+        RationManager.resolve_target_dmi(AnimalCombination.LAC_COW, _mock_pen())
+
+
+def test_resolve_target_dmi_per_x_with_nonpositive_x_falls_back_to_predicted(mocker: MockerFixture) -> None:
+    """The DMI per X option falls back to the predicted requirement when the X value is not positive."""
+    mock_warning = mocker.patch.object(RationManager._om, "add_warning")
+    RationManager.intake_options = {AnimalCombination.GROWING: IntakeOption.SET_DMI_PER_X}
+    RationManager.intake_values = {AnimalCombination.GROWING: 10.0}
+    pen = _mock_pen(dry_matter=7.5, growth=0.0)
+
+    target = RationManager.resolve_target_dmi(AnimalCombination.GROWING, pen)
+
+    assert target == 7.5
+    mock_warning.assert_called_once()
