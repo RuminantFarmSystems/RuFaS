@@ -205,8 +205,9 @@ class RationManager:
         Raises
         ------
         ValueError
-            If an intake option other than predict DMI is missing an intake value, or if the
-            DMI per X option is requested for an animal combination that does not support it.
+            If a ration names an unknown animal combination or intake option, if an intake option
+            other than predict DMI is missing an intake value, or if the DMI per X option is
+            requested for an animal combination that does not support it.
 
         """
         info_map: dict[str, object] = {"class": cls.__name__, "function": cls.set_intake_options.__name__}
@@ -214,13 +215,8 @@ class RationManager:
         cls.intake_options = {animal_combination: IntakeOption.PREDICT_DMI for animal_combination in AnimalCombination}
         cls.intake_values = {animal_combination: None for animal_combination in AnimalCombination}
 
-        combinations_by_value = {
-            animal_combination.value: animal_combination for animal_combination in AnimalCombination
-        }
         for ration in feed_config["rations"]:
-            combination = combinations_by_value.get(ration["animal_combination"])
-            if combination is None:
-                continue
+            combination = AnimalCombination(ration["animal_combination"])
             option = IntakeOption(ration.get("intake_option") or IntakeOption.PREDICT_DMI.value)
             intake_value = ration.get("intake_value") if option is not IntakeOption.PREDICT_DMI else None
 
