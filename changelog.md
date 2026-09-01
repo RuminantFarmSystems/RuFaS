@@ -26,6 +26,7 @@ This **changelog** file keeps a record of updates included in existing version r
 v1.0.5
 
 ### v1.0.5
+- [3248](https://github.com/RuminantFarmSystems/RuFaS/pull/3248) - [minor change] [Animal] [InputChange] [OutputChange] Adds set_DMI and set_DMI_per_X intake options so users can control dry matter intake of user-defined rations directly or per unit of milk yield / average daily gain
 - [3242](https://github.com/RuminantFarmSystems/RuFaS/pull/3242) - [minor change] [NoInputChange] [NoOutputChange] Corrects version number
 
 
