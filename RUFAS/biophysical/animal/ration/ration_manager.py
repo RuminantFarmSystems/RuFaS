@@ -384,6 +384,12 @@ class RationManager:
         ValueError
             If a DMI input option is configured without an intake value.
 
+        Notes
+        -----
+        If the DMI per X option is selected but the pen's X value (average milk production or
+        average daily gain) is not positive, e.g. before the first daily growth update, the
+        predicted dry matter requirement is used for that formulation and a warning is logged.
+
         """
         option = cls.get_intake_option(animal_combination)
 
@@ -399,7 +405,26 @@ class RationManager:
         if option is IntakeOption.SET_DMI:
             return intake_value
 
-        x_value = pen.average_milk_production if animal_combination is AnimalCombination.LAC_COW else pen.average_growth
+        if animal_combination is AnimalCombination.LAC_COW:
+            x_value = pen.average_milk_production
+            x_description = "average milk production"
+        else:
+            x_value = pen.average_growth
+            x_description = "average daily gain"
+        if x_value <= 0.0:
+            cls._om.add_warning(
+                "dmi_per_x_value_unavailable",
+                f"The {option.value} option for {animal_combination.value} could not be applied because the pen's "
+                f"{x_description} is not positive ({x_value}). The predicted dry matter requirement is used for "
+                "this ration formulation instead.",
+                {
+                    "class": cls.__name__,
+                    "function": cls.resolve_target_dmi.__name__,
+                    "animal_combination": animal_combination.value,
+                    "units": MeasurementUnits.KILOGRAMS,
+                },
+            )
+            return pen.average_nutrition_requirements.dry_matter
         return intake_value * x_value
 
     @classmethod

@@ -466,3 +466,16 @@ def test_resolve_target_dmi_missing_value_raises() -> None:
 
     with pytest.raises(ValueError):
         RationManager.resolve_target_dmi(AnimalCombination.LAC_COW, _mock_pen())
+
+
+def test_resolve_target_dmi_per_x_with_nonpositive_x_falls_back_to_predicted(mocker: MockerFixture) -> None:
+    """The DMI per X option falls back to the predicted requirement when the X value is not positive."""
+    mock_warning = mocker.patch.object(RationManager._om, "add_warning")
+    RationManager.intake_options = {AnimalCombination.GROWING: IntakeOption.SET_DMI_PER_X}
+    RationManager.intake_values = {AnimalCombination.GROWING: 10.0}
+    pen = _mock_pen(dry_matter=7.5, growth=0.0)
+
+    target = RationManager.resolve_target_dmi(AnimalCombination.GROWING, pen)
+
+    assert target == 7.5
+    mock_warning.assert_called_once()
