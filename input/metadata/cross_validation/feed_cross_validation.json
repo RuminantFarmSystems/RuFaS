@@ -1,0 +1,217 @@
+{
+  "cross_validation": [
+    {
+      "description": "The set_DMI_per_X intake option is only available for growing and lac_cow rations",
+      "aliases": {
+        "variables": {
+          "rations": "feed.rations"
+        },
+        "constants": {
+          "set_dmi_per_x": "set_DMI_per_X",
+          "growing": "growing",
+          "lac_cow": "lac_cow"
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "rations",
+              "field": "intake_option",
+              "value_to_compare": "set_dmi_per_x",
+              "relationship": "equal",
+              "field_to_save": "animal_combination"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["growing", "lac_cow"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ]
+    },
+    {
+      "description": "Rations using the set_DMI intake option must provide an intake_value",
+      "aliases": {
+        "variables": {
+          "rations": "feed.rations"
+        },
+        "constants": {
+          "set_dmi": "set_DMI",
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "rations",
+              "field": "intake_option",
+              "value_to_compare": "set_dmi",
+              "relationship": "equal",
+              "field_to_save": "intake_value"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        }
+      ]
+    },
+    {
+      "description": "Rations using the set_DMI_per_X intake option must provide an intake_value greater than 0 and less than 100",
+      "aliases": {
+        "variables": {
+          "rations": "feed.rations"
+        },
+        "constants": {
+          "set_dmi_per_x": "set_DMI_per_X",
+          "true_constant": true,
+          "zero": 0,
+          "one_hundred": 100,
+          "empty_list": []
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "rations",
+              "field": "intake_option",
+              "value_to_compare": "set_dmi_per_x",
+              "relationship": "equal",
+              "field_to_save": "intake_value"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "rations",
+              "field": "intake_option",
+              "value_to_compare": "set_dmi_per_x",
+              "relationship": "equal"
+            },
+            "save_as": "per_x_rations"
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "per_x_rations",
+              "field": "intake_value",
+              "value_to_compare": "true_constant",
+              "relationship": "is_not_null"
+            },
+            "save_as": "per_x_rations_with_values"
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "per_x_rations_with_values",
+              "field": "intake_value",
+              "value_to_compare": "zero",
+              "relationship": "greater"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        },
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "per_x_rations_with_values",
+              "field": "intake_value",
+              "value_to_compare": "one_hundred",
+              "relationship": "greater_or_equal_to",
+              "field_to_save": "intake_value"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["empty_list"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ]
+    },
+    {
+      "description": "Rations using the predict_DMI intake option must not provide an intake_value",
+      "aliases": {
+        "variables": {
+          "rations": "feed.rations"
+        },
+        "constants": {
+          "predict_dmi": "predict_DMI",
+          "true_constant": true
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "rations",
+              "field": "intake_option",
+              "value_to_compare": "predict_dmi",
+              "relationship": "equal",
+              "field_to_save": "intake_value"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        }
+      ]
+    }
+  ]
+}
