@@ -1125,6 +1125,23 @@ class TaskManager:
         output_manager = OutputManager()
         input_manager = InputManager(metadata_depth_limit)
 
+        im_args = e2e_runs[0]
+
+        is_data_valid = TaskManager.handle_input_data_audit(im_args, input_manager, output_manager, True)
+
+        if not is_data_valid:
+            output_manager.add_error(
+                "No task run",
+                f"Data not valid for {comparison_args['output_prefix']}, task not run",
+                info_map={
+                    "class": TaskManager.__name__,
+                    "function": TaskManager._process_end_to_end_testing_group.__name__,
+                    "units": MeasurementUnits.UNITLESS,
+                },
+            )
+            TaskManager.handle_post_processing(comparison_args, input_manager, output_manager, task_id, False)
+            return None
+
         try:
             # output_manager.run_startup_sequence(
             #     verbosity=(
@@ -1232,7 +1249,8 @@ class TaskManager:
         # # TODO this is where the loop ends
         # # TODO average results here - need new function in E2ETestResultsHandler to be called here
         # output_manager.is_first_post_processing = False
-        # # TODO this should be able to stay the same because it should be a single E2E comparison filter as it was before
+        # # TODO this should be able to stay the same because it should be a single E2E comparison filter as it was
+        # before 
         # E2ETestResultsHandler.compare_actual_and_expected_test_results(
         #     args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
         # )
