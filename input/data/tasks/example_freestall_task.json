@@ -10,7 +10,6 @@
       "exclude_info_maps": false,
       "cross_validation_file_paths": [
         "input/metadata/cross_validation/animal_cross_validation.json",
-        "input/metadata/cross_validation/feed_cross_validation.json",
         "input/metadata/cross_validation/weather_cross_validation.json",
         "input/metadata/cross_validation/feed_storage_cross_validation.json",
         "input/metadata/cross_validation/crop_and_soil_cross_validation.json",
