@@ -1,4 +1,4 @@
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
@@ -7,9 +7,6 @@ from RUFAS.biophysical.animal.data_types.intake_option import IntakeOption
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
-
-if TYPE_CHECKING:
-    from RUFAS.biophysical.animal.pen import Pen
 
 
 class RationManager:
@@ -359,7 +356,7 @@ class RationManager:
         return AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR
 
     @classmethod
-    def resolve_target_dmi(cls, animal_combination: AnimalCombination, pen: "Pen") -> float:
+    def resolve_target_dmi(cls, animal_combination: AnimalCombination, pen: Any) -> float:
         """
         Resolves the target dry matter intake for a pen based on its dry matter intake option.
 
@@ -367,8 +364,9 @@ class RationManager:
         ----------
         animal_combination : AnimalCombination
             The combination of animals in the pen.
-        pen : Pen
-            The pen whose target dry matter intake is resolved.
+        pen : Any
+            The Pen whose target dry matter intake is resolved. Typed as Any because Pen imports
+            RationManager, so importing Pen here would create a circular import.
 
         Returns
         -------
@@ -396,7 +394,7 @@ class RationManager:
         if option is IntakeOption.PREDICT_DMI:
             if animal_combination is AnimalCombination.CALF:
                 return float(cls.CALF_DRY_MATTER_INTAKE)
-            return pen.average_nutrition_requirements.dry_matter
+            return float(pen.average_nutrition_requirements.dry_matter)
 
         intake_value = cls.intake_values[animal_combination] if cls.intake_values is not None else None
         if intake_value is None:
@@ -424,8 +422,8 @@ class RationManager:
                     "units": MeasurementUnits.KILOGRAMS,
                 },
             )
-            return pen.average_nutrition_requirements.dry_matter
-        return intake_value * x_value
+            return float(pen.average_nutrition_requirements.dry_matter)
+        return float(intake_value * x_value)
 
     @classmethod
     def get_user_defined_ration(
