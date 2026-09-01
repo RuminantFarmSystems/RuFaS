@@ -50,6 +50,7 @@ NON_LIMITING_STREAM_FIELDS = [
     "degradable_volatile_solids",
     "total_solids",
     "bedding_non_degradable_volatile_solids",
+    "lignin",
 ]
 
 
@@ -179,6 +180,8 @@ class ManureManager:
                     potassium=processor.stored_manure.potassium,
                     total_manure_mass=processor.stored_manure.mass,
                     dry_matter=processor.stored_manure.total_solids,
+                    volatile_solids=processor.stored_manure.total_volatile_solids,
+                    lignin=processor.stored_manure.lignin,
                 )
 
                 self._manure_nutrient_manager.add_nutrients(nutrients)
@@ -1125,6 +1128,8 @@ class ManureManager:
         potassium = 0.0
         total_manure_mass = 0.0
         dry_matter = 0.0
+        volatile_solids = 0.0
+        lignin = 0.0
         for storage in storages:
             if self._effective_storage_manure_type(storage, manure_type) != manure_type:
                 continue
@@ -1134,6 +1139,8 @@ class ManureManager:
             potassium += source_stream.potassium
             total_manure_mass += source_stream.mass
             dry_matter += source_stream.total_solids
+            volatile_solids += source_stream.total_volatile_solids
+            lignin += source_stream.lignin
         return ManureNutrients(
             manure_type=manure_type,
             nitrogen=nitrogen,
@@ -1141,6 +1148,8 @@ class ManureManager:
             potassium=potassium,
             total_manure_mass=total_manure_mass,
             dry_matter=dry_matter,
+            volatile_solids=volatile_solids,
+            lignin=lignin,
         )
 
     def _handle_nutrient_request_for_storages(
@@ -1192,6 +1201,8 @@ class ManureManager:
         phosphorus = 0.0
         total_manure_mass = 0.0
         dry_matter = 0.0
+        volatile_solids = 0.0
+        lignin = 0.0
         for storage in daily_spread_storages:
             assert isinstance(storage, DailySpread)
             stream = storage.available_for_field_application
@@ -1199,6 +1210,8 @@ class ManureManager:
             phosphorus += stream.phosphorus
             total_manure_mass += stream.mass
             dry_matter += stream.total_solids
+            volatile_solids += stream.total_volatile_solids
+            lignin += stream.lignin
             storage.set_available_for_field_application(ManureStream.make_empty_manure_stream())
 
         if math.isclose(total_manure_mass, 0.0, abs_tol=1e-5):
@@ -1210,6 +1223,8 @@ class ManureManager:
             total_manure_mass=total_manure_mass,
             dry_matter=dry_matter,
             dry_matter_fraction=dry_matter / total_manure_mass,
+            carbon=ManureNutrientManager.calculate_manure_carbon(volatile_solids, nitrogen),
+            lignin=lignin,
         )
 
     @staticmethod
@@ -1401,6 +1416,8 @@ class ManureManager:
                 "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
                 "nitrogen": MeasurementUnits.KILOGRAMS,
                 "phosphorus": MeasurementUnits.KILOGRAMS,
+                "carbon": MeasurementUnits.KILOGRAMS,
+                "lignin": MeasurementUnits.KILOGRAMS,
                 "request_julian_day": MeasurementUnits.ORDINAL_DAY,
                 "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
             },
@@ -1418,6 +1435,8 @@ class ManureManager:
                 "inorganic_phosphorus_fraction": 0.0,
                 "nitrogen": 0.0,
                 "phosphorus": 0.0,
+                "carbon": 0.0,
+                "lignin": 0.0,
                 "request_julian_day": time.current_julian_day,
                 "request_calendar_year": time.current_calendar_year,
             }
@@ -1437,6 +1456,8 @@ class ManureManager:
                 "inorganic_phosphorus_fraction": manure_request_results.inorganic_phosphorus_fraction,
                 "nitrogen": manure_request_results.nitrogen,
                 "phosphorus": manure_request_results.phosphorus,
+                "carbon": manure_request_results.carbon,
+                "lignin": manure_request_results.lignin,
                 "request_julian_day": time.current_julian_day,
                 "request_calendar_year": time.current_calendar_year,
             }
