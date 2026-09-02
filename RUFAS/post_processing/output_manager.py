@@ -64,7 +64,7 @@ class OutputManager:
     def set_metadata_prefix(self, metadata_prefix: str) -> None:
         """Sets the metadata_prefix attribute."""
         self.__metadata_prefix = metadata_prefix
-        pass
+        self.file_manager.metadata_prefix = metadata_prefix
 
     def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
         """
