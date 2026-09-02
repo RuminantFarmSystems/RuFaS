@@ -1123,6 +1123,20 @@ class TaskManager:
         group_args["output_prefix"] = e2e_group
 
         output_manager = OutputManager()
+        output_manager.run_startup_sequence(
+            verbosity=LogVerbosity(group_args["log_verbosity"]) if verbosity is None else verbosity,
+            exclude_info_maps=group_args["exclude_info_maps"],
+            output_directory=output_directory,
+            clear_output_directory=False,
+            chunkification=group_args["chunkification"],
+            max_memory_usage_percent=int(group_args["maximum_memory_usage_percent"] / workers),
+            max_memory_usage=int(group_args["maximum_memory_usage"] / workers),
+            save_chunk_threshold_call_count=group_args["save_chunk_threshold_call_count"],
+            variables_file_path=Path(""),
+            output_prefix=group_args["output_prefix"],
+            task_id=task_id,
+            is_end_to_end_testing_run=True,
+        )
         input_manager = InputManager(metadata_depth_limit)
 
         im_args = e2e_runs[0]
