@@ -1,9 +1,9 @@
 import collections
 from pathlib import Path
+
+from numpy import inf
 from shared_data_types import POOL_ELEMENT_TYPE
 from typing import Any, Counter, Sequence, Union
-
-import numpy as np
 
 from RUFAS.post_processing.file_manager import FileManager
 from RUFAS.units import MeasurementUnits
@@ -28,7 +28,7 @@ class PoolManager:
         self.add_variable_call = 0
         self.save_chunk_threshold_call_count: int = 0
         self.current_pool_size: int = 0
-        self.maximum_pool_size: float = np.inf
+        self.maximum_pool_size: float = inf
         self._variables_usage_counter: Counter[str] = collections.Counter()
         self.file_manager = file_manager
 
@@ -309,7 +309,7 @@ class PoolManager:
 
     def load_multiple_variables_pools_from_files(self, pools: Sequence[tuple[str, Path] | dict[str, Any]]) -> None:
         """
-        Loads multiple previsouly saved ``variable_pools``, namespacing each pool's entries.
+        Loads multiple previously saved ``variable_pools``, namespacing each pool's entries.
 
         Parameters
         ----------

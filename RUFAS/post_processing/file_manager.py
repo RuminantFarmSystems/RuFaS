@@ -38,7 +38,7 @@ class FileManager:
     def __init__(self, metadata_prefix: str, supported_prefixes: dict[str, str]) -> None:
         self.metadata_prefix = metadata_prefix
         # TODO Since this can be 1 of 2 things based on whether it's an e2e run or regular simulation, maybe this should
-        # not be passed in as an argjust and instead be done via a setter function depending on the use case?
+        # not be passed in as an arg and instead be done via a setter function depending on the use case?
         self.supported_filter_types_prefixes = supported_prefixes
 
     def dict_to_file_json(
@@ -150,8 +150,7 @@ class FileManager:
                     ]
                 }
             }
-            output_manager = OutputManager()
-            modified_data_dict = output_manager._add_detailed_values(
+            modified_data_dict = self._add_detailed_values(
                 example_data_dict, OriginLabel.TRUE_AND_REPORT_ORIGINS
             )
             assert modified_data_dict[
@@ -285,26 +284,25 @@ class FileManager:
         --------
         .. code-block:: python
 
-            output_manager = OutputManager()
-            output_manager._get_units_substr("temperature", "C")
+            self._get_units_substr("temperature", "C")
 
         ' (C)'
 
         .. code-block:: python
 
-            output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "magnitude")
+            self._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "magnitude")
 
         ' (m/s)'
 
         .. code-block:: python
 
-            output_manager._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "direction")
+            self._get_units_substr("velocity", {"magnitude": "m/s", "direction": "degrees"}, "direction")
 
         ' (degrees)'
 
         .. code-block:: python
 
-            output_manager._get_units_substr("coordinates", {"x": "m", "y": "m"})
+            self._get_units_substr("coordinates", {"x": "m", "y": "m"})
 
         """
         pass
