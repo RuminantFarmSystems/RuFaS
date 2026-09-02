@@ -1,5 +1,6 @@
 import collections
 from pathlib import Path
+from shared_data_types import POOL_ELEMENT_TYPE
 from typing import Any, Counter, Sequence, Union
 
 import numpy as np
@@ -13,12 +14,15 @@ class PoolManager:
     Class overseeing the management of the variables pool including chunkification.
     """
 
-    pool_element_type = dict[str, list[Any]]
+    _VARIABLE_DUMP_KEYS_TO_IGNORE = frozenset(
+        ["units", "timestep", "info_maps", "prefix", "suffix", "data_origin", "number_animals_in_pen", "simulation_day"]
+    )
 
     def __init__(self, file_manager: FileManager) -> None:
-        self.variables_pool: dict[str, PoolManager.pool_element_type] = {}
+        self.variables_pool: dict[str, POOL_ELEMENT_TYPE] = {}
         self.chunkification: bool = False
         self.saved_pool_chunks_num: int = 0
+        self.saved_pool_chunks_path: Path | None = None
         self.available_memory: int = 0
         self.average_add_variable_call_addition: int = 118
         self.add_variable_call = 0
@@ -51,13 +55,13 @@ class PoolManager:
         """
         pass
 
-    def _pool_element_factory(self) -> pool_element_type:
+    def _pool_element_factory(self) -> POOL_ELEMENT_TYPE:
         """Factory for elements added to pools"""
         pass
 
     def _add_to_pool(
         self,
-        pool: dict[str, pool_element_type],
+        pool: dict[str, POOL_ELEMENT_TYPE],
         key: str,
         value: Any,
         info_map: dict[str, Any],
@@ -422,8 +426,7 @@ class PoolManager:
 
     def _set_variables_pool(
         self,
-        # new_pool: dict[str, PoolManager.pool_element_type],
-        # TODO figure out where pool_element_type type should reside
+        new_pool: dict[str, POOL_ELEMENT_TYPE],
         *,
         pool_size_override: int | None = None,
     ) -> None:
@@ -432,7 +435,7 @@ class PoolManager:
 
         Parameters
         ----------
-        new_pool : dict[str, OutputManager.pool_element_type]
+        new_pool : dict[str, POOL_ELEMENT_TYPE]
             The new ``variables_pool`` to be assigned.
         pool_size_override : int | None, optional
             If provided, this value will be used to set the current pool size instead of calculating it.

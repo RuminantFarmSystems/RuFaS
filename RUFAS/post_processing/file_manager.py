@@ -1,5 +1,6 @@
 from enum import Enum
 from pathlib import Path
+from shared_data_types import POOL_ELEMENT_TYPE
 from typing import Any, Union
 
 import pandas as pd
@@ -31,6 +32,8 @@ class FileManager:
     """
     Class overseeing file management activities in RuFaS.
     """
+
+    JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
     def __init__(self, metadata_prefix: str, supported_prefixes: dict[str, str]) -> None:
         self.metadata_prefix = metadata_prefix
@@ -408,7 +411,7 @@ class FileManager:
         self,
         filter_file: str,
         save_path: Path,
-        # filtered_pool: dict[str, pool_element_type],
+        filtered_pool: dict[str, POOL_ELEMENT_TYPE],
         filter_content: dict[str, Union[str, int]],
     ) -> None:
         """
@@ -420,7 +423,7 @@ class FileManager:
             The name of the filter file being processed.
         save_path : Path
             The directory path where the JSON file will be saved.
-        filtered_pool : dict[str, pool_element_type]
+        filtered_pool : dict[str, POOL_ELEMENT_TYPE]
             The pool of filtered data to be saved.
         filter_content : dict[str, Union[str, int]]
             Additional content from the filter that might influence the file naming.

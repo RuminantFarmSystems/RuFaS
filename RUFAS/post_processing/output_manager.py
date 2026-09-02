@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
 from RUFAS.post_processing.file_manager import FileManager
 from RUFAS.post_processing.output_config_validator import OutputConfigValidator
 from RUFAS.post_processing.pool_manager import PoolManager
 from RUFAS.rufas_time import RufasTime
+
+
+
 
 
 class OutputManager:
@@ -17,11 +19,6 @@ class OutputManager:
     """
 
     __instance: OutputManager | None = None
-    pool_element_type = dict[str, Any]
-    JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
-    _VARIABLE_DUMP_KEYS_TO_IGNORE = frozenset(
-        ["units", "timestep", "info_maps", "prefix", "suffix", "data_origin", "number_animals_in_pen", "simulation_day"]
-    )
 
     def __new__(cls) -> OutputManager:
         if not hasattr(cls, "instance"):
