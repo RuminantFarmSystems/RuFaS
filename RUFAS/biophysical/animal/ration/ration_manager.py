@@ -29,10 +29,10 @@ class RationManager:
         ration formulation.
     maximum_ration_reformulation_attempts : int
         Maximum number of attempts to formulate a ration in a single ration interval for a single pen.
-    intake_options : dict[AnimalCombination, IntakeOption] | None
-        A mapping of animal groupings to their dry matter intake control options. When None, the
-        predict DMI option (default behavior) is used for every animal combination.
-    intake_values : dict[AnimalCombination, float | None] | None
+    intake_options : dict[AnimalCombination, IntakeOption]
+        A mapping of animal groupings to their dry matter intake control options. Animal
+        combinations absent from this mapping use the predict DMI option (default behavior).
+    intake_values : dict[AnimalCombination, float | None]
         A mapping of animal groupings to their user-provided dry matter intake values. Values are
         None for animal combinations using the predict DMI option.
 
@@ -45,8 +45,8 @@ class RationManager:
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]] | None
     tolerance: float | None = 0.0
     maximum_ration_reformulation_attempts: int
-    intake_options: dict[AnimalCombination, IntakeOption] | None = None
-    intake_values: dict[AnimalCombination, float | None] | None = None
+    intake_options: dict[AnimalCombination, IntakeOption] = {}
+    intake_values: dict[AnimalCombination, float | None] = {}
 
     @classmethod
     def set_ration_feeds(cls, ration_config: dict[str, Any]) -> None:
@@ -65,8 +65,8 @@ class RationManager:
         behavior.
 
         """
-        cls.intake_options = None
-        cls.intake_values = None
+        cls.intake_options = {}
+        cls.intake_values = {}
         cls.ration_feeds = {animal_combination: [] for animal_combination in AnimalCombination}
 
         cls.ration_feeds[AnimalCombination.CALF] = [
@@ -265,7 +265,7 @@ class RationManager:
             The configured intake option, or the predict DMI option when none is configured.
 
         """
-        if animal_combination is None or cls.intake_options is None:
+        if animal_combination is None:
             return IntakeOption.PREDICT_DMI
         return cls.intake_options.get(animal_combination, IntakeOption.PREDICT_DMI)
 
@@ -392,7 +392,7 @@ class RationManager:
                 return float(cls.CALF_DRY_MATTER_INTAKE)
             return float(pen.average_nutrition_requirements.dry_matter)
 
-        intake_value = cls.intake_values[animal_combination] if cls.intake_values is not None else None
+        intake_value = cls.intake_values.get(animal_combination)
         if intake_value is None:
             raise ValueError(f"Intake option '{option.value}' for {animal_combination.value} requires an intake_value.")
 

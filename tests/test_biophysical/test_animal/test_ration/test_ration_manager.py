@@ -15,8 +15,8 @@ from RUFAS.biophysical.animal.data_types.intake_option import IntakeOption
 def _reset_intake_options() -> Iterator[None]:
     """Restores the RationManager intake option state after each test."""
     yield
-    RationManager.intake_options = None
-    RationManager.intake_values = None
+    RationManager.intake_options = {}
+    RationManager.intake_values = {}
 
 
 @pytest.fixture
@@ -297,8 +297,6 @@ def test_set_intake_options_defaults_to_predict(mocker: MockerFixture, valid_rat
 
     RationManager.set_intake_options(valid_ration_config)
 
-    assert RationManager.intake_options is not None
-    assert RationManager.intake_values is not None
     for combination in AnimalCombination:
         assert RationManager.intake_options[combination] is IntakeOption.PREDICT_DMI
         assert RationManager.intake_values[combination] is None
@@ -378,13 +376,13 @@ def test_set_ration_feeds_resets_intake_options() -> None:
 
     RationManager.set_ration_feeds({"rations": []})
 
-    assert RationManager.intake_options is None
-    assert RationManager.intake_values is None
+    assert RationManager.intake_options == {}
+    assert RationManager.intake_values == {}
 
 
 def test_get_intake_option_defaults_to_predict_when_unset() -> None:
     """Without configured intake options, every animal combination predicts DMI."""
-    RationManager.intake_options = None
+    RationManager.intake_options = {}
 
     assert RationManager.get_intake_option(AnimalCombination.LAC_COW) is IntakeOption.PREDICT_DMI
     assert RationManager.get_intake_option(None) is IntakeOption.PREDICT_DMI
@@ -418,7 +416,7 @@ def test_effective_dmi_constants(
 
 def test_resolve_target_dmi_predict_uses_pen_requirements() -> None:
     """The predict DMI option keeps the pen's predicted dry matter requirement."""
-    RationManager.intake_options = None
+    RationManager.intake_options = {}
 
     target = RationManager.resolve_target_dmi(AnimalCombination.GROWING, _mock_pen(dry_matter=11.5))
 
@@ -427,7 +425,7 @@ def test_resolve_target_dmi_predict_uses_pen_requirements() -> None:
 
 def test_resolve_target_dmi_predict_calf_uses_constant() -> None:
     """Calf pens keep the fixed calf dry matter intake under the predict DMI option."""
-    RationManager.intake_options = None
+    RationManager.intake_options = {}
 
     target = RationManager.resolve_target_dmi(AnimalCombination.CALF, _mock_pen())
 

@@ -889,8 +889,8 @@ def _reset_intake_options() -> Any:
     from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 
     yield RationManager
-    RationManager.intake_options = None
-    RationManager.intake_values = None
+    RationManager.intake_options = {}
+    RationManager.intake_values = {}
 
 
 def test_ration_config_uses_default_dmi_constants_without_intake_options(
