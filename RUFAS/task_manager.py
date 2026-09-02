@@ -281,10 +281,7 @@ class TaskManager:
                     {
                         "e2e_group": e2e_group,
                         "e2e_runs": e2e_runs,
-                        "task_id": (
-                            f"E2E comparison "
-                            f"{comparison_number}/{len(e2e_groups)}"
-                        ),
+                        "task_id": (f"E2E comparison " f"{comparison_number}/{len(e2e_groups)}"),
                     }
                 )
 
@@ -305,9 +302,7 @@ class TaskManager:
                 info_map,
             )
 
-            json_output_directory = next(iter(e2e_groups.values()))[0][
-                "json_output_directory"
-            ]
+            json_output_directory = next(iter(e2e_groups.values()))[0]["json_output_directory"]
 
             self.output_manager.summarize_e2e_test_results(
                 json_output_directory,
@@ -1064,11 +1059,7 @@ class TaskManager:
                 )
             )
 
-        failed = [
-            result
-            for result in results
-            if result is not None
-        ]
+        failed = [result for result in results if result is not None]
 
         if failed:
             self.output_manager.add_error(
@@ -1076,9 +1067,7 @@ class TaskManager:
                 f"Failed E2E comparison task(s): {failed}",
                 {
                     "class": TaskManager.__name__,
-                    "function": (
-                        self._run_end_to_end_testing_comparisons.__name__
-                    ),
+                    "function": (self._run_end_to_end_testing_comparisons.__name__),
                 },
             )
 
@@ -1182,20 +1171,16 @@ class TaskManager:
             #     is_end_to_end_testing_run=True,
             # )
 
-            averaged_results_path = (
-                E2ETestResultsHandler.average_test_results(
-                    e2e_group=e2e_group,
-                    e2e_runs=e2e_runs,
-                )
+            averaged_results_path = E2ETestResultsHandler.average_test_results(
+                e2e_group=e2e_group,
+                e2e_runs=e2e_runs,
             )
 
             output_manager.is_first_post_processing = False
 
             E2ETestResultsHandler.compare_actual_and_expected_test_results(
                 json_output_path=averaged_results_path,
-                convert_variable_table_path=group_args[
-                    "convert_variable_table_path"
-                ],
+                convert_variable_table_path=group_args["convert_variable_table_path"],
                 output_prefix=e2e_group,
             )
 
@@ -1217,11 +1202,7 @@ class TaskManager:
                 f"Failed to average and compare E2E results: {e}",
                 {
                     "class": TaskManager.__name__,
-                    "function": (
-                        TaskManager
-                        ._process_end_to_end_testing_group
-                        .__name__
-                    ),
+                    "function": (TaskManager._process_end_to_end_testing_group.__name__),
                 },
             )
 
@@ -1264,7 +1245,7 @@ class TaskManager:
         # # TODO average results here - need new function in E2ETestResultsHandler to be called here
         # output_manager.is_first_post_processing = False
         # # TODO this should be able to stay the same because it should be a single E2E comparison filter as it was
-        # before 
+        # before
         # E2ETestResultsHandler.compare_actual_and_expected_test_results(
         #     args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
         # )
