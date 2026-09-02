@@ -38,7 +38,7 @@ class RationManager:
 
     """
 
-    CALF_DRY_MATTER_INTAKE = 3
+    # CALF_DRY_MATTER_INTAKE = 3
 
     _om = OutputManager()
     ration_feeds: dict[AnimalCombination, list[RUFAS_ID]] | None
@@ -388,8 +388,8 @@ class RationManager:
         option = cls.get_intake_option(animal_combination)
 
         if option is IntakeOption.PREDICT_DMI:
-            if animal_combination is AnimalCombination.CALF:
-                return float(cls.CALF_DRY_MATTER_INTAKE)
+            # if animal_combination is AnimalCombination.CALF:
+            #     return float(cls.CALF_DRY_MATTER_INTAKE)
             return float(pen.average_nutrition_requirements.dry_matter)
 
         intake_value = cls.intake_values.get(animal_combination)
