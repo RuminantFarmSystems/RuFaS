@@ -8,9 +8,6 @@ from RUFAS.post_processing.pool_manager import PoolManager
 from RUFAS.rufas_time import RufasTime
 
 
-
-
-
 class OutputManager:
     """
     Output manager for RuFaS simulation results. Works by collecting variables,
