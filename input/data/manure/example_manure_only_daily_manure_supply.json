@@ -61,7 +61,7 @@
       "bedding_non_degradable_volatile_solids": 50,
       "urine_mass": 520.0,
       "urine_nitrogen": 6.25,
-      "methane_production_potential": 0.17
+      "methane_production_potential": 0.24
     },
     {
       "stream_name": "early_lac_pen",
