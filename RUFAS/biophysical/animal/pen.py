@@ -2,6 +2,7 @@ import math
 from typing import NamedTuple, Any
 from scipy.optimize import OptimizeResult
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.bedding.bedding import Bedding
 from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
@@ -1077,7 +1078,7 @@ class Pen:
             pen_available_feeds=pen_available_feeds,
             temperature=temperature,
             previous_ration=self.ration,
-            original_dmi_requirement=initial_requirements.dry_matter,
+            original_dmi_requirement=RationManager.resolve_target_dmi(self.animal_combination, self),
             initial_protein_requirement=initial_requirements.metabolizable_protein,
             simulation_day=simulation_day,
             info_map=info_map,
@@ -1127,6 +1128,13 @@ class Pen:
             # Non-lactating cow pens get a single attempt; only LAC_COW retries.
             if self.animal_combination is not AnimalCombination.LAC_COW:
                 return solution
+            # With a DMI input option and no allowable milk reduction, the user designates both
+            # intake and production, so retries cannot change the outcome.
+            if (
+                RationManager.uses_dmi_input_option(self.animal_combination)
+                and AnimalConfig.milk_reduction_maximum == 0.0
+            ):
+                return solution
             if num_attempts > RationManager.maximum_ration_reformulation_attempts:
                 om.add_log(
                     "Maximum ration reformulation attempts exceeded.",
@@ -1163,17 +1171,14 @@ class Pen:
         """
         if not is_ration_defined_by_user:
             return None
-        dmi_lower_bound = original_dmi_requirement * (
-            1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION + RationManager.tolerance
-        )
-        dmi_upper_bound = original_dmi_requirement * (
-            1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION - RationManager.tolerance
-        )
+        dmi_constraint_fraction = RationManager.effective_dmi_constraint_fraction(self.animal_combination)
+        dmi_lower_bound = original_dmi_requirement * (1 - dmi_constraint_fraction + RationManager.tolerance)
+        dmi_upper_bound = original_dmi_requirement * (1 + dmi_constraint_fraction - RationManager.tolerance)
         if not (dmi_lower_bound < current_dmi_requirement < dmi_upper_bound):
             return None
         if not (self._DMI_INCREASE_CONSTRAINTS & set(constraints_failed_list)):
             return None
-        return current_dmi_requirement * AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR
+        return current_dmi_requirement * RationManager.effective_dmi_retry_increase_factor(self.animal_combination)
 
     def _handle_lactation_failure_in_loop(
         self,
@@ -1306,7 +1311,7 @@ class Pen:
 
         """
         self.ration = RationManager.get_user_defined_ration(
-            self.animal_combination, self.average_nutrition_requirements.dry_matter
+            self.animal_combination, RationManager.resolve_target_dmi(self.animal_combination, self)
         )
         self.set_animal_nutritional_supply(feeds_used=pen_feeds, ration_formulation=self.ration)
         _, evaluation = NutritionEvaluator.evaluate_nutrition_supply(
@@ -1400,7 +1405,7 @@ class Pen:
             self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
         ration = RationManager.get_user_defined_ration(
-            animal_combination, self.average_nutrition_requirements.dry_matter
+            animal_combination, RationManager.resolve_target_dmi(animal_combination, self)
         )
         self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
 
@@ -1420,7 +1425,7 @@ class Pen:
                     break
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
                 ration = RationManager.get_user_defined_ration(
-                    animal_combination, self.average_nutrition_requirements.dry_matter
+                    animal_combination, RationManager.resolve_target_dmi(animal_combination, self)
                 )
                 self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=ration)
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
