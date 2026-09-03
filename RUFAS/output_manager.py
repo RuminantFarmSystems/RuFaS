@@ -2529,7 +2529,7 @@ class OutputManager(object):
             )
 
     def summarize_e2e_test_results(
-        self, 
+        self,
         json_output_directory: Path,
         output_prefixes: list[str],
         e2e_random_seeds: dict[str, list[int]],
@@ -2604,10 +2604,7 @@ class OutputManager(object):
             random_seeds = e2e_random_seeds.get(prefix)
             if random_seeds:
                 formatted_seeds = ", ".join(str(seed) for seed in random_seeds)
-                sys.stdout.write(
-                    f"  Results averaged across random seeds: "
-                    f"{formatted_seeds}\n"
-                )
+                sys.stdout.write(f"  Results averaged across random seeds: " f"{formatted_seeds}\n")
             for module, result in results.items():
                 result = "Passing" if result is True else "Failing" if result is False else result
                 sys.stdout.write(f"  {module}: {result}\n")

@@ -266,16 +266,11 @@ class TaskManager:
                 info_map,
             )
             e2e_random_seeds = {
-                group_name: group_runs[0]["random_seeds"]
-                for group_name, group_runs in e2e_groups.items()
+                group_name: group_runs[0]["random_seeds"] for group_name, group_runs in e2e_groups.items()
             }
             json_output_directory = next(iter(e2e_groups.values()))[0]["json_output_directory"]
 
-            self.output_manager.summarize_e2e_test_results(
-                json_output_directory,
-                output_prefixes,
-                e2e_random_seeds
-            )
+            self.output_manager.summarize_e2e_test_results(json_output_directory, output_prefixes, e2e_random_seeds)
 
         TaskManager.handle_post_processing(
             args={
@@ -1075,11 +1070,9 @@ class TaskManager:
             return None
 
         try:
-            averaged_results_path = (
-                E2ETestResultsHandler.average_test_results(
-                    e2e_group=e2e_group,
-                    e2e_runs=e2e_runs,
-                )
+            averaged_results_path = E2ETestResultsHandler.average_test_results(
+                e2e_group=e2e_group,
+                e2e_runs=e2e_runs,
             )
 
             output_manager.is_first_post_processing = False

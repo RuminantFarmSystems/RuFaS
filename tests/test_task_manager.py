@@ -254,11 +254,7 @@ def test_task_manager_start(
         "function": TaskManager.start.__name__,
     }
 
-    expanded_len = (
-        1
-        if is_end_to_end_test_task or is_update_end_to_end_test_task
-        else 2
-    )
+    expanded_len = 1 if is_end_to_end_test_task or is_update_end_to_end_test_task else 2
 
     expected_add_log_calls = [
         call(

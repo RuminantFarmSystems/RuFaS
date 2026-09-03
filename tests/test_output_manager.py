@@ -4094,9 +4094,7 @@ def test_summarize_e2e_test_results_invalid_prefix_logs_error(
         "_print_e2e_results_summary",
     )
 
-    (tmp_path / "NoMatch_comparison.json").write_text(
-        json.dumps({"Animal.something": {"values": [True]}})
-    )
+    (tmp_path / "NoMatch_comparison.json").write_text(json.dumps({"Animal.something": {"values": [True]}}))
     mock_add_error = mocker.patch.object(
         mock_output_manager,
         "add_error",
