@@ -265,12 +265,16 @@ class TaskManager:
                 f"Gathering e2e results for {output_prefixes}...",
                 info_map,
             )
-
+            e2e_random_seeds = {
+                group_name: group_runs[0]["random_seeds"]
+                for group_name, group_runs in e2e_groups.items()
+            }
             json_output_directory = next(iter(e2e_groups.values()))[0]["json_output_directory"]
 
             self.output_manager.summarize_e2e_test_results(
                 json_output_directory,
                 output_prefixes,
+                e2e_random_seeds
             )
 
         TaskManager.handle_post_processing(
