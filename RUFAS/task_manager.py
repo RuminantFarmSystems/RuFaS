@@ -232,42 +232,6 @@ class TaskManager:
                 " JSON.\n"
             )
 
-        # if is_end_to_end_test_task:
-        #     e2e_groups = self._group_end_to_end_testing_runs(runnable_args)
-
-        #     comparison_args: list[dict[str, Any]] = [
-        #         {
-        #             "e2e_group": e2e_group,
-        #             "e2e_runs": e2e_runs,
-        #         }
-        #         for e2e_group, e2e_runs in e2e_groups.items()
-        #     ]
-        #     # for e2e_group, e2e_runs in e2e_groups.items():
-        #         # self._process_end_to_end_testing_group(
-        #         #     e2e_group,
-        #         #     e2e_runs,
-        #         #     produce_graphics,
-        #         #     metadata_depth_limit,
-        #         #     output_directory,
-        #         #     verbosity,
-        #         # )
-        #     self._run_end_to_end_testing_comparisons(
-        #         comparison_args,
-        #         produce_graphics,
-        #         metadata_depth_limit,
-        #         output_directory,
-        #         verbosity,
-        #     )
-        #     output_prefixes: list[str] = [runnable_args[i]["output_prefix"] for i in range(len(runnable_args))]
-        #     self.output_manager.add_log(
-        #         "Summarizing e2e test results",
-        #         f"Gathering e2e results for {output_prefixes}...",
-        #         info_map,
-        #     )
-        #     json_output_directory = runnable_args[0]["json_output_directory"]
-
-        #     self.output_manager.summarize_e2e_test_results(json_output_directory, output_prefixes)
-
         if is_end_to_end_test_task:
             e2e_groups = self._group_end_to_end_testing_runs(runnable_args)
 
@@ -1009,23 +973,6 @@ class TaskManager:
                 e2e_groups[args["e2e_group"]].append(args)
         return e2e_groups
 
-    # @staticmethod
-    # def _run_end_to_end_testing_comparisons(
-    #     comparison_args: list[dict[str, Any]],
-    #     produce_graphics: bool,
-    #     metadata_depth_limit: int,
-    #     output_directory: Path,
-    #     verbosity: LogVerbosity | None,
-    # ) -> None:
-    #     for args in comparison_args:
-    #         TaskManager._process_end_to_end_testing_group(
-    #             e2e_group=args["e2e_group"],
-    #             e2e_runs=args["e2e_runs"],
-    #             produce_graphics=produce_graphics,
-    #             metadata_depth_limit=metadata_depth_limit,
-    #             output_directory=output_directory,
-    #             verbosity=verbosity
-    #         )
     def _run_end_to_end_testing_comparisons(
         self,
         comparison_args: list[dict[str, Any]],
@@ -1071,28 +1018,6 @@ class TaskManager:
                 },
             )
 
-    # @staticmethod
-    # def _process_end_to_end_testing_group(
-    #         self,
-    #         e2e_group: str,
-    #         e2e_runs: list[dict[str, Any]],
-    #         produce_graphics: bool,
-    #         metadata_depth_limit: int,
-    #         output_directory: Path,
-    #         verbosity: LogVerbosity | None,
-    #     ) -> None:
-    #     """Handles averaging of e2e results by simulation type and e2e results comparison."""
-    #     averaged_results_path = E2ETestResultsHandler.average_test_results(
-    #         e2e_group=e2e_group,
-    #         e2e_runs=e2e_runs
-    #     )
-
-    #     convert_variable_table_path = e2e_runs[0]["convert_variable_table_path"]
-    #     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-    #         json_output_path=averaged_results_path,
-    #         convert_variable_table_path=convert_variable_table_path,
-    #         output_prefix=e2e_group
-    #     )
     @staticmethod
     def _process_end_to_end_testing_group(
         comparison_args: dict[str, Any],
@@ -1146,34 +1071,11 @@ class TaskManager:
             return None
 
         try:
-            # output_manager.run_startup_sequence(
-            #     verbosity=(
-            #         LogVerbosity(group_args["log_verbosity"])
-            #         if verbosity is None
-            #         else verbosity
-            #     ),
-            #     exclude_info_maps=group_args["exclude_info_maps"],
-            #     output_directory=output_directory,
-            #     clear_output_directory=False,
-            #     chunkification=group_args["chunkification"],
-            #     max_memory_usage_percent=int(
-            #         group_args["maximum_memory_usage_percent"] / workers
-            #     ),
-            #     max_memory_usage=int(
-            #         group_args["maximum_memory_usage"] / workers
-            #     ),
-            #     save_chunk_threshold_call_count=(
-            #         group_args["save_chunk_threshold_call_count"]
-            #     ),
-            #     variables_file_path=Path(""),
-            #     output_prefix=e2e_group,
-            #     task_id=task_id,
-            #     is_end_to_end_testing_run=True,
-            # )
-
-            averaged_results_path = E2ETestResultsHandler.average_test_results(
-                e2e_group=e2e_group,
-                e2e_runs=e2e_runs,
+            averaged_results_path = (
+                E2ETestResultsHandler.average_test_results(
+                    e2e_group=e2e_group,
+                    e2e_runs=e2e_runs,
+                )
             )
 
             output_manager.is_first_post_processing = False
@@ -1224,10 +1126,7 @@ class TaskManager:
             "task_id": task_id,
             "produce_graphics": produce_graphics,
         }
-
-        # TODO update log to reflect that it's a series of simulations
         output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
-        # TODO add loop of running single simulations, saving the results, then moving to the next simulation
         TaskManager._handle_simulation_engine_run_tasks(
             args=args,
             input_manager=input_manager,
@@ -1238,27 +1137,6 @@ class TaskManager:
         )
 
         output_manager.add_log("End-to-end testing", "Completed simulation for end-to-end testing", info_map)
-
-        # output_manager.flush_pools()
-
-        # # TODO this is where the loop ends
-        # # TODO average results here - need new function in E2ETestResultsHandler to be called here
-        # output_manager.is_first_post_processing = False
-        # # TODO this should be able to stay the same because it should be a single E2E comparison filter as it was
-        # before
-        # E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        #     args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
-        # )
-
-        # TaskManager.handle_post_processing(
-        #     args=args,
-        #     input_manager=input_manager,
-        #     output_manager=output_manager,
-        #     task_id=task_id,
-        #     should_flush_im_pool=True,
-        #     produce_graphics=produce_graphics,
-        #     save_results=True,
-        # )
 
     @staticmethod
     def _handle_update_e2e_test_results(

@@ -406,37 +406,6 @@ class E2ETestResultsHandler:
                 test_results.append(json.load(result_file))
         return test_results
 
-    # @staticmethod
-    # def _extract_results_paths(e2e_runs: list[dict[str, Any]], json_output_directory: Path) -> list[Path]:
-    #     result_paths: list[Path] = []
-
-    #     for run in e2e_runs:
-    #         run_output_prefix = run["output_prefix"]
-
-    #         matching_paths = [
-    #             path
-    #             for path in json_output_directory.iterdir()
-    #             if path.name.startswith(run_output_prefix)
-    #         ]
-
-    #         if len(matching_paths) != 1:
-    #             OutputManager().add_error(
-    #                 "E2E Results Averaging Error",
-    #                 f"Expected exactly one E2E result file for '{run_output_prefix}', "
-    #                 f"but found {len(matching_paths)}.",
-    #                 info_map={
-    #                     "class": E2ETestResultsHandler.__class__.__name__,
-    #                     "function": E2ETestResultsHandler._extract_results_paths.__name__,
-    #                 }
-    #             )
-    #             raise ValueError(
-    #                 f"Expected exactly one E2E result file for '{run_output_prefix}', "
-    #                 f"but found {len(matching_paths)}."
-    #             )
-
-    #         result_paths.append(matching_paths[0])
-    #     return result_paths
-
     @staticmethod
     def _extract_results_paths(
         e2e_runs: list[dict[str, Any]],
