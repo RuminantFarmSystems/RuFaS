@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from RUFAS.post_processing.file_manager import FileManager
 from RUFAS.post_processing.output_config_validator import OutputConfigValidator
 from RUFAS.post_processing.pool_manager import PoolManager
