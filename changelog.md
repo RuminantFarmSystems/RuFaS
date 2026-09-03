@@ -24,7 +24,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 v1.0.0
 
 ### Next Version Updates
-- [XXXX](https://github.com/RuminantFarmSystems/RuFaS/pull/XXXX) - [minor change] [Economics] [NoInputChange] [OutputChange] Adds the `econ_pba_breakdown` partial budget line item output, one row per line item and scenario with the biophysical module, cost/revenue flow type, item name, biophysical aggregate, price aggregate, and line item value, so economics preprocessing can be audited in a single CSV or JSON output.
+- [3252](https://github.com/RuminantFarmSystems/RuFaS/pull/3252) - [minor change] [Economics] [NoInputChange] [OutputChange] Adds the `econ_pba_breakdown` partial budget line item output, one row per line item and scenario with the biophysical module, cost/revenue flow type, item name, biophysical aggregate, price aggregate, and line item value, so economics preprocessing can be audited in a single CSV or JSON output.
 - [3219](https://github.com/RuminantFarmSystems/RuFaS/pull/3219) - [minor change] [Economics] [NoInputChange] [OutputChange] Port the issue #3088 bedding cost preprocessing onto the special-case handler architecture as BeddingRequirementsHandler, keeping per-pen pairing, lactating-cow-only billing, and identical output.
 - [2793](https://github.com/RuminantFarmSystems/RuFaS/pull/2793) - [minor change] [Animal] [OutputManager] [NoInputChange] [OutputChange] Track and summarize when effective DMI falls below the empirical domain of manure equations for lactating and dry cows at end of simulation.
 - [2865](https://github.com/RuminantFarmSystems/RuFaS/pull/2865) - [minor change] [NoInputChange] [NoOutputChange] Update to tables and formatting in scientific documentation.
