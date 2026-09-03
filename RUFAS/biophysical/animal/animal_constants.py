@@ -96,16 +96,54 @@ DRY = "dry"
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
 OVERSUPPLY_CULL = "culled for herd resize"
 DEATH_CULL = "culled for death"
-LAMENESS_CULL = "culled for lameness"
-INJURY_CULL = "culled for injury"
-MASTITIS_CULL = "culled for mastitis"
-DISEASE_CULL = "culled for disease"
-UDDER_CULL = "culled for udder"
-UNKNOWN_CULL = "culled for unknown"
+# A single "acute sale" (a.k.a. forced / involuntary / spontaneous) removal reason replaces the
+# former six disease-specific cull reasons (feet-and-leg, injury, mastitis, disease, udder,
+# unknown). These represent animals that must leave the herd immediately regardless of whether a
+# replacement is available; the disease-level detail is not recoverable from farm records.
+ACUTE_SALE_CULL = "sold for acute (involuntary) reason"
 
 # youngstock mortality (a loss from death, not a cull)
 CALF_MORTALITY_LOSS = "died from pre-wean mortality"
 HEIFER_MORTALITY_LOSS = "died from post-wean mortality"
+
+# Removal-event timing distributions (moved out of user inputs; see issue #2694).
+#
+# These describe *when*, within a cow's lactation (days in milk), a scheduled death or acute
+# sale occurs. They are model constants -- not recoverable from farm records -- so they live
+# here rather than in animal.json. REMOVAL_TIMING_DAY_BREAKPOINTS are the days-in-milk
+# breakpoints that partition each cumulative distribution function (CDF); the two probability
+# arrays give the CDF value at each breakpoint (they must start at 0.0, end at 1.0, be
+# non-decreasing, and match the breakpoints in length).
+REMOVAL_TIMING_DAY_BREAKPOINTS = [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530]
+
+# CDF of death timing by days in milk.
+DEATH_TIMING_DAY_PROBABILITY = [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1]
+
+# CDF of acute-sale timing by days in milk. This single curve replaces the six former
+# reason-specific curves. The placeholder values below are the mean of those six curves; the
+# final values should be confirmed via literature review / expert input (issue #2694).
+ACUTE_SALE_TIMING_DAY_PROBABILITY = [
+    0,
+    0.063,
+    0.142,
+    0.230,
+    0.325,
+    0.422,
+    0.517,
+    0.607,
+    0.687,
+    0.765,
+    0.833,
+    0.893,
+    0.948,
+    1,
+]
+
+# When a cow selected for removal is already past the timing CDF's last breakpoint (e.g. an
+# extended lactation with days in milk >= REMOVAL_TIMING_DAY_BREAKPOINTS[-1]), the day-in-milk
+# curve has no remaining support, so the event is instead scheduled uniformly within this many
+# days from the current day.
+REMOVAL_FALLBACK_WINDOW_DAYS = 60
 
 # STATS
 STDI = 2

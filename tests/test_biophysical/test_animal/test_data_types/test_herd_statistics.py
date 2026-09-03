@@ -235,7 +235,7 @@ def test_reset_cull_reason_stats(herd_statistics: HerdStatistics) -> None:
     """Test that reset_cull_reason_stats resets cull reason-based attributes correctly."""
     # Set non-zero values
     herd_statistics.cull_reason_stats[animal_constants.DEATH_CULL] = 3
-    herd_statistics.cull_reason_stats_percent[animal_constants.LAMENESS_CULL] = 40.5
+    herd_statistics.cull_reason_stats_percent[animal_constants.ACUTE_SALE_CULL] = 40.5
 
     herd_statistics.reset_cull_reason_stats()
 
