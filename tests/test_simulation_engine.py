@@ -42,6 +42,7 @@ def test_simulation_type_enum_values() -> None:
     assert SimulationType.FIELD_AND_FEED.value == "field_and_feed"
     assert SimulationType.FIELD_ONLY.value == "field_only"
     assert SimulationType.ANIMALS_ONLY.value == "animals_only"
+    assert SimulationType.FEED_ONLY.value == "feed_only"
 
 
 @pytest.mark.parametrize(
@@ -51,6 +52,7 @@ def test_simulation_type_enum_values() -> None:
         (SimulationType.FIELD_AND_FEED, False),
         (SimulationType.FIELD_ONLY, False),
         (SimulationType.ANIMALS_ONLY, True),
+        (SimulationType.FEED_ONLY, False),
     ],
 )
 def test_simulate_animals(
@@ -85,6 +87,7 @@ def test_feed_simulation_types() -> None:
     assert SimulationType._feed_simulation_types() == {
         SimulationType.FULL_FARM,
         SimulationType.FIELD_AND_FEED,
+        SimulationType.FEED_ONLY,
     }
 
 
@@ -422,6 +425,152 @@ def test_execute_field_and_feed_daily_simulation(
     mock_execute_ration_planning.assert_not_called()
     mock_execute_daily_animal_operations.assert_not_called()
     mock_execute_daily_manure_operations.assert_not_called()
+
+
+def test_execute_feed_only_daily_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_feed_only_daily_simulation in file
+    RUFAS/simulation_engine.py
+    """
+    # Arrange
+    parent = MagicMock()
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_execute_feed_storage_upkeep"),
+        "execute_feed_storage_upkeep",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_report_daily_records"),
+        "report_daily_records",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_advance_time"),
+        "advance_time",
+    )
+
+    mock_execute_daily_field_operations = mocker.patch.object(simulation_engine, "_execute_daily_field_operations")
+    mock_receive_daily_harvested_crops = mocker.patch.object(simulation_engine, "_receive_daily_harvested_crops")
+    mock_execute_feed_planning = mocker.patch.object(simulation_engine, "_execute_feed_planning")
+    mock_execute_ration_planning = mocker.patch.object(simulation_engine, "_execute_ration_planning")
+    mock_execute_daily_animal_operations = mocker.patch.object(simulation_engine, "_execute_daily_animal_operations")
+    mock_execute_daily_manure_operations = mocker.patch.object(simulation_engine, "_execute_daily_manure_operations")
+
+    # Act
+    simulation_engine._execute_feed_only_daily_simulation()
+
+    # Assert
+    assert parent.mock_calls == [
+        call.execute_feed_storage_upkeep(),
+        call.report_daily_records(),
+        call.advance_time(),
+    ]
+
+    mock_execute_daily_field_operations.assert_not_called()
+    mock_receive_daily_harvested_crops.assert_not_called()
+    mock_execute_feed_planning.assert_not_called()
+    mock_execute_ration_planning.assert_not_called()
+    mock_execute_daily_animal_operations.assert_not_called()
+    mock_execute_daily_manure_operations.assert_not_called()
+
+
+@pytest.mark.parametrize("is_time_to_process_degradations", [True, False])
+def test_execute_feed_storage_upkeep(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    is_time_to_process_degradations: bool,
+) -> None:
+    """
+    Unit test for function _execute_feed_storage_upkeep in file RUFAS/simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
+    mock_time.simulation_day = 42
+    simulation_engine.weather = MagicMock(auto_spec=Weather)
+    simulation_engine.feed_manager = MagicMock()
+    simulation_engine.feed_degradations_interval_length = timedelta(days=30)
+    mocker.patch.object(
+        SimulationEngine,
+        "_is_time_to_process_feed_degradations",
+        new_callable=mocker.PropertyMock,
+        return_value=is_time_to_process_degradations,
+    )
+
+    # Act
+    simulation_engine._execute_feed_storage_upkeep()
+
+    # Assert
+    simulation_engine.feed_manager.report_feed_storage_levels.assert_called_once_with(42, "daily_storage_levels")
+    simulation_engine.feed_manager.report_cumulative_purchased_feeds.assert_called_once_with(42)
+    if is_time_to_process_degradations:
+        simulation_engine.feed_manager.process_degradations.assert_called_once_with(
+            simulation_engine.weather, mock_time
+        )
+        assert (
+            simulation_engine.next_degradations_processing
+            == (mock_time.current_date + simulation_engine.feed_degradations_interval_length).date()
+        )
+    else:
+        simulation_engine.feed_manager.process_degradations.assert_not_called()
+
+
+def test_gather_initial_feed_storage_contents(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
+    """
+    Unit test for function _gather_initial_feed_storage_contents in file RUFAS/simulation_engine.py
+    """
+    # Arrange
+    first_contents = {
+        "initial_contents": [
+            {"storage_name": "corn_silage_storage_1", "dry_matter_mass": 200000.0, "dry_matter_percentage": 35.0},
+            {"storage_name": "corn_silage_storage_1", "dry_matter_mass": 1.0, "dry_matter_percentage": 1.0},
+        ]
+    }
+    second_contents = {
+        "initial_contents": [
+            {"storage_name": "alfalfa_hay_storage_2", "dry_matter_mass": 30000.0, "dry_matter_percentage": 88.0},
+        ]
+    }
+    simulation_engine.im = MagicMock(auto_spec=InputManager)
+    simulation_engine.im.get_data_keys_by_properties.return_value = ["initial_contents_1", "initial_contents_2"]
+    simulation_engine.im.get_data.side_effect = [first_contents, second_contents]
+    mock_add_warning = mocker.patch.object(simulation_engine.om, "add_warning")
+
+    # Act
+    initial_contents_by_storage_name = simulation_engine._gather_initial_feed_storage_contents()
+
+    # Assert
+    assert initial_contents_by_storage_name == {
+        "corn_silage_storage_1": {"dry_matter_mass": 200000.0, "dry_matter_percentage": 35.0},
+        "alfalfa_hay_storage_2": {"dry_matter_mass": 30000.0, "dry_matter_percentage": 88.0},
+    }
+    mock_add_warning.assert_called_once()
+    assert "corn_silage_storage_1" in mock_add_warning.call_args.args[1]
+
+
+@pytest.mark.parametrize("simulate_fields, expected_warning_count", [(False, 1), (True, 0)])
+def test_gather_initial_feed_storage_contents_no_input_files(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_fields: bool,
+    expected_warning_count: int,
+) -> None:
+    """
+    Unit test for function _gather_initial_feed_storage_contents in file RUFAS/simulation_engine.py when no initial
+    contents input files are provided.
+    """
+    # Arrange
+    simulation_engine.simulate_fields = simulate_fields
+    simulation_engine.im = MagicMock(auto_spec=InputManager)
+    simulation_engine.im.get_data_keys_by_properties.return_value = []
+    mock_add_warning = mocker.patch.object(simulation_engine.om, "add_warning")
+
+    # Act
+    initial_contents_by_storage_name = simulation_engine._gather_initial_feed_storage_contents()
+
+    # Assert
+    assert initial_contents_by_storage_name == {}
+    assert mock_add_warning.call_count == expected_warning_count
 
 
 def test_execute_animals_only_daily_simulation(
