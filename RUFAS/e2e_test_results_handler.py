@@ -296,7 +296,10 @@ class E2ETestResultsHandler:
                 is_numeric = isinstance(reference_value, Number) and not isinstance(reference_value, bool)
 
                 if is_numeric:
-                    if not all(isinstance(value, Number) and not isinstance(value, bool) for value in matching_values):
+                    if not all(
+                        isinstance(value, Number) and not isinstance(value, bool)
+                        for value in matching_values
+                    ):
                         OutputManager().add_error(
                             "E2E Results Averaging Error",
                             f"Inconsistent numeric value types for '{output_name}' at index {index}.",
@@ -310,9 +313,21 @@ class E2ETestResultsHandler:
                             f"at index {index}: {matching_values}."
                         )
 
-                    numeric_values = [float(value) for value in matching_values if not math.isnan(float(value))]
+                    if all(value == reference_value for value in matching_values):
+                        averaged_values.append(reference_value)
+                        continue
 
-                    averaged_value = sum(numeric_values) / len(numeric_values) if numeric_values else float("nan")
+                    numeric_values = [
+                        float(value)
+                        for value in matching_values
+                        if not math.isnan(float(value))
+                    ]
+
+                    averaged_value = (
+                        sum(numeric_values) / len(numeric_values)
+                        if numeric_values
+                        else float("nan")
+                    )
 
                     averaged_values.append(averaged_value)
 
