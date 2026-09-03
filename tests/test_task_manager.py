@@ -101,8 +101,16 @@ def test_task_manager_start(
     tm.output_manager = mock_output_manager
 
     mock_im = mocker.MagicMock(auto_spec=InputManager)
-    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_im)
-    mock_start_data = mocker.patch.object(mock_im, "start_data_processing", return_value=True)
+    mocker.patch(
+        "RUFAS.task_manager.InputManager",
+        return_value=mock_im,
+    )
+
+    mock_start_data = mocker.patch.object(
+        mock_im,
+        "start_data_processing",
+        return_value=True,
+    )
     mock_get_data = mocker.patch.object(
         mock_im,
         "get_data",
@@ -119,41 +127,95 @@ def test_task_manager_start(
         "handle_post_processing",
     )
 
-    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
-    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
-    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
-    mocker.patch.object(tm, "get_rufas_version", return_value="1.0.0")
-    mock_check_dependencies = mocker.patch.object(tm, "check_dependencies")
-    mock_check_python_version = mocker.patch.object(tm, "check_python_version")
+    mock_run_startup_sequence = mocker.patch.object(
+        mock_output_manager,
+        "run_startup_sequence",
+    )
+    mock_print_credits = mocker.patch.object(
+        mock_output_manager,
+        "print_credits",
+    )
+    mock_add_log = mocker.patch.object(
+        mock_output_manager,
+        "add_log",
+    )
+
+    mocker.patch.object(
+        tm,
+        "get_rufas_version",
+        return_value="1.0.0",
+    )
+    mock_check_dependencies = mocker.patch.object(
+        tm,
+        "check_dependencies",
+    )
+    mock_check_python_version = mocker.patch.object(
+        tm,
+        "check_python_version",
+    )
 
     if is_end_to_end_test_task:
         e2e_task = {
             "task_type": TaskType.END_TO_END_TESTING,
             "output_prefix": "test_prefix",
+            "e2e_group": "test_group",
+            "random_seeds": [42, 44, 46],
             "json_output_directory": Path("out/e2e"),
         }
-        mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([e2e_task], [{}]))
-        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
-            tm, "_expand_multi_runs_to_single_runs", return_value=[]
+
+        mock_parse_input_tasks = mocker.patch.object(
+            tm,
+            "_parse_input_tasks",
+            return_value=([e2e_task], [{}]),
         )
+        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
+            tm,
+            "_expand_multi_runs_to_single_runs",
+            return_value=[],
+        )
+
     elif is_update_end_to_end_test_task:
         update_e2e_task = {
             "task_type": TaskType.UPDATE_E2E_TEST_RESULTS,
             "output_prefix": "update_prefix",
             "json_output_directory": Path("out/update_e2e"),
         }
-        mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([update_e2e_task], [{}]))
-        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
-            tm, "_expand_multi_runs_to_single_runs", return_value=[]
+
+        mock_parse_input_tasks = mocker.patch.object(
+            tm,
+            "_parse_input_tasks",
+            return_value=([update_e2e_task], [{}]),
         )
-    else:
-        mock_parse_input_tasks = mocker.patch.object(tm, "_parse_input_tasks", return_value=([{}], [{}]))
         mock_expand_multi_runs_to_single_runs = mocker.patch.object(
-            tm, "_expand_multi_runs_to_single_runs", return_value=[{}]
+            tm,
+            "_expand_multi_runs_to_single_runs",
+            return_value=[],
         )
 
-    mock_run_tasks = mocker.patch.object(tm, "_run_tasks")
-    mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
+    else:
+        mock_parse_input_tasks = mocker.patch.object(
+            tm,
+            "_parse_input_tasks",
+            return_value=([{}], [{}]),
+        )
+        mock_expand_multi_runs_to_single_runs = mocker.patch.object(
+            tm,
+            "_expand_multi_runs_to_single_runs",
+            return_value=[{}],
+        )
+
+    mock_run_tasks = mocker.patch.object(
+        tm,
+        "_run_tasks",
+    )
+    mock_run_e2e_comparisons = mocker.patch.object(
+        tm,
+        "_run_end_to_end_testing_comparisons",
+    )
+    mock_summarize = mocker.patch.object(
+        mock_output_manager,
+        "summarize_e2e_test_results",
+    )
 
     tm.start(
         metadata_path=Path("metadata/path"),
@@ -187,14 +249,36 @@ def test_task_manager_start(
         is_end_to_end_testing_run=False,
     )
 
-    info_map = {"class": TaskManager.__name__, "function": TaskManager.start.__name__}
-    expanded_len = 1 if (is_end_to_end_test_task or is_update_end_to_end_test_task) else 2
+    info_map = {
+        "class": TaskManager.__name__,
+        "function": TaskManager.start.__name__,
+    }
+
+    expanded_len = 1 if is_end_to_end_test_task or is_update_end_to_end_test_task else 2
+
     expected_add_log_calls = [
-        call("Task Manager Start", "Task Manager Started.", info_map),
-        call("Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map),
-        call("Task Manager parsed tasks", "Parsed 2 tasks args.", info_map),
-        call("Task Manager expanded tasks", f"Expanded task args to {expanded_len}. Starting the tasks...", info_map),
+        call(
+            "Task Manager Start",
+            "Task Manager Started.",
+            info_map,
+        ),
+        call(
+            "Task Manager workers",
+            f"Task Manager is going to run {workers} in parallel.",
+            info_map,
+        ),
+        call(
+            "Task Manager parsed tasks",
+            "Parsed 2 tasks args.",
+            info_map,
+        ),
+        call(
+            "Task Manager expanded tasks",
+            f"Expanded task args to {expanded_len}. Starting the tasks...",
+            info_map,
+        ),
     ]
+
     mock_add_log.assert_has_calls(expected_add_log_calls)
 
     mock_start_data.assert_called_once_with(
@@ -209,7 +293,10 @@ def test_task_manager_start(
 
     if not is_end_to_end_test_task and not is_update_end_to_end_test_task:
         mock_run_tasks.assert_called_once_with(
-            [{"task_id": "1/2"}, {"task_id": "2/2"}],
+            [
+                {"task_id": "1/2"},
+                {"task_id": "2/2"},
+            ],
             produce_graphics,
             metadata_depth_limit,
             workers,
@@ -217,10 +304,14 @@ def test_task_manager_start(
             Path("output/directory"),
             verbosity,
         )
+
+        mock_run_e2e_comparisons.assert_not_called()
         mock_summarize.assert_not_called()
+
     elif is_end_to_end_test_task:
         args, _kwargs = mock_run_tasks.call_args
         runnable_passed = args[0]
+
         assert len(runnable_passed) == 1
         assert runnable_passed[0]["task_id"] == "1/1"
         assert args[1] == produce_graphics
@@ -228,21 +319,54 @@ def test_task_manager_start(
         assert args[3] == workers
         assert args[4] == Path("metadata/path")
 
+        mock_run_e2e_comparisons.assert_called_once_with(
+            comparison_args=[
+                {
+                    "e2e_group": "test_group",
+                    "e2e_runs": [
+                        {
+                            "task_type": TaskType.END_TO_END_TESTING,
+                            "output_prefix": "test_prefix",
+                            "e2e_group": "test_group",
+                            "random_seeds": [42, 44, 46],
+                            "json_output_directory": Path("out/e2e"),
+                            "task_id": "1/1",
+                        }
+                    ],
+                    "task_id": "E2E comparison 1/1",
+                }
+            ],
+            produce_graphics=produce_graphics,
+            metadata_depth_limit=metadata_depth_limit,
+            workers=workers,
+            output_directory=Path("output/directory"),
+            verbosity=verbosity,
+        )
+
         mock_add_log.assert_any_call(
             "Summarizing e2e test results",
-            "Gathering e2e results for ['test_prefix']...",
+            "Gathering e2e results for ['test_group']...",
             info_map,
         )
-        mock_summarize.assert_called_once_with(Path("out/e2e"), ["test_prefix"])
+
+        mock_summarize.assert_called_once_with(
+            Path("out/e2e"),
+            ["test_group"],
+            {"test_group": [42, 44, 46]},
+        )
+
     else:
         args, _kwargs = mock_run_tasks.call_args
         runnable_passed = args[0]
+
         assert len(runnable_passed) == 1
         assert runnable_passed[0]["task_id"] == "1/1"
         assert args[1] == produce_graphics
         assert args[2] == metadata_depth_limit
         assert args[3] == workers
         assert args[4] == Path("metadata/path")
+
+        mock_run_e2e_comparisons.assert_not_called()
         mock_summarize.assert_not_called()
 
         captured = capsys.readouterr()
@@ -257,6 +381,7 @@ def test_task_manager_start(
     )
     mock_check_dependencies.assert_called_once()
     mock_check_python_version.assert_called_once()
+
     mock_handle_post_processing.assert_called_once_with(
         args={
             "exclude_info_maps": exclude_info_maps,
@@ -564,15 +689,11 @@ def test_handle_end_to_end_testing(
 ) -> None:
     """Test that end-to-end testing is executed correctly."""
     sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
-    post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
     args = {
         "json_output_directory": "json_path",
         "convert_variable_table_path": "compare_path",
         "output_prefix": "dummy_prefix",
     }
-    compare_outputs = mocker.patch(
-        "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results"
-    )
     mock_input_manager = mocker.MagicMock()
     add_log = mocker.patch.object(mock_output_manager, "add_log")
 
@@ -586,11 +707,7 @@ def test_handle_end_to_end_testing(
         produce_graphics=True,
         should_flush_im_pool=True,
     )
-    compare_outputs.assert_called_once_with(
-        args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
-    )
     assert add_log.call_count == 2
-    assert post_processing.call_count == 1
 
 
 def test_handle_update_e2e_test_results(
@@ -805,7 +922,7 @@ def test_task(
         "logs_directory": Path("/fake/logs"),
         "filters_directory": Path("/fake/filters"),
         "task_id": 1,
-        "random_seed": 924,
+        "random_seeds": [924],
         "suppress_log_files": True,
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
@@ -859,7 +976,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: OutputMan
         "output_prefix": "test",
         "logs_directory": Path("/fake/logs"),
         "task_id": 1,
-        "random_seed": 924,
+        "random_seeds": [924],
         "suppress_log_files": True,
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
@@ -922,7 +1039,7 @@ def test_task_failed(task_manager: TaskManager) -> None:
         "output_prefix": "test",
         "logs_directory": Path("/fake/logs"),
         "task_id": 1,
-        "random_seed": 924,
+        "random_seeds": [924],
         "suppress_log_files": True,
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
@@ -1054,7 +1171,7 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
         "output_prefix": "test",
         "logs_directory": "/fake/logs",
         "task_id": 1,
-        "random_seed": 924,
+        "random_seeds": [924],
         "suppress_log_files": True,
         "metadata_file_path": "/fake/logs",
         "properties_file_path": "more/fake/paths",
@@ -1091,7 +1208,7 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool, 
         "output_prefix": "test",
         "logs_directory": "/fake/logs",
         "task_id": 1,
-        "random_seed": 924,
+        "random_seeds": [924],
         "suppress_log_files": True,
         "metadata_file_path": "/fake/logs",
         "properties_file_path": "more/fake/paths",
@@ -1136,7 +1253,7 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
         "output_prefix": "test",
         "logs_directory": "/fake/logs",
         "task_id": 1,
-        "random_seed": 924,
+        "random_seeds": [924],
         "suppress_log_files": True,
         "metadata_file_path": "/fake/logs",
         "properties_file_path": "more/fake/paths",
@@ -1171,7 +1288,7 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "output_prefix": "Task 2",
                 "log_verbosity": "errors",
                 "sampler": "fractional_factorial",
-                "random_seed": 42,
+                "random_seeds": [42],
                 "SA_load_balancing_start": 0,
                 "SA_load_balancing_stop": 1,
                 "skip_values": 0,
@@ -1264,7 +1381,7 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "output_prefix": "Task 3",
                 "log_verbosity": "errors",
                 "sampler": "sobol",
-                "random_seed": 42,
+                "random_seeds": [42],
                 "SA_load_balancing_start": 0,
                 "SA_load_balancing_stop": 1,
                 "skip_values": 0,
@@ -1413,7 +1530,7 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "output_prefix": "Task 4",
                 "log_verbosity": "errors",
                 "sampler": "morris",
-                "random_seed": 42,
+                "random_seeds": [42],
                 "SA_load_balancing_start": 0,
                 "SA_load_balancing_stop": 1,
                 "skip_values": 0,
@@ -1517,7 +1634,7 @@ def test_expand_sensitivity_analysis_args(
             "output_prefix": expected_output_prefixes[i],
             "log_verbosity": "errors",
             "sampler": multi_run_args["sampler"],
-            "random_seed": 42,
+            "random_seeds": [42],
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
             "skip_values": 0,
