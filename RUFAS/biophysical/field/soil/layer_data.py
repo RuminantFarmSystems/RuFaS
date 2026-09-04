@@ -942,7 +942,7 @@ class LayerData:
 
         # pseudocode_soil S.4.B.1
         if self.water_content <= self.field_capacity_content:
-            if self.field_capacity_content == self.wilting_point_content:
+            if self.field_capacity_content - self.wilting_point_content == 0.0:
                 return 0.0
             else:
                 return (self.water_content - self.wilting_point_content) / (
