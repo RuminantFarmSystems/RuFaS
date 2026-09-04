@@ -19,6 +19,10 @@
   `mocker.patch("pkg.mod.Name")` / `with patch("...")`, never direct assignment
   `Class.method = MagicMock()`. Prefer patching estimator/manager methods over
   rewiring whole objects.
+- **Mock only reachable states** — when stubbing an internal helper's return
+  value, feed it only states the production code can actually produce (check
+  what the real callee can return before writing the stub). A green test on an
+  unreachable state validates dead code and hides it from review.
 - **Floats**: compare with `pytest.approx(...)`, never `==` — even for
   pass-through or literal-zero values. Justify the tolerance by the reference
   value's origin (`rel=1e-6` algebraic identity; `rel=0.03`–`0.05` published /
@@ -51,7 +55,9 @@
   derivation comments contradict each other. Before adding a `*_benchmarks.py`
   file, fold the scenarios into the existing calculator test file. Pin expected
   values as named module attributes with unit + conditions, and cite the source
-  workbook by filename in the module header.
+  workbook by filename in the module header. Before committing a derivation
+  comment, verify it actually reproduces the pinned value — a wrong derivation
+  next to a right pin poisons future reviews.
 
 ## End-to-end (E2E) tests
 

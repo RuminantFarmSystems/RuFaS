@@ -24,7 +24,12 @@ animal→manure, manure→crop_soil) — don't pass raw dicts between subsystems
 Constants live in dedicated `*_constants.py` modules per domain. Never inline
 a numeric literal in a formula — **including bounds/clamps** like
 `max(x, 0.95)`: name it. Give EVERY constant a docstring UNDER the assignment
-stating its unit and bibliographic source (canonical style: `ACTIVATION_ENERGY`
-in `manure/manure_constants.py`). A constant without a documented source blocks
-review. If a formula clamps or bounds a value, say so in the function's
-docstring (`Notes`) and cover the clamped branch with a test.
+stating its unit and provenance: a bibliographic source for scientific values
+(canonical style: `ACTIVATION_ENERGY` in `manure/manure_constants.py`), or an
+explicit statement that it is a numerical/implementation guard (e.g.
+"numerical guard against a near-zero denominator, not an NRC threshold" —
+`BEEF_DMI_MIN_NE_CONCENTRATION`). **NEVER invent or approximate a citation to
+satisfy this rule** — an honest "no source, here's why it exists" is
+compliant; a fabricated reference is not. A constant without documented
+provenance blocks review. If a formula clamps or bounds a value, say so in
+the function's docstring (`Notes`) and cover the clamped branch with a test.
