@@ -1,0 +1,5 @@
+﻿Variable , Definition , Units , Default
+region_adjustments , Regional adjustments based on FIPS codes (fips_code) in configuration file , -- , --
+year_adjustments , Yearly adjustments based on calving year; defined by simulation time period (time.end_date.year) ,-- , 2006-2016
+milking_frequency_adjustments, Adjustments based on milking frequency (cow_times_milked_per_day) in the animal input file,-- , 2 or 3 (classified as twice daily (< 2.5 milkings per day) or thrice daily (≥ 2.5 milkings/day))
+parity_adjustments," Adjustments to lactation curve based on parity (firs,t second, third+)", -- , 1-3

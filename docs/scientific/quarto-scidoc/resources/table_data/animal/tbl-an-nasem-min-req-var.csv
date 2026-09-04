@@ -1,5 +1,5 @@
 ﻿Variable,Description,Units
-ADG , average daily BW gain  ,grams per day (g/d)
+ADG , average daily BW gain ,grams per day (g/d)
 ADG , average daily gain ,g/d
 BW , Body weight ,kilograms (kg)
 BW , Body weight ,kg
@@ -8,7 +8,7 @@ Ca\_growth , Calcium requirement for growth ,g/d
 Ca\_lact , Calcium requirement for lactation ,g/d
 Ca\_main , Calcium requirement for maintenance ,g/d
 Ca\_preg , Calcium pregnancy requirement ,g/d
-DMI , dry matter intake  ,kg per day (kg/d)
+DMI , dry matter intake ,kg per day (kg/d)
 DOP , days of pregnancy ,d
 Milk , Milk yield ,kg/d
 MilkTP , Milk true protein ,%

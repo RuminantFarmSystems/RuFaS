@@ -1,9 +1,9 @@
 ﻿Variable,Definition (units),Default,Min,Max
-birth_weight_avg_ho,Average Holstein birth weight (kg/head),42.9,1,NA
-birth_weight_std_ho,Holstein birth weight standard deviation (kg/head),69,0,NA
-birth_weight_avg_je,Average Jersey birth weight (kg/head),25.2,1,NA
-birth_weight_std_je,Jersey birth weight standard deviation (kg/head),4.4,0,NA
-mature_body_weight_avg,The average mature body weight of cows (kg/head),740.1,0,NA
-mature_body_weight_std,The standard deviation of mature body weight of cows (kg/head),73.5,0,NA
-wean_day,the days of age at which calves are fully weaned from milk or milk replacer (days),60,0,NA
-target_heifer_preg_day,The target age (in days) for heifers to become pregnant â€“ adjusting for heifer body weight (days),420,NA,NA
+birth_weight_avg_ho,Average Holstein birth weight (kg/head),42.9,1,--
+birth_weight_std_ho,Holstein birth weight standard deviation (kg/head),69,0,--
+birth_weight_avg_je,Average Jersey birth weight (kg/head),25.2,1,--
+birth_weight_std_je,Jersey birth weight standard deviation (kg/head),4.4,0,--
+mature_body_weight_avg,The average mature body weight of cows (kg/head),740.1,0,--
+mature_body_weight_std,The standard deviation of mature body weight of cows (kg/head),73.5,0,--
+wean_day,the days of age at which calves are fully weaned from milk or milk replacer (days),60,0,--
+target_heifer_preg_day,The target age (in days) for heifers to become pregnant adjusting for heifer body weight (days),420,--,--

@@ -1,0 +1,8 @@
+﻿Variable , Definition , Default , Min , Max 
+estrus_conception_rate , Conception rate for ED/ED-TAI ,0.5,0, --
+presynch_program ,"Presynch method used in TAI (OvSynch 48,  OvSynch 56,  CoSynch 72,  5d CoSynch, None", OvSynch 56, -- , -- 
+presynch_program_start_day, Day of first hormone injection for presynch,70,0, --
+ovsynch_program ," OvSynch method used in TAI or ED-TAI (TAIafterPD,  TAIbeforePD,  PGFatP, None)", TAIafterPD, -- , -- 
+ovsynch_program_start_day, Start day for OvSynch protocol,0.6,0,1
+ovsynch_program_conception_rate, Conception rate for OvSynch program, --, --, --
+estrus_detection_rate, Resynch protocol around pregrancy check, --, --, --

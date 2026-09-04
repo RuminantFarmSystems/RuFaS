@@ -14,7 +14,7 @@ book:
     - qmd/example_structures.qmd
     - qmd/animal.qmd
     - qmd/manure.qmd
-    - qmd/crop_and_soil.qmd
+    - qmd/soil_and_crop.qmd
     - qmd/feed_storage.qmd
     - qmd/economics.qmd
     - qmd/connections.qmd
@@ -47,7 +47,7 @@ format:
     margin-right: 1in
     include-in-header: resources/templates/preamble.tex
     toc: true
-    toc-depth: 2
+    toc-depth: 3
     toc-title: "Contents"
     lof: true
     lot: true

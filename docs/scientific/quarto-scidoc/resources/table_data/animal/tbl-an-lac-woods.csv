@@ -1,0 +1,7 @@
+﻿Variable , Definition , Units , Default
+parameter_l_mean , Baseline value for parameter l of Wood's lactation curve , -- , 19.9 
+parameter_m_mean , Baseline value for parameter m of Wood's lactation curve ,-- , 0.247
+parameter_n_mean, Baseline value for parameter n of Wood's lactation curve,-- , 0.003376
+parameter_l_std_dev, Standard deviation for parameter l, -- , Parity 1: 0.28; Parity 2: 0.54; Parity 3+: 0.51
+parameter_m_std_dev, Standard deviation for parameter m, -- , Parity 1: 0.0046; Parity 2: 0.0064; Parity 3+: 0.0060
+parameter_n_std_dev, Standard deviation for parameter n, -- , Parity 1: 3.77e-5; Parity 2: 5.82e-5; Parity 3+: 5.54e-5
