@@ -3210,7 +3210,7 @@ If a cow is not pregnant when she reaches the days in milk cutoff specified by t
 If a cow is not pregnant when she reaches the days in milk cutoff specified by the user, she will be marked as Do Not Breed and no longer participate in reproductive protocols. When her milk production drops below the production cutoff specified by the user, she is sold for the reason of low production. Note that the only cows who are sold for “low production” are those flagged as DNB for reproductive failure; no low-producing cow who is pregnant or has fewer DIM than the cutoff will be sold for low production.
 :::
 
-## Methane Emission and Manure Excretion
+## Manure Excretion
 
 ### Introduction
 
@@ -3783,15 +3783,17 @@ All references may be found at the end of this document or are based on expert c
 and 2024.
 ::: 
 
-### Enteric Methane Emission Introduction
+## Enteric Methane Emission 
+
+### Introduction
 
 The Enteric Methane Calculator module calculates daily enteric methane emissions for calves, heifers, lactating cows, 
 and dry cows. Methane emissions are estimated based on animal characteristics, dietary intake, and a variety of 
 animal category specific methane models. The IPCC model is available for all animal classes except 
 calves [@IPCC2006]. The equation from @Mills2003 is also available for dry and lactating cows and the 
-@Niu2018 equation is available for lactating cows. <br>
+@Niu2018 equation is available for lactating cows. Finally, a separate equation published by @Pattanaik2003 is used for calves. 
 
-Finally, a separate equation published by @Pattanaik2003 is used for calves. Simulation of enteric methane mitigation via mitigation supplements 3-NOP or monensin are also available for lactating cows The module integrates with the `DigestiveSystem` class and supports methane mitigation strategies using feed additives.
+<br> Simulation of enteric methane mitigation via mitigation supplements 3-NOP or monensin are also available for lactating cows The module integrates with the `DigestiveSystem` class and supports methane mitigation strategies using feed additives.
 
 * *Classes:* `EntericMethaneCalculator`
 * *Key Methods:*
@@ -3803,7 +3805,7 @@ Finally, a separate equation published by @Pattanaik2003 is used for calves. Sim
 
 The calculated enteric methane emissions are directly output to the Output Manager to generate the final reports.
 
-#### Required User Inputs
+### Required User Inputs
 
 ```{python}
 #| label: tbl-an-gen-enteric-met
@@ -3832,7 +3834,7 @@ import_table(
 )
 ```
 
-#### Expected Outputs
+### Expected Outputs
 
 This module predicts the daily enteric methane emissions for individual animals:
 
@@ -3865,9 +3867,10 @@ $$
 [[**AN.MET.2**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{gross\_energy\_concentration} &= 0.263 \times \left(\text{crude\_protein\_concentration} + 0.522\right) \\
-&\qquad \times \left(\text{ethyl\_ester\_concentration} + 0.198\right) \times \left(\text{neutral\_detergent\_fiber\_concentration} + 0.160\right) \\
-&\qquad \times \text{soluble\_residue}
+\text{gross\_energy\_concentration} &= 0.263 \times \text{crude\_protein\_concentration} + \\
+&\qquad 0.522 \times \text{ethyl\_ester\_concentration} + \\
+&\qquad 0.198 \times \text{neutral\_detergent\_fiber\_concentration} +  \\
+&\qquad 0.160 \times \text{soluble\_residue}
 \end{aligned}
 $$
 :::
@@ -3898,7 +3901,7 @@ $$
 ::: {#eq-an-met-5}
 [[**AN.MET.5**]]{.aside .content-visible when-format="html"}
 $$
-\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565}
+\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentration} \times \text{dry\_matter\_intake}}{0.05565}
 $$
 :::
 
@@ -3950,7 +3953,7 @@ $$
 [See [AN.MET.5](#eq-an-met-5)]{.aside .content-visible when-format="html"}
 
 $$
-\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565}
+\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentration} \times \text{dry\_matter\_intake}}{0.05565}
 $$
 :::
 
@@ -3978,18 +3981,13 @@ This is previously described in the [lactating cow section](#sec-an-ipcc-model) 
 [See [AN.EXC.5](#eq-an-exc-5)]{.aside .content-visible when-format="html"}
 
 $$
-\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565} 
+\text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentration} \times \text{dry\_matter\_intake}}{0.05565} 
 $$
 :::
 
 ### Methane Mitigation
 
-- Methane mitigation strategies are applied exclusively to lactating and dry cows. However, caution is advised when 
-interpreting the outcomes for dry cows, as the equations used were developed based on datasets from lactating cows.
-- Currently, the implemented methane mitigation feed additives include 3-NOP and monensin, with essential oils and 
-seaweed planned for future integration.
-- The detailed methodology for methane mitigation calculations will be provided in a separate document titled Methane 
-Mitigation Calculator.
+
 
 #### Introduction
 
