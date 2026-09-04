@@ -5,4 +5,3 @@
  daily_milk_production , Daily milk production; for lactating cows only , kg , --
  body_weight , Body weight of the cow , kg , --
  milk_fat , Milk fat content , % ,3.5
- metabolizable_energy_intake , Metabolizable energy intake per kg DM , Mcal/kg DM , --
