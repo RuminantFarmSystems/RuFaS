@@ -2318,7 +2318,7 @@ when her bodyweight is updated.
 :::{#eq-an-bwt-17}
 [[**AN.BWT.17**]]{.aside .content-visible when-format="html"}
 $$        
-\text{conceptus\_growth} = \text{conceptus\_weight}
+\text{conceptus\_growth} = -\text{ conceptus\_weight}
 $$
 :::
 
@@ -2331,8 +2331,8 @@ daily tissue mobilized during lactation.
 [[**AN.BWT.18**]]{.aside .content-visible when-format="html"}
 $$     
 \text{bodyweight\_tissue\_change} = \frac{\text{P1}}{\text{P2}} \times \
-  exp\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg) + \
-  \text{DIM} \times exp\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg)
+  e^{(1 - \frac{\text{DIM}}{\text{P2}})} + \
+  \text{DIM} \times e^{(1 - \frac{\text{DIM}}{\text{P2}})}
 $$
 :::
 
