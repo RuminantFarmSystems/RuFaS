@@ -1,0 +1,4 @@
+﻿Variable Name , Definition , Default , Min , Max 
+ration.user_input , User decision to use the user-defined ration formulation or the automated ration formulation methods (true or false respectively) , TRUE , -- , --
+ration.formulation_interval , Ration formulation interval (days) , 30 , 1 , --
+ration.phosphorus_requirement_buffer , Increase in phosphorus nutrient requirement in calculation of animal requirements (percentage) , 75 , 0 , --

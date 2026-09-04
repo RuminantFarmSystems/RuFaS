@@ -1,0 +1,7 @@
+ Variable , Units , Calculation 
+water ,kg ,ManureStream water + bedding_water 
+ash ,kg ,"If bedding type = sand, ash = total_bedding_mass; otherwise, ash = 0 "
+phosphorus ,kg ,ManureStream phosphorus + total_bedding_mass × bedding_phosphorus_content 
+non_degradable_volatile_solids ,kg ,"If bedding type = sand, ManureStream NDVS = ash; otherwise, ManureStream NDVS + total_bedding_dry_solids "
+total_solids ,kg ,ManureStream total_solids + total_bedding_dry_solids 
+volume ,m³ ,ManureStream volume + total_bedding_volume 

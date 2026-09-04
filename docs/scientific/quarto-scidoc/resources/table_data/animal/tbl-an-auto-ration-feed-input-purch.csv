@@ -1,0 +1,4 @@
+﻿Variable Name , Definition , Default , Min , Max 
+calf_feeds or growing_feeds or close_up_feeds or lac_cow_feeds , Each section is comprised of a list of feeds (RuFaS Feed IDs) , -- , -- , --
+purchased_feed , RuFaS Feed ID , -- , -- , --
+purchased_feed_cost , Price per feed (dollars/kg DM) , -- , -- , --

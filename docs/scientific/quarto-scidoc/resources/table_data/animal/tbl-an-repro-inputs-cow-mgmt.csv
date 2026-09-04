@@ -1,0 +1,3 @@
+﻿Variable , Definition , Default , Min , Max 
+cow_repro_method ,"TAI, ED, Synch-ED", TAI , -- , --
+do_not_breed_time , Days after calving to stop breeding if not pregnant ,185,0, --

@@ -1,0 +1,4 @@
+﻿Variable , Definition , Default , Min , Max 
+breeding_start_day_h , Age when RuFaS initiates estrous protocol (days) , -- ,380,0
+heifer_repro_method ," Timed AI (TAI),  Estrus Detection (ED),  Synchronized ED (Synch-ED) ",TAI, --, --
+heifer_repro_cull_time , Age when a heifer is culled if not pregnant (days) , -- ,500,0

@@ -1,6 +1,6 @@
 ﻿Variable,Description,Units
-DMIest     , Dry matter intake estimation ,kilogram (kg)
-DOP        , Days of pregnancy ,days
-NEadj      , the adjustment for the net energy (NE) concentration of the diet ," if the NE concentration < 1 mcal/kg DM, then = 0.95 \newline if the concentration $>$ 1 mcal/kg DM, then is = to the NE concentration"
-PREGadj    , the adjustment for pregnancy status , if DOP $>$ 210 \newline 1 + ((210 - DOP) * 0.0025)
-WOL        , Week of lactation , Units are the integer part of days \(\frac{DIM}{7}\)
+DMIest, Dry matter intake estimation ,kg
+DOP , Days of pregnancy ,days
+NEadj, the adjustment for the net energy (NE) concentration of the diet ," if the NE concentration < 1 mcal/kg DM, then = 0.95; if the concentration $>$ 1 mcal/kg DM, then is = to the NE concentration"
+PREGadj, the adjustment for pregnancy status , if DOP $>$ 210 \newline 1 + ((210 - DOP) $\times$ 0.0025)
+WOL, Week of lactation , Units are the integer part of days $\frac{DIM}{7}$
