@@ -283,7 +283,7 @@ class EmissionsEstimator:
                     all_fields_by_layer[field_name] = {}
 
                 all_fields_by_layer[field_name][layer_number] = dict(zip(simulation_days, values["values"]))
-            for field_name in all_fields_by_layer:
+            for field_name in field_details:
                 field_size = field_details[field_name]["field_size"]
                 emission_data[filter_key][field_name] = {
                     simulation_day: (sum(
