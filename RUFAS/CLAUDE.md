@@ -39,6 +39,15 @@ Each has its own `CLAUDE.md`.
   `InputManager()`, `OutputManager()`); follow the surrounding pattern.
 - Keep functions under flake8 complexity 10 — these modules are already large,
   so prefer extracting helpers over growing a method.
+- **Extend existing structures, never add parallel ones** — when a dispatch
+  table, registration list, group loop, or config parser already handles the
+  family you're adding to, add your entry INTO it. A second near-identical
+  loop or `if` chain beside the existing one is a review blocker.
+- **New input blocks mirror the nearest sibling block's key naming** — before
+  inventing JSON keys for a new config/input section, read the `.get("...")`
+  keys of the closest existing block (same file or same domain) and reuse its
+  conventions (e.g. `num_<type>` for counts). The user-facing input schema
+  must stay uniform; it is expensive to change after merge.
 
 ## Reference docs (RuFaS wiki)
 

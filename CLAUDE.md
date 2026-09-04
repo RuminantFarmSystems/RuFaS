@@ -101,9 +101,10 @@ These mirror the RuFaS wiki — see
 - **Line length 120**, Black-formatted. Don't hand-format against Black.
 - **Keep cyclomatic complexity ≤ 10** (flake8 `max-complexity`). Refactor
   rather than suppress. Apply DRY / SOLID; keep functions small.
-- **No speculative code (YAGNI)** — never add a parameter, constant, config
-  field, or event string that has no production call-site in the same PR.
-  A test asserting a constant equals its own value is not a call-site.
+- **No speculative code (YAGNI)** — never add code (parameter, constant,
+  config field, branch, hook, …) that has no production call-site in the same
+  PR. A test is never a production call-site — code exercised only by its own
+  tests is still speculative.
 - **Comments are discouraged** — clean code should explain *what* it does; only a
   comment explaining *why* an approach was chosen is acceptable.
 - **Tests mirror `RUFAS/`** under `tests/` (`test_<module>.py`, `test_<pkg>/`),

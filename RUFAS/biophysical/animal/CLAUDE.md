@@ -33,15 +33,15 @@ family), follow the sibling module exactly:
   `ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`) and use early-return
   properties on `AnimalType` (`is_feedlot`-style) for behavioral shunts —
   never an `if/elif` chain on the animal type.
-- **Extend existing structures, never add parallel ones**: new cohorts go
-  INTO the `animal_groups` list of
-  `HerdManager._process_daily_herd_updates`, not into a second loop after
-  it; new rations/constraints follow the existing registration lists in
-  `ration_manager.py` / `ration_optimizer.py`.
-- **Input schema keys mirror the nearest sibling block exactly** — herd
-  counts are `num_<type>` (see `_initialize_feedlot_herd`: `num_steers`,
-  `num_heifers`, `entry_weight`), never `n_*`. Check the sibling's
-  `.get("...")` keys before inventing new ones.
+- **Extend existing structures, never add parallel ones** (repo-wide rule,
+  see `RUFAS/CLAUDE.md`) — here that means: new cohorts go INTO the
+  `animal_groups` list of `HerdManager._process_daily_herd_updates`, not
+  into a second loop after it; new rations/constraints follow the existing
+  registration lists in `ration_manager.py` / `ration_optimizer.py`.
+- **Input schema keys mirror the nearest sibling block** (repo-wide rule,
+  see `RUFAS/CLAUDE.md`) — here: herd counts are `num_<type>` (see
+  `_initialize_feedlot_herd`: `num_steers`, `num_heifers`, `entry_weight`),
+  never `n_*`.
 - **Config parsing = merge-then-validate**: merge user config with class
   defaults FIRST, then validate the merged dict — the canonical pair is
   `AnimalConfig._merge_beef_defaults` +
