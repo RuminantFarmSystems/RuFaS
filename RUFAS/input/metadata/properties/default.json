@@ -17,7 +17,7 @@
       "type": "string",
       "description": "The type of daily simulation to run. Will determine daily simulation function in SimulationEngine.",
       "default": "full_farm",
-      "pattern": "^(full_farm|field_and_feed|field_only|animals_only)$"
+      "pattern": "^(full_farm|field_and_feed|field_only|animals_only|feed_only)$"
     },
     "nutrient_standard": {
       "type": "string",
@@ -6925,6 +6925,87 @@
       "type": "array",
       "properties": {
         "type": "number"
+      }
+    }
+  },
+  "initial_feed_storage_contents_properties": {
+    "data_collection_app_compatible": false,
+    "initial_contents": {
+      "type": "array",
+      "description": "The contents that feed storages hold when the simulation starts. Storages that are not named start empty. Stated directly because a simulation without the crop and soil module has no harvests to derive contents from.",
+      "minimum_length": 0,
+      "properties": {
+        "type": "object",
+        "description": "The dry matter mass and composition of the crop one storage holds when the simulation starts.",
+        "storage_name": {
+          "type": "string",
+          "description": "Name of the feed storage instance that holds these contents. Must match a name from the feed storage configurations."
+        },
+        "dry_matter_mass": {
+          "type": "number",
+          "description": "Mass of dry matter initially held in the storage (kg).",
+          "minimum": 0.0
+        },
+        "dry_matter_percentage": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is not water.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "dry_matter_digestibility": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is digestible.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "crude_protein_percent": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is dietary crude protein.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "non_protein_nitrogen": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is non-protein nitrogen.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "starch": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is starch.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "adf": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is acid detergent fiber.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "ndf": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is neutral detergent fiber.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "lignin": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is lignin.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "sugar": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is labile carbohydrate.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "ash": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is ash.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        }
       }
     }
   }
