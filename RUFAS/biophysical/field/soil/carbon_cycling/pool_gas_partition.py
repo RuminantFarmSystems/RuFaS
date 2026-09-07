@@ -48,26 +48,26 @@ class PoolGasPartition:
         layer.carbon_lost_adjusted_factor = self._determine_carbon_lost_adjusted_factor(layer.silt_clay_content)
 
         # ---- plants
-        layer.plant_metabolic_active_carbon_loss = self._determine_plant_metabolic_active_carbon_loss(
-            layer.plant_metabolic_active_carbon_usage
+        layer.residue_metabolic_active_carbon_loss = self._determine_residue_metabolic_active_carbon_loss(
+            layer.residue_metabolic_active_carbon_usage
         )
-        layer.plant_metabolic_active_carbon_remaining = self._determine_plant_metabolic_active_carbon_remaining(
-            layer.plant_metabolic_active_carbon_usage
+        layer.residue_metabolic_active_carbon_remaining = self._determine_residue_metabolic_active_carbon_remaining(
+            layer.residue_metabolic_active_carbon_usage
         )
 
         # above ground structural C
-        layer.plant_structural_active_carbon_loss = self._determine_plant_structural_active_carbon_loss(
-            layer.plant_structural_active_carbon_usage
+        layer.residue_structural_active_carbon_loss = self._determine_residue_structural_active_carbon_loss(
+            layer.residue_structural_active_carbon_usage
         )
-        layer.plant_structural_active_carbon_remaining = self._determine_plant_structural_active_carbon_remaining(
-            layer.plant_structural_active_carbon_usage
+        layer.residue_structural_active_carbon_remaining = self._determine_residue_structural_active_carbon_remaining(
+            layer.residue_structural_active_carbon_usage
         )
 
-        layer.plant_structural_slow_carbon_loss = self._determine_plant_structural_slow_carbon_loss(
-            layer.plant_structural_slow_carbon_usage
+        layer.residue_structural_slow_carbon_loss = self._determine_residue_structural_slow_carbon_loss(
+            layer.residue_structural_slow_carbon_usage
         )
-        layer.plant_structural_slow_carbon_remaining = self._determine_plant_structural_slow_carbon_remaining(
-            layer.plant_structural_slow_carbon_usage
+        layer.residue_structural_slow_carbon_remaining = self._determine_residue_structural_slow_carbon_remaining(
+            layer.residue_structural_slow_carbon_usage
         )
 
         layer.active_carbon_decomposition_amount = self._determine_active_carbon_decomposition_amount(
@@ -102,14 +102,14 @@ class PoolGasPartition:
         )
 
         # aggregate active carbon pool flux
-        layer.plant_active_decompose_carbon = self._determine_plant_active_decompose_carbon(
-            layer.plant_metabolic_active_carbon_remaining,
-            layer.plant_structural_active_carbon_remaining,
+        layer.residue_active_decompose_carbon = self._determine_residue_active_decompose_carbon(
+            layer.residue_metabolic_active_carbon_remaining,
+            layer.residue_structural_active_carbon_remaining,
         )
         layer.soil_active_decompose_carbon = 0.0
         layer.active_carbon_amount = self._determine_soil_active_carbon_amount(
             layer.active_carbon_amount,
-            layer.plant_active_decompose_carbon,
+            layer.residue_active_decompose_carbon,
             layer.soil_active_decompose_carbon,
             layer.passive_to_active_carbon_amount,
             layer.slow_to_active_carbon_amount,
@@ -119,7 +119,7 @@ class PoolGasPartition:
 
         layer.slow_carbon_amount = self._determine_soil_slow_carbon_amount(
             layer.slow_carbon_amount,
-            layer.plant_structural_slow_carbon_remaining,
+            layer.residue_structural_slow_carbon_remaining,
             layer.soil_structural_slow_carbon_remaining,
             layer.active_carbon_to_slow_amount,
             layer.slow_carbon_decomposition_amount,
@@ -207,17 +207,17 @@ class PoolGasPartition:
             # active, slow and lost CO2 pools
 
             # aggregate active carbon pool flux
-            layer.plant_active_decompose_carbon = self._determine_plant_active_decompose_carbon(
-                layer.plant_metabolic_active_carbon_remaining,
-                layer.plant_structural_active_carbon_remaining,
+            layer.residue_active_decompose_carbon = self._determine_residue_active_decompose_carbon(
+                layer.residue_metabolic_active_carbon_remaining,
+                layer.residue_structural_active_carbon_remaining,
             )
             layer.soil_active_decompose_carbon = self._determine_soil_active_decompose_carbon(
-                layer.plant_metabolic_active_carbon_remaining,
+                layer.residue_metabolic_active_carbon_remaining,
                 layer.soil_structural_active_carbon_remaining,
             )
             layer.active_carbon_amount = self._determine_soil_active_carbon_amount(
                 layer.active_carbon_amount,
-                layer.plant_active_decompose_carbon,
+                layer.residue_active_decompose_carbon,
                 layer.soil_active_decompose_carbon,
                 layer.passive_to_active_carbon_amount,
                 layer.slow_to_active_carbon_amount,
@@ -227,7 +227,7 @@ class PoolGasPartition:
 
             layer.slow_carbon_amount = self._determine_soil_slow_carbon_amount(
                 layer.slow_carbon_amount,
-                layer.plant_structural_slow_carbon_remaining,
+                layer.residue_structural_slow_carbon_remaining,
                 layer.soil_structural_slow_carbon_remaining,
                 layer.active_carbon_to_slow_amount,
                 layer.slow_carbon_decomposition_amount,
@@ -284,7 +284,7 @@ class PoolGasPartition:
     @staticmethod
     def _determine_soil_slow_carbon_amount(
         slow_carbon_amount: float,
-        plant_structural_slow_carbon_remaining: float,
+        residue_structural_slow_carbon_remaining: float,
         soil_structural_slow_carbon_remaining: float,
         active_carbon_to_slow_amount: float,
         slow_carbon_decomposition_amount: float,
@@ -298,8 +298,8 @@ class PoolGasPartition:
         ----------
         slow_carbon_amount : float
             Slow carbon stored in the soil (kg/ha).
-        plant_structural_slow_carbon_remaining : float
-            Plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
+        residue_structural_slow_carbon_remaining : float
+            Residue metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
         soil_structural_slow_carbon_remaining : float
             Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
         active_carbon_to_slow_amount : float
@@ -319,7 +319,7 @@ class PoolGasPartition:
         """
         return (
             slow_carbon_amount
-            + plant_structural_slow_carbon_remaining
+            + residue_structural_slow_carbon_remaining
             + soil_structural_slow_carbon_remaining
             + active_carbon_to_slow_amount
             - slow_carbon_decomposition_amount
@@ -327,31 +327,31 @@ class PoolGasPartition:
 
     # ---- S.6.C.11
     @staticmethod
-    def _determine_plant_active_decompose_carbon(
-        plant_metabolic_active_carbon_remaining: float,
-        plant_structural_active_carbon_remaining: float,
+    def _determine_residue_active_decompose_carbon(
+        residue_metabolic_active_carbon_remaining: float,
+        residue_structural_active_carbon_remaining: float,
     ) -> float:
         """
-        Calculate plant carbon decomposed into the active carbon pool in the layer (kg/ha).
+        Calculate residue carbon decomposed into the active carbon pool in the layer (kg/ha).
 
         Parameters
         ----------
-        plant_metabolic_active_carbon_remaining : float
-            Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
-        plant_structural_active_carbon_remaining : float
-            Plant structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+        residue_metabolic_active_carbon_remaining : float
+            Residue metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+        residue_structural_active_carbon_remaining : float
+            Residue structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
 
         Returns
         -------
         float
-            Plant carbon decomposed into the active carbon pool (kg/ha).
+            Residue carbon decomposed into the active carbon pool (kg/ha).
 
         References
         ----------
         pseudocode_soil Reference: S.6.C.11.
 
         """
-        return plant_metabolic_active_carbon_remaining + plant_structural_active_carbon_remaining
+        return residue_metabolic_active_carbon_remaining + residue_structural_active_carbon_remaining
 
     @staticmethod
     def _determine_soil_active_decompose_carbon(
@@ -383,7 +383,7 @@ class PoolGasPartition:
     @staticmethod
     def _determine_soil_active_carbon_amount(
         active_carbon_amount: float,
-        plant_active_decompose_carbon: float,
+        residue_active_decompose_carbon: float,
         soil_active_decompose_carbon: float,
         passive_to_active_carbon_amount: float,
         slow_to_active_carbon_amount: float,
@@ -396,8 +396,8 @@ class PoolGasPartition:
         ----------
         active_carbon_amount : float
             Active carbon stored in the soil (kg/ha).
-        plant_active_decompose_carbon : float
-            Plant carbon decomposed into the active carbon pool (kg/ha).
+        residue_active_decompose_carbon : float
+            Residue carbon decomposed into the active carbon pool (kg/ha).
         soil_active_decompose_carbon : float
             Soil carbon decomposed into the active carbon pool (kg/ha).
         passive_to_active_carbon_amount : float
@@ -419,7 +419,7 @@ class PoolGasPartition:
         """
         return (
             active_carbon_amount
-            + plant_active_decompose_carbon
+            + residue_active_decompose_carbon
             + soil_active_decompose_carbon
             + slow_to_active_carbon_amount
             + passive_to_active_carbon_amount
@@ -800,171 +800,171 @@ class PoolGasPartition:
 
     # ----  S.6.C.1
     @staticmethod
-    def _determine_plant_metabolic_active_carbon_loss(
-        plant_metabolic_active_carbon_usage: float,
+    def _determine_residue_metabolic_active_carbon_loss(
+        residue_metabolic_active_carbon_usage: float,
         metabolic_active_carbon_loss_rate: float = 0.55,
     ) -> float:
         """
-        Calculate plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
+        Calculate residue metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
 
         Parameters
         ----------
-        plant_metabolic_active_carbon_usage : float
-            Plant metabolic carbon decomposed into active carbon (kg/ha).
+        residue_metabolic_active_carbon_usage : float
+            Residue metabolic carbon decomposed into active carbon (kg/ha).
         metabolic_active_carbon_loss_rate : float
             Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).
 
         Returns
         -------
         float
-            Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+            Residue metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
 
         References
         ----------
         pseudocode_soil Reference: S.6.C.1.
 
         """
-        return plant_metabolic_active_carbon_usage * metabolic_active_carbon_loss_rate
+        return residue_metabolic_active_carbon_usage * metabolic_active_carbon_loss_rate
 
     @staticmethod
-    def _determine_plant_metabolic_active_carbon_remaining(
-        plant_metabolic_active_carbon_usage: float,
+    def _determine_residue_metabolic_active_carbon_remaining(
+        residue_metabolic_active_carbon_usage: float,
         metabolic_active_carbon_loss_rate: float = 0.55,
     ) -> float:
         """
-        Calculate plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+        Calculate residue metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
         layer (kg/ha).
 
         Parameters
         ----------
-        plant_metabolic_active_carbon_usage : float
-            Plant metabolic carbon decomposed into active carbon (kg/ha).
+        residue_metabolic_active_carbon_usage : float
+            Residue metabolic carbon decomposed into active carbon (kg/ha).
         metabolic_active_carbon_loss_rate : float
             Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).
 
         Returns
         -------
         float
-            Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+            Residue metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
 
         References
         ----------
         pseudocode_soil Reference: S.6.C.1.
 
         """
-        return plant_metabolic_active_carbon_usage * (1 - metabolic_active_carbon_loss_rate)
+        return residue_metabolic_active_carbon_usage * (1 - metabolic_active_carbon_loss_rate)
 
     @staticmethod
-    def _determine_plant_structural_active_carbon_loss(
-        plant_structural_active_carbon_usage: float,
+    def _determine_residue_structural_active_carbon_loss(
+        residue_structural_active_carbon_usage: float,
         structural_active_carbon_loss_rate: float = 0.45,
     ) -> float:
         """
-        Calculate plant structural carbon being lost as carbon dioxide during decomposition into active carbon in the
+        Calculate residue structural carbon being lost as carbon dioxide during decomposition into active carbon in the
         layer (kg/ha).
 
         Parameters
         ----------
-        plant_structural_active_carbon_usage : float
-            Plant structural carbon decomposed into active carbon (kg/ha).
+        residue_structural_active_carbon_usage : float
+            Residue structural carbon decomposed into active carbon (kg/ha).
         structural_active_carbon_loss_rate : float
             Rate of carbon dioxide loss during transformation of structural to active carbon (unitless).
 
         Returns
         -------
         float
-            Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+            Residue structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
 
         References
         ----------
         pseudocode_soil Reference: S.6.C.1.
 
         """
-        return plant_structural_active_carbon_usage * structural_active_carbon_loss_rate
+        return residue_structural_active_carbon_usage * structural_active_carbon_loss_rate
 
     @staticmethod
-    def _determine_plant_structural_active_carbon_remaining(
-        plant_structural_active_carbon_usage: float,
+    def _determine_residue_structural_active_carbon_remaining(
+        residue_structural_active_carbon_usage: float,
         structural_active_carbon_loss_rate: float = 0.45,
     ) -> float:
         """
-        Calculate plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+        Calculate residue metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
         layer (kg/ha).
 
         Parameters
         ----------
-        plant_structural_active_carbon_usage : float
-            Plant metabolic carbon decomposed into active carbon (kg/ha).
+        residue_structural_active_carbon_usage : float
+            Residue metabolic carbon decomposed into active carbon (kg/ha).
         structural_active_carbon_loss_rate : float
             Rate of carbon dioxide loss during transformation of structural to active carbon (unitless).
 
         Returns
         -------
         float
-            Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
+            Residue metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).
 
         References
         ----------
         pseudocode_soil Reference: S.6.C.1.
 
         """
-        return plant_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
+        return residue_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
 
     @staticmethod
-    def _determine_plant_structural_slow_carbon_loss(
-        plant_structural_slow_carbon_usage: float,
+    def _determine_residue_structural_slow_carbon_loss(
+        residue_structural_slow_carbon_usage: float,
         structural_slow_carbon_loss_rate: float = 0.3,
     ) -> float:
         """
-        Calculate plant structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
+        Calculate residue structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
         layer.
 
         Parameters
         ----------
-        plant_structural_slow_carbon_usage : float
-            Plant structural carbon decomposed into slow carbon (kg/ha).
+        residue_structural_slow_carbon_usage : float
+            Residue structural carbon decomposed into slow carbon (kg/ha).
         structural_slow_carbon_loss_rate : float, default = 0.3
             Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).
 
         Returns
         -------
         float
-            Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
+            Residue structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
 
         References
         ----------
         pseudocode_soil Reference: S.6.C.1.
 
         """
-        return plant_structural_slow_carbon_usage * structural_slow_carbon_loss_rate
+        return residue_structural_slow_carbon_usage * structural_slow_carbon_loss_rate
 
     @staticmethod
-    def _determine_plant_structural_slow_carbon_remaining(
-        plant_structural_slow_carbon_usage: float,
+    def _determine_residue_structural_slow_carbon_remaining(
+        residue_structural_slow_carbon_usage: float,
         structural_slow_carbon_loss_rate: float = 0.3,
     ) -> float:
         """
-        Calculate plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
+        Calculate residue metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
         layer.
 
         Parameters
         ----------
-        plant_structural_slow_carbon_usage : float
-            Plant metabolic carbon decomposed into slow carbon (kg/ha).
+        residue_structural_slow_carbon_usage : float
+            Residue metabolic carbon decomposed into slow carbon (kg/ha).
         structural_slow_carbon_loss_rate : float
             Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).
 
         Returns
         -------
         float
-            Plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
+            Residue metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).
 
         References
         ----------
         pseudocode_soil Reference: S.6.C.1.
 
         """
-        return plant_structural_slow_carbon_usage * (1 - structural_slow_carbon_loss_rate)
+        return residue_structural_slow_carbon_usage * (1 - structural_slow_carbon_loss_rate)
 
     @staticmethod
     def _determine_soil_metabolic_active_carbon_loss(

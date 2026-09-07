@@ -8,8 +8,9 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, Stre
 
 @pytest.fixture
 def manure_stream(mocker: MockerFixture) -> ManureStream:
-    return ManureStream(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 8.8, 7.7, 10, 9.9, 10, 0.24,
-                        mocker.MagicMock(autospec=PenManureData))
+    return ManureStream(
+        1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 8.8, 7.7, 10, 9.9, 10, 0.24, mocker.MagicMock(autospec=PenManureData)
+    )
 
 
 def test_total_volatile_solids(manure_stream: ManureStream) -> None:
@@ -52,7 +53,7 @@ def manure_stream_1() -> ManureStream:
         volume=1.0,
         methane_production_potential=0.24,
         pen_manure_data=pen_data,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -82,7 +83,7 @@ def manure_stream_1() -> ManureStream:
                     manure_urine_nitrogen=3.0,
                     stream_type=StreamType.PARLOR,
                 ),
-                bedding_non_degradable_volatile_solids=2
+                bedding_non_degradable_volatile_solids=2,
             ),
             None,
             {
@@ -113,7 +114,7 @@ def manure_stream_1() -> ManureStream:
                 volume=0.5,
                 methane_production_potential=0.17,
                 pen_manure_data=None,
-                bedding_non_degradable_volatile_solids=2
+                bedding_non_degradable_volatile_solids=2,
             ),
             None,
             {
@@ -336,7 +337,7 @@ def sample_manure_stream(pen_data_2: PenManureData) -> ManureStream:
         volume=1.0,
         methane_production_potential=0.24,
         pen_manure_data=pen_data_2,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -380,10 +381,48 @@ def test_split_stream_without_pen_manure_data() -> None:
         volume=0.5,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
     split = stream.split_stream(0.5, stream_type=StreamType.GENERAL)
     assert split.pen_manure_data is None
     assert split.water == 25.0
     assert split.methane_production_potential == stream.methane_production_potential
+
+
+def test_lignin_defaults_to_zero(manure_stream_1: ManureStream) -> None:
+    """Checks that a stream constructed without lignin defaults to zero lignin."""
+    assert manure_stream_1.lignin == 0.0
+
+
+def test_add_manure_streams_combines_lignin() -> None:
+    """Checks that adding two manure streams sums their lignin masses."""
+    stream_a = ManureStream.make_empty_manure_stream()
+    stream_a.lignin = 4.0
+    stream_b = ManureStream.make_empty_manure_stream()
+    stream_b.lignin = 6.0
+
+    combined = stream_a + stream_b
+
+    assert combined.lignin == 10.0
+
+
+def test_split_stream_splits_lignin() -> None:
+    """Checks that splitting a manure stream splits its lignin by the split ratio."""
+    stream = ManureStream.make_empty_manure_stream()
+    stream.water = 100.0
+    stream.lignin = 8.0
+
+    split = stream.split_stream(0.25)
+
+    assert split.lignin == 2.0
+
+
+def test_is_empty_false_when_only_lignin_present() -> None:
+    """Checks that a stream holding only lignin is not considered empty."""
+    stream = ManureStream.make_empty_manure_stream()
+    assert stream.is_empty
+
+    stream.lignin = 1.0
+
+    assert not stream.is_empty

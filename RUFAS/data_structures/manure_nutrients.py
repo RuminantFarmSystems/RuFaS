@@ -41,6 +41,16 @@ class ManureNutrients:
     total_manure_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
     """Unit for total_manure_mass"""
 
+    volatile_solids: float = 0.0
+    """Amount of accumulated manure volatile solids derived from the manure module, kg."""
+    volatile_solids_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    """Unit for volatile_solids"""
+
+    lignin: float = 0.0
+    """Amount of accumulated manure lignin derived from the manure module, kg."""
+    lignin_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+    """Unit for lignin"""
+
     def __post_init__(self) -> None:
         """
         Validates the ManureNutrients object fields.
@@ -126,6 +136,36 @@ class ManureNutrients:
             return 0.0
         return self.phosphorus / self.total_manure_mass
 
+    @property
+    def volatile_solids_composition(self) -> float:
+        """
+        Calculate the volatile solids composition of the manure.
+
+        Returns
+        -------
+        float
+            The volatile solids composition of the manure, unitless, between 0 and 1.
+
+        """
+        if self.total_manure_mass == 0.0:
+            return 0.0
+        return self.volatile_solids / self.total_manure_mass
+
+    @property
+    def lignin_composition(self) -> float:
+        """
+        Calculate the lignin composition of the manure.
+
+        Returns
+        -------
+        float
+            The lignin composition of the manure, unitless, between 0 and 1.
+
+        """
+        if self.total_manure_mass == 0.0:
+            return 0.0
+        return self.lignin / self.total_manure_mass
+
     def reset_values(self) -> "ManureNutrients":
         """
         Return a new ManureNutrients with all numeric nutrient/mass
@@ -138,6 +178,8 @@ class ManureNutrients:
             potassium=0.0,
             dry_matter=0.0,
             total_manure_mass=0.0,
+            volatile_solids=0.0,
+            lignin=0.0,
         )
 
     def __add__(self, other: ManureNutrients) -> ManureNutrients:
