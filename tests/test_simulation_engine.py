@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 
 from RUFAS.EEE.emissions import EmissionsEstimator
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import DailyManureSupplier, ManureStream
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 import pytest
 from unittest.mock import MagicMock, PropertyMock, call
@@ -42,6 +42,7 @@ def test_simulation_type_enum_values() -> None:
     assert SimulationType.FIELD_AND_FEED.value == "field_and_feed"
     assert SimulationType.FIELD_ONLY.value == "field_only"
     assert SimulationType.ANIMALS_ONLY.value == "animals_only"
+    assert SimulationType.MANURE_ONLY.value == "manure_only"
 
 
 @pytest.mark.parametrize(
@@ -51,6 +52,7 @@ def test_simulation_type_enum_values() -> None:
         (SimulationType.FIELD_AND_FEED, False),
         (SimulationType.FIELD_ONLY, False),
         (SimulationType.ANIMALS_ONLY, True),
+        (SimulationType.MANURE_ONLY, False),
     ],
 )
 def test_simulate_animals(
@@ -77,7 +79,7 @@ def test_field_simulation_types() -> None:
 
 def test_manure_simulation_types() -> None:
     """Unit test for SimulationType._manure_simulation_types."""
-    assert SimulationType._manure_simulation_types() == {SimulationType.FULL_FARM}
+    assert SimulationType._manure_simulation_types() == {SimulationType.FULL_FARM, SimulationType.MANURE_ONLY}
 
 
 def test_feed_simulation_types() -> None:
@@ -460,6 +462,41 @@ def test_execute_animals_only_daily_simulation(
     mock_execute_ration_planning.assert_called_once_with()
     mock_execute_daily_animal_operations.assert_called_once_with()
     mock_report_daily_records.assert_called_once_with(daily_purchased_feeds_fed)
+    mock_advance_time.assert_called_once_with()
+
+
+def test_execute_manure_only_daily_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_manure_only_daily_simulation in file
+    RUFAS/simulation_engine.py
+    """
+    # Arrange
+    daily_manure_data = {"manure": "data"}
+    simulation_engine.daily_manure_supplier = MagicMock(auto_spec=DailyManureSupplier)
+    simulation_engine.daily_manure_supplier.get_daily_manure_streams.return_value = daily_manure_data
+    mock_execute_daily_manure_operations = mocker.patch.object(
+        simulation_engine,
+        "_execute_daily_manure_operations",
+    )
+    mock_report_daily_records = mocker.patch.object(
+        simulation_engine,
+        "_report_daily_records",
+    )
+    mock_advance_time = mocker.patch.object(
+        simulation_engine,
+        "_advance_time",
+    )
+
+    # Act
+    simulation_engine._execute_manure_only_daily_simulation()
+
+    # Assert
+    simulation_engine.daily_manure_supplier.get_daily_manure_streams.assert_called_once_with()
+    mock_execute_daily_manure_operations.assert_called_once_with(daily_manure_data)
+    mock_report_daily_records.assert_called_once_with()
     mock_advance_time.assert_called_once_with()
 
 
@@ -1558,4 +1595,67 @@ def test_gather_field_data_no_fields(mocker: MockerFixture) -> None:
         "No field input files.",
         "No fields will be simulated.",
         {"class": "SimulationEngine", "function": "_gather_field_data"},
+    )
+
+
+def test_gather_daily_manure_supply_with_supply_inputs(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_daily_manure_supply in simulation_engine.py when daily manure supply inputs are present.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.MANURE_ONLY)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    supply_names = ["daily_manure_supply_1", "daily_manure_supply_2"]
+    stream_config_1 = {"stream_name": "lac_pen", "first_processor": "lac_alley_scraper"}
+    stream_config_2 = {"stream_name": "calf_pen", "first_processor": "calf_manual_scraper"}
+    stream_config_3 = {"stream_name": "grow_pen", "first_processor": "growing_alley_scraper"}
+
+    mock_input_manager.get_data_keys_by_properties.return_value = supply_names
+    mock_input_manager.get_data.side_effect = [
+        {"daily_manure_streams": [stream_config_1, stream_config_2]},
+        {"daily_manure_streams": [stream_config_3]},
+    ]
+
+    # Act
+    result = simulation_engine._gather_daily_manure_supply()
+
+    # Assert
+    assert result == [stream_config_1, stream_config_2, stream_config_3]
+    mock_input_manager.get_data_keys_by_properties.assert_called_once_with("daily_manure_supply_properties")
+    mock_input_manager.get_data.assert_any_call("daily_manure_supply_1")
+    mock_input_manager.get_data.assert_any_call("daily_manure_supply_2")
+    mock_output_manager.add_warning.assert_not_called()
+
+
+def test_gather_daily_manure_supply_no_supply_inputs(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_daily_manure_supply in simulation_engine.py when no daily manure supply inputs are found.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.MANURE_ONLY)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    mock_input_manager.get_data_keys_by_properties.return_value = []
+
+    # Act
+    result = simulation_engine._gather_daily_manure_supply()
+
+    # Assert
+    assert result == []
+    mock_input_manager.get_data.assert_not_called()
+    mock_output_manager.add_warning.assert_called_once_with(
+        "No daily manure supply input files.",
+        "No manure will enter the manure system, and there are no animals to produce manure.",
+        {"class": "SimulationEngine", "function": "_gather_daily_manure_supply"},
     )
