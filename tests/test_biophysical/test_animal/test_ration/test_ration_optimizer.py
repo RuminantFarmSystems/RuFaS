@@ -919,3 +919,47 @@ def test_ration_config_neutralizes_dmi_constants_with_intake_option(
 
     assert config.dmi_constraint_fraction == 0.0
     assert config.dmi_requirement_boost == 1.0
+
+
+def test_build_bounds_user_defined_ration_pins_feed_at_limit_when_target_exceeds_it(
+    mocker: MockerFixture, nrc_ration_config: RationConfig
+) -> None:
+    """A target inclusion above a feed's limit pins the feed at its limit and warns, instead of inverting."""
+    mock_om = mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.OutputManager", return_value=MagicMock())
+    nrc_ration_config.dmi_requirement_boost = 1.0
+    nrc_ration_config.initial_dry_matter_requirement = 100.0
+    nrc_ration_config.feed_minimum_list = [0.0, 1.0]
+    nrc_ration_config.feed_maximum_list = [10.0, 10.0]
+
+    bounds = RationOptimizer._build_bounds_user_defined_ration(
+        ration_config=nrc_ration_config,
+        user_defined_ration_dictionary={2: 50.0, 1: 25.0},
+        user_defined_ration_tolerance=0.1,
+    )
+
+    # feed 1 wants 22.5-27.5 kg and feed 2 wants 45-55 kg; both exceed the 10 kg limit.
+    assert bounds == pytest.approx([(10.0, 10.0), (10.0, 10.0)])
+    assert all(lower <= upper for lower, upper in bounds)
+    mock_om.return_value.add_warning.assert_called_once()
+    assert "100.00 kg/animal/day" in mock_om.return_value.add_warning.call_args.args[1]
+
+
+def test_build_bounds_user_defined_ration_pins_feed_at_minimum_when_target_is_below_it(
+    mocker: MockerFixture, nrc_ration_config: RationConfig
+) -> None:
+    """A target inclusion below a feed's lower limit pins the feed at that minimum and warns."""
+    mock_om = mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.OutputManager", return_value=MagicMock())
+    nrc_ration_config.dmi_requirement_boost = 1.0
+    nrc_ration_config.initial_dry_matter_requirement = 1.0
+    nrc_ration_config.feed_minimum_list = [0.0, 1.0]
+    nrc_ration_config.feed_maximum_list = [10.0, 10.0]
+
+    bounds = RationOptimizer._build_bounds_user_defined_ration(
+        ration_config=nrc_ration_config,
+        user_defined_ration_dictionary={2: 50.0, 1: 25.0},
+        user_defined_ration_tolerance=0.1,
+    )
+
+    # feed 1 wants 0.225-0.275 kg and is fine; feed 2 wants 0.45-0.55 kg, below its 1.0 kg minimum.
+    assert bounds == pytest.approx([(0.225, 0.275), (1.0, 1.0)])
+    mock_om.return_value.add_warning.assert_called_once()
