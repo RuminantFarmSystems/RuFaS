@@ -30,6 +30,8 @@ def storage(mocker: MockerFixture) -> Storage:
     storage._om = OutputManager()
     storage._cover = StorageCover.COVER
     storage._storage_time_period = 120
+    storage._configured_emptying_fraction = None
+    storage._capacity = inf
     storage._surface_area = 300.0
     storage._received_manure = ManureStream.make_empty_manure_stream()
     storage.stored_manure = ManureStream.make_empty_manure_stream()
@@ -80,8 +82,43 @@ def test_storage_init() -> None:
     assert actual._capacity == inf
     assert actual._cover == StorageCover.COVER
     assert actual._storage_time_period == 100
+    assert actual._configured_emptying_fraction is None
+    assert actual._emptying_fraction == 1.0
     assert actual._surface_area == 300.0
     assert actual._prefix == "Manure.Processor.Storage.test"
+
+
+@pytest.mark.parametrize("emptying_fraction", [0.0, 0.35, 1.0])
+def test_storage_init_with_emptying_fraction(emptying_fraction: float) -> None:
+    """Test that a user-configured emptying fraction overrides the default emptying fraction."""
+    actual = Storage(
+        name="test",
+        is_housing_emissions_calculator=False,
+        cover=StorageCover.COVER,
+        storage_time_period=100,
+        surface_area=300.0,
+        emptying_fraction=emptying_fraction,
+    )
+
+    assert actual._configured_emptying_fraction == emptying_fraction
+    assert actual._emptying_fraction == emptying_fraction
+
+
+@pytest.mark.parametrize("emptying_fraction", [-0.1, 1.1])
+def test_storage_init_with_invalid_emptying_fraction(emptying_fraction: float, mocker: MockerFixture) -> None:
+    """Test that initializing a Storage with an out-of-range emptying fraction raises an error."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+
+    with pytest.raises(ValueError, match="invalid emptying fraction"):
+        Storage(
+            name="test",
+            is_housing_emissions_calculator=False,
+            cover=StorageCover.COVER,
+            storage_time_period=100,
+            surface_area=300.0,
+            emptying_fraction=emptying_fraction,
+        )
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -253,6 +290,80 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         mock_handle_overflowing_manure.assert_called_once_with(mock_time)
     else:
         mock_handle_overflowing_manure.assert_not_called()
+
+
+@pytest.mark.parametrize("emptying_fraction", [0.25, 0.9])
+def test_process_manure_partial_emptying(emptying_fraction: float, storage: Storage, mocker: MockerFixture) -> None:
+    """
+    Test that on an emptying day with a fractional emptying fraction, the emptied portion of the stored manure is
+    reported and returned for downstream routing while the retained portion stays in storage.
+    """
+    mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
+    mock_time = MagicMock(spec=RufasTime)
+    mock_time.simulation_day = storage._storage_time_period - 1
+    storage._configured_emptying_fraction = emptying_fraction
+
+    storage._received_manure = ManureStream.make_empty_manure_stream()
+    storage.stored_manure = (
+        dummy_stored_manure := ManureStream(
+            water=10.11,
+            ammoniacal_nitrogen=20.22,
+            nitrogen=30.33,
+            phosphorus=40.44,
+            potassium=50.55,
+            ash=60.66,
+            non_degradable_volatile_solids=70.77,
+            degradable_volatile_solids=80.88,
+            total_solids=290.01,
+            volume=100.12,
+            methane_production_potential=0.24,
+            pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=10,
+        )
+    )
+    expected_emptied = dummy_stored_manure.split_stream(emptying_fraction)
+    expected_retained = dummy_stored_manure.split_stream(1.0 - emptying_fraction)
+
+    result = storage.process_manure(MagicMock(auto_spec=CurrentDayConditions), mock_time)
+
+    assert result["manure"] == expected_emptied
+    assert storage.stored_manure == expected_retained
+    mock_report_manure_stream.assert_called_once_with(expected_emptied, "emptied", mock_time.simulation_day)
+
+
+def test_process_manure_zero_emptying_fraction(storage: Storage, mocker: MockerFixture) -> None:
+    """Test that on an emptying day with an emptying fraction of 0.0, no manure leaves the storage."""
+    mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
+    mock_time = MagicMock(spec=RufasTime)
+    mock_time.simulation_day = storage._storage_time_period - 1
+    storage._configured_emptying_fraction = 0.0
+
+    storage._received_manure = ManureStream.make_empty_manure_stream()
+    storage.stored_manure = (
+        dummy_stored_manure := ManureStream(
+            water=10.11,
+            ammoniacal_nitrogen=20.22,
+            nitrogen=30.33,
+            phosphorus=40.44,
+            potassium=50.55,
+            ash=60.66,
+            non_degradable_volatile_solids=70.77,
+            degradable_volatile_solids=80.88,
+            total_solids=290.01,
+            volume=100.12,
+            methane_production_potential=0.24,
+            pen_manure_data=None,
+            bedding_non_degradable_volatile_solids=10,
+        )
+    )
+
+    result = storage.process_manure(MagicMock(auto_spec=CurrentDayConditions), mock_time)
+
+    assert result == {}
+    assert storage.stored_manure == dummy_stored_manure
+    mock_report_manure_stream.assert_called_once_with(
+        ManureStream.make_empty_manure_stream(), "emptied", mock_time.simulation_day
+    )
 
 
 def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: RufasTime) -> None:
