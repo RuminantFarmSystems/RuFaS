@@ -36,6 +36,7 @@
       "graphics_directory": "output/graphics/.",
       "cross_validation_file_paths": [
         "input/metadata/cross_validation/animal_cross_validation.json",
+        "input/metadata/cross_validation/feed_cross_validation.json",
         "input/metadata/cross_validation/weather_cross_validation.json",
         "input/metadata/cross_validation/feed_storage_cross_validation.json",
         "input/metadata/cross_validation/crop_and_soil_cross_validation.json",
@@ -76,6 +77,7 @@
       "graphics_directory": "output/graphics/.",
       "cross_validation_file_paths": [
         "input/metadata/cross_validation/animal_cross_validation.json",
+        "input/metadata/cross_validation/feed_cross_validation.json",
         "input/metadata/cross_validation/weather_cross_validation.json",
         "input/metadata/cross_validation/feed_storage_cross_validation.json"
       ]
@@ -112,6 +114,7 @@
       "graphics_directory": "output/graphics/.",
       "cross_validation_file_paths": [
         "input/metadata/cross_validation/animal_cross_validation.json",
+        "input/metadata/cross_validation/feed_cross_validation.json",
         "input/metadata/cross_validation/weather_cross_validation.json",
         "input/metadata/cross_validation/feed_storage_cross_validation.json",
         "input/metadata/cross_validation/crop_and_soil_cross_validation.json",
@@ -149,7 +152,8 @@
       "json_output_directory": "output/JSONs/.",
       "report_directory": "output/reports/.",
       "graphics_directory": "output/graphics/.",
-      "cross_validation_file_paths": ["input/metadata/cross_validation/animal_cross_validation.json"]
+      "cross_validation_file_paths": ["input/metadata/cross_validation/animal_cross_validation.json",
+        "input/metadata/cross_validation/feed_cross_validation.json"]
     }
   ]
 }

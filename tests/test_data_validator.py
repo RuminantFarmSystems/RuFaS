@@ -2595,8 +2595,10 @@ def test_early_exit_when_apply_when_fails_and_eager_true(mocker: MockerFixture, 
     mock_evaluate_condition.assert_not_called()
 
 
-def test_evaluates_all_rules_when_eager_false_and_returns_last(mocker: MockerFixture, cv: CrossValidator) -> None:
-    """Test that cross_validate_data evaluates all rules when eager_termination is False and returns last result."""
+def test_evaluates_all_rules_when_eager_false_and_fails_on_any_failure(
+    mocker: MockerFixture, cv: CrossValidator
+) -> None:
+    """Test that cross_validate_data evaluates all rules when eager_termination is False and fails if any rule fails."""
     mock_evaluate_condition_clause_array = mocker.patch.object(
         cv, "_evaluate_condition_clause_array", return_value=True
     )
@@ -2606,7 +2608,7 @@ def test_evaluates_all_rules_when_eager_false_and_returns_last(mocker: MockerFix
 
     result = cv.cross_validate_data({"y": 2}, cross_validation_block, eager_termination=False)
 
-    assert result is True
+    assert result is False
     assert mock_evaluate_condition.call_count == 3
     mock_evaluate_condition.assert_has_calls(
         [mocker.call(rules[0], False), mocker.call(rules[1], False), mocker.call(rules[2], False)]
