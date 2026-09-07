@@ -91,6 +91,7 @@ class PurchasedFeedStorage:
             "class": self.__class__.__name__,
             "function": self.report_stored_purchased_feeds.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.KILOGRAMS,
             "suffix": reporting_suffix,
         }

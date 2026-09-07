@@ -114,6 +114,7 @@ def test_report_milk(mocker: MockerFixture) -> None:
         "class": AnimalModuleReporter.__name__,
         "function": AnimalModuleReporter.report_milk.__name__,
         "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+        "is_daily_variable": True,
         "units": MilkProductionStatistics.UNITS | MilkProductionStatistics.GENETIC_UNITS,
     }
     expected_add_variable_calls = [
@@ -230,6 +231,7 @@ def test_ration_per_animal(mocker: MockerFixture) -> None:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_ration_per_animal.__name__,
             "simulation_day": 10,
+            "is_daily_variable": True,
             "number_animals_in_pen": 8,
             "units": {
                 "1": MeasurementUnits.KILOGRAMS,
@@ -303,6 +305,7 @@ def test_report_nutrient_amounts(mocker: MockerFixture) -> None:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_nutrient_amounts.__name__,
             "simulation_day": 8,
+            "is_daily_variable": True,
             "units": NutritionSupply.UNITS,
             "number_animals_in_pen": 10,
         },
@@ -375,6 +378,7 @@ def test_report_average_nutrient_requirements(mocker: MockerFixture) -> None:
             "function": AnimalModuleReporter.report_average_nutrient_requirements.__name__,
             "number_animals_in_pen": 10,
             "simulation_day": 8,
+            "is_daily_variable": True,
             "units": NutritionRequirements.UNITS,
         },
     )
@@ -420,6 +424,7 @@ def test_report_average_nutrient_evaluation_results(mocker: MockerFixture) -> No
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_average_nutrient_evaluation_results.__name__,
                 "simulation_day": 10,
+                "is_daily_variable": True,
                 "units": NutritionEvaluationResults.UNITS,
             },
         ),
@@ -430,6 +435,7 @@ def test_report_average_nutrient_evaluation_results(mocker: MockerFixture) -> No
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_average_nutrient_evaluation_results.__name__,
                 "simulation_day": 10,
+                "is_daily_variable": True,
                 "units": NutritionEvaluationResults.REPORT_UNITS,
             },
         ),
@@ -449,6 +455,7 @@ def test_report_me_diet(mocker: MockerFixture) -> None:
             "function": AnimalModuleReporter.report_me_diet.__name__,
             "number_animals_in_pen": 8,
             "simulation_day": 12,
+            "is_daily_variable": True,
             "units": MeasurementUnits.MEGACALORIES,
         },
     )
@@ -476,6 +483,7 @@ def test_report_daily_herd_total_ration(mocker: MockerFixture) -> None:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_herd_total_ration.__name__,
             "simulation_day": 10,
+            "is_daily_variable": True,
             "units": units,
         },
     )
@@ -500,6 +508,7 @@ def test_report_daily_ration_per_pen(mocker: MockerFixture) -> None:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_ration_per_pen.__name__,
             "simulation_day": 10,
+            "is_daily_variable": True,
             "units": {key: MeasurementUnits.KILOGRAMS for key in pen_ration.keys()},
         },
     )
@@ -763,10 +772,6 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
         total_solids=7.7,
         degradable_volatile_solids=8.8,
         non_degradable_volatile_solids=9.9,
-        inorganic_phosphorus_fraction=1.1,
-        organic_phosphorus_fraction=2.2,
-        non_water_inorganic_phosphorus_fraction=3.3,
-        non_water_organic_phosphorus_fraction=4.4,
         phosphorus=5.5,
         phosphorus_fraction=6.6,
         potassium=7.7,
@@ -780,7 +785,7 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_manure_excretions(manure_excretions_by_pen, 10)
 
-    assert mock_om_add_variable.call_count == 16 * len(manure_excretions_by_pen)
+    assert mock_om_add_variable.call_count == 12 * len(manure_excretions_by_pen)
 
 
 def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
@@ -988,6 +993,7 @@ def test_report_daily_pen_total(mocker: MockerFixture) -> None:
         "function": AnimalModuleReporter.report_daily_pen_total.__name__,
         "units": MeasurementUnits.ANIMALS,
         "simulation_day": 10,
+        "is_daily_variable": True,
     }
     mock_om_add_variable.assert_called_once_with("number_of_animals_in_pen_1_GROWING", 8, info_map)
 
@@ -1324,6 +1330,7 @@ def test_report_305_day_milk_yield(mocker: MockerFixture) -> None:
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
                 "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "is_daily_variable": True,
                 "units": MeasurementUnits.KILOGRAMS,
             },
         ),
@@ -1334,6 +1341,7 @@ def test_report_305_day_milk_yield(mocker: MockerFixture) -> None:
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
                 "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "is_daily_variable": True,
                 "units": MeasurementUnits.KILOGRAMS,
             },
         ),
@@ -1344,6 +1352,7 @@ def test_report_305_day_milk_yield(mocker: MockerFixture) -> None:
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
                 "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "is_daily_variable": True,
                 "units": MeasurementUnits.KILOGRAMS,
             },
         ),
@@ -1354,6 +1363,7 @@ def test_report_305_day_milk_yield(mocker: MockerFixture) -> None:
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
                 "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+                "is_daily_variable": True,
                 "units": MeasurementUnits.KILOGRAMS,
             },
         ),

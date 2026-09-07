@@ -70,9 +70,9 @@ REQUIRED_FILE_BLOBS: set[str] = {
 The paths to the properties that define the inputs.
 """
 PROPERTIES_FILE_PATHS: dict[str, Path] = {
-    "default": Path("input/metadata/properties/default.json"),
-    "tasks_properties": Path("input/metadata/properties/tasks_properties.json"),
-    "commodity_properties": Path("input/metadata/properties/commodity_properties.json"),
+    "default": Path("RUFAS/input/metadata/properties/default.json"),
+    "tasks_properties": Path("RUFAS/input/metadata/properties/tasks_properties.json"),
+    "commodity_properties": Path("RUFAS/input/metadata/properties/commodity_properties.json"),
 }
 
 
@@ -210,9 +210,10 @@ class InputManager:
             self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(input_root, eager_termination)
-        is_input_data_valid = (
-            self._cross_validate_data(cross_validation_file_paths, eager_termination) and is_input_data_valid
-        )
+        if not is_input_data_valid:
+            self.om.route_logs(self.data_validator.event_logs)
+            return False
+        is_input_data_valid = self._cross_validate_data(cross_validation_file_paths, eager_termination)
         self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 

@@ -233,7 +233,7 @@ class Crop:
         field_size: float,
         time: RufasTime,
         soil_data: SoilData,
-    ) -> HarvestedCrop:
+    ) -> HarvestedCrop | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
 
         Parameters
@@ -251,8 +251,9 @@ class Crop:
 
         Returns
         -------
-        HarvestedCrop
-            A harvested crop data structure.
+        HarvestedCrop | None
+            A harvested crop data structure, or ``None`` when the operation collects no yield (a kill-only operation
+            or a crop configured to deposit all residue into the field).
 
         """
         return self._crop_management.manage_harvest(harvest_operation, field_name, field_size, time, soil_data)

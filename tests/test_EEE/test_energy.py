@@ -14,7 +14,7 @@ from tests.test_EEE.fixtures import (
     parsed_diesel_consumption_inputs,
     EEE_constants,
     tractor_dataset,
-    filtered_variable_pool
+    filtered_variable_pool,
 )
 
 assert parsed_diesel_consumption_inputs is not None
@@ -23,50 +23,83 @@ assert tractor_dataset is not None
 assert filtered_variable_pool is not None
 
 
+@pytest.mark.parametrize(
+    "tractor_size",
+    [
+        TractorSize.SMALL.value,
+        None,
+    ],
+)
 def test_estimate_all(
-        parsed_diesel_consumption_inputs: list[dict[str, Any]],
-        EEE_constants: list[dict[str, Any]],
-        tractor_dataset: dict[str, list[Any]],
-        mocker: MockerFixture
+    parsed_diesel_consumption_inputs: list[dict[str, Any]],
+    EEE_constants: list[dict[str, Any]],
+    tractor_dataset: dict[str, list[Any]],
+    tractor_size: str | None,
+    mocker: MockerFixture,
 ) -> None:
-    """Tests the estimation routines are called correctly."""
+    """Tests the estimation routines with and without a configured tractor size."""
     im, om = InputManager(), OutputManager()
-    mock_parse_inputs_for_diesel_consumption_calculation = mocker.patch.object(
+
+    mock_parse_inputs = mocker.patch.object(
         EnergyEstimator,
         "parse_inputs_for_diesel_consumption_calculation",
-        return_value=parsed_diesel_consumption_inputs
+        return_value=parsed_diesel_consumption_inputs,
     )
     mock_calculate_diesel_consumption = mocker.patch.object(
         EnergyEstimator,
         "calculate_diesel_consumption",
-        return_value=10
+        return_value=10,
     )
     mock_report_diesel_consumption = mocker.patch.object(
         EnergyEstimator,
-        "report_diesel_consumption"
+        "report_diesel_consumption",
     )
+
+    mock_tractor = mocker.patch(
+        f"{EnergyEstimator.__module__}.Tractor",
+    )
+    mock_tractor.return_value.tractor_size = TractorSize(tractor_size) if tractor_size else TractorSize.SMALL
 
     def mock_get_data(data_address: str) -> Any:
         if data_address == "EEE_constants.constants":
             return EEE_constants
-        elif data_address == "tractor_dataset":
+        if data_address == "tractor_dataset":
             return tractor_dataset
-        else:
+        if data_address == "animal.herd_information.herd_num":
             return 10
+        if data_address.endswith(".tractor_size"):
+            return tractor_size
+        return 10
 
-    mocker.patch.object(
-        im,
-        "get_data",
-        side_effect=mock_get_data
-    )
+    mocker.patch.object(im, "get_data", side_effect=mock_get_data)
     mock_om_add_variable = mocker.patch.object(om, "add_variable")
 
-    EnergyEstimator.estimate_all()
+    EnergyEstimator.estimate_all(
+        simulate_animals=True,
+        simulate_feed=True,
+        simulate_fields=True,
+        simulate_manure=True,
+    )
 
-    mock_parse_inputs_for_diesel_consumption_calculation.assert_called_once_with()
-    assert mock_calculate_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
-    assert mock_report_diesel_consumption.call_count == len(parsed_diesel_consumption_inputs)
-    mock_om_add_variable.assert_called_once()
+    operation_count = len(parsed_diesel_consumption_inputs)
+
+    mock_parse_inputs.assert_called_once_with()
+    assert mock_calculate_diesel_consumption.call_count == operation_count
+    assert mock_report_diesel_consumption.call_count == operation_count
+    assert mock_tractor.call_count == operation_count
+
+    expected_tractor_size = TractorSize(tractor_size) if tractor_size else None
+
+    for tractor_call in mock_tractor.call_args_list:
+        assert tractor_call.kwargs["herd_size"] == 10
+        assert tractor_call.kwargs["tractor_size"] == expected_tractor_size
+
+    unique_field_years = {(item["field_name"], item["operation_year"]) for item in parsed_diesel_consumption_inputs}
+    unique_years = {item["operation_year"] for item in parsed_diesel_consumption_inputs}
+
+    expected_add_variable_calls = len(unique_field_years) + len(unique_years)
+
+    assert mock_om_add_variable.call_count == expected_add_variable_calls
 
 
 @pytest.mark.parametrize(
@@ -85,7 +118,7 @@ def test_estimate_all(
                 "mass": None,
                 "tillage_implement": None,
             },
-            5 + 2
+            5 + 2,
         ),
         (
             {
@@ -100,7 +133,7 @@ def test_estimate_all(
                 "mass": None,
                 "tillage_implement": None,
             },
-            5 + 1
+            5 + 1,
         ),
         (
             {
@@ -115,7 +148,7 @@ def test_estimate_all(
                 "mass": 8.8,
                 "tillage_implement": None,
             },
-            5 + 2
+            5 + 2,
         ),
         (
             {
@@ -130,7 +163,7 @@ def test_estimate_all(
                 "mass": 8.8,
                 "tillage_implement": None,
             },
-            5 + 2
+            5 + 2,
         ),
         (
             {
@@ -145,14 +178,12 @@ def test_estimate_all(
                 "mass": None,
                 "tillage_implement": TillageImplement.DISK_HARROW,
             },
-            5 + 2
+            5 + 2,
         ),
-    ]
+    ],
 )
 def test_report_diesel_consumption(
-        diesel_consumption_data: dict[str, Any],
-        expected_add_variable_calls: int,
-        mocker: MockerFixture
+    diesel_consumption_data: dict[str, Any], expected_add_variable_calls: int, mocker: MockerFixture
 ) -> None:
     """Tests the diesel consumption report function."""
     om = OutputManager()
@@ -163,24 +194,20 @@ def test_report_diesel_consumption(
         diesel_consumption_data=diesel_consumption_data,
         herd_size=18,
         tractor_size=TractorSize.SMALL,
-        diesel_consumption_tractor_implement_liter_per_ton=10
+        diesel_consumption_tractor_implement_liters_per_ha=10,
     )
 
     assert mock_om_add_variable.call_count == expected_add_variable_calls
 
 
 def test_parse_inputs_for_diesel_consumption_calculation(
-        filtered_variable_pool: dict[str, Any],
-        parsed_diesel_consumption_inputs: list[dict[str, Any]],
-        mocker: MockerFixture,
+    filtered_variable_pool: dict[str, Any],
+    parsed_diesel_consumption_inputs: list[dict[str, Any]],
+    mocker: MockerFixture,
 ) -> None:
     """Tests the diesel consumption calculation inputs are parsed correctly."""
     om = OutputManager()
-    mocker.patch.object(
-        om,
-        "filter_variables_pool",
-        side_effect=filtered_variable_pool
-    )
+    mocker.patch.object(om, "filter_variables_pool", side_effect=filtered_variable_pool)
 
     ee = EnergyEstimator()
     result = ee.parse_inputs_for_diesel_consumption_calculation()
@@ -193,16 +220,16 @@ def test_parse_inputs_for_diesel_consumption_calculation(
         (100, 50, 20, 500, 0.5, 0.14476319 * 2),
         (150, 75, 30, 750, 0.6, 0.09650879 * 2),
         (200, 100, 40, None, None, 0.07238159 * 2),
-    ]
+    ],
 )
 def test_calculate_diesel_consumption(
-        crop_yield: float,
-        field_production_size: float,
-        clay_percent: float,
-        applications_mass: float | None,
-        application_dm_content: float | None,
-        expected_result: float,
-        mocker: MockerFixture
+    crop_yield: float,
+    field_production_size: float,
+    clay_percent: float,
+    applications_mass: float | None,
+    application_dm_content: float | None,
+    expected_result: float,
+    mocker: MockerFixture,
 ) -> None:
     """Tests the diesel consumption calculation is performed correctly."""
     tractor = MagicMock(auto_spec=Tractor)

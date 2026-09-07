@@ -400,15 +400,31 @@ def test_start_data_processing(
     cv_ok: bool,
     expected_return: bool,
 ) -> None:
-    """Covers: metadata/properties valid, populate_pool path, CV blocks (none/pass/fail,
-    eager short-circuit vs collect)."""
+    """Tests successful processing, cross-validation failures, and invalid input data."""
     mocker.patch.object(mock_input_manager, "_load_metadata")
     mocker.patch.object(mock_input_manager, "_load_properties")
     mocker.patch.object(mock_input_manager, "_validate_required_file_blobs")
-    mocker.patch.object(mock_input_manager, "_cross_validate_data", return_value=cv_ok)
-    mocker.patch.object(type(mock_input_manager.data_validator), "validate_metadata", return_value=(True, ""))
-    mocker.patch.object(type(mock_input_manager.data_validator), "validate_properties", return_value=(True, ""))
-    mocker.patch.object(type(mock_input_manager), "_populate_pool", return_value=populate_ok)
+
+    mock_cross_validate_data = mocker.patch.object(
+        mock_input_manager,
+        "_cross_validate_data",
+        return_value=cv_ok,
+    )
+    mocker.patch.object(
+        type(mock_input_manager.data_validator),
+        "validate_metadata",
+        return_value=(True, ""),
+    )
+    mocker.patch.object(
+        type(mock_input_manager.data_validator),
+        "validate_properties",
+        return_value=(True, ""),
+    )
+    mocker.patch.object(
+        type(mock_input_manager),
+        "_populate_pool",
+        return_value=populate_ok,
+    )
 
     route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
 
@@ -424,6 +440,14 @@ def test_start_data_processing(
     )
 
     assert result is expected_return
+
+    if populate_ok:
+        mock_cross_validate_data.assert_called_once_with(
+            [],
+            eager_termination,
+        )
+    else:
+        mock_cross_validate_data.assert_not_called()
 
     route_logs.assert_called_once_with(mock_input_manager.data_validator.event_logs)
 

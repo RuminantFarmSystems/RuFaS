@@ -35,7 +35,7 @@ class Tractor:
     herd_size : int | None, optional
         The size of the herd, used to determine the tractor size if ``tractor_size`` is not provided.
     application_depth : float | None, optional
-        The depth of the application (cm).
+        The depth of the application (mm).
     tillage_implement : TillageImplement | None, optional
         The type of tillage implement used for the operation.
     harvest_type : HarvestOperation | None, optional
@@ -138,7 +138,7 @@ class Tractor:
         Parameters
         ----------
         application_depth : float | None, optional
-            The depth of the application (cm), used for nutrient application operations.
+            The depth of the application (mm), used for nutrient application operations.
 
         Returns
         -------
@@ -167,7 +167,7 @@ class Tractor:
         Parameters
         ----------
         application_depth : float | None
-            The depth of the fertilizer application (cm).
+            The depth of the fertilizer application (mm).
 
         Returns
         -------
@@ -189,7 +189,7 @@ class Tractor:
         Parameters
         ----------
         application_depth : float | None
-            The depth of the manure application (cm).
+            The depth of the manure application (mm).
 
         Returns
         -------

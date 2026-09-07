@@ -136,10 +136,14 @@ def test_add_matter_nutrient_request_results(
     dry_matter_two = dry_frac_two * mass_two
 
     first_request = NutrientRequestResults(
-        total_manure_mass=mass_one, dry_matter_fraction=dry_frac_one, dry_matter=dry_matter_one
+        total_manure_mass=mass_one,
+        dry_matter_fraction=dry_frac_one,
+        dry_matter=dry_matter_one
     )
     second_request = NutrientRequestResults(
-        total_manure_mass=mass_two, dry_matter_fraction=dry_frac_two, dry_matter=dry_matter_two
+        total_manure_mass=mass_two,
+        dry_matter_fraction=dry_frac_two,
+        dry_matter=dry_matter_two
     )
 
     # Act

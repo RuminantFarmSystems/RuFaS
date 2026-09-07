@@ -151,7 +151,22 @@ class Hay(Storage):
 
         additional_loss = self._calculate_additional_dry_matter_loss(crop, weather_conditions)
 
-        return current_loss - processed_loss + additional_loss
+        raw_loss = current_loss - processed_loss + additional_loss
+        if raw_loss > crop.dry_matter_mass:
+            self.om.add_warning(
+                "Hay dry matter loss capped",
+                (
+                    f"Calculated dry matter loss ({raw_loss:.2f} kg) exceeded the remaining dry matter "
+                    f"({crop.dry_matter_mass:.2f} kg) for crop '{crop.config_name}' in field "
+                    f"'{crop.field_name}'. Capping loss to the remaining dry matter."
+                ),
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.calculate_dry_matter_loss_to_gas.__name__,
+                },
+            )
+
+        return min(crop.dry_matter_mass, max(0.0, raw_loss))
 
     def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: date) -> float:
         """
@@ -188,7 +203,9 @@ class Hay(Storage):
             14206 - 2433 * FINAL_MOISTURE_PERCENTAGE / (1 - FINAL_MOISTURE_PERCENTAGE)
         )
 
-        fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
+        fraction_of_initial_dry_matter_lost = (
+            numerator / denominator * fraction_of_total_loss if denominator > 0.0 else 0
+        )
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
     def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: date) -> float:
