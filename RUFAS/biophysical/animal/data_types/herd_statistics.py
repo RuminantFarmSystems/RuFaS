@@ -267,12 +267,7 @@ class HerdStatistics:
         self.cull_reason_stats = {
             animal_constants.DEATH_CULL: 0,
             animal_constants.OVERSUPPLY_CULL: 0,
-            animal_constants.LAMENESS_CULL: 0,
-            animal_constants.INJURY_CULL: 0,
-            animal_constants.MASTITIS_CULL: 0,
-            animal_constants.DISEASE_CULL: 0,
-            animal_constants.UDDER_CULL: 0,
-            animal_constants.UNKNOWN_CULL: 0,
+            animal_constants.ACUTE_SALE_CULL: 0,
         }
         self.parity_culling_stats_range = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
         self.num_cow_for_parity = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "greater_than_5": 0}
@@ -281,12 +276,7 @@ class HerdStatistics:
         self.cull_reason_stats_percent = {
             animal_constants.DEATH_CULL: 0.0,
             animal_constants.OVERSUPPLY_CULL: 0.0,
-            animal_constants.LAMENESS_CULL: 0.0,
-            animal_constants.INJURY_CULL: 0.0,
-            animal_constants.MASTITIS_CULL: 0.0,
-            animal_constants.DISEASE_CULL: 0.0,
-            animal_constants.UDDER_CULL: 0.0,
-            animal_constants.UNKNOWN_CULL: 0.0,
+            animal_constants.ACUTE_SALE_CULL: 0.0,
         }
         self.percent_cow_for_parity = {
             "1": 0.0,

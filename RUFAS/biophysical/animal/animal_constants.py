@@ -96,12 +96,7 @@ DRY = "dry"
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
 OVERSUPPLY_CULL = "culled for herd resize"
 DEATH_CULL = "culled for death"
-LAMENESS_CULL = "culled for lameness"
-INJURY_CULL = "culled for injury"
-MASTITIS_CULL = "culled for mastitis"
-DISEASE_CULL = "culled for disease"
-UDDER_CULL = "culled for udder"
-UNKNOWN_CULL = "culled for unknown"
+ACUTE_SALE_CULL = "culled for acute sale"
 
 # youngstock mortality (a loss from death, not a cull)
 CALF_MORTALITY_LOSS = "died from pre-wean mortality"
