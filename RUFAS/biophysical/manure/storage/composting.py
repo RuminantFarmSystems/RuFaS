@@ -17,18 +17,21 @@ FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
     CompostingType.STATIC_PILE: 0.5,
     CompostingType.PASSIVE_WINDROW: 0.45,
     CompostingType.INTENSIVE_WINDROW: 0.5,
+    CompostingType.IN_VESSEL: 0.45,
 }
 
 FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: dict[CompostingType, float] = {
     CompostingType.STATIC_PILE: 0.01,
     CompostingType.PASSIVE_WINDROW: 0.005,
     CompostingType.INTENSIVE_WINDROW: 0.005,
+    CompostingType.IN_VESSEL: 0.006,
 }
 
 FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
     CompostingType.STATIC_PILE: 0.06,
     CompostingType.PASSIVE_WINDROW: 0.04,
     CompostingType.INTENSIVE_WINDROW: 0.06,
+    CompostingType.IN_VESSEL: 0.0,
 }
 
 MCF_TABLE: dict[tuple[float, float], dict[CompostingType, float]] = {
@@ -36,16 +39,19 @@ MCF_TABLE: dict[tuple[float, float], dict[CompostingType, float]] = {
         CompostingType.STATIC_PILE: 1.0,
         CompostingType.INTENSIVE_WINDROW: 0.5,
         CompostingType.PASSIVE_WINDROW: 1.0,
+        CompostingType.IN_VESSEL: 0.5,
     },
     (10.0, 18.0): {
         CompostingType.STATIC_PILE: 2.0,
         CompostingType.INTENSIVE_WINDROW: 1.0,
         CompostingType.PASSIVE_WINDROW: 2.0,
+        CompostingType.IN_VESSEL: 0.5,
     },
     (18.0, inf): {
         CompostingType.STATIC_PILE: 2.5,
         CompostingType.INTENSIVE_WINDROW: 1.5,
         CompostingType.PASSIVE_WINDROW: 2.5,
+        CompostingType.IN_VESSEL: 0.5,
     },
 }
 

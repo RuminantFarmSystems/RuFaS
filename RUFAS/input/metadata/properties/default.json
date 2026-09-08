@@ -5696,7 +5696,7 @@
         "composting_type": {
           "type": "string",
           "description": "Composting method, applicable only to the composting storage type.",
-          "pattern": "^(intensive windrow|passive windrow|static pile)$",
+          "pattern": "^(intensive windrow|passive windrow|static pile|in vessel)$",
           "nullable": true
         },
         "is_mixed": {
