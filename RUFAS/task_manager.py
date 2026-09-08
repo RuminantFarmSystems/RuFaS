@@ -266,7 +266,11 @@ class TaskManager:
                 info_map,
             )
             e2e_random_seeds = {
-                group_name: group_runs[0]["random_seeds"] for group_name, group_runs in e2e_groups.items()
+                group_name: [
+                    run["random_seed"]
+                    for run in group_runs
+                ]
+                for group_name, group_runs in e2e_groups.items()
             }
             json_output_directory = next(iter(e2e_groups.values()))[0]["json_output_directory"]
 
@@ -462,6 +466,9 @@ class TaskManager:
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
+                random_seeds = input_task.pop("random_seeds", None)
+                if random_seeds is not None:
+                    input_task["random_seed"] = random_seeds[0]
                 parsed_single_run_args.append(input_task)
         return parsed_single_run_args, parsed_multi_run_args
 
@@ -515,7 +522,8 @@ class TaskManager:
         for i in range(multi_run_args["multi_run_counts"]):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
-            new_args["random_seeds"] = [random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)]
+            new_args["random_seed"] = [random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)]
+            new_args.pop("random_seeds", None)
             new_args["output_prefix"] = f"{new_args['output_prefix']} run {i + 1}"
             single_run_args.append(new_args)
 
@@ -648,6 +656,7 @@ class TaskManager:
             new_args = e2e_args.copy()
 
             new_args["random_seed"] = random_seed
+            new_args.pop("random_seeds", None)
             new_args["e2e_group"] = base_output_prefix
             new_args["e2e_run_number"] = run_number
             new_args["output_prefix"] = f"{base_output_prefix}_run_{run_number}"
@@ -867,7 +876,7 @@ class TaskManager:
             filters_path = Path(args["filters_directory"])
             output_manager.validate_filter_constant_content(filters_path)
 
-            TaskManager.set_random_seed(args["random_seeds"][0], output_manager)
+            TaskManager.set_random_seed(args["random_seed"], output_manager)
 
             handler = simulation_and_analysis_handlers.get(task_type)
             if handler:

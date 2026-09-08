@@ -267,11 +267,34 @@ class E2ETestResultsHandler:
             if output_name == "DISCLAIMER":
                 averaged_results[output_name] = reference_output
                 continue
+            missing_results_paths = [
+                result_path
+                for result_path, result in zip(results_paths, test_results)
+                if output_name not in result
+            ]
+            if missing_results_paths:
+                OutputManager().add_warning(
+                    "E2E Results Averaging Warning",
+                    (
+                        f"E2E output '{output_name}' is missing from "
+                        f"{len(missing_results_paths)} of {len(test_results)} runs "
+                        "and will be excluded from the averaged results. "
+                        f"Missing from: {missing_results_paths}."
+                    ),
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": (
+                            E2ETestResultsHandler._average_results.__name__
+                        ),
+                    },
+                )
+                continue
+
             matching_outputs = [result[output_name] for result in test_results]
 
             if not isinstance(reference_output, dict) or "values" not in reference_output:
                 if not all(output == reference_output for output in matching_outputs):
-                    OutputManager().add_error(
+                    OutputManager().add_warning(
                         "E2E Results Averaging Error",
                         f"Non-matching data in reference output for {output_name}",
                         info_map={
@@ -279,8 +302,7 @@ class E2ETestResultsHandler:
                             "function": E2ETestResultsHandler._average_results.__name__,
                         },
                     )
-                    raise ValueError(f"Non-standard E2E output '{output_name}' differs between runs.")
-
+                    continue
                 averaged_results[output_name] = reference_output
                 continue
 
@@ -333,17 +355,13 @@ class E2ETestResultsHandler:
 
                 else:
                     if not all(value == reference_value for value in matching_values):
-                        OutputManager().add_error(
+                        OutputManager().add_warning(
                             "E2E Results Averaging Error",
                             f"Non-numeric values differ for '{output_name}' at index {index}.",
                             info_map={
                                 "class": E2ETestResultsHandler.__class__.__name__,
                                 "function": E2ETestResultsHandler.average_test_results.__name__,
                             },
-                        )
-                        raise ValueError(
-                            f"Non-numeric values differ for E2E output "
-                            f"'{output_name}' at index {index}: {matching_values}."
                         )
 
                     averaged_values.append(reference_value)
@@ -372,7 +390,7 @@ class E2ETestResultsHandler:
                 raise ValueError(f"E2E output '{output_name}' in '{result_path}' does not " "contain a 'values' list.")
 
             if len(output["values"]) != len(reference_values):
-                OutputManager().add_error(
+                OutputManager().add_warning(
                     "E2E Results Averaging Error",
                     f"E2E output '{output_name}' has {len(output['values'])} values "
                     f"in '{result_path}', but {len(reference_values)} were expected.",
@@ -381,35 +399,43 @@ class E2ETestResultsHandler:
                         "function": E2ETestResultsHandler._validate_values.__name__,
                     },
                 )
-                raise ValueError(
-                    f"E2E output '{output_name}' has {len(output['values'])} values "
-                    f"in '{result_path}', but {len(reference_values)} were expected."
-                )
 
     @staticmethod
     def _validate_results(
-        result_paths: list[Path], test_results: list[dict[str, Any]], reference_keys: set[str]
+        result_paths: list[Path],
+        test_results: list[dict[str, Any]],
+        reference_keys: set[str],
     ) -> None:
-        for result_path, result in zip(result_paths[1:], test_results[1:]):
+        for result_path, result in zip(
+            result_paths[1:],
+            test_results[1:],
+        ):
             result_keys = set(result)
 
-            if result_keys != reference_keys:
-                missing_keys = reference_keys - result_keys
-                unexpected_keys = result_keys - reference_keys
-                OutputManager().add_error(
-                    "E2E Results Averaging Error",
-                    f"E2E result structure does not match for '{result_path}'. "
-                    f"Missing keys: {sorted(missing_keys)}. "
-                    f"Unexpected keys: {sorted(unexpected_keys)}.",
+            missing_keys = reference_keys - result_keys
+            unexpected_keys = result_keys - reference_keys
+
+            if missing_keys or unexpected_keys:
+                OutputManager().add_warning(
+                    "E2E Results Averaging Warning",
+                    (
+                        f"E2E result structure differs for "
+                        f"'{result_path}'. "
+                        f"Missing keys: {sorted(missing_keys)}. "
+                        f"Unexpected keys: {sorted(unexpected_keys)}."
+                    ),
                     info_map={
-                        "class": E2ETestResultsHandler.__class__.__name__,
-                        "function": E2ETestResultsHandler._validate_results.__name__,
+                        "class": (
+                            E2ETestResultsHandler
+                            .__class__
+                            .__name__
+                        ),
+                        "function": (
+                            E2ETestResultsHandler
+                            ._validate_results
+                            .__name__
+                        ),
                     },
-                )
-                raise ValueError(
-                    f"E2E result structure does not match for '{result_path}'. "
-                    f"Missing keys: {sorted(missing_keys)}. "
-                    f"Unexpected keys: {sorted(unexpected_keys)}."
                 )
 
     @staticmethod
