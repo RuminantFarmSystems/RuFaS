@@ -158,6 +158,63 @@
         "type": "bool",
         "description": "Whether or not to simulate genetics for animals",
         "default": false
+      },
+      "tbv_fat_std": {
+        "type": "number",
+        "description": "True Breeding Value Fat Standard Deviation (kg) -- The standard deviation of the true breeding value (TBV) for fat yield in the herd. Defaults to the CDCB national average",
+        "default": 25.8,
+        "minimum": 0
+      },
+      "tbv_protein_std": {
+        "type": "number",
+        "description": "True Breeding Value Protein Standard Deviation (kg) -- The standard deviation of the true breeding value (TBV) for protein yield in the herd. Defaults to the CDCB national average",
+        "default": 13.4,
+        "minimum": 0
+      },
+      "tbv_correlation": {
+        "type": "number",
+        "description": "True Breeding Value Correlation (unitless) -- The correlation between the fat and protein true breeding values (TBV). Defaults to the CDCB national average",
+        "default": 0.59,
+        "minimum": -1,
+        "maximum": 1
+      },
+      "permanent_environment_fat_std": {
+        "type": "number",
+        "description": "Permanent Environmental Effect Fat Standard Deviation (kg) -- The standard deviation of the permanent environmental effect on fat yield in the herd. Defaults to the CDCB national average",
+        "default": 38.8,
+        "minimum": 0
+      },
+      "permanent_environment_protein_std": {
+        "type": "number",
+        "description": "Permanent Environmental Effect Protein Standard Deviation (kg) -- The standard deviation of the permanent environmental effect on protein yield in the herd. Defaults to the CDCB national average",
+        "default": 20.1,
+        "minimum": 0
+      },
+      "permanent_environment_correlation": {
+        "type": "number",
+        "description": "Permanent Environmental Effect Correlation (unitless) -- The correlation between the fat and protein permanent environmental effects. Defaults to the CDCB national average",
+        "default": 0.95,
+        "minimum": -1,
+        "maximum": 1
+      },
+      "temporary_environment_fat_std": {
+        "type": "number",
+        "description": "Temporary Environmental Effect Fat Standard Deviation (kg) -- The standard deviation of the temporary environmental effect on fat yield in the herd. Defaults to the CDCB national average",
+        "default": 64.5,
+        "minimum": 0
+      },
+      "temporary_environment_protein_std": {
+        "type": "number",
+        "description": "Temporary Environmental Effect Protein Standard Deviation (kg) -- The standard deviation of the temporary environmental effect on protein yield in the herd. Defaults to the CDCB national average",
+        "default": 33.4,
+        "minimum": 0
+      },
+      "temporary_environment_correlation": {
+        "type": "number",
+        "description": "Temporary Environmental Effect Correlation (unitless) -- The correlation between the fat and protein temporary environmental effects. Defaults to the CDCB national average",
+        "default": 0.78,
+        "minimum": -1,
+        "maximum": 1
       }
     },
     "herd_initialization": {
