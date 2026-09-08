@@ -44,6 +44,22 @@ def reset_animal_config_state() -> Generator[None, None, None]:
         setattr(AnimalConfig, name, value)
 
 
+def _make_herd_information() -> dict[str, Any]:
+    """Builds the ``herd_information`` blob that ``AnimalConfig.initialize_animal_config()`` reads."""
+    return {
+        "simulate_genetics": False,
+        "tbv_fat_std": 25.8,
+        "tbv_protein_std": 13.4,
+        "tbv_correlation": 0.59,
+        "permanent_environment_fat_std": 38.8,
+        "permanent_environment_protein_std": 20.1,
+        "permanent_environment_correlation": 0.95,
+        "temporary_environment_fat_std": 64.5,
+        "temporary_environment_protein_std": 33.4,
+        "temporary_environment_correlation": 0.78,
+    }
+
+
 def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) -> dict[str, Any]:
     """Builds the ``animal_config`` blob that ``AnimalConfig.initialize_animal_config()`` reads."""
     return {
@@ -193,7 +209,7 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
         "methane_mitigation": {
             "methane_mitigation_method": "None",
         },
-        "herd_information": {"simulate_genetics": False},
+        "herd_information": _make_herd_information(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -262,7 +278,7 @@ def test_initialize_animal_config_selects_dose_of_chosen_mitigation_method(
             "essential_oils_additive_amount": 50,
             "seaweed_additive_amount": 55,
         },
-        "herd_information": {"simulate_genetics": False},
+        "herd_information": _make_herd_information(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -297,7 +313,7 @@ def test_initialize_animal_config_warns_when_selected_mitigation_dose_field_is_m
         "methane_model": {"dummy": "model"},
         # "3-NOP" is selected, but "3-NOP_additive_amount" is absent from the blob.
         "methane_mitigation": {"methane_mitigation_method": "3-NOP"},
-        "herd_information": {"simulate_genetics": False},
+        "herd_information": _make_herd_information(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -450,7 +466,7 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
         "methane_mitigation": {
             "methane_mitigation_method": "None",
         },
-        "herd_information": {"simulate_genetics": False},
+        "herd_information": _make_herd_information(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -474,3 +490,53 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
     warning_args, warning_kwargs = mock_om.add_warning.call_args
 
     assert "3rd pregnancy check day >=" in warning_args[0]
+
+
+def test_initialize_animal_config_reads_genetics_inputs(mocker: pytest_mock.MockerFixture) -> None:
+    """The farm-specific genetic distribution inputs in ``herd_information`` are read into ``AnimalConfig``."""
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
+    mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
+
+    mock_im = mock_im_cls.return_value
+
+    animal_data = {
+        "animal_config": _make_base_animal_config("5dCG2P", "TAI"),
+        "methane_model": {"dummy": "model"},
+        "methane_mitigation": {"methane_mitigation_method": "None"},
+        "herd_information": {
+            "simulate_genetics": True,
+            "tbv_fat_std": 1.1,
+            "tbv_protein_std": 2.2,
+            "tbv_correlation": 0.3,
+            "permanent_environment_fat_std": 4.4,
+            "permanent_environment_protein_std": 5.5,
+            "permanent_environment_correlation": 0.6,
+            "temporary_environment_fat_std": 7.7,
+            "temporary_environment_protein_std": 8.8,
+            "temporary_environment_correlation": 0.9,
+        },
+    }
+
+    def get_data_side_effect(key: str) -> Any:
+        if key == "animal":
+            return animal_data
+        if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
+            return 1.23
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+            return {}
+        raise KeyError(key)
+
+    mock_im.get_data.side_effect = get_data_side_effect
+
+    AnimalConfig.initialize_animal_config()
+
+    assert AnimalConfig.simulate_genetics is True
+    assert AnimalConfig.tbv_fat_std == 1.1
+    assert AnimalConfig.tbv_protein_std == 2.2
+    assert AnimalConfig.tbv_correlation == 0.3
+    assert AnimalConfig.permanent_environment_fat_std == 4.4
+    assert AnimalConfig.permanent_environment_protein_std == 5.5
+    assert AnimalConfig.permanent_environment_correlation == 0.6
+    assert AnimalConfig.temporary_environment_fat_std == 7.7
+    assert AnimalConfig.temporary_environment_protein_std == 8.8
+    assert AnimalConfig.temporary_environment_correlation == 0.9
