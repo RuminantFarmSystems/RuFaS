@@ -266,11 +266,7 @@ class TaskManager:
                 info_map,
             )
             e2e_random_seeds = {
-                group_name: [
-                    run["random_seed"]
-                    for run in group_runs
-                ]
-                for group_name, group_runs in e2e_groups.items()
+                group_name: [run["random_seed"] for run in group_runs] for group_name, group_runs in e2e_groups.items()
             }
             json_output_directory = next(iter(e2e_groups.values()))[0]["json_output_directory"]
 

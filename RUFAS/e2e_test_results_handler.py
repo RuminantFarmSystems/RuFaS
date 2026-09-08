@@ -268,9 +268,7 @@ class E2ETestResultsHandler:
                 averaged_results[output_name] = reference_output
                 continue
             missing_results_paths = [
-                result_path
-                for result_path, result in zip(results_paths, test_results)
-                if output_name not in result
+                result_path for result_path, result in zip(results_paths, test_results) if output_name not in result
             ]
             if missing_results_paths:
                 OutputManager().add_warning(
@@ -283,9 +281,7 @@ class E2ETestResultsHandler:
                     ),
                     info_map={
                         "class": E2ETestResultsHandler.__class__.__name__,
-                        "function": (
-                            E2ETestResultsHandler._average_results.__name__
-                        ),
+                        "function": (E2ETestResultsHandler._average_results.__name__),
                     },
                 )
                 continue
@@ -318,10 +314,7 @@ class E2ETestResultsHandler:
                 is_numeric = isinstance(reference_value, Number) and not isinstance(reference_value, bool)
 
                 if is_numeric:
-                    if not all(
-                        isinstance(value, Number) and not isinstance(value, bool)
-                        for value in matching_values
-                    ):
+                    if not all(isinstance(value, Number) and not isinstance(value, bool) for value in matching_values):
                         OutputManager().add_error(
                             "E2E Results Averaging Error",
                             f"Inconsistent numeric value types for '{output_name}' at index {index}.",
@@ -339,17 +332,9 @@ class E2ETestResultsHandler:
                         averaged_values.append(reference_value)
                         continue
 
-                    numeric_values = [
-                        float(value)
-                        for value in matching_values
-                        if not math.isnan(float(value))
-                    ]
+                    numeric_values = [float(value) for value in matching_values if not math.isnan(float(value))]
 
-                    averaged_value = (
-                        sum(numeric_values) / len(numeric_values)
-                        if numeric_values
-                        else float("nan")
-                    )
+                    averaged_value = sum(numeric_values) / len(numeric_values) if numeric_values else float("nan")
 
                     averaged_values.append(averaged_value)
 
@@ -425,16 +410,8 @@ class E2ETestResultsHandler:
                         f"Unexpected keys: {sorted(unexpected_keys)}."
                     ),
                     info_map={
-                        "class": (
-                            E2ETestResultsHandler
-                            .__class__
-                            .__name__
-                        ),
-                        "function": (
-                            E2ETestResultsHandler
-                            ._validate_results
-                            .__name__
-                        ),
+                        "class": (E2ETestResultsHandler.__class__.__name__),
+                        "function": (E2ETestResultsHandler._validate_results.__name__),
                     },
                 )
 
