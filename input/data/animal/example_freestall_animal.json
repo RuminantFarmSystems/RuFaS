@@ -20,7 +20,16 @@
     },
 	"milking_cow_fraction": 0.8356,
     "annual_milk_yield": null,
-    "simulate_genetics": false
+    "simulate_genetics": false,
+    "tbv_fat_std": 25.8,
+    "tbv_protein_std": 13.4,
+    "tbv_correlation": 0.59,
+    "permanent_environment_fat_std": 38.8,
+    "permanent_environment_protein_std": 20.1,
+    "permanent_environment_correlation": 0.95,
+    "temporary_environment_fat_std": 64.5,
+    "temporary_environment_protein_std": 33.4,
+    "temporary_environment_correlation": 0.78
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
