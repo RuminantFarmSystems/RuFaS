@@ -2356,10 +2356,7 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
     animal.animal_type = AnimalType.HEIFER_II
     mock_determine_days_in_milk = mocker.patch.object(animal, "_determine_days_in_milk", return_value=3)
     mock_set_wood_parameters = mocker.patch.object(MilkProduction, "set_wood_parameters")
-    mock_determine_future_death_date = mocker.patch.object(animal, "determine_future_death_date", return_value=3)
-    mock_determine_future_cull_date = mocker.patch.object(
-        animal, "determine_future_cull_date", return_value=(3, "test")
-    )
+    mock_assess_removal_risk = mocker.patch.object(animal, "_assess_removal_risk")
     mock_get_wood_parameters = mocker.patch.object(
         LactationCurve, "get_wood_parameters", return_value={"l": 10.2, "m": 41.2, "n": 41.8}
     )
@@ -2384,7 +2381,7 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
         ),
     )
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=True)
-    # First calving (parity 1) triggers the initial annual removal-risk assessment.
+    # First calving (parity 1) triggers the initial removal-risk assessment.
     mocker.patch.object(Animal, "calves", new_callable=PropertyMock, return_value=1)
     mocker.patch.object(Animal, "calving_interval_history", new_callable=PropertyMock, return_value=[100])
     mocker.patch.object(AnimalEvents, "get_most_recent_date", return_value=2)
@@ -2394,11 +2391,8 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
     mock_get_wood_parameters.assert_called_once()
     mock_set_wood_parameters.assert_called_once()
     mock_determine_days_in_milk.assert_called_once()
-    mock_determine_future_cull_date.assert_called_once()
-    mock_determine_future_death_date.assert_called_once()
+    mock_assess_removal_risk.assert_called_once()
 
-    assert animal.future_cull_date == 3
-    assert animal.cull_reason == "test"
     assert animal.days_in_milk == 3
     assert animal.body_weight == 10
     assert animal.days_in_pregnancy == 12
@@ -3040,25 +3034,21 @@ def test_get_cow_values(mock_lactating_cow: Animal) -> None:
     assert mock_lactating_cow._get_cow_values() == expected
 
 
-def test_determine_future_death_date_no_death(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+def test_will_die_tomorrow_no_death(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
     animal.calves = 1
     animal.days_born = 150
     mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.95)
-    result = animal.determine_future_death_date()
-    assert result == sys.maxsize
+    assert animal.will_die_tomorrow() is False
 
 
-def test_determine_future_death_date_with_death(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
-    """When the annual death roll selects the cow, the day is delegated to _sample_removal_date."""
+def test_will_die_tomorrow_with_death(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    """A roll below the daily death rate (annual parity probability / 365) selects the cow."""
     animal = mock_lactating_cow
     animal.calves = 5
-    # random() <= parity_death_probability[3] (0.117) selects the cow for death this year.
-    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.0005)
-    mock_sample = mocker.patch.object(animal, "_sample_removal_date", return_value=42)
-    result = animal.determine_future_death_date()
-    assert result == 42
-    mock_sample.assert_called_once_with(animal_constants.DEATH_TIMING_DAY_PROBABILITY)
+    # daily death rate = parity_death_probability[3] (0.117) / 365 ~= 0.00032.
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.0001)
+    assert animal.will_die_tomorrow() is True
 
 
 def test_setup_calf_mortality_disabled_when_rate_zero(mock_calf: Animal, mocker: MockerFixture) -> None:
@@ -3221,49 +3211,19 @@ def test_setup_heifer_mortality_not_committed_when_day_already_passed(
     assert animal._future_death_date is None
 
 
-def test_determine_future_cull_date_with_acute_sale(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
-    """When the annual acute-sale roll selects the cow, the day is delegated to _sample_removal_date."""
+def test_will_be_sold_tomorrow_with_acute_sale(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    """A roll below the daily acute-sale rate (annual parity probability / 365) selects the cow."""
     animal = mock_lactating_cow
     animal.calves = 1
-    # random() <= parity_acute_sale_probability[0] (0.169) selects the cow for an acute sale.
-    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.05)
-    mock_sample = mocker.patch.object(animal, "_sample_removal_date", return_value=159)
-    result = animal.determine_future_cull_date()
-    assert result == (159, animal_constants.ACUTE_SALE_CULL)
-    mock_sample.assert_called_once_with(animal_constants.ACUTE_SALE_TIMING_DAY_PROBABILITY)
+    # daily acute-sale rate = parity_acute_sale_probability[0] (0.169) / 365 ~= 0.00046.
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.0001)
+    assert animal.will_be_sold_tomorrow() is True
 
 
-def test_determine_future_cull_date_no_acute_sale(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+def test_will_be_sold_tomorrow_no_acute_sale(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 1
     mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.95)
-    result = mock_lactating_cow.determine_future_cull_date()
-    assert result == (sys.maxsize, "")
-
-
-def test_sample_removal_date_conditions_on_current_days_in_milk(
-    mock_lactating_cow: Animal, mocker: MockerFixture
-) -> None:
-    """The event is placed at the sampled day in milk, anchored to the current lactation start."""
-    animal = mock_lactating_cow
-    animal.days_born = 150
-    animal.days_in_milk = 10
-    # A cow at 10 DIM has already passed CDF value 0.25 on the death curve; uniform draws the
-    # remaining mass. Force the draw to the very start of that remaining mass (0.25) so the
-    # inverted day in milk is exactly the current DIM (10), landing the event at lactation_start + 10.
-    mocker.patch("RUFAS.biophysical.animal.animal.uniform", return_value=0.25)
-    result = animal._sample_removal_date(animal_constants.DEATH_TIMING_DAY_PROBABILITY)
-    # lactation_start (150 - 10) + sampled day in milk (10) == 150.
-    assert result == 150
-
-
-def test_sample_removal_date_falls_back_past_last_breakpoint(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
-    """A cow past the timing curve's last breakpoint gets a short fixed fallback window."""
-    animal = mock_lactating_cow
-    animal.days_born = 900
-    animal.days_in_milk = animal_constants.REMOVAL_TIMING_DAY_BREAKPOINTS[-1] + 5
-    mocker.patch("RUFAS.biophysical.animal.animal.randint", return_value=30)
-    result = animal._sample_removal_date(animal_constants.DEATH_TIMING_DAY_PROBABILITY)
-    assert result == 930
+    assert mock_lactating_cow.will_be_sold_tomorrow() is False
 
 
 def test_set_nutrient_standard() -> None:

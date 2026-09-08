@@ -1,6 +1,6 @@
 import sys
 from datetime import timedelta
-from random import random, randint, uniform
+from random import random, randint
 from typing import Callable, cast
 
 from scipy.stats import truncnorm
@@ -1767,12 +1767,8 @@ class Animal:
                 self.milk_production.set_wood_parameters(
                     wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
                 )
-                # A heifer becomes a cow at her first calving; give her an initial mortality /
-                # acute-sale assessment now so she is not risk-free until the next Jan 1. Later
-                # lactations are not re-rolled here -- removal risk is reassessed annually
-                # (see ``_assess_annual_removal_risk``), decoupling it from reproduction.
                 if self.calves == 1:
-                    self._assess_annual_removal_risk()
+                    self._assess_removal_risk()
 
         self.events += reproduction_outputs.events
 
@@ -1810,12 +1806,8 @@ class Animal:
 
         newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
 
-        # Reassess mortality / acute-sale risk once a year (Jan 1, Julian day 1) for every cow, so
-        # risk accrues with time in the herd rather than only at calving (issue #2694). The guard
-        # inside the assessment skips risk types that already have a pending event, so a cow that
-        # first calved earlier today is not double-rolled.
-        if self.animal_type.is_cow and time.current_julian_day == 1:
-            self._assess_annual_removal_risk()
+        if self.animal_type.is_cow:
+            self._assess_removal_risk()
 
         daily_routines_output.animal_status, daily_routines_output.newborn_calf_config = self.animal_life_stage_update(
             time
@@ -2432,15 +2424,15 @@ class Animal:
             parity=self.calves,
         )
 
-    def _assess_annual_removal_risk(self) -> None:
+    def _assess_removal_risk(self) -> None:
         """
-        Roll a cow's annual mortality and acute-sale risk and schedule any resulting removal.
+        Roll a cow's daily mortality and acute-sale risk and schedule any resulting removal.
 
-        Called on each Jan 1 for every cow, and once when a heifer first calves, so removal risk
+        Called each day for every cow, and once when a heifer first calves, so removal risk
         accrues with time spent in the herd rather than only at calving (issue #2694). Death and
         acute sale are rolled independently. A risk type that already has a pending future event is
-        left untouched: this prevents overwriting or double-scheduling an event a prior roll placed
-        (the days-in-milk timing can land a scheduled event more than a year out, across a Jan 1).
+        left untouched, preventing a later roll from overwriting a removal a prior roll scheduled.
+        A cow selected for removal is scheduled to leave the herd immediately (on the current day).
 
         Notes
         -------
@@ -2448,145 +2440,58 @@ class Animal:
 
         """
         if self.future_death_date == sys.maxsize:
-            death_date = self.determine_future_death_date()
-            if death_date != sys.maxsize:
-                self.future_death_date = death_date
+            if self.will_die_tomorrow():
+                self.future_death_date = self.days_born
                 self._future_death_reason = animal_constants.DEATH_CULL
 
         if self.future_cull_date == sys.maxsize:
-            cull_date, cull_reason = self.determine_future_cull_date()
-            if cull_date != sys.maxsize:
-                self.future_cull_date = cull_date
-                self.cull_reason = cull_reason
+            if self.will_be_sold_tomorrow():
+                self.future_cull_date = self.days_born
+                self.cull_reason = animal_constants.ACUTE_SALE_CULL
 
     def _parity_index(self) -> int:
         """Return the 0-based index into a by-parity array, capping parity 4+ at the last entry."""
         return 3 if self.calves >= 4 else self.calves - 1
 
-    @staticmethod
-    def _interpolate_cdf_at_day(day: float, cdf: list[float], breakpoints: list[int]) -> float:
+    def will_die_tomorrow(self) -> bool:
         """
-        Linearly interpolate a cumulative-distribution value at a given day in milk.
+        Roll the cow's daily mortality risk.
 
-        Parameters
-        ----------
-        day : float
-            Day in milk at which to evaluate the CDF.
-        cdf : list[float]
-            Cumulative-distribution values at each breakpoint (non-decreasing, 0.0 to 1.0).
-        breakpoints : list[int]
-            Days-in-milk breakpoints that partition the CDF (same length as ``cdf``).
+        The parity-indexed annual :attr:`AnimalConfig.parity_death_probability` is converted to a
+        daily rate by dividing by 365 and rolled once per day (issue #2694).
 
         Returns
         -------
-        float
-            The interpolated CDF value, clamped to ``cdf[0]`` below the first breakpoint and
-            ``cdf[-1]`` at or beyond the last.
-
-        """
-        if day <= breakpoints[0]:
-            return cdf[0]
-        for i in range(len(breakpoints) - 1):
-            if breakpoints[i] <= day < breakpoints[i + 1]:
-                slope = (cdf[i + 1] - cdf[i]) / (breakpoints[i + 1] - breakpoints[i])
-                return cdf[i] + slope * (day - breakpoints[i])
-        return cdf[-1]
-
-    def _sample_removal_date(self, timing_cdf: list[float]) -> int:
-        """
-        Sample an absolute simulation day for a scheduled removal from a days-in-milk timing CDF.
-
-        The day is shaped by ``timing_cdf`` (the distribution of removal timing across a lactation)
-        but conditioned to fall after the cow's current days in milk, so a cow selected for removal
-        is always scheduled to leave in the future rather than "escaping" the event. If the cow is
-        already past the CDF's last breakpoint (an extended lactation), the event is instead placed
-        uniformly within ``REMOVAL_FALLBACK_WINDOW_DAYS`` of today.
-
-        Parameters
-        ----------
-        timing_cdf : list[float]
-            Cumulative-distribution values of removal timing at each of
-            ``REMOVAL_TIMING_DAY_BREAKPOINTS``.
-
-        Returns
-        -------
-        int
-            The absolute simulation day (in ``days_born`` terms) on which the removal occurs.
-
-        Notes
-        -------
-        [AN.ANM.1], [AN.ANM.2]
-
-        """
-        breakpoints = animal_constants.REMOVAL_TIMING_DAY_BREAKPOINTS
-        current_days_in_milk = self.days_in_milk
-        lactation_start = self.days_born - current_days_in_milk
-
-        if current_days_in_milk >= breakpoints[-1]:
-            return self.days_born + randint(1, animal_constants.REMOVAL_FALLBACK_WINDOW_DAYS)
-
-        # Draw uniformly on the CDF mass that remains after the current day in milk, then invert
-        # back to a day in milk so the timing keeps its lactation-stage shape.
-        lower_cdf_value = self._interpolate_cdf_at_day(current_days_in_milk, timing_cdf, breakpoints)
-        removal_cdf_value = uniform(lower_cdf_value, 1.0)
-        for i in range(len(timing_cdf) - 1):
-            if timing_cdf[i] <= removal_cdf_value < timing_cdf[i + 1]:
-                slope = (breakpoints[i + 1] - breakpoints[i]) / (timing_cdf[i + 1] - timing_cdf[i])
-                day_in_milk = breakpoints[i] + slope * (removal_cdf_value - timing_cdf[i])
-                return round(lactation_start + day_in_milk)
-        # ``uniform`` can return its upper bound (1.0), which no half-open segment contains.
-        return round(lactation_start + breakpoints[-1])
-
-    def determine_future_death_date(self) -> int:
-        """
-        Roll the cow's annual mortality risk and, if selected, schedule a death day.
-
-        The parity-indexed :attr:`AnimalConfig.parity_death_probability` is now an *annual*
-        probability (issue #2694), rolled by the annual removal assessment rather than once per
-        lactation. When the cow is selected to die, the day is drawn from the days-in-milk death
-        timing CDF via :meth:`_sample_removal_date`.
-
-        Returns
-        -------
-        int
-            Calculated future death date in simulation days, or ``sys.maxsize`` if not selected.
+        bool
+            ``True`` if the cow is selected to die, ``False`` otherwise.
 
         Notes
         -------
         [AN.ANM.1]
 
         """
-        death_rate = AnimalConfig.parity_death_probability[self._parity_index()]
-        if random() <= death_rate:
-            return self._sample_removal_date(animal_constants.DEATH_TIMING_DAY_PROBABILITY)
-        return sys.maxsize
+        death_rate = AnimalConfig.parity_death_probability[self._parity_index()] / 365
+        return random() <= death_rate
 
-    def determine_future_cull_date(self) -> tuple[int, str]:
+    def will_be_sold_tomorrow(self) -> bool:
         """
-        Roll the cow's annual acute-sale risk and, if selected, schedule an acute-sale day.
+        Roll the cow's daily acute-sale (forced / involuntary) risk.
 
-        An acute sale ("forced" / "involuntary" / "spontaneous" removal) is a cow that must leave
-        the herd immediately regardless of whether a replacement is available. The parity-indexed
-        :attr:`AnimalConfig.parity_acute_sale_probability` is now an *annual* probability
-        (issue #2694); the former six disease-specific reasons are collapsed into the single
-        :data:`animal_constants.ACUTE_SALE_CULL` reason with one timing CDF.
+        The parity-indexed annual :attr:`AnimalConfig.parity_acute_sale_probability` is converted to
+        a daily rate by dividing by 365 and rolled once per day (issue #2694).
 
         Returns
         -------
-        tuple[int, str]
-            - Future acute-sale date in simulation days (``sys.maxsize`` if not selected).
-            - Reason for removal (empty string if not selected).
+        bool
+            ``True`` if the cow is selected for an acute sale, ``False`` otherwise.
 
         Notes
         -------
         [AN.ANM.2]
 
         """
-        acute_sale_rate = AnimalConfig.parity_acute_sale_probability[self._parity_index()]
-        if random() <= acute_sale_rate:
-            future_cull_date = self._sample_removal_date(animal_constants.ACUTE_SALE_TIMING_DAY_PROBABILITY)
-            return future_cull_date, animal_constants.ACUTE_SALE_CULL
-        return sys.maxsize, ""
+        acute_sale_rate = AnimalConfig.parity_acute_sale_probability[self._parity_index()] / 365
+        return random() <= acute_sale_rate
 
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """
