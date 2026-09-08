@@ -1,6 +1,8 @@
 import json
 import re
 from collections import namedtuple
+import math
+from numbers import Number
 from pathlib import Path
 import shutil
 from typing import Any
@@ -197,6 +199,273 @@ class E2ETestResultsHandler:
         info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": domain})
         for comparison_type, difference in comparison_results.items():
             om.add_variable(comparison_type, difference, info_map)
+
+    @staticmethod
+    def average_test_results(
+        e2e_group: str,
+        e2e_runs: list[dict[str, Any]],
+    ) -> Path:
+        if not e2e_runs:
+            OutputManager().add_error(
+                "E2E Results Averaging Error",
+                "No e2e runs data sent to 'average_test_results()' function.",
+                info_map={
+                    "class": E2ETestResultsHandler.__class__.__name__,
+                    "function": E2ETestResultsHandler.average_test_results.__name__,
+                },
+            )
+            raise ValueError(f"Cannot average E2E results for '{e2e_group}' because no runs were provided.")
+
+        json_output_directory = Path(e2e_runs[0]["json_output_directory"])
+
+        averaged_results_directory = json_output_directory / "averaged" / e2e_group
+        averaged_results_directory.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(e2e_group)
+
+        for path_set in test_result_path_sets:
+            result_paths = E2ETestResultsHandler._extract_results_paths(
+                e2e_runs=e2e_runs,
+                json_output_directory=json_output_directory,
+                actual_results_path=Path(path_set.actual_results_path),
+            )
+
+            averaged_results = E2ETestResultsHandler._average_results(result_paths)
+
+            averaged_result_path = (
+                averaged_results_directory / f"{Path(path_set.actual_results_path).name}_averaged.json"
+            )
+
+            with open(
+                averaged_result_path,
+                "w",
+                encoding="utf-8",
+            ) as averaged_file:
+                json.dump(
+                    averaged_results,
+                    averaged_file,
+                    separators=(",", ":"),
+                )
+
+        return averaged_results_directory
+
+    @staticmethod
+    def _average_results(results_paths: list[Path]) -> dict[str, Any]:
+        test_results = E2ETestResultsHandler._load_results(results_paths)
+
+        reference_results = test_results[0]
+        reference_keys = set(reference_results)
+
+        E2ETestResultsHandler._validate_results(results_paths, test_results, reference_keys)
+
+        averaged_results: dict[str, Any] = {}
+
+        for output_name, reference_output in reference_results.items():
+            if output_name == "DISCLAIMER":
+                averaged_results[output_name] = reference_output
+                continue
+            missing_results_paths = [
+                result_path for result_path, result in zip(results_paths, test_results) if output_name not in result
+            ]
+            if missing_results_paths:
+                OutputManager().add_warning(
+                    "E2E Results Averaging Warning",
+                    (
+                        f"E2E output '{output_name}' is missing from "
+                        f"{len(missing_results_paths)} of {len(test_results)} runs "
+                        "and will be excluded from the averaged results. "
+                        f"Missing from: {missing_results_paths}."
+                    ),
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": (E2ETestResultsHandler._average_results.__name__),
+                    },
+                )
+                continue
+
+            matching_outputs = [result[output_name] for result in test_results]
+
+            if not isinstance(reference_output, dict) or "values" not in reference_output:
+                if not all(output == reference_output for output in matching_outputs):
+                    OutputManager().add_warning(
+                        "E2E Results Averaging Error",
+                        f"Non-matching data in reference output for {output_name}",
+                        info_map={
+                            "class": E2ETestResultsHandler.__class__.__name__,
+                            "function": E2ETestResultsHandler._average_results.__name__,
+                        },
+                    )
+                    continue
+                averaged_results[output_name] = reference_output
+                continue
+
+            reference_values = reference_output["values"]
+
+            E2ETestResultsHandler._validate_values(results_paths, output_name, matching_outputs, reference_values)
+
+            averaged_values: list[Any] = []
+
+            for index, reference_value in enumerate(reference_values):
+                matching_values = [output["values"][index] for output in matching_outputs]
+
+                is_numeric = isinstance(reference_value, Number) and not isinstance(reference_value, bool)
+
+                if is_numeric:
+                    if not all(isinstance(value, Number) and not isinstance(value, bool) for value in matching_values):
+                        OutputManager().add_error(
+                            "E2E Results Averaging Error",
+                            f"Inconsistent numeric value types for '{output_name}' at index {index}.",
+                            info_map={
+                                "class": E2ETestResultsHandler.__class__.__name__,
+                                "function": E2ETestResultsHandler.average_test_results.__name__,
+                            },
+                        )
+                        raise ValueError(
+                            f"E2E output '{output_name}' has inconsistent value types "
+                            f"at index {index}: {matching_values}."
+                        )
+
+                    if all(value == reference_value for value in matching_values):
+                        averaged_values.append(reference_value)
+                        continue
+
+                    numeric_values = [float(value) for value in matching_values if not math.isnan(float(value))]
+
+                    averaged_value = sum(numeric_values) / len(numeric_values) if numeric_values else float("nan")
+
+                    averaged_values.append(averaged_value)
+
+                else:
+                    if not all(value == reference_value for value in matching_values):
+                        OutputManager().add_warning(
+                            "E2E Results Averaging Error",
+                            f"Non-numeric values differ for '{output_name}' at index {index}.",
+                            info_map={
+                                "class": E2ETestResultsHandler.__class__.__name__,
+                                "function": E2ETestResultsHandler.average_test_results.__name__,
+                            },
+                        )
+
+                    averaged_values.append(reference_value)
+
+            averaged_results[output_name] = {
+                **reference_output,
+                "values": averaged_values,
+            }
+
+        return averaged_results
+
+    @staticmethod
+    def _validate_values(
+        result_paths: list[Path], output_name: Any, matching_outputs: Any, reference_values: Any
+    ) -> None:
+        for result_path, output in zip(result_paths, matching_outputs):
+            if not isinstance(output, dict) or "values" not in output:
+                OutputManager().add_error(
+                    "E2E Results Averaging Error",
+                    f"E2E output '{output_name}' in '{result_path}' does not " "contain a 'values' list.",
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": E2ETestResultsHandler._validate_values.__name__,
+                    },
+                )
+                raise ValueError(f"E2E output '{output_name}' in '{result_path}' does not " "contain a 'values' list.")
+
+            if len(output["values"]) != len(reference_values):
+                OutputManager().add_warning(
+                    "E2E Results Averaging Error",
+                    f"E2E output '{output_name}' has {len(output['values'])} values "
+                    f"in '{result_path}', but {len(reference_values)} were expected.",
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": E2ETestResultsHandler._validate_values.__name__,
+                    },
+                )
+
+    @staticmethod
+    def _validate_results(
+        result_paths: list[Path],
+        test_results: list[dict[str, Any]],
+        reference_keys: set[str],
+    ) -> None:
+        for result_path, result in zip(
+            result_paths[1:],
+            test_results[1:],
+        ):
+            result_keys = set(result)
+
+            missing_keys = reference_keys - result_keys
+            unexpected_keys = result_keys - reference_keys
+
+            if missing_keys or unexpected_keys:
+                OutputManager().add_warning(
+                    "E2E Results Averaging Warning",
+                    (
+                        f"E2E result structure differs for "
+                        f"'{result_path}'. "
+                        f"Missing keys: {sorted(missing_keys)}. "
+                        f"Unexpected keys: {sorted(unexpected_keys)}."
+                    ),
+                    info_map={
+                        "class": (E2ETestResultsHandler.__class__.__name__),
+                        "function": (E2ETestResultsHandler._validate_results.__name__),
+                    },
+                )
+
+    @staticmethod
+    def _load_results(result_paths: list[Path]) -> list[dict[str, Any]]:
+        test_results: list[dict[str, Any]] = []
+
+        for result_path in result_paths:
+            with open(result_path, "r", encoding="utf-8") as result_file:
+                test_results.append(json.load(result_file))
+        return test_results
+
+    @staticmethod
+    def _extract_results_paths(
+        e2e_runs: list[dict[str, Any]],
+        json_output_directory: Path,
+        actual_results_path: Path,
+    ) -> list[Path]:
+        result_paths: list[Path] = []
+
+        for run in e2e_runs:
+            run_output_prefix = run["output_prefix"]
+            e2e_group = run["e2e_group"]
+
+            result_name = actual_results_path.name.removeprefix(f"{e2e_group}_")
+
+            expected_prefix = f"{run_output_prefix}_" f"{result_name}"
+
+            matching_paths = [path for path in json_output_directory.iterdir() if path.name.startswith(expected_prefix)]
+
+            if len(matching_paths) != 1:
+                OutputManager().add_error(
+                    "E2E Results Averaging Error",
+                    (
+                        f"Expected exactly one E2E result file for "
+                        f"'{run_output_prefix}' matching "
+                        f"'{result_name}', but found "
+                        f"{len(matching_paths)}."
+                    ),
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": E2ETestResultsHandler._extract_results_paths.__name__,
+                    },
+                )
+                raise ValueError(
+                    f"Expected exactly one E2E result file for "
+                    f"'{run_output_prefix}' matching "
+                    f"'{result_name}', but found "
+                    f"{len(matching_paths)}."
+                )
+
+            result_paths.append(matching_paths[0])
+
+        return result_paths
 
     @staticmethod
     def _convert_expected_result_variable_names(
