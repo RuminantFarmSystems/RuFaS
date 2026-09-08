@@ -62,7 +62,54 @@ When directed by the `FieldManager`, the Field class initializes a new Field obj
 
 ### Required User Inputs
 
+```{python}
+#| label: tbl-sc-field-inputs
+#| tbl-cap: Required user inputs for the Field section.
+import_table(
+  "../resources/table_data/soil_and_crop/tbl-sc-field-inputs.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+
+```{python}
+#| label: tbl-sc-crop-mgmt-inputs
+#| tbl-cap: Required user inputs for the Crop Management section.
+import_table(
+  "../resources/table_data/soil_and_crop/tbl-sc-crop-mgmt-inputs.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+``` 
+
+```{python}
+#| label: tbl-sc-fert-mgmt-inputs
+#| tbl-cap: Required user inputs for the Fertilizer Management section.
+import_table(
+  "../resources/table_data/soil_and_crop/tbl-sc-fert-mgmt-inputs.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+
+```{python}
+#| label: tbl-sc-fert-schd-inputs
+#| tbl-cap: Required user inputs for the Fertilizer Schedule section.
+import_table(
+  "../resources/table_data/soil_and_crop/tbl-sc-fert-schd-inputs.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+
+```{python}
+#| label: tbl-sc-man-app-inputs
+#| tbl-cap: Required user inputs for the Manure Application section.
+import_table(
+  "../resources/table_data/soil_and_crop/tbl-sc-man-app-inputs.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
+
 ### Expected Outputs
+
+
 
 ### Methodology
 
@@ -153,13 +200,13 @@ $$
 
 *Where*:
 
-* `applied_mass` (kg) is the mass of the given fertilizer required to satisfy all nutrient requests.
-* fert_mass<sub>nitrogen</sub> (kg) is the mass nitrogen requested.
-* fert_mass<sub>phosphorus</sub> (kg) is the mass of phosphorus requested.
-* fert_mass<sub>potassium</sub> (kg) is the mass of potassium requested.
-* `fert_nitrogen_frac` (proportion) is the fraction of nitrogen in the fertilizer mix.
-* `fert_phosphorus_frac` (proportion) is the fraction of phosphorus in the fertilizer mix.
-* `fert_potassium_frac` (proportion) is the fraction of potassium in the fertilizer mix.
+* `applied_mass` (kg) = mass of the given fertilizer required to satisfy all nutrient requests.
+* fert_mass<sub>nitrogen</sub> (kg) = mass nitrogen requested.
+* fert_mass<sub>phosphorus</sub> (kg) = mass of phosphorus requested.
+* fert_mass<sub>potassium</sub> (kg) = mass of potassium requested.
+* `fert_nitrogen_frac` (proportion) = fraction of nitrogen in the fertilizer mix.
+* `fert_phosphorus_frac` (proportion) = fraction of phosphorus in the fertilizer mix.
+* `fert_potassium_frac` (proportion) = fraction of potassium in the fertilizer mix.
 
 The mass of each nutrient applied is then calculated as:
    
@@ -176,9 +223,9 @@ $$
 
 *Where*:
 
-* `applied_nitrogen` (kg) is the mass of nitrogen applied.
-* `applied_phosphorus` (kg) is the mass of phosphorus applied.
-* `applied_potassium` (kg) is the mass of potassium applied.
+* `applied_nitrogen` (kg) = mass of nitrogen applied.
+* `applied_phosphorus` (kg) = mass of phosphorus applied.
+* `applied_potassium` (kg) = mass of potassium applied.
 
 Once the total fertilizer mass and nutrients associated with a fertilizer application are determined, the fertilizer nitrogen and phosphorus masses are added to the appropriate soil nutrient pools via the `apply_fertilizer()` function in the `FertilizerApplication` class in the `fertilizer_application.py` file. 
 
@@ -199,9 +246,9 @@ $$
 
 *Where*:
 
-* `surface_applied_nutrient` (kg/ha) is the mass per ha of each nutrient applied to the surface soil layer.
-* `surface_remainder_fraction` (proportion) is the user-provided input defining the fraction of the fertilizer that remains on the soil surface.
-* `field_size` (ha) is the size of the field.
+* `surface_applied_nutrient` (kg/ha) = mass per ha of each nutrient applied to the surface soil layer.
+* `surface_remainder_fraction` (proportion) = user-provided input defining the fraction of the fertilizer that remains on the soil surface.
+* `field_size` (ha) = size of the field.
 
 The proportion of the subsurface fertilizer that is applied to each layer is calculated from the relationship between the bottom depth of each soil and the application depth. So, for each layer a “depth factor” is calculated as:
 
@@ -225,9 +272,9 @@ $$
 
 *Where*:
 
-* `depth_factor` (proportion) is the fraction of subsurface fertilizer added to each soil layer.
-* `layer_depth` (mm) is the bottom depth of each sub-surface soil layer.
-* `depth_factor_sum` (proportion) is the sum of the depth factors for all layers above the deepest layer receiving fertilizer.
+* `depth_factor` (proportion) = fraction of subsurface fertilizer added to each soil layer.
+* `layer_depth` (mm) = bottom depth of each sub-surface soil layer.
+* `depth_factor_sum` (proportion) = sum of the depth factors for all layers above the deepest layer receiving fertilizer.
 
 Thus, the amount of fertilizer added to each nutrient pool in a sub-surface soil layer is: 
 
@@ -272,7 +319,7 @@ $$
             
 *Where*:
 
-* `manure_applied_water` is the amount of water applied to the field with a manure application (L)
+* `manure_applied_water` = amount of water applied to the field with a manure application (L)
 
 The amount of water in liters is then converted to the amount in mm by a helper function `convert_liters_to_millimeters()`. 
 
@@ -291,9 +338,9 @@ $$
             
 *Where*:
 
-* `surface_dry_matter_mass` (kg) is the amount of manure solids or dry matter that is applied to the soil surface at that application.
-* `manure_dry_matter_mass` (kg) is the amount of manure solids or dry matter that is applied at that application.
-* `surface_remainder_fraction` (kg) is the user-provided value for the amount of the manure applied that remains on the surface.
+* `surface_dry_matter_mass` (kg) = amount of manure solids or dry matter that is applied to the soil surface at that application.
+* `manure_dry_matter_mass` (kg) = amount of manure solids or dry matter that is applied at that application.
+* `surface_remainder_fraction` (kg) = user-provided value for the amount of the manure applied that remains on the surface.
 
 **Surface Phosphorus Application**
 
@@ -341,10 +388,10 @@ $$
 
 *Where*:
 
-* `mass_to_add_to_labile_phos` (kg) is the phosphorus that will be added to the surface labile phosphorus pool during that application.
-* `mass_to_add_to_active_phos` (kg) is the phosphorus that will be added to the surface active phosphorus pool during that application.
-* `total_phosphorus_mass` (kg) is the total phosphorus applied during that application.
-* `soil_infiltration` is equal to 0.4 if the manure applied is less than 15% dry matter, and 0 otherwise.
+* `mass_to_add_to_labile_phos` (kg) = phosphorus that will be added to the surface labile phosphorus pool during that application.
+* `mass_to_add_to_active_phos` (kg) = phosphorus that will be added to the surface active phosphorus pool during that application.
+* `total_phosphorus_mass` (kg) = total phosphorus applied during that application.
+* `soil_infiltration` = 0.4 if the manure applied is less than 15% dry matter, and 0 otherwise.
 
 The SurPhos manure pool attributes for the manure dry matter mass, moisture factor and field coverage are then updated according to the new field coverage and surface dry matter mass for that application [@vadas2007].
 
@@ -369,13 +416,13 @@ $$
 
 *Where*:
 
-* `mass_nitrates_added` (kg N/ha) is the mass of nitrate nitrogen applied to relevant soil layer.
-* `mass_ammonium_added` (kg N/ha) is the mass of ammonium nitrogen applied to relevant soil layer.
-* `mass_fresh_organic_nitrogen_added` (kg N/ha) is the mass of fresh organic nitrogen applied to relevant soil layer.
-* `mass_stable_organic_nitrogen_added` (kg N/ha) is the mass of stable organic nitrogen applied to relevant soil layer.
-* `manure_dry_matter_mass` (kg) is the mass of manure dry matter added to the soil layer.
-* `ammonium_fraction` (proportion) is the fraction of inorganic nitrogen that is in the form of ammoniacal nitrogen and is provided by the Manure Module.
-* `fresh_fraction_of_organic_nitrogen` (proportion) is the fraction of organic nitrogen that is more quickly mineralized and is set to a constant of 0.9286.
+* `mass_nitrates_added` (kg N/ha) = mass of nitrate nitrogen applied to relevant soil layer.
+* `mass_ammonium_added` (kg N/ha) = mass of ammonium nitrogen applied to relevant soil layer.
+* `mass_fresh_organic_nitrogen_added` (kg N/ha) = mass of fresh organic nitrogen applied to relevant soil layer.
+* `mass_stable_organic_nitrogen_added` (kg N/ha) = mass of stable organic nitrogen applied to relevant soil layer.
+* `manure_dry_matter_mass` (kg) = mass of manure dry matter added to the soil layer.
+* `ammonium_fraction` (proportion) = fraction of inorganic nitrogen that is in the form of ammoniacal nitrogen and is provided by the Manure Module.
+* `fresh_fraction_of_organic_nitrogen` (proportion) = fraction of organic nitrogen that is more quickly mineralized and is set to a constant of 0.9286.
 
 The manure mass that is applied to the surface layer is set to the 100% of the `surface_dry_matter_mass` calculated in [SC.FLD.9](#eq-sc-fld-9) if the manure dry matter content is greater than 15%. For liquid manure when the dry matter content is less than 15%, infiltration is assumed and the surface application is set to 60% of the `surface_dry_matter_mass` from [SC.FLD.9](#eq-sc-fld-9) and 40% of the `surface_dry_matter_mass` is assigned to be added to the first sub-surface layer.
 
@@ -463,7 +510,14 @@ RuFaS can simulate soils of any combination of textures in as many layers deline
 
 ### Required User Inputs
 
-
+```{python}
+#| label: tbl-sc-soil-inputs
+#| tbl-cap: Required user inputs for the Soil section.
+import_table(
+  "../resources/table_data/soil_and_crop/tbl-sc-soil-inputs.csv",
+  colalign = ["left", "left", "center", "center", "center"]
+)
+```
 
 ### Expected Outputs
 
@@ -480,7 +534,7 @@ Soil temperature fluctuates diurnally and seasonally and is estimated daily as a
 ::: {#eq-sc-tmp-1}
 [[**SC.TMP.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{T}_{\text{soil}\text{(z,dn)}} = (\text{L} \times \text{T}_\text{soil(z,dn-1)}) + (1 - \text{L}) \times [\text{df} \times (\text{T}_\text{aair} - \text{T}_\text{surf}) + \text{T}_\text{surf}]
+\text{T}_{\text{soil}\text{(z,dn)}} = (\text{L} \times \text{T}_\text{soil(z,dn-1)}) + (1 - \text{L}) \times (\text{df} \times (\text{T}_\text{aair} - \text{T}_\text{surf}) + \text{T}_\text{surf})
 $$
 ::: 
 
@@ -569,7 +623,6 @@ $$
 \text{E}_\text{sr} = \frac{\text{H}_\text{day} \times (1 - \text{albedo}) - 14}{20}
 $$
 ::: 
-
             
 *Where*:
         
@@ -666,7 +719,7 @@ S is calculated as
 ::: {#eq-sc-inf-4}
 [[**SC.INF.4**]]{.aside .content-visible when-format="html"}
 $$
-\text{S} = \text{S}_\text{max} \times (1 - \frac{\text{SW}_\text{available}}{\text{SW}_\text{available} + e^{\text{w}_1 - (\text{w}_2 \times \text{SW}_\text{available})}})
+\text{S} = \text{S}_\text{max} \times \left(1 - \frac{\text{SW}_\text{available}}{\text{SW}_\text{available} + e^{\text{w}_1 - (\text{w}_2 \times \text{SW}_\text{available})}}\right)
 $$
 :::  
 
@@ -690,7 +743,7 @@ w<sub>1</sub> and w<sub>2</sub> are calculated as:
 ::: {#eq-sc-inf-6}
 [[**SC.INF.6**]]{.aside .content-visible when-format="html"}
 $$
-\text{w}_1 = ln (\frac{\text{FC}}{1 - (\text{S}_3 \times \text{S}_{\text{max}}^{-1})} - \text{FC}) + (\text{w}_2 \times \text{FC})
+\text{w}_1 = ln \left(\frac{\text{FC}}{1 - (\text{S}_3 \times \text{S}_{\text{max}}^{-1})} - \text{FC}\right) + (\text{w}_2 \times \text{FC})
 $$
 :::  
 
@@ -711,7 +764,7 @@ S<sub>3</sub> is calculated as:
 ::: {#eq-sc-inf-8}
 [[**SC.INF.8**]]{.aside .content-visible when-format="html"}
 $$
-\text{S}_3 = 25.4 \times (\frac{1000}{\text{CN}_3} - 10)
+\text{S}_3 = 25.4 \times \left(\frac{1000}{\text{CN}_3} - 10 \right)
 $$
 :::  
             
@@ -744,7 +797,7 @@ Potential evapotranspiration (PET) is the maximum amount of water that could be 
 ::: {#eq-sc-evp-1}
 [[**SC.EVP.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{ET}_\text{max} = max ({\frac{0.0023 \times \text{H}_0 \times (\text{T}_\text{max} - \text{T}_\text{min})^{0.5} \times (\text{T}_\text{avg} + 17.8)}{\text{LHV}}, 0.001})
+\text{ET}_\text{max} = max \left({\frac{0.0023 \times \text{H}_0 \times (\text{T}_\text{max} - \text{T}_\text{min})^{0.5} \times (\text{T}_\text{avg} + 17.8)}{\text{LHV}}, 0.001}\right)
 $$
 :::  
             
@@ -809,12 +862,12 @@ $$
             
 * `BioMass` = aboveground biomass and residue (kg ha$^{-1}$) 
         
-Potential evaporation is adjusted based on trans\textsubscript{max} as: 
+Potential evaporation is adjusted based on trans{max} as: 
 
 ::: {#eq-sc-evp-6}
 [[**SC.EVP.6**]]{.aside .content-visible when-format="html"}
 $$
-\text{evap}_\text{max} = min(\frac{\text{evap}_\text{max} \times \text{ET}_\text{max}}{\text{evap}_\text{max} + \text{trans}_\text{max}}, \text{evap}_\text{max})
+\text{evap}_\text{max} = min \left(\frac{\text{evap}_\text{max} \times \text{ET}_\text{max}}{\text{evap}_\text{max} + \text{trans}_\text{max}}, \text{evap}_\text{max}\right)
 $$
 :::    
             
@@ -1257,10 +1310,10 @@ $$
 * `temperature` is the temperature in the soil layer (℃).
         
 $$
-\text{water_factor} =
+\text{water\_factor} =
 \begin{cases}
-& 1, \text{if water\_content} \leq (0.25 \times \text{field\_capacity}) - (0.75 \times \text{wilting\_point}) \\[8pt]
-& \frac{\text{water\_content} - \text{wilting\_point}}{0.25 \times (\text{field\_capacity} - \text{wilting\_point})}, \text{otherwise} 
+1,& \text{if water\_content} \leq (0.25 \times \text{field\_capacity}) - (0.75 \times \text{wilting\_point}) \\[8pt]
+\frac{\text{water\_content} - \text{wilting\_point}}{0.25 \times (\text{field\_capacity} - \text{wilting\_point})},& \text{otherwise} 
 \end{cases}
 $$ 
 
@@ -1306,7 +1359,7 @@ $$
 The total mass of NH<sub>4</sub> (kg N ha$^{-1}$) converted through nitrification and volatilization is given by:
 
 ::: {#eq-sc-nnv-4}
-[[**SC.NNV.2**]]{.aside .content-visible when-format="html"}
+[[**SC.NNV.4**]]{.aside .content-visible when-format="html"}
 $$
 \text{total\_ammonium\_lost} = \text{NH}_4 \times (1 - e^{(-1 \times \text{nitrification\_regulator} - \text{volatilization\_regulator})})
 $$
@@ -1512,7 +1565,7 @@ $$
 ::: {#eq-sc-ndn-3}
 [[**SC.NDN.3**]]{.aside .content-visible when-format="html"}
 $$
-\text{NO3\_effect} = 1.0 - (0.5 + \text{arctan}(\pi \times 0.01 \times \frac{\text{NO3\_content} - 190}{\pi})) \times 25 
+\text{NO3\_effect} = 1.0 - \left(0.5 + \text{arctan}\left(\pi \times 0.01 \times \frac{\text{NO3\_content} - 190}{\pi}\right)\right) \times 25 
 $$
 :::    
 
@@ -1917,7 +1970,7 @@ Manure is an important source of bioavailable P for crop uptake, runoff, and lea
 $$
 \begin{aligned}
 & \text{MIP}_\text{leach} = max(0.0, \text{manure}_\text{extr} \times \text{WIP}) \\[8pt]
-& \text{MOP}_\text{leach} = max(0.0, \frac{\text{manure}_\text{extr} \times \text{WOP}}{0.6})
+& \text{MOP}_\text{leach} = max \left(0.0, \frac{\text{manure}_\text{extr} \times \text{WOP}}{0.6}\right)
 \end{aligned}
 $$
 :::          
@@ -1937,7 +1990,7 @@ The concentration of dissolved P in runoff (mg/L):
 ::: {#eq-sc-psl-32}
 [[**SC.PSL.32**]]{.aside .content-visible when-format="html"}
 $$
-\text{PD}_\text{fact} = (\frac{\text{runoff}}{\text{rainfall}})^{0.225}
+\text{PD}_\text{fact} = \left(\frac{\text{runoff}}{\text{rainfall}}\right)^{0.225}
 $$
 ::: 
         
@@ -2029,9 +2082,9 @@ $$
 
 *Where*:
             
-* wet\textsubscript{rate} is the wet rate of manure decomposition (unitless)
-* dry\textsubscript{rate}is the dry rate of manure decomposition (unitless)
-* manure\textsubscript{mass}is the total mass of manure on the field (kg/ha)
+* wet{rate} is the wet rate of manure decomposition (unitless)
+* dry{rate}is the dry rate of manure decomposition (unitless)
+* manure{mass}is the total mass of manure on the field (kg/ha)
 * `mass` is the mass of applied manure (kg)
 * `manure_moisture` is the manure water content (unitless)
         
@@ -2098,7 +2151,7 @@ The decomposition factor is then used to calculate the cover decomposition facto
 ::: {#eq-sc-psl-46}
 [[**SC.PSL.46**]]{.aside .content-visible when-format="html"}
 $$
-\text{cov}_\text{dcom} = min(\text{manure}_\text{cov}, max(0.0, \frac{\text{dcom}}{\text{manure}_\text{mass}}))
+\text{cov}_\text{dcom} = min \left(\text{manure}_\text{cov}, max \left(0.0, \frac{\text{dcom}}{\text{manure}_\text{mass}}\right)\right)
 $$
 :::         
     
@@ -2113,7 +2166,7 @@ $$
     
 *Where*:
             
-* P\textsubscript{pools} represents each of the tracked P pools: stable inorganic P (SIP), stable organic P (SOP), water-extractable organic P (WOP)
+* P{pools} represents each of the tracked P pools: stable inorganic P (SIP), stable organic P (SOP), water-extractable organic P (WOP)
         
 Manure mass and total cover also have assimilation factors calculated as: 
             
@@ -2127,7 +2180,7 @@ $$
 ::: {#eq-sc-psl-49}
 [[**SC.PSL.49**]]{.aside .content-visible when-format="html"}
 $$
-\text{cov}_\text{ASIM} = min(\text{manure}_\text{cov}, max(0.0, \frac{\text{manure}_\text{ASIM}}{\text{manure}_\text{mass} \times \text{manure}_\text{cov}}))
+\text{cov}_\text{ASIM} = min \left(\text{manure}_\text{cov}, max \left(0.0, \frac{\text{manure}_\text{ASIM}}{\text{manure}_\text{mass} \times \text{manure}_\text{cov}}\right)\right)
 $$
 :::     
 
@@ -2136,7 +2189,7 @@ Each pool then also has an ASIM calculated as:
 ::: {#eq-sc-psl-50}
 [[**SC.PSL.50**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_\text{ASIM} = min(\text{P}, max(0.0, \frac{\text{manure}_\text{ASIM}}{\text{manure}_\text{mass} \times \text{P}}))
+\text{P}_\text{ASIM} = min \left(\text{P}, max \left(0.0, \frac{\text{manure}_\text{ASIM}}{\text{manure}_\text{mass} \times \text{P}}\right)\right)
 $$
 :::         
     
@@ -2209,7 +2262,7 @@ $$
          
 *Where*:
             
-* MDRP\textsubscript{runoff} is the manure dissolved reactive P transported in runoff (mg/L)
+* MDRP{runoff} is the manure dissolved reactive P transported in runoff (mg/L)
 * `manureP` is the amount of manure phosphorus
         
 The total inorganic phosphorus in runoff is calculated as the sum of manure inorganic, dissolved reactive, and fertilizer P:
@@ -2223,10 +2276,10 @@ $$
 
 *Where*:
             
-* TIP\textsubscript{runoff} is the total inorganic P runoff
-* MIP\textsubscript{runoff} is the manure inorganic P runoff
-* MDRP\textsubscript{runoff} is the manure dissolved reactive P runoff [SC.PSL.55](eq-sc-psl-55)
-* fertP\textsubscript{runoff} is the fertilizer P runoff
+* TIP{runoff} is the total inorganic P runoff
+* MIP{runoff} is the manure inorganic P runoff
+* MDRP{runoff} is the manure dissolved reactive P runoff [SC.PSL.55](eq-sc-psl-55)
+* fertP{runoff} is the fertilizer P runoff
         
 **Phosphorus Mineralization** `phosphorus_mineralization.py`
 
@@ -2243,7 +2296,7 @@ $$
     
 *Where*:
             
-* PSP\textsubscript{actual} is the actual P sorption parameter (unitless)
+* PSP{actual} is the actual P sorption parameter (unitless)
 * meanPSP is the mean sorption parameter (unitless)
 * currentPSP is the current sorption parameter (unitless)
         
@@ -2263,7 +2316,7 @@ $$
 * `pbal` is the current balance of P between labile and active inorganic pools
 * `labileP` is the labile inorganic P content of the soil layer (kg/ha)
 * `activeP` is the active inorganic P content of the soil layer (kg/ha)
-* PSP\textsubscript{act} is the The actual P sorption parameter of the layer adjusted from the maximum (unitless)
+* PSP{act} is the The actual P sorption parameter of the layer adjusted from the maximum (unitless)
         
 The P desorption factor (`PDfac`) calculates how much P should be desorped in the given soil layer and given as:
 
@@ -2292,11 +2345,11 @@ $$
 
 *Where*:
             
-* PD\textsubscript{fac} is the P desorption factor
-* day\textsubscript{count} is the number of days that the active inorganic P pool has been greater than it would be when in equilibrium with the labile inorganic P pool. 
-* labile\textsubscript{pflow} is the amount of P moved from the active to labile inorganic P pool to maintain equilibrium (kg/ha).
+* PD{fac} is the P desorption factor
+* day{count} is the number of days that the active inorganic P pool has been greater than it would be when in equilibrium with the labile inorganic P pool. 
+* labile{pflow} is the amount of P moved from the active to labile inorganic P pool to maintain equilibrium (kg/ha).
 * `base` is a value used to determine how much P is transferred from the active P pool to the labile inorganic P pool (unitless). 
-* PSP\textsubscript{act}	is the actual P sorption parameter of the layer adjusted from the maximum (unitless)
+* PSP{act}	is the actual P sorption parameter of the layer adjusted from the maximum (unitless)
         
 P sorption factor (`PDfac`) calculates how much P should be sorped in the given soil layer:
             
@@ -2309,7 +2362,7 @@ $$
     
 *Where*:
             
-* PS\textsubscript{fac} is the P sorption factor
+* PS{fac} is the P sorption factor
 * scalar is the scalar used to calculate sorption factor. The scalar is used in determining how much phosphorus is removed from the labile inorganic phosphorus pool and transferred to the active inorganic phosphorus pool (unitless).
 * exponent is a value used as an exponential term when determining the phosphorus sorption rate (unitless).
         
@@ -2329,16 +2382,16 @@ P also transfers from stable pool to the active pool and given as `stablepflow` 
 $$
 \text{stable}_\text{pflow} = 
 \begin{cases}
-& 0.0006 \times (\text{stableP} - (4.0 \times \text{activeP})) \\[8pt]
-& min(\text{stableP}, \text{stable}_\text{pflow}), \qquad \text{if stable}_\text{pflow} > 0 \\[8pt]
-& (-1 \times \text{stable}_\text{pflow}), \qquad \text{if stable}_\text{pflow} > \text{activeP}
+0.0006 \times (\text{stableP} - (4.0 \times \text{activeP}))& \\[8pt]
+min(\text{stableP}, \text{stable}_\text{pflow}),& \qquad \text{if stable}_\text{pflow} > 0 \\[8pt]
+(-1 \times \text{stable}_\text{pflow}),& \qquad \text{if stable}_\text{pflow} > \text{activeP}
 \end{cases}
 $$
 :::
     
 *Where*:
             
-* Stable\textsubscript{pflow} is the P transferred from the stable to the active inorganic P pool (kg ha$^{-1}$)
+* Stable{pflow} is the P transferred from the stable to the active inorganic P pool (kg ha$^{-1}$)
 * `stableP` is the stable inorganic P content of the soil layer (kg ha$^{-1}$)
 * `activeP` is the active inorganic P content of the soil layer (kg ha$^{-1}$)
 
@@ -2372,9 +2425,9 @@ $$
     
 *Where*:
             
-* C\textsubscript{active}% = active C composition of the soil (%)
-* C\textsubscript{slow}% = slow C composition of the soil (%)
-* C\textsubscript{passive}% = passive C composition of the soil (%)
+* C{active}% = active C composition of the soil (%)
+* C{slow}% = slow C composition of the soil (%)
+* C{passive}% = passive C composition of the soil (%)
 * `soil mass` = the mass of soil (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-2}
@@ -2413,11 +2466,11 @@ $$
     
 *Where*:
             
-* T\textsubscript{d} = unitless temperature effect on decomposition factor (empirically determined based on average soil temperature)
-* teff\textsubscript{1} = x-value at inflection point (empirical factor set at 15.4)
-* teff\textsubscript{2} = y location of inflection point (before normalization) (empirical factor set to 11.75)
-* teff\textsubscript{3} = distance from maximum point to the minimum point (empirical factor set at 29.7)
-* teff\textsubscript{4} = slope of line at inflection point (empirical factor set at 0.031)
+* T{d} = unitless temperature effect on decomposition factor (empirically determined based on average soil temperature)
+* teff{1} = x-value at inflection point (empirical factor set at 15.4)
+* teff{2} = y location of inflection point (before normalization) (empirical factor set to 11.75)
+* teff{3} = distance from maximum point to the minimum point (empirical factor set at 29.7)
+* teff{4} = slope of line at inflection point (empirical factor set at 0.031)
 * `normalizer` = empirical factor set at 20.80546
         
 ::: {#eq-sc-car-5}
@@ -2429,13 +2482,13 @@ $$
 
 *Where*:
             
-* M\textsubscript{d} = unitless moisture effect on decomposition factor (empirically determined based on soil water levels)
-* water\textsubscript{fac} = relative water saturation (%)
+* Md = unitless moisture effect on decomposition factor (empirically determined based on soil water levels)
+* water{fac} = relative water saturation (%)
 * `a` = dimensionless empirical factor (0.55)
 * `b` = dimensionless empirical factor (1.7)
 * `c` = dimensionless empirical factor (-0.007)
-* e\textsubscript{1} = dimensionless empirical factor (6.648115)
-* e\textsubscript{2} = dimensionless empirical factor (3.22)
+* e1 = dimensionless empirical factor (6.648115)
+* e2 = dimensionless empirical factor (3.22)
         
 Decomposition proceeds at differing rates between the active, slow, and passive pools.
 
@@ -2448,9 +2501,9 @@ $$
 
 *Where*:
             
-* C\textsubscript{active decomp rate} = rate at which active C is decomposed into slow C, passive C and CO<sub>2</sub> (%) (kg year$^{-1}$)
+* C{active decomp rate} = rate at which active C is decomposed into slow C, passive C and CO<sub>2</sub> (%) (kg year$^{-1}$)
 * K5 = maximum rate of C decomposition (0.14, [@parton1987analysis]) 
-* silt:clay\textsubscript{%} = ratio of percent silt to clay content in the soil
+* `silt:clay_%` = ratio of percent silt to clay content in the soil
         
 ::: {#eq-sc-car-7}
 [[**SC.CAR.7**]]{.aside .content-visible when-format="html"}
@@ -2461,8 +2514,8 @@ $$
 
 *Where*:
             
-* C\textsubscript{active decomp} = active C decomposed into slow or passive C and CO<sub>2</sub> (kg ha$^{-1}$)
-* C\textsubscript{active} = active C stored in the soil (kg ha$^{-1}$)
+* C{active decomp} = active C decomposed into slow or passive C and CO<sub>2</sub> (kg ha$^{-1}$)
+* C{active} = active C stored in the soil (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-8}
 [[**SC.CAR.8**]]{.aside .content-visible when-format="html"}
@@ -2473,9 +2526,9 @@ $$
 
 *Where*:
             
-* C\textsubscript{slow decomp} = slow C decomposed into active or passive carbon and CO<sub>2</sub> (kg ha$^{-1}$)
+* C{slow decomp} = slow C decomposed into active or passive carbon and CO<sub>2</sub> (kg ha$^{-1}$)
 * `K6` = slow C decomposition factor (set at 0.0038, [@parton1987analysis])
-* C\textsubscript{slow} = slow C stored in the soil (kg ha$^{-1}$)
+* C{slow} = slow C stored in the soil (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-9}
 [[**SC.CAR.9**]]{.aside .content-visible when-format="html"}
@@ -2486,9 +2539,9 @@ $$
 
 *Where*:
 
-* C\textsubscript{passive decomp} = passive C decomposed into active or passive carbon and CO<sub>2</sub> (kg ha$^{-1}$)
+* C{passive decomp} = passive C decomposed into active or passive carbon and CO<sub>2</sub> (kg ha$^{-1}$)
 * `K7` = passive C decomposition factor (set at 0.0038, [@parton1987analysis])
-* C\textsubscript{passive} = passive C stored in the soil (kg ha$^{-1}$)
+* C{passive} = passive C stored in the soil (kg ha$^{-1}$)
 
 CO<sub>2</sub> produced during soil C pool decomposition:
 
@@ -2515,8 +2568,8 @@ $$
 
 *Where*:
             
-* C\textsubscript{active:slow} = active C decomposed into slow C (kg ha$^{-1}$)
-* C\textsubscript{active loss} = active C lost as CO<sub>2</sub> during decomposition into slow C (kg ha$^{-1}$)
+* C{active_to_slow} = active C decomposed into slow C (kg ha$^{-1}$)
+* C{active loss} = active C lost as CO<sub>2</sub> during decomposition into slow C (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-12}
 [[**SC.CAR.12**]]{.aside .content-visible when-format="html"}
@@ -2527,7 +2580,7 @@ $$
 
 *Where*:
             
-* C\textsubscript{active}:C\textsubscript{passive} = active C decomposed into passive carbon (kg ha$^{-1}$)
+* C{active}:C{passive} = active C decomposed into passive carbon (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-13}
 [[**SC.CAR.13**]]{.aside .content-visible when-format="html"}
@@ -2542,11 +2595,11 @@ $$
 
 *Where*:
             
-* C\textsubscript{slow\_to\_active} = slow C decomposed into active C (kg ha$^{-1}$)
-* CO<sub>2</sub>\_to\_C\textsubscript{slow loss} = slow C lost as CO<sub>2</sub> during decomposition (fraction)
-* frac\_C\textsubscript{slow\_to\_passive} = slow C decomposed into passive C (fraction)
-* C\textsubscript{slow\_to\_passive} = slow C decomposed into passive C (kg ha$^{-1}$)
-* C\textsubscript{slow\_to\_CO$_2$} = slow C lost as CO<sub>2</sub> during decomposition (kg ha$^{-1}$)
+* C{slow_to_active} = slow C decomposed into active C (kg ha$^{-1}$)
+* CO<sub>2</sub>_to_C{slow loss} = slow C lost as CO<sub>2</sub> during decomposition (fraction)
+* frac_C{slow_to_passive} = slow C decomposed into passive C (fraction)
+* C{slow_to_passive} = slow C decomposed into passive C (kg ha$^{-1}$)
+* C{slow_to_CO$_2$} = slow C lost as CO<sub>2</sub> during decomposition (kg ha$^{-1}$)
 
 ::: {#eq-sc-car-14}
 [[**SC.CAR.14**]]{.aside .content-visible when-format="html"}        
@@ -2557,9 +2610,9 @@ $$
 
 *Where*:
 
-* C\textsubscript{passive:active} = passive C decomposed into active carbon (kg ha$^{-1}$)
-* frac\_CO<sub>2</sub>\textsubscript{passive loss} = passive C lost as CO<sub>2</sub> during decomposition (fraction)
-* C\textsubscript{passive loss} =passive C lost as CO<sub>2</sub> during decomposition (kg ha$^{-1}$)
+* C{passive_to_active} = passive C decomposed into active carbon (kg ha$^{-1}$)
+* frac_CO<sub>2</sub>{passive loss} = passive C lost as CO<sub>2</sub> during decomposition (fraction)
+* C{passive loss} =passive C lost as CO<sub>2</sub> during decomposition (kg ha$^{-1}$)
 
 ::: {#eq-sc-car-15}
 [[**SC.CAR.15**]]{.aside .content-visible when-format="html"}        
@@ -2570,7 +2623,7 @@ $$
         
 *Where*:
 
-* C\textsubscript{CO<sub>2</sub> loss decomp} =C lost as CO<sub>2</sub> during decomposition (kg ha$^{-1}$)
+* C{CO<sub>2</sub> loss decomp} =C lost as CO<sub>2</sub> during decomposition (kg ha$^{-1}$)
         
         
 **Residue Partitioning** `residue_partitioning.py`
@@ -2590,7 +2643,7 @@ $$
 
 *Where*:
             
-* AG\textsubscript{lignin res frac} = fraction of lignin composition of above ground plant residue (unitless)
+* AG{lignin res frac} = fraction of lignin composition of above ground plant residue (unitless)
 * `rainfall` = amount of rainfall on the current day (mm)
         
 ::: {#eq-sc-car-17}
@@ -2606,8 +2659,8 @@ $$
 
 *Where*:
             
-* G\textsubscript{L:N} = above ground plant lignin to nitrogen (N) ratio when nitrogen in plant residue at harvest is greater than 0 (unitless)
-* fr\textsubscript{N} = fraction of N in plant residue at harvest (unitless)
+* AG{L:N} = above ground plant lignin to nitrogen (N) ratio when nitrogen in plant residue at harvest is greater than 0 (unitless)
+* fr{N} = fraction of N in plant residue at harvest (unitless)
         
 The ratio of lignin to N in residue determines the percentage of above ground residue in the metabolic pool, with a maximum of 85%.
         
@@ -2620,7 +2673,7 @@ $$
     
 *Where*:
             
-* AG\textsubscript{met frac} = above ground residue that is metabolic (unitless)
+* AG{met frac} = above ground residue that is metabolic (unitless)
         
 The component of residue dry matter at harvest consisting of above ground metabolic carbon (C) is added to the above ground metabolic C pool.
                 
@@ -2633,9 +2686,9 @@ $$
     
 *Where*:
             
-* AG\textsubscript{met} = above ground metabolic carbon (kg ha$^{-1}$)
-* AG\textsubscript{met frac} = fraction of above ground residue that is metabolic (unitless)
-* AG\textsubscript{DM res} = dry matter residue at harvest (kg ha$^{-1}$)
+* AG{met} = above ground metabolic carbon (kg ha$^{-1}$)
+* AG{met frac} = fraction of above ground residue that is metabolic (unitless)
+* AG{DM res} = dry matter residue at harvest (kg ha$^{-1}$)
         
 Above ground metabolic C follows two paths into the soil. It is either incorporated below ground pool via tillage or decomposed into the active C. The calculated values are subtracted from the above ground metabolic pool and added to the relevant pool.
                 
@@ -2648,8 +2701,8 @@ $$
     
 Where*:
             
-* AG\textsubscript{met}\_to\_C\textsubscript{active}	= above ground metabolic C decomposed to active carbon (kg ha$^{-1}$)
-* AG\textsubscript{met active decomp} = rate of decomposition from metabolic to active C (set at 0.28, \cite{parton1987analysis})
+* AG{met}:C{active}	= above ground metabolic C decomposed to active carbon (kg ha$^{-1}$)
+* AG{met active decomp} = rate of decomposition from metabolic to active C (set at 0.28, \cite{parton1987analysis})
         
 Below ground metabolic C decomposes into active C.
         
@@ -2662,7 +2715,7 @@ $$
     
 *Where*:
             
-* AG\textsubscript{met}:BG\textsubscript{met} = above ground metabolic C decomposed to below ground metabolic C (kg ha$^{-1}$)
+* AG{met}:BG{met} = above ground metabolic C decomposed to below ground metabolic C (kg ha$^{-1}$)
 * tillagefrac = fraction metabolic C incorporated into soil during tillage (unitless)
         
 Any dry matter residue at harvest that is not added to the above ground metabolic C pool is added to the above ground structural C pool:
@@ -2676,7 +2729,7 @@ $$
 
 *Where*:
 
-* AG\textsubscript{struct} = above ground structural C (kg ha$^{-1}$)
+* AG{struct} = above ground structural C (kg ha$^{-1}$)
         
 Similarly to above ground metabolic C, above ground structural C is incorporated into the belowground structural C pool via tillage or decomposed, in this case, equally into active and slow C pools. The calculated values are subtracted from the above ground structural pool and added to the relevant pool.
         
@@ -2689,7 +2742,7 @@ $$
     
 *Where*:
 
-* AG\textsubscript{struct\ decomp} = rate at which above ground structural C decomposes into slow or active C
+* AG{struct decomp} = rate at which above ground structural C decomposes into slow or active C
 * `K1` = structural decomposition factor, set at 0.076 [@parton1987analysis]
         
 ::: {#eq-sc-car-24}
@@ -2704,8 +2757,8 @@ $$
 
 *Where*:
             
-* AG\textsubscript{struct}:C\textsubscript{active} = above ground structural C decomposed into active C (kg ha$^{-1}$)
-* AG\textsubscript{struct}:C\textsubscript{slow} = above ground structural C decomposed into slow C (kg ha$^{-1}$)
+* AG{struct}:C{active} = above ground structural C decomposed into active C (kg ha$^{-1}$)
+* AG{struct}:C{slow} = above ground structural C decomposed into slow C (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-25}
 [[**SC.CAR.25**]]{.aside .content-visible when-format="html"}
@@ -2716,7 +2769,7 @@ $$
 
 *Where*:
 
-* AG\textsubscript{struct}:BG\textsubscript{struct} = transfer of structural carbon during tillage (kg ha$^{-1}$)
+* AG{struct}:BG{struct} = transfer of structural carbon during tillage (kg ha$^{-1}$)
         
 **Below Ground: Lignin, Metabolic C, Structural C**
 
@@ -2738,22 +2791,22 @@ $$
 
 *Where*:
             
-* BG\textsubscript{lignin res} = below ground residue comprised of lignin (fraction)
-* BG\textsubscript{DM res} = below ground residue mass (kg ha$^{-1}$)
-* BG\textsubscript{bio} = below ground biomass (kg ha$^{-1}$)
+* BG{lignin res} = below ground residue comprised of lignin (fraction)
+* BG{DM res} = below ground residue mass (kg ha$^{-1}$)
+* BG{bio} = below ground biomass (kg ha$^{-1}$)
         
 The below ground ratio of lignin to N will then be a weighted sum of the lignin to N ratio in the below ground and the incorporated biomass.
         
 ::: {#eq-sc-car-28}
 [[**SC.CAR.28**]]{.aside .content-visible when-format="html"}
 $$
-\text{BG}_\text{L:N} = \text{AG}_\text{L:N} \times \frac{\text{BG}_\text{DM res}}{\text{BG}_\text{DM res} + \text{BG}_\text{bio}} + \frac{\text{BG}_\text{lignin res frac}}{\text{fr}_\text{N} \times 100} \times (1 - \frac{\text{BG}_\text{DM res}}{\text{BG}_\text{DM res} + \text{BG}_\text{bio}})  
+\text{BG}_\text{L:N} = \text{AG}_\text{L:N} \times \frac{\text{BG}_\text{DM res}}{\text{BG}_\text{DM res} + \text{BG}_\text{bio}} + \frac{\text{BG}_\text{lignin res frac}}{\text{fr}_\text{N} \times 100} \times \left(1 - \frac{\text{BG}_\text{DM res}}{\text{BG}_\text{DM res} + \text{BG}_\text{bio}}\right)  
 $$
 ::: 
     
 *Where*:
             
-* BG\textsubscript{L:N} = below ground lignin to N ratio
+* BG{L:N} = below ground lignin to N ratio
         
 The component of below ground residue that is metabolic is determined by the below ground lignin to N ratio, with a maximum composition of 85%.
         
@@ -2766,7 +2819,7 @@ $$
     
 *Where*:
             
-* BG\textsubscript{met frac} = below ground residue that is metabolic (fraction)
+* BG{met frac} = below ground residue that is metabolic (fraction)
 
 Incorporated metabolic C and the component of below ground biomass consisting of metabolic C are added to the below ground metabolic C pool.
         
@@ -2779,7 +2832,7 @@ $$
     
 *Where*:
             
-* BG\textsubscript{met}=below ground metabolic C (kg ha$^{-1}$)
+* BG{met}=below ground metabolic C (kg ha$^{-1}$)
         
 Below ground metabolic C decomposes and the calculated mass is removed from below ground metabolic C and added to below ground active C.
         
@@ -2793,7 +2846,7 @@ $$
 *Where*:
             
 * `BG<sub>met</sub>_to_C$_{active}$` = below ground metabolic C decomposed into active C (kg ha$^{-1}$)
-* BG\textsubscript{met active decomp} =	rate at which below ground metabolic C decomposes into	active C (set at 0.35, @parton1987analysis)
+* BG{met active decomp} =	rate at which below ground metabolic C decomposes into	active C (set at 0.35, @parton1987analysis)
         
 Incorporated structural and the component of below ground biomass consisting of structural C are added to the below ground structural C pool.
         
@@ -2818,10 +2871,10 @@ $$
     
 *Where*:
             
-* BG\textsubscript{struct}\_to\_C\textsubscript{active} = below ground structural C decomposed into active C (kg ha$^{-1}$)
-* BG\textsubscript{struct}\_to\_C\textsubscript{slow} = below ground structural C decomposed into slow C (kg ha$^{-1}$)
-* BG\textsubscript{struct decomp} = rate at which below ground structural C decomposes into slow or active C (set at 0.094, @parton1987analysis)
-* BG\textsubscript{struct} = below ground structural C (kg ha$^{-1}$)
+* BG{struct}\_to\_C{active} = below ground structural C decomposed into active C (kg ha$^{-1}$)
+* BG{struct}\_to\_C{slow} = below ground structural C decomposed into slow C (kg ha$^{-1}$)
+* BG{struct decomp} = rate at which below ground structural C decomposes into slow or active C (set at 0.094, @parton1987analysis)
+* BG{struct} = below ground structural C (kg ha$^{-1}$)
         
 **Pool and Gas Partitioning** `pool_gas_partition.py`
 
@@ -2839,9 +2892,9 @@ $$
             
 *Where*:
             
-* frac_CO2\textsubscript{met\_to\_active} = rate of C dioxide loss during transformation of metabolic to active C (0.55, @parton1987analysis)
-* AG\textsubscript{met}\_to\_C\textsubscript{active loss} = above ground metabolic C being lost as carbon dioxide during decomposition into active C (kg ha$^{-1}$)
-* AG\textsubscript{met}\_to\_C\textsubscript{active act} = above ground metabolic C decomposed to active carbon after accounting for C dioxide loss (kg ha$^{-1}$)
+* frac_CO2{met\_to\_active} = rate of C dioxide loss during transformation of metabolic to active C (0.55, @parton1987analysis)
+* AG{met}\_to\_C{active loss} = above ground metabolic C being lost as carbon dioxide during decomposition into active C (kg ha$^{-1}$)
+* AG{met}\_to\_C{active act} = above ground metabolic C decomposed to active carbon after accounting for C dioxide loss (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-35}
 [[**SC.CAR.35**]]{.aside .content-visible when-format="html"}        
@@ -2855,9 +2908,9 @@ $$
            
 *Where*:
             
-* frac\_CO2\textsubscript{struct active} = rate of CO<sub>2</sub> loss during transformation of structural to	active C (0.45, @parton1987analysis)
-* AG\textsubscript{struct}\_to\_C\textsubscript{active act} = above ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss C (kg ha$^{-1}$)
-* AG\textsubscript{struct}\_to\_C\textsubscript{active loss} = above ground structural C being lost as CO2 during decomposition into active C (kg ha$^{-1}$)
+* frac\_CO2{struct active} = rate of CO<sub>2</sub> loss during transformation of structural to	active C (0.45, @parton1987analysis)
+* AG{struct}\_to\_C{active act} = above ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss C (kg ha$^{-1}$)
+* AG{struct}\_to\_C{active loss} = above ground structural C being lost as CO2 during decomposition into active C (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-36}
 [[**SC.CAR.36**]]{.aside .content-visible when-format="html"}        
@@ -2871,9 +2924,9 @@ $$
            
 *Where*:
             
-* AG\textsubscript{struct}\_to\_C\textsubscript{slow loss} = decomposing above ground structural C being lost as CO<sub>2</sub> during decomposition into slow C (kg ha$^{-1}$)
-* AG\textsubscript{struct}\_to\_C\textsubscript{slow act}  = above ground structural C decomposed to slow C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
-* frac\_CO2\textsubscript{struct\_to\_slow} = rate of CO2 loss during transformation of structural to slow C (0.3,  Partonet al. 1987)
+* AG{struct}\_to\_C{slow loss} = decomposing above ground structural C being lost as CO<sub>2</sub> during decomposition into slow C (kg ha$^{-1}$)
+* AG{struct}\_to\_C{slow act}  = above ground structural C decomposed to slow C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
+* frac\_CO2{struct\_to\_slow} = rate of CO2 loss during transformation of structural to slow C (0.3,  Partonet al. 1987)
         
 ::: {#eq-sc-car-37}
 [[**SC.CAR.37**]]{.aside .content-visible when-format="html"}        
@@ -2887,8 +2940,8 @@ $$
             
 *Where*:
             
-* G\textsubscript{met}\_to\_C\textsubscript{active loss} = below ground metabolic C being lost as CO<sub>2</sub> during decomposition into active C (kg ha$^{-1}$)
-* BG\textsubscript{met}\_to\_C\textsubscript{active act} = below ground metabolic C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
+* G{met}\_to\_C{active loss} = below ground metabolic C being lost as CO<sub>2</sub> during decomposition into active C (kg ha$^{-1}$)
+* BG{met}\_to\_C{active act} = below ground metabolic C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-38}
 [[**SC.CAR.38**]]{.aside .content-visible when-format="html"}        
@@ -2902,8 +2955,8 @@ $$
           
 *Where*:
             
-* BG\textsubscript{struct}\_to\_C\textsubscript{active loss} = below ground structural C being lost as CO<sub>2</sub> during  decomposition into active C (kg ha$^{-1}$)
-* BG\textsubscript{struct}\_to\_C\textsubscript{active act} = below ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
+* BG{struct}\_to\_C{active loss} = below ground structural C being lost as CO<sub>2</sub> during  decomposition into active C (kg ha$^{-1}$)
+* BG{struct}\_to\_C{active act} = below ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-38}
 [[**SC.CAR.38**]]{.aside .content-visible when-format="html"}        
@@ -2917,8 +2970,8 @@ $$
 
 *Where*:
             
-* BG\textsubscript{struct}\_to\_C\textsubscript{slow loss} = below ground structural C being lost as CO<sub>2</sub> during  decomposition into active C (kg ha$^{-1}$)
-* BG\textsubscript{struct}\_to\_C\textsubscript{slow act} = below ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
+* BG{struct}\_to\_C{slow loss} = below ground structural C being lost as CO<sub>2</sub> during  decomposition into active C (kg ha$^{-1}$)
+* BG{struct}\_to\_C{slow act} = below ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
         
 Decomposition losses, mass transfers between pools, and totals are updated following pooling and gas partitioning:
           
@@ -2935,8 +2988,8 @@ $$
 
 *Where*:
             
-* AG\_to\_C\textsubscript{active} = above ground C decomposed into the active carbon pool (kg ha$^{-1}$)
-* BG\_to\_C\textsubscript{active} = below ground C decomposed into the active carbon pool (kg ha$^{-1}$)
+* AG\_to\_C{active} = above ground C decomposed into the active carbon pool (kg ha$^{-1}$)
+* BG\_to\_C{active} = below ground C decomposed into the active carbon pool (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-41}
 [[**SC.CAR.41**]]{.aside .content-visible when-format="html"}        
@@ -2983,9 +3036,9 @@ $$
 
 *Where*:
             
-* C\textsubscript{active}%	= active C composition of the soil (\%)
-* C\textsubscript{slow}% = slow C composition of the soil (\%)
-* C\textsubscript{passive}% = passive C composition of the soil (\%)
+* C{active}%	= active C composition of the soil (\%)
+* C{slow}% = slow C composition of the soil (\%)
+* C{passive}% = passive C composition of the soil (\%)
         
 ::: {#eq-sc-car-45}
 [[**SC.CAR.45**]]{.aside .content-visible when-format="html"}        
@@ -3012,8 +3065,8 @@ $$
 *Where*:
             
 * C = soil carbon (kg ha$^{-1}$)
-* C\textsubscript{mg} = soil carbon (mg ha$^{-1}$)
-* C\textsubscript{g} = soil carbon (g ha$^{-1}$)
+* C{mg} = soil carbon (mg ha$^{-1}$)
+* C{g} = soil carbon (g ha$^{-1}$)
         
 ::: {#eq-sc-car-47}
 [[**SC.CAR.47**]]{.aside .content-visible when-format="html"}        
@@ -3027,8 +3080,8 @@ $$
 
 *Where*:
             
-* AG\textsubscript{CO<sub>2</sub> loss} = above ground C lost as CO<sub>2</sub> (kg ha$^{-1}$)
-* BG\textsubscript{CO<sub>2</sub> loss} = below ground C lost as CO<sub>2</sub> (kg ha$^{-1}$)
+* AG{CO<sub>2</sub> loss} = above ground C lost as CO<sub>2</sub> (kg ha$^{-1}$)
+* BG{CO<sub>2</sub> loss} = below ground C lost as CO<sub>2</sub> (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-43}
 [[**SC.CAR.43**]]{.aside .content-visible when-format="html"}        
@@ -3039,7 +3092,7 @@ $$
             
 *Where*:
             
-* C\textsubscript{CO<sub>2</sub> loss} = total C lost as CO<sub>2</sub> (kg ha$^{-1}$)
+* C{CO<sub>2</sub> loss} = total C lost as CO<sub>2</sub> (kg ha$^{-1}$)
 
 
 ## Crop Management 
@@ -3136,7 +3189,7 @@ $$
 
 Finally, the remaining precipitation is passed by the `Field` class to the `Soil` as the precipitation that reaches the soil: 
     
-::: {#eq-sc-crp-6}
+::: {#eq-sc-crp-6 style="font-size:90%"}
 [[**SC.CRP.6**]]{.aside .content-visible when-format="html"}        
 $$
 \text{precipitation\_reaching\_soil} = \text{precipitation} - \text{water\_taken\_to\_be\_stored}
@@ -3181,14 +3234,14 @@ The potential maximum water uptake from any soil layer, then, can be calculated 
 ::: {#eq-sc-crp-8}
 [[**SC.CRP.8**]]{.aside .content-visible when-format="html"}        
 $$
-\text{max\_water\_uptake}_\text{layer} = \text{max\_water\_uptake}_\text{bottom_depth} - \text{max\_water\_uptake}_\text{top\_depth}
+\text{max\_water\_uptake}_\text{layer} = \text{max\_water\_uptake}_\text{bottom\_depth} - \text{max\_water\_uptake}_\text{top\_depth}
 $$
 :::
 
 *Where*: 
 
-* \(max\_water\_uptake_{bottom\_depth}\) = potential water uptake for the lower boundary of the soil layer (mm H<sub>2</sub>O) 
-* \(max\_water\_uptake_{top\_depth}\) = potential water uptake for the upper boundary of the soil layer (mm H<sub>2</sub>O)
+* max_water_uptake_{bottom_depth} = potential water uptake for the lower boundary of the soil layer (mm H<sub>2</sub>O) 
+* max_water_uptake_{top_depth} = potential water uptake for the upper boundary of the soil layer (mm H<sub>2</sub>O)
 
 Potential water uptakes from each layer are then calculated sequentially from the soil surface to the maximum depth by layer to allow for compensation for unmet demand set by the maximum water uptake by the available water in lower layers. 
 
@@ -3206,13 +3259,16 @@ The unmet demands are then used to calculate the potential water uptakes for eac
 ::: {#eq-sc-crp-10}
 [[**SC.CRP.10**]]{.aside .content-visible when-format="html"}        
 $$
-\text{potential\_water\_updake}_\text{layer} = \text{max\_water\_uptake}_\text{layer} + \text{unmet\_demand}_\text{layer} \times \text{uptake\_compensation\_layer}
+\begin{aligned}
+\text{potential\_water\_updake}_\text{layer} &= \text{max\_water\_uptake}_\text{layer} + \text{unmet\_demand}_\text{layer} \\[8pt]
+&\qquad \times \text{ uptake\_compensation\_layer}
+\end{aligned}
 $$
 :::
 
 *Where*: 
 
-* potential\_water\_uptake\_{layer} = adjusted potential water uptake for layer (mm H<sub>2</sub>O)
+* potential_water_uptake_{layer} = adjusted potential water uptake for layer (mm H<sub>2</sub>O)
 * `uptake_compensation_factor` = plant uptake compensation factor which is a user-defined input for each crop that ranges between 0.01 and 1.00 
 
 When the `uptake_compensation_factor` approaches 1.00 the model allows more of the water uptake demand to be met by lower layers in the soil; when it approaches 0.00, the model allows less variation from the original depth distribution to take place. 
@@ -3232,8 +3288,8 @@ $$
 
 *Where*:
 
-* \(available\_water\_capcity_{layer}\) = point at which plant available water in the soil layer begins to limit efficiency of plant uptake
-* \(soil\_water_{layer}\) = soil water in a given layer (mm H<sub>2</sub>O)
+* available_water_capcity_{layer} = point at which plant available water in the soil layer begins to limit efficiency of plant uptake
+* soil_water_{layer} = soil water in a given layer (mm H<sub>2</sub>O)
 
 **Actural Water Uptake**
 
@@ -3242,14 +3298,17 @@ The actual water uptake for each layer are then calculated as the minimum of the
 ::: {#eq-sc-crp-12}
 [[**SC.CRP.12**]]{.aside .content-visible when-format="html"}        
 $$
-\text{actual\_water\_uptake\_layer} = min(\text{adjusted\_potential\_water\_uptake}_\text{layer}, \text{ soil\_water}_\text{layer} - \text{wilting\_point}_\text{layer})
+\begin{aligned}
+\text{actual\_water\_uptake\_layer} &= min(\text{adjusted\_potential\_water\_uptake}_\text{layer}, \\[8pt]
+&\qquad \text{ soil\_water}_\text{layer} - \text{wilting\_point}_\text{layer})
+\end{aligned}
 $$
 :::
 
 *Where*: 
 
-* \(actual\_water\_uptake\_layer\) = actual water for the layer (mm H<sub>2</sub>O)
-* \(wilting\_point_{layer}\) = water content of the layer at wilting point (mm H<sub>2</sub>O) 
+* `actual_water_uptake_layer` = actual water for the layer (mm H<sub>2</sub>O)
+* wilting_point_{layer} = water content of the layer at wilting point (mm H<sub>2</sub>O) 
 
 The total plant uptake for the entire profile for the day (mm H<sub>2</sub>O) is calculated as the sum of these values for each layer in the profile
     
@@ -3262,7 +3321,7 @@ $$
 
 *Where*: 
 
-* \(actual\_water\_uptake\_later_i\) = actual water for layer (mm H<sub>2</sub>O) and n is the number of layers in the soil profile
+* actual_water_uptake_later_i = actual water for layer (mm H<sub>2</sub>O) and n is the number of layers in the soil profile
 
 The total plant water uptake is passed to `WaterDynamics` `cycle_water()` method as the actual amount of transpiration on the day (mm H<sub>2</sub>O).
     
@@ -3300,10 +3359,10 @@ $$
 
 *Where*:
 
-* \(HU_{sum}\) = heat units accumulated up to the current day 
+* HU_{sum} = heat units accumulated up to the current day 
 * `PHU` = crop-specific total heat units required for maturity
 
-\(HU_{sum}\) is calculated from day 1 (planting day) to the day until the plant reaches maturity. 
+HU_{sum} is calculated from day 1 (planting day) to the day until the plant reaches maturity. 
 
 **Dormancy**
 
@@ -3318,7 +3377,7 @@ $$
 
 *Where*: 
 
-* \(daylength\_min\) = minimum day length for the location during the year (hrs)
+* `daylength_min` = minimum day length for the location during the year (hrs)
 * `dormancy_threshold` = dormancy threshold (hrs). 
 
 Plants enter dormancy when the day length falls below the threshold and exit dormancy when day length exceeds the threshold again in the next year. The dormancy threshold varies with latitude and is calculated as: 
@@ -3378,10 +3437,10 @@ $$
 
 *Where*:
     
-* fr\textsubscript{PHU} = fraction of potential heat units
-* fr\textsubscript{PHU,harvest,min} = minimum fraction of potential heat units acquired to warrant  harvest (user input)
+* fr{PHU} = fraction of potential heat units
+* fr{PHU,harvest,min} = minimum fraction of potential heat units acquired to warrant  harvest (user input)
       
-The parameters that drive growth (fr\textsubscript{PHU}, HU\textsubscript{sum}, fr\textsubscript{LAI,max}) are reset to 0 and crop biomass, nitrogen, and phosphorus are reduced by 10% of their value at the time of harvest. Biomass lost when entering dormancy is added to residue.
+The parameters that drive growth (fr{PHU}, HU{sum}, fr{LAI,max}) are reset to 0 and crop biomass, nitrogen, and phosphorus are reduced by 10% of their value at the time of harvest. Biomass lost when entering dormancy is added to residue.
 
 **Accumulation of Heat Units**
 
@@ -3399,10 +3458,10 @@ $$
 
 *Where*: 
 
-* \(T_{HU}\) = either the mean daily temperature ℃ or the temperature used to define the maximum heat units for the day
-* \(T_{min}\) = base or minimum temperature required for the plant growth ℃
+* T_{HU} = either the mean daily temperature ℃ or the temperature used to define the maximum heat units for the day
+* T_{min} = base or minimum temperature required for the plant growth ℃
 
-By default, \(T_{HU}\) is  set to the mean daily ambient temperature. If the attribute `use_heat_unit_temperature` is set to True, then THU is defined by the equation below:
+By default, T_{HU} is  set to the mean daily ambient temperature. If the attribute `use_heat_unit_temperature` is set to True, then THU is defined by the equation below:
     
 ::: {#eq-sc-crp-22}
 [[**SC.CRP.22**]]{.aside .content-visible when-format="html"}        
@@ -3413,8 +3472,8 @@ $$
 
 *Where*: 
 
-* \(T_{HU,max}\) = maximum heat unit temperature on a given day ℃
-* \(T_{HU,min}\) = minimum heat unit temperature on a given day ℃
+* T_{HU,max} = maximum heat unit temperature on a given day ℃
+* T_{HU,min} = minimum heat unit temperature on a given day ℃
     
 ::: {#eq-sc-crp-23}
 [[**SC.CRP.23**]]{.aside .content-visible when-format="html"}        
@@ -3440,8 +3499,8 @@ $$
 
 *Where*:
 
-* \(T_{crop,max}\) and \(T_{crop,min}\)	= crop-specific maximum and minimum temperatures required to sustain growth (℃)
-* \(T_{ambient,max}\) and \(T_{ambient,min}\) = maximum and minimum ambient temperatures that day (℃)
+* T_{crop,max} and T_{crop,min}	= crop-specific maximum and minimum temperatures required to sustain growth (℃)
+* T_{ambient,max} and T_{ambient,min} = maximum and minimum ambient temperatures that day (℃)
 
 The effect of using the alternative method on heat unit accumulation varies depending on the relationship between the air temperature range and the crop's growth temperature range:
 
@@ -3454,7 +3513,7 @@ Once the heat units for that day have been calculated, they are added to the pre
 
 **Root Development**
 
-The depth of the roots on a given day is estimated based on the fraction of accumulated heat units \(fr_{PHU}\) and the maximum rooting depth. First a root specific fraction is calculated:
+The depth of the roots on a given day is estimated based on the fraction of accumulated heat units fr_{PHU} and the maximum rooting depth. First a root specific fraction is calculated:
     
 ::: {#eq-sc-crp-25}
 [[**SC.CRP.25**]]{.aside .content-visible when-format="html"}        
@@ -3469,7 +3528,7 @@ $$
 
 *Where*: 
 
-* \(root\_depth_{max}\) = maximum depth of root development in the soil (mm)
+* root_depth_{max} = maximum depth of root development in the soil (mm)
     
 ::: {#eq-sc-crp-26}
 [[**SC.CRP.26**]]{.aside .content-visible when-format="html"}        
@@ -3493,7 +3552,7 @@ $$
 
 *Where*:
 
-* `root_depthmax` = maximum depth of root development in the soil (mm) 
+* root_depth_{max} = maximum depth of root development in the soil (mm) 
 
 **Nitrogen Uptake**
 
@@ -3516,12 +3575,12 @@ $$
 
 *Where*:
 
-* \(fr_{N,1}\) = fraction of N in the plant biomass at emergence
-* \(fr_{N,3}\) = fraction of N in the plant biomass at maturity
-* \(fr_{PHU}\) = fraction of potential heat units accumulated for the plant on a given day in the growing season (described in [SC.CRP.15](#eq-sc-crp-15))
-* \(n_1\) and \(n_2\) = shape coefficients. 
+* fr_{N,1} = fraction of N in the plant biomass at emergence
+* fr_{N,3} = fraction of N in the plant biomass at maturity
+* fr_{PHU} = fraction of potential heat units accumulated for the plant on a given day in the growing season (described in [SC.CRP.15](#eq-sc-crp-15))
+* n_1 and n_2 = shape coefficients. 
 
-The shape coefficients are calculated by solving the below equations using the composition of the plant at two known points in crop development: half maturity (fr<sub>PHU,50\%</sub>) and maturity (fr<sub>PHU,100\%</sub>). The second shape coefficient is needed to calculate the first shape coefficient and is calculated as:
+The shape coefficients are calculated by solving the below equations using the composition of the plant at two known points in crop development: half maturity (fr<sub>PHU,50%</sub>) and maturity (fr<sub>PHU,100%</sub>). The second shape coefficient is needed to calculate the first shape coefficient and is calculated as:
 
 ::: {#eq-sc-crp-29}
 [[**SC.CRP.29**]]{.aside .content-visible when-format="html"}        
@@ -3543,14 +3602,14 @@ $$
            
 *Where*:
 
-* \(n_1\) = first shape coefficient 
-* \(n_2\) = second shape coefficient
-* \(fr_{N,1}\) = fraction of N in plant biomass at emergence
-* \(fr_{N,2}\) = the fraction of N in the plant biomass at 50% maturity
-* \(fr_{N,~3}\) = fraction of N in the plant biomass near maturity
-* \(fr_{N,3}\) = normal fraction of N in plant biomass at maturity
-* \(fr_{PHU,50\%}\) = fraction of potential heat units accumulated for the plant at 50% maturity
-* \(fr_{PHU,100\%}\) = fraction of potential heat units accumulated for the plant at 100% maturity
+* n_1 = first shape coefficient 
+* n_2 = second shape coefficient
+* fr_{N,1} = fraction of N in plant biomass at emergence
+* fr_{N,2} = the fraction of N in the plant biomass at 50% maturity
+* fr_{N,~3} = fraction of N in the plant biomass near maturity
+* fr_{N,3} = normal fraction of N in plant biomass at maturity
+* fr_{PHU,50%} = fraction of potential heat units accumulated for the plant at 50% maturity
+* fr_{PHU,100%} = fraction of potential heat units accumulated for the plant at 100% maturity
 
 We follow the SWAT model assumption that the difference between the nutrient fraction near maturity and the nutrient fraction at maturity in the crop is equal to 0.00001 and the near mature nutrient fraction is calculated from the mature nutrient fraction according to this assumption.
 
@@ -3588,7 +3647,7 @@ Once the potential nitrogen uptake has been calculated, the request for nutrient
 
 The number of accessible soil layers is then used to calculate the bottom depths of each layer and the amount of nitrates in each layer that are accessible to the plant by the methods `access_layers` in the `NonWaterUptake` class.
 
-The potential N uptake from the surface to any given depth z (\(N_{up,z}\); kg N ha$^{-1}$) is calculated as:
+The potential N uptake from the surface to any given depth z (N_{up,z}; kg N ha$^{-1}$) is calculated as:
     
 ::: {#eq-sc-crp-33}
 [[**SC.CRP.33**]]{.aside .content-visible when-format="html"}        
@@ -3601,11 +3660,11 @@ $$
 
 * `nitrogen_uptake_depth` = potential N uptake from the soil surface to the lower boundary of a given depth
 * `nitrogen_uptake` = total potential N uptake (kg N ha$^{-1}$)
-* \(\beta_n\) = nutrient uptake distribution parameter
+* beta_n = nutrient uptake distribution parameter
 * `depth` = depth from soil surface (mm)
 * `root_depth` = depth of root development in the soil on a given day (mm)
 
-The $\beta_\text{n}$ parameter does not significantly affect N uptake by plants, but it has a significant impact on the maximum amount of NO<sub>3</sub> removed from the upper 10 cm via surface runoff. Higher $\beta_\text{n}$ values allow plants to extract a greater percentage of N\textsubscript{3}up from the upper soil layers, which results in less NO<sub>3</sub> loss to runoff. We set this parameter to a default value of 10.
+The $\beta_\text{n}$ parameter does not significantly affect N uptake by plants, but it has a significant impact on the maximum amount of NO<sub>3</sub> removed from the upper 10 cm via surface runoff. Higher $\beta_\text{n}$ values allow plants to extract a greater percentage of N{3}up from the upper soil layers, which results in less NO<sub>3</sub> loss to runoff. We set this parameter to a default value of 10.
 
 Potential N uptake for each layer is then calculated as the difference in the potential uptake to the bottom depth of the layer and the potential uptake to the top depth of each layer. For the surface layer, where the top depth or upper boundary of the soil layer is at 0 mm depth:
     
@@ -3618,7 +3677,7 @@ $$
 
 *Where*:
 
-* \(nitrogen\_uptake_{layer}\) = potential N uptake from the surface soil layer (kg N ha$^{-1}$)
+* nitrogen_uptake_{layer} = potential N uptake from the surface soil layer (kg N ha$^{-1}$)
 
 For every other layer, the potential N uptake is calculated for the upper and lower boundaries of the layer and \(N_{up,ly}\) is taken as the difference between the two:
     
@@ -3631,8 +3690,8 @@ $$
 
 *Where*: 
 
-* potential\_nitrogen\_uptake\textsubscript{depth,bottom} = potential N uptake from the soil surface to the lower boundary of the soil layer (kg N ha$^{-1}$)
-* nitrogen\_uptake\textsubscript{depth,upper} = potential N uptake from the soil surface to the upper boundary of the soil layer (kg N ha$^{-1}$)
+* potential_nitrogen_uptake{depth,bottom} = potential N uptake from the soil surface to the lower boundary of the soil layer (kg N ha$^{-1}$)
+* nitrogen_uptake{depth,upper} = potential N uptake from the soil surface to the upper boundary of the soil layer (kg N ha$^{-1}$)
 
 The actual N uptake from a given soil layer (kg N ha$^{-1}$) is calculated as the minimum of potential N uptake plus demand, and available NO<sub>3</sub> in the layer and given as:
     
@@ -3647,7 +3706,7 @@ $$
 
 * `unmet_nitrogen_demand` = potential N uptake from the overlying soil layers (kg N ha$^{-1}$) that was not met by the nutrients in those layers. 
     * For the first soil layer where there are no overlying layers, `unmet_nitrogen_demand` is 0. 
-* nitrogen\_uptake\textsubscript{layer} = potential N uptake for the soil layer (kg N ha$^{-1}$)
+* nitrogen_uptake{layer} = potential N uptake for the soil layer (kg N ha$^{-1}$)
 * `soil_nitrate` is the nitrate content of the soil layer (kg N ha$^{-1}$)
 
 For every other soil layer the unmet nitrogen demand is calculated as:
@@ -3661,8 +3720,8 @@ $$
 
 *Where*:
 
-* N\textsubscript{up},over = sum of potential N uptake for each layer overlying the given layer (kg N ha$^{-1}$) 
-* NO$^3$\textsubscript{over} = sum of nitrate content of each soil layer overlying the given layer (kg N ha$^{-1}$)
+* N{up},over = sum of potential N uptake for each layer overlying the given layer (kg N ha$^{-1}$) 
+* NO$_3${over} = sum of nitrate content of each soil layer overlying the given layer (kg N ha$^{-1}$)
    
 
 ::: {#eq-sc-crp-38}
@@ -3679,10 +3738,10 @@ $$
 
 * `layer-1` = soil layer above the current layer
 * `S` = surface layer
-* `potential_nitrogen_uptake\textsubscript{layer}` = potential uptake for the given soil layer (kg N ha$^{-1}$)
-* soil\_nitrate\textsubscript{layer} is the nitrate content of the given soil layer (kg NO<sub>3</sub>-N ha$^{-1}$)
+* `potential_nitrogen_uptake{layer}` = potential uptake for the given soil layer (kg N ha$^{-1}$)
+* soil_nitrate{layer} is the nitrate content of the given soil layer (kg NO<sub>3</sub>-N ha$^{-1}$)
 
-actual\_nitrogen\_uptake\textsubscript{total} for the entire profile on a given day is the sum of N\textsubscript{actualup} for each layer.
+actual_nitrogen_uptake{total} for the entire profile on a given day is the sum of N{actualup} for each layer.
    
 ::: {#eq-sc-crp-39}
 [[**SC.CRP.39**]]{.aside .content-visible when-format="html"}        
@@ -3693,7 +3752,7 @@ $$
 
 **Nitrogen Fixation**
 
-The N fixation module amends the routine and equations described in the SWAT 2009 documentation by limiting calculations of f\textsubscript{NO3}, f\textsubscript{SW}, N\textsubscript{demand}, and N\textsubscript{fix} to the portion of the soil profile that is accessible to root biomass. This module also only applies to those crops that have been designated/defined as capable of forming symbiotic N fixation associations (e.g. legumes).
+The N fixation module amends the routine and equations described in the SWAT 2009 documentation by limiting calculations of f{NO3}, f{SW}, N{demand}, and N{fix} to the portion of the soil profile that is accessible to root biomass. This module also only applies to those crops that have been designated/defined as capable of forming symbiotic N fixation associations (e.g. legumes).
 
 After the amount of N available in the soil to meet the crop’s nitrogen demands has been determined, the amount of N added to the plant biomass by fixation ( kg N ha$^{-1}$)  is calculated using the unmet demands from the soil:
    
@@ -3743,7 +3802,7 @@ $$
 *Where*: 
 
 * `root_layer` = soil layer of lowest depth that is accessible to the root biomass
-* soil\_nitrates\textsubscript{layer},i = nitrate content in the given soil layer (kg N ha$^{-1}$)
+* soil_nitrates{layer},i = nitrate content in the given soil layer (kg N ha$^{-1}$)
 
 The soil nitrate factor is then determined along the continuum:
    
@@ -3789,8 +3848,8 @@ $$
 *Where*: 
 
 * `previous_crop_nitrogen` = N stored in plant biomass on the previous day (kg N ha$^{-1}$)
-* \(N_{actualup}\) = actual N uptake for the entire soil profile (kg N ha$^{-1}$)
-* \(N_{fix}\) = amount of N added to the plant biomass by fixation (kg N ha$^{-1}$) for perennial crops
+* N_{actualup} = actual N uptake for the entire soil profile (kg N ha$^{-1}$)
+* N_{fix} = amount of N added to the plant biomass by fixation (kg N ha$^{-1}$) for perennial crops
 
 
 #### Phosphorus Uptake
@@ -3840,8 +3899,8 @@ $$
 
 *Where*:
 
-* \(w_{actualup}\) = daily total plant water uptake (mm H<sub>2</sub>O) 
-* E\textsubscript{t} = actual amount of transpiration on a given day (mm H<sub>2</sub>O)
+* w_{actualup} = daily total plant water uptake (mm H<sub>2</sub>O) 
+* E{t} = actual amount of transpiration on a given day (mm H<sub>2</sub>O)
 
 **Temperature Stress**
 
@@ -3856,8 +3915,8 @@ $$
 
 *Where*: 
 
-* \( \bar{T}_{ave}\) = mean air temperature (℃) 
-* \(T_{base}\) = plant-specific minimum temperature for growth (℃)
+* \bar{T}_{ave} = mean air temperature (℃) 
+* T_{base} = plant-specific minimum temperature for growth (℃)
 
 If the base temperature is less than the average temperature and the average temperature is less than or equal to the optimal temperature, then temperature stress is calculated as:
    
@@ -3870,7 +3929,7 @@ $$
 
 *Where*: 
 
-* \(T_{opt}\) = plant-specific optimal temperature for growth (℃)
+* T_{opt} = plant-specific optimal temperature for growth (℃)
 
 If the optimal temperature is less than the average temperature and the average temperature is less than or equal to two times the optimal temperature minus the base temperature, then temperature stress for a given day is calculated as:
    
@@ -3881,7 +3940,6 @@ $$
 $$
 ::: 
             
-
 If the average temperature is greater than two times the optimal temperature minus the base temperature, then temperature stress is set to 1 and results in no biomass accumulation, 
    
 ::: {#eq-sc-crp-51}
@@ -3947,9 +4005,9 @@ $$
 
 *Where*: 
 
-* \(fr_{PHU,1}\), \(fr_{PHU,2}\), \(fr_{LAI,1}\), and \(fr_{LAI,2}\) = crop-specific curve points 
-    * \(fr_{PHU,1}\) and \(fr_{PHU,2}\) = fractions of total potential heat units of the growing season corresponding to the 1st point and 2nd point on the optimal leaf area development curve
-    * \(fr_{LAI,1}\) and \(fr_{LAI,2}\) = fractions of the maximum plant LAI corresponding to the 1st and 2nd point on the optimal leaf area development curve
+* fr_{PHU,1}, fr_{PHU,2}, fr_{LAI,1}, and fr_{LAI,2} = crop-specific curve points 
+    * fr_{PHU,1} and fr_{PHU,2} = fractions of total potential heat units of the growing season corresponding to the 1st point and 2nd point on the optimal leaf area development curve
+    * fr_{LAI,1} and fr_{LAI,2} = fractions of the maximum plant LAI corresponding to the 1st and 2nd point on the optimal leaf area development curve
  
 Next, the optimal LAI fraction for a given day is calculated by the method `determine_optimal_leaf_area_fraction()` as:
    
@@ -3962,9 +4020,9 @@ $$
 
 *Where*: 
 
-* \(fr_{LAI,opt}\) = fraction of the plant’s maximum potential LAI corresponding to a given fraction of potential heat units (PHU) the plant has accumulated on that day
+* fr_{LAI,opt} = fraction of the plant’s maximum potential LAI corresponding to a given fraction of potential heat units (PHU) the plant has accumulated on that day
 
-The optimal LAI fraction ( \(fr_{LAI,opt}\)) is then used by the method `determine_canopy_height()` to set the canopy height for that day according to the following equation:
+The optimal LAI fraction (fr_{LAI,opt}) is then used by the method `determine_canopy_height()` to set the canopy height for that day according to the following equation:
    
 ::: {#eq-sc-crp-57}
 [[**SC.CRP.57**]]{.aside .content-visible when-format="html"}        
@@ -3973,7 +4031,6 @@ $$
 $$
 :::
             
-
 The optimal increase in LAI for annuals and perennials that are not in senescence is calculated by the method `determine_max_leaf_area_change()` using the following equation:
    
 ::: {#eq-sc-crp-58}
@@ -3989,8 +4046,8 @@ $$
 *Where*: 
 
 * LAImax = crop-specific maximum LAI
-* \(fr_{LAI,max,d}\) and \(fr_{LAI,max,d-1}\) = fraction of the plant’s maximum LAI accumulated on the given day d and the previous day respectively
-* \(LAI_{act,d-1}\)LAIact,d-1 = actual LAI on the previous day
+* fr_{LAI,max,d} and fr_{LAI,max,d-1} = fraction of the plant’s maximum LAI accumulated on the given day d and the previous day respectively
+* LAI_{act,d-1}LAIact,d-1 = actual LAI on the previous day
 
 The actual LAI added is then calculated as: 
    
@@ -4022,9 +4079,9 @@ $$
 
 *Where*: 
 
-* \(LAI_{max}\) = maximum LAI
-* \(fr_{PHU,sen}\) = crop-specific fraction of PHU at which senescence becomes the dominant growth process
-* \(fr_{PHU}\) = fraction of PHU accumulated for the plant on a given day in the growing season
+* LAI_{max} = maximum LAI
+* fr_{PHU,sen} = crop-specific fraction of PHU at which senescence becomes the dominant growth process
+* fr_{PHU} = fraction of PHU accumulated for the plant on a given day in the growing season
 
 
 **Biomass Accumulation**
@@ -4044,7 +4101,7 @@ $$
 
 * `radiation` = incident total solar radiation (MJ m$^{-2}%), 0.5 x \(H_{day}\)
 * `extinction_coef` = light extinction coefficient
-* \(LAI_{act}\) = leaf area index 
+* LAI_{act} = leaf area index 
  
 Using this value, the maximum potential biomass increase for that day is calculated as:
    
@@ -4113,7 +4170,7 @@ When the Field class initiates a harvest event via the `manage_harvest()` functi
 
 If a custom harvest index is provided by the user (harvest index override), that value is used. Otherwise, the harvest index is calculated based on the crop's accumulated heat fraction and the crop-specific optimal harvest index. The method also adjusts the harvest index based on the crop's water deficiency. Harvest index is defined as the fraction of the above ground dry biomass of plant that is removed as dry yield. 
 
-The potential harvest index (\(HI_{max}\)) for the plant for a given day is calculated as:
+The potential harvest index (HI_{max}) for the plant for a given day is calculated as:
    
 ::: {#eq-sc-crp-66}
 [[**SC.CRP.66**]]{.aside .content-visible when-format="html"}        
@@ -4123,8 +4180,9 @@ $$
 :::           
 
 *Where*: 
+
 * `optimal_harvest_index` = optimal harvest index for the plant at maturity, given ideal growing conditions 
-* \(fr_{PHU}\) = fraction of potential heat units accumulated for the plant on a given day in the growing season
+* fr_{PHU} = fraction of potential heat units accumulated for the plant on a given day in the growing season
 
 The actual harvest index is then adjusted for water deficiency: 
    
@@ -4280,7 +4338,7 @@ The last steps in the `CropManagement` method for managing the crop harvest is t
 
 If the crop is not killed and there is only surface residue and the soil pools in the surface layer are updated as follows:
    
-::: {#eq-sc-crp-77}
+::: {#eq-sc-crp-77 style="font-size:90%"}
 [[**SC.CRP.77**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}

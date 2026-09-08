@@ -99,7 +99,7 @@ The following are important assumptions made in the manure handler submodules, a
 #| label: tbl-mn-hdl-classes
 #| tbl-cap: The classes of handlers that are used in this module.
 import_table(
-  "../resources/table_data/manure/tbl-ma-hdl-classes.csv",
+  "../resources/table_data/manure/tbl-mn-hdl-classes.csv",
   colalign = ["left", "left"]
 )
 ```
@@ -110,7 +110,7 @@ import_table(
 #| label: tbl-mn-hdl-inputs
 #| tbl-cap: "Required inputs for the Manure Handler (`refreshed_manure_management.json`)."
 import_table(
-  "../resources/table_data/manure/tbl-ma-hdl-inputs.csv",
+  "../resources/table_data/manure/tbl-mn-hdl-inputs.csv",
   colalign = ["left", "center", "left"]
 )
 ```
@@ -253,13 +253,13 @@ $$
 *Where*:
 
 * `num_stalls` = the number of stalls in the pen assigned to the handler
-* `surface_area` (m^2/animal) = surface area per stall, provided in @tbl-ma-hdl-surface-area.
+* `surface_area` (m^2/animal) = surface area per stall, provided in @tbl-mn-hdl-surface-area.
 
 ```{python}
 #| label: tbl-mn-hdl-surface-area
 #| tbl-cap: The surface area per stall that is covered with manure is a function of the pen type and type of animal housed.
 import_table(
-  "../resources/table_data/manure/tbl-ma-hdl-surface-area.csv",
+  "../resources/table_data/manure/tbl-mn-hdl-surface-area.csv",
   colalign = ["left", "center", "center"]
 )
 ```
@@ -435,7 +435,7 @@ Equations in the table below are in the format of "Output/exiting value" = "Ente
 #| label: tbl-mn-hdl-manure-update
 #| tbl-cap: Calculated manure storage variables and their units.
 import_table(
-  "../resources/table_data/manure/tbl-ma-hdl-manure-update.csv",
+  "../resources/table_data/manure/tbl-mn-hdl-manure-update.csv",
   colalign = ["left", "center", "left"]
 )
 ```

@@ -1,0 +1,11 @@
+﻿Variable , Definition , Default , Min , Max 
+mix_names , List of the mix names that will be used for the corresponding fertilizer application , -- , -- , --  
+years , List of years in which fertilizer will be applied , -- , 1 , --  
+days , List of days on which fertilizer will be applied , -- , 1 , 366  
+nitrogen_masses , List of minimum nitrogen masses that the corresponding fertilizer applications should contain (kg) , -- , 0 , --  
+phosphorus_masses , List of minimum phosphorus masses that the corresponding fertilizer applications should contain (kg) , -- , 0 , --   
+potassium_masses , List of minimum potassium masses that the corresponding fertilizer applications should contain (kg) , -- , 0 , --  
+application_depths , List of depths at which the fertilizer is injected into the soil (mm) , -- , 0 , --  
+surface_remainder_fractions , List of fractions of fertilizer which remain on the soil surface when applied via injection , -- , 0 , 1  
+pattern_repeat , Number of times that this fertilizer application schedule should be repeated. , 0 , 0 , --
+pattern_skip , Number of years to be skipped between schedule repetitions. , 0 , 0 , --  

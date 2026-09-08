@@ -265,7 +265,7 @@ Bedding is assigned and applied by manure stream, not by pen. The following calc
 ::: {#eq-an-pen-7}
 [[AN.PEN.7]]{.aside .content-visible when-format="html"}
 $$
-\text{total\_bedding\_mass,(kg)} = \text{bedding\_mass\_per\_day} \times \text{num\_animals} \times \text{sand\_removal\_efficiency}
+\text{total\_bedding\_mass (kg)} = \text{bedding\_mass\_per\_day} \times \text{num\_animals} \times \text{sand\_removal\_efficiency}
 $$
 :::
 
@@ -295,7 +295,7 @@ $$
 ::: {#eq-an-pen-9}
 [[AN.PEN.9]]{.aside .content-visible when-format="html"}
 $$
-\text{total\_bedding\_dry\_solids\,(kg)} = \text{total\_bedding\_mass} \times \text{bedding\_dry\_matter\_content}
+\text{total\_bedding\_dry\_solids (kg)} = \text{total\_bedding\_mass} \times \text{bedding\_dry\_matter\_content}
 $$
 :::
 
@@ -309,7 +309,7 @@ $$
 ::: {#eq-an-pen-10}
 [[AN.PEN.10]]{.aside .content-visible when-format="html"}
 $$
-\text{total\_bedding\_water\,(kg)} = \text{total\_bedding\_mass} \times (1 - \text{bedding\_dry\_matter\_content})
+\text{total\_bedding\_water (kg)} = \text{total\_bedding\_mass} \times (1 - \text{bedding\_dry\_matter\_content})
 $$
 :::
 
