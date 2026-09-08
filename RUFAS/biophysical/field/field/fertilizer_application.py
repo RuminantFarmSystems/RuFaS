@@ -136,9 +136,7 @@ class FertilizerApplication:
 
     @staticmethod
     def generate_depth_factors(
-        application_depth: float,
-        soil_layer_top_depths: list[float],
-        soil_layer_bottom_depths: list[float]
+        application_depth: float, soil_layer_top_depths: list[float], soil_layer_bottom_depths: list[float]
     ) -> list[float]:
         """
         Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.

@@ -21,10 +21,7 @@ from RUFAS.biophysical.field.soil.soil_data import SoilData
     ],
 )
 def test_generate_depth_factors(
-    depth: float,
-    top_depths: list[float],
-    bottom_depths: list[float],
-    expected: list[float]
+    depth: float, top_depths: list[float], bottom_depths: list[float], expected: list[float]
 ) -> None:
     """Tests that the depth factors are correctly calculated for subsurface nutrient applications."""
     actual = FertilizerApplication.generate_depth_factors(depth, top_depths, bottom_depths)
@@ -75,13 +72,11 @@ def test_apply_subsurface_fertilizer(
             [20.0, 70.0, 200.0, 400.0],
         )
         for index, expected_result in enumerate(expected):
-            assert (
-                fert_app.soil.data.soil_layers[index].labile_inorganic_phosphorus_content
-                == pytest.approx(expected_result)
+            assert fert_app.soil.data.soil_layers[index].labile_inorganic_phosphorus_content == pytest.approx(
+                expected_result
             )
             assert fert_app.soil.data.soil_layers[index].nitrate_content == pytest.approx(expected_result)
             assert fert_app.soil.data.soil_layers[index].ammonium_content == pytest.approx(expected_result)
-
 
 
 @pytest.mark.parametrize(
