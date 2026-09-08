@@ -621,154 +621,23 @@
         },
         "culling": {
           "type": "object",
-          "description": "Defines probabilities and distributions for death and six health-related reasons (feet-and-leg, injury, mastitis, disease, udder, unknown) an animal might be removed (culled) from the herd.",
-          "cull_day_count": {
-            "type": "array",
-            "description": "Defines breakpoints that partition the cumulative distribution function (CDF) for culling probabilities into segments. These values correspond to the 'cull_day_prob' array, allowing for more accurate definition of the CDF.The numbers in the array represent days into the lactation (days in milk).",
-            "properties": {
-              "type": "number",
-              "minimum": 0
-            }
-          },
-          "feet_leg_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to feet-and-leg-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "Conditional probability that a culled (sold) animal is removed due to feet-and-leg-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six  culling reasons equals 1.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Cumulative distribution function (CDF) values associated with the likelihood of feet-and-leg-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "injury_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to injury-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "Conditional probability that a culled (sold) animal is removed due to injury-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Cumulative distribution function (CDF) values associated with the likelihood of injury-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "mastitis_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to mastitis-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "Conditional probability that a culled (sold) animal is removed due to mastitis-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Cumulative distribution function (CDF) values associated with the likelihood of mastitis-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "disease_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to disease-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "Conditional probability that a culled (sold) animal is removed due to general disease-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Cumulative distribution function (CDF) values associated with the likelihood of general disease-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "udder_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to udder-related health issues.",
-            "probability": {
-              "type": "number",
-              "description": "Conditional probability that a culled (sold) animal is removed due to udder-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Cumulative distribution function (CDF) values associated with the likelihood of udder-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
-          "unknown_cull": {
-            "type": "object",
-            "description": "Cull probabilities due to other health issues.",
-            "probability": {
-              "type": "number",
-              "description": "Conditional probability that a culled (sold) animal is removed due to unknown reasons. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "cull_day_prob": {
-              "type": "array",
-              "description": "Cumulative distribution function (CDF) values associated with the likelihood of culling for unknown reasons over time. The 'cull_day_count' array defines the segments of the CDF.",
-              "properties": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            }
-          },
+          "description": "Defines the annual, by-parity probabilities that a cow dies or is sold for an acute (involuntary) reason. The timing of each event within a lactation, previously configured here, is now a model constant (see animal_constants.py, issue #2694).",
           "parity_death_prob": {
             "type": "array",
-            "description": "Death Probability, by Parity",
+            "description": "Annual Death Probability, by Parity",
             "properties": {
               "type": "number",
-              "description": "Death Probability, by Parity Group -- The probability of death for cows of a single parity group (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
+              "description": "Annual Death Probability, by Parity Group -- The probability that a cow of a single parity group (first lactation, second lactation, etc.) dies during a given year; a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total).",
               "minimum": 0,
               "maximum": 1
             }
           },
-          "parity_cull_prob": {
+          "parity_acute_sale_prob": {
             "type": "array",
-            "description": "Cull Probability, by Parity",
+            "description": "Annual Acute-Sale Probability, by Parity",
             "properties": {
               "type": "number",
-              "description": "Cull Probability, by Parity Group -- The probability of culling for cows of a single parity group (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total). Culling refers to removal from the herd while alive.",
-              "minimum": 0,
-              "maximum": 1
-            }
-          },
-          "death_day_prob": {
-            "type": "array",
-            "description": "Cumulative distribution function (CDF) values associated with the likelihood of death over time. The 'cull_day_count' array defines the segments of the CDF.",
-            "properties": {
-              "type": "number",
+              "description": "Annual Acute-Sale Probability, by Parity Group -- The probability that a cow of a single parity group is sold for an acute (forced / involuntary) reason during a given year, regardless of whether a replacement is available; a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total).",
               "minimum": 0,
               "maximum": 1
             }
