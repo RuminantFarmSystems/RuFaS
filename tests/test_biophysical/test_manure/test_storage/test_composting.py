@@ -47,7 +47,7 @@ def stored_manure() -> ManureStream:
         volume=100.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -67,7 +67,7 @@ def received_manure() -> ManureStream:
         volume=10.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -301,6 +301,7 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture, compostin
         (18.0, CompostingType.STATIC_PILE, 2.5),
         (25.0, CompostingType.INTENSIVE_WINDROW, 1.5),
         (100.0, CompostingType.PASSIVE_WINDROW, 2.5),
+        (100.0, CompostingType.IN_VESSEL, 0.5),
     ],
 )
 def test_valid_temperatures_return_expected_mcf(
