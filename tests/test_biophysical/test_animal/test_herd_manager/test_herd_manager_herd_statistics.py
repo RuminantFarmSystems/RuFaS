@@ -176,23 +176,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             {
                 animal_constants.DEATH_CULL: 0,
                 animal_constants.OVERSUPPLY_CULL: 0,
-                animal_constants.LAMENESS_CULL: 0,
-                animal_constants.INJURY_CULL: 0,
-                animal_constants.MASTITIS_CULL: 0,
-                animal_constants.DISEASE_CULL: 0,
-                animal_constants.UDDER_CULL: 0,
-                animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.ACUTE_SALE_CULL: 0,
             },
             0,
             {
                 animal_constants.DEATH_CULL: 0.0,
                 animal_constants.OVERSUPPLY_CULL: 0.0,
-                animal_constants.LAMENESS_CULL: 0.0,
-                animal_constants.INJURY_CULL: 0.0,
-                animal_constants.MASTITIS_CULL: 0.0,
-                animal_constants.DISEASE_CULL: 0.0,
-                animal_constants.UDDER_CULL: 0.0,
-                animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.ACUTE_SALE_CULL: 0.0,
             },
         ),
         # 2. One reason has all culls, matches exit_num -> 100% that reason
@@ -200,23 +190,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             {
                 animal_constants.DEATH_CULL: 5,
                 animal_constants.OVERSUPPLY_CULL: 0,
-                animal_constants.LAMENESS_CULL: 0,
-                animal_constants.INJURY_CULL: 0,
-                animal_constants.MASTITIS_CULL: 0,
-                animal_constants.DISEASE_CULL: 0,
-                animal_constants.UDDER_CULL: 0,
-                animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.ACUTE_SALE_CULL: 0,
             },
             5,
             {
                 animal_constants.DEATH_CULL: 100.0,
                 animal_constants.OVERSUPPLY_CULL: 0.0,
-                animal_constants.LAMENESS_CULL: 0.0,
-                animal_constants.INJURY_CULL: 0.0,
-                animal_constants.MASTITIS_CULL: 0.0,
-                animal_constants.DISEASE_CULL: 0.0,
-                animal_constants.UDDER_CULL: 0.0,
-                animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.ACUTE_SALE_CULL: 0.0,
             },
         ),
         # 3. Multiple reasons evenly split
@@ -225,23 +205,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             {
                 animal_constants.DEATH_CULL: 5,
                 animal_constants.OVERSUPPLY_CULL: 5,
-                animal_constants.LAMENESS_CULL: 0,
-                animal_constants.INJURY_CULL: 0,
-                animal_constants.MASTITIS_CULL: 0,
-                animal_constants.DISEASE_CULL: 0,
-                animal_constants.UDDER_CULL: 0,
-                animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.ACUTE_SALE_CULL: 0,
             },
             10,
             {
                 animal_constants.DEATH_CULL: 50.0,
                 animal_constants.OVERSUPPLY_CULL: 50.0,
-                animal_constants.LAMENESS_CULL: 0.0,
-                animal_constants.INJURY_CULL: 0.0,
-                animal_constants.MASTITIS_CULL: 0.0,
-                animal_constants.DISEASE_CULL: 0.0,
-                animal_constants.UDDER_CULL: 0.0,
-                animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.ACUTE_SALE_CULL: 0.0,
             },
         ),
         # 4. Partial distribution
@@ -250,23 +220,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             {
                 animal_constants.DEATH_CULL: 3,
                 animal_constants.OVERSUPPLY_CULL: 2,
-                animal_constants.LAMENESS_CULL: 0,
-                animal_constants.INJURY_CULL: 0,
-                animal_constants.MASTITIS_CULL: 0,
-                animal_constants.DISEASE_CULL: 0,
-                animal_constants.UDDER_CULL: 0,
-                animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.ACUTE_SALE_CULL: 0,
             },
             10,
             {
                 animal_constants.DEATH_CULL: 30.0,
                 animal_constants.OVERSUPPLY_CULL: 20.0,
-                animal_constants.LAMENESS_CULL: 0.0,
-                animal_constants.INJURY_CULL: 0.0,
-                animal_constants.MASTITIS_CULL: 0.0,
-                animal_constants.DISEASE_CULL: 0.0,
-                animal_constants.UDDER_CULL: 0.0,
-                animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.ACUTE_SALE_CULL: 0.0,
             },
         ),
         # 5. Non-zero exit, some reasons zero
@@ -276,23 +236,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
             {
                 animal_constants.DEATH_CULL: 2,
                 animal_constants.OVERSUPPLY_CULL: 0,
-                animal_constants.LAMENESS_CULL: 0,
-                animal_constants.INJURY_CULL: 0,
-                animal_constants.MASTITIS_CULL: 0,
-                animal_constants.DISEASE_CULL: 8,
-                animal_constants.UDDER_CULL: 0,
-                animal_constants.UNKNOWN_CULL: 0,
+                animal_constants.ACUTE_SALE_CULL: 8,
             },
             10,
             {
                 animal_constants.DEATH_CULL: 20.0,
                 animal_constants.OVERSUPPLY_CULL: 0.0,
-                animal_constants.LAMENESS_CULL: 0.0,
-                animal_constants.INJURY_CULL: 0.0,
-                animal_constants.MASTITIS_CULL: 0.0,
-                animal_constants.DISEASE_CULL: 80.0,
-                animal_constants.UDDER_CULL: 0.0,
-                animal_constants.UNKNOWN_CULL: 0.0,
+                animal_constants.ACUTE_SALE_CULL: 80.0,
             },
         ),
     ],
@@ -540,12 +490,7 @@ def test_update_sold_and_died_cow_statistics(
     """Unit test for _update_sold_and_died_cow_statistics()"""
     cull_reasons = [
         animal_constants.OVERSUPPLY_CULL,
-        animal_constants.LAMENESS_CULL,
-        animal_constants.INJURY_CULL,
-        animal_constants.MASTITIS_CULL,
-        animal_constants.DISEASE_CULL,
-        animal_constants.UDDER_CULL,
-        animal_constants.UNKNOWN_CULL,
+        animal_constants.ACUTE_SALE_CULL,
     ]
 
     num_sold_cows, num_dead_cows = randint(1, 100), randint(1, 100)
@@ -612,12 +557,7 @@ def test_update_sold_and_died_cow_statistics(
     current_cull_reason_stats = {
         animal_constants.DEATH_CULL: randint(0, num_total_sold_and_died_cows),
         animal_constants.OVERSUPPLY_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.LAMENESS_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.INJURY_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.MASTITIS_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.DISEASE_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.UDDER_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.UNKNOWN_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.ACUTE_SALE_CULL: randint(0, num_total_sold_and_died_cows),
     }
     herd_manager.herd_statistics.cull_reason_stats = current_cull_reason_stats
     expected_cull_reason_stats = {
@@ -625,18 +565,8 @@ def test_update_sold_and_died_cow_statistics(
         + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DEATH_CULL]),
         animal_constants.OVERSUPPLY_CULL: current_cull_reason_stats[animal_constants.OVERSUPPLY_CULL]
         + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.OVERSUPPLY_CULL]),
-        animal_constants.LAMENESS_CULL: current_cull_reason_stats[animal_constants.LAMENESS_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LAMENESS_CULL]),
-        animal_constants.INJURY_CULL: current_cull_reason_stats[animal_constants.INJURY_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.INJURY_CULL]),
-        animal_constants.MASTITIS_CULL: current_cull_reason_stats[animal_constants.MASTITIS_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.MASTITIS_CULL]),
-        animal_constants.DISEASE_CULL: current_cull_reason_stats[animal_constants.DISEASE_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DISEASE_CULL]),
-        animal_constants.UDDER_CULL: current_cull_reason_stats[animal_constants.UDDER_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.UDDER_CULL]),
-        animal_constants.UNKNOWN_CULL: current_cull_reason_stats[animal_constants.UNKNOWN_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.UNKNOWN_CULL]),
+        animal_constants.ACUTE_SALE_CULL: current_cull_reason_stats[animal_constants.ACUTE_SALE_CULL]
+        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.ACUTE_SALE_CULL]),
     }
 
     current_sold_cow_num = randint(0, current_cow_herd_exit_num)
