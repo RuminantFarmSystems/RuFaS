@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -176,6 +177,10 @@
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>The name of the storage.</p>
+</dd>
+<dt>is_housing_emissions_calculator<span class="classifier">bool</span></dt><dd><p>Flag indicating whether the storage is a housing emissions calculator.</p>
+</dd>
 <dt>cover<span class="classifier">str</span></dt><dd><p>What the storage will be covered with, if anything.</p>
 </dd>
 <dt>storage_time_period<span class="classifier">int | None</span></dt><dd><p>How long manure is stored for before emptying the storage (days). None if the storage is never emptied.</p>
@@ -251,6 +256,13 @@ Defaults to 1.0.</p>
 </dd>
 </dl>
 </section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If missing data needed to calculate outdoor storage temp.</p>
+</dd>
+</dl>
+</section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
@@ -277,11 +289,25 @@ data and is adjusted to reflect the time of manure temperature change based on a
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.storage.Storage.receive_manure">
 <span class="sig-name descname"><span class="pre">receive_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.storage.Storage.receive_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.storage.Storage.receive_manure'"><span>#</span></a></dt>
 <dd><p>Receives manure and puts it in storage to be processed.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>manure<span class="classifier">ManureStream</span></dt><dd><p>The manure to be received by the processor.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.storage.Storage.process_manure">
 <span class="sig-name descname"><span class="pre">process_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.storage.Storage.process_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.storage.Storage.process_manure'"><span>#</span></a></dt>
 <dd><p>Adds the manure received on the current day to the manure already stored, and empties the storage if scheduled.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.storage.Storage._report_emptied">
+<span class="sig-name descname"><span class="pre">_report_emptied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.storage.Storage._report_emptied" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.storage.Storage._report_emptied'"><span>#</span></a></dt>
+<dd><p>Report the manure removed from this storage on the current day under the <code class="docutils literal notranslate"><span class="pre">"emptied"</span></code> stream.</p>
+<p>Provided as an overridable hook so subclasses can change what counts as “emptied” (e.g. <code class="docutils literal notranslate"><span class="pre">DailySpread</span></code>
+reports only the manure that was not spread on the field).</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.storage.Storage._validate_emptying_fraction">
@@ -292,8 +318,8 @@ data and is adjusted to reflect the time of manure temperature change based on a
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.storage.Storage.handle_overflowing_manure">
 <span class="sig-name descname"><span class="pre">handle_overflowing_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.storage.Storage.handle_overflowing_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.storage.Storage.handle_overflowing_manure'"><span>#</span></a></dt>
 <dd><p>Deals with excess manure when amount in storage exceeds capacity.</p>
-<section id="id2">
-<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance tracking the current time of the simulation.</p>
 </dd>
@@ -309,8 +335,8 @@ data and is adjusted to reflect the time of manure temperature change based on a
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_methane_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_degradable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.storage.Storage._calculate_methane_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.storage.Storage._calculate_methane_emissions'"><span>#</span></a></dt>
 <dd><p>Calculates methane that is emitted from liquid manure storages by calculating emissions from the degradable and
 non-degradable volatile solids fractions.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>volatile_solids<span class="classifier">float</span></dt><dd><p>Mass of volatile solids that are emitting methane (kg). Can be degradable or non-degradable.</p>
 </dd>
@@ -320,8 +346,8 @@ non-degradable volatile solids fractions.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Methane emission from volatile solids (kg).</p>
 </dd>
@@ -332,22 +358,22 @@ non-degradable volatile solids fractions.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.storage.Storage._calculate_arrhenius_exponent">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_arrhenius_exponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.storage.Storage._calculate_arrhenius_exponent" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.storage.Storage._calculate_arrhenius_exponent'"><span>#</span></a></dt>
 <dd><p>Calculate the Arrhenius exponent.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>temperature<span class="classifier">float</span></dt><dd><p>Temperature in Celsius (degrees C).</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Arrhenius exponent (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="raises">
-<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<section id="id8">
+<h3>Raises<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the temperature is not between -40 and 60 degrees Celsius.</p>
 </dd>
@@ -358,17 +384,20 @@ non-degradable volatile solids fractions.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.storage.Storage._calculate_cover_and_flare_methane">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_cover_and_flare_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.storage.Storage._calculate_cover_and_flare_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.storage.Storage._calculate_cover_and_flare_methane'"><span>#</span></a></dt>
 <dd><p>Adjust the methane burned and lost when using cover and flare cover type.</p>
-<section id="id7">
-<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>methane_loss: float</dt><dd><p>The amount of methane lost (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id8">
-<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>tuple[float, float]</dt><dd><p>The amount of storage methane burned and the adjusted methane loss (kg).</p>
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The amount of storage methane burned (kg).</p></li>
+<li><p>The adjusted methane loss (kg).</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -377,8 +406,8 @@ non-degradable volatile solids fractions.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.storage.Storage._calculate_nitrous_oxide_emissions">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_nitrous_oxide_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrous_oxide_emissions_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_added</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.storage.Storage._calculate_nitrous_oxide_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.storage.Storage._calculate_nitrous_oxide_emissions'"><span>#</span></a></dt>
 <dd><p>Calculates amount of nitrous oxide nitrogen emitted from a storage on a single day.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>nitrous_oxide_emissions_factor<span class="classifier">float</span></dt><dd><p>The emission factor for nitrous oxide (kg nitrous oxide nitrogen / kg nitrogen).</p>
 </dd>
@@ -386,8 +415,8 @@ non-degradable volatile solids fractions.</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Nitrous oxide nitrogen emissions (kg).</p>
 </dd>
@@ -415,6 +444,7 @@ non-degradable volatile solids fractions.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.storage.Storage._calculate_surface_area'" class="reference internal" href="#RUFAS.biophysical.manure.storage.storage.Storage._calculate_surface_area"><code class="docutils literal notranslate"><span class="pre">Storage._calculate_surface_area()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.storage.Storage.receive_manure'" class="reference internal" href="#RUFAS.biophysical.manure.storage.storage.Storage.receive_manure"><code class="docutils literal notranslate"><span class="pre">Storage.receive_manure()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.storage.Storage.process_manure'" class="reference internal" href="#RUFAS.biophysical.manure.storage.storage.Storage.process_manure"><code class="docutils literal notranslate"><span class="pre">Storage.process_manure()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.storage.Storage._report_emptied'" class="reference internal" href="#RUFAS.biophysical.manure.storage.storage.Storage._report_emptied"><code class="docutils literal notranslate"><span class="pre">Storage._report_emptied()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.storage.Storage._validate_emptying_fraction'" class="reference internal" href="#RUFAS.biophysical.manure.storage.storage.Storage._validate_emptying_fraction"><code class="docutils literal notranslate"><span class="pre">Storage._validate_emptying_fraction()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.storage.Storage.handle_overflowing_manure'" class="reference internal" href="#RUFAS.biophysical.manure.storage.storage.Storage.handle_overflowing_manure"><code class="docutils literal notranslate"><span class="pre">Storage.handle_overflowing_manure()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.storage.Storage._abc_impl'" class="reference internal" href="#RUFAS.biophysical.manure.storage.storage.Storage._abc_impl"><code class="docutils literal notranslate"><span class="pre">Storage._abc_impl</span></code></a></li>

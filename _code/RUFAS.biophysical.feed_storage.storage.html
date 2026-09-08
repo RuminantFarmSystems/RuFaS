@@ -29,7 +29,7 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.biophysical.manure.html" rel="next" title="RUFAS.biophysical.manure package"/>
+<link href="RUFAS.biophysical.field.html" rel="next" title="RUFAS.biophysical.field package"/>
 <link href="RUFAS.biophysical.feed_storage.silage.html" rel="prev" title="RUFAS.biophysical.feed_storage.silage module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -154,26 +155,21 @@
 dry matter mass of the crop. These values are defined in the Feed Storage Scientific Documentation, section 1.3.</p>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h2>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id1" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<p>Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2</p>
-</aside>
-</aside>
+<p>Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2.</p>
 </section>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.feed_storage.storage.</span></span><span class="sig-name descname"><span class="pre">Storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Abstract class representing a general storage structure.</p>
+<p>Abstract base class representing a general feed storage structure.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>storage_config<span class="classifier">dict[str, str | float]</span></dt><dd><dl class="simple">
+<dt>storage_config<span class="classifier">dict[str, str | float | list[str]]</span></dt><dd><dl class="simple">
 <dt>Configuration dictionary for the storage, containing keys:</dt><dd><ul class="simple">
 <li><p>name: Name of the storage (str).</p></li>
-<li><p>field_name: Name of the field associated with the storage (str).</p></li>
+<li><p>field_names: Names of the fields associated with the storage (list[str]).</p></li>
 <li><p>crop_name: Name of the crop associated with the storage (str).</p></li>
 <li><p>rufas_id: RuFaS Feed ID associated with the storage (int).</p></li>
 <li><p>initial_storage_dry_matter: Initial dry matter percentage of the crop when first stored (float).</p></li>
@@ -187,59 +183,33 @@ dry matter mass of the crop. These values are defined in the Feed Storage Scient
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>capacity<span class="classifier">float</span></dt><dd><p>The maximum capacity of the storage.</p>
+<dt>capacity<span class="classifier">float</span></dt><dd><p>The maximum capacity of the storage (kg).</p>
 </dd>
-<dt>stored<span class="classifier">list[HarvestedCrop]</span></dt><dd><p>A list of HarvestedCrop objects representing the crops stored.</p>
+<dt>stored<span class="classifier">list[HarvestedCrop]</span></dt><dd><p>A list of <code class="docutils literal notranslate"><span class="pre">HarvestedCrop</span></code> objects representing the crops stored.</p>
 </dd>
 <dt>storage_name<span class="classifier">str</span></dt><dd><p>Name of the storage.</p>
 </dd>
-<dt>field_names<span class="classifier">str</span></dt><dd><p>Names of the fields associated with the storage.</p>
+<dt>field_names<span class="classifier">list[str]</span></dt><dd><p>Names of the fields associated with the storage.</p>
 </dd>
 <dt>crop_name<span class="classifier">str</span></dt><dd><p>Name of the crop associated with the storage.</p>
 </dd>
 <dt>rufas_feed_id<span class="classifier">int</span></dt><dd><p>RuFaS Feed ID associated with the storage.</p>
 </dd>
-<dt>initial_storage_dry_matter<span class="classifier">float</span></dt><dd><p>Initial dry matter percentage of the crop when first stored.</p>
+<dt>initial_storage_dry_matter<span class="classifier">float</span></dt><dd><p>Initial dry matter percentage of the crop when first stored (unitless).</p>
 </dd>
-<dt>crude_protein_loss_coefficient<span class="classifier">float, default 0.0</span></dt><dd><p>Fractional coefficient used to adjust crude protein after dry matter loss.</p>
+<dt>crude_protein_loss_coefficient<span class="classifier">float, default=0.0</span></dt><dd><p>Fractional coefficient used to adjust crude protein after dry matter loss.</p>
 </dd>
-<dt>starch_loss_coefficient<span class="classifier">float, default 0.0</span></dt><dd><p>Fractional coefficient used to adjust starch after dry matter loss.</p>
+<dt>starch_loss_coefficient<span class="classifier">float, default=0.0</span></dt><dd><p>Fractional coefficient used to adjust starch after dry matter loss.</p>
 </dd>
-<dt>adf_loss_coefficient<span class="classifier">float, default 0.0</span></dt><dd><p>Fractional coefficient used to adjust ADF after dry matter loss.</p>
+<dt>adf_loss_coefficient<span class="classifier">float, default=0.0</span></dt><dd><p>Fractional coefficient used to adjust ADF after dry matter loss.</p>
 </dd>
-<dt>ndf_loss_coefficient<span class="classifier">float, default 0.0</span></dt><dd><p>Fractional coefficient used to adjust NDF after dry matter loss.</p>
+<dt>ndf_loss_coefficient<span class="classifier">float, default=0.0</span></dt><dd><p>Fractional coefficient used to adjust NDF after dry matter loss.</p>
 </dd>
-<dt>lignin_loss_coefficient<span class="classifier">float, default 0.0</span></dt><dd><p>Fractional coefficient used to adjust lignin after dry matter loss.</p>
+<dt>lignin_loss_coefficient<span class="classifier">float, default=0.0</span></dt><dd><p>Fractional coefficient used to adjust lignin after dry matter loss.</p>
 </dd>
-<dt>ash_loss_coefficient<span class="classifier">float, default 0.0</span></dt><dd><p>Fractional coefficient used to adjust ash after dry matter loss.</p>
+<dt>ash_loss_coefficient<span class="classifier">float, default=0.0</span></dt><dd><p>Fractional coefficient used to adjust ash after dry matter loss.</p>
 </dd>
-</dl>
-</section>
-<section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#methods'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>stored_mass()</dt><dd><p>The total mass (kg) of currently stored crops</p>
-</dd>
-<dt>receive_crop(crop: HarvestedCrop, time: RufasTime)</dt><dd><p>Receives a harvested crop and adds it to the storage.</p>
-</dd>
-<dt>process_degradations(current_conditions: CurrentDayConditions, time: RufasTime)</dt><dd><p>Processes the degradations and losses of the stored crops.</p>
-</dd>
-<dt>reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)</dt><dd><p>Resets mass related attributes after loss of dry matter and/or moisture.</p>
-</dd>
-<dt>_record_stored_crops(self, simulation_day: int)</dt><dd><p>Records information about total mass and nutrient content of the stored crops.</p>
-</dd>
-<dt>calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)</dt><dd><p>Calculates the dry matter loss to gas.</p>
-</dd>
-<dt>calculate_bale_density(initial_dry_matter: float)</dt><dd><p>Calculates the density of a bale.</p>
-</dd>
-<dt>recalculate_nutrient_percentage(</dt><dd><p>initial_nutrient_percentage: float,
-loss_coefficient: float,
-dry_matter_loss: float,
-initial_dry_matter: float</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>)</dt><dd><p>Recalculates a single nutrient percentage after dry matter loss.</p>
+<dt>om<span class="classifier">OutputManager</span></dt><dd><p>The singleton output manager used for model outputs.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -305,14 +275,14 @@ initial_dry_matter: float</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage.stored_mass">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">stored_mass</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage.stored_mass" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage.stored_mass'"><span>#</span></a></dt>
-<dd><p>The total mass (kg) of currently stored crops</p>
+<dd><p>The total mass of currently stored crops (kg).</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage.receive_crop">
 <span class="sig-name descname"><span class="pre">receive_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage.receive_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage.receive_crop'"><span>#</span></a></dt>
 <dd><p>Receives a harvested crop and adds it to the storage.</p>
-<section id="id2">
-<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The harvested crop to be added to the storage.</p>
 </dd>
@@ -320,37 +290,24 @@ initial_dry_matter: float</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h3>References<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<p>Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2</p>
-</aside>
-</aside>
-</section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
-<p>None</p>
-</section>
 <section id="raises">
 <h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>NotImplementedError</dt><dd><p>If the storage’s acceptable crops is not populated.</p>
-</dd>
-<dt>ValueError</dt><dd><p>If the crop’s category is not compatible with the storage.</p>
-</dd>
 <dt>Exception</dt><dd><p>If adding the crop exceeds the storage’s capacity.</p>
 </dd>
 </dl>
+</section>
+<section id="id2">
+<h3>References<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<p>Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage.process_degradations">
 <span class="sig-name descname"><span class="pre">process_degradations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage.process_degradations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage.process_degradations'"><span>#</span></a></dt>
 <dd><p>Processes the degradations and losses of nutrients and dry matter in the stored crops.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>weather<span class="classifier">Weather</span></dt><dd><p>Weather instance containing all weather information for the simulation.</p>
 </dd>
@@ -367,10 +324,10 @@ initial_dry_matter: float</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage.project_degradations">
 <span class="sig-name descname"><span class="pre">project_degradations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage.project_degradations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage.project_degradations'"><span>#</span></a></dt>
 <dd><p>Projects the state of crops currently stored at a given future date.</p>
-<section id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>crops<span class="classifier">list[HarvestedCrop]</span></dt><dd><p>List of HarvestedCrops to project degradations for.</p>
+<dt>crops<span class="classifier">list[HarvestedCrop]</span></dt><dd><p>List of <code class="docutils literal notranslate"><span class="pre">HarvestedCrop</span></code> objects to project degradations for.</p>
 </dd>
 <dt>weather<span class="classifier">Weather</span></dt><dd><p>Weather instance containing all weather information for the simulation.</p>
 </dd>
@@ -378,8 +335,8 @@ initial_dry_matter: float</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>list[HarvestedCrop]</dt><dd><p>Crops in the state they are projected to be in at the given date.</p>
 </dd>
@@ -390,8 +347,8 @@ initial_dry_matter: float</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._calculate_degradation_values">
 <span class="sig-name descname"><span class="pre">_calculate_degradation_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._calculate_degradation_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._calculate_degradation_values'"><span>#</span></a></dt>
 <dd><p>Calculates the loss from the given crop and state of the remaining crop mass.</p>
-<section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>Crop for which degradations are being calculated.</p>
 </dd>
@@ -401,10 +358,10 @@ initial_dry_matter: float</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dict[str, Any]</dt><dd><p>Mapping the attributes of the crop after degradation to their values.</p>
+<dt>dict[str, Any]</dt><dd><p>Mapping of the attributes of the crop after degradation to their values.</p>
 </dd>
 </dl>
 </section>
@@ -419,8 +376,8 @@ initial_dry_matter: float</p>
 <span class="sig-name descname"><span class="pre">_calculate_mass_attributes_after_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._calculate_mass_attributes_after_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._calculate_mass_attributes_after_loss'"><span>#</span></a></dt>
 <dd><p>Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after loss of both dry
 matter and moisture.</p>
-<section id="id10">
-<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The stored crop that has lost dry matter.</p>
 </dd>
@@ -430,15 +387,15 @@ matter and moisture.</p>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dict[str, float]</dt><dd><p>Fresh mass and dry matter percentage of the crop after loss (kg and percentage, respectively).</p>
+<dt>dict[str, float]</dt><dd><p>Dry matter mass and dry matter percentage of the crop after loss (kg and percentage, respectively).</p>
 </dd>
 </dl>
 </section>
-<section id="id12">
-<h3>Notes<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Notes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <p>The amount of dry matter mass remaining is calculated first, then the remaining amount of fresh mass. After
 these two attributes have been set, the dry matter percentage is recalculated and set.</p>
 </section>
@@ -447,8 +404,8 @@ these two attributes have been set, the dry matter percentage is recalculated an
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._record_received_crop">
 <span class="sig-name descname"><span class="pre">_record_received_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._record_received_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._record_received_crop'"><span>#</span></a></dt>
 <dd><p>Records the details of harvested crops received.</p>
-<section id="id13">
-<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>field_name<span class="classifier">str</span></dt><dd><p>The name of the field from which the crop was harvested.</p>
 </dd>
@@ -461,8 +418,8 @@ these two attributes have been set, the dry matter percentage is recalculated an
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._record_stored_crops">
 <span class="sig-name descname"><span class="pre">_record_stored_crops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._record_stored_crops" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._record_stored_crops'"><span>#</span></a></dt>
 <dd><p>Wrapper function to record both storage-level and individual crop-level data.</p>
-<section id="id14">
-<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current day of the simulation, used for recording purposes.</p>
 </dd>
@@ -472,9 +429,9 @@ these two attributes have been set, the dry matter percentage is recalculated an
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._record_storage_totals">
 <span class="sig-name descname"><span class="pre">_record_storage_totals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._record_storage_totals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._record_storage_totals'"><span>#</span></a></dt>
-<dd><p>Records the total mass and nutrient content of the stored crops at the storage level.</p>
-<section id="id15">
-<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<dd><p>Records the total mass and nutrient amounts held in storage.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current day of the simulation, used for recording purposes.</p>
 </dd>
@@ -485,8 +442,8 @@ these two attributes have been set, the dry matter percentage is recalculated an
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._record_individual_crops">
 <span class="sig-name descname"><span class="pre">_record_individual_crops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._record_individual_crops" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._record_individual_crops'"><span>#</span></a></dt>
 <dd><p>Records the mass and nutrient content of each crop currently stored.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current day of the simulation, used for recording purposes.</p>
 </dd>
@@ -496,16 +453,16 @@ these two attributes have been set, the dry matter percentage is recalculated an
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._get_total_nutritive_amount">
 <span class="sig-name descname"><span class="pre">_get_total_nutritive_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._get_total_nutritive_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._get_total_nutritive_amount'"><span>#</span></a></dt>
-<dd><p>Calculates the total amount of the specifed nutrient that is currently held in storage.</p>
-<section id="id17">
-<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<dd><p>Calculates the total amount of the specified nutrient that is currently held in storage.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>nutrient_name<span class="classifier">str</span></dt><dd><p>The name of the target nutrient attribute in HarvestedCrop.</p>
+<dt>nutrient_name<span class="classifier">str</span></dt><dd><p>The name of the target nutrient attribute in <code class="docutils literal notranslate"><span class="pre">HarvestedCrop</span></code>.</p>
 </dd>
 </dl>
 </section>
-<section id="id18">
-<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Total amount of the target nutrient in the stored crops (kg).</p>
 </dd>
@@ -516,8 +473,8 @@ these two attributes have been set, the dry matter percentage is recalculated an
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage.calculate_dry_matter_loss_to_gas">
 <span class="sig-name descname"><span class="pre">calculate_dry_matter_loss_to_gas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage.calculate_dry_matter_loss_to_gas" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage.calculate_dry_matter_loss_to_gas'"><span>#</span></a></dt>
 <dd><p>Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.</p>
-<section id="id19">
-<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The stored crop that is losing dry matter.</p>
 </dd>
@@ -527,29 +484,24 @@ these two attributes have been set, the dry matter percentage is recalculated an
 </dd>
 </dl>
 </section>
-<section id="id20">
-<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of dry matter lost to gas, specific to fermentation (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id21">
-<h3>References<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id22" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<p>Feed Storage Scientific Documentation equations FS.SIL.1 and FS.SIL.2</p>
-</aside>
-</aside>
-</section>
-<section id="id23">
-<h3>Notes<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<section id="id18">
+<h3>Notes<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
 <p>If the ambient temperature or dry matter percentage of the crop do not fall within the acceptable ranges, then
 no dry matter loss occurs. Alfalfa uses different parameters and limits for calculating dry matter loss,
 but the structure of the loss equation remains the same.</p>
 <p>Note that the current time is not needed for calculating the dry matter loss to fermentation, but it allows the
-interface to remain uniform across all implementations of <cite>calculate_dry_matter_loss_to_gas</cite>.</p>
+interface to remain uniform across all implementations of <code class="docutils literal notranslate"><span class="pre">calculate_dry_matter_loss_to_gas</span></code>.</p>
+</section>
+<section id="id19">
+<h3>References<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<p>Feed Storage Scientific Documentation, equations FS.SIL.1 and FS.SIL.2.</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -557,8 +509,8 @@ interface to remain uniform across all implementations of <cite>calculate_dry_ma
 <span class="sig-name descname"><span class="pre">_get_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">last_degradations_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._get_conditions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._get_conditions'"><span>#</span></a></dt>
 <dd><p>Gets the weather conditions for the days between the current time and the time that degradations were last
 processed.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>last_degradations_time<span class="classifier">date</span></dt><dd><p>The last day a crop’s degradations were processed.</p>
 </dd>
@@ -568,8 +520,15 @@ processed.</p>
 </dd>
 </dl>
 </section>
-<section id="id25">
-<h3>Notes<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>list[CurrentDayConditions]</dt><dd><p>Weather conditions between the last degradation time and the current time.</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Notes<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
 <p>If the current day is the same as or before the last day that the crop was degraded, no weather conditions will
 be returned.</p>
 </section>
@@ -579,8 +538,8 @@ be returned.</p>
 <span class="sig-name descname"><span class="pre">_process_moisture_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_moisture_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._process_moisture_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._process_moisture_loss'"><span>#</span></a></dt>
 <dd><p>Deducts and records the moisture that has been lost from all crops in storage since the last time degradations
 were processed.</p>
-<section id="id26">
-<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the time that loss should be processed up to.</p>
 </dd>
@@ -594,11 +553,11 @@ were processed.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._project_moisture_loss">
 <span class="sig-name descname"><span class="pre">_project_moisture_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_moisture_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._project_moisture_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._project_moisture_loss'"><span>#</span></a></dt>
-<dd><p>Creates a HarvestedCrop with projected moisture loss accounted for.</p>
-<section id="id27">
-<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
+<dd><p>Creates <code class="docutils literal notranslate"><span class="pre">HarvestedCrop</span></code> objects with projected moisture loss accounted for.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>crop<span class="classifier">list[HarvestedCrop]</span></dt><dd><p>HarvestedCrops to project moisture loss for.</p>
+<dt>crops<span class="classifier">list[HarvestedCrop]</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">HarvestedCrop</span></code> objects to project moisture loss for.</p>
 </dd>
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the time that loss should be processed up to.</p>
 </dd>
@@ -608,8 +567,8 @@ were processed.</p>
 </dd>
 </dl>
 </section>
-<section id="id28">
-<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>list[HarvestedCrop]</dt><dd><p>Crops with the projected moisture loss incorporated into their values.</p>
 </dd>
@@ -620,8 +579,8 @@ were processed.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._calculate_values_after_moisture_loss">
 <span class="sig-name descname"><span class="pre">_calculate_values_after_moisture_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_moisture_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._calculate_values_after_moisture_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._calculate_values_after_moisture_loss'"><span>#</span></a></dt>
 <dd><p>Calculates amount of moisture lost from a crop in storage since the last time degradations were processed.</p>
-<section id="id29">
-<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>Crop for which moisture loss will be calculated.</p>
 </dd>
@@ -633,8 +592,8 @@ were processed.</p>
 </dd>
 </dl>
 </section>
-<section id="id30">
-<h3>Returns<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
+<section id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, float]</dt><dd><p>Mapping of the crop’s mass values after moisture loss and the amount of moisture it lost.</p>
 </dd>
@@ -645,10 +604,10 @@ were processed.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage._calculate_moisture_loss">
 <span class="sig-name descname"><span class="pre">_calculate_moisture_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_moisture_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage._calculate_moisture_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage._calculate_moisture_loss'"><span>#</span></a></dt>
 <dd><p>Calculates the moisture lost from a crop since it was stored.</p>
-<section id="id31">
-<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The  crop to process moisture loss in.</p>
+<dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The crop to process moisture loss in.</p>
 </dd>
 <dt>time<span class="classifier">date</span></dt><dd><p>The date that loss should be processed up to.</p>
 </dd>
@@ -658,53 +617,54 @@ were processed.</p>
 </dd>
 </dl>
 </section>
-<section id="id32">
-<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<section id="id29">
+<h3>Returns<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Moisture loss from the crop that occurred in the first 30 days of storage (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id33">
-<h3>References<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
+<section id="id30">
+<h3>References<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
+<p>Feed Storage Scientific Documentation, equation FS.HAY.3.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.feed_storage.storage.Storage.recalculate_nutrient_percentage">
 <span class="sig-name descname"><span class="pre">recalculate_nutrient_percentage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_nutrient_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.feed_storage.storage.Storage.recalculate_nutrient_percentage" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.feed_storage.storage.Storage.recalculate_nutrient_percentage'"><span>#</span></a></dt>
 <dd><p>Calculates the updated relative nutrient percentage after dry matter has been lost from a stored crop.</p>
-<section id="id34">
-<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>initial_nutrient_percentage<span class="classifier">float</span></dt><dd><p>Nutrient percentage in stored crop before loss.</p>
 </dd>
 <dt>loss_coefficient<span class="classifier">float</span></dt><dd><p>Fractional loss coefficient that regulates how quickly this nutrient is lost.</p>
 </dd>
-<dt>dry_matter_loss<span class="classifier">float</span></dt><dd><p>Amount of dry matter lost from stored crop in kg.</p>
+<dt>dry_matter_loss<span class="classifier">float</span></dt><dd><p>Amount of dry matter lost from stored crop (kg).</p>
 </dd>
-<dt>initial_dry_matter<span class="classifier">float</span></dt><dd><p>Amount of dry matter stored crop contained before loss in kg.</p>
+<dt>initial_dry_matter<span class="classifier">float</span></dt><dd><p>Amount of dry matter stored crop contained before loss (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id35">
-<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The nutrient percentage after dry matter loss.</p>
 </dd>
 </dl>
 </section>
-<section id="id36">
-<h3>References<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
-</section>
-<section id="id37">
-<h3>Notes<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
+<section id="id33">
+<h3>Notes<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
 <p>When stored crops lose dry matter, they do not always lose proportional amounts of the nutrients they are
 composed of. In this case, the concentration of the nutrient within the dry matter changes which is why it must
 be recalculated. If a negative nutrient percentage would be calculated after losing dry matter, the percentage
-is calculated to be 0 and a warning is logged to the OuputManager. If a negative nutrient percentage would have
-been calculated, a warning is logged to the Output Manager that the method is preventing this. If all dry matter
-is lost from the stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a
-division by zero error.</p>
+is calculated to be 0 and a warning is logged to the <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code>. If all dry matter is lost from the
+stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a division by
+zero error.</p>
+</section>
+<section id="id34">
+<h3>References<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
+<p>Feed Storage Scientific Documentation, equation FS.NUT.1.</p>
 </section>
 </dd></dl>
 </section>

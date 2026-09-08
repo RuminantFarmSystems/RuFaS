@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.soil.carbon_cycling.decomposition.html" rel="next" title="RUFAS.biophysical.field.soil.carbon_cycling.decomposition module"/>
+<link href="RUFAS.biophysical.field.soil.carbon_cycling.html" rel="prev" title="RUFAS.biophysical.field.soil.carbon_cycling package"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,12 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.html">RUFAS.biophysical.field.soil package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.carbon_cycling.html">RUFAS.biophysical.field.soil.carbon_cycling package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.soil.carbon_cycling.carbon_cycle module</span>
 </nav>
 <div id="content" role="main">
@@ -150,7 +159,7 @@ partitioning between different pools and gases, and handling of crop residues.</
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>soil_data<span class="classifier">Optional[SoilData], default None</span></dt><dd><p>An instance of <cite>SoilData</cite> containing initial soil properties and state. If not provided,
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>An instance of <code class="docutils literal notranslate"><span class="pre">SoilData</span></code> containing initial soil properties and state. If not provided,
 a default instance with initialized values is used.</p>
 </dd>
 </dl>
@@ -187,11 +196,11 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id1">
 <h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm)</p>
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
 </dd>
-<dt>temp_average<span class="classifier">float</span></dt><dd><p>Average temperature on the current day (mm)</p>
+<dt>temp_average<span class="classifier">float</span></dt><dd><p>Average temperature on the current day (mm).</p>
 </dd>
-<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha)</p>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
 </dd>
 </dl>
 </section>
@@ -203,7 +212,7 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id2">
 <h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>field_size: float</dt><dd><p>Size of the field (ha)</p>
+<dt>field_size: float</dt><dd><p>Size of the field (ha).</p>
 </dd>
 </dl>
 </section>
@@ -215,16 +224,16 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id3">
 <h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>layer_thickness: float</dt><dd><p>thickness of soil layer (mm)</p>
+<dt>layer_thickness: float</dt><dd><p>Thickness of soil layer (mm).</p>
 </dd>
-<dt>field_size: float</dt><dd><p>Size of the field (ha)</p>
+<dt>field_size: float</dt><dd><p>Size of the field (ha).</p>
 </dd>
 </dl>
 </section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>soil volume (cubic meters)</p>
+<dt>float</dt><dd><p>Soil volume (cubic meters).</p>
 </dd>
 </dl>
 </section>
@@ -236,16 +245,16 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id4">
 <h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>bulk_density: float</dt><dd><p>bulk density of the soil layer (Megagrams per cubic meter)</p>
+<dt>bulk_density: float</dt><dd><p>Bulk density of the soil layer (Megagrams per cubic meter).</p>
 </dd>
-<dt>soil_volume: float</dt><dd><p>soil volume (cubic meters)</p>
+<dt>soil_volume: float</dt><dd><p>Soil volume (cubic meters).</p>
 </dd>
 </dl>
 </section>
 <section id="id5">
 <h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>mass of soil (Megagrams)</p>
+<dt>float</dt><dd><p>Mass of soil (Megagrams).</p>
 </dd>
 </dl>
 </section>
@@ -257,18 +266,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id6">
 <h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>active_carbon_amount: float</dt><dd><p>active carbon stored in the soil (kg/ha)</p>
+<dt>active_carbon_amount: float</dt><dd><p>Active carbon stored in the soil (kg/ha).</p>
 </dd>
-<dt>soil_mass: float</dt><dd><p>mass of soil (kg)</p>
+<dt>soil_mass: float</dt><dd><p>Mass of soil (kg).</p>
 </dd>
-<dt>field_size: float</dt><dd><p>size of the field (ha)</p>
+<dt>field_size: float</dt><dd><p>Size of the field (ha).</p>
 </dd>
 </dl>
 </section>
 <section id="id7">
 <h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>fraction of active carbon in the soil (unitless)</p>
+<dt>float</dt><dd><p>Fraction of active carbon in the soil (unitless).</p>
 </dd>
 </dl>
 </section>
@@ -284,18 +293,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id9">
 <h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>slow_carbon_amount: float</dt><dd><p>slow carbon stored in the soil (kg/ha)</p>
+<dt>slow_carbon_amount: float</dt><dd><p>Slow carbon stored in the soil (kg/ha).</p>
 </dd>
-<dt>soil_mass: float</dt><dd><p>mass of soil (kg)</p>
+<dt>soil_mass: float</dt><dd><p>Mass of soil (kg).</p>
 </dd>
-<dt>field_size: float</dt><dd><p>size of the field (ha)</p>
+<dt>field_size: float</dt><dd><p>Size of the field (ha).</p>
 </dd>
 </dl>
 </section>
 <section id="id10">
 <h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>fraction of slow carbon in the soil (unitless)</p>
+<dt>float</dt><dd><p>Fraction of slow carbon in the soil (unitless).</p>
 </dd>
 </dl>
 </section>
@@ -311,18 +320,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id12">
 <h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>passive_carbon_amount: float</dt><dd><p>passive carbon stored in the soil (kg/ha)</p>
+<dt>passive_carbon_amount: float</dt><dd><p>Passive carbon stored in the soil (kg/ha).</p>
 </dd>
-<dt>soil_mass: float</dt><dd><p>mass of soil (kg)</p>
+<dt>soil_mass: float</dt><dd><p>Mass of soil (kg).</p>
 </dd>
-<dt>field_size: float</dt><dd><p>size of the field (ha)</p>
+<dt>field_size: float</dt><dd><p>Size of the field (ha).</p>
 </dd>
 </dl>
 </section>
 <section id="id13">
 <h3>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>fraction of passive carbon in the soil (unitless)</p>
+<dt>float</dt><dd><p>Fraction of passive carbon in the soil (unitless).</p>
 </dd>
 </dl>
 </section>
@@ -338,18 +347,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id15">
 <h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>soil_active_carbon_fraction: float</dt><dd><p>fraction of active carbon in the soil (unitless)</p>
+<dt>soil_active_carbon_fraction: float</dt><dd><p>Fraction of active carbon in the soil (unitless).</p>
 </dd>
-<dt>soil_slow_carbon_fraction: float</dt><dd><p>fraction of slow carbon in the soil (unitless)</p>
+<dt>soil_slow_carbon_fraction: float</dt><dd><p>Fraction of slow carbon in the soil (unitless).</p>
 </dd>
-<dt>soil_passive_carbon_fraction: float</dt><dd><p>fraction of passive carbon in the soil (unitless)</p>
+<dt>soil_passive_carbon_fraction: float</dt><dd><p>Fraction of passive carbon in the soil (unitless).</p>
 </dd>
 </dl>
 </section>
 <section id="id16">
 <h3>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>the total fraction of carbon in the soil by mass(unitless)</p>
+<dt>float</dt><dd><p>The total fraction of carbon in the soil by mass (unitless).</p>
 </dd>
 </dl>
 </section>
@@ -365,18 +374,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id18">
 <h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>active_carbon_amount: float</dt><dd><p>active carbon stored in the soil (kg/ha)</p>
+<dt>active_carbon_amount: float</dt><dd><p>Active carbon stored in the soil (kg/ha).</p>
 </dd>
-<dt>slow_carbon_amount: float</dt><dd><p>slow carbon stored in the soil (kg/ha)</p>
+<dt>slow_carbon_amount: float</dt><dd><p>Slow carbon stored in the soil (kg/ha).</p>
 </dd>
-<dt>passive_carbon_amount: float</dt><dd><p>passive carbon stored in the soil (kg/ha)</p>
+<dt>passive_carbon_amount: float</dt><dd><p>Passive carbon stored in the soil (kg/ha).</p>
 </dd>
 </dl>
 </section>
 <section id="id19">
 <h3>Returns<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>the total amount of soil carbon (kg/ha)</p>
+<dt>float</dt><dd><p>The total amount of soil carbon (kg/ha).</p>
 </dd>
 </dl>
 </section>
@@ -392,18 +401,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id21">
 <h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>plant_metabolic_active_carbon_loss: float</dt><dd><p>plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)</p>
+<dt>plant_metabolic_active_carbon_loss: float</dt><dd><p>Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
 </dd>
-<dt>plant_structural_active_carbon_loss: float</dt><dd><p>plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)</p>
+<dt>plant_structural_active_carbon_loss: float</dt><dd><p>Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
 </dd>
-<dt>plant_structural_slow_carbon_loss: float</dt><dd><p>plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)</p>
+<dt>plant_structural_slow_carbon_loss: float</dt><dd><p>Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).</p>
 </dd>
 </dl>
 </section>
 <section id="id22">
 <h3>Returns<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>total amount plant carbon lost as CO2 (kg/ha)</p>
+<dt>float</dt><dd><p>Total amount plant carbon lost as CO2 (kg/ha).</p>
 </dd>
 </dl>
 </section>
@@ -419,18 +428,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id24">
 <h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>soil_metabolic_active_carbon_loss: float</dt><dd><p>soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)</p>
+<dt>soil_metabolic_active_carbon_loss: float</dt><dd><p>Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
 </dd>
-<dt>soil_structural_active_carbon_loss: float</dt><dd><p>soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)</p>
+<dt>soil_structural_active_carbon_loss: float</dt><dd><p>Soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
 </dd>
-<dt>soil_structural_slow_carbon_loss: float</dt><dd><p>soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)</p>
+<dt>soil_structural_slow_carbon_loss: float</dt><dd><p>Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).</p>
 </dd>
 </dl>
 </section>
 <section id="id25">
 <h3>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>total amount soil carbon lost as CO2 (kg/ha)</p>
+<dt>float</dt><dd><p>Total amount soil carbon lost as CO2 (kg/ha).</p>
 </dd>
 </dl>
 </section>
@@ -446,18 +455,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id27">
 <h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>active_carbon_to_slow_loss: float</dt><dd><p>active carbon lost as CO2 during decomposition into slow carbon (kg/ha)</p>
+<dt>active_carbon_to_slow_loss: float</dt><dd><p>Active carbon lost as CO2 during decomposition into slow carbon (kg/ha).</p>
 </dd>
-<dt>slow_carbon_co2_lost_amount: float</dt><dd><p>slow carbon lost as CO2 during decomposition (kg/ha)</p>
+<dt>slow_carbon_co2_lost_amount: float</dt><dd><p>Slow carbon lost as CO2 during decomposition (kg/ha).</p>
 </dd>
-<dt>passive_carbon_co2_lost_amount: float</dt><dd><p>passive carbon lost as CO2 during decomposition (kg/ha)</p>
+<dt>passive_carbon_co2_lost_amount: float</dt><dd><p>Passive carbon lost as CO2 during decomposition (kg/ha).</p>
 </dd>
 </dl>
 </section>
 <section id="id28">
 <h3>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>amount of total carbon lost as CO2 during decomposition(kg/ha)</p>
+<dt>float</dt><dd><p>Amount of total carbon lost as CO2 during decomposition (kg/ha).</p>
 </dd>
 </dl>
 </section>
@@ -473,18 +482,18 @@ invoking various routines related to carbon flux and storage.</p>
 <section id="id30">
 <h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>total_plant_carbon_CO2_loss: float</dt><dd><p>total amount plant carbon lost as CO2 (kg/ha)</p>
+<dt>total_plant_carbon_CO2_loss: float</dt><dd><p>Total amount plant carbon lost as CO2 (kg/ha).</p>
 </dd>
-<dt>total_soil_carbon_CO2_loss: float</dt><dd><p>total amount soil carbon lost as CO2 (kg/ha)</p>
+<dt>total_soil_carbon_CO2_loss: float</dt><dd><p>Total amount soil carbon lost as CO2 (kg/ha).</p>
 </dd>
-<dt>total_decomposition_carbon_CO2_lost: float</dt><dd><p>amount of total carbon lost as CO2 during decomposition(kg/ha)</p>
+<dt>total_decomposition_carbon_CO2_lost: float</dt><dd><p>Amount of total carbon lost as CO2 during decomposition (kg/ha).</p>
 </dd>
 </dl>
 </section>
 <section id="id31">
 <h3>Returns<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>total amount of carbon lost as CO2 (kg/ha)</p>
+<dt>float</dt><dd><p>Total amount of carbon lost as CO2 (kg/ha).</p>
 </dd>
 </dl>
 </section>

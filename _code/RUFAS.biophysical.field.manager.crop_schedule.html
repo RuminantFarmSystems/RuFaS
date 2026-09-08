@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.manager.fertilizer_schedule.html" rel="next" title="RUFAS.biophysical.field.manager.fertilizer_schedule module"/>
+<link href="RUFAS.biophysical.field.manager.html" rel="prev" title="RUFAS.biophysical.field.manager package"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.manager.html">RUFAS.biophysical.field.manager package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.manager.crop_schedule module</span>
 </nav>
 <div id="content" role="main">
@@ -143,7 +151,7 @@
 <span id="rufas-biophysical-field-manager-crop-schedule-module"></span><h1>RUFAS.biophysical.field.manager.crop_schedule module<a class="headerlink" href="#module-RUFAS.biophysical.field.manager.crop_schedule" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.manager.crop_schedule.CropSchedule">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.manager.crop_schedule.</span></span><span class="sig-name descname"><span class="pre">CropSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvesting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.manager.crop_schedule.</span></span><span class="sig-name descname"><span class="pre">CropSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvesting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule'"><span>#</span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="RUFAS.biophysical.field.manager.schedule.html#RUFAS.biophysical.field.manager.schedule.Schedule" title="RUFAS.biophysical.field.manager.schedule.Schedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Schedule</span></code></a></p>
 <p>A class for defining a schedule for planting and harvesting crops, allows users to specify a pattern for planting
 and harvesting a certain crop that can be repeated over a specified number of years, with specified breaks in
@@ -155,17 +163,17 @@ between repetitions of the pattern.</p>
 </dd>
 <dt>crop_reference<span class="classifier">str</span></dt><dd><p>Reference to the name of the crop that will be used to identify the correct crop specifications.</p>
 </dd>
-<dt>planting_years<span class="classifier">List[int]</span></dt><dd><p>Years in which the crop is planted.</p>
+<dt>planting_years<span class="classifier">list[int]</span></dt><dd><p>Years in which the crop is planted.</p>
 </dd>
-<dt>planting_days<span class="classifier">List[int]</span></dt><dd><p>Julian days on which the crop is planted.</p>
+<dt>planting_days<span class="classifier">list[int]</span></dt><dd><p>Julian days on which the crop is planted.</p>
 </dd>
-<dt>harvest_years<span class="classifier">List[int]</span></dt><dd><p>Years in which the crop is harvested.</p>
+<dt>harvest_years<span class="classifier">list[int]</span></dt><dd><p>Years in which the crop is harvested.</p>
 </dd>
-<dt>harvest_days<span class="classifier">List[int]</span></dt><dd><p>Julian days on which the crop is harvested.</p>
+<dt>harvest_days<span class="classifier">list[int]</span></dt><dd><p>Julian days on which the crop is harvested.</p>
 </dd>
-<dt>harvest_operations<span class="classifier">List[str]</span></dt><dd><p>Operations with which the crop is harvested.</p>
+<dt>harvest_operations<span class="classifier">list[str]</span></dt><dd><p>Operations with which the crop is harvested.</p>
 </dd>
-<dt>use_heat_scheduling<span class="classifier">bool, optional, default False</span></dt><dd><p>Indicates if heat scheduling should be used to determine when the crop is harvested.</p>
+<dt>use_heat_scheduling<span class="classifier">bool, default False</span></dt><dd><p>Indicates if heat scheduling should be used to determine when the crop is harvested.</p>
 </dd>
 <dt>planting_skip<span class="classifier">int, optional, default 0</span></dt><dd><p>Number of years to skip between planting cycles.</p>
 </dd>
@@ -180,70 +188,58 @@ between repetitions of the pattern.</p>
 <dl class="simple">
 <dt>crop_reference<span class="classifier">str</span></dt><dd><p>Identifier for the crop associated with this schedule.</p>
 </dd>
-<dt>planting_years<span class="classifier">List[int]</span></dt><dd><p>List of years in which planting events will occur.</p>
+<dt>planting_years<span class="classifier">list[int]</span></dt><dd><p>List of years in which planting events will occur.</p>
 </dd>
-<dt>planting_days<span class="classifier">List[int]</span></dt><dd><p>Corresponding Julian days for planting.</p>
+<dt>planting_days<span class="classifier">list[int]</span></dt><dd><p>Corresponding Julian days for planting.</p>
 </dd>
 <dt>planting_skip<span class="classifier">int</span></dt><dd><p>Number of years to skip between planting events.</p>
 </dd>
-<dt>harvest_years<span class="classifier">List[int]</span></dt><dd><p>List of years in which harvesting events will occur.</p>
+<dt>harvest_years<span class="classifier">list[int]</span></dt><dd><p>List of years in which harvesting events will occur.</p>
 </dd>
-<dt>harvest_days<span class="classifier">List[int]</span></dt><dd><p>Corresponding Julian days for harvesting.</p>
+<dt>harvest_days<span class="classifier">list[int]</span></dt><dd><p>Corresponding Julian days for harvesting.</p>
 </dd>
-<dt>harvest_operations<span class="classifier">List[HarvestOperation]</span></dt><dd><p>Enumerated list of operations to perform at harvest.</p>
+<dt>harvest_operations<span class="classifier">list[HarvestOperation]</span></dt><dd><p>Enumerated list of operations to perform at harvest.</p>
 </dd>
 <dt>heat_scheduled<span class="classifier">bool</span></dt><dd><p>Flag indicating if heat unit scheduling is utilized for harvesting decisions.</p>
 </dd>
-<dt>harvesting_skip<span class="classifier">int, optional, default 0.0</span></dt><dd><p>Number of years to skip between harvesting cycles.</p>
+<dt>harvesting_skip<span class="classifier">int, default 0.0</span></dt><dd><p>Number of years to skip between harvesting cycles.</p>
 </dd>
 </dl>
 </section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<p>This class extends the <cite>Schedule</cite> class, adding specific functionality for managing agricultural crop schedules.
+<p>This class extends the <code class="docutils literal notranslate"><span class="pre">Schedule</span></code> class, adding specific functionality for managing agricultural crop schedules.
 It involves detailed tracking and management of planting and harvesting events, including optional heat scheduling
 for advanced crop management.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvesting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvesting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.__init__'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.manager.crop_schedule.CropSchedule._validate_planting_parameters">
 <span class="sig-name descname"><span class="pre">_validate_planting_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule._validate_planting_parameters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule._validate_planting_parameters'"><span>#</span></a></dt>
 <dd><p>Checks fields that dictate planting for correctness, otherwise raises errors.</p>
-<section id="raises">
-<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If not all planting years are valid.
-If not all planting days are valid.
-If not number of planting years and days are not equal.</p>
-</dd>
-</dl>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.manager.crop_schedule.CropSchedule._validate_harvest_parameters">
 <span class="sig-name descname"><span class="pre">_validate_harvest_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule._validate_harvest_parameters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule._validate_harvest_parameters'"><span>#</span></a></dt>
 <dd><p>Checks fields that dictate harvesting of crop for correctness, otherwise raises errors.</p>
-<section id="id1">
-<h3>Raises<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>ValueError</dt><dd><p>If not all harvest years are valid.
-If not all harvest days are valid.
-If the number of harvest years, days, and operations are not equal.
-If the last harvest operation is not a final one, or if any operations before the last are final ones.</p>
+<dt>ValueError</dt><dd><p>If the final harvest operation is not the only one that kills the crop.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_planting_events">
-<span class="sig-name descname"><span class="pre">generate_planting_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.PlantingEvent" title="RUFAS.data_structures.events.PlantingEvent"><span class="pre">PlantingEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_planting_events" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_planting_events'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">generate_planting_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.PlantingEvent" title="RUFAS.data_structures.events.PlantingEvent"><span class="pre">PlantingEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_planting_events" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_planting_events'"><span>#</span></a></dt>
 <dd><p>Generates a list of all planting events that should happen for this crop schedule.</p>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>List[PlantingEvent]</dt><dd><p>List of all planting events that will happen for this crop schedule.</p>
+<dt>list[PlantingEvent]</dt><dd><p>List of all planting events that will happen for this crop schedule.</p>
 </dd>
 </dl>
 </section>
@@ -252,17 +248,48 @@ If the last harvest operation is not a final one, or if any operations before th
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_harvest_events">
 <span class="sig-name descname"><span class="pre">generate_harvest_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.HarvestEvent" title="RUFAS.data_structures.events.HarvestEvent"><span class="pre">HarvestEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_harvest_events" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_harvest_events'"><span>#</span></a></dt>
 <dd><p>Generates a list of all harvest events that will occur in the crop schedule.</p>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>List[HarvestEvent]</dt><dd><p>List of harvesting events that will happen for this crop schedule.</p>
+<dt>list[HarvestEvent]</dt><dd><p>List of harvesting events that will happen for this crop schedule.</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h3>Notes<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id2">
+<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <p>If heat scheduled harvesting is used, then only the final harvesting event (i.e. the one that kills it) will be
 scheduled, which is why this method contains the if block that removes all non-final harvest events.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.validate_crop_schedule_event_order">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">validate_crop_schedule_event_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schedule_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.validate_crop_schedule_event_order" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.validate_crop_schedule_event_order'"><span>#</span></a></dt>
+<dd><p>Validates that planting, harvest, and kill events occur in a biologically valid order.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>rotation<span class="classifier">dict[str, Any]</span></dt><dd><p>Crop schedule definition from the crop rotation input file. Must contain the planting and harvest year/day
+information required to construct a chronological event sequence.</p>
+</dd>
+<dt>schedule_name<span class="classifier">str</span></dt><dd><p>Name of the crop schedule being validated. Used for error reporting.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Raises<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If a harvest or kill operation occurs before planting, or if one occurs after the crop has already been
+terminated and before another planting.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<p>A crop must be planted before any harvest or kill operation can occur. Once an operation in
+<code class="docutils literal notranslate"><span class="pre">FINAL_HARVEST_OPERATIONS</span></code> occurs, including <code class="docutils literal notranslate"><span class="pre">harvest_kill</span></code> or <code class="docutils literal notranslate"><span class="pre">kill_only</span></code>, no additional harvest or kill
+events are permitted until another planting event re-establishes the crop. These rules are evaluated
+chronologically across the entire schedule and are not reset at calendar year boundaries, allowing support for
+perennial and overwintering crops.</p>
 </section>
 </dd></dl>
 </section>
@@ -277,6 +304,7 @@ scheduled, which is why this method contains the if block that removes all non-f
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule._validate_harvest_parameters'" class="reference internal" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule._validate_harvest_parameters"><code class="docutils literal notranslate"><span class="pre">CropSchedule._validate_harvest_parameters()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_planting_events'" class="reference internal" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_planting_events"><code class="docutils literal notranslate"><span class="pre">CropSchedule.generate_planting_events()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_harvest_events'" class="reference internal" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.generate_harvest_events"><code class="docutils literal notranslate"><span class="pre">CropSchedule.generate_harvest_events()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.validate_crop_schedule_event_order'" class="reference internal" href="#RUFAS.biophysical.field.manager.crop_schedule.CropSchedule.validate_crop_schedule_event_order"><code class="docutils literal notranslate"><span class="pre">CropSchedule.validate_crop_schedule_event_order()</span></code></a></li>
 </ul>
 </li>
 </ul>

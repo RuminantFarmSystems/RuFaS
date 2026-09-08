@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.crop.dormancy.html" rel="next" title="RUFAS.biophysical.field.crop.dormancy module"/>
+<link href="RUFAS.biophysical.field.crop.crop_data_factory.html" rel="prev" title="RUFAS.biophysical.field.crop.crop_data_factory module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.crop.html">RUFAS.biophysical.field.crop package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.crop.crop_management module</span>
 </nav>
 <div id="content" role="main">
@@ -143,24 +151,21 @@
 <span id="rufas-biophysical-field-crop-crop-management-module"></span><h1>RUFAS.biophysical.field.crop.crop_management module<a class="headerlink" href="#module-RUFAS.biophysical.field.crop.crop_management" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.crop.crop_management.</span></span><span class="sig-name descname"><span class="pre">CropManagement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData" title="RUFAS.biophysical.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_efficiency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wet_yield_collected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_yield_collected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.crop.crop_management.</span></span><span class="sig-name descname"><span class="pre">CropManagement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData" title="RUFAS.biophysical.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wet_yield_collected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_yield_collected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class for managing crop operations based on crop data.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
-<dl>
-<dt>crop_data<span class="classifier">Optional[CropData], optional</span></dt><dd><p>The data class containing crop specifications and tracked attributes.
+<dl class="simple">
+<dt>crop_data<span class="classifier">CropData, optional</span></dt><dd><p>The data class containing crop specifications and tracked attributes.
 If not provided, default CropData will be used.</p>
 </dd>
-<dt>harvest_efficiency<span class="classifier">float, default 1.0</span></dt><dd><p>Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
-(unitless; [0, 1]).</p>
+<dt>potential_harvest_index<span class="classifier">float, optional</span></dt><dd><p>Potential harvest index for a given day (unitless).</p>
 </dd>
-<dt>potential_harvest_index<span class="classifier">Optional[float], default None</span></dt><dd><p>Potential harvest index for a given day (unitless).</p>
-</dd>
-<dt>harvest_index<span class="classifier">Optional[float], default None</span></dt><dd><p>Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
+<dt>harvest_index<span class="classifier">float, optional</span></dt><dd><p>Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
 (unitless).</p>
 </dd>
-<dt>cut_biomass<span class="classifier">Optional[float], default None</span></dt><dd><p>Total amount of the desired crop product (kg/ha).</p>
+<dt>cut_biomass<span class="classifier">float, optional</span></dt><dd><p>Total amount of the desired crop product (kg/ha).</p>
 </dd>
 <dt>wet_yield_collected<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of the desired crop product to be removed from the field (kg/ha).</p>
 </dd>
@@ -168,42 +173,27 @@ If not provided, default CropData will be used.</p>
 </dd>
 <dt>yield_residue<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of dry matter residue created; unharvested yield (kg/ha).</p>
 </dd>
-<dt>yield_nitrogen<span class="classifier">Optional[float], default None</span></dt><dd><p>Nitrogen contained in the harvested yield (kg/ha).</p>
+<dt>yield_nitrogen<span class="classifier">float, optional</span></dt><dd><p>Nitrogen contained in the harvested yield (kg/ha).</p>
 </dd>
-<dt>yield_phosphorus<span class="classifier">Optional[float], default None</span></dt><dd><p>Phosphorus contained in the harvested yield (kg/ha).</p>
+<dt>yield_phosphorus<span class="classifier">float, optional</span></dt><dd><p>Phosphorus contained in the harvested yield (kg/ha).</p>
 </dd>
 <dt>residue_nitrogen<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of nitrogen in the residue from this plant (kg/ha).</p>
 </dd>
 <dt>residue_phosphorus<span class="classifier">float, default 0.0</span></dt><dd><p>Amount of phosphorus in the residue from this plant (kg/ha).</p>
 </dd>
-<dt>root_distribution_param_da: float, default 145.0</dt><dd><p>Empirical root distribution parameter d_a (mm).
-Reference: Fan, Jianling, et al. “Root distribution by depth for temperate agricultural crops.” Field Crops</p>
-<blockquote>
-<div><p>Research 189 (2016): 68-74, table 1. Note that the value has been converted to mm.</p>
-</div></blockquote>
-</dd>
-<dt>root_distribution_param_c: float, default -1.165</dt><dd><p>Empirical root distribution parameter c (unitless).
-Reference: Fan, Jianling, et al. “Root distribution by depth for temperate agricultural crops.” Field Crops</p>
-<blockquote>
-<div><p>Research 189 (2016): 68-74, table 1.</p>
-</div></blockquote>
-</dd>
 </dl>
 </section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
-<dl>
-<dt>data<span class="classifier">CropData</span></dt><dd><p>A reference to <cite>crop_data</cite>, on which crop management operations will be conducted.</p>
+<dl class="simple">
+<dt>data<span class="classifier">CropData</span></dt><dd><p>A reference to <code class="docutils literal notranslate"><span class="pre">crop_data</span></code>, on which crop management operations will be conducted.</p>
 </dd>
-<dt>harvest_efficiency<span class="classifier">float</span></dt><dd><p>Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
-(unitless; [0, 1]).</p>
+<dt>potential_harvest_index<span class="classifier">float | None</span></dt><dd><p>Potential harvest index for a given day (unitless).</p>
 </dd>
-<dt>potential_harvest_index<span class="classifier">Optional[float]</span></dt><dd><p>Potential harvest index for a given day (unitless).</p>
-</dd>
-<dt>harvest_index<span class="classifier">Optional[float]</span></dt><dd><p>Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
+<dt>harvest_index<span class="classifier">float | None</span></dt><dd><p>Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
 (unitless).</p>
 </dd>
-<dt>cut_biomass<span class="classifier">Optional[float]</span></dt><dd><p>Total amount of the desired crop product (kg/ha).</p>
+<dt>cut_biomass<span class="classifier">float | None</span></dt><dd><p>Total amount of the desired crop product (kg/ha).</p>
 </dd>
 <dt>wet_yield_collected<span class="classifier">float</span></dt><dd><p>Amount of the desired crop product to be removed from the field (kg/ha).</p>
 </dd>
@@ -211,44 +201,32 @@ Reference: Fan, Jianling, et al. “Root distribution by depth for temperate agr
 </dd>
 <dt>yield_residue<span class="classifier">float</span></dt><dd><p>Amount of dry matter residue created; unharvested yield (kg/ha).</p>
 </dd>
-<dt>yield_nitrogen<span class="classifier">Optional[float]</span></dt><dd><p>Nitrogen contained in the harvested yield (kg/ha).</p>
+<dt>yield_nitrogen<span class="classifier">float | None</span></dt><dd><p>Nitrogen contained in the harvested yield (kg/ha).</p>
 </dd>
-<dt>yield_phosphorus<span class="classifier">Optional[float]</span></dt><dd><p>Phosphorus contained in the harvested yield (kg/ha).</p>
+<dt>yield_phosphorus<span class="classifier">float | None</span></dt><dd><p>Phosphorus contained in the harvested yield (kg/ha).</p>
 </dd>
 <dt>residue_nitrogen<span class="classifier">float</span></dt><dd><p>Amount of nitrogen in the residue from this plant (kg/ha).</p>
 </dd>
 <dt>residue_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of phosphorus in the residue from this plant (kg/ha).</p>
 </dd>
-<dt>root_distribution_param_da: float</dt><dd><p>Empirical root distribution parameter d_a (mm).
-Reference: Fan, Jianling, et al. “Root distribution by depth for temperate agricultural crops.” Field Crops</p>
-<blockquote>
-<div><p>Research 189 (2016): 68-74, table 1. Note that the value has been converted to mm.</p>
-</div></blockquote>
-</dd>
-<dt>root_distribution_param_c: float</dt><dd><p>Empirical root distribution parameter c (unitless).
-Reference: Fan, Jianling, et al. “Root distribution by depth for temperate agricultural crops.” Field Crops</p>
-<blockquote>
-<div><p>Research 189 (2016): 68-74, table 1.</p>
-</div></blockquote>
-</dd>
 </dl>
 </section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<p>This class is designed to handle various crop management operations using data provided by the <cite>CropData</cite> class.
+<p>This class is designed to handle various crop management operations using data provided by the <code class="docutils literal notranslate"><span class="pre">CropData</span></code> class.
 It is primarily based upon the “Crop Yield” (5:2.4) and “General Management” (6:1) sections of the SWAT model.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData" title="RUFAS.biophysical.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_efficiency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wet_yield_collected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_yield_collected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData" title="RUFAS.biophysical.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wet_yield_collected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_yield_collected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.__init__'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement.manage_harvest">
-<span class="sig-name descname"><span class="pre">manage_harvest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvest_operaion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.harvest_operations.html#RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation" title="RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData" title="RUFAS.biophysical.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.manage_harvest" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.manage_harvest'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">manage_harvest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvest_operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.harvest_operations.html#RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation" title="RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData" title="RUFAS.biophysical.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.manage_harvest" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.manage_harvest'"><span>#</span></a></dt>
 <dd><p>Executes the harvest operation passed on the crop that contains this module.</p>
 <section id="id1">
 <h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>harvest_operaion<span class="classifier">HarvestOperation</span></dt><dd><p>The operation to be executed on this crop.</p>
+<dt>harvest_operation<span class="classifier">HarvestOperation</span></dt><dd><p>The operation to be executed on this crop.</p>
 </dd>
 <dt>field_name<span class="classifier">str</span></dt><dd><p>The name of the field that contains this crop.</p>
 </dd>
@@ -263,18 +241,24 @@ It is primarily based upon the “Crop Yield” (5:2.4) and “General Managemen
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>HarvestedCrop</dt><dd><p>The harvested crop data structure containing mass and nutritional information associated with the
-harvest’s yield.</p>
+<dt>HarvestedCrop | None</dt><dd><p>The harvested crop data structure containing mass and nutritional information associated with the
+harvest’s yield. This is <code class="docutils literal notranslate"><span class="pre">None</span></code> for a kill-only operation, which collects no yield.</p>
 </dd>
 </dl>
+</section>
+<section id="id2">
+<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<p>The crop’s <code class="docutils literal notranslate"><span class="pre">harvest_efficiency</span></code> determines how much of the cut biomass is extracted from the field; the
+remainder is deposited as residue. A forage that is only partially utilized, such as a grazed pasture,
+therefore returns a substantial share of each cut to the field.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement.kill">
 <span class="sig-name descname"><span class="pre">kill</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.kill" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.kill'"><span>#</span></a></dt>
 <dd><p>Kills the plant, preventing it from growing further, and converts all biomass to residue.</p>
-<section id="id2">
-<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Notes<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <p>This operation is based on the SWAT model’s guidelines, where a kill operation converts all biomass of
 the plant to residue. It is typically executed after a harvest (when specified) or at the end of the
 growing season for annual plants.</p>
@@ -284,8 +268,8 @@ growing season for annual plants.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement.determine_harvest_index">
 <span class="sig-name descname"><span class="pre">determine_harvest_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.determine_harvest_index" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.determine_harvest_index'"><span>#</span></a></dt>
 <dd><p>Sets the crop’s harvest index based on various conditions.</p>
-<section id="id3">
-<h3>Notes<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Notes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <p>If a custom harvest index is provided by the user (harvest index override), that value is used. Otherwise,
 the harvest index is calculated based on the crop’s accumulated heat fraction and the crop-specific optimal
 harvest index. The method also adjusts the harvest index based on the crop’s water deficiency.</p>
@@ -297,17 +281,18 @@ harvest index. The method also adjusts the harvest index based on the crop’s w
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement.cut_crop">
-<span class="sig-name descname"><span class="pre">cut_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collected_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.cut_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.cut_crop'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">cut_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collected_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.cut_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.cut_crop'"><span>#</span></a></dt>
 <dd><p>Performs a cut operation on the crop and, optionally, collects yield.</p>
-<section id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>collected_fraction: The fraction of the cut biomass that is collected. The remaining portion remains</dt><dd><p>in the field (between 0 and 1, inclusive).</p>
+<dt>collected_fraction<span class="classifier">float, default 0.0</span></dt><dd><p>The fraction of the cut biomass that is collected. The remaining portion remains in the field (
+between 0 and 1, inclusive).</p>
 </dd>
 </dl>
 </section>
-<section id="id5">
-<h3>References<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="id6">
+<h3>References<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation section 5:2.4 and section 6:1.2</p>
 </section>
 <section id="raises">
@@ -317,8 +302,8 @@ harvest index. The method also adjusts the harvest index based on the crop’s w
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Notes<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Notes<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <p>The proportion of a crop that is cut is determined by the harvest index. A harvest index &lt; 1 is the typical
 scenario and indicates that a proportion of biomass equal to the harvest index will be removed from the
 above-ground biomass of the plant. A harvest index &gt; 1 will cut into below ground biomass as well.</p>
@@ -337,15 +322,15 @@ used.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement._recalculate_biomass_distribution">
 <span class="sig-name descname"><span class="pre">_recalculate_biomass_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roots_harvested</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._recalculate_biomass_distribution" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._recalculate_biomass_distribution'"><span>#</span></a></dt>
 <dd><p>Recalculates how much biomass is stored above ground and how much is stored in the roots.</p>
-<section id="id7">
-<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>roots_harvested<span class="classifier">bool</span></dt><dd><p>Whether the roots were harvested.</p>
 </dd>
 </dl>
 </section>
-<section id="id8">
-<h3>Notes<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Notes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <p>SWAT does not specifically state how biomass should be redistributed after a harvest event. It has equation
 5:2.4.4, but does not specify if this equation is used to calculate biomass distributions pre- or post-harvest.</p>
 <p>If roots are not harvested, then the amount of biomass cut in the harvest operation is removed from the above
@@ -357,8 +342,8 @@ harvested, no biomass is left above ground and the fraction of biomass that is b
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement._get_harvested_crop">
 <span class="sig-name descname"><span class="pre">_get_harvested_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._get_harvested_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._get_harvested_crop'"><span>#</span></a></dt>
 <dd><p>Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the current time of the simulation.</p>
 </dd>
@@ -368,15 +353,15 @@ harvested, no biomass is left above ground and the fraction of biomass that is b
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>HarvestedCrop</dt><dd><p>HarvestedCrop instance containing all the details of this harvest event.</p>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h3>Notes<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<section id="id12">
+<h3>Notes<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <p>It is assumed that the wet yield is recorded in kg / ha for crops, but stored in the FeedManager as kg.</p>
 </section>
 </dd></dl>
@@ -384,8 +369,8 @@ harvested, no biomass is left above ground and the fraction of biomass that is b
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement._record_yield">
 <span class="sig-name descname"><span class="pre">_record_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvest_op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.harvest_operations.html#RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation" title="RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._record_yield" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._record_yield'"><span>#</span></a></dt>
 <dd><p>Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.</p>
-<section id="id12">
-<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>harvest_op<span class="classifier">HarvestOperation</span></dt><dd><p>The operation to be executed on this crop.</p>
 </dd>
@@ -405,8 +390,8 @@ harvested, no biomass is left above ground and the fraction of biomass that is b
 <span class="sig-name descname"><span class="pre">_transfer_residue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData" title="RUFAS.biophysical.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">killed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._transfer_residue" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._transfer_residue'"><span>#</span></a></dt>
 <dd><p>Transfers residue from harvest to SoilData that tracks how that residue is degraded and assimilated into the
 soil.</p>
-<section id="id13">
-<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>Object that tracks the attributes of the soil profile that contains this crop.</p>
 </dd>
@@ -414,8 +399,8 @@ soil.</p>
 </dd>
 </dl>
 </section>
-<section id="id14">
-<h3>Notes<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<section id="id15">
+<h3>Notes<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
 <p>If a crop is harvested but not killed, then there is only residue added to the surface. If it is harvested and
 killed, then both surface and root residue is added to the soil profile. After transferring residue to the soil
 profile, the residue pools are reset to zero.</p>
@@ -425,12 +410,10 @@ profile, the residue pools are reset to zero.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement._distribute_residue_nutrients">
 <span class="sig-name descname"><span class="pre">_distribute_residue_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData" title="RUFAS.biophysical.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._distribute_residue_nutrients" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._distribute_residue_nutrients'"><span>#</span></a></dt>
 <dd><p>Distributes nutrients from plant residue into the soil profile.</p>
-<section id="id15">
-<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>Object that tracks the attributes of the soil profile that contains this crop.</p>
-</dd>
-<dt>root_residue_mass<span class="classifier">float</span></dt><dd><p>Dry matter mass of residue that is roots (kg / ha).</p>
 </dd>
 </dl>
 </section>
@@ -439,8 +422,8 @@ profile, the residue pools are reset to zero.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement._add_yield_residue_to_layer">
 <span class="sig-name descname"><span class="pre">_add_yield_residue_to_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.layer_data.html#RUFAS.biophysical.field.soil.layer_data.LayerData" title="RUFAS.biophysical.field.soil.layer_data.LayerData"><span class="pre">LayerData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._add_yield_residue_to_layer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._add_yield_residue_to_layer'"><span>#</span></a></dt>
 <dd><p>Adds plant mass and nutrients left behind from a crop harvest into a soil layer.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>layer<span class="classifier">LayerData</span></dt><dd><p>The soil layer into which nutrients and residue are being added.</p>
 </dd>
@@ -459,34 +442,34 @@ profile, the residue pools are reset to zero.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement._calculate_root_mass_distribution">
 <span class="sig-name descname"><span class="pre">_calculate_root_mass_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bottom_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._calculate_root_mass_distribution" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._calculate_root_mass_distribution'"><span>#</span></a></dt>
 <dd><p>Calculates the fraction of total root biomass that is contained within each soil layer.</p>
-<section id="id17">
-<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bottom_depth<span class="classifier">float</span></dt><dd><p>The bottom depth of the soil layer for which the root distribution is being calculated for (mm).</p>
 </dd>
 </dl>
 </section>
-<section id="id18">
-<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Fraction of root biomass that is at or above the passed soil depth (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id19">
-<h3>References<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<section id="id20">
+<h3>References<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id20" role="doc-footnote">
+<aside class="footnote brackets" id="id21" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>Fan, Jianling, et al. “Root distribution by depth for temperate agricultural crops.” Field Crops Research
 189 (2016): 68-74, equation (2).</p>
 </aside>
 </aside>
 </section>
-<section id="id21">
-<h3>Notes<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
+<section id="id22">
+<h3>Notes<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
 <p>If the bottom depth of a soil layer extends past the maximum depth of the roots, then that soil layer contains
-all of the crop’s root mass. If the bottom depth of the soil layer is 0 (i.e. it is the soil surface) then it
+all the crop’s root mass. If the bottom depth of the soil layer is 0 (i.e. it is the soil surface) then it
 will not contain any of the crop’s root mass.</p>
 </section>
 </dd></dl>
@@ -494,8 +477,8 @@ will not contain any of the crop’s root mass.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement._determine_potential_harvest_index">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_potential_harvest_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heat_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimal_harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._determine_potential_harvest_index" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._determine_potential_harvest_index'"><span>#</span></a></dt>
 <dd><p>Calculates the potential harvest index for a plant on a given day.</p>
-<section id="id22">
-<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>heat_fraction<span class="classifier">float</span></dt><dd><p>Fraction of potential heat units accumulated to date (unitless).</p>
 </dd>
@@ -503,21 +486,21 @@ will not contain any of the crop’s root mass.</p>
 </dd>
 </dl>
 </section>
-<section id="id23">
-<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<section id="id24">
+<h3>Returns<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Potential harvest index for the day (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id24">
-<h3>Notes<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
+<section id="id25">
+<h3>Notes<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
 <p>The harvest index is the ratio of grain to total shoot dry matter. This calculation takes into
 account the fraction of potential heat units accumulated to date and the species-specific optimal
 harvest index for the plant at maturity under ideal conditions.</p>
 </section>
-<section id="id25">
-<h3>References<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
+<section id="id26">
+<h3>References<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
 <p>SWAT documentation section 5:2.4.1</p>
 </section>
 </dd></dl>
@@ -525,8 +508,8 @@ harvest index for the plant at maturity under ideal conditions.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_management.CropManagement._adjust_harvest_index">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_adjust_harvest_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_deficiency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement._adjust_harvest_index" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement._adjust_harvest_index'"><span>#</span></a></dt>
 <dd><p>Calculates the actual harvest index for a given day, adjusted for water deficiency.</p>
-<section id="id26">
-<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>minimum_harvest_index<span class="classifier">float</span></dt><dd><p>Harvest index in drought conditions; minimum possible harvest index for the plant. Must be positive and
 unitless.</p>
@@ -537,21 +520,21 @@ unitless.</p>
 </dd>
 </dl>
 </section>
-<section id="id27">
-<h3>Returns<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
+<section id="id28">
+<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Actual harvest index for the day, adjusted for water deficiency (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id28">
-<h3>Notes<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
+<section id="id29">
+<h3>Notes<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
 <p>The method takes into consideration the minimum harvest index under drought conditions, the potential harvest
 index for the day, and the water deficiency factor of the plant. If values of minimum_harvest_index and
 harvest_index are input below their bounds, they are updated to equal their lower bounds.</p>
 </section>
-<section id="id29">
-<h3>References<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
+<section id="id30">
+<h3>References<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
 <p>SWAT 5:3.3.1</p>
 </section>
 </dd></dl>
@@ -560,8 +543,8 @@ harvest_index are input below their bounds, they are updated to equal their lowe
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">determine_biomass_cut_from_whole_plant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_management.CropManagement.determine_biomass_cut_from_whole_plant" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_management.CropManagement.determine_biomass_cut_from_whole_plant'"><span>#</span></a></dt>
 <dd><p>Calculates the maximum crop yield at harvest under ideal conditions, applicable when the harvest index is
 greater than 1.</p>
-<section id="id30">
-<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>biomass<span class="classifier">float</span></dt><dd><p>Total plant biomass, measured in kilograms (kg).</p>
 </dd>
@@ -569,20 +552,20 @@ greater than 1.</p>
 </dd>
 </dl>
 </section>
-<section id="id31">
-<h3>Returns<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Crop yield, measured in kilograms per hectare (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id32">
-<h3>Notes<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<section id="id33">
+<h3>Notes<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
 <p>The yield is calculated as a proportion of the above-ground biomass. This method is based on the SWAT model’s
 guidelines for crop yield calculation.</p>
 </section>
-<section id="id33">
-<h3>References<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
+<section id="id34">
+<h3>References<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
 <p>SWAT 5:2.4.3</p>
 </section>
 </dd></dl>

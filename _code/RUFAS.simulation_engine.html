@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -146,42 +147,178 @@
 <section id="module-RUFAS.simulation_engine">
 <span id="rufas-simulation-engine-module"></span><h1>RUFAS.simulation_engine module<a class="headerlink" href="#module-RUFAS.simulation_engine" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.simulation_engine.</span></span><span class="sig-name descname"><span class="pre">SimulationType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration for the different types of simulations that can be run in RuFaS.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>FULL_FARM<span class="classifier">str</span></dt><dd><p>Represents a full farm simulation with all sub-modules active.</p>
+</dd>
+<dt>FIELD_AND_FEED<span class="classifier">str</span></dt><dd><p>Represents a simulation that includes only field and feed modules, no animal and manure modules.</p>
+</dd>
+<dt>ANIMALS_ONLY<span class="classifier">str</span></dt><dd><p>Represents a simulation that only simulates animals, no other biophysical modules.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.FULL_FARM">
+<span class="sig-name descname"><span class="pre">FULL_FARM</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'full_farm'</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.FULL_FARM" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.FULL_FARM'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.FIELD_AND_FEED">
+<span class="sig-name descname"><span class="pre">FIELD_AND_FEED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'field_and_feed'</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.FIELD_AND_FEED" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.FIELD_AND_FEED'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.FIELD_ONLY">
+<span class="sig-name descname"><span class="pre">FIELD_ONLY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'field_only'</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.FIELD_ONLY" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.FIELD_ONLY'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.ANIMALS_ONLY">
+<span class="sig-name descname"><span class="pre">ANIMALS_ONLY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'animals_only'</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.ANIMALS_ONLY" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.ANIMALS_ONLY'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.simulate_animals">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">simulate_animals</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.simulate_animals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.simulate_animals'"><span>#</span></a></dt>
+<dd><p>Return whether this simulation type includes the animal module.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.simulate_manure">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">simulate_manure</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.simulate_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.simulate_manure'"><span>#</span></a></dt>
+<dd><p>Return whether this simulation type includes the manure module.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.simulate_fields">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">simulate_fields</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.simulate_fields" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.simulate_fields'"><span>#</span></a></dt>
+<dd><p>Return whether this simulation type includes the crop, soil, and field module.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.simulate_feed">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">simulate_feed</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.simulate_feed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.simulate_feed'"><span>#</span></a></dt>
+<dd><p>Return whether this simulation type includes the feed module.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType._animal_simulation_types">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_animal_simulation_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.simulation_engine.SimulationType" title="RUFAS.simulation_engine.SimulationType"><span class="pre">SimulationType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType._animal_simulation_types" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType._animal_simulation_types'"><span>#</span></a></dt>
+<dd><p>Return the set of simulation types that simulate animals.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType._manure_simulation_types">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_manure_simulation_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.simulation_engine.SimulationType" title="RUFAS.simulation_engine.SimulationType"><span class="pre">SimulationType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType._manure_simulation_types" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType._manure_simulation_types'"><span>#</span></a></dt>
+<dd><p>Return the set of simulation types that simulate manure processing.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType._fields_simulation_types">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_fields_simulation_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.simulation_engine.SimulationType" title="RUFAS.simulation_engine.SimulationType"><span class="pre">SimulationType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType._fields_simulation_types" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType._fields_simulation_types'"><span>#</span></a></dt>
+<dd><p>Return the set of simulation types that simulate crops, soil, and fields.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType._feed_simulation_types">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_feed_simulation_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.simulation_engine.SimulationType" title="RUFAS.simulation_engine.SimulationType"><span class="pre">SimulationType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType._feed_simulation_types" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType._feed_simulation_types'"><span>#</span></a></dt>
+<dd><p>Return the set of simulation types that simulate feed storage and management.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationType.get_simulation_type">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_simulation_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.simulation_engine.SimulationType" title="RUFAS.simulation_engine.SimulationType"><span class="pre">SimulationType</span></a></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationType.get_simulation_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationType.get_simulation_type'"><span>#</span></a></dt>
+<dd><p>Gets the simulation type.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>simulation_type<span class="classifier">str</span></dt><dd><p>The type of simulation as a string.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the simulation type is not recognized.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+</section>
+</dd></dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.simulation_engine.</span></span><span class="sig-name descname"><span class="pre">SimulationEngine</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.simulation_engine.</span></span><span class="sig-name descname"><span class="pre">SimulationEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.simulation_engine.SimulationType" title="RUFAS.simulation_engine.SimulationType"><span class="pre">SimulationType</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The SimulationEngine class is responsible for orchestrating the entire simulation
 process for RuFaS. It manages the simulation’s lifecycle, advancing time, executing daily
 and annual routines, and logging simulation progress.</p>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<section id="id1">
+<h2>Attributes<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>weather<span class="classifier">Weather</span></dt><dd><p>The weather object that contains the weather data.</p>
+<dt>om<span class="classifier">OutputManager</span></dt><dd><p>An instance of OutputManager.</p>
+</dd>
+<dt>im<span class="classifier">InputManager</span></dt><dd><p>An instnace of InputManager.</p>
+</dd>
+<dt>simulation_type<span class="classifier">SimulationType</span></dt><dd><p>The type of simulation that will be run.</p>
+</dd>
+<dt>simulate_animals<span class="classifier">bool</span></dt><dd><p>Whether or not the simulation will have a HerdManager.</p>
+</dd>
+<dt>simulate_fields<span class="classifier">bool</span></dt><dd><p>Whether or not the simulation will have a FieldManager.</p>
+</dd>
+<dt>simulate_manure<span class="classifier">bool</span></dt><dd><p>Whether or not the simulation will have a ManureManager.</p>
+</dd>
+<dt>simulate_feed<span class="classifier">bool</span></dt><dd><p>Whether or not the simulation will have a FeedManager.</p>
+</dd>
+<dt>_simulation_type_to_daily_simulation_function<span class="classifier">dict[SimulationType, Callable]</span></dt><dd><p>A dictionary mapping the simulation type to the appropriate daily simulation function.</p>
 </dd>
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime object that contains methods for accessing and manipulating the simulation time.</p>
 </dd>
-<dt>feed: Feed</dt><dd><p>The Feed object that stores the information for the feeds managed by the farm, and the methods for storage.</p>
+<dt>weather<span class="classifier">Weather</span></dt><dd><p>The weather object that contains the weather data.</p>
+</dd>
+<dt>emissions_estimator<span class="classifier">EmissionsEstimator</span></dt><dd><p>The engine used to estimate emissions associated with purchased feeds used for animals.</p>
+</dd>
+<dt>field_manager: FieldManager</dt><dd><p>The FieldManager object that manages all fields in the simulation.</p>
+</dd>
+<dt>feed_manager: FeedManager</dt><dd><p>The FeedManager object that stores the information for the feeds managed by the farm
+and the methods for storage.</p>
 </dd>
 <dt>herd_manager: HerdManager</dt><dd><p>The HerdManager object that manages all animal in the herd.</p>
 </dd>
 <dt>manure_manager: ManureManager</dt><dd><p>The ManureManager object that sets up and manages different manure management components including manure
 handlers, reception pits, manure separators, and manure storage treatments.</p>
 </dd>
-<dt>field_manager: FieldManager</dt><dd><p>The FieldManager object that manages all fields in the simulation.</p>
+<dt>available_feeds<span class="classifier">list[Feed]</span></dt><dd><p>The feeds set to be available for the simulation in the feed input.</p>
 </dd>
-<dt>simulate_animals: bool</dt><dd><p>A boolean indicating whether user has chosen to simulate animals in config.</p>
+<dt>max_daily_feed_recalculation_interval<span class="classifier">timedelta</span></dt><dd><p>The interval on which <cite>max_daily_feed_recalculation</cite> should occur.</p>
 </dd>
-</dl>
-</section>
-<section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#methods'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>simulate()</dt><dd><p>Execute the simulation process.</p>
+<dt>next_max_daily_feed_recalculation<span class="classifier">datetime</span></dt><dd><p>The date on which the next max daily feed recalculation should occur.</p>
+</dd>
+<dt>feed_degradations_interval_length<span class="classifier">timedelta</span></dt><dd><p>The interval on which feed degradations should occur.</p>
+</dd>
+<dt>next_degredations_process<span class="classifier">datetime</span></dt><dd><p>The date on which the next feed degradations processing should occur.</p>
+</dd>
+<dt>ration_formulation_interval_length<span class="classifier">timedelta</span></dt><dd><p>The interval on which ration reformulation should occur.</p>
+</dd>
+<dt>next_ration_reformulation<span class="classifier">datetime</span></dt><dd><p>The date on which the next ration reformulation should occur.</p>
+</dd>
+<dt>is_ration_defined_by_user<span class="classifier">bool</span></dt><dd><p>Whether or not the ration is user-defined.</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.simulation_engine.SimulationType" title="RUFAS.simulation_engine.SimulationType"><span class="pre">SimulationType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine.__init__'"><span>#</span></a></dt>
 <dd><p>Initializes the simulation engine.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._setup_simulation_modules">
+<span class="sig-name descname"><span class="pre">_setup_simulation_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._setup_simulation_modules" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._setup_simulation_modules'"><span>#</span></a></dt>
+<dd><p>Instantiates the requested biophysical modules based on simulation type.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._gather_field_data">
+<span class="sig-name descname"><span class="pre">_gather_field_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._gather_field_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._gather_field_data'"><span>#</span></a></dt>
+<dd><p>Gathers configuration data for all fields from the InputManager.</p>
+<p>Logs a warning if no field input files are found.</p>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[str, dict[str, Any]]</dt><dd><p>Mapping of field names to their configuration data.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine.simulate">
@@ -189,14 +326,156 @@ handlers, reception pits, manure separators, and manure storage treatments.</p>
 <dd><p>Executes the simulation.</p>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._post_simulation_processing">
+<span class="sig-name descname"><span class="pre">_post_simulation_processing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._post_simulation_processing" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._post_simulation_processing'"><span>#</span></a></dt>
+<dd><p>Runs end-of-simulation calculations for all active modules.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._post_simulation_reporting">
+<span class="sig-name descname"><span class="pre">_post_simulation_reporting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._post_simulation_reporting" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._post_simulation_reporting'"><span>#</span></a></dt>
+<dd><p>Runs end-of-simulation reporting for all active modules.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._post_simulation_logging">
+<span class="sig-name descname"><span class="pre">_post_simulation_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_simulation_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._post_simulation_logging" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._post_simulation_logging'"><span>#</span></a></dt>
+<dd><p>Logs end-of-simulation warnings and timing for all active modules.</p>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop">
 <span class="sig-name descname"><span class="pre">_run_simulation_main_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop'"><span>#</span></a></dt>
 <dd><p>The main loop for simulation.</p>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._daily_simulation">
-<span class="sig-name descname"><span class="pre">_daily_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._daily_simulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._daily_simulation'"><span>#</span></a></dt>
-<dd><p>Executes the daily simulation routines.</p>
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_full_farm_daily_simulation">
+<span class="sig-name descname"><span class="pre">_execute_full_farm_daily_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_full_farm_daily_simulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_full_farm_daily_simulation'"><span>#</span></a></dt>
+<dd><p>Executes the daily simulation routines for a full farm with all sub-modules.</p>
+<p>Daily Full Farm Simulation Process:
+1. Field operations (manure applications, harvesting)
+2. Feed planning (recalculate feed availability, update purchase plans)
+3. Ration planning (periodic reformulation check, estimate future inventory, formulate ration,
+update purchase plans)
+4. Animal operations (feeding, growth, reproduction, and milk production routines)
+5. Manure operations (collect and process manure)
+6. Record keeping (time, weather, purchased feeds fed emissions)
+7. Advance simulation date</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_field_only_simulation">
+<span class="sig-name descname"><span class="pre">_execute_field_only_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_field_only_simulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_field_only_simulation'"><span>#</span></a></dt>
+<dd><p>Executes the daily simulation routines for a field only modules.</p>
+<p>Daily Field Process:
+1. Field operations without sending the crops to the feed manager
+2. Record keeping (time, weather, purchased feeds fed emissions)
+3. Advance simulation date</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_field_and_feed_daily_simulation">
+<span class="sig-name descname"><span class="pre">_execute_field_and_feed_daily_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_field_and_feed_daily_simulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_field_and_feed_daily_simulation'"><span>#</span></a></dt>
+<dd><p>Executes the daily simulation routines for a farm with only the field and feed modules.</p>
+<p>Daily Field and Feed Simulation Process:
+1. Field operations (manure applications, harvesting)
+2. Feed planning (recalculate feed availability, update purchase plans)
+3. Ration planning (periodic reformulation check, estimate future inventory, formulate ration,
+update purchase plans)
+4. Record keeping (time, weather, purchased feeds fed emissions)
+5. Advance simulation date</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_animals_only_daily_simulation">
+<span class="sig-name descname"><span class="pre">_execute_animals_only_daily_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_animals_only_daily_simulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_animals_only_daily_simulation'"><span>#</span></a></dt>
+<dd><p>Executes the daily simulation routines for a farm with only animals.</p>
+<p>Daily Animals Only Simulation Process:
+1. Ration planning (periodic reformulation check, formulate ration)
+2. Animal operations (feeding, growth, reproduction, and milk production routines)
+3. Record keeping (time, weather, purchased feeds fed emissions)
+4. Advance simulation date</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_daily_field_operations">
+<span class="sig-name descname"><span class="pre">_execute_daily_field_operations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_daily_field_operations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_daily_field_operations'"><span>#</span></a></dt>
+<dd><p>Handles daily field operations including manure applications and crop harvesting/receiving.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._generate_daily_manure_applications">
+<span class="sig-name descname"><span class="pre">_generate_daily_manure_applications</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults" title="RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults"><span class="pre">ManureEventNutrientRequestResults</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._generate_daily_manure_applications" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._generate_daily_manure_applications'"><span>#</span></a></dt>
+<dd><p>Requests nutrients from the manure manager for each field in the simulation.</p>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>list[ManureEventNutrientRequestResults]</dt><dd><p>A list containing the ManureEvents and corresponding NutrientRequestResults to be applied to fields.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._receive_daily_harvested_crops">
+<span class="sig-name descname"><span class="pre">_receive_daily_harvested_crops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvested_crops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._receive_daily_harvested_crops" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._receive_daily_harvested_crops'"><span>#</span></a></dt>
+<dd><p>Receives and stores the crops harvested.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._build_harvest_schedule">
+<span class="sig-name descname"><span class="pre">_build_harvest_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvested_crops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">date</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._build_harvest_schedule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._build_harvest_schedule'"><span>#</span></a></dt>
+<dd><p>Builds a schedule of next harvest dates for all crop types.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>harvested_crops<span class="classifier">list[HarvestedCrop]</span></dt><dd><p>A list of crops that were harvested on the current day.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[str, date | None]</dt><dd><p>A dictionary mapping crops to their next harvest dates.
+If a crop does not have a scheduled next harvest, the value will be None.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<ul class="simple">
+<li><p>The method checks if it’s time to recalculate feed planning, which is done at a user-specified interval.</p></li>
+</ul>
+<p>If it is time, it will include all crops that are relevant for feed planning in the harvest schedule,
+even if they were not harvested today.</p>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._should_recalculate_feed_planning">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_should_recalculate_feed_planning</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._should_recalculate_feed_planning" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._should_recalculate_feed_planning'"><span>#</span></a></dt>
+<dd><p>Check if it’s time to recalculate maximum daily feed allocations.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_feed_planning">
+<span class="sig-name descname"><span class="pre">_execute_feed_planning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvest_schedule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">date</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_feed_planning" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_feed_planning'"><span>#</span></a></dt>
+<dd><p>Recalculates maximum daily feed allocations if it’s time.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>harvest_schedule<span class="classifier">dict[str, date | None]</span></dt><dd><p>A dictionary mapping crop config names to their next harvest dates, used to inform feed planning.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._update_all_max_daily_feeds">
+<span class="sig-name descname"><span class="pre">_update_all_max_daily_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_projected_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_harvest_dates_with_rufas_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">date</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.IdealFeeds" title="RUFAS.data_structures.feed_storage_to_animal_connection.IdealFeeds"><span class="pre">IdealFeeds</span></a></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._update_all_max_daily_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._update_all_max_daily_feeds'"><span>#</span></a></dt>
+<dd><p>Wrapper function for HerdManager daily max feeds update.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._is_time_to_process_feed_degradations">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_is_time_to_process_feed_degradations</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._is_time_to_process_feed_degradations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._is_time_to_process_feed_degradations'"><span>#</span></a></dt>
+<dd><p>Checks if it’s time to process feed degradations</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_ration_planning">
+<span class="sig-name descname"><span class="pre">_execute_ration_planning</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_ration_planning" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_ration_planning'"><span>#</span></a></dt>
+<dd><p>Checks if it’s time to reformulate the ration and executes ration formulation if needed.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._is_time_to_reformulate_ration">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_is_time_to_reformulate_ration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._is_time_to_reformulate_ration" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._is_time_to_reformulate_ration'"><span>#</span></a></dt>
+<dd><p>Checks if it’s time to reformulate the ration based on the user-defined interval.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._formulate_ration">
@@ -204,13 +483,43 @@ handlers, reception pits, manure separators, and manure storage treatments.</p>
 <dd><p>Formulates the ration for the animals.</p>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine.generate_daily_manure_applications">
-<span class="sig-name descname"><span class="pre">generate_daily_manure_applications</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults" title="RUFAS.data_structures.manure_to_crop_soil_connection.ManureEventNutrientRequestResults"><span class="pre">ManureEventNutrientRequestResults</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine.generate_daily_manure_applications" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine.generate_daily_manure_applications'"><span>#</span></a></dt>
-<dd><p>Requests nutrients from the manure manager for each field in the simulation.</p>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_daily_animal_operations">
+<span class="sig-name descname"><span class="pre">_execute_daily_animal_operations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_daily_animal_operations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_daily_animal_operations'"><span>#</span></a></dt>
+<dd><p>Executes the daily animal routines.</p>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>list[ManureEventNutrientRequestResults]</dt><dd><p>A list containing the ManureEvents and corresponding NutrientRequestResults to be applied to fields.</p>
+<dt>tuple[dict[str, ManureStream] | None, dict[str, float]]</dt><dd><ul class="simple">
+<li><p>A dictionary mapping pens to their corresponding ManureStream objects generated
+from the daily routines. If animals are not being simulated, this will be None.</p></li>
+<li><p>A dictionary mapping feed types to the amount of purchased feed fed to the herd.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._execute_daily_manure_operations">
+<span class="sig-name descname"><span class="pre">_execute_daily_manure_operations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_manure_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._execute_daily_manure_operations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._execute_daily_manure_operations'"><span>#</span></a></dt>
+<dd><p>Executes the daily manure operations routine.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>daily_manure_data<span class="classifier">dict[str, ManureStream] | None</span></dt><dd><p>A list of dictionaries containing manure data for each pen in the herd.
+If animals are not being simulated, this will be None.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._report_daily_records">
+<span class="sig-name descname"><span class="pre">_report_daily_records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_purchased_feeds_fed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._report_daily_records" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._report_daily_records'"><span>#</span></a></dt>
+<dd><p>Reports the daily records for the simulation to OutputManager.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>daily_purchased_feeds_fed<span class="classifier">dict[int, float] | None</span></dt><dd><p>A dictionary mapping feed types to the amount of purchased feed fed to the herd on the current day.
+If no purchased feed was fed, this will be None.</p>
 </dd>
 </dl>
 </section>
@@ -241,30 +550,60 @@ Resets the state for the following year</p>
 <dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine.annual_mass_balance">
 <span class="sig-name descname"><span class="pre">annual_mass_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine.annual_mass_balance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine.annual_mass_balance'"><span>#</span></a></dt>
 <dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.simulation_engine.SimulationEngine._initialize_simulation">
-<span class="sig-name descname"><span class="pre">_initialize_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.simulation_engine.SimulationEngine._initialize_simulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.simulation_engine.SimulationEngine._initialize_simulation'"><span>#</span></a></dt>
-<dd><p>Instantiates the simulation object by requesting data from the Input Manager.</p>
-</dd></dl>
 </section>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType"><code class="docutils literal notranslate"><span class="pre">SimulationType</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.FULL_FARM'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.FULL_FARM"><code class="docutils literal notranslate"><span class="pre">SimulationType.FULL_FARM</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.FIELD_AND_FEED'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.FIELD_AND_FEED"><code class="docutils literal notranslate"><span class="pre">SimulationType.FIELD_AND_FEED</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.FIELD_ONLY'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.FIELD_ONLY"><code class="docutils literal notranslate"><span class="pre">SimulationType.FIELD_ONLY</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.ANIMALS_ONLY'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.ANIMALS_ONLY"><code class="docutils literal notranslate"><span class="pre">SimulationType.ANIMALS_ONLY</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.simulate_animals'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.simulate_animals"><code class="docutils literal notranslate"><span class="pre">SimulationType.simulate_animals</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.simulate_manure'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.simulate_manure"><code class="docutils literal notranslate"><span class="pre">SimulationType.simulate_manure</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.simulate_fields'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.simulate_fields"><code class="docutils literal notranslate"><span class="pre">SimulationType.simulate_fields</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.simulate_feed'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.simulate_feed"><code class="docutils literal notranslate"><span class="pre">SimulationType.simulate_feed</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType._animal_simulation_types'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType._animal_simulation_types"><code class="docutils literal notranslate"><span class="pre">SimulationType._animal_simulation_types()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType._manure_simulation_types'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType._manure_simulation_types"><code class="docutils literal notranslate"><span class="pre">SimulationType._manure_simulation_types()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType._fields_simulation_types'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType._fields_simulation_types"><code class="docutils literal notranslate"><span class="pre">SimulationType._fields_simulation_types()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType._feed_simulation_types'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType._feed_simulation_types"><code class="docutils literal notranslate"><span class="pre">SimulationType._feed_simulation_types()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationType.get_simulation_type'" class="reference internal" href="#RUFAS.simulation_engine.SimulationType.get_simulation_type"><code class="docutils literal notranslate"><span class="pre">SimulationType.get_simulation_type()</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine"><code class="docutils literal notranslate"><span class="pre">SimulationEngine</span></code></a><ul>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine.__init__'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine.__init__"><code class="docutils literal notranslate"><span class="pre">SimulationEngine.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._setup_simulation_modules'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._setup_simulation_modules"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._setup_simulation_modules()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._gather_field_data'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._gather_field_data"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._gather_field_data()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine.simulate'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine.simulate"><code class="docutils literal notranslate"><span class="pre">SimulationEngine.simulate()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._post_simulation_processing'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._post_simulation_processing"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._post_simulation_processing()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._post_simulation_reporting'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._post_simulation_reporting"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._post_simulation_reporting()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._post_simulation_logging'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._post_simulation_logging"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._post_simulation_logging()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._run_simulation_main_loop()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._daily_simulation'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._daily_simulation"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._daily_simulation()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_full_farm_daily_simulation'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_full_farm_daily_simulation"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_full_farm_daily_simulation()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_field_only_simulation'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_field_only_simulation"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_field_only_simulation()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_field_and_feed_daily_simulation'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_field_and_feed_daily_simulation"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_field_and_feed_daily_simulation()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_animals_only_daily_simulation'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_animals_only_daily_simulation"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_animals_only_daily_simulation()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_daily_field_operations'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_daily_field_operations"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_daily_field_operations()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._generate_daily_manure_applications'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._generate_daily_manure_applications"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._generate_daily_manure_applications()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._receive_daily_harvested_crops'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._receive_daily_harvested_crops"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._receive_daily_harvested_crops()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._build_harvest_schedule'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._build_harvest_schedule"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._build_harvest_schedule()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._should_recalculate_feed_planning'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._should_recalculate_feed_planning"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._should_recalculate_feed_planning</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_feed_planning'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_feed_planning"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_feed_planning()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._update_all_max_daily_feeds'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._update_all_max_daily_feeds"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._update_all_max_daily_feeds()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._is_time_to_process_feed_degradations'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._is_time_to_process_feed_degradations"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._is_time_to_process_feed_degradations</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_ration_planning'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_ration_planning"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_ration_planning()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._is_time_to_reformulate_ration'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._is_time_to_reformulate_ration"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._is_time_to_reformulate_ration</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._formulate_ration'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._formulate_ration"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._formulate_ration()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine.generate_daily_manure_applications'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine.generate_daily_manure_applications"><code class="docutils literal notranslate"><span class="pre">SimulationEngine.generate_daily_manure_applications()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_daily_animal_operations'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_daily_animal_operations"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_daily_animal_operations()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._execute_daily_manure_operations'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._execute_daily_manure_operations"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._execute_daily_manure_operations()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._report_daily_records'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._report_daily_records"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._report_daily_records()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._advance_time'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._advance_time"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._advance_time()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._run_post_annual_routines'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._run_post_annual_routines"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._run_post_annual_routines()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._annual_simulation'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._annual_simulation"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._annual_simulation()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine.annual_reset'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine.annual_reset"><code class="docutils literal notranslate"><span class="pre">SimulationEngine.annual_reset()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine.annual_mass_balance'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine.annual_mass_balance"><code class="docutils literal notranslate"><span class="pre">SimulationEngine.annual_mass_balance()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.simulation_engine.SimulationEngine._initialize_simulation'" class="reference internal" href="#RUFAS.simulation_engine.SimulationEngine._initialize_simulation"><code class="docutils literal notranslate"><span class="pre">SimulationEngine._initialize_simulation()</span></code></a></li>
 </ul>
 </li>
 </ul>

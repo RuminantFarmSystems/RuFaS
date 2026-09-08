@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.soil.percolation.html" rel="next" title="RUFAS.biophysical.field.soil.percolation module"/>
+<link href="RUFAS.biophysical.field.soil.layer_data.html" rel="prev" title="RUFAS.biophysical.field.soil.layer_data module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.html">RUFAS.biophysical.field.soil package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.soil.manure_pool module</span>
 </nav>
 <div id="content" role="main">
@@ -220,6 +228,16 @@ that leached phosphorus is distributed.</p>
 </dd>
 </dl>
 </section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The organic results for infiltrated phosphorous.</p></li>
+<li><p>The inorganic results for infiltrated phosphorous.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool.adjust_manure_moisture_factor">
@@ -247,15 +265,13 @@ and how much the field coverage changes as a result.</p>
 </dd>
 </dl>
 </section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>Tuple[float, float]</dt><dd><dl class="simple">
-<dt>decomposed_manure_mass_change: change in the mass of applied manure on the field surface</dt><dd><p>decomposed on this day (kg).</p>
-</dd>
-<dt>decomposed_manure_coverage_change: change in field coverage of applied manure on the field</dt><dd><p>surface (unitless).</p>
-</dd>
-</dl>
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The change in the mass of applied manure on the field surface decomposed on this day (kg).</p></li>
+<li><p>The change in field coverage of applied manure on the field surface (unitless).</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -265,8 +281,8 @@ and how much the field coverage changes as a result.</p>
 <span class="sig-name descname"><span class="pre">determine_assimilated_surface_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_assimilated_surface_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_assimilated_surface_manure'"><span>#</span></a></dt>
 <dd><p>Determines how much manure is assimilated into the soil profile and how much the manure coverage is reduced
 by on the current day.</p>
-<section id="id4">
-<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>temperature_factor<span class="classifier">float</span></dt><dd><p>The temperature factor on the current day (unitless).</p>
 </dd>
@@ -274,11 +290,13 @@ by on the current day.</p>
 </dd>
 </dl>
 </section>
-<section id="id5">
-<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<section id="id6">
+<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>tuple[float, float]</dt><dd><p>assimilated_manure: Amount of manure that is assimilated on a given day (kg).
-manure_coverage: Amount of decrease in the fraction of field covered by manure on a given day (unitless).</p>
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>Amount of manure that is assimilated on a given day (kg).</p></li>
+<li><p>Amount of decrease in the fraction of field covered by manure on a given day (unitless).</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -287,15 +305,15 @@ manure_coverage: Amount of decrease in the fraction of field covered by manure o
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_temperature_factor">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_temperature_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean_air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_temperature_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_temperature_factor'"><span>#</span></a></dt>
 <dd><p>Calculates the temperature factor for the current day</p>
-<section id="id6">
-<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>mean_air_temperature<span class="classifier">float</span></dt><dd><p>The average air temperature of the current day (degrees Celsius).</p>
+<dt>mean_air_temperature<span class="classifier">float</span></dt><dd><p>The average air temperature of the current day (Celsius).</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h2>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The temperature factor on the current day (unitless).</p>
 </dd>
@@ -310,22 +328,22 @@ manure_coverage: Amount of decrease in the fraction of field covered by manure o
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_dry_matter_decomposition_rate">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_dry_matter_decomposition_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_dry_matter_decomposition_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_dry_matter_decomposition_rate'"><span>#</span></a></dt>
 <dd><p>Calculates the rate of manure dry matter decomposition on the current day.</p>
-<section id="id8">
-<h2>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>temperature_factor<span class="classifier">float</span></dt><dd><p>The temperature factor on the current day (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h2>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The rate of manure dry matter decomposition on the current day (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h2>References<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
+<section id="id11">
+<h2>References<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
 <p>SurPhos [1], pseudocode_soil [S.5.D.III.4]</p>
 </section>
 </dd></dl>
@@ -333,8 +351,8 @@ manure_coverage: Amount of decrease in the fraction of field covered by manure o
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_dry_manure_matter_assimilation">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_dry_manure_matter_assimilation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moisture_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_cover_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_dung</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_dry_manure_matter_assimilation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_dry_manure_matter_assimilation'"><span>#</span></a></dt>
 <dd><p>Calculates the mass of dry manure matter applied by machine assimilated into the soil that day.</p>
-<section id="id11">
-<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>moisture_factor<span class="classifier">float</span></dt><dd><p>Manure moisture factor, in range [0.0, 1.0] (unitless).</p>
 </dd>
@@ -346,26 +364,26 @@ manure_coverage: Amount of decrease in the fraction of field covered by manure o
 </dd>
 </dl>
 </section>
-<section id="id12">
-<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<section id="id13">
+<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of manure dry matter that is assimilated into the soil by macroinvertebrates (bioturbation) on
 the current day (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id13">
-<h2>References<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
+<section id="id14">
+<h2>References<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
 <p>SurPhos [3, 7], pseudocode_soil [S.5.D.III.4] (Note the equation in the pseudocode is wrong)</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_moisture_change">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_moisture_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_moisture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_moisture_change" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_moisture_change'"><span>#</span></a></dt>
-<dd><p>This function determines the daily change in the moisture factor of the maure based on the current days
+<dd><p>This function determines the daily change in the moisture factor of the manure based on the current days
 precipitation conditions.</p>
-<section id="id14">
-<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
 </dd>
@@ -377,15 +395,15 @@ precipitation conditions.</p>
 </dd>
 </dl>
 </section>
-<section id="id15">
-<h2>Returns<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>float</dt><dd><p>The change the moisture factor of the manure application on this day.</p>
+<dt>float</dt><dd><p>The change of the moisture factor of the manure application on this day (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id16">
-<h2>References<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<section id="id17">
+<h2>References<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
 <p>SurPhos [5, 6], pseudocode_soil [S.5.D.III.1]</p>
 </section>
 </dd></dl>
@@ -393,8 +411,8 @@ precipitation conditions.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_rain_manure_dry_matter_ratio">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_rain_manure_dry_matter_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_rain_manure_dry_matter_ratio" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_rain_manure_dry_matter_ratio'"><span>#</span></a></dt>
 <dd><p>Calculates the ratio of rainfall to manure dry matter currently on the field.</p>
-<section id="id17">
-<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
+<section id="id18">
+<h2>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
 </dd>
@@ -404,15 +422,15 @@ precipitation conditions.</p>
 </dd>
 </dl>
 </section>
-<section id="id18">
-<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
+<section id="id19">
+<h2>Returns<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The ratio of rainfall to manure dry matter currently on the field (cubic cm per g).</p>
 </dd>
 </dl>
 </section>
-<section id="id19">
-<h2>References<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
+<section id="id20">
+<h2>References<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
 <p>SurPhos Theoretical Documentation [11]</p>
 </section>
 </dd></dl>
@@ -421,8 +439,8 @@ precipitation conditions.</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_phosphorus_leached_from_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_dry_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_extractable_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_organic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_phosphorus_leached_from_surface" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_phosphorus_leached_from_surface'"><span>#</span></a></dt>
 <dd><p>This method determines how much phosphorus is leached from the given pool, how that phosphorus is distributed
 between runoff and soil infiltration, and how much phosphorus remains in the given pool.</p>
-<section id="id20">
-<h2>Parameters<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
+<section id="id21">
+<h2>Parameters<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>The amount of rainfall on the current day (mm).</p>
 </dd>
@@ -436,14 +454,14 @@ between runoff and soil infiltration, and how much phosphorus remains in the giv
 </dd>
 <dt>water_extractable_phosphorus<span class="classifier">float</span></dt><dd><p>The mass of the water extractable phosphorus pool that is being leached from (kg).</p>
 </dd>
-<dt>is_organic<span class="classifier">bool</span></dt><dd><p>Is the phosphorus being leached organic (True / False).</p>
+<dt>is_organic<span class="classifier">bool</span></dt><dd><p>Is the phosphorus being leached organic.</p>
 </dd>
 </dl>
 </section>
-<section id="id21">
-<h2>Returns<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h2>
+<section id="id22">
+<h2>Returns<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>dict (keys listed below)</dt><dd><p>new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg).
+<dt>dict[str, float]</dt><dd><p>new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg).
 infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg).
 runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg).</p>
 </dd>
@@ -473,8 +491,8 @@ by the section with the header “Phosphorus Leaching from Manure by Rain” (pa
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">determine_mineralized_surface_phosphorus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phosphorus_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_mineralized_surface_phosphorus" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_mineralized_surface_phosphorus'"><span>#</span></a></dt>
 <dd><p>Calculates the amount of phosphorus that mineralizes into water-extractable inorganic phosphorus on the
 current day from the given pool.</p>
-<section id="id22">
-<h2>Parameters<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h2>
+<section id="id23">
+<h2>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>phosphorus_amount<span class="classifier">float</span></dt><dd><p>The amount of phosphorus in the pool that is being mineralized (kg).</p>
 </dd>
@@ -486,19 +504,19 @@ current day from the given pool.</p>
 </dd>
 </dl>
 </section>
-<section id="id23">
-<h2>Returns<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
+<section id="id24">
+<h2>Returns<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of phosphorus that is mineralized from that pool that is passed (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id24">
-<h2>References<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
+<section id="id25">
+<h2>References<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h2>
 <p>SurPhos theoretical documentation eqn. [4]</p>
 </section>
-<section id="id25">
-<h2>Notes<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h2>
+<section id="id26">
+<h2>Notes<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
 <p>As defined in the paragraph on page 6 of the SurPhos theoretical documentation underneath eqn. [4], the rates
 for stable organic Phosphorus, stable inorganic phosphorus, and water-extractable organic phosphorus are 0.01,
 0.0025, and 0.1, respectively.</p>
@@ -508,8 +526,8 @@ for stable organic Phosphorus, stable inorganic phosphorus, and water-extractabl
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_assimilated_phosphorus_amount">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">determine_assimilated_phosphorus_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assimilation_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_assimilated_phosphorus_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_assimilated_phosphorus_amount'"><span>#</span></a></dt>
 <dd><p>Calculates the amount of phosphorus that is removed through assimilation on a given day.</p>
-<section id="id26">
-<h2>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
+<section id="id27">
+<h2>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>assimilation_ratio<span class="classifier">float</span></dt><dd><p>Ratio of manure mass assimilated to amount present before assimilation (unitless).</p>
 </dd>
@@ -517,8 +535,8 @@ for stable organic Phosphorus, stable inorganic phosphorus, and water-extractabl
 </dd>
 </dl>
 </section>
-<section id="id27">
-<h2>Returns<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h2>
+<section id="id28">
+<h2>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of phosphorus removed from the pool (kg).</p>
 </dd>
@@ -530,8 +548,8 @@ for stable organic Phosphorus, stable inorganic phosphorus, and water-extractabl
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_phosphorus_distribution_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_phosphorus_distribution_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_phosphorus_distribution_factor'"><span>#</span></a></dt>
 <dd><p>Calculates a factor used to determine the concentration of Phosphorus dissolved in runoff, based on the ratio
 of rainfall to runoff.</p>
-<section id="id28">
-<h2>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
+<section id="id29">
+<h2>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
 </dd>
@@ -539,15 +557,15 @@ of rainfall to runoff.</p>
 </dd>
 </dl>
 </section>
-<section id="id29">
-<h2>Returns<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
+<section id="id30">
+<h2>Returns<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The ratio of rainfall to runoff adjusted for use in determining dissolved Phosphorus concentrations.</p>
 </dd>
 </dl>
 </section>
-<section id="id30">
-<h2>References<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h2>
+<section id="id31">
+<h2>References<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h2>
 <p>SurPhos [13], pseudocode_soil [S.5.D.II.2]</p>
 </section>
 </dd></dl>
@@ -555,8 +573,8 @@ of rainfall to runoff.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_water_extractable_phosphorus_leached">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_water_extractable_phosphorus_leached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_water_extractable_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall_to_dry_manure_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_from_cow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_water_extractable_phosphorus_leached" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_water_extractable_phosphorus_leached'"><span>#</span></a></dt>
 <dd><p>Determines the amount of water extractable organic or inorganic phosphorus leached by rainfall.</p>
-<section id="id31">
-<h2>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h2>
+<section id="id32">
+<h2>Parameters<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>manure_water_extractable_phosphorus<span class="classifier">float</span></dt><dd><p>The amount of water extractable phosphorus from manure on the field (kg).</p>
 </dd>
@@ -568,16 +586,16 @@ of rainfall to runoff.</p>
 </dd>
 </dl>
 </section>
-<section id="id32">
-<h2>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h2>
+<section id="id33">
+<h2>Returns<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of water extractable phosphorus leached from manure on the soil surface by rain on the given
 day (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id33">
-<h2>References<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h2>
+<section id="id34">
+<h2>References<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
 <p>SurPhos [9, 10], pseudocode_soil [S.5.D.I.3, II.1]</p>
 </section>
 <section id="details">
@@ -590,8 +608,8 @@ is why the is_from_cow parameter is necessary.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_water_extractable_phosphorus_runoff_concentration">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_water_extractable_phosphorus_runoff_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_leached</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_water_extractable_phosphorus_runoff_concentration" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool._determine_water_extractable_phosphorus_runoff_concentration'"><span>#</span></a></dt>
 <dd><p>Calculates the concentration of water extractable phosphorus in runoff on the current day.</p>
-<section id="id34">
-<h2>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
+<section id="id35">
+<h2>Parameters<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>manure_leached<span class="classifier">float</span></dt><dd><p>Mass of water extractable phosphorus leached from surface manure by rain on the current day (kg).</p>
 </dd>
@@ -603,8 +621,8 @@ is why the is_from_cow parameter is necessary.</p>
 </dd>
 </dl>
 </section>
-<section id="id35">
-<h2>Returns<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h2>
+<section id="id36">
+<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The concentration of water extractable phosphorus in runoff on the current day (milligrams per liter).</p>
 </dd>
@@ -615,8 +633,8 @@ is why the is_from_cow parameter is necessary.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_phosphorus_leach">
 <span class="sig-name descname"><span class="pre">determine_phosphorus_leach</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_phosphorus_leach" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.manure_pool.ManurePool.determine_phosphorus_leach'"><span>#</span></a></dt>
 <dd><p>Determine if phosphorus leaching operations should run.</p>
-<section id="id36">
-<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h2>
+<section id="id37">
+<h2>Returns<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>bool</dt><dd><p>The status to determine if phosphorus leaching should run.</p>
 </dd>

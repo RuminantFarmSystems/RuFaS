@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.EEE.energy.html" rel="next" title="RUFAS.EEE.energy module"/>
+<link href="RUFAS.EEE.EEE_manager.html" rel="prev" title="RUFAS.EEE.EEE_manager module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,9 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.EEE.html">RUFAS.EEE package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.EEE.emissions module</span>
 </nav>
 <div id="content" role="main">
@@ -143,15 +149,36 @@
 <span id="rufas-eee-emissions-module"></span><h1>RUFAS.EEE.emissions module<a class="headerlink" href="#module-RUFAS.EEE.emissions" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.EEE.emissions.</span></span><span class="sig-name descname"><span class="pre">EmissionsEstimator</span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.EEE.emissions.</span></span><span class="sig-name descname"><span class="pre">EmissionsEstimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulate_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Estimates emissions associated with purchased feeds used for animals.</p>
+<p>Estimates the emissions and resources associated with the feeds used to feed animals.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>simulate_animals<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the AnimalManager module.</p>
+</dd>
+<dt>simulate_feed<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the FeedManager module</p>
+</dd>
+<dt>simulate_fields<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the FieldManager module.</p>
+</dd>
+<dt>simulate_manure<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the ManureManager module</p>
+</dd>
+</dl>
+</section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>im<span class="classifier">InputManager</span></dt><dd><p>An instance of the InputManager class.</p>
 </dd>
 <dt>om<span class="classifier">OutputManager</span></dt><dd><p>An instance of the OutputManager class.</p>
+</dd>
+<dt>simulate_animals<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the AnimalManager module.</p>
+</dd>
+<dt>simulate_feed<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the FeedManager module</p>
+</dd>
+<dt>simulate_fields<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the FieldManager module.</p>
+</dd>
+<dt>simulate_manure<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the ManureManager module</p>
 </dd>
 <dt>crop_species_to_purchased_feed_id<span class="classifier">dict[str, list[str]]</span></dt><dd><p>A dictionary mapping crop species to their corresponding RuFaS feed IDs.</p>
 </dd>
@@ -168,23 +195,71 @@ the location of the simulation.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator.__init__'"><span>#</span></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulate_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator.__init__'"><span>#</span></a></dt>
+<dd><p>Initializes the EmissionsEstimator with location-specific feed emissions data and feed configurations.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator.check_available_purchased_feed_data">
 <span class="sig-name descname"><span class="pre">check_available_purchased_feed_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_feed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator.check_available_purchased_feed_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator.check_available_purchased_feed_data'"><span>#</span></a></dt>
 <dd><p>Checks that all purchased feed IDs used in the simulation have emissions data available for them.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>available_feed_ids<span class="classifier">list[int]</span></dt><dd><p>The RuFaS feed IDs used in the simulation to check for available emissions data.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<p>Any feed IDs that are missing purchased feed or land use change emissions data are recorded and reported as
+warnings to the <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code>.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator.calculate_purchased_feed_emissions">
 <span class="sig-name descname"><span class="pre">calculate_purchased_feed_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">purchased_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator.calculate_purchased_feed_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator.calculate_purchased_feed_emissions'"><span>#</span></a></dt>
-<dd><p>Calculates the emissions from purchased feeds and land use changes. If there are feed IDs with missing
-emissions factor data, they will be omitted from the calculations and not reported.</p>
+<dd><p>Calculates the emissions from purchased feeds and land use changes and reports them to the <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code>.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>purchased_feeds<span class="classifier">dict[int, float]</span></dt><dd><p>A mapping of RuFaS feed IDs to the amount of each purchased feed used (kg dry matter).</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Notes<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<p>If there are feed IDs with missing emissions factor data, they are omitted from the calculations and not
+reported.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._get_feed_emissions_data">
 <span class="sig-name descname"><span class="pre">_get_feed_emissions_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">county_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_emissions_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._get_feed_emissions_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._get_feed_emissions_data'"><span>#</span></a></dt>
-<dd><p>Grabs the appropriate list of emissions for purchased feeds for the location of the simulation.</p>
+<dd><p>Grabs the appropriate emissions factors for purchased feeds for the location of the simulation.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>county_code<span class="classifier">int</span></dt><dd><p>The FIPS county code of the simulation location.</p>
+</dd>
+<dt>feed_emissions_data<span class="classifier">dict[str, list[float]]</span></dt><dd><p>A mapping of RuFaS feed IDs to their emissions factors per county, including a <code class="docutils literal notranslate"><span class="pre">"county_code"</span></code> key
+listing the county codes in the same order as the factors.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[str, float]</dt><dd><p>A mapping of RuFaS feed IDs to their emissions factors for the simulation’s county.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the simulation’s county code is not present in <code class="docutils literal notranslate"><span class="pre">feed_emissions_data</span></code>.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator.estimate_farmgrown_feed_emissions">
@@ -193,64 +268,122 @@ emissions factor data, they will be omitted from the calculations and not report
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feeds_emission_data">
-<span class="sig-name descname"><span class="pre">_parse_farmgrown_feeds_emission_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feeds_emission_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feeds_emission_data'"><span>#</span></a></dt>
-<dd><p>Parses farmgrown feeds emission data from the OutputManager and returns a dictionary with emission data for
-each field on every simulation day.</p>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
-<p>The farmgrown feeds Nitrous Oxide and Ammonia emission data has unit kg.</p>
+<span class="sig-name descname"><span class="pre">_parse_farmgrown_feeds_emission_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feeds_emission_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feeds_emission_data'"><span>#</span></a></dt>
+<dd><p>Parses farmgrown feeds emission data from the OutputManager and returns a
+dictionary with emission data for each field on every simulation day.</p>
+<p>Emission values across all soil layers for a given field are aggregated by
+summing layer-level values for each simulation day.</p>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[str, dict[str, dict[int, float]]]</dt><dd><p>A nested dictionary structured as
+<code class="docutils literal notranslate"><span class="pre">{emission_type:</span> <span class="pre">{field_name:</span> <span class="pre">{simulation_day:</span> <span class="pre">total_emission}}}</span></code>,
+where emission types are <code class="docutils literal notranslate"><span class="pre">"nitrous_oxide_emissions"</span></code> and
+<code class="docutils literal notranslate"><span class="pre">"ammonia_emissions"</span></code>. Emission values are in kg/ha.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Raises<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If a variable in the filtered data does not match the expected field
+and layer naming pattern.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._parse_manure_and_fertilizer_application_data">
 <span class="sig-name descname"><span class="pre">_parse_manure_and_fertilizer_application_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_manure_and_fertilizer_application_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._parse_manure_and_fertilizer_application_data'"><span>#</span></a></dt>
-<dd><p>Parses manure and fertilizer application data from the OutputManager and returns a dictionary with
-application data for each field by simulation day.</p>
-<section id="id1">
-<h3>Notes<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
-<p>The manure and fertilizer application data has unit kg.</p>
+<dd><p>Parses manure and fertilizer application data from the OutputManager and
+returns a dictionary with application data for each field by simulation day.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>simulation_start_date<span class="classifier">datetime</span></dt><dd><p>The start date of the simulation, used to convert event dates to
+simulation day offsets.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[str, dict[str, dict[int, dict[str, float]]]]</dt><dd><p>A nested dictionary structured as
+<code class="docutils literal notranslate"><span class="pre">{application_type:</span> <span class="pre">{field_name:</span> <span class="pre">{simulation_day:</span> <span class="pre">{variable:</span> <span class="pre">value}}}}</span></code>,
+where application types are <code class="docutils literal notranslate"><span class="pre">"manure_applications"</span></code> and
+<code class="docutils literal notranslate"><span class="pre">"fertilizer_applications"</span></code>. Application values are in kg/ha.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feed_deductions_data">
 <span class="sig-name descname"><span class="pre">_parse_farmgrown_feed_deductions_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_simulation_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feed_deductions_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feed_deductions_data'"><span>#</span></a></dt>
-<dd><p>Parses farmgrown feed deductions data by feed_id and simulation day from the simulation OutputManager.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._build_field_details">
-<span class="sig-name descname"><span class="pre">_build_field_details</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._build_field_details" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._build_field_details'"><span>#</span></a></dt>
-<dd><p>Builds a dictionary of field details including field name, and field size.</p>
+<dd><p>Parses farmgrown feed deductions data by feed ID and simulation day from
+the simulation OutputManager.</p>
+<p>For simulation days with no recorded deduction, a value of <code class="docutils literal notranslate"><span class="pre">0.0</span></code> is
+used to ensure all days are represented in the output.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>all_simulation_days<span class="classifier">list[int]</span></dt><dd><p>The complete list of simulation days to include in the output,
+used to fill missing days with a default value of <code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[RUFAS_ID, dict[int, float]]</dt><dd><p>A dictionary structured as <code class="docutils literal notranslate"><span class="pre">{feed_id:</span> <span class="pre">{simulation_day:</span> <span class="pre">amount}}</span></code>,
+where each feed ID maps to a day-indexed record of deducted feed amounts.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Raises<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If a variable name in the filtered data does not match the expected
+feed ID naming pattern.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._parse_crop_to_feed_id_mapping">
 <span class="sig-name descname"><span class="pre">_parse_crop_to_feed_id_mapping</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_crop_to_feed_id_mapping" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._parse_crop_to_feed_id_mapping'"><span>#</span></a></dt>
 <dd><p>Parses the mapping of crop names and field names to RUFAS feed IDs.</p>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[tuple[str, str], RUFAS_ID]</dt><dd><p>A dictionary mapping <code class="docutils literal notranslate"><span class="pre">(field_name,</span> <span class="pre">crop_name)</span></code> tuples to their
+corresponding RUFAS feed IDs.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._parse_harvest_data">
 <span class="sig-name descname"><span class="pre">_parse_harvest_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_to_feed_id_mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_harvest_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._parse_harvest_data'"><span>#</span></a></dt>
-<dd><p>Parses harvest data by field name and simulation day from the simulation OutputManager.</p>
-<section id="id2">
-<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
-<p>The harvest dry yield data has unit kg/ha.</p>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._group_harvest_details_by_date">
-<span class="sig-name descname"><span class="pre">_group_harvest_details_by_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvest_yield_by_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._group_harvest_details_by_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._group_harvest_details_by_date'"><span>#</span></a></dt>
-<dd><p>Regroups harvest data keyed by field name into data keyed by harvest simulation day, collecting the
-harvests from every field that share the same simulation day into a single list.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
+<dd><p>Parses harvest data by field name and simulation day from the simulation
+OutputManager.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]]</dt><dd><p>The harvest details for farmgrown feeds keyed by field name.</p>
+<dt>crop_to_feed_id_mapping<span class="classifier">dict[tuple[str, str], RUFAS_ID]</span></dt><dd><p>A mapping of <code class="docutils literal notranslate"><span class="pre">(field_name,</span> <span class="pre">crop_name)</span></code> tuples to their corresponding
+RUFAS feed IDs, used to associate each harvest event with a feed ID.</p>
+</dd>
+<dt>simulation_start_date<span class="classifier">datetime</span></dt><dd><p>The start date of the simulation, used to convert harvest dates to
+simulation day offsets.</p>
 </dd>
 </dl>
 </section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dict[int, list[dict[str, str | dict[str, Any]]]]</dt><dd><p>The harvest details for farmgrown feeds across all fields keyed by harvest date.</p>
+<dt>dict[str, dict[int, dict[str, Any]]]</dt><dd><p>A nested dictionary structured as
+<code class="docutils literal notranslate"><span class="pre">{field_name:</span> <span class="pre">{simulation_day:</span> <span class="pre">{harvest_attribute:</span> <span class="pre">value}}}</span></code>.
+Each harvest record contains the field name, crop name, feed ID,
+harvest type, and dry yield in kg/ha.</p>
 </dd>
 </dl>
 </section>
@@ -259,23 +392,66 @@ harvests from every field that share the same simulation day into a single list.
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_emissions_and_resources">
 <span class="sig-name descname"><span class="pre">_calculate_daily_farmgrown_feed_emissions_and_resources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emission_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_yield_by_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_simulation_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_emissions_and_resources" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_emissions_and_resources'"><span>#</span></a></dt>
 <dd><p>Calculates daily emissions and resources used for farmgrown feeds production.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<p>For each field, emissions and resource inputs are accumulated between harvest
+events and normalized by the cumulative dry yield to produce per-unit values.
+These normalized values are then assigned to each simulation day within the
+corresponding harvest window. Days with no associated harvest data are assigned
+zero values for all tracked variables.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>emission_data<span class="classifier">dict[str, dict[str, dict[int, float]]]</span></dt><dd><p>The Nitrous Oxide and Ammonia emission data for farmgrown feeds, (kg/ha).</p>
+<dt>emission_data<span class="classifier">dict[str, dict[str, dict[int, float]]]</span></dt><dd><p>Nitrous oxide and ammonia emission data for farmgrown feeds, keyed by
+emission type, field name, and simulation day (kg/ha).</p>
 </dd>
-<dt>resource_data<span class="classifier">dict[str, dict[str, dict[int, dict[str, float]]]]</span></dt><dd><p>The manure and fertilizer application data for farmgrown feeds, (kg/ha).</p>
+<dt>resource_data<span class="classifier">dict[str, dict[str, dict[int, dict[str, float]]]]</span></dt><dd><p>Manure and fertilizer application data for farmgrown feeds, keyed by
+application type, field name, simulation day, and nutrient variable (kg/ha).</p>
 </dd>
-<dt>harvest_yield_by_field<span class="classifier">dict[str, dict[int, dict[str, Any]]]</span></dt><dd><p>The harvest dry yield data for farmgrown feeds, (kg/ha).</p>
+<dt>harvest_yield_by_field<span class="classifier">dict[str, dict[int, dict[str, Any]]]</span></dt><dd><p>Harvest dry yield data for farmgrown feeds, keyed by field name and
+simulation day (kg/ha).</p>
 </dd>
-<dt>all_simulation_days<span class="classifier">list[int]</span></dt><dd><p>A list of all simulation days.</p>
+<dt>all_simulation_days<span class="classifier">list[int]</span></dt><dd><p>A list of all simulation days in the simulation.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dict[RUFAS_ID, dict[int, dict[str, float]]]</dt><dd><p>The calculated daily emissions and resources used for farmgrown feeds production.</p>
+<dt>dict[RUFAS_ID, dict[int, dict[str, float]]]</dt><dd><p>A nested dictionary structured as
+<code class="docutils literal notranslate"><span class="pre">{feed_id:</span> <span class="pre">{simulation_day:</span> <span class="pre">{variable:</span> <span class="pre">value}}}</span></code>, where each record
+contains the per-unit nitrous oxide emissions, ammonia emissions,
+fertilizer N, fertilizer P, fertilizer K, and manure N for that day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._gather_farmgrown_feed_inventory_data">
+<span class="sig-name descname"><span class="pre">_gather_farmgrown_feed_inventory_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_simulation_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._gather_farmgrown_feed_inventory_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._gather_farmgrown_feed_inventory_data'"><span>#</span></a></dt>
+<dd><p>Gathers farmgrown feed inventory data by feed ID and simulation day from
+the simulation OutputManager.</p>
+<p>For simulation days with no recorded inventory, a value of <code class="docutils literal notranslate"><span class="pre">0.0</span></code> is
+used to ensure all days are represented in the output.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>all_simulation_days<span class="classifier">list[int]</span></dt><dd><p>The complete list of simulation days to include in the output,
+used to fill missing days with a default value of <code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[RUFAS_ID, dict[int, float]]</dt><dd><p>A dictionary structured as <code class="docutils literal notranslate"><span class="pre">{feed_id:</span> <span class="pre">{simulation_day:</span> <span class="pre">amount}}</span></code>,
+where each feed ID maps to a day-indexed record of inventory levels.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Raises<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If a variable name in the filtered data does not match the expected
+feed ID and storage level naming pattern.</p>
 </dd>
 </dl>
 </section>
@@ -283,22 +459,22 @@ harvests from every field that share the same simulation day into a single list.
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._calculate_harvest_dates_by_feed_id">
 <span class="sig-name descname"><span class="pre">_calculate_harvest_dates_by_feed_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvest_yield_by_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._calculate_harvest_dates_by_feed_id" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._calculate_harvest_dates_by_feed_id'"><span>#</span></a></dt>
-<dd><p>Generates a mapping of feed IDs to their respective harvest dates based on the
-harvest data of multiple fields.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dd><p>Generates a mapping of feed IDs to their respective harvest dates based on
+the harvest data of multiple fields.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>harvest_yield_by_field<span class="classifier">dict: dict[str, dict[int, dict[str, Any]]]</span></dt><dd><p>A dictionary containing harvest data organized by field name. Each field
-name maps to another dictionary where keys represent harvest dates, and
-values are dictionaries containing details like “feed_id”.</p>
+<dt>harvest_yield_by_field<span class="classifier">dict[str, dict[int, dict[str, Any]]]</span></dt><dd><p>Harvest data organized by field name, where each field name maps to a
+dictionary of harvest dates and their associated harvest attributes,
+including <code class="docutils literal notranslate"><span class="pre">"feed_id"</span></code>.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dict: dict[RUFAS_ID, list[int]]</dt><dd><p>A dictionary where each key is a feed ID, and the value is a sorted list
-of harvest dates associated with that feed ID.</p>
+<dt>dict[RUFAS_ID, list[int]]</dt><dd><p>A dictionary mapping each feed ID to a sorted list of harvest dates
+associated with that feed ID.</p>
 </dd>
 </dl>
 </section>
@@ -306,17 +482,62 @@ of harvest dates associated with that feed ID.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_fed_emissions_and_resources">
 <span class="sig-name descname"><span class="pre">_calculate_daily_farmgrown_feed_fed_emissions_and_resources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_farmgrown_feed_emissions_and_resources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_deductions_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_simulation_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_fed_emissions_and_resources" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_fed_emissions_and_resources'"><span>#</span></a></dt>
-<dd><p>Calculates daily farmgrown feed emissions and resources used for farmgrown feeds fed to the animals.</p>
+<dd><p>Calculates daily farmgrown feed emissions and resources used for farmgrown
+feeds fed to the animals.</p>
+<p>Per-unit emission and resource values are scaled by the amount of feed
+deducted on each simulation day to produce the total emissions and resources
+attributable to the feed actually consumed.</p>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>daily_farmgrown_feed_emissions_and_resources<span class="classifier">dict[RUFAS_ID, dict[int, dict[str, float]]]</span></dt><dd><p>Per-unit daily emissions and resource values for each farmgrown feed,
+keyed by feed ID, simulation day, and variable name.</p>
+</dd>
+<dt>feed_deductions_data<span class="classifier">dict[RUFAS_ID, dict[int, float]]</span></dt><dd><p>Daily feed deduction amounts for each farmgrown feed, keyed by feed ID
+and simulation day.</p>
+</dd>
+<dt>all_simulation_days<span class="classifier">list[int]</span></dt><dd><p>A list of all simulation days in the simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[RUFAS_ID, dict[int, dict[str, float]]]</dt><dd><p>A nested dictionary structured as
+<code class="docutils literal notranslate"><span class="pre">{feed_id:</span> <span class="pre">{simulation_day:</span> <span class="pre">{variable:</span> <span class="pre">value}}}</span></code>, where each record
+contains the total nitrous oxide emissions, ammonia emissions,
+fertilizer N, fertilizer P, fertilizer K, and manure N attributable
+to the feed consumed on that day, (kg/day).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._report_daily_farmgrown_feed_fed_emissions_and_resources">
 <span class="sig-name descname"><span class="pre">_report_daily_farmgrown_feed_fed_emissions_and_resources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_farmgrown_feed_fed_emissions_and_resources</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._report_daily_farmgrown_feed_fed_emissions_and_resources" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._report_daily_farmgrown_feed_fed_emissions_and_resources'"><span>#</span></a></dt>
 <dd><p>Reports the emissions and resources for daily farmgrown feeds fed to the animals.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>daily_farmgrown_feed_fed_emissions_and_resources<span class="classifier">dict[RUFAS_ID, dict[int, dict[str, float]]]</span></dt><dd><p>The daily emissions and resources attributable to the farmgrown feed fed to animals, keyed by feed ID,
+simulation day, and variable name.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.emissions.EmissionsEstimator._calculate_and_report_lca_emissions">
 <span class="sig-name descname"><span class="pre">_calculate_and_report_lca_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">farm_grown_feeds_fed_to_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_deductions_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.emissions.EmissionsEstimator._calculate_and_report_lca_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.emissions.EmissionsEstimator._calculate_and_report_lca_emissions'"><span>#</span></a></dt>
-<dd><p>Calculates and reports LCA and Land-Use-Change emissions.</p>
+<dd><p>Calculates and reports life cycle assessment (LCA) and land use change emissions.</p>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>farm_grown_feeds_fed_to_animals<span class="classifier">list[RUFAS_ID]</span></dt><dd><p>The feed IDs of the farmgrown feeds that were fed to animals during the simulation.</p>
+</dd>
+<dt>feed_deductions_data<span class="classifier">dict[RUFAS_ID, dict[int, float]]</span></dt><dd><p>Daily feed deduction amounts for each farmgrown feed, keyed by feed ID and simulation day.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 </section>
 </dd></dl>
@@ -333,11 +554,10 @@ of harvest dates associated with that feed ID.</p>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feeds_emission_data'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feeds_emission_data"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._parse_farmgrown_feeds_emission_data()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._parse_manure_and_fertilizer_application_data'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_manure_and_fertilizer_application_data"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._parse_manure_and_fertilizer_application_data()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feed_deductions_data'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_farmgrown_feed_deductions_data"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._parse_farmgrown_feed_deductions_data()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._build_field_details'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._build_field_details"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._build_field_details()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._parse_crop_to_feed_id_mapping'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_crop_to_feed_id_mapping"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._parse_crop_to_feed_id_mapping()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._parse_harvest_data'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._parse_harvest_data"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._parse_harvest_data()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._group_harvest_details_by_date'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._group_harvest_details_by_date"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._group_harvest_details_by_date()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_emissions_and_resources'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_emissions_and_resources"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._calculate_daily_farmgrown_feed_emissions_and_resources()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._gather_farmgrown_feed_inventory_data'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._gather_farmgrown_feed_inventory_data"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._gather_farmgrown_feed_inventory_data()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._calculate_harvest_dates_by_feed_id'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._calculate_harvest_dates_by_feed_id"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._calculate_harvest_dates_by_feed_id()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_fed_emissions_and_resources'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._calculate_daily_farmgrown_feed_fed_emissions_and_resources"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._calculate_daily_farmgrown_feed_fed_emissions_and_resources()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.emissions.EmissionsEstimator._report_daily_farmgrown_feed_fed_emissions_and_resources'" class="reference internal" href="#RUFAS.EEE.emissions.EmissionsEstimator._report_daily_farmgrown_feed_fed_emissions_and_resources"><code class="docutils literal notranslate"><span class="pre">EmissionsEstimator._report_daily_farmgrown_feed_fed_emissions_and_resources()</span></code></a></li>

@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.EEE.tractor.html" rel="next" title="RUFAS.EEE.tractor module"/>
+<link href="RUFAS.EEE.emissions.html" rel="prev" title="RUFAS.EEE.emissions module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,9 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.EEE.html">RUFAS.EEE package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.EEE.energy module</span>
 </nav>
 <div id="content" role="main">
@@ -145,18 +151,32 @@
 <dt class="sig sig-object py" id="RUFAS.EEE.energy.EnergyEstimator">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.EEE.energy.</span></span><span class="sig-name descname"><span class="pre">EnergyEstimator</span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to estimate energy consumption for various operations on the farm</p>
+<p>Estimates energy consumption for the various field operations on the farm.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.energy.EnergyEstimator.estimate_all">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">estimate_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator.estimate_all" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator.estimate_all'"><span>#</span></a></dt>
-<dd><p>Runs all estimation functions and performs pre/post processing for them.</p>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">estimate_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulate_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator.estimate_all" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator.estimate_all'"><span>#</span></a></dt>
+<dd><p>Runs the diesel consumption estimation for all field operations and reports the per-operation and total
+results.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>simulate_animals<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the AnimalManager module.</p>
+</dd>
+<dt>simulate_feed<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the FeedManager module</p>
+</dd>
+<dt>simulate_fields<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the FieldManager module.</p>
+</dd>
+<dt>simulate_manure<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the ManureManager module</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.energy.EnergyEstimator.report_diesel_consumption">
-<span class="sig-name descname"><span class="pre">report_diesel_consumption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diesel_consumption_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tractor_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.TractorSize" title="RUFAS.data_structures.tillage_implements.TractorSize"><span class="pre">TractorSize</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">diesel_consumption_tractor_implement_liter_per_ton</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator.report_diesel_consumption" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator.report_diesel_consumption'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">report_diesel_consumption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diesel_consumption_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tractor_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.tillage_implements.html#RUFAS.data_structures.tillage_implements.TractorSize" title="RUFAS.data_structures.tillage_implements.TractorSize"><span class="pre">TractorSize</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">diesel_consumption_tractor_implement_liters_per_ha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator.report_diesel_consumption" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator.report_diesel_consumption'"><span>#</span></a></dt>
 <dd><p>Reports diesel consumption data for a specific tractor-implement operation.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>diesel_consumption_data<span class="classifier">dict[str, Any]</span></dt><dd><p>Diesel consumption data for the operation.</p>
 </dd>
@@ -164,7 +184,7 @@
 </dd>
 <dt>tractor_size<span class="classifier">TractorSize</span></dt><dd><p>Size of the tractor used.</p>
 </dd>
-<dt>diesel_consumption_tractor_implement_liter_per_ton<span class="classifier">float</span></dt><dd><p>Diesel consumption per ton of implement.</p>
+<dt>diesel_consumption_tractor_implement_liters_per_ha<span class="classifier">float</span></dt><dd><p>Diesel consumption rate for the tractor-implement operation (l/ha).</p>
 </dd>
 </dl>
 </section>
@@ -172,67 +192,90 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.energy.EnergyEstimator.parse_inputs_for_diesel_consumption_calculation">
 <span class="sig-name descname"><span class="pre">parse_inputs_for_diesel_consumption_calculation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator.parse_inputs_for_diesel_consumption_calculation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator.parse_inputs_for_diesel_consumption_calculation'"><span>#</span></a></dt>
-<dd><p>Parses the OutputManager variables pool for diesel consumption calculation.</p>
+<dd><p>Parses the <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code> variables pool into diesel consumption input data.</p>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>list[dict[str, Any]]</dt><dd><p>A list of event data dictionaries, one per field operation event, each mapping EEE input keys to their
+values along with the associated <code class="docutils literal notranslate"><span class="pre">operation_event</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If an expected variable key is missing from the filtered variables pool.</p>
+</dd>
+<dt>IndexError</dt><dd><p>If a variable’s value list is shorter than expected while building the event data.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.energy.EnergyEstimator.calculate_diesel_consumption">
 <span class="sig-name descname"><span class="pre">calculate_diesel_consumption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_yield</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_production_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tractor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor" title="RUFAS.EEE.tractor.Tractor"><span class="pre">Tractor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">clay_percent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_dm_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator.calculate_diesel_consumption" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator.calculate_diesel_consumption'"><span>#</span></a></dt>
-<dd><p>General estimate of diesel fuel consumption for a given attachment type and tractor size.
-Different practices use different types of tools/implements; the equation to estimate diesel fuel consumption
-may be the same across practices, but different implements have different parameter values.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>crop_yield: float</dt><dd><p>Amount of crop yielded per hectares (metric ton/ha).</p>
-</dd>
-<dt>field_production_size: float</dt><dd><p>The filed area under production (ha).</p>
-</dd>
-<dt>tractor: Tractor</dt><dd><p>The specifications of the tractor.</p>
-</dd>
-<dt>clay_percent<span class="classifier">float</span></dt><dd><p>The clay percentage of the field under production (unitless).</p>
-</dd>
-<dt>application_mass<span class="classifier">float | None = None</span></dt><dd><p>The mass of a manure or fertilizer application (kg).</p>
-</dd>
-<dt>application_dm_content<span class="classifier">float | None = None</span></dt><dd><p>The dry matter content of a manure or fertilizer application (kg).</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>float</dt><dd><p>Diesel Consumption for Tractor-Implement (l/ha).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.EEE.energy.EnergyEstimator._calculate_total_power_needed">
-<span class="sig-name descname"><span class="pre">_calculate_total_power_needed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tractor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor" title="RUFAS.EEE.tractor.Tractor"><span class="pre">Tractor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">implement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement" title="RUFAS.EEE.tractor_implement.TractorImplement"><span class="pre">TractorImplement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_yield_ton_per_ha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_production_size_ha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clay_percent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator._calculate_total_power_needed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator._calculate_total_power_needed'"><span>#</span></a></dt>
-<dd><p>Calculates the total power needed to perform the field operation by the tractor and implement where applicable.
-Implements Helper Function 412 in EEE Functions file.</p>
+<dd><p>General estimate of diesel fuel consumption for a given attachment type and tractor size.</p>
 <section id="id2">
 <h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
 <dl class="simple">
+<dt>crop_yield<span class="classifier">float</span></dt><dd><p>Amount of crop yielded per hectare (metric ton/ha).</p>
+</dd>
+<dt>field_production_size<span class="classifier">float</span></dt><dd><p>The field area under production (ha).</p>
+</dd>
 <dt>tractor<span class="classifier">Tractor</span></dt><dd><p>The specifications of the tractor.</p>
-</dd>
-<dt>implement<span class="classifier">TractorImplement</span></dt><dd><p>The specifications of the implement.</p>
-</dd>
-<dt>crop_yield_ton_per_ha<span class="classifier">float</span></dt><dd><p>Amount of crop yielded per hectares (metric ton/ha)</p>
-</dd>
-<dt>field_production_size_ha<span class="classifier">float</span></dt><dd><p>The filed area under production (ha)</p>
 </dd>
 <dt>clay_percent<span class="classifier">float</span></dt><dd><p>The clay percentage of the field under production (unitless).</p>
 </dd>
-<dt>application_mass<span class="classifier">float | None = None</span></dt><dd><p>The mass of a manure or fertilizer application (kg).</p>
+<dt>application_mass<span class="classifier">float | None, optional</span></dt><dd><p>The mass of a manure or fertilizer application (kg).</p>
+</dd>
+<dt>application_dm_content<span class="classifier">float | None, optional</span></dt><dd><p>The dry matter content of a manure or fertilizer application (kg).</p>
 </dd>
 </dl>
 </section>
 <section id="id3">
 <h2>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>float</dt><dd><p>The total power needed for the field operation (kW)</p>
+<dt>float</dt><dd><p>Diesel consumption for the tractor-implement (l/ha).</p>
 </dd>
 </dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<p>Different practices use different types of tools/implements; the equation to estimate diesel fuel consumption
+may be the same across practices, but different implements have different parameter values.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.EEE.energy.EnergyEstimator._calculate_total_power_needed">
+<span class="sig-name descname"><span class="pre">_calculate_total_power_needed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tractor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.EEE.tractor.html#RUFAS.EEE.tractor.Tractor" title="RUFAS.EEE.tractor.Tractor"><span class="pre">Tractor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">implement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.EEE.tractor_implement.html#RUFAS.EEE.tractor_implement.TractorImplement" title="RUFAS.EEE.tractor_implement.TractorImplement"><span class="pre">TractorImplement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_yield_ton_per_ha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_production_size_ha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clay_percent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.EEE.energy.EnergyEstimator._calculate_total_power_needed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.energy.EnergyEstimator._calculate_total_power_needed'"><span>#</span></a></dt>
+<dd><p>Calculates the total power needed to perform the field operation by the tractor and implement where applicable.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>tractor<span class="classifier">Tractor</span></dt><dd><p>The specifications of the tractor.</p>
+</dd>
+<dt>implement<span class="classifier">TractorImplement</span></dt><dd><p>The specifications of the implement.</p>
+</dd>
+<dt>crop_yield_ton_per_ha<span class="classifier">float</span></dt><dd><p>Amount of crop yielded per hectare (metric ton/ha).</p>
+</dd>
+<dt>field_production_size_ha<span class="classifier">float</span></dt><dd><p>The field area under production (ha).</p>
+</dd>
+<dt>clay_percent<span class="classifier">float</span></dt><dd><p>The clay percentage of the field under production (unitless).</p>
+</dd>
+<dt>application_mass<span class="classifier">float | None, optional</span></dt><dd><p>The mass of a manure or fertilizer application (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The total power needed for the field operation (kW).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h2>
+<p>Implements Helper Function 412 in the EEE Functions file.</p>
 </section>
 </dd></dl>
 </dd></dl>

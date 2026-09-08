@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -152,10 +153,12 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrients.Nutrients">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.nutrients.nutrients.</span></span><span class="sig-name descname"><span class="pre">Nutrients</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Representation of the nutrients of an animal.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrients.Nutrients.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients.__init__'"><span>#</span></a></dt>
-<dd></dd></dl>
+<dd><p>Init method for Nutrients class.</p>
+</dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrients.Nutrients.phosphorus_excess_in_diet">
 <span class="sig-name descname"><span class="pre">phosphorus_excess_in_diet</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients.phosphorus_excess_in_diet" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients.phosphorus_excess_in_diet'"><span>#</span></a></dt>
@@ -215,15 +218,13 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrients.Nutrients._calculate_total_animal_phosphorus">
 <span class="sig-name descname"><span class="pre">_calculate_total_animal_phosphorus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients._calculate_total_animal_phosphorus" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nutrients.Nutrients._calculate_total_animal_phosphorus'"><span>#</span></a></dt>
 <dd><p>Calculates the total phosphorus for the animal.</p>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<p>Change in body P reserves (g), must be &lt;= 0</p>
+</section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h2>
 <p>RuFaS Phosphorus Animal Module documentation sections A.1G.A.1, A.1G.A.2, A.1G.A.3.</p>
-</section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<ul class="simple">
-<li><p>Change in body P reserves (g), must be &lt;= 0</p></li>
-</ul>
 </section>
 </dd></dl>
 <dl class="py method">

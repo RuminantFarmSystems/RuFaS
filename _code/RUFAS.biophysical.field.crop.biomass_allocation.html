@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.crop.crop.html" rel="next" title="RUFAS.biophysical.field.crop.crop module"/>
+<link href="RUFAS.biophysical.field.crop.html" rel="prev" title="RUFAS.biophysical.field.crop package"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.crop.html">RUFAS.biophysical.field.crop package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.crop.biomass_allocation module</span>
 </nav>
 <div id="content" role="main">
@@ -150,16 +158,16 @@ and some components from the Crop Yield section (5:2.4)</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>crop_data<span class="classifier">Optional[CropData]</span></dt><dd><p>The data object used for biomass calculation. Stores information
+<dt>crop_data<span class="classifier">CropData, optional</span></dt><dd><p>The data object used for biomass calculation. Stores information
 about the plant’s growth and environmental factors.</p>
 </dd>
 <dt>light_extinction<span class="classifier">float, default 0.65</span></dt><dd><p>Light extinction coefficient (unitless).</p>
 </dd>
-<dt>usable_light<span class="classifier">Optional[float], default None</span></dt><dd><p>Solar radiation captured for photosynthesis (MJ/m^2).</p>
+<dt>usable_light<span class="classifier">float, optional</span></dt><dd><p>Solar radiation captured for photosynthesis (MJ/m^2).</p>
 </dd>
-<dt>biomass_growth<span class="classifier">Optional[float], default None</span></dt><dd><p>Biomass accumulated during the day (kg/ha).</p>
+<dt>biomass_growth<span class="classifier">float, optional</span></dt><dd><p>Biomass accumulated during the day (kg/ha).</p>
 </dd>
-<dt>previous_biomass<span class="classifier">Optional[float], default None</span></dt><dd><p>Biomass accumulated on the previous day (kg/ha).</p>
+<dt>previous_biomass<span class="classifier">float, optional</span></dt><dd><p>Biomass accumulated on the previous day (kg/ha).</p>
 </dd>
 </dl>
 </section>
@@ -171,11 +179,11 @@ about the plant’s growth and environmental factors.</p>
 </dd>
 <dt>light_extinction<span class="classifier">float</span></dt><dd><p>Light extinction coefficient (unitless).</p>
 </dd>
-<dt>usable_light<span class="classifier">Optional[float]</span></dt><dd><p>Solar radiation captured for photosynthesis (MJ/m^2).</p>
+<dt>usable_light<span class="classifier">float | None</span></dt><dd><p>Solar radiation captured for photosynthesis (MJ/m^2).</p>
 </dd>
-<dt>biomass_growth<span class="classifier">Optional[float]</span></dt><dd><p>Biomass accumulated during the day (kg/ha).</p>
+<dt>biomass_growth<span class="classifier">float | None</span></dt><dd><p>Biomass accumulated during the day (kg/ha).</p>
 </dd>
-<dt>previous_biomass<span class="classifier">Optional[float]</span></dt><dd><p>Biomass accumulated on the previous day (kg/ha).</p>
+<dt>previous_biomass<span class="classifier">float | None</span></dt><dd><p>Biomass accumulated on the previous day (kg/ha).</p>
 </dd>
 </dl>
 </section>
@@ -214,10 +222,6 @@ about the plant’s growth and environmental factors.</p>
 </dd>
 </dl>
 </section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
-<p>None</p>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation.photosynthesize">
@@ -235,17 +239,13 @@ about the plant’s growth and environmental factors.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation.partition_biomass">
 <span class="sig-name descname"><span class="pre">partition_biomass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation.partition_biomass" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation.partition_biomass'"><span>#</span></a></dt>
 <dd><p>Partition the accumulated biomass into above ground and below ground portions.</p>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
-<p>None</p>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._intercept_radiation">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_intercept_radiation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radiation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extinction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lai</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._intercept_radiation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._intercept_radiation'"><span>#</span></a></dt>
 <dd><p>Calculate the amount of solar radiation intercepted for photosynthesis during the day.</p>
-<section id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>radiation<span class="classifier">float</span></dt><dd><p>Total solar radiation available for the day (MJ/m^2).</p>
 </dd>
@@ -255,8 +255,8 @@ about the plant’s growth and environmental factors.</p>
 </dd>
 </dl>
 </section>
-<section id="id5">
-<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Intercepted radiation energy (MJ/m^2).</p>
 </dd>
@@ -267,8 +267,8 @@ about the plant’s growth and environmental factors.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_max_accumulation">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_max_accumulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">efficiency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_max_accumulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_max_accumulation'"><span>#</span></a></dt>
 <dd><p>Calculate the upper limit to biomass accumulation during a day.</p>
-<section id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>energy<span class="classifier">float</span></dt><dd><p>Intercepted energy from solar radiation for the day (MJ/m^2).</p>
 </dd>
@@ -276,8 +276,8 @@ about the plant’s growth and environmental factors.</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The maximum biomass that can be accumulated in a day (kg/ha).</p>
 </dd>
@@ -288,8 +288,8 @@ about the plant’s growth and environmental factors.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_accumulated_biomass">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_accumulated_biomass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">growth_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_growth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_accumulated_biomass" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_accumulated_biomass'"><span>#</span></a></dt>
 <dd><p>Calculate the biomass accumulated during the day.</p>
-<section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>growth_factor<span class="classifier">float</span></dt><dd><p>The growth factor for the plant, which is a value from 0 to 1 (unitless).</p>
 </dd>
@@ -297,8 +297,8 @@ about the plant’s growth and environmental factors.</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Biomass accumulated in a day (kg/ha).</p>
 </dd>
@@ -309,8 +309,8 @@ about the plant’s growth and environmental factors.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_above_ground_biomass">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_above_ground_biomass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_above_ground_biomass" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_above_ground_biomass'"><span>#</span></a></dt>
 <dd><p>Calculate above ground plant biomass.</p>
-<section id="id10">
-<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>root_frac<span class="classifier">float</span></dt><dd><p>Fraction of biomass stored in roots (unitless).</p>
 </dd>
@@ -318,8 +318,8 @@ about the plant’s growth and environmental factors.</p>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Above ground biomass (kg/ha).</p>
 </dd>
@@ -334,8 +334,8 @@ about the plant’s growth and environmental factors.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_below_ground_biomass">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_below_ground_biomass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_below_ground_biomass" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.biomass_allocation.BiomassAllocation._determine_below_ground_biomass'"><span>#</span></a></dt>
 <dd><p>Calculate below ground plant biomass.</p>
-<section id="id12">
-<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>root_frac<span class="classifier">float</span></dt><dd><p>Fraction of biomass stored in roots (unitless).</p>
 </dd>
@@ -343,8 +343,8 @@ about the plant’s growth and environmental factors.</p>
 </dd>
 </dl>
 </section>
-<section id="id13">
-<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Below ground biomass (kg/ha).</p>
 </dd>

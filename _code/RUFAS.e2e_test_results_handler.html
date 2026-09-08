@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -147,7 +148,7 @@
 <span id="rufas-e2e-test-results-handler-module"></span><h1>RUFAS.e2e_test_results_handler module<a class="headerlink" href="#module-RUFAS.e2e_test_results_handler" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">ResultPathType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_results_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_results_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.ResultPathType'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">ResultPathType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_results_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_results_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">must_change_variables_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.ResultPathType'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._asdict">
@@ -156,11 +157,11 @@
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._field_defaults">
-<span class="sig-name descname"><span class="pre">_field_defaults</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._field_defaults" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.ResultPathType._field_defaults'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_field_defaults</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'must_change_variables_path':</span> <span class="pre">''}</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._field_defaults" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.ResultPathType._field_defaults'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._fields">
-<span class="sig-name descname"><span class="pre">_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('domain',</span> <span class="pre">'expected_results_path',</span> <span class="pre">'actual_results_path',</span> <span class="pre">'tolerance')</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._fields" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.ResultPathType._fields'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('domain',</span> <span class="pre">'expected_results_path',</span> <span class="pre">'actual_results_path',</span> <span class="pre">'tolerance',</span> <span class="pre">'must_change_variables_path')</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._fields" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.ResultPathType._fields'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._make">
@@ -188,6 +189,11 @@
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType.must_change_variables_path">
+<span class="sig-name descname"><span class="pre">must_change_variables_path</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType.must_change_variables_path" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.ResultPathType.must_change_variables_path'"><span>#</span></a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType.tolerance">
 <span class="sig-name descname"><span class="pre">tolerance</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType.tolerance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.ResultPathType.tolerance'"><span>#</span></a></dt>
 <dd><p>Alias for field number 3</p>
@@ -197,8 +203,7 @@
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">E2ETestResultsHandler</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Handles generating and comparing actual and expected results for end-to-end testing of various
-RuFaS modules.</p>
+<p>Handles generating and comparing actual and expected results for end-to-end testing of various RuFaS modules.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">compare_actual_and_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_variable_table_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results'"><span>#</span></a></dt>
@@ -208,20 +213,57 @@ RuFaS modules.</p>
 <dl class="simple">
 <dt>json_output_path<span class="classifier">Path</span></dt><dd><p>Path to which JSON outputs are written to.</p>
 </dd>
-<dt>convert_variable_table_path<span class="classifier">str | None</span></dt><dd><p>String path to the csv look up table to convert the variable names in the expected results to match the
+<dt>convert_variable_table_path<span class="classifier">str | None</span></dt><dd><p>String path to the csv lookup table to convert the variable names in the expected results to match the
 variable names in the actual results.</p>
 </dd>
 <dt>output_prefix<span class="classifier">str</span></dt><dd><p>The output prefix for the current e2e run.</p>
 </dd>
 </dl>
 </section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<p>Variables flagged in the input set’s must-change variables file are held to the opposite assertion of the
+regular comparison: each flagged variable must differ from its recorded expected value beyond the domain
+tolerance, and its differences are not reported as regular failures. The comparison results additionally
+report <code class="docutils literal notranslate"><span class="pre">changed_variables</span></code>, the names of the unflagged variables whose values differ from the expected
+results, so a subject matter expert can evaluate them and flag the ones that are expected to change.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._report_domain_comparison_results">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_report_domain_comparison_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtered_diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_must_change_variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">must_change_satisfied</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">must_change_violations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._report_domain_comparison_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._report_domain_comparison_results'"><span>#</span></a></dt>
+<dd><p>Logs the outcome of a domain’s end-to-end comparison and records the comparison results as variables.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>domain<span class="classifier">str</span></dt><dd><p>The RuFaS domain the comparison results belong to.</p>
+</dd>
+<dt>filtered_diff<span class="classifier">dict[str, Any]</span></dt><dd><p>The domain’s <code class="docutils literal notranslate"><span class="pre">DeepDiff</span></code> result with insignificant changes filtered out.</p>
+</dd>
+<dt>domain_must_change_variables<span class="classifier">list[str]</span></dt><dd><p>The must-change variable names present in the domain’s expected results.</p>
+</dd>
+<dt>must_change_satisfied<span class="classifier">list[str]</span></dt><dd><p>The must-change variables whose values differ from the expected results.</p>
+</dd>
+<dt>must_change_violations<span class="classifier">dict[str, str]</span></dt><dd><p>The violating must-change variables, mapped to the reason each one failed.</p>
+</dd>
+<dt>info_map<span class="classifier">dict[str, Any]</span></dt><dd><p>Information about the source of the recorded variables. Updated in place with the units and the
+<code class="docutils literal notranslate"><span class="pre">domain</span></code> output prefix.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<p>The domain passes when the filtered diff is empty and there are no must-change violations; each failure
+cause is logged as an error, and the recorded results include <code class="docutils literal notranslate"><span class="pre">changed_variables</span></code> (the names of the
+unflagged variables that differ) and the must-change outcomes.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_convert_expected_result_variable_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion_csv_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names'"><span>#</span></a></dt>
-<dd><p>Convert variable names in the <cite>expected_results</cite> dictionary using a CSV-based conversion table.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<dd><p>Convert variable names in the <code class="docutils literal notranslate"><span class="pre">expected_results</span></code> dictionary using a CSV-based conversion table.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>expected_results<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary where the keys represent the original variable names and the values are
 the associated data.</p>
@@ -235,24 +277,24 @@ to new variable names.</p>
 <h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>dict[str, Any]</dt><dd><p>A dictionary with updated keys based on the conversion mappings from the CSV. If a key
-in <cite>expected_results</cite> is not found in the mapping, it is preserved in the returned dictionary.</p>
+in <code class="docutils literal notranslate"><span class="pre">expected_results</span></code> is not found in the mapping, it is preserved in the returned dictionary.</p>
 </dd>
 </dl>
 </section>
 <section id="raises">
 <h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>KeyError</dt><dd><p>Raised if the conversion table CSV does not contain both ‘Original’ and ‘New’ columns.</p>
+<dt>KeyError</dt><dd><p>Raised if the conversion table CSV does not contain both “Original” and “New” columns.</p>
 </dd>
 <dt>ValueError</dt><dd><p>Raised if the conversion table CSV contains duplicate mappings for original variable names.</p>
 </dd>
 </dl>
 </section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<section id="id4">
+<h2>Notes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
 <p>Reads a CSV file containing mappings of original variable names to new variable names and applies
-these mappings to the keys in the given dictionary <cite>expected_results</cite>. The conversion table must
-contain two columns: ‘Original’ and ‘New’. Ensures no duplicate mappings exist in the CSV and raises
+these mappings to the keys in the given dictionary <code class="docutils literal notranslate"><span class="pre">expected_results</span></code>. The conversion table must
+contain two columns: “Original” and “New”. Ensures no duplicate mappings exist in the CSV and raises
 appropriate errors otherwise. Returns a dictionary with updated keys while preserving their associated
 values.</p>
 </section>
@@ -260,35 +302,35 @@ values.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._find_duplicate_mappings">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_find_duplicate_mappings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._find_duplicate_mappings" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._find_duplicate_mappings'"><span>#</span></a></dt>
-<dd><p>Identifies entries in a DataFrame where a single key maps to multiple values.</p>
-<section id="id2">
-<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<dd><p>Identifies entries in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> where a single key maps to multiple values.</p>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>mapping<span class="classifier">pd.DataFrame</span></dt><dd><p>The DataFrame containing the mapping data. Must include the specified columns.</p>
+<dt>mapping<span class="classifier">pd.DataFrame</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the mapping data. Must include the specified columns.</p>
 </dd>
 <dt>group_column_name<span class="classifier">str</span></dt><dd><p>The column to be analyzed for duplicate mappings.</p>
 </dd>
-<dt>list_column_name<span class="classifier">str</span></dt><dd><p>The column containing values that are mapped from ‘group_column_name’.</p>
+<dt>list_column_name<span class="classifier">str</span></dt><dd><p>The column containing values that are mapped from <code class="docutils literal notranslate"><span class="pre">group_column_name</span></code>.</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<section id="id6">
+<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>dict[str, list[str]]</dt><dd><p>A dictionary where each key is a duplicated entry from ‘group_column_name’,
-and each value is a list of corresponding mapped values from ‘list_column_name’.</p>
+<dt>dict[str, list[str]]</dt><dd><p>A dictionary where each key is a duplicated entry from <code class="docutils literal notranslate"><span class="pre">group_column_name</span></code>,
+and each value is a list of corresponding mapped values from <code class="docutils literal notranslate"><span class="pre">list_column_name</span></code>.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h2>Notes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
-<p>This method examines a DataFrame containing mappings between two columns and
-finds instances where a value in the ‘group_column_name’ column is associated
-with more than one unique value in the ‘list_column_name’ column.</p>
+<section id="id7">
+<h2>Notes<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
+<p>This method examines a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing mappings between two columns and
+finds instances where a value in the <code class="docutils literal notranslate"><span class="pre">group_column_name</span></code> column is associated
+with more than one unique value in the <code class="docutils literal notranslate"><span class="pre">list_column_name</span></code> column.</p>
 <dl class="simple">
 <dt>The result is a dictionary where:</dt><dd><ul class="simple">
-<li><p>Keys are the duplicated values from ‘group_column_name’.</p></li>
-<li><p>Values are lists of corresponding values from ‘list_column_name’.</p></li>
+<li><p>Keys are the duplicated values from <code class="docutils literal notranslate"><span class="pre">group_column_name</span></code>.</p></li>
+<li><p>Values are lists of corresponding values from <code class="docutils literal notranslate"><span class="pre">list_column_name</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -297,20 +339,20 @@ with more than one unique value in the ‘list_column_name’ column.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._duplicate_mappings_exist">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_duplicate_mappings_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._duplicate_mappings_exist" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._duplicate_mappings_exist'"><span>#</span></a></dt>
-<dd><p>Checks for duplicate mappings in the provided DataFrame and logs errors if any
+<dd><p>Checks for duplicate mappings in the provided <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and logs errors if any
 duplicates are found. This ensures that no original variable name maps to multiple new
 variable names, and no new variable name is mapped from multiple original variable names.</p>
-<section id="id5">
-<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<section id="id8">
+<h2>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>mapping<span class="classifier">pd.DataFrame</span></dt><dd><p>A DataFrame containing the mappings between “Original” and “New” variable names.</p>
+<dt>mapping<span class="classifier">pd.DataFrame</span></dt><dd><p>A <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the mappings between <code class="docutils literal notranslate"><span class="pre">Original</span></code> and <code class="docutils literal notranslate"><span class="pre">New</span></code> variable names.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<section id="id9">
+<h2>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>bool</dt><dd><p>If any duplicate mappings are found, returns True. Otherwise, returns False.</p>
+<dt>bool</dt><dd><p>If any duplicate mappings are found, returns <code class="docutils literal notranslate"><span class="pre">True</span></code>. Otherwise, returns <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </dd>
 </dl>
 </section>
@@ -319,30 +361,123 @@ variable names, and no new variable name is mapped from multiple original variab
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_get_test_result_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="RUFAS.e2e_test_results_handler.ResultPathType"><span class="pre">ResultPathType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths'"><span>#</span></a></dt>
 <dd><p>Retrieves the paths to test results and associated information from the InputManager.</p>
+<section id="id10">
+<h2>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>output_prefix<span class="classifier">str</span></dt><dd><p>The output prefix.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>list[ResultPathType]</dt><dd><p>List of result path sets, each containing the domain, expected results path,
+actual results path, and tolerance for one test domain.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._load_must_change_variables">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_load_must_change_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_result_path_sets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="RUFAS.e2e_test_results_handler.ResultPathType"><span class="pre">ResultPathType</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._load_must_change_variables" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._load_must_change_variables'"><span>#</span></a></dt>
+<dd><p>Loads the names of the variables flagged as must change for an end-to-end testing input set.</p>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>test_result_path_sets<span class="classifier">list[ResultPathType]</span></dt><dd><p>List of result path sets for the input set, each optionally referencing a must-change variables file
+through its <code class="docutils literal notranslate"><span class="pre">must_change_variables_path</span></code> field.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>set[str]</dt><dd><p>The union of the variable names listed in the referenced must-change variables files. Path sets with an
+empty <code class="docutils literal notranslate"><span class="pre">must_change_variables_path</span></code> are skipped.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h2>Raises<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>FileNotFoundError</dt><dd><p>If a referenced must-change variables file does not exist.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If a referenced file is not valid JSON, or does not contain a list of strings under the
+<code class="docutils literal notranslate"><span class="pre">must_change_variables</span></code> key.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._evaluate_must_change_variables">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_evaluate_must_change_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">must_change_variable_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._evaluate_must_change_variables" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._evaluate_must_change_variables'"><span>#</span></a></dt>
+<dd><p>Checks that each variable flagged as must change actually differs from its recorded expected value.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>expected_results<span class="classifier">dict[str, Any]</span></dt><dd><p>The expected results for a domain, keyed by variable name.</p>
+</dd>
+<dt>actual_results<span class="classifier">dict[str, Any]</span></dt><dd><p>The actual results for a domain, keyed by variable name.</p>
+</dd>
+<dt>must_change_variable_names<span class="classifier">list[str]</span></dt><dd><p>The must-change variable names present in <code class="docutils literal notranslate"><span class="pre">expected_results</span></code>.</p>
+</dd>
+<dt>tolerance<span class="classifier">float</span></dt><dd><p>The threshold (expressed as a percent) below which a difference is considered no change.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>tuple[list[str], dict[str, str]]</dt><dd><p>A list of the must-change variables whose values differ from the expected results, and a dictionary
+mapping each violating must-change variable to the reason it failed: either its value still matches the
+expected results, or it is missing from the actual results.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._extract_changed_variable_names">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_extract_changed_variable_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diff_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._extract_changed_variable_names" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._extract_changed_variable_names'"><span>#</span></a></dt>
+<dd><p>Compiles the names of the variables that a <code class="docutils literal notranslate"><span class="pre">DeepDiff</span></code> result reports as different.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>diff_result<span class="classifier">dict[str, Any]</span></dt><dd><p>A <code class="docutils literal notranslate"><span class="pre">DeepDiff</span></code> result mapping change categories (e.g. <code class="docutils literal notranslate"><span class="pre">values_changed</span></code>) to changed paths.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>list[str]</dt><dd><p>The sorted, deduplicated top-level variable names extracted from the changed paths. Paths that do not
+start with a top-level dictionary key (e.g. a change to the results root) are skipped.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_significant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">changes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant'"><span>#</span></a></dt>
-<dd><p>Determines if a numerical change is significant based if the change between the
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_significant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">changes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant'"><span>#</span></a></dt>
+<dd><p>Determines if a numerical change is significant based on if the change between the
 “old_value” and “new_value” exceeds the specified tolerance.</p>
-<section id="id7">
-<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>changes<span class="classifier">dict[str, float | str]</span></dt><dd><p>A dictionary representing changes with “old_value” and “new_value”.</p>
+<dt>changes<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary representing changes with “old_value” and “new_value”.</p>
 </dd>
 <dt>tolerance<span class="classifier">float</span></dt><dd><p>The threshold for considering a difference as significant.</p>
 </dd>
 </dl>
 </section>
-<section id="id8">
-<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
+<section id="id20">
+<h2>Returns<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>bool</dt><dd><p>True if the change is both numerical and significant, False otherwise.</p>
+<dt>bool</dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the change is both numerical and significant, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h2>Notes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
+<section id="id21">
+<h2>Notes<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h2>
 <p>The comparison is based on the absolute difference between the “old_value” and “new_value”,
 relative to the “old_value”. If the “old_value” is zero, a fallback reference value of 1 is used
 to ensure the tolerance comparison remains meaningful.</p>
@@ -352,37 +487,37 @@ to ensure the tolerance comparison remains meaningful.</p>
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_nested">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">filter_nested</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values_changed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_nested" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_nested'"><span>#</span></a></dt>
 <dd><p>Recursively filters out insignificant numerical changes from a nested structure.</p>
-<section id="id10">
-<h2>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
+<section id="id22">
+<h2>Parameters<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>values_changed<span class="classifier">dict[str, dict[str, float | str]]</span></dt><dd><p>The <cite>values_changed</cite> section of a DeepDiff result.</p>
+<dt>values_changed<span class="classifier">dict[str, dict[str, float | str]]</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">values_changed</span></code> section of a <code class="docutils literal notranslate"><span class="pre">DeepDiff</span></code> result.</p>
 </dd>
 <dt>tolerance<span class="classifier">float</span></dt><dd><p>The threshold for considering a difference as significant.</p>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h2>Notes<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
-<p>This method modifies <cite>values_changed</cite> in place.</p>
+<section id="id23">
+<h2>Notes<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
+<p>This method modifies <code class="docutils literal notranslate"><span class="pre">values_changed</span></code> in place.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_insignificant_changes">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">filter_insignificant_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diff_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_insignificant_changes" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_insignificant_changes'"><span>#</span></a></dt>
-<dd><p>Removes insignificant changes from a DeepDiff <cite>values_changed</cite> section.</p>
-<section id="id12">
-<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<dd><p>Removes insignificant changes from a <code class="docutils literal notranslate"><span class="pre">DeepDiff</span></code> <code class="docutils literal notranslate"><span class="pre">values_changed</span></code> section.</p>
+<section id="id24">
+<h2>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>diff_result<span class="classifier">dict[str, dict[str, dict[str, float | str]]]</span></dt><dd><p>The DeepDiff result to filter.</p>
+<dt>diff_result<span class="classifier">dict[str, dict[str, dict[str, float | str]]]</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">DeepDiff</span></code> result to filter.</p>
 </dd>
 <dt>tolerance<span class="classifier">float</span></dt><dd><p>The threshold for considering a difference as significant.</p>
 </dd>
 </dl>
 </section>
-<section id="id13">
-<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
+<section id="id25">
+<h2>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>dict[str, dict[str, dict[str, float | str]]]</dt><dd><p>The filtered DeepDiff result.</p>
+<dt>dict[str, dict[str, dict[str, float | str]]]</dt><dd><p>The filtered <code class="docutils literal notranslate"><span class="pre">DeepDiff</span></code> result.</p>
 </dd>
 </dl>
 </section>
@@ -392,33 +527,39 @@ to ensure the tolerance comparison remains meaningful.</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">update_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results'"><span>#</span></a></dt>
 <dd><p>Compares the actual end-to-end testing results for various RuFaS domains and updates the expected
 results in the appropriate domain filter file if differences are found.</p>
-<section id="id14">
-<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
+<section id="id26">
+<h2>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>output_dir<span class="classifier">str</span></dt><dd><p>The directory to which the actual results are written to.</p>
+<dt>output_dir<span class="classifier">Path</span></dt><dd><p>The directory to which the actual results are written to.</p>
 </dd>
 <dt>output_prefix<span class="classifier">str</span></dt><dd><p>The prefix to give the output file names.</p>
 </dd>
 </dl>
 </section>
+<section id="id27">
+<h2>Notes<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h2>
+<p>The input set’s must-change variables file is not touched: after an update, the freshly recorded expected
+results already reflect any flagged changes, so it is the user’s responsibility to empty the must-change
+list, otherwise the leftover flags will fail the next comparison run.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_matching_path">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_get_matching_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="RUFAS.e2e_test_results_handler.ResultPathType"><span class="pre">ResultPathType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_matching_path" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_matching_path'"><span>#</span></a></dt>
-<dd><p>Returns the path that matches the path_set actual results path.</p>
-<section id="id15">
-<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
+<dd><p>Returns the path that matches the <code class="docutils literal notranslate"><span class="pre">path_set</span></code> actual results path.</p>
+<section id="id28">
+<h2>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>dir_path<span class="classifier">Path</span></dt><dd><p>The path to the directory.</p>
 </dd>
-<dt>path_set<span class="classifier">ResultPathType</span></dt><dd><p>ResultPathType object containing the domain, expected results path, actual results path, and tolerance.</p>
+<dt>path_set<span class="classifier">ResultPathType</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">ResultPathType</span></code> object containing the domain, expected results path, actual results path, and tolerance.</p>
 </dd>
 </dl>
 </section>
-<section id="id16">
-<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<section id="id29">
+<h2>Returns<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>Path</dt><dd><p>The matching path.</p>
+<dt>Path | None</dt><dd><p>The matching path.</p>
 </dd>
 </dl>
 </section>
@@ -426,13 +567,20 @@ results in the appropriate domain filter file if differences are found.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._write_formatted_json">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_write_formatted_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._write_formatted_json" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._write_formatted_json'"><span>#</span></a></dt>
-<dd><p>Writes a JSON file with custom serialization settings for the “expected_results” field.</p>
-<section id="id17">
-<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
+<dd><p>Writes a JSON file with custom serialization settings for the <code class="docutils literal notranslate"><span class="pre">expected_results</span></code> field.</p>
+<section id="id30">
+<h2>Parameters<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>file_path<span class="classifier">Path</span></dt><dd><p>The path to the JSON file.</p>
 </dd>
-<dt>data<span class="classifier">dict</span></dt><dd><p>The data to write to the JSON file.</p>
+<dt>data<span class="classifier">dict[str, str]</span></dt><dd><p>The data to write to the JSON file.</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h2>Raises<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the input data is missing required keys.</p>
 </dd>
 </dl>
 </section>
@@ -451,15 +599,20 @@ results in the appropriate domain filter file if differences are found.</p>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.ResultPathType.actual_results_path'" class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType.actual_results_path"><code class="docutils literal notranslate"><span class="pre">ResultPathType.actual_results_path</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.ResultPathType.domain'" class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType.domain"><code class="docutils literal notranslate"><span class="pre">ResultPathType.domain</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.ResultPathType.expected_results_path'" class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType.expected_results_path"><code class="docutils literal notranslate"><span class="pre">ResultPathType.expected_results_path</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.ResultPathType.must_change_variables_path'" class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType.must_change_variables_path"><code class="docutils literal notranslate"><span class="pre">ResultPathType.must_change_variables_path</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.ResultPathType.tolerance'" class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType.tolerance"><code class="docutils literal notranslate"><span class="pre">ResultPathType.tolerance</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler</span></code></a><ul>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler.compare_actual_and_expected_test_results()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._report_domain_comparison_results'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._report_domain_comparison_results"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler._report_domain_comparison_results()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler._convert_expected_result_variable_names()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._find_duplicate_mappings'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._find_duplicate_mappings"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler._find_duplicate_mappings()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._duplicate_mappings_exist'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._duplicate_mappings_exist"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler._duplicate_mappings_exist()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler._get_test_result_paths()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._load_must_change_variables'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._load_must_change_variables"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler._load_must_change_variables()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._evaluate_must_change_variables'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._evaluate_must_change_variables"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler._evaluate_must_change_variables()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._extract_changed_variable_names'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._extract_changed_variable_names"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler._extract_changed_variable_names()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler.is_significant()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_nested'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_nested"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler.filter_nested()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_insignificant_changes'" class="reference internal" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_insignificant_changes"><code class="docutils literal notranslate"><span class="pre">E2ETestResultsHandler.filter_insignificant_changes()</span></code></a></li>

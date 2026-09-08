@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -151,6 +152,79 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.herd_manager.</span></span><span class="sig-name descname"><span class="pre">HerdManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_ration_defined_by_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manager class for the animal herd.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>weather<span class="classifier">Weather</span></dt><dd><p>instance of the Weather class</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>instance of the RufasTime class</p>
+</dd>
+<dt>is_ration_defined_by_user<span class="classifier">bool</span></dt><dd><p>True if user-defined rations are used for the herd, otherwise false.</p>
+</dd>
+<dt>available_feeds<span class="classifier">list[Feed]</span></dt><dd><p>Nutrition information of feeds available to formulate animals rations with.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>ANIMAL_GROUPING_SCENARIO<span class="classifier">AnimalGroupingScenario</span></dt><dd><p>Animal grouping strategy used to assign animals to pens.</p>
+</dd>
+<dt>DEFAULT_NUM_STALLS_BY_COMBINATION<span class="classifier">dict[AnimalCombination, int]</span></dt><dd><p>Default number of stalls assigned to each animal grouping
+combination.</p>
+</dd>
+<dt>calves<span class="classifier">list[Animal]</span></dt><dd><p>Animals currently classified as calves.</p>
+</dd>
+<dt>heiferIs<span class="classifier">list[Animal]</span></dt><dd><p>Animals currently classified as heifer I.</p>
+</dd>
+<dt>heiferIIs<span class="classifier">list[Animal]</span></dt><dd><p>Animals currently classified as heifer II.</p>
+</dd>
+<dt>heiferIIIs<span class="classifier">list[Animal]</span></dt><dd><p>Animals currently classified as heifer III.</p>
+</dd>
+<dt>cows<span class="classifier">list[Animal]</span></dt><dd><p>Animals currently classified as lactating or dry cows.</p>
+</dd>
+<dt>replacement_market<span class="classifier">list[Animal]</span></dt><dd><p>Replacement animals available for purchase into the herd.</p>
+</dd>
+<dt>heifers_sold<span class="classifier">list[Animal]</span></dt><dd><p>Heifers removed from the herd through sale.</p>
+</dd>
+<dt>cows_culled<span class="classifier">list[Animal]</span></dt><dd><p>Cows removed from the herd through culling.</p>
+</dd>
+<dt>all_pens<span class="classifier">list[Pen]</span></dt><dd><p>All pens used to house animals in the simulation.</p>
+</dd>
+<dt>animal_to_pen_id_map<span class="classifier">dict[int, int]</span></dt><dd><p>Mapping of animal identifier to assigned pen identifier.</p>
+</dd>
+<dt>herd_statistics<span class="classifier">HerdStatistics</span></dt><dd><p>Herd-level statistics tracked throughout the simulation.</p>
+</dd>
+<dt>herd_reproduction_statistics<span class="classifier">HerdReproductionStatistics</span></dt><dd><p>Herd-level reproductive performance statistics.</p>
+</dd>
+<dt>adjustment_period<span class="classifier">int</span></dt><dd><p>Number of simulation days between herd size adjustment evaluations, (simulation days).</p>
+</dd>
+<dt>selling_threshold<span class="classifier">int | float</span></dt><dd><p>Herd size threshold above which animals may be sold.</p>
+</dd>
+<dt>buying_threshold<span class="classifier">int | float</span></dt><dd><p>Herd size threshold below which replacement animals may be purchased.</p>
+</dd>
+<dt>cull_eligibility_minimum_days_in_milk<span class="classifier">int | float</span></dt><dd><p>Minimum days in milk a cow must have reached to be eligible for an oversupply cull,
+(simulation days). Protects fresh cows from being sold.</p>
+</dd>
+<dt>cull_eligibility_maximum_days_carried_calf<span class="classifier">int | float</span></dt><dd><p>Maximum days carrying a calf (days in pregnancy) a cow may have to remain eligible for an
+oversupply cull, (simulation days). Protects late-pregnant cows from being sold.</p>
+</dd>
+<dt>cull_ranking_criteria<span class="classifier">str</span></dt><dd><p>Attribute used to rank eligible cows when selecting which to sell for an oversupply cull.
+One of <code class="docutils literal notranslate"><span class="pre">"milk"</span></code> (daily milk production) or <code class="docutils literal notranslate"><span class="pre">"305_day_milk"</span></code> (305-day milk yield); the
+lowest-ranked eligible cows are sold first.</p>
+</dd>
+<dt>housing<span class="classifier">dict[str, Any]</span></dt><dd><p>Housing configuration information for the herd.</p>
+</dd>
+<dt>pasture_concentrate<span class="classifier">dict[str, Any]</span></dt><dd><p>Pasture and concentrate feeding configuration data.</p>
+</dd>
+<dt>is_ration_defined_by_user<span class="classifier">bool</span></dt><dd><p>Whether user-defined rations are used instead of formulated rations.</p>
+</dd>
+<dt>advance_purchase_allowance<span class="classifier">AdvancePurchaseAllowance</span></dt><dd><p>Feed purchase constraints used for advance feed planning.</p>
+</dd>
+<dt>formulation_interval<span class="classifier">int</span></dt><dd><p>Number of simulation days between ration reformulations, (simulation days).</p>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.DEFAULT_NUM_STALLS_BY_COMBINATION">
 <span class="sig-name descname"><span class="pre">DEFAULT_NUM_STALLS_BY_COMBINATION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{AnimalCombination.CALF:</span> <span class="pre">110,</span> <span class="pre">AnimalCombination.CLOSE_UP:</span> <span class="pre">200,</span> <span class="pre">AnimalCombination.GROWING:</span> <span class="pre">800,</span> <span class="pre">AnimalCombination.GROWING_AND_CLOSE_UP:</span> <span class="pre">500,</span> <span class="pre">AnimalCombination.LAC_COW:</span> <span class="pre">850}</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.DEFAULT_NUM_STALLS_BY_COMBINATION" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.DEFAULT_NUM_STALLS_BY_COMBINATION'"><span>#</span></a></dt>
@@ -163,8 +237,8 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.set_animal_grouping_scenario">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_animal_grouping_scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal_grouping_scenarios.html#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario" title="RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario"><span class="pre">AnimalGroupingScenario</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.set_animal_grouping_scenario" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.set_animal_grouping_scenario'"><span>#</span></a></dt>
 <dd><p>Sets the animal grouping scenario to the given scenario.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>scenario<span class="classifier">AnimalGroupingScenario</span></dt><dd><p>The scenario to set the animal grouping scenario to.</p>
 </dd>
@@ -174,30 +248,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_ration_defined_by_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.__init__'"><span>#</span></a></dt>
-<dd><p>Initializes the pens and the animal herd in the simulation with data from
-user inputs.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>weather<span class="classifier">Weather</span></dt><dd><p>instance of the Weather class</p>
-</dd>
-<dt>time<span class="classifier">RufasTime</span></dt><dd><p>instance of the RufasTime class</p>
-</dd>
-<dt>is_ration_defined_by_user<span class="classifier">bool</span></dt><dd><p>True if user-defined rations are used for the herd, otherwise false.</p>
-</dd>
-<dt>available_feeds<span class="classifier">list[Feed]</span></dt><dd><p>Nutrition information of feeds available to formulate animals rations with.</p>
-</dd>
-<dt>feed_emissions_estimator<span class="classifier">PurchasedFeedEmissionsEstimator, default=None</span></dt><dd><p>Instance of the PurchasedFeedEmissionsEstimator class.</p>
-</dd>
-</dl>
-</section>
+<dd><p>Initializes the pens and the animal herd in the simulation with data from user inputs.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.animals_by_type">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">animals_by_type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalType</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.animals_by_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.animals_by_type'"><span>#</span></a></dt>
 <dd><p>Group animals by type.</p>
 <section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[AnimalType, list[Animal]]</dt><dd><p>A dictionary where each key corresponds to an <cite>AnimalType</cite> enum and
 each value is a list of <cite>Animal</cite> objects belonging to that type.</p>
@@ -210,7 +268,7 @@ each value is a list of <cite>Animal</cite> objects belonging to that type.</p>
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">animals_by_combination</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalCombination</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.animals_by_combination" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.animals_by_combination'"><span>#</span></a></dt>
 <dd><p>Group animals by combination.</p>
 <section id="id2">
-<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[AnimalCombination, list[Animal]]</dt><dd><p>A dictionary where the keys are instances of <cite>AnimalCombination</cite>, and
 the values are lists of <cite>Animal</cite> instances belonging to the corresponding
@@ -224,9 +282,9 @@ combination.</p>
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">pens_by_animal_combination</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalCombination</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen" title="RUFAS.biophysical.animal.pen.Pen"><span class="pre">Pen</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.pens_by_animal_combination" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.pens_by_animal_combination'"><span>#</span></a></dt>
 <dd><p>Group a list of pens by animal combination.</p>
 <section id="id3">
-<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>Dict[AnimalCombination, list[Pen]]</dt><dd><p>Dictionary of pens grouped by animal combination.</p>
+<dt>dict[AnimalCombination, list[Pen]]</dt><dd><p>Dictionary of pens grouped by animal combination.</p>
 </dd>
 </dl>
 </section>
@@ -236,31 +294,18 @@ combination.</p>
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">phosphorus_concentration_by_animal_class</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalType</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.phosphorus_concentration_by_animal_class" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.phosphorus_concentration_by_animal_class'"><span>#</span></a></dt>
 <dd><p>Retrieves the phosphorus concentration for each animal type.</p>
 <section id="id4">
-<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dict[AnimalType, float]</dt><dd><p>A dictionary mapping each animal type to its corresponding phosphorus
-concentration. If the total body weight of an animal class is zero, the
-phosphorus concentration is set to 0.0 for that class.</p>
+<dt>dict[AnimalType, float]</dt><dd><p>A dictionary mapping each animal type to its corresponding phosphorus concentration. If the total body
+weight of an animal class is zero, the phosphorus concentration is set to 0.0 for that class.</p>
 </dd>
 </dl>
 </section>
 <section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
 <p>These variables are the P concentrations of each class of animal. They are calculated daily and are used when an
 animal is added to the herd, whether by birth or replacement herd purchase. They  are calculated by dividing the
 total P in the animals of the class by the total body weight of the animals, on a per-animal basis.</p>
-</section>
-</dd></dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.current_herd_size">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_herd_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.current_herd_size" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.current_herd_size'"><span>#</span></a></dt>
-<dd><p>Calculates the current size of the herd based on the number of heiferIIIs and cows.</p>
-<section id="id5">
-<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>int</dt><dd><p>The current size of the herd.</p>
-</dd>
-</dl>
 </section>
 </dd></dl>
 <dl class="py property">
@@ -268,8 +313,8 @@ total P in the animals of the class by the total body weight of the animals, on 
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">heiferII_events_by_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalEvents</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.heiferII_events_by_id" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.heiferII_events_by_id'"><span>#</span></a></dt>
 <dd><p>Returns a dictionary that maps unique identifiers for HeiferII objects to their corresponding events.</p>
 <p>The unique identifier for each HeiferII object is a combination of its <cite>animal_type.name</cite> and <cite>id</cite>.</p>
-<section id="id6">
-<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, AnimalEvents]</dt><dd><p>A dictionary where each key is the unique identifier of a HeiferII,
 and the value is the string representation of the events associated with that HeiferII.</p>
@@ -282,8 +327,8 @@ and the value is the string representation of the events associated with that He
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">cow_events_by_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalEvents</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.cow_events_by_id" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.cow_events_by_id'"><span>#</span></a></dt>
 <dd><p>Returns a dictionary that maps unique identifiers for Cow objects to their corresponding events.</p>
 <p>The unique identifier for each Cow object is a combination of its <cite>animal_type.name</cite> and <cite>id</cite>.</p>
-<section id="id7">
-<h2>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, AnimalEvents]</dt><dd><p>A dictionary where each key is the unique identifier of a Cow,
 and the value is the string representation of the events associated with that Cow.</p>
@@ -295,22 +340,60 @@ and the value is the string representation of the events associated with that Co
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.daily_milk_report">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">daily_milk_report</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">MilkProductionStatistics</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.daily_milk_report" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.daily_milk_report'"><span>#</span></a></dt>
 <dd><p>Returns a list of MilkProductionStatistics for all cows in the herd.</p>
-<section id="id8">
-<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>list[MilkProductionStatistics]</dt><dd><p>A list of MilkProductionStatistics for all cows.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_lactation_number">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_get_cow_lactation_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_lactation_number" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_lactation_number'"><span>#</span></a></dt>
+<dd><p>Returns the current lactation number for a cow.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._average_305_day_milk_yield_for_cows">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_average_305_day_milk_yield_for_cows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._average_305_day_milk_yield_for_cows" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._average_305_day_milk_yield_for_cows'"><span>#</span></a></dt>
+<dd><p>Returns the mean 305-day milk yield for the provided cohort of cows.</p>
+</dd></dl>
 <dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.average_herd_305_days_milk_production">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">average_herd_305_days_milk_production</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.average_herd_305_days_milk_production" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.average_herd_305_days_milk_production'"><span>#</span></a></dt>
-<dd><p>Calculates the herd average total past 305-day milk production.</p>
-<section id="id9">
-<h2>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.average_l1_305_day_milk_yield">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">average_l1_305_day_milk_yield</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l1_305_day_milk_yield" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l1_305_day_milk_yield'"><span>#</span></a></dt>
+<dd><p>Returns the mean 305-day milk yield for cows in lactation 1.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.average_l2_305_day_milk_yield">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">average_l2_305_day_milk_yield</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l2_305_day_milk_yield" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l2_305_day_milk_yield'"><span>#</span></a></dt>
+<dd><p>Returns the mean 305-day milk yield for cows in lactation 2.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.average_l3_plus_305_day_milk_yield">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">average_l3_plus_305_day_milk_yield</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l3_plus_305_day_milk_yield" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l3_plus_305_day_milk_yield'"><span>#</span></a></dt>
+<dd><p>Returns the mean 305-day milk yield for cows in lactation 3 or greater.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.all_animals">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">all_animals</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.all_animals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.all_animals'"><span>#</span></a></dt>
+<dd><p>Retrieve a combined list of all animals in the herd.</p>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>The herd mean of latest_milk_production_305days.</p>
+<dt>list[Animal]</dt><dd><p>A list of all animals, including calves, heiferIs, heiferIIs, heiferIIIs,
+and cows.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.animal_genetic_history_by_id">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">animal_genetic_history_by_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.animal_genetic_history_by_id" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.animal_genetic_history_by_id'"><span>#</span></a></dt>
+<dd><p>Retrieve a dict of genetic histories for all animals in the herd by id.</p>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>dict[int, str]</dt><dd><p>A dict of genetic histories for all animals by id.</p>
 </dd>
 </dl>
 </section>
@@ -320,7 +403,7 @@ and the value is the string representation of the events associated with that Co
 <span class="sig-name descname"><span class="pre">collect_daily_feed_request</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed" title="RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed"><span class="pre">RequestedFeed</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.collect_daily_feed_request" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.collect_daily_feed_request'"><span>#</span></a></dt>
 <dd><p>Collects total amount of feeds needed for all animals on the current day.</p>
 <section id="id10">
-<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[RUFAS_ID, float]</dt><dd><p>Mapping of the feed ID’s requested to the amounts of feed (kg dry matter).</p>
 </dd>
@@ -333,26 +416,10 @@ and the value is the string representation of the events associated with that Co
 <dd><p>Prints a formatted snapshot of the herd, showing the current count of
 different categories of cattle such as calves, heifer groups, and cows.</p>
 <section id="id11">
-<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>txt<span class="classifier">str</span></dt><dd><p>A descriptive prefix to the snapshot summary, typically used to
 identify the context or timestamp of the snapshot.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._print_animal_num_warnings">
-<span class="sig-name descname"><span class="pre">_print_animal_num_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._print_animal_num_warnings" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._print_animal_num_warnings'"><span>#</span></a></dt>
-<dd><dl class="simple">
-<dt>If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,</dt><dd><p>and logs how many warnings were generated</p>
-</dd>
-</dl>
-<p>Otherwise, if simulate_animals is true, logs that it is true</p>
-<section id="id12">
-<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>herd_data<span class="classifier">Dict[str, Any]</span></dt><dd><p>dictionary containing information about the herd</p>
 </dd>
 </dl>
 </section>
@@ -378,19 +445,93 @@ identify the context or timestamp of the snapshot.</p>
 <dd><p>Perform daily routines for a given list of animals.</p>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_genetic_values_at_lactation_start">
+<span class="sig-name descname"><span class="pre">_update_genetic_values_at_lactation_start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_genetic_values_at_lactation_start" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_genetic_values_at_lactation_start'"><span>#</span></a></dt>
+<dd><p>Updates the genetic values of an animal at the start of a new lactation.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>animal<span class="classifier">Animal</span></dt><dd><p>The animal whose genetic values are to be updated at lactation start.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object containing the current date of the simulation, used to
+derive the animal’s birth year.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Notes<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<p>If genetics simulation is disabled, the method returns without making any changes. Otherwise, the animal’s
+genetic values are recalculated using the animal’s birth year, type, parity, and the mean true breeding values
+(TBV) for fat and protein across the current cow group.</p>
+</section>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_herd_structure">
-<span class="sig-name descname"><span class="pre">_update_herd_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graduated_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newborn_calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newly_added_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_herd_structure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_herd_structure'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_update_herd_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graduated_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newborn_calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newly_added_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_herd_structure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_herd_structure'"><span>#</span></a></dt>
 <dd><p>Call the corresponding functions to update the herd structure and reassign animals to new pens.</p>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.daily_routines">
-<span class="sig-name descname"><span class="pre">daily_routines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.daily_routines" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.daily_routines'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._process_daily_herd_updates">
+<span class="sig-name descname"><span class="pre">_process_daily_herd_updates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">DailyHerdUpdates</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._process_daily_herd_updates" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._process_daily_herd_updates'"><span>#</span></a></dt>
+<dd><p>Run daily routines for all animal groups and collect herd-level updates.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._apply_daily_herd_structure_updates">
+<span class="sig-name descname"><span class="pre">_apply_daily_herd_structure_updates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graduated_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newborn_calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._apply_daily_herd_structure_updates" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._apply_daily_herd_structure_updates'"><span>#</span></a></dt>
+<dd><p>Apply animal additions, removals, and herd-size adjustments after daily routines run.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._collect_manure_outputs_by_pen">
+<span class="sig-name descname"><span class="pre">_collect_manure_outputs_by_pen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalManureExcretions</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._collect_manure_outputs_by_pen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._collect_manure_outputs_by_pen'"><span>#</span></a></dt>
+<dd><p>Collect manure streams, manure excretions, and enteric methane emissions from all pens.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_heifer_average_daily_weight_gain">
+<span class="sig-name descname"><span class="pre">_calculate_heifer_average_daily_weight_gain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_heifer_average_daily_weight_gain" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_heifer_average_daily_weight_gain'"><span>#</span></a></dt>
+<dd><p>Calculates average daily weight gain for heifers across all pens and
+animal types.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>Current simulation day, used to backfill missing entries for newly
+tracked pens.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Notes<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<p>Only pens with <code class="docutils literal notranslate"><span class="pre">AnimalCombination.GROWING</span></code> or
+<code class="docutils literal notranslate"><span class="pre">AnimalCombination.GROWING_AND_CLOSE_UP</span></code> are evaluated; all other pen
+types are skipped. Note that the <code class="docutils literal notranslate"><span class="pre">AnimalCombination.CLOSE_UP</span></code> pens
+which contains heiferIIIs and dry cows are not evaluated.</p>
+<p>For each eligible pen, the average is computed over all animals whose
+<code class="docutils literal notranslate"><span class="pre">animal_type.is_heifer</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. If no heifers are present, the
+pen’s value is set to <code class="docutils literal notranslate"><span class="pre">None</span></code>. If heifers are present and the pen is
+seen for the first time, all prior simulation days are backfilled with
+<code class="docutils literal notranslate"><span class="pre">None</span></code>. The backfill uses <code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_herd_statistics_data</span></code>
+as the class and function in the <code class="docutils literal notranslate"><span class="pre">info_map</span></code> so that backfilled entries
+share the same variable name as values recorded during normal reporting.</p>
+<p>Per-animal-type averages are also computed independently across the full
+herd for Heifer I, II, and III groups. Groups with no animals are set
+to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._warn_when_lactating_cows_have_no_milk">
+<span class="sig-name descname"><span class="pre">_warn_when_lactating_cows_have_no_milk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._warn_when_lactating_cows_have_no_milk" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._warn_when_lactating_cows_have_no_milk'"><span>#</span></a></dt>
+<dd><p>Warn when lactating cows have no milk production after the first day in milk.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._report_daily_routine_outputs">
+<span class="sig-name descname"><span class="pre">_report_daily_routine_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_manager_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_manure_excretions_by_pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalManureExcretions</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enteric_methane_emission_by_pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._report_daily_routine_outputs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._report_daily_routine_outputs'"><span>#</span></a></dt>
+<dd><p>Report the daily outputs generated by herd manager routines.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.execute_daily_routines">
+<span class="sig-name descname"><span class="pre">execute_daily_routines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.execute_daily_routines" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.execute_daily_routines'"><span>#</span></a></dt>
 <dd><p>Perform daily routines for managing animal herds and updating associated data.</p>
-<p>This method handles all daily activities related to the management of animal herds,
-including animal transitions (graduation, removal), sales, births, updates to herd
-statistics, and manure data collection.</p>
-<section id="id13">
-<h2>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>available_feeds<span class="classifier">list[Feed]</span></dt><dd><p>A list of feed resources available for the day.</p>
 </dd>
@@ -398,17 +539,40 @@ statistics, and manure data collection.</p>
 </dd>
 <dt>weather<span class="classifier">Weather</span></dt><dd><p>An object providing weather conditions affecting herd activities.</p>
 </dd>
-<dt>total_inventory<span class="classifier">TotalInventory</span></dt><dd><p>Object representing the total inventory of herd-related resources.</p>
-</dd>
 </dl>
 </section>
-<section id="id14">
-<h2>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, ManureStream]</dt><dd><p>A list of dictionaries containing manure data for each pen in the herd.</p>
 </dd>
 </dl>
 </section>
+<section id="id18">
+<h3>Notes<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<p>This method handles all daily activities related to the management of animal herds,
+including animal transitions (graduation, removal), sales, births, updates to herd
+statistics, and manure data collection.</p>
+<p>Daily Herd Routine Process:
+1. Reset the daily herd statistics (the cumulative herd reproduction statistics persist</p>
+<blockquote>
+<div><p>across the whole simulation and are not reset here).</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Run per-animal daily routines for calves, heifer groups, and cows.</p></li>
+<li><p>Collect herd-level updates from those routines, including graduations, removals, births, and sales.</p></li>
+<li><p>Update sold-animal and stillborn-calf statistics.</p></li>
+<li><p>Apply herd structure changes, including removals, additions, pen moves, and periodic replacement logic.</p></li>
+<li><p>Record pen history and collect manure and enteric methane outputs by pen.</p></li>
+<li><p>Recompute herd statistics and warn about lactating cows with no milk production.</p></li>
+<li><p>Report daily herd outputs, including population, herd statistics, manure, milk, ration, and genetics.</p></li>
+</ol>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_and_report_average_genetics">
+<span class="sig-name descname"><span class="pre">_calculate_and_report_average_genetics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_and_report_average_genetics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_and_report_average_genetics'"><span>#</span></a></dt>
+<dd><p>Calculates and reports the average genetics for the herd, calves, heiferIs, heiferIIs, heiferIIIs, and cows.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._report_ration">
@@ -417,20 +581,19 @@ statistics, and manure data collection.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._create_newborn_calf">
-<span class="sig-name descname"><span class="pre">_create_newborn_calf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newborn_calf_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NewBornCalfValuesTypedDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._create_newborn_calf" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._create_newborn_calf'"><span>#</span></a></dt>
-<dd><p>Creates a new newborn calf instance and records its entry event in the herd if it
-is not sold.</p>
-<section id="id15">
-<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
+<span class="sig-name descname"><span class="pre">_create_newborn_calf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newborn_calf_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NewBornCalfValuesTypedDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._create_newborn_calf" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._create_newborn_calf'"><span>#</span></a></dt>
+<dd><p>Creates a new newborn calf instance and records its entry event in the herd if it is not sold.</p>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>newborn_calf_config<span class="classifier">NewBornCalfValuesTypedDict</span></dt><dd><p>Configuration for the newborn calf containing its attributes.</p>
 </dd>
-<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current day in the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The current time in the simulation.</p>
 </dd>
 </dl>
 </section>
-<section id="id16">
-<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<section id="id20">
+<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>Animal</dt><dd><p>An instance of the Animal class representing the newly created newborn calf.</p>
 </dd>
@@ -438,56 +601,91 @@ is not sold.</p>
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_heifers_need_to_be_sold">
-<span class="sig-name descname"><span class="pre">_check_if_heifers_need_to_be_sold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_heifers_need_to_be_sold" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_heifers_need_to_be_sold'"><span>#</span></a></dt>
-<dd><p>Checks if surplus heifers need to be sold based on herd size.</p>
-<p>This method evaluates if the current number of heifers and cows exceeds a
-specified threshold (defined as 3% over the herd statistics’ target
-herd size). If the threshold is surpassed, heiferIIIs are removed from the
-herd until the herd size falls within the acceptable range.</p>
-<section id="id17">
-<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._cull_ranking_value">
+<span class="sig-name descname"><span class="pre">_cull_ranking_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._cull_ranking_value" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._cull_ranking_value'"><span>#</span></a></dt>
+<dd><p>Returns the value used to rank <code class="docutils literal notranslate"><span class="pre">cow</span></code> for an oversupply cull, based on the user-defined
+<code class="docutils literal notranslate"><span class="pre">cull_ranking_criteria</span></code>.</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The simulation day on which the check and potential sale is conducted.</p>
+<dt>cow<span class="classifier">Animal</span></dt><dd><p>The cow to compute a ranking value for.</p>
 </dd>
 </dl>
 </section>
-<section id="id18">
-<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>list[Animal]</dt><dd><p>A list of heiferIIIs to be sold.</p>
+<dt>float</dt><dd><p>The cow’s daily milk production when <code class="docutils literal notranslate"><span class="pre">cull_ranking_criteria</span></code> is <code class="docutils literal notranslate"><span class="pre">"milk"</span></code>, or its
+305-day milk yield when it is <code class="docutils literal notranslate"><span class="pre">"305_day_milk"</span></code>.</p>
 </dd>
 </dl>
 </section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">cull_ranking_criteria</span></code> is not one of the supported options.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_removal_index">
+<span class="sig-name descname"><span class="pre">_get_cow_removal_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">removed_animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_removal_index" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_removal_index'"><span>#</span></a></dt>
+<dd><p>Finds the index of the lowest-ranked cow that is eligible for an oversupply cull.</p>
+<p>Eligibility is governed by the <code class="docutils literal notranslate"><span class="pre">cull_eligibility_minimum_days_in_milk</span></code> and
+<code class="docutils literal notranslate"><span class="pre">cull_eligibility_maximum_days_carried_calf</span></code> user inputs (protecting fresh and
+late-pregnant cows respectively), and ranking is governed by the <code class="docutils literal notranslate"><span class="pre">cull_ranking_criteria</span></code>
+user input. The lowest-ranked eligible cow is selected for removal.</p>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>int | None</dt><dd><p>Index into <code class="docutils literal notranslate"><span class="pre">self.cows</span></code> of the lowest-ranked eligible cow, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if no
+eligible cow exists.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_cows_need_to_be_sold">
+<span class="sig-name descname"><span class="pre">_check_if_cows_need_to_be_sold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_cows_need_to_be_sold" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_cows_need_to_be_sold'"><span>#</span></a></dt>
+<dd><p>Checks if surplus cows need to be sold based on herd size.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_replacement_heifers_needed">
 <span class="sig-name descname"><span class="pre">_check_if_replacement_heifers_needed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_replacement_heifers_needed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_replacement_heifers_needed'"><span>#</span></a></dt>
 <dd><p>Checks if replacement heifers are needed to maintain the herd size.</p>
-<p>This function determines whether additional heiferIIIs need to be added to the herd based on
-the current herd size, purchase thresholds, and the availability of heifers in the
-replacement market.</p>
-<section id="id19">
-<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>An instance of the RufasTime class providing the current simulation day and date.</p>
 </dd>
 </dl>
 </section>
-<section id="id20">
-<h2>Returns<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>list[Animal]</dt><dd><p>A list of heiferIIIs bought.</p>
 </dd>
 </dl>
 </section>
+<section id="id26">
+<h3>Notes<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
+<p>This function determines whether additional heiferIIIs need to be added to the herd based on
+the current herd size, purchase thresholds, and the availability of heifers in the
+replacement market.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_replacement_animal_genetics">
+<span class="sig-name descname"><span class="pre">_update_replacement_animal_genetics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">replacement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_replacement_animal_genetics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_replacement_animal_genetics'"><span>#</span></a></dt>
+<dd><p>Updates the genetic values of a replacement animal.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._remove_animal_from_current_array">
 <span class="sig-name descname"><span class="pre">_remove_animal_from_current_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._remove_animal_from_current_array" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._remove_animal_from_current_array'"><span>#</span></a></dt>
 <dd><p>Remove an animal object from the current array that it belongs to.</p>
-<section id="id21">
-<h2>Parameters<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h2>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>animal<span class="classifier">Animal</span></dt><dd><p>The animal instance to be removed from its current array.</p>
 </dd>
@@ -498,8 +696,8 @@ replacement market.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_new_array">
 <span class="sig-name descname"><span class="pre">_add_animal_to_new_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_new_array" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_new_array'"><span>#</span></a></dt>
 <dd><p>Adds an animal to the appropriate array based on its type.</p>
-<section id="id22">
-<h2>Parameters<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h2>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>animal<span class="classifier">Animal</span></dt><dd><p>The animal object to be added to the respective array based on its <cite>animal_type</cite>.</p>
 </dd>
@@ -511,8 +709,8 @@ replacement market.</p>
 <span class="sig-name descname"><span class="pre">_update_animal_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_animal_array" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_animal_array'"><span>#</span></a></dt>
 <dd><p>Updates the internal animal array by removing the given animal from its current
 array and adding it to a new array.</p>
-<section id="id23">
-<h2>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>animal<span class="classifier">Animal</span></dt><dd><p>The animal object to update in the internal arrays.</p>
 </dd>
@@ -521,18 +719,16 @@ array and adding it to a new array.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._handle_graduated_animals">
-<span class="sig-name descname"><span class="pre">_handle_graduated_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graduated_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._handle_graduated_animals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._handle_graduated_animals'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_handle_graduated_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graduated_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._handle_graduated_animals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._handle_graduated_animals'"><span>#</span></a></dt>
 <dd><p>Reassigns animals that have graduated to a new pen, and updates the pen id map.</p>
-<section id="id24">
-<h2>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>graduated_animals<span class="classifier">list[Animal]</span></dt><dd><p>List of animals that have graduated and need to be reassigned to a new pen.</p>
 </dd>
 <dt>available_feeds<span class="classifier">list[Feed]</span></dt><dd><p>Nutrition information of feeds available to formulate animals rations with.</p>
 </dd>
 <dt>current_day_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Object representing the current conditions of the day.</p>
-</dd>
-<dt>total_inventory<span class="classifier">TotalInventory</span></dt><dd><p>Inventory currently available or projected to be available at a future date.</p>
 </dd>
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
 </dd>
@@ -541,18 +737,16 @@ array and adding it to a new array.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._handle_newly_added_animals">
-<span class="sig-name descname"><span class="pre">_handle_newly_added_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._handle_newly_added_animals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._handle_newly_added_animals'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_handle_newly_added_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._handle_newly_added_animals" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._handle_newly_added_animals'"><span>#</span></a></dt>
 <dd><p>Adds newly added animals to their appropriate pen and updates the pen id map.</p>
-<section id="id25">
-<h2>Parameters<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h2>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>new_animals<span class="classifier">list[Animal]</span></dt><dd><p>List of newly added animals.</p>
 </dd>
 <dt>available_feeds<span class="classifier">list[Feed]</span></dt><dd><p>Nutrition information of feeds available to formulate animals rations with.</p>
 </dd>
 <dt>current_day_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Object representing the current conditions of the day.</p>
-</dd>
-<dt>total_inventory<span class="classifier">TotalInventory</span></dt><dd><p>Inventory currently available or projected to be available at a future date.</p>
 </dd>
 <dt>simulation_day: int</dt><dd><p>Day of simulation.</p>
 </dd>
@@ -563,8 +757,8 @@ array and adding it to a new array.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._remove_animal_from_pen_and_id_map">
 <span class="sig-name descname"><span class="pre">_remove_animal_from_pen_and_id_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._remove_animal_from_pen_and_id_map" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._remove_animal_from_pen_and_id_map'"><span>#</span></a></dt>
 <dd><p>Removes animal from its current pen, and removes it from the pen id map.</p>
-<section id="id26">
-<h2>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
+<section id="id32">
+<h3>Parameters<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>animal<span class="classifier">Animal</span></dt><dd><p>The animal to be removed from its current pen and the pen id map.</p>
 </dd>
@@ -573,18 +767,16 @@ array and adding it to a new array.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_pen_and_id_map">
-<span class="sig-name descname"><span class="pre">_add_animal_to_pen_and_id_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_pen_and_id_map" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_pen_and_id_map'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_add_animal_to_pen_and_id_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_pen_and_id_map" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_pen_and_id_map'"><span>#</span></a></dt>
 <dd><p>Adds animal to pen with the lowest stocking density, and updates the pen id map accordingly.</p>
-<section id="id27">
-<h2>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h2>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>animal<span class="classifier">Animal</span></dt><dd><p>The animal to be added to a pen.</p>
 </dd>
 <dt>available_feeds<span class="classifier">list[Feed]</span></dt><dd><p>Nutrition information of feeds available to formulate animals rations with.</p>
 </dd>
 <dt>current_day_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Object representing the current conditions of the day.</p>
-</dd>
-<dt>total_inventory<span class="classifier">TotalInventory</span></dt><dd><p>Inventory currently available or projected to be available at a future date.</p>
 </dd>
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
 </dd>
@@ -595,8 +787,8 @@ array and adding it to a new array.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.initialize_pens">
 <span class="sig-name descname"><span class="pre">initialize_pens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_pen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.initialize_pens" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.initialize_pens'"><span>#</span></a></dt>
 <dd><p>Populates the list of pens with the information from the input json file.</p>
-<section id="id28">
-<h2>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>all_pen_data: list[dict[str, Any]]</dt><dd><p>List containing information about the pens.</p>
 </dd>
@@ -615,6 +807,33 @@ the overall density as closely as possible.</p>
 <span class="sig-name descname"><span class="pre">_plan_animal_allocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_spaces_in_pens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._plan_animal_allocation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._plan_animal_allocation'"><span>#</span></a></dt>
 <dd><p>Make an allocation plan to distribute animals across pens based on overall pen density,
 allowing controlled overstocking if the number of animals exceeds total pen capacity.</p>
+<section id="id35">
+<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The total number of animals to allocate. Must be a non-negative integer.</p>
+</dd>
+<dt>max_spaces_in_pens<span class="classifier">list[int]</span></dt><dd><p>A list of integers representing the maximum number of animals each pen can accommodate
+without overstocking. Each integer must be positive.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h3>Returns<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>list[int]</dt><dd><p>A list of integers representing the number of animals allocated to each pen.
+Each value may exceed the pen’s capacity if overstocking occurs.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h3>Raises<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>AssertionError</dt><dd><p>If the total number of allocated animals does not match the number of animals provided.</p>
+</dd>
+</dl>
+</section>
+<section id="id38">
+<h3>Notes<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
 <p>General rules:
 1. Animals are allocated proportionally across pens based on overall density,
 ensuring even distribution relative to pen capacity.
@@ -624,8 +843,6 @@ ensuring even distribution relative to pen capacity.
 the excess animals are distributed proportionally, allowing pens to exceed capacity.
 4. Warnings are logged for any pen that becomes overstocked.
 5. All animals are guaranteed to be allocated.</p>
-<section id="id29">
-<h2>Notes<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
 <p>This allocation strategy prioritizes proportional and fair distribution by calculating
 an overall density and applying it to each pen’s capacity. The result ensures that
 pen densities remain consistent even under overstocking scenarios.</p>
@@ -634,33 +851,8 @@ pen receives any remaining animals to guarantee full allocation.</p>
 <p>Overstocking is permitted when necessary and is handled fairly based on capacity-derived
 allocation limits. Logging ensures that overstocked pens are tracked for review.</p>
 </section>
-<section id="id30">
-<h2>Parameters<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>num_animals<span class="classifier">int</span></dt><dd><p>The total number of animals to allocate. Must be a non-negative integer.</p>
-</dd>
-<dt>max_spaces_in_pens<span class="classifier">list[int]</span></dt><dd><p>A list of integers representing the maximum number of animals each pen can accommodate
-without overstocking. Each integer must be positive.</p>
-</dd>
-</dl>
-</section>
-<section id="id31">
-<h2>Returns<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>list[int]</dt><dd><p>A list of integers representing the number of animals allocated to each pen.
-Each value may exceed the pen’s capacity if overstocking occurs.</p>
-</dd>
-</dl>
-</section>
-<section id="raises">
-<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>AssertionError</dt><dd><p>If the total number of allocated animals does not match the number of animals provided.</p>
-</dd>
-</dl>
-</section>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#examples'"><span>#</span></a></h2>
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#examples'"><span>#</span></a></h3>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">_plan_animal_allocation</span><span class="p">(</span><span class="n">num_animals</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">max_spaces_in_pens</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">simulation_day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </span><span id="line-2"><span class="go">[30, 30, 30]</span>
 </span></code></pre></div>
@@ -683,10 +875,8 @@ Each value may exceed the pen’s capacity if overstocking occurs.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._execute_allocation_plan">
 <span class="sig-name descname"><span class="pre">_execute_allocation_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allocation_plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_pens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen" title="RUFAS.biophysical.animal.pen.Pen"><span class="pre">Pen</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._execute_allocation_plan" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._execute_allocation_plan'"><span>#</span></a></dt>
 <dd><p>Execute an allocation plan to distribute animals into pens according to the given plan.</p>
-<p>This method iterates over the provided allocation plan and updates each pen with the specified number
-of animals.</p>
-<section id="id32">
-<h2>Parameters<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h2>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>allocation_plan<span class="classifier">list[int]</span></dt><dd><p>A list of integers representing the number of animals to be allocated to each pen.
 The length of the allocation_plan list must match the number of pens in animal_pens.</p>
@@ -697,13 +887,18 @@ The length of the allocation_plan list must match the number of pens in animal_p
 </dd>
 </dl>
 </section>
-<section id="id33">
-<h2>Raises<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h2>
+<section id="id40">
+<h3>Raises<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the length of the allocation plan does not match the number of pens.
 If the sum of the allocation plan does not match the number of animals.</p>
 </dd>
 </dl>
+</section>
+<section id="id41">
+<h3>Notes<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
+<p>This method iterates over the provided allocation plan and updates each pen with the specified number
+of animals.</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -715,8 +910,8 @@ If the sum of the allocation plan does not match the number of animals.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_max_animal_spaces_per_pen">
 <span class="sig-name descname"><span class="pre">_calculate_max_animal_spaces_per_pen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_stalls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_stocking_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_max_animal_spaces_per_pen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_max_animal_spaces_per_pen'"><span>#</span></a></dt>
 <dd><p>Calculate the maximum number of animal spaces available per pen based on the user density.</p>
-<section id="id34">
-<h2>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
+<section id="id42">
+<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>num_stalls<span class="classifier">int</span></dt><dd><p>The number of stalls in the pen. Must be greater than or equal to 0.</p>
 </dd>
@@ -724,22 +919,22 @@ If the sum of the allocation plan does not match the number of animals.</p>
 </dd>
 </dl>
 </section>
-<section id="id35">
-<h2>Returns<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h2>
+<section id="id43">
+<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>int</dt><dd><p>The maximum number of animal spaces available in the pen.</p>
 </dd>
 </dl>
 </section>
-<section id="id36">
-<h2>Raises<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h2>
+<section id="id44">
+<h3>Raises<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the number of stalls or maximum stocking density is less than 0.</p>
 </dd>
 </dl>
 </section>
-<section id="id37">
-<h2>Examples<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h2>
+<section id="id45">
+<h3>Examples<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">HerdManager</span><span class="o">.</span><span class="n">_calculate_max_animal_spaces_per_pen</span><span class="p">(</span><span class="n">num_stalls</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_stocking_density</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
 </span><span id="line-2"><span class="go">15</span>
 </span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">HerdManager</span><span class="o">.</span><span class="n">_calculate_max_animal_spaces_per_pen</span><span class="p">(</span><span class="n">num_stalls</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">max_stocking_density</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
@@ -752,10 +947,8 @@ If the sum of the allocation plan does not match the number of animals.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._allocate_animals_to_pens_helper">
 <span class="sig-name descname"><span class="pre">_allocate_animals_to_pens_helper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen" title="RUFAS.biophysical.animal.pen.Pen"><span class="pre">Pen</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._allocate_animals_to_pens_helper" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._allocate_animals_to_pens_helper'"><span>#</span></a></dt>
 <dd><p>Allocate animals to pens based on overall density while preventing overcrowding.</p>
-<p>This method distributes the animals among the available pens, ensuring that the density
-in each pen matches the overall density as closely as possible.</p>
-<section id="id38">
-<h2>Parameters<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h2>
+<section id="id46">
+<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>animals<span class="classifier">List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]</span></dt><dd><p>A list of animal to be allocated to pens.</p>
 </dd>
@@ -763,6 +956,11 @@ in each pen matches the overall density as closely as possible.</p>
 the same animal combination.</p>
 </dd>
 </dl>
+</section>
+<section id="id47">
+<h3>Notes<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
+<p>This method distributes the animals among the available pens, ensuring that the density
+in each pen matches the overall density as closely as possible.</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -777,8 +975,8 @@ associated with the pen that animal is in.</p>
 <dd><p>Updates pen history data for a given animal type.</p>
 <p>Checks the current pen ID and pen composition of all animals for a given animal class, and then updates the
 pen history for that type using the update_pen_history() method.</p>
-<section id="id39">
-<h2>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h2>
+<section id="id48">
+<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>animal_type_list<span class="classifier">List[Animal]</span></dt><dd><p>List of animals.</p>
 </dd>
@@ -791,8 +989,8 @@ pen history for that type using the update_pen_history() method.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.record_pen_history">
 <span class="sig-name descname"><span class="pre">record_pen_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.record_pen_history" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.record_pen_history'"><span>#</span></a></dt>
 <dd><p>Records the pen history of all the animals.</p>
-<section id="id40">
-<h2>Parameters<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h2>
+<section id="id49">
+<h3>Parameters<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
 </dd>
@@ -809,8 +1007,8 @@ routines that happen every ration interval.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.end_ration_interval">
 <span class="sig-name descname"><span class="pre">end_ration_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.end_ration_interval" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.end_ration_interval'"><span>#</span></a></dt>
 <dd><p>Checks if a new ration should be formulated for the current simulation_day.</p>
-<section id="id41">
-<h2>Returns<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h2>
+<section id="id50">
+<h3>Returns<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if today is the day a new ration has to be formulated,
 False otherwise.</p>
@@ -827,8 +1025,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.initialize_nutrient_requirements">
 <span class="sig-name descname"><span class="pre">initialize_nutrient_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.initialize_nutrient_requirements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.initialize_nutrient_requirements'"><span>#</span></a></dt>
 <dd><p>Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation.</p>
-<section id="id42">
-<h2>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h2>
+<section id="id51">
+<h3>Parameters<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>weather<span class="classifier">Weather</span></dt><dd><p>instance of the Weather class</p>
 </dd>
@@ -843,8 +1041,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.update_all_max_daily_feeds">
 <span class="sig-name descname"><span class="pre">update_all_max_daily_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_harvest_dates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">date</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.IdealFeeds" title="RUFAS.data_structures.feed_storage_to_animal_connection.IdealFeeds"><span class="pre">IdealFeeds</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.update_all_max_daily_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.update_all_max_daily_feeds'"><span>#</span></a></dt>
 <dd><p>Updates the max feeds of all available feeds types based on the current total inventory.</p>
-<section id="id43">
-<h2>Parameters<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h2>
+<section id="id52">
+<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>total_inventory<span class="classifier">TotalInventory</span></dt><dd><p>The total inventory of all available feeds.</p>
 </dd>
@@ -854,8 +1052,8 @@ False otherwise.</p>
 </dd>
 </dl>
 </section>
-<section id="id44">
-<h2>Returns<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h2>
+<section id="id53">
+<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>IdealFeeds</dt><dd><p>The maximum daily feeds for each feed type.</p>
 </dd>
@@ -866,8 +1064,8 @@ False otherwise.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_single_max_daily_feed">
 <span class="sig-name descname"><span class="pre">_update_single_max_daily_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rufas_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_harvest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_single_max_daily_feed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_single_max_daily_feed'"><span>#</span></a></dt>
 <dd><p>Updates a single max daily feed based on the current amount available, number of animals, and next harvest date.</p>
-<section id="id45">
-<h2>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h2>
+<section id="id54">
+<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>rufas_id<span class="classifier">RUFAS_ID</span></dt><dd><p>The RuFaS Feed ID of the max daily feed to be updated.</p>
 </dd>
@@ -887,10 +1085,10 @@ False otherwise.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.formulate_rations">
-<span class="sig-name descname"><span class="pre">formulate_rations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_interval_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed" title="RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed"><span class="pre">RequestedFeed</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.formulate_rations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.formulate_rations'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">formulate_rations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_interval_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed" title="RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed"><span class="pre">RequestedFeed</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.formulate_rations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.formulate_rations'"><span>#</span></a></dt>
 <dd><p>Formulates rations for all pens.</p>
-<section id="id46">
-<h2>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h2>
+<section id="id55">
+<h3>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>available_feeds<span class="classifier">List[Feed]</span></dt><dd><p>List of available feeds.</p>
 </dd>
@@ -898,14 +1096,12 @@ False otherwise.</p>
 </dd>
 <dt>ration_interval_length<span class="classifier">int</span></dt><dd><p>Length of the ration interval (days).</p>
 </dd>
-<dt>total_inventory<span class="classifier">TotalInventory</span></dt><dd><p>The total inventory of all available feeds.</p>
-</dd>
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
 </dd>
 </dl>
 </section>
-<section id="id47">
-<h2>Returns<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h2>
+<section id="id56">
+<h3>Returns<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>RequestedFeed</dt><dd><p>Feeds requested to be purchased for the newly formulated rations.</p>
 </dd>
@@ -914,18 +1110,16 @@ False otherwise.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._reformulate_ration_single_pen">
-<span class="sig-name descname"><span class="pre">_reformulate_ration_single_pen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen" title="RUFAS.biophysical.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_inventory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><span class="pre">TotalInventory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._reformulate_ration_single_pen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._reformulate_ration_single_pen'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_reformulate_ration_single_pen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.pen.html#RUFAS.biophysical.animal.pen.Pen" title="RUFAS.biophysical.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.feed_storage_to_animal_connection.html#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._reformulate_ration_single_pen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._reformulate_ration_single_pen'"><span>#</span></a></dt>
 <dd><p>Reformulates ration for a single pen.</p>
-<section id="id48">
-<h2>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h2>
+<section id="id57">
+<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>pen<span class="classifier">Pen</span></dt><dd><p>Pen that requires ration reformulation.</p>
 </dd>
 <dt>pen_available_feeds<span class="classifier">List[Feed]</span></dt><dd><p>List of available feeds in this pen.</p>
 </dd>
 <dt>current_temperature<span class="classifier">float</span></dt><dd><p>Current temperature (C).</p>
-</dd>
-<dt>total_inventory<span class="classifier">TotalInventory</span></dt><dd><p>Inventory currently available or projected to be available at a future date.</p>
 </dd>
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
 </dd>
@@ -934,7 +1128,7 @@ False otherwise.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_statistics">
-<span class="sig-name descname"><span class="pre">update_herd_statistics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_statistics'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">update_herd_statistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_statistics'"><span>#</span></a></dt>
 <dd><p>Calculates and updates herd statistics.</p>
 </dd></dl>
 <dl class="py method">
@@ -957,6 +1151,8 @@ the corresponding attributes of the <cite>herd_statistics</cite> object.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_cow_parity_statistics">
 <span class="sig-name descname"><span class="pre">_update_cow_parity_statistics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_cow_parity_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_cow_parity_statistics'"><span>#</span></a></dt>
 <dd><p>Updates statistics related to the parity of cows in the herd.</p>
+<section id="id58">
+<h3>Notes<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>Parity-related statistics include:</dt><dd><ul class="simple">
 <li><p>the number of cows for each parity level</p></li>
@@ -968,6 +1164,7 @@ the corresponding attributes of the <cite>herd_statistics</cite> object.</p>
 </dl>
 <p>This method also calculates the percentage distribution of cows across parity levels relative to the herd
 population. All computed statistics are stored in the <cite>herd_statistics</cite> attribute of the class.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_cow_milking_statistics">
@@ -984,8 +1181,8 @@ The metrics include:</p>
 <li><p>voluntary waiting period statistics.</p></li>
 </ul>
 </div></blockquote>
-<section id="id49">
-<h2>Raises<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h2>
+<section id="id59">
+<h3>Raises<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If any milk production, fat content, or protein content is detected
 from dry cows. An error entry is also added to the error log with
@@ -998,50 +1195,62 @@ details on the issue.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_cow_pregnancy_statistics">
 <span class="sig-name descname"><span class="pre">_update_cow_pregnancy_statistics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_cow_pregnancy_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_cow_pregnancy_statistics'"><span>#</span></a></dt>
 <dd><p>Updates the pregnancy statistics for the cows in the herd.</p>
+<section id="id60">
+<h3>Notes<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
 <p>This method calculates and updates the statistics related to pregnant cows, open (non-pregnant)
 cows, and the average number of days in pregnancy.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_and_died_cow_statistics">
 <span class="sig-name descname"><span class="pre">_update_sold_and_died_cow_statistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sold_and_died_cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_and_died_cow_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_and_died_cow_statistics'"><span>#</span></a></dt>
-<dd><p>Updates the herd statistics with details of cows that are sold or have died.
-This method records the culling age, updates statistics related to culled cows, and categorizes
-the cows based on specific attributes such as cull reason and parity.</p>
-<section id="id50">
-<h2>Parameters<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h2>
+<dd><p>Updates the herd statistics with details of cows that are sold or have died.</p>
+<section id="id61">
+<h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>sold_and_died_cows<span class="classifier">list[Animal]</span></dt><dd><p>A list of cows that were either sold or died.</p>
 </dd>
 </dl>
+</section>
+<section id="id62">
+<h3>Notes<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
+<p>This method records the culling age, updates statistics related to culled cows, and categorizes
+the cows based on specific attributes such as cull reason and parity.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_heiferII_statistics">
 <span class="sig-name descname"><span class="pre">_update_sold_heiferII_statistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sold_heiferIIs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_heiferII_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_heiferII_statistics'"><span>#</span></a></dt>
 <dd><p>Updates sold heiferII statistics in the herd statistics.</p>
-<p>This method updates the herd’s statistical values relating to sold heiferIIs.
-The updates include incrementing the number of sold heiferIIs, appending details
-about each sold heiferII, and calculating the average heiferII culling age.</p>
-<section id="id51">
-<h2>Parameters<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h2>
+<section id="id63">
+<h3>Parameters<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>sold_heiferIIs<span class="classifier">list[Animal]</span></dt><dd><p>A list of heiferII animals that have been sold.</p>
 </dd>
 </dl>
 </section>
+<section id="id64">
+<h3>Notes<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h3>
+<p>This method updates the herd’s statistical values relating to sold heiferIIs.
+The updates include incrementing the number of sold heiferIIs, appending details
+about each sold heiferII, and calculating the average heiferII culling age.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_newborn_calf_statistics">
 <span class="sig-name descname"><span class="pre">_update_sold_newborn_calf_statistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sold_newborn_calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_newborn_calf_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_newborn_calf_statistics'"><span>#</span></a></dt>
-<dd><p>Updates the statistics of sold newborn calves in the herd statistics.
-It increments the count of sold calves and appends detailed information about each sold newborn
-calf to the corresponding statistics.</p>
-<section id="id52">
-<h2>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h2>
+<dd><p>Updates the statistics of sold newborn calves in the herd statistics.</p>
+<section id="id65">
+<h3>Parameters<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>sold_newborn_calves<span class="classifier">list[Animal]</span></dt><dd><p>A list of newborn calves that were sold.</p>
 </dd>
 </dl>
+</section>
+<section id="id66">
+<h3>Notes<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h3>
+<p>It increments the count of sold calves and appends detailed information about each sold newborn
+calf to the corresponding statistics.</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -1079,6 +1288,12 @@ calf to the corresponding statistics.</p>
 <span class="sig-name descname"><span class="pre">_update_total_enteric_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">digestive_outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalType</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_total_enteric_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_total_enteric_methane'"><span>#</span></a></dt>
 <dd><p>Update the amount of total enteric methane in the herd statistics.</p>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_305_day_milk_yields">
+<span class="sig-name descname"><span class="pre">update_herd_305_day_milk_yields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_305_day_milk_yields" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_305_day_milk_yields'"><span>#</span></a></dt>
+<dd><p>Refresh each cow’s 305-day milk yield estimate (used by reporting and culling).</p>
+</dd></dl>
+</section>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -1093,24 +1308,39 @@ calf to the corresponding statistics.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.animals_by_combination'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.animals_by_combination"><code class="docutils literal notranslate"><span class="pre">HerdManager.animals_by_combination</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.pens_by_animal_combination'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.pens_by_animal_combination"><code class="docutils literal notranslate"><span class="pre">HerdManager.pens_by_animal_combination</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.phosphorus_concentration_by_animal_class'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.phosphorus_concentration_by_animal_class"><code class="docutils literal notranslate"><span class="pre">HerdManager.phosphorus_concentration_by_animal_class</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.current_herd_size'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.current_herd_size"><code class="docutils literal notranslate"><span class="pre">HerdManager.current_herd_size</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.heiferII_events_by_id'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.heiferII_events_by_id"><code class="docutils literal notranslate"><span class="pre">HerdManager.heiferII_events_by_id</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.cow_events_by_id'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.cow_events_by_id"><code class="docutils literal notranslate"><span class="pre">HerdManager.cow_events_by_id</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.daily_milk_report'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.daily_milk_report"><code class="docutils literal notranslate"><span class="pre">HerdManager.daily_milk_report</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.average_herd_305_days_milk_production'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.average_herd_305_days_milk_production"><code class="docutils literal notranslate"><span class="pre">HerdManager.average_herd_305_days_milk_production</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_lactation_number'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_lactation_number"><code class="docutils literal notranslate"><span class="pre">HerdManager._get_cow_lactation_number()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._average_305_day_milk_yield_for_cows'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._average_305_day_milk_yield_for_cows"><code class="docutils literal notranslate"><span class="pre">HerdManager._average_305_day_milk_yield_for_cows()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l1_305_day_milk_yield'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l1_305_day_milk_yield"><code class="docutils literal notranslate"><span class="pre">HerdManager.average_l1_305_day_milk_yield</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l2_305_day_milk_yield'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l2_305_day_milk_yield"><code class="docutils literal notranslate"><span class="pre">HerdManager.average_l2_305_day_milk_yield</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l3_plus_305_day_milk_yield'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.average_l3_plus_305_day_milk_yield"><code class="docutils literal notranslate"><span class="pre">HerdManager.average_l3_plus_305_day_milk_yield</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.all_animals'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.all_animals"><code class="docutils literal notranslate"><span class="pre">HerdManager.all_animals</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.animal_genetic_history_by_id'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.animal_genetic_history_by_id"><code class="docutils literal notranslate"><span class="pre">HerdManager.animal_genetic_history_by_id</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.collect_daily_feed_request'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.collect_daily_feed_request"><code class="docutils literal notranslate"><span class="pre">HerdManager.collect_daily_feed_request()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.print_herd_snapshot'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.print_herd_snapshot"><code class="docutils literal notranslate"><span class="pre">HerdManager.print_herd_snapshot()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._print_animal_num_warnings'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._print_animal_num_warnings"><code class="docutils literal notranslate"><span class="pre">HerdManager._print_animal_num_warnings()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._reset_daily_statistics'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._reset_daily_statistics"><code class="docutils literal notranslate"><span class="pre">HerdManager._reset_daily_statistics()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_stillborn_calf_statistics'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_stillborn_calf_statistics"><code class="docutils literal notranslate"><span class="pre">HerdManager._update_stillborn_calf_statistics()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_animal_statistics'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_animal_statistics"><code class="docutils literal notranslate"><span class="pre">HerdManager._update_sold_animal_statistics()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._perform_daily_routines_for_animals'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._perform_daily_routines_for_animals"><code class="docutils literal notranslate"><span class="pre">HerdManager._perform_daily_routines_for_animals()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_genetic_values_at_lactation_start'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_genetic_values_at_lactation_start"><code class="docutils literal notranslate"><span class="pre">HerdManager._update_genetic_values_at_lactation_start()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_herd_structure'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_herd_structure"><code class="docutils literal notranslate"><span class="pre">HerdManager._update_herd_structure()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.daily_routines'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.daily_routines"><code class="docutils literal notranslate"><span class="pre">HerdManager.daily_routines()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._process_daily_herd_updates'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._process_daily_herd_updates"><code class="docutils literal notranslate"><span class="pre">HerdManager._process_daily_herd_updates()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._apply_daily_herd_structure_updates'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._apply_daily_herd_structure_updates"><code class="docutils literal notranslate"><span class="pre">HerdManager._apply_daily_herd_structure_updates()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._collect_manure_outputs_by_pen'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._collect_manure_outputs_by_pen"><code class="docutils literal notranslate"><span class="pre">HerdManager._collect_manure_outputs_by_pen()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_heifer_average_daily_weight_gain'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_heifer_average_daily_weight_gain"><code class="docutils literal notranslate"><span class="pre">HerdManager._calculate_heifer_average_daily_weight_gain()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._warn_when_lactating_cows_have_no_milk'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._warn_when_lactating_cows_have_no_milk"><code class="docutils literal notranslate"><span class="pre">HerdManager._warn_when_lactating_cows_have_no_milk()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._report_daily_routine_outputs'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._report_daily_routine_outputs"><code class="docutils literal notranslate"><span class="pre">HerdManager._report_daily_routine_outputs()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.execute_daily_routines'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.execute_daily_routines"><code class="docutils literal notranslate"><span class="pre">HerdManager.execute_daily_routines()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_and_report_average_genetics'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._calculate_and_report_average_genetics"><code class="docutils literal notranslate"><span class="pre">HerdManager._calculate_and_report_average_genetics()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._report_ration'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._report_ration"><code class="docutils literal notranslate"><span class="pre">HerdManager._report_ration()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._create_newborn_calf'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._create_newborn_calf"><code class="docutils literal notranslate"><span class="pre">HerdManager._create_newborn_calf()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_heifers_need_to_be_sold'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_heifers_need_to_be_sold"><code class="docutils literal notranslate"><span class="pre">HerdManager._check_if_heifers_need_to_be_sold()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._cull_ranking_value'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._cull_ranking_value"><code class="docutils literal notranslate"><span class="pre">HerdManager._cull_ranking_value()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_removal_index'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._get_cow_removal_index"><code class="docutils literal notranslate"><span class="pre">HerdManager._get_cow_removal_index()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_cows_need_to_be_sold'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_cows_need_to_be_sold"><code class="docutils literal notranslate"><span class="pre">HerdManager._check_if_cows_need_to_be_sold()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_replacement_heifers_needed'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_replacement_heifers_needed"><code class="docutils literal notranslate"><span class="pre">HerdManager._check_if_replacement_heifers_needed()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_replacement_animal_genetics'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_replacement_animal_genetics"><code class="docutils literal notranslate"><span class="pre">HerdManager._update_replacement_animal_genetics()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._remove_animal_from_current_array'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._remove_animal_from_current_array"><code class="docutils literal notranslate"><span class="pre">HerdManager._remove_animal_from_current_array()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_new_array'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._add_animal_to_new_array"><code class="docutils literal notranslate"><span class="pre">HerdManager._add_animal_to_new_array()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_animal_array'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_animal_array"><code class="docutils literal notranslate"><span class="pre">HerdManager._update_animal_array()</span></code></a></li>
@@ -1154,6 +1384,7 @@ calf to the corresponding statistics.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_average_cow_parity'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_average_cow_parity"><code class="docutils literal notranslate"><span class="pre">HerdManager._update_average_cow_parity()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.report_ration_interval_data'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.report_ration_interval_data"><code class="docutils literal notranslate"><span class="pre">HerdManager.report_ration_interval_data()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager._update_total_enteric_methane'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager._update_total_enteric_methane"><code class="docutils literal notranslate"><span class="pre">HerdManager._update_total_enteric_methane()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_305_day_milk_yields'" class="reference internal" href="#RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_305_day_milk_yields"><code class="docutils literal notranslate"><span class="pre">HerdManager.update_herd_305_day_milk_yields()</span></code></a></li>
 </ul>
 </li>
 </ul>

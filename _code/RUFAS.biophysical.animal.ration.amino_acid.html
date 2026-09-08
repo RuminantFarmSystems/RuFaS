@@ -29,7 +29,7 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.biophysical.animal.ration.animal_requirements.html" rel="next" title="RUFAS.biophysical.animal.ration.animal_requirements module"/>
+<link href="RUFAS.biophysical.animal.ration.calf_ration_manager.html" rel="next" title="RUFAS.biophysical.animal.ration.calf_ration_manager module"/>
 <link href="RUFAS.biophysical.animal.ration.html" rel="prev" title="RUFAS.biophysical.animal.ration package"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -152,6 +153,7 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.amino_acid.AminoAcidComposition">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.ration.amino_acid.</span></span><span class="sig-name descname"><span class="pre">AminoAcidComposition</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.amino_acid.AminoAcidComposition" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.amino_acid.AminoAcidComposition'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>A container for the amino acids components</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.amino_acid.AminoAcidComposition.duodenal_endogenous">
 <span class="sig-name descname"><span class="pre">duodenal_endogenous</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.amino_acid.AminoAcidComposition.duodenal_endogenous" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.amino_acid.AminoAcidComposition.duodenal_endogenous'"><span>#</span></a></dt>
@@ -181,6 +183,7 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.ration.amino_acid.</span></span><span class="sig-name descname"><span class="pre">EssentialAminoAcidRequirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">histidine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isoleucine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leucine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lysine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methionine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phenylalanine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threonine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thryptophan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The requirements for essential amino acids</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements.histidine">
 <span class="sig-name descname"><span class="pre">histidine</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements.histidine" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.amino_acid.EssentialAminoAcidRequirements.histidine'"><span>#</span></a></dt>

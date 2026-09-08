@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.util.html" rel="next" title="RUFAS.util module"/>
+<link href="RUFAS.units.html" rel="prev" title="RUFAS.units module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,8 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.user_constants module</span>
 </nav>
 <div id="content" role="main">
@@ -157,7 +162,7 @@
 </dd>
 <dt>NITROGEN_TO_PROTEIN<span class="classifier">float</span></dt><dd><p>Conversion factor from nitrogen to protein (unitless).</p>
 </dd>
-<dt>MILK_FAT_WEIGHT<span class="classifier">float</span></dt><dd><p>Average weight of milk fat (unitless).</p>
+<dt>MILK_FAT_WEIGHT<span class="classifier">float</span></dt><dd><p>Average weight of milk fat (kg).</p>
 </dd>
 <dt>FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL<span class="classifier">float</span></dt><dd><p>Fraction of humic nitrogen in an active pool (unitless).
 Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:1.1.4.</p>
@@ -167,6 +172,8 @@ Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:
 <dt>GENERAL_LOWER_BOUND_TEMPERATURE<span class="classifier">float</span></dt><dd><p>General temperature lower bound (°C).</p>
 </dd>
 <dt>GENERAL_UPPER_BOUND_TEMPERATURE<span class="classifier">float</span></dt><dd><p>General temperature upper bound (°C).</p>
+</dd>
+<dt>SPECIFIC_FUEL_CONSUMPTION<span class="classifier">float</span></dt><dd><p>The specific fuel consumption of a single unit of fuel (L/kWh).</p>
 </dd>
 <dt>CONSTANTS_TO_UNITS<span class="classifier">dict[str, MeasurementUnits]</span></dt><dd><p>A dictionary mapping constant names to their respective measurement units.</p>
 </dd>
@@ -213,7 +220,7 @@ Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS">
-<span class="sig-name descname"><span class="pre">CONSTANTS_TO_UNITS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'GENERAL_LOWER_BOUND_TEMPERATURE':</span> <span class="pre">MeasurementUnits.DEGREES_CELSIUS,</span> <span class="pre">'GENERAL_UPPER_BOUND_TEMPERATURE':</span> <span class="pre">MeasurementUnits.DEGREES_CELSIUS,</span> <span class="pre">'METHANE_FACTOR':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,</span> <span class="pre">'MILK_FAT_WEIGHT':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'NITROGEN_TO_PROTEIN':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'PROTEIN_TO_NITROGEN':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'SPECIFIC_FUEL_CONSUMPTION':</span> <span class="pre">MeasurementUnits.LITERS_PER_KILOWATTS_PER_HOUR,</span> <span class="pre">'WATER_DENSITY_KG_PER_LITER':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_LITER,</span> <span class="pre">'WATER_DENSITY_KG_PER_M3':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_CUBIC_METER}</span></span><a class="headerlink" href="#RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">CONSTANTS_TO_UNITS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'GENERAL_LOWER_BOUND_TEMPERATURE':</span> <span class="pre">MeasurementUnits.DEGREES_CELSIUS,</span> <span class="pre">'GENERAL_UPPER_BOUND_TEMPERATURE':</span> <span class="pre">MeasurementUnits.DEGREES_CELSIUS,</span> <span class="pre">'METHANE_FACTOR':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,</span> <span class="pre">'MILK_FAT_WEIGHT':</span> <span class="pre">MeasurementUnits.KILOGRAMS,</span> <span class="pre">'NITROGEN_TO_PROTEIN':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'PROTEIN_TO_NITROGEN':</span> <span class="pre">MeasurementUnits.UNITLESS,</span> <span class="pre">'SPECIFIC_FUEL_CONSUMPTION':</span> <span class="pre">MeasurementUnits.LITERS_PER_KILOWATTS_PER_HOUR,</span> <span class="pre">'WATER_DENSITY_KG_PER_LITER':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_LITER,</span> <span class="pre">'WATER_DENSITY_KG_PER_M3':</span> <span class="pre">MeasurementUnits.KILOGRAMS_PER_CUBIC_METER}</span></span><a class="headerlink" href="#RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.user_constants.UserConstants.CONSTANTS_TO_UNITS'"><span>#</span></a></dt>
 <dd></dd></dl>
 </section>
 </dd></dl>

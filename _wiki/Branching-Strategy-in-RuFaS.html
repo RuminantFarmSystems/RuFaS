@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -143,7 +144,7 @@
 <div id="content" role="main">
 <section id="branching-strategy-in-rufas">
 <h1>Branching Strategy in RuFaS<a class="headerlink" href="#branching-strategy-in-rufas" title="Link to this heading"><span>#</span></a></h1>
-<p>In this wiki, we outline the branching strategy used in RuFaS, detailing
+<p>In this page, we outline the branching strategy used in RuFaS, detailing
 the purpose of each branch and the process for merging changes.</p>
 <section id="branches-overview">
 <h2>Branches Overview<a class="headerlink" href="#branches-overview" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#branches-overview'"><span>#</span></a></h2>
@@ -153,19 +154,29 @@ the purpose of each branch and the process for merging changes.</p>
 <li><p><strong>Purpose</strong>: Active development branch where new features and changes
 are implemented.</p></li>
 <li><p><strong>Usage</strong>: All pull requests (PRs) are merged into <code class="docutils literal notranslate"><span class="pre">dev</span></code>. This is
-the main branch for ongoing development.</p></li>
-<li><p><strong>Approval</strong>: Merging to <code class="docutils literal notranslate"><span class="pre">dev</span></code> requires 2 approvals.</p></li>
+the primary branch for ongoing development.</p></li>
+<li><p><strong>Approval</strong>: Merging to <code class="docutils literal notranslate"><span class="pre">dev</span></code> requires <strong>2 approvals</strong>.</p></li>
+<li><p><strong>Note</strong>: All the changes on <code class="docutils literal notranslate"><span class="pre">dev</span></code> are considered for the next release.</p></li>
 </ul>
+<blockquote>
+<div><p>If something is <strong>NOT</strong> intended to be included in the next release,
+it should be merged into a separate parking branch and not merged into <code class="docutils literal notranslate"><span class="pre">dev</span></code>
+until it is ready for release.</p>
+</div></blockquote>
 </section>
 <section id="test">
 <h3><code class="docutils literal notranslate"><span class="pre">test</span></code><a class="headerlink" href="#test" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#test'"><span>#</span></a></h3>
-<ul class="simple">
-<li><p><strong>Purpose</strong>: Intermediate branch used for integration and testing of
-features before moving to <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
-<li><p><strong>Usage</strong>: Changes from <code class="docutils literal notranslate"><span class="pre">dev</span></code> are periodically pulled into <code class="docutils literal notranslate"><span class="pre">test</span></code>
-for vigorous testing. This ensures that new features and fixes are
-properly tested before being considered stable.</p></li>
-<li><p><strong>Approval</strong>: Merging to <code class="docutils literal notranslate"><span class="pre">test</span></code> requires at least 1 approval.</p></li>
+<ul>
+<li><p><strong>Purpose</strong>: Intermediate branch used for <strong>integration, validation,
+and stabilization</strong> prior to a release.</p></li>
+<li><p><strong>Usage</strong>: When preparing a release candidate, the current state of
+<code class="docutils literal notranslate"><span class="pre">dev</span></code> is merged into <code class="docutils literal notranslate"><span class="pre">test</span></code>. The <code class="docutils literal notranslate"><span class="pre">test</span></code> branch is then used for
+validation and stabilization before releasing a new version.</p>
+<p>Once <code class="docutils literal notranslate"><span class="pre">dev</span></code> has been merged into <code class="docutils literal notranslate"><span class="pre">test</span></code> for a release candidate,
+no new development work should be introduced into <code class="docutils literal notranslate"><span class="pre">test</span></code>. Only bug
+fixes discovered during testing should be applied.</p>
+</li>
+<li><p><strong>Approval</strong>: <code class="docutils literal notranslate"><span class="pre">test</span></code> is locked and only admins can merge into it.</p></li>
 </ul>
 </section>
 <section id="main">
@@ -173,12 +184,23 @@ properly tested before being considered stable.</p></li>
 <ul class="simple">
 <li><p><strong>Purpose</strong>: Primary branch representing the latest stable release
 that is ready for production.</p></li>
-<li><p><strong>Usage</strong>: Once changes in <code class="docutils literal notranslate"><span class="pre">test</span></code> are confirmed to be stable, the
-version number is updated, and updates are pulled into <code class="docutils literal notranslate"><span class="pre">main</span></code>. The
-<code class="docutils literal notranslate"><span class="pre">main</span></code> branch is locked, and only <a class="reference external" href="https://github.com/PooyaHekmati">Pooya
-Hekmati</a> and <a class="reference external" href="https://github.com/KFosterReed">Kristan
-Reed</a> have the permissions to merge
-PRs into it.</p></li>
+<li><p><strong>Usage</strong>: Once changes in <code class="docutils literal notranslate"><span class="pre">test</span></code> are confirmed to be stable and the
+version number has been updated, updates are pulled into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
+<li><p><strong>Permissions</strong>: The <code class="docutils literal notranslate"><span class="pre">main</span></code> branch is locked, and only
+repo admins have permission to merge pull requests into it.</p></li>
+</ul>
+</section>
+<section id="scientific-documentation-updates">
+<h3><code class="docutils literal notranslate"><span class="pre">scientific_documentation_updates</span></code><a class="headerlink" href="#scientific-documentation-updates" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#scientific-documentation-updates'"><span>#</span></a></h3>
+<ul class="simple">
+<li><p><strong>Purpose</strong>: Branch used for updates to the <strong>scientific documentation</strong>
+that do not require changes to the RuFaS codebase.</p></li>
+<li><p><strong>Usage</strong>: Documentation updates may be committed directly to this
+branch and merged into <code class="docutils literal notranslate"><span class="pre">main</span></code> without going through the <code class="docutils literal notranslate"><span class="pre">test</span></code>
+branch.</p></li>
+<li><p><strong>Synchronization</strong>: After merging into <code class="docutils literal notranslate"><span class="pre">main</span></code>, the changes must
+also be merged into <code class="docutils literal notranslate"><span class="pre">dev</span></code> to ensure documentation remains consistent
+across development branches.</p></li>
 </ul>
 </section>
 </section>
@@ -187,57 +209,126 @@ PRs into it.</p></li>
 <section id="merging-to-dev">
 <h3>Merging to <code class="docutils literal notranslate"><span class="pre">dev</span></code><a class="headerlink" href="#merging-to-dev" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#merging-to-dev'"><span>#</span></a></h3>
 <ol class="arabic simple">
-<li><p><strong>Develop</strong>: Create feature branches off <code class="docutils literal notranslate"><span class="pre">dev</span></code> to work on new
-features or fixes.</p></li>
-<li><p><strong>Submit PR</strong>: Once the feature is ready, create a pull request to
-merge it into <code class="docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
-<li><p><strong>Review</strong>: The code is reviewed following the <a class="reference external" href="https://github.com/RuminantFarmSystems/MASM/wiki/Code-review">code review
-process</a>
-in RuFaS.</p></li>
-<li><p><strong>Merge</strong>: After approval, the PR is merged into <code class="docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
+<li><p><strong>Develop</strong></p>
+<ul class="simple">
+<li><p>Create feature branches from <code class="docutils literal notranslate"><span class="pre">dev</span></code> to implement new features,
+bug fixes, or improvements.</p></li>
+</ul>
+</li>
+<li><p><strong>Submit PR</strong></p>
+<ul class="simple">
+<li><p>Once development is complete, submit a pull request to merge the
+feature branch into <code class="docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Review</strong></p>
+<ul class="simple">
+<li><p>Code is reviewed following the
+<a class="reference external" href="https://ruminantfarmsystems.github.io/RuFaS/_wiki/Code-review.html">code review process</a>
+used in RuFaS.</p></li>
+</ul>
+</li>
+<li><p><strong>Merge</strong></p>
+<ul class="simple">
+<li><p>After receiving the required approvals, the PR is merged into
+<code class="docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="merging-to-test">
 <h3>Merging to <code class="docutils literal notranslate"><span class="pre">test</span></code><a class="headerlink" href="#merging-to-test" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#merging-to-test'"><span>#</span></a></h3>
-<ol class="arabic simple">
-<li><p><strong>Periodic Updates</strong>: Periodically, pull changes from <code class="docutils literal notranslate"><span class="pre">dev</span></code> into
-<code class="docutils literal notranslate"><span class="pre">test</span></code>.</p></li>
-<li><p><strong>Testing</strong>: Conduct rigorous testing on the <code class="docutils literal notranslate"><span class="pre">test</span></code> branch to
-ensure all features and fixes are stable.</p></li>
-<li><p><strong>Feedback</strong>: Address any issues found during testing by pushing
-fixes to <code class="docutils literal notranslate"><span class="pre">dev</span></code> and then merging the updates back into <code class="docutils literal notranslate"><span class="pre">test</span></code>.</p></li>
+<ol class="arabic">
+<li><p><strong>Prepare a Release Candidate</strong></p>
+<ul class="simple">
+<li><p>When the development team decides to prepare a release,
+update the version number in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> on the <code class="docutils literal notranslate"><span class="pre">dev</span></code>
+branch and merge <code class="docutils literal notranslate"><span class="pre">dev</span></code> into <code class="docutils literal notranslate"><span class="pre">test</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Testing Phase</strong></p>
+<ul class="simple">
+<li><p>Conduct rigorous testing on the <code class="docutils literal notranslate"><span class="pre">test</span></code> branch to verify model
+correctness, integration stability, and expected behavior.</p></li>
+</ul>
+</li>
+<li><p><strong>Handling Issues During Testing</strong></p>
+<p>If an issue is discovered during testing:</p>
+<ul class="simple">
+<li><p>Create a <strong>fix branch from ``test``</strong>.</p></li>
+<li><p>Implement the fix in that branch.</p></li>
+<li><p>Submit a PR to merge the fix into <code class="docutils literal notranslate"><span class="pre">test</span></code>.</p></li>
+<li><p>After the fix is merged into <code class="docutils literal notranslate"><span class="pre">test</span></code>, create a PR to merge the
+same fix back into <code class="docutils literal notranslate"><span class="pre">dev</span></code> so both branches remain synchronized.</p></li>
+</ul>
+</li>
+<li><p><strong>Continue Stabilization</strong></p>
+<ul class="simple">
+<li><p>Repeat this process until the <code class="docutils literal notranslate"><span class="pre">test</span></code> branch is confirmed to be
+stable and ready for release.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="merging-to-main">
 <h3>Merging to <code class="docutils literal notranslate"><span class="pre">main</span></code><a class="headerlink" href="#merging-to-main" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#merging-to-main'"><span>#</span></a></h3>
 <ol class="arabic simple">
-<li><p><strong>Stability Confirmation</strong>: Once the <code class="docutils literal notranslate"><span class="pre">test</span></code> branch is confirmed to
-be stable, update the version number in both <code class="docutils literal notranslate"><span class="pre">TaskManager</span></code> and the
-change log. <a class="reference internal" href="RuFaS-Versioning-Policy.html"><span class="doc">RuFaS Versioning Policy</span></a></p></li>
-<li><p><strong>Pull Updates</strong>: Pull the stable updates from <code class="docutils literal notranslate"><span class="pre">test</span></code> into
-<code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
-<li><p><strong>Approval</strong>: Only <a class="reference external" href="https://github.com/PooyaHekmati">Pooya
-Hekmati</a> and <a class="reference external" href="https://github.com/KFosterReed">Kristan
-Reed</a> can merge PRs into <code class="docutils literal notranslate"><span class="pre">main</span></code>
-to ensure high-quality, stable releases.</p></li>
+<li><p><strong>Merge Version Update into Test</strong></p>
+<ul class="simple">
+<li><p>Merge the updated <code class="docutils literal notranslate"><span class="pre">dev</span></code> branch into <code class="docutils literal notranslate"><span class="pre">test</span></code> as part of the
+release preparation.</p></li>
+</ul>
+</li>
+<li><p><strong>Stability Confirmation</strong></p>
+<ul class="simple">
+<li><p>Confirm that the <code class="docutils literal notranslate"><span class="pre">test</span></code> branch has passed validation and
+stabilization testing.</p></li>
+</ul>
+</li>
+<li><p><strong>PML Approval</strong></p>
+<ul class="simple">
+<li><p>The <strong>Program Management Leadership (PML)</strong> must approve the release and
+the release notes before the merge to <code class="docutils literal notranslate"><span class="pre">main</span></code> is performed.</p></li>
+</ul>
+</li>
+<li><p><strong>Merge to Main</strong></p>
+<ul class="simple">
+<li><p>Pull the stable updates from <code class="docutils literal notranslate"><span class="pre">test</span></code> into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Tag the Release</strong></p>
+<ul class="simple">
+<li><p>Create a Git tag corresponding to the version number
+(for example <code class="docutils literal notranslate"><span class="pre">v1.2.0</span></code>).</p></li>
+</ul>
+</li>
 </ol>
 </section>
 </section>
 <section id="best-practices">
 <h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#best-practices'"><span>#</span></a></h2>
-<ul class="simple">
-<li><p><strong>Consistent Testing</strong>: Ensure thorough testing is done in <code class="docutils literal notranslate"><span class="pre">test</span></code>
-before merging into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
-<li><p><strong>Clear Communication</strong>: Keep all team members informed about the
-status of each branch and any important changes.</p></li>
-<li><p><strong>Documentation</strong>: Maintain clear and up-to-date documentation for all
-changes and testing procedures.</p></li>
-<li><p><strong>Review and Approval</strong>: Adhere to the <a class="reference internal" href="Code-review.html"><span class="doc">code review guidelines</span></a>
-to maintain code quality and stability.</p></li>
+<ul>
+<li><p><strong>Consistent Testing</strong></p>
+<p>Ensure thorough validation is completed in <code class="docutils literal notranslate"><span class="pre">test</span></code> before merging
+into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p>
+</li>
+<li><p><strong>Branch Consistency</strong></p>
+<p>Fixes applied during the testing phase must always be merged back into
+<code class="docutils literal notranslate"><span class="pre">dev</span></code> to prevent branch divergence.</p>
+</li>
+<li><p><strong>Clear Communication</strong></p>
+<p>Keep all team members informed about the status of release candidates
+and branch updates.</p>
+</li>
+<li><p><strong>Documentation</strong></p>
+<p>Maintain clear and up-to-date documentation for changes and testing
+procedures.</p>
+</li>
+<li><p><strong>Review and Approval</strong></p>
+<p>Adhere to the <span class="xref std std-doc">Code Review Guidelines</span> to maintain
+code quality and model integrity.</p>
+</li>
 </ul>
-<p>By following this branching strategy, we ensure a clear and structured
-workflow that supports continuous integration and delivery, maintaining
-the high standards of code quality in RuFaS.</p>
 </section>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -247,6 +338,7 @@ the high standards of code quality in RuFaS.</p>
 <li><a :data-current="activeSection === '#dev'" class="reference internal" href="#dev"><code class="docutils literal notranslate"><span class="pre">dev</span></code></a></li>
 <li><a :data-current="activeSection === '#test'" class="reference internal" href="#test"><code class="docutils literal notranslate"><span class="pre">test</span></code></a></li>
 <li><a :data-current="activeSection === '#main'" class="reference internal" href="#main"><code class="docutils literal notranslate"><span class="pre">main</span></code></a></li>
+<li><a :data-current="activeSection === '#scientific-documentation-updates'" class="reference internal" href="#scientific-documentation-updates"><code class="docutils literal notranslate"><span class="pre">scientific_documentation_updates</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#merging-process'" class="reference internal" href="#merging-process">Merging Process</a><ul>

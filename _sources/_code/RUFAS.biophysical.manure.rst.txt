@@ -20,6 +20,7 @@ Submodules
 
    RUFAS.biophysical.manure.manure_constants
    RUFAS.biophysical.manure.manure_manager
+   RUFAS.biophysical.manure.manure_nutrient_manager
    RUFAS.biophysical.manure.processor
    RUFAS.biophysical.manure.processor_enum
 

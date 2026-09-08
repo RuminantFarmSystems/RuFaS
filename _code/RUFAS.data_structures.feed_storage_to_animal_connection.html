@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.data_structures.manure_nutrients.html" rel="next" title="RUFAS.data_structures.manure_nutrients module"/>
+<link href="RUFAS.data_structures.events.html" rel="prev" title="RUFAS.data_structures.events module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,11 +139,19 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.data_structures.html">RUFAS.data_structures package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.data_structures.feed_storage_to_animal_connection module</span>
 </nav>
 <div id="content" role="main">
 <section id="module-RUFAS.data_structures.feed_storage_to_animal_connection">
 <span id="rufas-data-structures-feed-storage-to-animal-connection-module"></span><h1>RUFAS.data_structures.feed_storage_to_animal_connection module<a class="headerlink" href="#module-RUFAS.data_structures.feed_storage_to_animal_connection" title="Link to this heading"><span>#</span></a></h1>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.RUFAS_ID">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.feed_storage_to_animal_connection.</span></span><span class="sig-name descname"><span class="pre">RUFAS_ID</span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.RUFAS_ID" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.RUFAS_ID'"><span>#</span></a></dt>
+<dd><p>Ratio of the price of an on-farm price to the price of buying that feed from an off farm source.</p>
+</dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.feed_storage_to_animal_connection.</span></span><span class="sig-name descname"><span class="pre">FeedCategorization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization'"><span>#</span></a></dt>
@@ -309,7 +320,7 @@
 </dd>
 <dt>is_wetforage<span class="classifier">bool</span></dt><dd><p>Identifier of wet forage type feed (unitless).</p>
 </dd>
-<dt>units<span class="classifier">MeasurementUnits</span></dt><dd><p>The units with which the feed is measured.</p>
+<dt>units<span class="classifier">MeasurementUnits</span></dt><dd><p>The units with which the feed is measured (unitless).</p>
 </dd>
 <dt>limit<span class="classifier">float</span></dt><dd><p>Upper limit of feed that is allowed to be used in a single animal’s diet (kg).</p>
 </dd>
@@ -325,7 +336,7 @@
 </dd>
 <dt>purchase_cost<span class="classifier">float</span></dt><dd><p>Price of buying feed from off-farm ($ / kg).</p>
 </dd>
-<dt>buffer<span class="classifier">float</span></dt><dd><p>Fraction of extra feed purchases to account for shrinkage.</p>
+<dt>buffer<span class="classifier">float</span></dt><dd><p>Fraction of extra feed purchases to account for shrinkage (unitless).</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -500,64 +511,109 @@
 </dd>
 <dt>DE_Base<span class="classifier">float</span></dt><dd><p>Digestible energy standard (Mcal / kg).</p>
 </dd>
-</dl>
-<p>copper : float
-iron : float
-manganese : float
-zinc : float
-molibdenum : float
-chromium : float
-cobalt : float
-iodine : float
-selenium : float
-arginine : float
-histidine : float
-isoleucine : float
-leucine : float
-lysine : float
-methionine : float
-phenylalanine : float
-threonine : float
-triptophan : float
-valine : float
-C120_FA : float
-C140_FA : float
-C160_FA : float
-C161_FA : float
-C180_FA : float
-C181t_FA : float
-C181c_FA : float
-C182_FA : float
-C183_FA : float
-otherFA_FA : float
-NPN_source : float</p>
-<blockquote>
-<div><p>Non-protein nitrogen fraction (%).</p>
-</div></blockquote>
-<dl class="simple">
+<dt>copper<span class="classifier">float</span></dt><dd><p>Copper (% dry matter).</p>
+</dd>
+<dt>iron<span class="classifier">float</span></dt><dd><p>Iron (% dry matter).</p>
+</dd>
+<dt>manganese<span class="classifier">float</span></dt><dd><p>Manganese (% dry matter).</p>
+</dd>
+<dt>zinc<span class="classifier">float</span></dt><dd><p>Zinc (% dry matter).</p>
+</dd>
+<dt>molibdenum<span class="classifier">float</span></dt><dd><p>Molibdenum (% dry matter).</p>
+</dd>
+<dt>chromium<span class="classifier">float</span></dt><dd><p>Chromium (% dry matter).</p>
+</dd>
+<dt>cobalt<span class="classifier">float</span></dt><dd><p>Cobalt (% dry matter).</p>
+</dd>
+<dt>iodine<span class="classifier">float</span></dt><dd><p>Iodine (% dry matter).</p>
+</dd>
+<dt>selenium<span class="classifier">float</span></dt><dd><p>Selenium (% dry matter).</p>
+</dd>
+<dt>arginine<span class="classifier">float</span></dt><dd><p>Arginine (% dry matter).</p>
+</dd>
+<dt>histidine<span class="classifier">float</span></dt><dd><p>Histidine (% dry matter).</p>
+</dd>
+<dt>isoleucine<span class="classifier">float</span></dt><dd><p>Isoleucine (% dry matter).</p>
+</dd>
+<dt>leucine<span class="classifier">float</span></dt><dd><p>Leucine (% dry matter).</p>
+</dd>
+<dt>lysine<span class="classifier">float</span></dt><dd><p>Lysine (% dry matter).</p>
+</dd>
+<dt>methionine<span class="classifier">float</span></dt><dd><p>Methionine (% dry matter).</p>
+</dd>
+<dt>phenylalanine<span class="classifier">float</span></dt><dd><p>Phenylalanine (% dry matter).</p>
+</dd>
+<dt>threonine<span class="classifier">float</span></dt><dd><p>Threonine (% dry matter).</p>
+</dd>
+<dt>triptophan<span class="classifier">float</span></dt><dd><p>Triptophan (% dry matter).</p>
+</dd>
+<dt>valine<span class="classifier">float</span></dt><dd><p>Valine (% dry matter).</p>
+</dd>
+<dt>C120_FA<span class="classifier">float</span></dt><dd><p>C120_FA (% dry matter).</p>
+</dd>
+<dt>C140_FA<span class="classifier">float</span></dt><dd><p>C140_FA (% dry matter).</p>
+</dd>
+<dt>C160_FA<span class="classifier">float</span></dt><dd><p>C160_FA (% dry matter).</p>
+</dd>
+<dt>C161_FA<span class="classifier">float</span></dt><dd><p>C161_FA (% dry matter).</p>
+</dd>
+<dt>C180_FA<span class="classifier">float</span></dt><dd><p>C180_FA (% dry matter).</p>
+</dd>
+<dt>C181t_FA<span class="classifier">float</span></dt><dd><p>C181t_FA (% dry matter).</p>
+</dd>
+<dt>C181c_FA<span class="classifier">float</span></dt><dd><p>C181c_FA (% dry matter).</p>
+</dd>
+<dt>C182_FA<span class="classifier">float</span></dt><dd><p>C182_FA (% dry matter).</p>
+</dd>
+<dt>C183_FA<span class="classifier">float</span></dt><dd><p>C183_FA (% dry matter).</p>
+</dd>
+<dt>otherFA_FA<span class="classifier">float</span></dt><dd><p>OtherFA_FA (% dry matter).</p>
+</dd>
+<dt>NPN_source<span class="classifier">float</span></dt><dd><p>Non-protein nitrogen fraction (%).</p>
+</dd>
 <dt>starch_digested<span class="classifier">float</span></dt><dd><p>Base starch digestibility (%).</p>
 </dd>
+<dt>FA_dig<span class="classifier">float</span></dt><dd><p>FA_dig (% dry matter).</p>
+</dd>
+<dt>P_inorg<span class="classifier">float</span></dt><dd><p>P_inorg (% dry matter).</p>
+</dd>
+<dt>P_org<span class="classifier">float</span></dt><dd><p>P_org (% dry matter).</p>
+</dd>
+<dt>B_Carotene<span class="classifier">float</span></dt><dd><p>B_Carotene (% dry matter).</p>
+</dd>
+<dt>biotin<span class="classifier">float</span></dt><dd><p>Biotin (% dry matter).</p>
+</dd>
+<dt>choline<span class="classifier">float</span></dt><dd><p>Choline (% dry matter).</p>
+</dd>
+<dt>niacin<span class="classifier">float</span></dt><dd><p>Niacin (% dry matter).</p>
+</dd>
+<dt>Vit_A<span class="classifier">float</span></dt><dd><p>Vita_A (% dry matter).</p>
+</dd>
+<dt>Vit_D<span class="classifier">float</span></dt><dd><p>Vit_D (% dry matter).</p>
+</dd>
+<dt>Vit_E<span class="classifier">float</span></dt><dd><p>Vit_E (% dry matter).</p>
+</dd>
+<dt>Abs_calcium<span class="classifier">float</span></dt><dd><p>Abs_calcium (% dry matter).</p>
+</dd>
+<dt>Abs_phosphorus<span class="classifier">float</span></dt><dd><p>Abs_phosphorus (% dry matter).</p>
+</dd>
+<dt>Abs_sodium<span class="classifier">float</span></dt><dd><p>Abs_sodium (% dry matter).</p>
+</dd>
+<dt>Abs_chloride<span class="classifier">float</span></dt><dd><p>Abs_chloride (% dry matter).</p>
+</dd>
+<dt>Abs_potassium<span class="classifier">float</span></dt><dd><p>Abs_potassium (% dry matter).</p>
+</dd>
+<dt>Abs_copper<span class="classifier">float</span></dt><dd><p>Abs_copper (% dry matter).</p>
+</dd>
+<dt>Abs_iron<span class="classifier">float</span></dt><dd><p>Abs_iron (% dry matter).</p>
+</dd>
+<dt>Abs_magnesium<span class="classifier">float</span></dt><dd><p>Abs_magnesium (% dry matter).</p>
+</dd>
+<dt>Abs_manganesum<span class="classifier">float</span></dt><dd><p>Abs_manganesum (% dry matter).</p>
+</dd>
+<dt>Abs_zinc<span class="classifier">float</span></dt><dd><p>Abs_zinc (% dry matter).</p>
+</dd>
 </dl>
-<p>FA_dig : float
-P_inorg : float
-P_org : float
-B_Carotene : float
-biotin : float
-choline : float
-niacin : float
-Vit_A : float
-Vit_D : float
-Vit_E : float
-Abs_calcium : float
-Abs_phosphorus : float
-Abs_sodium : float
-Abs_chloride : float
-Abs_potassium : float
-Abs_copper : float
-Abs_iron : float
-Abs_magnesium : float
-Abs_manganesum : float
-Abs_zinc : float</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.Name">
 <span class="sig-name descname"><span class="pre">Name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.Name" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.NASEMFeed.Name'"><span>#</span></a></dt>
@@ -824,12 +880,99 @@ Abs_zinc : float</p>
 </section>
 </dd></dl>
 <dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.feed_storage_to_animal_connection.</span></span><span class="sig-name descname"><span class="pre">AvailableFeedsBuilder</span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Builds the list of feeds available for use in the simulation.</p>
+<p>This class is responsible for loading feed composition data from the input
+manager, translating it into simulation-friendly types, and constructing
+the purchased feeds configured for the simulation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder.setup_available_feeds">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">setup_available_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_standard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard" title="RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard"><span class="pre">NutrientStandard</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.Feed" title="RUFAS.data_structures.feed_storage_to_animal_connection.Feed"><span class="pre">Feed</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder.setup_available_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder.setup_available_feeds'"><span>#</span></a></dt>
+<dd><p>Creates sorted list of feeds available for use in the simulation.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>feed_config<span class="classifier">dict[str, list[Any]]</span></dt><dd><p>Mapping of the feeds available for purchase to the prices of those feeds.</p>
+</dd>
+<dt>nutrient_standard<span class="classifier">NutrientStandard</span></dt><dd><p>Indicates whether the NASEM or NRC nutrient standards is being used.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>list[Feed]</dt><dd><p>Nutrition and price information of feeds available in the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._validate_feed_config">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_validate_feed_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_library</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_standard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard" title="RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard"><span class="pre">NutrientStandard</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._validate_feed_config" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._validate_feed_config'"><span>#</span></a></dt>
+<dd><p>Validates the feed configuration prior to constructing available feeds.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>feed_config<span class="classifier">dict[str, Any]</span></dt><dd><p>Feed configuration input containing the top-level <code class="docutils literal notranslate"><span class="pre">feeds</span></code> and <code class="docutils literal notranslate"><span class="pre">rations</span></code> sections.</p>
+</dd>
+<dt>feed_library<span class="classifier">dict[RUFAS_ID, dict[str, Any]]</span></dt><dd><p>Mapping of RuFaS feed IDs to the nutritional properties available in the selected feed library.</p>
+</dd>
+<dt>nutrient_standard<span class="classifier">NutrientStandard</span></dt><dd><p>Indicates whether the NASEM or NRC nutrient standards is being used.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><ul class="simple">
+<li><p>If any configured feed type does not exist in the selected feed library.</p></li>
+<li><p>If duplicate feed types are present in the top-level <code class="docutils literal notranslate"><span class="pre">feeds</span></code> section.</p></li>
+<li><p>If duplicate feed types are present within an individual ration.</p></li>
+<li><p>If a ration references a feed type that is not defined in the top-level <code class="docutils literal notranslate"><span class="pre">feeds</span></code> section.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<p>These checks ensure that all ration feeds are uniquely defined, correspond to purchasable feeds configured for
+the simulation, and can be successfully mapped to feed composition data from the selected feed library.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._find_feed_repeats">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_find_feed_repeats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._find_feed_repeats" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._find_feed_repeats'"><span>#</span></a></dt>
+<dd><p>Finds values that occur more than once in a list.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._process_feed_library">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_process_feed_library</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_standard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard" title="RUFAS.data_structures.feed_storage_to_animal_connection.NutrientStandard"><span class="pre">NutrientStandard</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._process_feed_library" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._process_feed_library'"><span>#</span></a></dt>
+<dd><p>Collects and processes the feed library input so that it can be translated into a simulation-friendly format.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>nutrient_standard<span class="classifier">NutrientStandard</span></dt><dd><p>Indicates whether the NASEM or NRC nutrient standards is being used.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>dict[RUFAS_ID, dict[str, Any]]</dt><dd><p>Mapping of RuFaS feed IDs to the nutritional properties of those feeds.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.feed_storage_to_animal_connection.</span></span><span class="sig-name descname"><span class="pre">TotalInventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inventory_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Contains information about the amounts of feeds held at the specified date.</p>
-<section id="id3">
-<h2>Attributes<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<section id="id6">
+<h2>Attributes<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>available_feeds<span class="classifier">list[Feed]</span></dt><dd><p>List of Feeds which are held by the Feed Storage module and are available to feed to animals.</p>
 </dd>
@@ -855,8 +998,8 @@ Abs_zinc : float</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.feed_storage_to_animal_connection.</span></span><span class="sig-name descname"><span class="pre">IdealFeeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ideal_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.IdealFeeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.IdealFeeds'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Amounts of feeds that would ideally be purchased before the next harvest of a crop.</p>
-<section id="id4">
-<h2>Attributes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<section id="id7">
+<h2>Attributes<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>ideal_feeds<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Amounts of feeds which would ideally be purchased before the next harvest of a crop, where the key is the RuFaS
 Feed ID and the value is the requested feed amount (kg).</p>
@@ -877,8 +1020,8 @@ Feed ID and the value is the requested feed amount (kg).</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.feed_storage_to_animal_connection.</span></span><span class="sig-name descname"><span class="pre">RequestedFeed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requested_feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Total amounts of feed needed for the herd.</p>
-<section id="id5">
-<h2>Attributes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<section id="id8">
+<h2>Attributes<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>requested_feed<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Amounts of feeds to be fed to the herd, where the key is the RuFaS Feed ID and the value is the requested feed
 amount (kg).</p>
@@ -895,12 +1038,56 @@ amount (kg).</p>
 </section>
 </dd></dl>
 <dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.feed_storage_to_animal_connection.</span></span><span class="sig-name descname"><span class="pre">FeedFulfillmentResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">purchased</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">farmgrown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Tracks how much feed was deducted from purchased and farmgrown sources to fulfill a request.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.purchased">
+<span class="sig-name descname"><span class="pre">purchased</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.purchased" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.purchased'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.farmgrown">
+<span class="sig-name descname"><span class="pre">farmgrown</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.farmgrown" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.farmgrown'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.fulfill_feed_request_as_purchased">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fulfill_feed_request_as_purchased</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requested_feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed" title="RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed"><span class="pre">RequestedFeed</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults" title="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults"><span class="pre">FeedFulfillmentResults</span></a></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.fulfill_feed_request_as_purchased" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.fulfill_feed_request_as_purchased'"><span>#</span></a></dt>
+<dd><p>Create a fulfillment result where all requested feed is satisfied by purchased sources.</p>
+<p>This is used when the feed module is not simulated.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.empty">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_feed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">farmgrown_feed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults" title="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults"><span class="pre">FeedFulfillmentResults</span></a></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.empty" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.empty'"><span>#</span></a></dt>
+<dd><p>Create an empty results object with optional initialized keys.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_purchased">
+<span class="sig-name descname"><span class="pre">add_purchased</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_purchased" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_purchased'"><span>#</span></a></dt>
+<dd><p>Add deducted purchased feed for a given feed ID.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_farmgrown">
+<span class="sig-name descname"><span class="pre">add_farmgrown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_farmgrown" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_farmgrown'"><span>#</span></a></dt>
+<dd><p>Add deducted farmgrown feed for a given feed ID.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.total_deducted_for_feed">
+<span class="sig-name descname"><span class="pre">total_deducted_for_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.total_deducted_for_feed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.total_deducted_for_feed'"><span>#</span></a></dt>
+<dd><p>Return total deducted amount for a single feed ID across all sources.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">purchased</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">farmgrown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.__init__'"><span>#</span></a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.feed_storage_to_animal_connection.</span></span><span class="sig-name descname"><span class="pre">PurchaseAllowance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Limits on amounts of feeds that may be purchased at a given time.</p>
-<section id="id6">
-<h2>Attributes<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<section id="id9">
+<h2>Attributes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>allowances<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Amounts of feeds that may be purchased, where the key is the RuFaS Feed ID and the value is the maximum amount
 of that feed (kg).</p>
@@ -916,7 +1103,7 @@ of that feed (kg).</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance._setup_purchase_allowance">
-<span class="sig-name descname"><span class="pre">_setup_purchase_allowance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance._setup_purchase_allowance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance._setup_purchase_allowance'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_setup_purchase_allowance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance._setup_purchase_allowance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance._setup_purchase_allowance'"><span>#</span></a></dt>
 <dd></dd></dl>
 </section>
 </dd></dl>
@@ -954,6 +1141,7 @@ of that feed (kg).</p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.RUFAS_ID'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.RUFAS_ID"><code class="docutils literal notranslate"><span class="pre">RUFAS_ID</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization"><code class="docutils literal notranslate"><span class="pre">FeedCategorization</span></code></a><ul>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization.ANIMAL_PROTEIN'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization.ANIMAL_PROTEIN"><code class="docutils literal notranslate"><span class="pre">FeedCategorization.ANIMAL_PROTEIN</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization.BY_PRODUCT_OTHER'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedCategorization.BY_PRODUCT_OTHER"><code class="docutils literal notranslate"><span class="pre">FeedCategorization.BY_PRODUCT_OTHER</span></code></a></li>
@@ -1093,6 +1281,13 @@ of that feed (kg).</p>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.NRCFeed.__init__'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.NRCFeed.__init__"><code class="docutils literal notranslate"><span class="pre">NRCFeed.__init__()</span></code></a></li>
 </ul>
 </li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder"><code class="docutils literal notranslate"><span class="pre">AvailableFeedsBuilder</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder.setup_available_feeds'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder.setup_available_feeds"><code class="docutils literal notranslate"><span class="pre">AvailableFeedsBuilder.setup_available_feeds()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._validate_feed_config'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._validate_feed_config"><code class="docutils literal notranslate"><span class="pre">AvailableFeedsBuilder._validate_feed_config()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._find_feed_repeats'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._find_feed_repeats"><code class="docutils literal notranslate"><span class="pre">AvailableFeedsBuilder._find_feed_repeats()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._process_feed_library'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.AvailableFeedsBuilder._process_feed_library"><code class="docutils literal notranslate"><span class="pre">AvailableFeedsBuilder._process_feed_library()</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory"><code class="docutils literal notranslate"><span class="pre">TotalInventory</span></code></a><ul>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory.available_feeds'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory.available_feeds"><code class="docutils literal notranslate"><span class="pre">TotalInventory.available_feeds</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory.inventory_date'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.TotalInventory.inventory_date"><code class="docutils literal notranslate"><span class="pre">TotalInventory.inventory_date</span></code></a></li>
@@ -1107,6 +1302,17 @@ of that feed (kg).</p>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed"><code class="docutils literal notranslate"><span class="pre">RequestedFeed</span></code></a><ul>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed.requested_feed'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed.requested_feed"><code class="docutils literal notranslate"><span class="pre">RequestedFeed.requested_feed</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed.__init__'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.RequestedFeed.__init__"><code class="docutils literal notranslate"><span class="pre">RequestedFeed.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults</span></code></a><ul>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.purchased'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.purchased"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults.purchased</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.farmgrown'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.farmgrown"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults.farmgrown</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.fulfill_feed_request_as_purchased'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.fulfill_feed_request_as_purchased"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults.fulfill_feed_request_as_purchased()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.empty'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.empty"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults.empty()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_purchased'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_purchased"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults.add_purchased()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_farmgrown'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.add_farmgrown"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults.add_farmgrown()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.total_deducted_for_feed'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.total_deducted_for_feed"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults.total_deducted_for_feed()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.__init__'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.FeedFulfillmentResults.__init__"><code class="docutils literal notranslate"><span class="pre">FeedFulfillmentResults.__init__()</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance'" class="reference internal" href="#RUFAS.data_structures.feed_storage_to_animal_connection.PurchaseAllowance"><code class="docutils literal notranslate"><span class="pre">PurchaseAllowance</span></code></a><ul>

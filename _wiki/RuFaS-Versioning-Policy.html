@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -144,120 +145,190 @@
 <section id="rufas-versioning-policy">
 <h1>RuFaS Versioning Policy<a class="headerlink" href="#rufas-versioning-policy" title="Link to this heading"><span>#</span></a></h1>
 <p>RuFaS follows a <strong>Semantic Versioning</strong> policy to ensure clear
-communication of changes and maintain compatibility across updates. This
-page outlines how we handle versioning, branch structure, and the
-process for updating version numbers in RuFaS.</p>
+communication of changes and maintain compatibility across updates.
+This page outlines how version numbers are assigned, how releases are
+prepared, and how changes are documented.</p>
 <section id="semantic-versioning-in-rufas">
 <h2>Semantic Versioning in RuFaS<a class="headerlink" href="#semantic-versioning-in-rufas" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#semantic-versioning-in-rufas'"><span>#</span></a></h2>
-<p>RuFaS adheres to the <a class="reference external" href="https://semver.org/">Semantic Versioning
-(SemVer)</a> scheme to manage and communicate
-changes across the project. The version format is as follows:
-<code class="docutils literal notranslate"><span class="pre">MAJOR.MINOR.PATCH</span></code>.</p>
-<ul class="simple">
-<li><p><strong>MAJOR version</strong> (<code class="docutils literal notranslate"><span class="pre">X.0.0</span></code>): Incremented when we make changes that
-are <strong>backward-incompatible</strong> or introduce significant new
-functionality that may require users to adjust their code or workflow.</p></li>
-<li><p><strong>MINOR version</strong> (<code class="docutils literal notranslate"><span class="pre">0.Y.0</span></code>): Incremented when new features are added
-that are <strong>backward-compatible</strong>. This allows users to upgrade without
-needing to modify their existing setup.</p></li>
-<li><p><strong>PATCH version</strong> (<code class="docutils literal notranslate"><span class="pre">0.0.Z</span></code>): Incremented for <strong>backward-compatible
-bug fixes</strong> or minor improvements that don’t add new features but
-improve stability or fix known issues.</p></li>
+<p>RuFaS follows the <a class="reference external" href="https://semver.org/">Semantic Versioning (SemVer)</a>
+standard. Versions follow the format:</p>
+<p><code class="docutils literal notranslate"><span class="pre">MAJOR.MINOR.PATCH</span></code></p>
+<ul>
+<li><p><strong>MAJOR version</strong> (<code class="docutils literal notranslate"><span class="pre">X.0.0</span></code>)</p>
+<p>Incremented when changes introduce <strong>backward-incompatible behavior</strong>
+that requires users to modify their workflows, inputs, or scripts.</p>
+</li>
+<li><p><strong>MINOR version</strong> (<code class="docutils literal notranslate"><span class="pre">X.Y.0</span></code>)</p>
+<p>Incremented when <strong>new functionality is added in a backward-compatible
+way</strong>. Existing simulations should continue to work without requiring
+modification.</p>
+</li>
+<li><p><strong>PATCH version</strong> (<code class="docutils literal notranslate"><span class="pre">X.Y.Z</span></code>)</p>
+<p>Incremented for <strong>backward-compatible bug fixes and stability
+improvements</strong>. These updates may correct model behavior but must not
+require users to change inputs or workflows.</p>
+</li>
 </ul>
 <section id="example">
 <h3>Example<a class="headerlink" href="#example" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#example'"><span>#</span></a></h3>
-<p>For a release version <code class="docutils literal notranslate"><span class="pre">2.1.4</span></code>:</p>
+<p>For a release version <code class="docutils literal notranslate"><span class="pre">2.3.5</span></code>:</p>
 <ul class="simple">
-<li><p><strong>2</strong>: MAJOR update indicating a significant or breaking change.</p></li>
-<li><p><strong>1</strong>: MINOR update indicating the addition of new features.</p></li>
-<li><p><strong>4</strong>: PATCH update indicating minor fixes or improvements.</p></li>
+<li><p><strong>2</strong> indicates a major update introducing incompatible changes.</p></li>
+<li><p><strong>3</strong> indicates new backward-compatible functionality.</p></li>
+<li><p><strong>5</strong> indicates bug fixes or minor improvements.</p></li>
+</ul>
+</section>
+</section>
+<section id="compatibility-in-rufas">
+<h2>Compatibility in RuFaS<a class="headerlink" href="#compatibility-in-rufas" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#compatibility-in-rufas'"><span>#</span></a></h2>
+<p>In the context of RuFaS, compatibility primarily concerns <strong>model
+inputs, outputs, and user workflows</strong>.</p>
+<p>Typical interpretations include:</p>
+<ul>
+<li><p><strong>InputChange</strong></p>
+<p>Indicates whether a change modifies model inputs. This may include
+new required fields, changed input structures, or modified semantics.</p>
+</li>
+<li><p><strong>OutputChange</strong></p>
+<p>Indicates whether model outputs change. Output changes may result
+from bug fixes, improved calculations, or new outputs being added.</p>
+</li>
+</ul>
+<section id="guidelines">
+<h3>Guidelines<a class="headerlink" href="#guidelines" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#guidelines'"><span>#</span></a></h3>
+<ul>
+<li><p><strong>InputChange = Yes</strong></p>
+<p>Usually requires a <strong>MAJOR version bump</strong>, unless the change is purely
+additive and does not break existing inputs.</p>
+</li>
+<li><p><strong>OutputChange = Yes</strong></p>
+<p>May appear in <strong>PATCH</strong> releases when correcting model behavior.
+Structural output changes may require a <strong>MINOR</strong> or <strong>MAJOR</strong> version
+bump depending on their impact.</p>
+</li>
 </ul>
 </section>
 </section>
 <section id="branch-structure">
 <h2>Branch Structure<a class="headerlink" href="#branch-structure" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#branch-structure'"><span>#</span></a></h2>
-<p>RuFaS follows a structured branching model to manage development,
-testing, and production-ready code. The three main branches are:</p>
-<ul class="simple">
-<li><p><strong>dev</strong>: The primary development branch where new features, bug fixes,
-and improvements are implemented. Changes here are not considered
-stable and may undergo significant modifications.</p></li>
-<li><p><strong>test</strong>: Once features are completed and pass initial testing, they
-are merged into the <code class="docutils literal notranslate"><span class="pre">test</span></code> branch. This branch is used for broader
-testing, including integration tests and any QA processes.</p></li>
-<li><p><strong>main</strong>: The stable release branch. Only code that has been
-thoroughly tested and reviewed is merged into <code class="docutils literal notranslate"><span class="pre">main</span></code>. This is the
-production-ready version of RuFaS that users rely on.</p></li>
+<p>RuFaS uses three primary branches to manage development and releases.</p>
+<ul>
+<li><p><strong>dev</strong></p>
+<p>Primary development branch where new features, improvements, and
+fixes are implemented.</p>
+</li>
+<li><p><strong>test</strong></p>
+<p>Integration and stabilization branch used to validate a release
+candidate before publishing a new version.</p>
+</li>
+<li><p><strong>main</strong></p>
+<p>Stable branch representing the officially released production version
+of RuFaS.</p>
+</li>
 </ul>
-<p>See <a class="reference internal" href="Branching-Strategy-in-RuFaS.html"><span class="doc">Branching Strategy</span></a>
-for more details.</p>
+<p>See <span class="xref std std-doc">Branching Strategy</span>
+for details about how these branches interact.</p>
+</section>
+<section id="version-location">
+<h2>Version Location<a class="headerlink" href="#version-location" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#version-location'"><span>#</span></a></h2>
+<p>The RuFaS version number is stored in the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file.</p>
+<p>Example:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="k">[project]</span>
+</span><span id="line-2"><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"1.2.0"</span>
+</span></code></pre></div>
+</div>
+<p>This value represents the official version of RuFaS once the release is
+merged into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p>
 </section>
 <section id="version-number-update-process">
 <h2>Version Number Update Process<a class="headerlink" href="#version-number-update-process" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#version-number-update-process'"><span>#</span></a></h2>
-<p>Every time we merge the <strong>test</strong> branch into the <strong>main</strong> branch, we
-follow the steps below to update the version number and track the
-changes.</p>
+<p>Each RuFaS release follows a structured process to ensure version
+numbers and release history remain consistent.</p>
 <section id="steps">
-<h3>Steps:<a class="headerlink" href="#steps" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#steps'"><span>#</span></a></h3>
-<ol class="arabic simple">
-<li><p><strong>Decide on the Version Increment</strong>:</p>
+<h3>Steps<a class="headerlink" href="#steps" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#steps'"><span>#</span></a></h3>
+<ol class="arabic">
+<li><p><strong>Determine Version Increment</strong></p>
 <ul class="simple">
-<li><p>Evaluate the changes introduced since the last merge. Based on the
-nature of the changes (major, minor, or patch), increment the
-version number accordingly following the <strong>Semantic Versioning</strong>
-guidelines.</p></li>
+<li><p>PML reviews all changes introduced since the previous release.</p></li>
+<li><p>PML decides whether the release should increment <strong>MAJOR</strong>, <strong>MINOR</strong>, or
+<strong>PATCH</strong> according to Semantic Versioning.</p></li>
 </ul>
 </li>
-<li><p><strong>Update Version in TaskManager</strong>:</p>
+<li><p><strong>Update Version in ``dev``</strong></p>
 <ul class="simple">
-<li><p>Navigate to the version configuration file in the TaskManager and
-update the version number to reflect the changes.</p></li>
-</ul>
-</li>
-<li><p><strong>Changelog Updates Automatically</strong>:</p>
-<ul class="simple">
-<li><p>The changelog is automatically updated, reflecting all the pull
-requests merged up to this point. The new version number simply
-marks the last pull request included in the current version.</p></li>
-</ul>
-</li>
-<li><p><strong>Tag the Release</strong>:</p>
-<ul class="simple">
-<li><p>Once the version is updated, create a new Git tag with the version
-number (e.g., <code class="docutils literal notranslate"><span class="pre">v1.2.0</span></code>) to mark the release in the <strong>main</strong>
+<li><p>Repo Admin updates the <code class="docutils literal notranslate"><span class="pre">version</span></code> field in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> on the <code class="docutils literal notranslate"><span class="pre">dev</span></code>
 branch.</p></li>
 </ul>
 </li>
-</ol>
-</section>
-<section id="example-workflow">
-<h3>Example Workflow:<a class="headerlink" href="#example-workflow" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#example-workflow'"><span>#</span></a></h3>
+<li><p><strong>Create Release Candidate</strong></p>
 <ul class="simple">
-<li><p>A new feature is completed and tested in the <code class="docutils literal notranslate"><span class="pre">dev</span></code> branch.</p></li>
-<li><p>The feature is merged into <code class="docutils literal notranslate"><span class="pre">test</span></code> for broader testing and
-integration validation.</p></li>
-<li><p>After successful testing, The version number is incremented in
-<code class="docutils literal notranslate"><span class="pre">TaskManager</span></code> and change log.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">test</span></code> branch is merged into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
+<li><p>Repo Admin merges <code class="docutils literal notranslate"><span class="pre">dev</span></code> into <code class="docutils literal notranslate"><span class="pre">test</span></code> to create a release candidate.</p></li>
 </ul>
+</li>
+<li><p><strong>Stabilization Testing</strong></p>
+<ul class="simple">
+<li><p>Validate the release candidate on the <code class="docutils literal notranslate"><span class="pre">test</span></code> branch.</p></li>
+<li><p>If issues are discovered:</p>
+<ul>
+<li><p>Create a fix branch from <code class="docutils literal notranslate"><span class="pre">test</span></code>.</p></li>
+<li><p>Merge the fix into <code class="docutils literal notranslate"><span class="pre">test</span></code>.</p></li>
+<li><p>Merge the same fix back into <code class="docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>PML Approval</strong></p>
+<ul class="simple">
+<li><p>The <strong>Program Management Leadership (PML)</strong> must approve the release and
+the release notes before the release is finalized.</p></li>
+</ul>
+</li>
+<li><p><strong>Merge into Main</strong></p>
+<ul class="simple">
+<li><p>Repo Admin merges <code class="docutils literal notranslate"><span class="pre">test</span></code> into <code class="docutils literal notranslate"><span class="pre">main</span></code> once stabilization testing is complete.</p></li>
+</ul>
+</li>
+<li><p><strong>Tag the Release</strong></p>
+<ul class="simple">
+<li><p>Repo Admin creates a Git tag corresponding to the version number, for example:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">v1</span><span class="mf">.2.0</span>
+</span></code></pre></div>
+</div>
+</li>
+</ol>
 </section>
 </section>
 <section id="changelog-format">
 <h2>Changelog Format<a class="headerlink" href="#changelog-format" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#changelog-format'"><span>#</span></a></h2>
-<p>Each entry in the Changelog follows this format:</p>
-<ul class="simple">
-<li><p><strong>PR #</strong>: Provide the pull request number (e.g.,
-<code class="docutils literal notranslate"><span class="pre">[123](https://github.com/RuminantFarmSystems/RuFaS/pull/123)</span></code>).</p></li>
-<li><p><strong>Type of Change</strong>: Indicate if it is a major or minor change (e.g.,
-<code class="docutils literal notranslate"><span class="pre">[Major</span> <span class="pre">change]</span></code> or <code class="docutils literal notranslate"><span class="pre">[Minor</span> <span class="pre">change]</span></code>).</p></li>
-<li><p><strong>Impact Area</strong>: Specify which part of the codebase is affected (e.g.,
-<code class="docutils literal notranslate"><span class="pre">[Animal</span> <span class="pre">Module]</span></code>, <code class="docutils literal notranslate"><span class="pre">[Manure</span> <span class="pre">Module]</span></code>, etc.).</p></li>
-<li><p><strong>Description</strong>: Provide a concise, informative description of the
-changes.</p></li>
+<p>Each entry in the changelog must follow the format below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="o">-</span> <span class="p">[</span><span class="mi">123</span><span class="p">](</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">RuminantFarmSystems</span><span class="o">/</span><span class="n">RuFaS</span><span class="o">/</span><span class="n">pull</span><span class="o">/</span><span class="mi">123</span><span class="p">)</span> <span class="o">-</span> <span class="p">[</span><span class="n">Major</span> <span class="n">change</span><span class="o">/</span><span class="n">minor</span> <span class="n">change</span><span class="p">]</span> <span class="p">[</span><span class="n">Impact</span> <span class="n">Area</span><span class="p">]</span> <span class="p">[</span><span class="n">InputChange</span><span class="o">/</span><span class="n">NoInputChange</span><span class="p">]</span> <span class="p">[</span><span class="n">OutputChange</span><span class="o">/</span><span class="n">NoOutputChange</span><span class="p">]</span> <span class="n">Short</span> <span class="n">description</span> <span class="n">of</span> <span class="n">the</span> <span class="n">change</span> <span class="ow">or</span> <span class="n">feature</span><span class="o">.</span>
+</span></code></pre></div>
+</div>
+<section id="fields">
+<h3>Fields<a class="headerlink" href="#fields" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#fields'"><span>#</span></a></h3>
+<ul>
+<li><p><strong>PR Number</strong></p>
+<p>Link to the pull request that introduced the change.</p>
+</li>
+<li><p><strong>Type of Change</strong></p>
+<p>Indicates whether the change is a <strong>major change</strong> or <strong>minor change</strong>.</p>
+</li>
+<li><p><strong>Impact Area</strong></p>
+<p>The RuFaS component affected (for example <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">Module</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Manure</span> <span class="pre">Module</span></code>).</p>
+</li>
+<li><p><strong>InputChange</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">InputChange</span></code> if the change modifies model inputs; otherwise <code class="docutils literal notranslate"><span class="pre">NoInputChange</span></code>.</p>
+</li>
+<li><p><strong>OutputChange</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">OutputChange</span></code> if the change modifies model outputs; otherwise <code class="docutils literal notranslate"><span class="pre">NoOutputChange</span></code>.</p>
+</li>
+<li><p><strong>Description</strong></p>
+<p>A concise description of the change or feature.</p>
+</li>
 </ul>
-<p>By following this process, RuFaS ensures that versioning is consistent,
-changes are tracked transparently, and users are well-informed about
-updates and their impacts.</p>
+</section>
 </section>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -267,13 +338,20 @@ updates and their impacts.</p>
 <li><a :data-current="activeSection === '#example'" class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
-<li><a :data-current="activeSection === '#branch-structure'" class="reference internal" href="#branch-structure">Branch Structure</a></li>
-<li><a :data-current="activeSection === '#version-number-update-process'" class="reference internal" href="#version-number-update-process">Version Number Update Process</a><ul>
-<li><a :data-current="activeSection === '#steps'" class="reference internal" href="#steps">Steps:</a></li>
-<li><a :data-current="activeSection === '#example-workflow'" class="reference internal" href="#example-workflow">Example Workflow:</a></li>
+<li><a :data-current="activeSection === '#compatibility-in-rufas'" class="reference internal" href="#compatibility-in-rufas">Compatibility in RuFaS</a><ul>
+<li><a :data-current="activeSection === '#guidelines'" class="reference internal" href="#guidelines">Guidelines</a></li>
 </ul>
 </li>
-<li><a :data-current="activeSection === '#changelog-format'" class="reference internal" href="#changelog-format">Changelog Format</a></li>
+<li><a :data-current="activeSection === '#branch-structure'" class="reference internal" href="#branch-structure">Branch Structure</a></li>
+<li><a :data-current="activeSection === '#version-location'" class="reference internal" href="#version-location">Version Location</a></li>
+<li><a :data-current="activeSection === '#version-number-update-process'" class="reference internal" href="#version-number-update-process">Version Number Update Process</a><ul>
+<li><a :data-current="activeSection === '#steps'" class="reference internal" href="#steps">Steps</a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#changelog-format'" class="reference internal" href="#changelog-format">Changelog Format</a><ul>
+<li><a :data-current="activeSection === '#fields'" class="reference internal" href="#fields">Fields</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </aside>

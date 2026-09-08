@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul class="current">
@@ -633,9 +634,419 @@ terminate the simulation.</p></li>
 </section>
 <section id="the-cross-validation-blob">
 <h3>The “cross-validation” blob<a class="headerlink" href="#the-cross-validation-blob" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#the-cross-validation-blob'"><span>#</span></a></h3>
-<p>This blob is intended to provide a way to ensure input data for
-different parts of the codebase are congruent. This blob is yet to be
-implemented.</p>
+<p>Cross-validation enforces coherence across fields and files — ensuring that independently valid inputs also make sense when considered together. While individual-field validation in the properties blob can confirm that values are well-formed and within acceptable ranges, it cannot capture relationships between different parts of the input structure.</p>
+<p>Cross-validation fills this gap by validating cross-field dependencies and system-level constraints. For example, verifying that the total number of stalls across all calf pens is at least as large as the number of calves divided by the maximum stocking density requires values from multiple parts of the input tree. These checks ensure that the overall configuration is not just syntactically valid, but operationally realistic and internally consistent, helping prevent subtle configuration errors that could lead to invalid or misleading simulation results.</p>
+<p>The cross-validation configuration is stored in one or more standalone
+JSON files (separate from the main metadata file). Each file contains a
+top-level <code class="docutils literal notranslate"><span class="pre">"cross_validation"</span></code> key whose value is an array of
+<em>validation blocks</em>.</p>
+<p>Cross-validation file paths are registered in the metadata under a
+dedicated <code class="docutils literal notranslate"><span class="pre">cross_validation_file_paths</span></code> entry. Input Manager loads
+every file in that list and runs all blocks from all files in order.</p>
+<section id="structure-of-a-validation-block">
+<h4>Structure of a validation block<a class="headerlink" href="#structure-of-a-validation-block" title="Link to this heading"><span>#</span></a></h4>
+<p>Each block has four top-level keys:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code> — human-readable label reported in error logs when
+the block fails.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">aliases</span></code> — maps short local names (used inside this block) to
+actual data addresses or literal constant values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">apply_when</span></code> <em>(optional)</em> — an array of condition clauses that
+act as a guard: if any clause is not satisfied the entire block is
+skipped and counted as passing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rules</span></code> — an array of condition clauses that must all be satisfied
+for the block to pass.</p></li>
+</ul>
+<p>Template:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2">  <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"&lt;human-readable label&gt;"</span><span class="p">,</span>
+</span><span id="line-3">  <span class="s2">"aliases"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-4">    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-5">      <span class="s2">"&lt;alias&gt;"</span><span class="p">:</span> <span class="s2">"&lt;dot-separated address in IM pool&gt;"</span>
+</span><span id="line-6">    <span class="p">},</span>
+</span><span id="line-7">    <span class="s2">"constants"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-8">      <span class="s2">"&lt;alias&gt;"</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">literal</span> <span class="n">value</span><span class="o">&gt;</span>
+</span><span id="line-9">    <span class="p">}</span>
+</span><span id="line-10">  <span class="p">},</span>
+</span><span id="line-11">  <span class="s2">"apply_when"</span><span class="p">:</span> <span class="p">[</span> <span class="o">&lt;</span><span class="n">condition</span> <span class="n">clause</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">...</span> <span class="p">],</span>
+</span><span id="line-12">  <span class="s2">"rules"</span><span class="p">:</span>      <span class="p">[</span> <span class="o">&lt;</span><span class="n">condition</span> <span class="n">clause</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">...</span> <span class="p">]</span>
+</span><span id="line-13"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<section id="aliases">
+<h5>Aliases<a class="headerlink" href="#aliases" title="Link to this heading"><span>#</span></a></h5>
+<p>The <code class="docutils literal notranslate"><span class="pre">aliases</span></code> block populates a local <em>alias pool</em> used only while
+evaluating cross validation rules. It has two optional sub-keys:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">variables</span></code> — a mapping of alias name → dot-separated address.
+Input Manager resolves each address against the IM data pool (the
+same pool used by <code class="docutils literal notranslate"><span class="pre">get_data()</span></code>) and stores the result under the
+alias name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">constants</span></code> — a mapping of alias name → literal value (number,
+string, boolean). No pool lookup is performed; the literal is stored
+as-is.</p></li>
+</ul>
+<p>Only the keys <code class="docutils literal notranslate"><span class="pre">variables</span></code> and <code class="docutils literal notranslate"><span class="pre">constants</span></code> are accepted; any other
+key in <code class="docutils literal notranslate"><span class="pre">aliases</span></code> is treated as an error.</p>
+</section>
+<section id="condition-clauses">
+<h5>Condition clauses<a class="headerlink" href="#condition-clauses" title="Link to this heading"><span>#</span></a></h5>
+<p>Both <code class="docutils literal notranslate"><span class="pre">apply_when</span></code> entries and <code class="docutils literal notranslate"><span class="pre">rules</span></code> entries are <em>condition
+clauses</em>. A condition clause compares a left-hand expression to a
+right-hand expression using a relationship operator:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2">  <span class="s2">"left_hand"</span><span class="p">:</span>  <span class="o">&lt;</span><span class="n">expression</span> <span class="n">block</span><span class="o">&gt;</span><span class="p">,</span>
+</span><span id="line-3">  <span class="s2">"right_hand"</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">expression</span> <span class="n">block</span><span class="o">&gt;</span><span class="p">,</span>
+</span><span id="line-4">  <span class="s2">"relationship"</span><span class="p">:</span> <span class="s2">"&lt;operator&gt;"</span>
+</span><span id="line-5"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p>Supported relationship operators:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Operator</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">equal</span></code></p></td>
+<td><p>LHS == RHS (pairwise when both are lists)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">not_equal</span></code></p></td>
+<td><p>LHS != RHS</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">greater</span></code></p></td>
+<td><p>LHS &gt; RHS (pairwise when both are lists)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">greater_or_equal_to</span></code></p></td>
+<td><p>LHS &gt;= RHS (pairwise when both are lists)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">is_of_type</span></code></p></td>
+<td><p>All LHS values match the type string in RHS
+(<code class="docutils literal notranslate"><span class="pre">"string"</span></code>, <code class="docutils literal notranslate"><span class="pre">"integer"</span></code>, <code class="docutils literal notranslate"><span class="pre">"float"</span></code>,
+<code class="docutils literal notranslate"><span class="pre">"boolean"</span></code>, <code class="docutils literal notranslate"><span class="pre">"number"</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">is_null</span></code></p></td>
+<td><p>All LHS values are <code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">regex</span></code></p></td>
+<td><p>LHS value fully matches the RHS regex pattern</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">is_equal_length</span></code></p></td>
+<td><p>LHS and RHS are lists of the same length</p></td>
+</tr>
+</tbody>
+</table>
+<p>When both sides resolve to lists of equal length, comparison operators
+(<code class="docutils literal notranslate"><span class="pre">equal</span></code>, <code class="docutils literal notranslate"><span class="pre">not_equal</span></code>, <code class="docutils literal notranslate"><span class="pre">greater</span></code>, <code class="docutils literal notranslate"><span class="pre">greater_or_equal_to</span></code>) are
+applied pairwise and every pair must pass.</p>
+</section>
+<section id="expression-blocks">
+<h5>Expression blocks<a class="headerlink" href="#expression-blocks" title="Link to this heading"><span>#</span></a></h5>
+<p>Each of <code class="docutils literal notranslate"><span class="pre">left_hand</span></code> and <code class="docutils literal notranslate"><span class="pre">right_hand</span></code> is an <em>expression block</em>.
+Exactly one of the following sub-block types must be present:</p>
+<p><strong>aggregation</strong> — resolves one or more aliases from the pool and
+applies an operation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2">  <span class="s2">"aggregation"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-3">    <span class="s2">"operation"</span><span class="p">:</span> <span class="s2">"&lt;op&gt;"</span><span class="p">,</span>
+</span><span id="line-4">    <span class="s2">"operands"</span><span class="p">:</span>  <span class="p">[</span><span class="s2">"&lt;alias&gt;"</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+</span><span id="line-5">    <span class="s2">"mode"</span><span class="p">:</span>      <span class="s2">"&lt;element_wise | aggregate&gt;"</span>
+</span><span id="line-6">  <span class="p">},</span>
+</span><span id="line-7">  <span class="s2">"save_as"</span><span class="p">:</span> <span class="s2">"&lt;alias&gt;"</span>
+</span><span id="line-8"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">operands</span></code> — non-empty list of alias names to resolve.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">operation</span></code> — aggregation function to apply. Supported operations:
+<code class="docutils literal notranslate"><span class="pre">"no_op"</span></code> (pass through), <code class="docutils literal notranslate"><span class="pre">"sum"</span></code>, <code class="docutils literal notranslate"><span class="pre">"division"</span></code>. When
+<code class="docutils literal notranslate"><span class="pre">operands</span></code> contains more than one entry, <code class="docutils literal notranslate"><span class="pre">operation</span></code> must be
+provided and cannot be <code class="docutils literal notranslate"><span class="pre">"no_op"</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mode</span></code> — required when any resolved operand is a list or dict:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">"element_wise"</span></code> — return the resolved values as-is, one per
+element.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"aggregate"</span></code> — apply the operation across all elements and
+return a single result.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>for_each</strong> — iterates over a list of dicts in the alias pool and
+either filters entries or enforces a condition on every entry.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2">  <span class="s2">"for_each"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-3">    <span class="s2">"in"</span><span class="p">:</span>               <span class="s2">"&lt;alias for list[dict]&gt;"</span><span class="p">,</span>
+</span><span id="line-4">    <span class="s2">"field"</span><span class="p">:</span>            <span class="s2">"&lt;key within each dict to evaluate&gt;"</span><span class="p">,</span>
+</span><span id="line-5">    <span class="s2">"value_to_compare"</span><span class="p">:</span> <span class="s2">"&lt;alias for scalar comparand&gt;"</span><span class="p">,</span>
+</span><span id="line-6">    <span class="s2">"field_to_compare"</span><span class="p">:</span> <span class="s2">"&lt;key within each dict used as comparand&gt;"</span><span class="p">,</span>
+</span><span id="line-7">    <span class="s2">"relationship"</span><span class="p">:</span>     <span class="s2">"&lt;operator&gt;"</span><span class="p">,</span>
+</span><span id="line-8">    <span class="s2">"mode"</span><span class="p">:</span>             <span class="s2">"&lt;filter | enforce&gt;"</span>
+</span><span id="line-9">  <span class="p">},</span>
+</span><span id="line-10">  <span class="s2">"save_as"</span><span class="p">:</span> <span class="s2">"&lt;alias&gt;"</span>
+</span><span id="line-11"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">in</span></code> — alias that resolves to a <code class="docutils literal notranslate"><span class="pre">list</span></code> of <code class="docutils literal notranslate"><span class="pre">dict</span></code> objects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">field</span></code> — the dict key whose value is the left-hand comparand for
+each entry.</p></li>
+<li><p>Exactly one of <code class="docutils literal notranslate"><span class="pre">value_to_compare</span></code> or <code class="docutils literal notranslate"><span class="pre">field_to_compare</span></code> must be
+provided:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">value_to_compare</span></code> — alias resolved once from the pool; the same
+value is used as the right-hand comparand for every entry.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">field_to_compare</span></code> — key read from each entry at comparison time.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">relationship</span></code> — one of the supported operators listed above.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mode</span></code>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">"filter"</span></code> — returns the subset of entries that satisfy the
+condition.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"enforce"</span></code> — returns <code class="docutils literal notranslate"><span class="pre">[True]</span></code> when all entries satisfy the
+condition, otherwise <code class="docutils literal notranslate"><span class="pre">[False]</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>save_as</strong> (optional, applies to both block types)</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">"save_as"</span></code> is present on an expression block, the result of that
+expression is written back into the local alias pool under the given
+name. This allows a computed intermediate value to be referenced by
+subsequent expressions within the same block.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="s2">"right_hand"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-2">  <span class="s2">"aggregation"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-3">    <span class="s2">"operation"</span><span class="p">:</span> <span class="s2">"division"</span><span class="p">,</span>
+</span><span id="line-4">    <span class="s2">"operands"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"number_of_calves"</span><span class="p">,</span> <span class="s2">"pen_stocking_density"</span><span class="p">]</span>
+</span><span id="line-5">  <span class="p">},</span>
+</span><span id="line-6">  <span class="s2">"save_as"</span><span class="p">:</span> <span class="s2">"min_num_stalls"</span>
+</span><span id="line-7"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+</section>
+<section id="the-apply-when-guard">
+<h5>The <code class="docutils literal notranslate"><span class="pre">apply_when</span></code> guard<a class="headerlink" href="#the-apply-when-guard" title="Link to this heading"><span>#</span></a></h5>
+<p>When <code class="docutils literal notranslate"><span class="pre">apply_when</span></code> is present, Input Manager evaluates every clause in
+the array before running the <code class="docutils literal notranslate"><span class="pre">rules</span></code>. If any <code class="docutils literal notranslate"><span class="pre">apply_when</span></code> clause is
+<em>not</em> satisfied, the entire block is skipped and treated as passing.
+This is useful for blocks whose rules only make sense under specific
+conditions — for example, a rule that applies only when a pen’s animal
+type is <code class="docutils literal notranslate"><span class="pre">"CALF"</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="s2">"apply_when"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="line-2">  <span class="p">{</span>
+</span><span id="line-3">    <span class="s2">"left_hand"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-4">      <span class="s2">"aggregation"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"operation"</span><span class="p">:</span> <span class="s2">"no_op"</span><span class="p">,</span> <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"aggregate"</span><span class="p">,</span>
+</span><span id="line-5">                       <span class="s2">"operands"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"pen_animal_type"</span><span class="p">]</span> <span class="p">}</span>
+</span><span id="line-6">    <span class="p">},</span>
+</span><span id="line-7">    <span class="s2">"right_hand"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-8">      <span class="s2">"aggregation"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"operation"</span><span class="p">:</span> <span class="s2">"no_op"</span><span class="p">,</span> <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"element_wise"</span><span class="p">,</span>
+</span><span id="line-9">                       <span class="s2">"operands"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"calf_pen_type"</span><span class="p">]</span> <span class="p">}</span>
+</span><span id="line-10">    <span class="p">},</span>
+</span><span id="line-11">    <span class="s2">"relationship"</span><span class="p">:</span> <span class="s2">"equal"</span>
+</span><span id="line-12">  <span class="p">}</span>
+</span><span id="line-13"><span class="p">]</span>
+</span></code></pre></div>
+</div>
+</section>
+</section>
+<section id="error-behaviour-and-eager-termination">
+<h4>Error behaviour and <code class="docutils literal notranslate"><span class="pre">eager_termination</span></code><a class="headerlink" href="#error-behaviour-and-eager-termination" title="Link to this heading"><span>#</span></a></h4>
+<p>When a block’s rules fail, Input Manager records the block’s
+<code class="docutils literal notranslate"><span class="pre">description</span></code> in a list of failures. Two termination modes control
+what happens next:</p>
+<ul class="simple">
+<li><p><strong>Eager termination on</strong> (normal simulation): the first failing rule
+inside a block stops evaluation of that block immediately. The first
+failing block stops evaluation of the entire ruleset.</p></li>
+<li><p><strong>Eager termination off</strong> (<code class="docutils literal notranslate"><span class="pre">-ov</span></code> mode): all rules in all blocks are
+evaluated. At the end, if any block failed, Input Manager logs all
+failing block descriptions and returns <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+<p>In both modes, <code class="docutils literal notranslate"><span class="pre">apply_when</span></code> failures are silent — they mean “this
+block does not apply” and are always counted as passing.</p>
+</section>
+<section id="full-example">
+<h4>Full example<a class="headerlink" href="#full-example" title="Link to this heading"><span>#</span></a></h4>
+<p>The following example checks that the total number of stalls in all
+calf pens is sufficient to hold every calf at the configured maximum
+stocking density. The <code class="docutils literal notranslate"><span class="pre">apply_when</span></code> guard ensures the rule is skipped
+if the first pen is not a calf pen:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2">  <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Number of stalls in calf pen"</span><span class="p">,</span>
+</span><span id="line-3">  <span class="s2">"aliases"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-4">    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-5">      <span class="s2">"number_of_calves"</span><span class="p">:</span>    <span class="s2">"animal.herd_information.calf_num"</span><span class="p">,</span>
+</span><span id="line-6">      <span class="s2">"pen_animal_type"</span><span class="p">:</span>     <span class="s2">"animal.pen_information.0.animal_combination"</span><span class="p">,</span>
+</span><span id="line-7">      <span class="s2">"pen_stall_num"</span><span class="p">:</span>       <span class="s2">"animal.pen_information.0.number_of_stalls"</span><span class="p">,</span>
+</span><span id="line-8">      <span class="s2">"pen_stocking_density"</span><span class="p">:</span><span class="s2">"animal.pen_information.0.max_stocking_density"</span>
+</span><span id="line-9">    <span class="p">},</span>
+</span><span id="line-10">    <span class="s2">"constants"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="line-11">      <span class="s2">"calf_pen_type"</span><span class="p">:</span> <span class="s2">"CALF"</span>
+</span><span id="line-12">    <span class="p">}</span>
+</span><span id="line-13">  <span class="p">},</span>
+</span><span id="line-14">  <span class="s2">"apply_when"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="line-15">    <span class="p">{</span>
+</span><span id="line-16">      <span class="s2">"left_hand"</span><span class="p">:</span>  <span class="p">{</span> <span class="s2">"aggregation"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"operation"</span><span class="p">:</span> <span class="s2">"no_op"</span><span class="p">,</span>
+</span><span id="line-17">                       <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"aggregate"</span><span class="p">,</span> <span class="s2">"operands"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"pen_animal_type"</span><span class="p">]</span> <span class="p">}</span> <span class="p">},</span>
+</span><span id="line-18">      <span class="s2">"right_hand"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"aggregation"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"operation"</span><span class="p">:</span> <span class="s2">"no_op"</span><span class="p">,</span>
+</span><span id="line-19">                       <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"element_wise"</span><span class="p">,</span> <span class="s2">"operands"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"calf_pen_type"</span><span class="p">]</span> <span class="p">}</span> <span class="p">},</span>
+</span><span id="line-20">      <span class="s2">"relationship"</span><span class="p">:</span> <span class="s2">"equal"</span>
+</span><span id="line-21">    <span class="p">}</span>
+</span><span id="line-22">  <span class="p">],</span>
+</span><span id="line-23">  <span class="s2">"rules"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="line-24">    <span class="p">{</span>
+</span><span id="line-25">      <span class="s2">"left_hand"</span><span class="p">:</span>  <span class="p">{</span> <span class="s2">"aggregation"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"operation"</span><span class="p">:</span> <span class="s2">"sum"</span><span class="p">,</span>
+</span><span id="line-26">                       <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"aggregate"</span><span class="p">,</span> <span class="s2">"operands"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"pen_stall_num"</span><span class="p">]</span> <span class="p">}</span> <span class="p">},</span>
+</span><span id="line-27">      <span class="s2">"right_hand"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"aggregation"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"operation"</span><span class="p">:</span> <span class="s2">"division"</span><span class="p">,</span>
+</span><span id="line-28">                       <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"element_wise"</span><span class="p">,</span>
+</span><span id="line-29">                       <span class="s2">"operands"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"number_of_calves"</span><span class="p">,</span> <span class="s2">"pen_stocking_density"</span><span class="p">]</span> <span class="p">},</span>
+</span><span id="line-30">                      <span class="s2">"save_as"</span><span class="p">:</span> <span class="s2">"min_num_stalls"</span> <span class="p">},</span>
+</span><span id="line-31">      <span class="s2">"relationship"</span><span class="p">:</span> <span class="s2">"greater_or_equal_to"</span>
+</span><span id="line-32">    <span class="p">}</span>
+</span><span id="line-33">  <span class="p">]</span>
+</span><span id="line-34"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+</section>
+<section id="decision-tree-flow-diagram">
+<h4>Decision-tree flow diagram<a class="headerlink" href="#decision-tree-flow-diagram" title="Link to this heading"><span>#</span></a></h4>
+<pre class="mermaid" data-zoom-id="id-e4c23134-dff3-418d-8558-7488521e07a4">
+        flowchart TD
+    START([start_data_processing]) --&gt; CV[_cross_validate_data]
+
+    subgraph FILE_LOAD ["File Loading"]
+        CV --&gt; LP[load_cross_validation_file_paths]
+        LP --&gt; NULL{file_paths is None?}
+        NULL -- Yes --&gt; SKIP_ALL([Skip CV, return None])
+        NULL -- No --&gt; FCHECK{File exists &amp;\nvalid JSON?}
+        FCHECK -- No --&gt; ERR([Raise FileNotFoundError\nor JSONDecodeError])
+        FCHECK -- Yes --&gt; LOADED[Load list of rulesets]
+    end
+
+    LOADED --&gt; RULESET_LOOP[For each ruleset]
+
+    subgraph ALIAS_SETUP ["Alias Setup"]
+        RULESET_LOOP --&gt; CV_LOOP[For each cross_validation block]
+        CV_LOOP --&gt; HAS_ALIASES{aliases\nblock exists?}
+        HAS_ALIASES -- No --&gt; SKIP_BLOCK[Skip block]
+        HAS_ALIASES -- Yes --&gt; EXTRACT[_extract_target_and_save_block]
+        EXTRACT --&gt; CHECK_KEYS[check_target_and_save_block\nReject unknown section keys]
+        CHECK_KEYS --&gt; SEC_TYPE{Section type?}
+        SEC_TYPE -- variables --&gt; VAR_RESOLVE[Get data from\nInputManager pool\nvia dot_path]
+        SEC_TYPE -- constants --&gt; CONST_RESOLVE[Use literal\nconstant value]
+        VAR_RESOLVE --&gt; ALIAS_POOL[(Populate alias pool)]
+        CONST_RESOLVE --&gt; ALIAS_POOL
+    end
+
+    ALIAS_POOL --&gt; CROSS_VAL[cross_validate_data]
+
+    subgraph APPLY_WHEN ["Apply-When Guard"]
+        CROSS_VAL --&gt; HAS_AW{apply_when\npresent?}
+        HAS_AW -- Yes --&gt; EVAL_AW[_evaluate_condition_clause_array\nfor apply_when]
+        EVAL_AW --&gt; AW_PASS{All conditions\nsatisfied?}
+        AW_PASS -- No --&gt; SKIP_VAL([Skip validation,\nreturn True])
+        AW_PASS -- Yes --&gt; RULES_EVAL
+        HAS_AW -- No --&gt; RULES_EVAL[Evaluate rules array]
+    end
+
+    subgraph RULES_LOOP ["Rules Evaluation Loop"]
+        RULES_EVAL --&gt; EACH_RULE[For each rule in rules]
+        EACH_RULE --&gt; VALIDATE_CLAUSE[_validate_condition_clause\nCheck left_hand, right_hand,\nrelationship present &amp; valid]
+        VALIDATE_CLAUSE --&gt; CLAUSE_OK{Valid?}
+        CLAUSE_OK -- No --&gt; RULE_FALSE([Return False])
+        CLAUSE_OK -- Yes --&gt; EVAL_LHS
+
+        subgraph EXPRESSION ["_evaluate_expression  ·  called for LHS then RHS"]
+            EVAL_LHS[Evaluate left_hand\nexpression] --&gt; EXPR_TYPE_L{block type?}
+
+            EXPR_TYPE_L -- for_each --&gt; FOR_EACH_L[_evaluate_for_each_block]
+            EXPR_TYPE_L -- aggregation --&gt; AGG_L[_evaluate_aggregation_block]
+            EXPR_TYPE_L -- neither --&gt; EXPR_ERR_L([Log error,\nreturn None, False])
+
+            subgraph FOR_EACH_BLOCK ["for_each block"]
+                FOR_EACH_L --&gt; FE_RESOLVE[Resolve source alias\nfrom alias pool]
+                FE_RESOLVE --&gt; FE_SRC_OK{list of dicts?}
+                FE_SRC_OK -- No --&gt; FE_ERR([Log error,\nreturn None, False])
+                FE_SRC_OK -- Yes --&gt; FE_COMP{comparand source?}
+                FE_COMP -- value_to_compare --&gt; FE_SCALAR[Resolve once\nfrom alias pool]
+                FE_COMP -- field_to_compare --&gt; FE_FIELD[Read field from\neach entry at call time]
+                FE_SCALAR --&gt; FE_MODE{mode?}
+                FE_FIELD --&gt; FE_MODE
+                FE_MODE -- filter --&gt; FE_FILTER[Return matching\nsubset of entries]
+                FE_MODE -- enforce --&gt; FE_ENFORCE[True if all entries match,\nFalse if any fail]
+            end
+
+            subgraph AGG_BLOCK ["aggregation block"]
+                AGG_L --&gt; AGG_RESOLVE[Resolve all operands\nfrom alias pool]
+                AGG_RESOLVE --&gt; AGG_COMPLEX{Any operand\nis list or dict?}
+                AGG_COMPLEX -- Yes --&gt; AGG_VALIDATE[Validate:\n≤1 complex operand\nmode key required]
+                AGG_VALIDATE --&gt; AGG_VALID{Valid?}
+                AGG_VALID -- No --&gt; AGG_ERR([Log error,\nreturn None, False])
+                AGG_VALID -- Yes --&gt; AGG_MODE{mode?}
+                AGG_MODE -- element_wise --&gt; AGG_EW[Return values as-is\none result per element]
+                AGG_MODE -- aggregate --&gt; AGG_COLL[Apply operation to list,\nreturn single result]
+                AGG_COMPLEX -- No --&gt; AGG_OP{operation?}
+                AGG_OP -- no_op --&gt; AGG_NOOP[Return operand\nvalues as-is]
+                AGG_OP -- sum / division / etc. --&gt; AGG_SCALAR[Apply operation,\nreturn single result]
+            end
+
+            FE_FILTER --&gt; SAVE_AS_L{save_as\npresent?}
+            FE_ENFORCE --&gt; SAVE_AS_L
+            AGG_EW --&gt; SAVE_AS_L
+            AGG_COLL --&gt; SAVE_AS_L
+            AGG_NOOP --&gt; SAVE_AS_L
+            AGG_SCALAR --&gt; SAVE_AS_L
+
+            SAVE_AS_L -- Yes --&gt; STORE_L[Save result\nto alias pool]
+            SAVE_AS_L -- No --&gt; LHS_DONE([Return result, evaluated])
+            STORE_L --&gt; LHS_DONE
+        end
+
+        LHS_DONE --&gt; EVAL_RHS[Evaluate right_hand\nexpression\n same logic as LHS]
+        EVAL_RHS --&gt; BOTH_OK{Both sides\nevaluated?}
+        BOTH_OK -- No --&gt; RULE_FALSE2([Return False])
+        BOTH_OK -- Yes --&gt; APPLY_REL[Apply relationship function\nto left_hand, right_hand]
+
+        APPLY_REL --&gt; OPERATOR{relationship?}
+        OPERATOR -- equal --&gt; OP_EQ[_evaluate_equal_condition\npairwise if both are lists]
+        OPERATOR -- not_equal --&gt; OP_NEQ[Negate equal result]
+        OPERATOR -- greater --&gt; OP_GT[_evaluate_greater_condition\npairwise if both are lists]
+        OPERATOR -- greater_or_equal_to --&gt; OP_GTE[_evaluate_greater_or_equal_condition\npairwise if both are lists]
+        OPERATOR -- is_of_type --&gt; OP_TYPE[_evaluate_is_type\ncheck all values match type string]
+        OPERATOR -- is_null --&gt; OP_NULL[_evaluate_is_null\nall left-hand values are None?]
+        OPERATOR -- regex --&gt; OP_RE[_evaluate_regex\nre.fullmatch pattern]
+        OPERATOR -- is_equal_length --&gt; OP_LEN[_evaluate_equal_data_length\nboth lists, same length?]
+
+        OP_EQ --&gt; RULE_RESULT{Rule passed?}
+        OP_NEQ --&gt; RULE_RESULT
+        OP_GT --&gt; RULE_RESULT
+        OP_GTE --&gt; RULE_RESULT
+        OP_TYPE --&gt; RULE_RESULT
+        OP_NULL --&gt; RULE_RESULT
+        OP_RE --&gt; RULE_RESULT
+        OP_LEN --&gt; RULE_RESULT
+        RULE_FALSE --&gt; RULE_RESULT
+        RULE_FALSE2 --&gt; RULE_RESULT
+
+        RULE_RESULT -- No, eager_termination --&gt; BREAK([Break loop,\nreturn False])
+        RULE_RESULT -- No, not eager --&gt; TRACK[Track failure,\ncontinue remaining rules]
+        RULE_RESULT -- Yes, more rules --&gt; EACH_RULE
+        RULE_RESULT -- Yes, all done --&gt; RETURN_TRUE([Return True])
+        TRACK --&gt; MORE_RULES{More rules?}
+        MORE_RULES -- Yes --&gt; EACH_RULE
+        MORE_RULES -- No --&gt; RETURN_LAST([Return False\nlast rule failed])
+    end
+
+    BREAK --&gt; MORE_BLOCKS{More blocks?}
+    RETURN_TRUE --&gt; MORE_BLOCKS
+    RETURN_LAST --&gt; MORE_BLOCKS
+    SKIP_BLOCK --&gt; MORE_BLOCKS
+    MORE_BLOCKS -- Yes --&gt; CV_LOOP
+    MORE_BLOCKS -- No --&gt; FINAL{Any blocks\nfailed?}
+    FINAL -- Yes --&gt; FAIL([Log failing block descriptions,\nreturn False])
+    FINAL -- No --&gt; PASS([Return True])
+
+    </pre></section>
 </section>
 </section>
 </section>
@@ -664,7 +1075,19 @@ implemented.</p>
 </li>
 </ul>
 </li>
-<li><a :data-current="activeSection === '#the-cross-validation-blob'" class="reference internal" href="#the-cross-validation-blob">The “cross-validation” blob</a></li>
+<li><a :data-current="activeSection === '#the-cross-validation-blob'" class="reference internal" href="#the-cross-validation-blob">The “cross-validation” blob</a><ul>
+<li><a :data-current="activeSection === '#structure-of-a-validation-block'" class="reference internal" href="#structure-of-a-validation-block">Structure of a validation block</a><ul>
+<li><a :data-current="activeSection === '#aliases'" class="reference internal" href="#aliases">Aliases</a></li>
+<li><a :data-current="activeSection === '#condition-clauses'" class="reference internal" href="#condition-clauses">Condition clauses</a></li>
+<li><a :data-current="activeSection === '#expression-blocks'" class="reference internal" href="#expression-blocks">Expression blocks</a></li>
+<li><a :data-current="activeSection === '#the-apply-when-guard'" class="reference internal" href="#the-apply-when-guard">The <code class="docutils literal notranslate"><span class="pre">apply_when</span></code> guard</a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#error-behaviour-and-eager-termination'" class="reference internal" href="#error-behaviour-and-eager-termination">Error behaviour and <code class="docutils literal notranslate"><span class="pre">eager_termination</span></code></a></li>
+<li><a :data-current="activeSection === '#full-example'" class="reference internal" href="#full-example">Full example</a></li>
+<li><a :data-current="activeSection === '#decision-tree-flow-diagram'" class="reference internal" href="#decision-tree-flow-diagram">Decision-tree flow diagram</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -684,5 +1107,364 @@ implemented.</p>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (true) {
+                                        addZoomToSvgs(d3.selectAll(".mermaid").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (true) {
+        const mermaids_to_add_zoom = -1 === -1 ? mermaids_active.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll(".mermaid").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (true) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
 </body>
 </html>

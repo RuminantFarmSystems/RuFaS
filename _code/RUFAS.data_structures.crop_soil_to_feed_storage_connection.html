@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.data_structures.events.html" rel="next" title="RUFAS.data_structures.events module"/>
+<link href="RUFAS.data_structures.animal_to_manure_connection.html" rel="prev" title="RUFAS.data_structures.animal_to_manure_connection module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,9 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.data_structures.html">RUFAS.data_structures package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.data_structures.crop_soil_to_feed_storage_connection module</span>
 </nav>
 <div id="content" role="main">
@@ -160,11 +166,13 @@
 <dt>last_time_degraded<span class="classifier">date</span></dt><dd><p>The last time at which the quality and mass of the crop was recalculated. This value is initially set to the
 storage time of the crop.</p>
 </dd>
+<dt>dry_matter_mass<span class="classifier">float</span></dt><dd><p>The mass of dry matter in the crop. This is calculated from the fresh mass and dry matter percentage (kg).</p>
+</dd>
 <dt>dry_matter_percentage<span class="classifier">float</span></dt><dd><p>Percent of mass that is not water.</p>
 </dd>
 <dt>initial_dry_matter_percentage<span class="classifier">float</span></dt><dd><p>Percent of mass that is not water at the time this crop is stored.</p>
 </dd>
-<dt>initial_dry_matter_mass<span class="classifier">float</span></dt><dd><p>Mass of dry matter initially stored (kg). Note that this value is only used if this crop is stored in a <cite>Hay</cite>
+<dt>initial_dry_matter_mass<span class="classifier">float</span></dt><dd><p>Mass of dry matter initially stored (kg). Note that this value is only used if this crop is stored in a <code class="docutils literal notranslate"><span class="pre">Hay</span></code>
 instance (or one of its child classes), and is only calculated at the time of storage.</p>
 </dd>
 <dt>dry_matter_digestibility<span class="classifier">float</span></dt><dd><p>Percent of mass that is digestible.</p>
@@ -185,26 +193,17 @@ instance (or one of its child classes), and is only calculated at the time of st
 </dd>
 <dt>ash<span class="classifier">float</span></dt><dd><p>Percent of mass that is ash.</p>
 </dd>
+<dt>recorded_days<span class="classifier">set[int]</span></dt><dd><p>A set of simulation days on which this crop was recorded.</p>
+</dd>
 <dt>estimated_maximum_effluent<span class="classifier">float</span></dt><dd><p>Total amount of mass that will be lost from this crop as effluent in kg. Note that this value is only used if
-this crop is stored in a <cite>Silage</cite> instance (or one of its child classes), and is calculated only once, when it
+this crop is stored in a <code class="docutils literal notranslate"><span class="pre">Silage</span></code> instance (or one of its child classes), and is calculated only once, when it
 is stored.</p>
 </dd>
 <dt>bale_density<span class="classifier">float</span></dt><dd><p>Density of this crop if it is hayed in kg per cubic meter. Note that this value is only used if this crop is
-stored in a <cite>Hay</cite> instance (or one of its child classes), and is only calculated at the time of storage.</p>
+stored in a <code class="docutils literal notranslate"><span class="pre">Hay</span></code> instance (or one of its child classes), and is only calculated at the time of storage.</p>
 </dd>
 <dt>total_sensible_heat_generated<span class="classifier">float</span></dt><dd><p>Heat generated by this crop if it is hayed in kJ per kg. Note that this value is only used if this crop is
-stored in a <cite>Hay</cite> instance (or one of its child classes), and is only calculated at the time of storage.</p>
-</dd>
-<dt>recorded_days<span class="classifier">set[int]</span></dt><dd><p>A set of simulation days on which this crop was recorded.</p>
-</dd>
-<dt>dry_matter_mass</dt><dd><p>The mass of dry matter in the crop in kg. This is calculated from the fresh mass and dry matter percentage.</p>
-</dd>
-</dl>
-</section>
-<section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#methods'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>__post_init__():</dt><dd><p>Validates the category and type relationship.</p>
+stored in a <code class="docutils literal notranslate"><span class="pre">Hay</span></code> instance (or one of its child classes), and is only calculated at the time of storage.</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -335,6 +334,14 @@ stored in a <cite>Hay</cite> instance (or one of its child classes), and is only
 </dd>
 </dl>
 </section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the amount of dry matter to remove is greater than the amount of dry matter currently in
+the crop.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop.estimate_maximum_effluent">
@@ -343,7 +350,7 @@ stored in a <cite>Hay</cite> instance (or one of its child classes), and is only
 <section id="id2">
 <h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>Estimated maximum amount of mass that will flow out of this crop in kg.</p>
+<dt>float</dt><dd><p>Estimated maximum amount of mass that will flow out of this crop (kg).</p>
 </dd>
 </dl>
 </section>
@@ -364,7 +371,7 @@ stored in a <cite>Hay</cite> instance (or one of its child classes), and is only
 <section id="id4">
 <h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>Bale density of this crop (kg / cubic meter).</p>
+<dt>float</dt><dd><p>Bale density of this crop (kg / m^3).</p>
 </dd>
 </dl>
 </section>
@@ -385,7 +392,7 @@ stored in a <cite>Hay</cite> instance (or one of its child classes), and is only
 <section id="id7">
 <h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>Total sensible heat generated by this crop (kJ per kilogram).</p>
+<dt>float</dt><dd><p>Total sensible heat generated by this crop (kJ / kg).</p>
 </dd>
 </dl>
 </section>

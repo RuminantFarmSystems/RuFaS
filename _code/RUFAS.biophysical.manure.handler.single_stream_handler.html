@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -205,6 +206,13 @@ base handler’s process manure.</p>
 </dd>
 </dl>
 </section>
+<section id="id3">
+<h3>Raises<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>TypeError</dt><dd><p>If the ManureStream is a NoneType.</p>
+</dd>
+</dl>
+</section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
@@ -219,8 +227,8 @@ the only classification is “manure”.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions">
 <span class="sig-name descname"><span class="pre">_report_gas_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">housing_CO2_emissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_methane_emissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.single_stream_handler.SingleStreamHandler._report_gas_emissions'"><span>#</span></a></dt>
 <dd><p>Reports the gas emissions in single stream handler.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>housing_CO2_emissions<span class="classifier">float</span></dt><dd><p>The amount of housing CO2 emissions (kg).</p>
 </dd>
@@ -229,10 +237,6 @@ the only classification is “manure”.</p>
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>The day of simulation.</p>
 </dd>
 </dl>
-</section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
-<p>None</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -249,9 +253,11 @@ the only classification is “manure”.</p>
 <section id="id6">
 <h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>tuple[float, float, float]</dt><dd><p>The updated amount of degradable volatile solids (kg).
-The updated amount of non-degradable volatile solids (kg).
-The updated amount of total solids (kg).</p>
+<dt>tuple[float, float, float]</dt><dd><ul class="simple">
+<li><p>The updated amount of degradable volatile solids (kg).</p></li>
+<li><p>The updated amount of non-degradable volatile solids (kg).</p></li>
+<li><p>The updated amount of total solids (kg).</p></li>
+</ul>
 </dd>
 </dl>
 </section>

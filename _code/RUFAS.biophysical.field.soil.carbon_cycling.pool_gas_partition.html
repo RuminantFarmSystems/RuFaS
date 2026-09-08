@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.soil.carbon_cycling.residue_partition.html" rel="next" title="RUFAS.biophysical.field.soil.carbon_cycling.residue_partition module"/>
+<link href="RUFAS.biophysical.field.soil.carbon_cycling.decomposition.html" rel="prev" title="RUFAS.biophysical.field.soil.carbon_cycling.decomposition module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,12 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.html">RUFAS.biophysical.field.soil package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.carbon_cycling.html">RUFAS.biophysical.field.soil.carbon_cycling package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition module</span>
 </nav>
 <div id="content" role="main">
@@ -180,7 +189,7 @@ provided.</p>
 <section id="notes">
 <h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
 <p>This method applies all the gas-partitioning sub routines to each layer of soil that is present in the soil
-<cite>data</cite> object.</p>
+<code class="docutils literal notranslate"><span class="pre">data</span></code> object.</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -667,26 +676,25 @@ provided.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_loss">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_plant_metabolic_active_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolic_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_loss'"><span>#</span></a></dt>
-<dd><p>Calculate plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
-Parameters
-———-
-plant_metabolic_active_carbon_usage : float</p>
-<blockquote>
-<div><p>Plant metabolic carbon decomposed into active carbon (kg/ha).</p>
-</div></blockquote>
+<dd><p>Calculate plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the</p>
+<section id="id54">
+<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon.</p>
+<dt>plant_metabolic_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed into active carbon (kg/ha).</p>
+</dd>
+<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).</p>
 </dd>
 </dl>
-<section id="id54">
-<h3>Returns<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
+</section>
+<section id="id55">
+<h3>Returns<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id55">
-<h3>References<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
+<section id="id56">
+<h3>References<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -695,24 +703,24 @@ plant_metabolic_active_carbon_usage : float</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_plant_metabolic_active_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolic_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_remaining" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_metabolic_active_carbon_remaining'"><span>#</span></a></dt>
 <dd><p>Calculate plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
 layer (kg/ha).</p>
-<section id="id56">
-<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
+<section id="id57">
+<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>plant_metabolic_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed into active carbon (kg/ha).</p>
 </dd>
-<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon.</p>
+<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id57">
-<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
+<section id="id58">
+<h3>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id58">
-<h3>References<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
+<section id="id59">
+<h3>References<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -721,24 +729,24 @@ layer (kg/ha).</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_plant_structural_active_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.45</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_active_carbon_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_active_carbon_loss'"><span>#</span></a></dt>
 <dd><p>Calculate plant structural carbon being lost as carbon dioxide during decomposition into active carbon in the
 layer (kg/ha).</p>
-<section id="id59">
-<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
+<section id="id60">
+<h3>Parameters<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>plant_structural_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant structural carbon decomposed into active carbon (kg/ha).</p>
 </dd>
-<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon.</p>
+<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id60">
-<h3>Returns<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
+<section id="id61">
+<h3>Returns<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id61">
-<h3>References<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
+<section id="id62">
+<h3>References<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -747,24 +755,24 @@ layer (kg/ha).</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_plant_structural_active_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.45</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_active_carbon_remaining" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_active_carbon_remaining'"><span>#</span></a></dt>
 <dd><p>Calculate plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
 layer (kg/ha).</p>
-<section id="id62">
-<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
+<section id="id63">
+<h3>Parameters<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>plant_structural_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed into active carbon (kg/ha).</p>
 </dd>
-<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon.</p>
+<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id63">
-<h3>Returns<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
+<section id="id64">
+<h3>Returns<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id64">
-<h3>References<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h3>
+<section id="id65">
+<h3>References<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -772,25 +780,25 @@ layer (kg/ha).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_loss">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_plant_structural_slow_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_loss'"><span>#</span></a></dt>
 <dd><p>Calculate plant structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
-layer (kg/ha).</p>
-<section id="id65">
-<h3>Parameters<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h3>
+layer.</p>
+<section id="id66">
+<h3>Parameters<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>plant_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant structural carbon decomposed into slow carbon (kg/ha).</p>
 </dd>
-<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon.</p>
+<dt>structural_slow_carbon_loss_rate<span class="classifier">float, default = 0.3</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id66">
-<h3>Returns<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h3>
+<section id="id67">
+<h3>Returns<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id67">
-<h3>References<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h3>
+<section id="id68">
+<h3>References<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -798,25 +806,25 @@ layer (kg/ha).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_remaining">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_plant_structural_slow_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_remaining" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_plant_structural_slow_carbon_remaining'"><span>#</span></a></dt>
 <dd><p>Calculate plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
-layer (kg/ha).</p>
-<section id="id68">
-<h3>Parameters<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h3>
+layer.</p>
+<section id="id69">
+<h3>Parameters<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>plant_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Plant metabolic carbon decomposed into slow carbon (kg/ha).</p>
 </dd>
-<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon.</p>
+<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id69">
-<h3>Returns<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h3>
+<section id="id70">
+<h3>Returns<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id70">
-<h3>References<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h3>
+<section id="id71">
+<h3>References<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -825,24 +833,24 @@ layer (kg/ha).</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_metabolic_active_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolic_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_metabolic_active_carbon_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_metabolic_active_carbon_loss'"><span>#</span></a></dt>
 <dd><p>Calculate soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
 layer (kg/ha).</p>
-<section id="id71">
-<h3>Parameters<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h3>
+<section id="id72">
+<h3>Parameters<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_metabolic_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil metabolic carbon decomposed into active carbon (kg/ha).</p>
 </dd>
-<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon.</p>
+<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id72">
-<h3>Returns<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h3>
+<section id="id73">
+<h3>Returns<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id73">
-<h3>References<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h3>
+<section id="id74">
+<h3>References<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -851,24 +859,24 @@ layer (kg/ha).</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_metabolic_active_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_metabolic_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolic_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_metabolic_active_carbon_remaining" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_metabolic_active_carbon_remaining'"><span>#</span></a></dt>
 <dd><p>Calculate soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
 layer (kg/ha).</p>
-<section id="id74">
-<h3>Parameters<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h3>
+<section id="id75">
+<h3>Parameters<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_metabolic_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil metabolic carbon decomposed into active carbon (kg/ha).</p>
 </dd>
-<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon.</p>
+<dt>metabolic_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of metabolic to active carbon (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id75">
-<h3>Returns<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h3>
+<section id="id76">
+<h3>Returns<a class="headerlink" href="#id76" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id76'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id76">
-<h3>References<a class="headerlink" href="#id76" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id76'"><span>#</span></a></h3>
+<section id="id77">
+<h3>References<a class="headerlink" href="#id77" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id77'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -877,24 +885,24 @@ layer (kg/ha).</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_structural_active_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.45</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_active_carbon_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_active_carbon_loss'"><span>#</span></a></dt>
 <dd><p>Calculate soil structural carbon being lost as carbon dioxide during decomposition into active carbon in the
 layer (kg/ha).</p>
-<section id="id77">
-<h3>Parameters<a class="headerlink" href="#id77" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id77'"><span>#</span></a></h3>
+<section id="id78">
+<h3>Parameters<a class="headerlink" href="#id78" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id78'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_structural_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into active carbon (kg/ha).</p>
 </dd>
-<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon.</p>
+<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon. (unitless)</p>
 </dd>
 </dl>
 </section>
-<section id="id78">
-<h3>Returns<a class="headerlink" href="#id78" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id78'"><span>#</span></a></h3>
+<section id="id79">
+<h3>Returns<a class="headerlink" href="#id79" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id79'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id79">
-<h3>References<a class="headerlink" href="#id79" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id79'"><span>#</span></a></h3>
+<section id="id80">
+<h3>References<a class="headerlink" href="#id80" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id80'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -903,24 +911,24 @@ layer (kg/ha).</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_structural_active_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_active_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_active_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.45</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_active_carbon_remaining" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_active_carbon_remaining'"><span>#</span></a></dt>
 <dd><p>Calculate soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss in the
 layer (kg/ha).</p>
-<section id="id80">
-<h3>Parameters<a class="headerlink" href="#id80" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id80'"><span>#</span></a></h3>
+<section id="id81">
+<h3>Parameters<a class="headerlink" href="#id81" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id81'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_structural_active_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into active carbon (kg/ha).</p>
 </dd>
-<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon.</p>
+<dt>structural_active_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to active carbon (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id81">
-<h3>Returns<a class="headerlink" href="#id81" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id81'"><span>#</span></a></h3>
+<section id="id82">
+<h3>Returns<a class="headerlink" href="#id82" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id82'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id82">
-<h3>References<a class="headerlink" href="#id82" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id82'"><span>#</span></a></h3>
+<section id="id83">
+<h3>References<a class="headerlink" href="#id83" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id83'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>
@@ -928,35 +936,9 @@ layer (kg/ha).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_loss">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_structural_slow_carbon_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_loss" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_loss'"><span>#</span></a></dt>
 <dd><p>Calculate soil structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
-layer (kg/ha).</p>
-<section id="id83">
-<h3>Parameters<a class="headerlink" href="#id83" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id83'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>soil_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into slow carbon (kg/ha).</p>
-</dd>
-<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon.</p>
-</dd>
-</dl>
-</section>
+layer.</p>
 <section id="id84">
-<h3>Returns<a class="headerlink" href="#id84" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id84'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).</p>
-</dd>
-</dl>
-</section>
-<section id="id85">
-<h3>References<a class="headerlink" href="#id85" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id85'"><span>#</span></a></h3>
-<p>pseudocode_soil Reference: S.6.C.1.</p>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_remaining">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_structural_slow_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_remaining" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_remaining'"><span>#</span></a></dt>
-<dd><p>Calculate soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
-layer (kg/ha).</p>
-<section id="id86">
-<h3>Parameters<a class="headerlink" href="#id86" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id86'"><span>#</span></a></h3>
+<h3>Parameters<a class="headerlink" href="#id84" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id84'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into slow carbon (kg/ha).</p>
 </dd>
@@ -964,15 +946,41 @@ layer (kg/ha).</p>
 </dd>
 </dl>
 </section>
+<section id="id85">
+<h3>Returns<a class="headerlink" href="#id85" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id85'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id86">
+<h3>References<a class="headerlink" href="#id86" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id86'"><span>#</span></a></h3>
+<p>pseudocode_soil Reference: S.6.C.1.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_remaining">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_structural_slow_carbon_remaining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_structural_slow_carbon_usage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_slow_carbon_loss_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_remaining" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.PoolGasPartition._determine_soil_structural_slow_carbon_remaining'"><span>#</span></a></dt>
+<dd><p>Calculate soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
+layer.</p>
 <section id="id87">
-<h3>Returns<a class="headerlink" href="#id87" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id87'"><span>#</span></a></h3>
+<h3>Parameters<a class="headerlink" href="#id87" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id87'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>soil_structural_slow_carbon_usage<span class="classifier">float</span></dt><dd><p>Soil structural carbon decomposed into slow carbon (kg/ha).</p>
+</dd>
+<dt>structural_slow_carbon_loss_rate<span class="classifier">float</span></dt><dd><p>Rate of carbon dioxide loss during transformation of structural to slow carbon (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id88">
+<h3>Returns<a class="headerlink" href="#id88" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id88'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha).</p>
 </dd>
 </dl>
 </section>
-<section id="id88">
-<h3>References<a class="headerlink" href="#id88" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id88'"><span>#</span></a></h3>
+<section id="id89">
+<h3>References<a class="headerlink" href="#id89" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id89'"><span>#</span></a></h3>
 <p>pseudocode_soil Reference: S.6.C.1.</p>
 </section>
 </dd></dl>

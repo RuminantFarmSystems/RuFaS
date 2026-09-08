@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.soil.soil_temp.html" rel="next" title="RUFAS.biophysical.field.soil.soil_temp module"/>
+<link href="RUFAS.biophysical.field.soil.soil_data.html" rel="prev" title="RUFAS.biophysical.field.soil.soil_data module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.html">RUFAS.biophysical.field.soil package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.soil.soil_erosion module</span>
 </nav>
 <div id="content" role="main">
@@ -151,7 +159,7 @@
 <dl class="simple">
 <dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track and simulate erosion.</p>
 </dd>
-<dt>field_size<span class="classifier">float, optional, default=None</span></dt><dd><p>The size of the field (ha).</p>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>The size of the field (ha).</p>
 </dd>
 </dl>
 </section>
@@ -183,13 +191,20 @@ not provided (ha)</p>
 <section id="id2">
 <h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field that contains this Soil object (hectares).</p>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field that contains this Soil object (ha).</p>
 </dd>
 <dt>minimum_cover_management_factor<span class="classifier">float</span></dt><dd><p>Minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless).</p>
 </dd>
-<dt>surface_residue<span class="classifier">float</span></dt><dd><p>Amount of residue on the soil surface (kg per hectare).</p>
+<dt>surface_residue<span class="classifier">float</span></dt><dd><p>Amount of residue on the soil surface (kg / ha).</p>
 </dd>
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain that fell on the field on the current day (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>TypeError</dt><dd><p>If SoilData accumulated_runoff is NoneType.</p>
 </dd>
 </dl>
 </section>
@@ -378,36 +393,55 @@ residue on the soil surface, which means less energy is transferred to soil when
 </dl>
 </section>
 <section id="id23">
-<h3>References<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<h3>Raises<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If minimum cover and management is &lt;= 0.</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h3>References<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation eqn. 4:1.1.10</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_support_practice_factor">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_support_practice_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_support_practice_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_support_practice_factor'"><span>#</span></a></dt>
-<dd><p>SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
-stripcropping, and/or terracing)</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_exponential_term">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_exponential_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_exponential_term" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_exponential_term'"><span>#</span></a></dt>
-<dd><p>Calculate the exponential term used to determine the topographic factor.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>average_subbasin_slope<span class="classifier">float</span></dt><dd><p>Average slope fraction of the subbasin (unitless).</p>
-</dd>
-</dl>
-</section>
+<dd><p>Determine the support practice factor (only applies to fields that are doing contour tillage/planting,
+stripcropping, and/or terracing).</p>
 <section id="id25">
 <h3>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>The exponential term (unitless).</p>
+<dt>float</dt><dd><p>The support practice factor (unitless).</p>
 </dd>
 </dl>
 </section>
 <section id="id26">
 <h3>References<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
+<p>SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
+stripcropping, and/or terracing)</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_exponential_term">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_exponential_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_exponential_term" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_exponential_term'"><span>#</span></a></dt>
+<dd><p>Calculate the exponential term used to determine the topographic factor.</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>average_subbasin_slope<span class="classifier">float</span></dt><dd><p>Average slope fraction of the subbasin (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The exponential term (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>References<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation eqn. 4:1.1.13</p>
 </section>
 </dd></dl>
@@ -416,8 +450,8 @@ stripcropping, and/or terracing)</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_topographic_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_topographic_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_topographic_factor'"><span>#</span></a></dt>
 <dd><p>Calculate the topographic factor, which represents the expected ratio of soil loss per unit area from a field
 slope to that from a 22.1 m length of uniform 9% slope under otherwise identical conditions.</p>
-<section id="id27">
-<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>slope_length<span class="classifier">float</span></dt><dd><p>Length of the slope (m).</p>
 </dd>
@@ -425,19 +459,19 @@ slope to that from a 22.1 m length of uniform 9% slope under otherwise identical
 </dd>
 </dl>
 </section>
-<section id="id28">
-<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
+<section id="id31">
+<h3>Returns<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The topographic factor (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id29">
-<h3>References<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
+<section id="id32">
+<h3>References<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation eqn. 4:1.1.12</p>
 </section>
-<section id="id30">
-<h3>Notes<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
+<section id="id33">
+<h3>Notes<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
 <p>The length and slope of a soil have an effect on erodibility, with shorter lengths and steeper slopes
 resulting in more soil erosion. A shorter length means more erosion because sediment does not have to travel
 as far to reach channels and be removed from the soil. A steeper slope means that there is less
@@ -451,27 +485,27 @@ here because there will never be a field at an angle &lt; -90 or &gt; 90 degrees
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_coarse_fragment_factor">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_coarse_fragment_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rock_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_coarse_fragment_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_coarse_fragment_factor'"><span>#</span></a></dt>
 <dd><p>Calculate the coarse fragment factor for use in calculating sediment yield.</p>
-<section id="id31">
-<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>rock_fraction<span class="classifier">float</span></dt><dd><p>Fraction rock in the first soil layer.</p>
 </dd>
 </dl>
 </section>
-<section id="id32">
-<h3>Notes<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<section id="id35">
+<h3>Notes<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
 <p>The mass of rocks is much greater than particles of sand, silt, clay, etc., requiring significantly more force
 to move them off a field, resulting in slower erosion in soils with higher rock content.</p>
 </section>
-<section id="id33">
-<h3>Returns<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
+<section id="id36">
+<h3>Returns<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Coarse fragment factor based on the rock content of the soil (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id34">
-<h3>References<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
+<section id="id37">
+<h3>References<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation eqn. 4:1.1.15</p>
 </section>
 </dd></dl>
@@ -479,8 +513,8 @@ to move them off a field, resulting in slower erosion in soils with higher rock 
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_peak_runoff_rate">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_peak_runoff_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_peak_runoff_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_peak_runoff_rate'"><span>#</span></a></dt>
 <dd><p>Determines the maximum runoff flow rate that occurs with a given rainfall event.</p>
-<section id="id35">
-<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>surface_runoff<span class="classifier">float</span></dt><dd><p>Amount of rainfall that did not infiltrate into the soil on the current day (mm).</p>
 </dd>
@@ -496,19 +530,19 @@ to move them off a field, resulting in slower erosion in soils with higher rock 
 </dd>
 </dl>
 </section>
-<section id="id36">
-<h3>Returns<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
+<section id="id39">
+<h3>Returns<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Peak runoff rate (cubic meters per second).</p>
 </dd>
 </dl>
 </section>
-<section id="id37">
-<h3>References<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
+<section id="id40">
+<h3>References<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation equation 2:1.3.1</p>
 </section>
-<section id="id38">
-<h3>Notes<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
+<section id="id41">
+<h3>Notes<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
 <p>This equation actually demands the area of the subbasin, not the field, as a parameter. But the field area was
 used in the old code, and is used here until the data for subbasin areas can be found.</p>
 </section>
@@ -517,8 +551,8 @@ used in the old code, and is used here until the data for subbasin areas can be 
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_runoff_coefficient">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_runoff_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_runoff_coefficient" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_runoff_coefficient'"><span>#</span></a></dt>
 <dd><p>Calculates the surface runoff coefficient for the current day.</p>
-<section id="id39">
-<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
+<section id="id42">
+<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>surface_runoff<span class="classifier">float</span></dt><dd><p>Amount of rainfall that did not infiltrate into the soil on the current day (mm).</p>
 </dd>
@@ -526,15 +560,15 @@ used in the old code, and is used here until the data for subbasin areas can be 
 </dd>
 </dl>
 </section>
-<section id="id40">
-<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
+<section id="id43">
+<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Ratio of runoff to rainfall on the current day (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id41">
-<h3>References<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
+<section id="id44">
+<h3>References<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation equation 2:1.3.15</p>
 </section>
 </dd></dl>
@@ -542,8 +576,8 @@ used in the old code, and is used here until the data for subbasin areas can be 
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_rainfall_intensity">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_rainfall_intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_rainfall_intensity" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_rainfall_intensity'"><span>#</span></a></dt>
 <dd><p>Determines the average rainfall rate during the time of concentration.</p>
-<section id="id42">
-<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain that fell on the current day (mm).</p>
 </dd>
@@ -555,24 +589,24 @@ used in the old code, and is used here until the data for subbasin areas can be 
 </dd>
 </dl>
 </section>
-<section id="id43">
-<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
+<section id="id46">
+<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Rainfall intensity (mm / hour).</p>
 </dd>
 </dl>
 </section>
-<section id="id44">
-<h3>References<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
+<section id="id47">
+<h3>References<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation equation 2:1.3.16</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_time_of_concentration">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_time_of_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_time_of_concentration" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_time_of_concentration'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_time_of_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_time_of_concentration" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_time_of_concentration'"><span>#</span></a></dt>
 <dd><p>Calculates the time of concentration for the subbasin.</p>
-<section id="id45">
-<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
+<section id="id48">
+<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>slope_length<span class="classifier">float</span></dt><dd><p>Length of the subbasin slope (m).</p>
 </dd>
@@ -582,19 +616,19 @@ used in the old code, and is used here until the data for subbasin areas can be 
 </dd>
 </dl>
 </section>
-<section id="id46">
-<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
+<section id="id49">
+<h3>Returns<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>RufasTime of concentration (hour).</p>
 </dd>
 </dl>
 </section>
-<section id="id47">
-<h3>References<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
+<section id="id50">
+<h3>References<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation section 2:1.3.6</p>
 </section>
-<section id="id48">
-<h3>Notes<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
+<section id="id51">
+<h3>Notes<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
 <p>According to the SWAT Theoretical documentation, “the time of concentration is the amount of time from the
 beginning of a rainfall event until the entire subbasin area is contributing to flow at the outlet.”. In SWAT,
 this is calculated as the overland flow time of concentration plus the channel flow time of concentration, but
@@ -607,27 +641,27 @@ concentration. This equation in SWAT also assumes an average flow rate of 6.35 m
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_half_hour_rainfall_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_half_hour_rainfall_fraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_half_hour_rainfall_fraction'"><span>#</span></a></dt>
 <dd><p>Calculates the fraction of total rainfall that falls during the half-hour of most intense rainfall of this storm
 event.</p>
-<section id="id49">
-<h3>Parameters<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
+<section id="id52">
+<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain that fell on the current day (mm).</p>
 </dd>
 </dl>
 </section>
-<section id="id50">
-<h3>Returns<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
+<section id="id53">
+<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The fraction of total rainfall that fell during the half-hour of most intense rainfall on the current day
 (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id51">
-<h3>References<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
+<section id="id54">
+<h3>References<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation section 1:3.2.2</p>
 </section>
-<section id="id52">
-<h3>Notes<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
+<section id="id55">
+<h3>Notes<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
 <p>This method for calculating the maximum half-hour rainfall is from the old version of the Field module, and has
 been significantly simplified from the method in SWAT.</p>
 </section>
@@ -636,8 +670,8 @@ been significantly simplified from the method in SWAT.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_fraction_rainfall_during_time_of_concentration">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_fraction_rainfall_during_time_of_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_of_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">half_hour_rainfall_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_fraction_rainfall_during_time_of_concentration" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_fraction_rainfall_during_time_of_concentration'"><span>#</span></a></dt>
 <dd><p>Calculates the fraction of rainfall that occurs over the time of concentration.</p>
-<section id="id53">
-<h3>Parameters<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h3>
+<section id="id56">
+<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time_of_concentration<span class="classifier">float</span></dt><dd><p>RufasTime of concentration for this subbasin (hours).</p>
 </dd>
@@ -645,15 +679,15 @@ been significantly simplified from the method in SWAT.</p>
 </dd>
 </dl>
 </section>
-<section id="id54">
-<h3>Returns<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
+<section id="id57">
+<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Fraction of rainfall that occurs over the time of concentration (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id55">
-<h3>References<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
+<section id="id58">
+<h3>References<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation equation 2:1.3.19</p>
 </section>
 </dd></dl>
@@ -661,8 +695,8 @@ been significantly simplified from the method in SWAT.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_sediment_yield">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_sediment_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_area_runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_runoff_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_erodibility_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover_management_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">support_practice_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topographic_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_fragment_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_sediment_yield" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_sediment_yield'"><span>#</span></a></dt>
 <dd><p>Calculate the sediment yield for a given day.</p>
-<section id="id56">
-<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
+<section id="id59">
+<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>surface_area_runoff<span class="classifier">float</span></dt><dd><p>Surface runoff volume (mm per hectare).</p>
 </dd>
@@ -685,8 +719,8 @@ slope under identical conditions (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id57">
-<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
+<section id="id60">
+<h3>Returns<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Sediment yield on a given day (metric tons).</p>
 </dd>
@@ -697,8 +731,8 @@ slope under identical conditions (unitless).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_adjusted_sediment_yield">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_adjusted_sediment_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sediment_yield</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_water_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_adjusted_sediment_yield" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_erosion.SoilErosion._determine_adjusted_sediment_yield'"><span>#</span></a></dt>
 <dd><p>Adjust the sediment yield based on the amount of snow cover.</p>
-<section id="id58">
-<h3>Parameters<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
+<section id="id61">
+<h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>sediment_yield<span class="classifier">float</span></dt><dd><p>Sediment yield on a given day (metric tons).</p>
 </dd>
@@ -706,15 +740,15 @@ slope under identical conditions (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id59">
-<h3>Returns<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
+<section id="id62">
+<h3>Returns<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The sediment yield on a given day adjusted for the water content of the snow cover.</p>
 </dd>
 </dl>
 </section>
-<section id="id60">
-<h3>Reference<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
+<section id="id63">
+<h3>Reference<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation eqn. 4:1.3.1</p>
 </section>
 </dd></dl>

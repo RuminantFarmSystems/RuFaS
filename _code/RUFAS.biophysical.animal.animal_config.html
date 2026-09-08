@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -155,25 +156,23 @@
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>wean_day<span class="classifier">int</span></dt><dd><p>The number of days after birth when a calf is weaned, (simulation days).</p>
+<dt>wean_day<span class="classifier">int</span></dt><dd><p>The number of days after birth when a calf is weaned, (simulation day).</p>
 </dd>
-<dt>wean_length<span class="classifier">int</span></dt><dd><p>The duration required for weaning, (simulation days).</p>
+<dt>wean_length<span class="classifier">int</span></dt><dd><p>The duration required for weaning, (simulation day).</p>
 </dd>
-<dt>target_heifer_pregnant_day<span class="classifier">int</span></dt><dd><p>The target day for heifers to become pregnant, (simulation days).</p>
+<dt>target_heifer_pregnant_day<span class="classifier">int</span></dt><dd><p>The target day for heifers to become pregnant, (simulation day).</p>
 </dd>
-<dt>heifer_breed_start_day<span class="classifier">int</span></dt><dd><p>The day heifer breeding starts, , (simulation days).</p>
+<dt>heifer_breed_start_day<span class="classifier">int</span></dt><dd><p>The day heifer breeding starts, (simulation day).</p>
 </dd>
-<dt>heifer_prefresh_day<span class="classifier">int</span></dt><dd><p>The number of days for prefresh heifer preparation , (simulation days).</p>
+<dt>heifer_prefresh_day<span class="classifier">int</span></dt><dd><p>The number of days for prefresh heifer preparation , (simulation day).</p>
 </dd>
-<dt>calving_interval<span class="classifier">int</span></dt><dd><p>The targeted interval between calvings, (simulation days).</p>
+<dt>calving_interval<span class="classifier">int</span></dt><dd><p>The targeted interval between calvings, (simulation day).</p>
 </dd>
-<dt>dry_off_day_of_pregnancy<span class="classifier">int</span></dt><dd><p>The day of pregnancy when a cow is dried off, (simulation days).</p>
+<dt>dry_off_day_of_pregnancy<span class="classifier">int</span></dt><dd><p>The day of pregnancy when a cow is dried off, (simulation day).</p>
 </dd>
-<dt>heifer_reproduction_cull_day<span class="classifier">int</span></dt><dd><p>Maximum day at which a heifer is culled if not pregnant, (simulation days).</p>
+<dt>heifer_reproduction_cull_day<span class="classifier">int</span></dt><dd><p>Maximum day at which a heifer is culled if not pregnant, (simulation day).</p>
 </dd>
-<dt>do_not_breed_time<span class="classifier">int</span></dt><dd><p>The duration after which breeding is stopped, (simulation days).</p>
-</dd>
-<dt>cull_milk_production<span class="classifier">int</span></dt><dd><p>The threshold milk production below which cows are culled, (simulation days).</p>
+<dt>do_not_breed_time<span class="classifier">int</span></dt><dd><p>The duration after which breeding is stopped, (simulation day).</p>
 </dd>
 <dt>semen_type<span class="classifier">str</span></dt><dd><p>Types of semen used for reproduction, e.g., “conventional”, (unitless).</p>
 </dd>
@@ -181,13 +180,21 @@
 </dd>
 <dt>male_calf_rate_sexed_semen<span class="classifier">float</span></dt><dd><p>Proportion of male calves when sexed semen is used, (unitless).</p>
 </dd>
-<dt>keep_female_calf_rate<span class="classifier">float</span></dt><dd><p>Rate at which female calves are kept, (unitless).</p>
+<dt>keep_female_calf_rate<span class="classifier">float</span></dt><dd><p>Rate at which female calves are kept, used when <code class="docutils literal notranslate"><span class="pre">calf_retention_method</span></code> is
+<code class="docutils literal notranslate"><span class="pre">"rate"</span></code> (unitless).</p>
+</dd>
+<dt>calf_retention_method<span class="classifier">str</span></dt><dd><p>Method used to decide female-calf retention: <code class="docutils literal notranslate"><span class="pre">"rate"</span></code> (keep each live female
+calf with probability <code class="docutils literal notranslate"><span class="pre">keep_female_calf_rate</span></code>) or <code class="docutils literal notranslate"><span class="pre">"count"</span></code> (keep a target
+number of female calves per year, <code class="docutils literal notranslate"><span class="pre">annual_keep_female_calf_num</span></code>).</p>
+</dd>
+<dt>annual_keep_female_calf_num<span class="classifier">int</span></dt><dd><p>Target number of female calves to keep per year, used when
+<code class="docutils literal notranslate"><span class="pre">calf_retention_method</span></code> is <code class="docutils literal notranslate"><span class="pre">"count"</span></code>, (head/year).</p>
 </dd>
 <dt>still_birth_rate<span class="classifier">float</span></dt><dd><p>Probability of stillbirth occurring during calving, (unitless).</p>
 </dd>
-<dt>average_gestation_length<span class="classifier">int</span></dt><dd><p>The average gestation length, (simulation days).</p>
+<dt>average_gestation_length<span class="classifier">int</span></dt><dd><p>The average gestation length, (simulation day).</p>
 </dd>
-<dt>std_gestation_length<span class="classifier">float</span></dt><dd><p>The standard deviation for gestation length, (simulation days).</p>
+<dt>std_gestation_length<span class="classifier">float</span></dt><dd><p>The standard deviation for gestation length, (simulation day).</p>
 </dd>
 <dt>cow_times_milked_per_day<span class="classifier">int</span></dt><dd><p>Number of times a cow is milked per day, (unitless).</p>
 </dd>
@@ -221,13 +228,13 @@
 </dd>
 <dt>cow_estrus_detection_rate<span class="classifier">float</span></dt><dd><p>Probability of detecting estrus in cows.</p>
 </dd>
-<dt>ovsynch_program_start_day<span class="classifier">int</span></dt><dd><p>The starting day for the Ovsynch program, (simulation days).</p>
+<dt>ovsynch_program_start_day<span class="classifier">int</span></dt><dd><p>The starting day for the Ovsynch program, (simulation day).</p>
 </dd>
 <dt>ovsynch_program_conception_rate<span class="classifier">float</span></dt><dd><p>Conception rate associated with the Ovsynch program, (unitless).</p>
 </dd>
-<dt>presynch_program_start_day<span class="classifier">int</span></dt><dd><p>The starting day for the presynchronization program, (simulation days).</p>
+<dt>presynch_program_start_day<span class="classifier">int</span></dt><dd><p>The starting day for the presynchronization program, (simulation day).</p>
 </dd>
-<dt>voluntary_waiting_period<span class="classifier">int</span></dt><dd><p>The voluntary waiting period before breeding is resumed after calving, (simulation days).</p>
+<dt>voluntary_waiting_period<span class="classifier">int</span></dt><dd><p>The voluntary waiting period before breeding is resumed after calving, (simulation day).</p>
 </dd>
 <dt>birth_weight_avg_ho<span class="classifier">float</span></dt><dd><p>Average Holstein birth weight, (kg).</p>
 </dd>
@@ -247,31 +254,31 @@
 </dd>
 <dt>should_decrease_conception_rate_by_parity<span class="classifier">bool</span></dt><dd><p>Whether to adjust conception rates based on parity number, (unitless).</p>
 </dd>
-<dt>average_estrus_cycle_return<span class="classifier">int</span></dt><dd><p>Average number of days before an estrus cycle returns, (simulation days).</p>
+<dt>average_estrus_cycle_return<span class="classifier">int</span></dt><dd><p>Average number of days before an estrus cycle returns, (simulation day).</p>
 </dd>
-<dt>std_estrus_cycle_return<span class="classifier">float</span></dt><dd><p>Standard deviation for estrus cycle return time, (simulation days).</p>
+<dt>std_estrus_cycle_return<span class="classifier">float</span></dt><dd><p>Standard deviation for estrus cycle return time, (simulation day).</p>
 </dd>
-<dt>average_estrus_cycle_heifer<span class="classifier">int</span></dt><dd><p>Average estrus cycle length for heifers, (simulation days).</p>
+<dt>average_estrus_cycle_heifer<span class="classifier">int</span></dt><dd><p>Average estrus cycle length for heifers, (simulation day).</p>
 </dd>
-<dt>std_estrus_cycle_heifer<span class="classifier">float</span></dt><dd><p>Standard deviation for heifer estrus cycle length, (simulation days).</p>
+<dt>std_estrus_cycle_heifer<span class="classifier">float</span></dt><dd><p>Standard deviation for heifer estrus cycle length, (simulation day).</p>
 </dd>
-<dt>average_estrus_cycle_cow<span class="classifier">int</span></dt><dd><p>Average estrus cycle length for cows, (simulation days).</p>
+<dt>average_estrus_cycle_cow<span class="classifier">int</span></dt><dd><p>Average estrus cycle length for cows, (simulation day).</p>
 </dd>
-<dt>std_estrus_cycle_cow<span class="classifier">float</span></dt><dd><p>Standard deviation for cow estrus cycle length, (simulation days).</p>
+<dt>std_estrus_cycle_cow<span class="classifier">float</span></dt><dd><p>Standard deviation for cow estrus cycle length, (simulation day).</p>
 </dd>
-<dt>average_estrus_cycle_after_pgf<span class="classifier">int</span></dt><dd><p>Average estrus cycle length after prostaglandin injection, (simulation days).</p>
+<dt>average_estrus_cycle_after_pgf<span class="classifier">int</span></dt><dd><p>Average estrus cycle length after prostaglandin injection, (simulation day).</p>
 </dd>
-<dt>std_estrus_cycle_after_pgf<span class="classifier">float</span></dt><dd><p>Standard deviation for estrus cycle length after prostaglandin injection, (simulation days).</p>
+<dt>std_estrus_cycle_after_pgf<span class="classifier">float</span></dt><dd><p>Standard deviation for estrus cycle length after prostaglandin injection, (simulation day).</p>
 </dd>
-<dt>first_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>First pregnancy check day post-breeding, (simulation days).</p>
+<dt>first_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>First pregnancy check day post-breeding, (simulation day).</p>
 </dd>
 <dt>first_pregnancy_check_loss_rate<span class="classifier">float</span></dt><dd><p>Pregnancy loss probability during the first pregnancy check, (unitless).</p>
 </dd>
-<dt>second_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>Second pregnancy check day post-breeding, (simulation days).</p>
+<dt>second_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>Second pregnancy check day post-breeding, (simulation day).</p>
 </dd>
 <dt>second_pregnancy_check_loss_rate<span class="classifier">float</span></dt><dd><p>Pregnancy loss probability during the second pregnancy check, (unitless).</p>
 </dd>
-<dt>third_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>Third pregnancy check day post-breeding, (simulation days).</p>
+<dt>third_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>Third pregnancy check day post-breeding, (simulation day).</p>
 </dd>
 <dt>third_pregnancy_check_loss_rate<span class="classifier">float</span></dt><dd><p>Pregnancy loss probability during the third pregnancy check, (unitless).</p>
 </dd>
@@ -281,7 +288,7 @@
 </dd>
 <dt>parity_cull_probability<span class="classifier">list[float]</span></dt><dd><p>List of culling probabilities based on parity number, (unitless).</p>
 </dd>
-<dt>cull_day_count<span class="classifier">list[int]</span></dt><dd><p>List of day intervals for culling analysis, (simulation days).</p>
+<dt>cull_day_count<span class="classifier">list[int]</span></dt><dd><p>List of day intervals for culling analysis, (simulation day).</p>
 </dd>
 <dt>feet_leg_cull_probability<span class="classifier">float</span></dt><dd><p>Probability of feet and leg-related culling, (unitless).</p>
 </dd>
@@ -307,15 +314,20 @@
 </dd>
 <dt>unknown_cull_day_probability<span class="classifier">list[float]</span></dt><dd><p>Cumulative distribution for unknown reasons of culling over time, (unitless).</p>
 </dd>
-<dt>methane_model<span class="classifier">str</span></dt><dd><p>The methane emission model being used, e.g., “IPCC”, (unitless).</p>
-</dd>
 <dt>methane_mitigation_method<span class="classifier">str</span></dt><dd><p>The mitigation method applied for methane reduction, e.g., “None”, (unitless).</p>
 </dd>
-<dt>methane_mitigation_additive_amount<span class="classifier">float</span></dt><dd><p>The amount of additive used for methane mitigation, (kg).</p>
+<dt>methane_mitigation_additive_amount<span class="classifier">float</span></dt><dd><p>The dose of the additive selected by <code class="docutils literal notranslate"><span class="pre">methane_mitigation_method</span></code>, taken from that
+method’s per-additive input field, (mg/kg DMI).</p>
 </dd>
 <dt>milk_reduction_maximum<span class="classifier">float</span></dt><dd><p>Maximum possible milk production reduction from a given cause, (kg).</p>
 </dd>
-<dt>methane_model: dict[str, dict[str, bool]]</dt><dd><p>The methods to use for each animal type.</p>
+<dt>methane_model: dict[str, Any]</dt><dd><p>Methane emission model selections for each animal category and production stage.</p>
+</dd>
+<dt>average_phenotype<span class="classifier">dict[str, dict[int, float]]</span></dt><dd><p>Average genetic phenotype values used for genetic simulations.</p>
+</dd>
+<dt>top_listing_semen<span class="classifier">dict[str, dict[str, float]]</span></dt><dd><p>Semen sire information used for genetic simulations and breeding selection.</p>
+</dd>
+<dt>simulate_genetics<span class="classifier">bool</span></dt><dd><p>Whether genetic simulation functionality is enabled.</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -355,8 +367,12 @@
 <span class="sig-name descname"><span class="pre">do_not_breed_time</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">185</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.do_not_breed_time" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.do_not_breed_time'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_milk_production">
-<span class="sig-name descname"><span class="pre">cull_milk_production</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_milk_production" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_milk_production'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_mortality_rate">
+<span class="sig-name descname"><span class="pre">calf_mortality_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_mortality_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_mortality_rate'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_mortality_rate">
+<span class="sig-name descname"><span class="pre">heifer_mortality_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_mortality_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_mortality_rate'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.semen_type">
@@ -373,6 +389,14 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.keep_female_calf_rate">
 <span class="sig-name descname"><span class="pre">keep_female_calf_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.keep_female_calf_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.keep_female_calf_rate'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_retention_method">
+<span class="sig-name descname"><span class="pre">calf_retention_method</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rate'</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_retention_method" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_retention_method'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.annual_keep_female_calf_num">
+<span class="sig-name descname"><span class="pre">annual_keep_female_calf_num</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.annual_keep_female_calf_num" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.annual_keep_female_calf_num'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.still_birth_rate">
@@ -635,8 +659,24 @@
 <span class="sig-name descname"><span class="pre">methane_mitigation_additive_amount</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_additive_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_additive_amount'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig._METHANE_MITIGATION_DOSE_FIELDS">
+<span class="sig-name descname"><span class="pre">_METHANE_MITIGATION_DOSE_FIELDS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'3-NOP':</span> <span class="pre">'3-NOP_additive_amount',</span> <span class="pre">'Essential</span> <span class="pre">Oils':</span> <span class="pre">'essential_oils_additive_amount',</span> <span class="pre">'Monensin':</span> <span class="pre">'monensin_additive_amount',</span> <span class="pre">'Seaweed':</span> <span class="pre">'seaweed_additive_amount'}</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig._METHANE_MITIGATION_DOSE_FIELDS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig._METHANE_MITIGATION_DOSE_FIELDS'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_reduction_maximum">
 <span class="sig-name descname"><span class="pre">milk_reduction_maximum</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_reduction_maximum" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_reduction_maximum'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.average_phenotype">
+<span class="sig-name descname"><span class="pre">average_phenotype</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_phenotype" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_phenotype'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.top_listing_semen">
+<span class="sig-name descname"><span class="pre">top_listing_semen</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.top_listing_semen" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.top_listing_semen'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.simulate_genetics">
+<span class="sig-name descname"><span class="pre">simulate_genetics</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.simulate_genetics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_config.AnimalConfig.simulate_genetics'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config">
@@ -659,11 +699,14 @@
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.dry_off_day_of_pregnancy'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.dry_off_day_of_pregnancy"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.dry_off_day_of_pregnancy</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_cull_day'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_cull_day"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.heifer_reproduction_cull_day</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.do_not_breed_time'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.do_not_breed_time"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.do_not_breed_time</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_milk_production'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_milk_production"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.cull_milk_production</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_mortality_rate'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_mortality_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.calf_mortality_rate</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_mortality_rate'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_mortality_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.heifer_mortality_rate</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.semen_type'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.semen_type"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.semen_type</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.male_calf_rate_conventional_semen'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.male_calf_rate_conventional_semen"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.male_calf_rate_conventional_semen</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.male_calf_rate_sexed_semen'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.male_calf_rate_sexed_semen"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.male_calf_rate_sexed_semen</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.keep_female_calf_rate'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.keep_female_calf_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.keep_female_calf_rate</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_retention_method'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.calf_retention_method"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.calf_retention_method</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.annual_keep_female_calf_num'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.annual_keep_female_calf_num"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.annual_keep_female_calf_num</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.still_birth_rate'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.still_birth_rate"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.still_birth_rate</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_gestation_length'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_gestation_length"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.average_gestation_length</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.std_gestation_length'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.std_gestation_length"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.std_gestation_length</span></code></a></li>
@@ -729,7 +772,11 @@
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.methane_model</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_method'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_method"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.methane_mitigation_method</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_additive_amount'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_additive_amount"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.methane_mitigation_additive_amount</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig._METHANE_MITIGATION_DOSE_FIELDS'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig._METHANE_MITIGATION_DOSE_FIELDS"><code class="docutils literal notranslate"><span class="pre">AnimalConfig._METHANE_MITIGATION_DOSE_FIELDS</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_reduction_maximum'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_reduction_maximum"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.milk_reduction_maximum</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_phenotype'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_phenotype"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.average_phenotype</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.top_listing_semen'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.top_listing_semen"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.top_listing_semen</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.simulate_genetics'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.simulate_genetics"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.simulate_genetics</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config'" class="reference internal" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config"><code class="docutils literal notranslate"><span class="pre">AnimalConfig.initialize_animal_config()</span></code></a></li>
 </ul>
 </li>

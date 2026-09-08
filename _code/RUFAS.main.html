@@ -21,14 +21,16 @@
 <meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>RUFAS.biophysical.manure.field_manure_supplier module | Ruminant Farm Simulation (RuFaS)  documentation</title>
-<meta content="RUFAS.biophysical.manure.field_manure_supplier module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
-<meta content="RUFAS.biophysical.manure.field_manure_supplier module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
+<title>RUFAS.main module | Ruminant Farm Simulation (RuFaS)  documentation</title>
+<meta content="RUFAS.main module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
+<meta content="RUFAS.main module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.output_manager.html" rel="next" title="RUFAS.output_manager module"/>
+<link href="RUFAS.input_manager.html" rel="prev" title="RUFAS.input_manager module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,93 +139,37 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
-<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.manure.field_manure_supplier module</span>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.main module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-RUFAS.biophysical.manure.field_manure_supplier">
-<span id="rufas-biophysical-manure-field-manure-supplier-module"></span><h1>RUFAS.biophysical.manure.field_manure_supplier module<a class="headerlink" href="#module-RUFAS.biophysical.manure.field_manure_supplier" title="Link to this heading"><span>#</span></a></h1>
-<dl class="py data">
-<dt class="sig sig-object py" id="RUFAS.biophysical.manure.field_manure_supplier.LIQUID_MANURE_DRY_MASS_TO_WET_MASS">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.field_manure_supplier.</span></span><span class="sig-name descname"><span class="pre">LIQUID_MANURE_DRY_MASS_TO_WET_MASS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">21.739</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.field_manure_supplier.LIQUID_MANURE_DRY_MASS_TO_WET_MASS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.field_manure_supplier.LIQUID_MANURE_DRY_MASS_TO_WET_MASS'"><span>#</span></a></dt>
-<dd><p>Factor for converting nitrogen mass to dry matter mass of liquid manure.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_LIQUID_MANURE_DRY_MASS">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.field_manure_supplier.</span></span><span class="sig-name descname"><span class="pre">NITROGEN_TO_LIQUID_MANURE_DRY_MASS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20.909</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_LIQUID_MANURE_DRY_MASS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_LIQUID_MANURE_DRY_MASS'"><span>#</span></a></dt>
-<dd><p>Factor for converting phosphorus mass to dry matter mass of liquid manure.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.field_manure_supplier.</span></span><span class="sig-name descname"><span class="pre">PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">51.111</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS'"><span>#</span></a></dt>
-<dd><p>Factor for converting dry matter mass of solid manure to wet mass.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="RUFAS.biophysical.manure.field_manure_supplier.SOLID_MANURE_DRY_MASS_TO_WET_MASS">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.field_manure_supplier.</span></span><span class="sig-name descname"><span class="pre">SOLID_MANURE_DRY_MASS_TO_WET_MASS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.469</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.field_manure_supplier.SOLID_MANURE_DRY_MASS_TO_WET_MASS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.field_manure_supplier.SOLID_MANURE_DRY_MASS_TO_WET_MASS'"><span>#</span></a></dt>
-<dd><p>Factor for converting nitrogen mass to dry matter mass of solid manure.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_SOLID_MANURE_DRY_MASS">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.field_manure_supplier.</span></span><span class="sig-name descname"><span class="pre">NITROGEN_TO_SOLID_MANURE_DRY_MASS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">67.516</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_SOLID_MANURE_DRY_MASS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_SOLID_MANURE_DRY_MASS'"><span>#</span></a></dt>
-<dd><p>Factor for converting phosphorus mass to dry matter mass of solid manure.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.field_manure_supplier.</span></span><span class="sig-name descname"><span class="pre">PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">135.033</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS'"><span>#</span></a></dt>
-<dd><p>Maps the currently supported manure types to the constants associated with them.</p>
-</dd></dl>
+<section id="module-RUFAS.main">
+<span id="rufas-main-module"></span><h1>RUFAS.main module<a class="headerlink" href="#module-RUFAS.main" title="Link to this heading"><span>#</span></a></h1>
+<p>This file serves as a main entry point to RuFaS.</p>
+<p>The main function run_rufas() will execute the model simulation(s). It accepts a path to the location of the input
+file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.main.main">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.main.main" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.main.main'"><span>#</span></a></dt>
+<dd></dd></dl>
 <dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.field_manure_supplier.</span></span><span class="sig-name descname"><span class="pre">FieldManureSupplier</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier'"><span>#</span></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Supplies manure for field applications.</p>
-<section id="methods">
-<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#methods'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>request_nutrients(request: NutrientRequest) -&gt; NutrientRequestResults</dt><dd><p>Receives a request for manure nutrients and constructs a manure amount to fulfill the request.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier.request_nutrients">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">request_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest"><span class="pre">NutrientRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequestResults" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier.request_nutrients" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier.request_nutrients'"><span>#</span></a></dt>
-<dd><p>Formulates a manure supply response based on a nutrient request.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>request<span class="classifier">NutrientRequest</span></dt><dd><p>Request for manure containing masses of N, P and the desired manure type (liquid or solid).</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>NutrientRequestResults</dt><dd><p>Response containing manure mass, nutrient mass, and other nutrient details in response to the request.</p>
-</dd>
-</dl>
-</section>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
-<p>This method calculates the total mass of manure that would be applied for each of the requested nutrients, then
-selects the smallest mass and uses it to construct the amount of manure that is actually returned. If one of the
-requested nutrient masses is 0, that nutrient is not considered when formulating the manure result.</p>
-</section>
+<dt class="sig sig-object py" id="RUFAS.main.CaseInsensitiveArgumentAction">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.main.</span></span><span class="sig-name descname"><span class="pre">CaseInsensitiveArgumentAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option_strings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">const</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metavar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.main.CaseInsensitiveArgumentAction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.main.CaseInsensitiveArgumentAction'"><span>#</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Action</span></code></p>
 </dd></dl>
-</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.main.parse_gnu_args">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.main.</span></span><span class="sig-name descname"><span class="pre">parse_gnu_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Namespace</span></span></span><a class="headerlink" href="#RUFAS.main.parse_gnu_args" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.main.parse_gnu_args'"><span>#</span></a></dt>
+<dd><p>Parse command line options, if applicable</p>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.field_manure_supplier.LIQUID_MANURE_DRY_MASS_TO_WET_MASS'" class="reference internal" href="#RUFAS.biophysical.manure.field_manure_supplier.LIQUID_MANURE_DRY_MASS_TO_WET_MASS"><code class="docutils literal notranslate"><span class="pre">LIQUID_MANURE_DRY_MASS_TO_WET_MASS</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_LIQUID_MANURE_DRY_MASS'" class="reference internal" href="#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_LIQUID_MANURE_DRY_MASS"><code class="docutils literal notranslate"><span class="pre">NITROGEN_TO_LIQUID_MANURE_DRY_MASS</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS'" class="reference internal" href="#RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS"><code class="docutils literal notranslate"><span class="pre">PHOSPHORUS_TO_LIQUID_MANURE_DRY_MASS</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.field_manure_supplier.SOLID_MANURE_DRY_MASS_TO_WET_MASS'" class="reference internal" href="#RUFAS.biophysical.manure.field_manure_supplier.SOLID_MANURE_DRY_MASS_TO_WET_MASS"><code class="docutils literal notranslate"><span class="pre">SOLID_MANURE_DRY_MASS_TO_WET_MASS</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_SOLID_MANURE_DRY_MASS'" class="reference internal" href="#RUFAS.biophysical.manure.field_manure_supplier.NITROGEN_TO_SOLID_MANURE_DRY_MASS"><code class="docutils literal notranslate"><span class="pre">NITROGEN_TO_SOLID_MANURE_DRY_MASS</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS'" class="reference internal" href="#RUFAS.biophysical.manure.field_manure_supplier.PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS"><code class="docutils literal notranslate"><span class="pre">PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier'" class="reference internal" href="#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier"><code class="docutils literal notranslate"><span class="pre">FieldManureSupplier</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier.request_nutrients'" class="reference internal" href="#RUFAS.biophysical.manure.field_manure_supplier.FieldManureSupplier.request_nutrients"><code class="docutils literal notranslate"><span class="pre">FieldManureSupplier.request_nutrients()</span></code></a></li>
-</ul>
-</li>
+<li><a :data-current="activeSection === '#RUFAS.main.main'" class="reference internal" href="#RUFAS.main.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.main.CaseInsensitiveArgumentAction'" class="reference internal" href="#RUFAS.main.CaseInsensitiveArgumentAction"><code class="docutils literal notranslate"><span class="pre">CaseInsensitiveArgumentAction</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.main.parse_gnu_args'" class="reference internal" href="#RUFAS.main.parse_gnu_args"><code class="docutils literal notranslate"><span class="pre">parse_gnu_args()</span></code></a></li>
 </ul>
 </div>
 </aside>

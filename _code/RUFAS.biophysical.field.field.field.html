@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.field.field_data.html" rel="next" title="RUFAS.biophysical.field.field.field_data module"/>
+<link href="RUFAS.biophysical.field.field.fertilizer_application.html" rel="prev" title="RUFAS.biophysical.field.field.fertilizer_application module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.field.html">RUFAS.biophysical.field.field package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.field.field module</span>
 </nav>
 <div id="content" role="main">
@@ -143,7 +151,7 @@
 <span id="rufas-biophysical-field-field-field-module"></span><h1>RUFAS.biophysical.field.field.field module<a class="headerlink" href="#module-RUFAS.biophysical.field.field.field" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.field.field.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData" title="RUFAS.biophysical.field.field.field_data.FieldData"><span class="pre">FieldData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil.html#RUFAS.biophysical.field.soil.soil.Soil" title="RUFAS.biophysical.field.soil.soil.Soil"><span class="pre">Soil</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plantings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.PlantingEvent" title="RUFAS.data_structures.events.PlantingEvent"><span class="pre">PlantingEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvestings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.HarvestEvent" title="RUFAS.data_structures.events.HarvestEvent"><span class="pre">HarvestEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.TillageEvent" title="RUFAS.data_structures.events.TillageEvent"><span class="pre">TillageEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.FertilizerEvent" title="RUFAS.data_structures.events.FertilizerEvent"><span class="pre">FertilizerEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_mixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.ManureEvent" title="RUFAS.data_structures.events.ManureEvent"><span class="pre">ManureEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.field.field.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData" title="RUFAS.biophysical.field.field.field_data.FieldData"><span class="pre">FieldData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil.html#RUFAS.biophysical.field.soil.soil.Soil" title="RUFAS.biophysical.field.soil.soil.Soil"><span class="pre">Soil</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plantings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.PlantingEvent" title="RUFAS.data_structures.events.PlantingEvent"><span class="pre">PlantingEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvestings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.HarvestEvent" title="RUFAS.data_structures.events.HarvestEvent"><span class="pre">HarvestEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.TillageEvent" title="RUFAS.data_structures.events.TillageEvent"><span class="pre">TillageEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.FertilizerEvent" title="RUFAS.data_structures.events.FertilizerEvent"><span class="pre">FertilizerEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_mixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.ManureEvent" title="RUFAS.data_structures.events.ManureEvent"><span class="pre">ManureEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_spread_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This is a high-level class that represents and simulates an entire field. It is responsible for executing the daily
 biophysical routines which take place in soil columns and in crops planted in the field. It is also responsible for
@@ -152,23 +160,25 @@ including planting and harvesting crops, adding manure and fertilizer to the soi
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>field_data<span class="classifier">FieldData, default=None</span></dt><dd><p>FieldData object that will be simulated.</p>
+<dt>field_data<span class="classifier">FieldData, optional</span></dt><dd><p>FieldData object that will be simulated.</p>
 </dd>
-<dt>soil<span class="classifier">Soil, default=None</span></dt><dd><p>The soil component of the field.</p>
+<dt>soil<span class="classifier">Soil, optional</span></dt><dd><p>The soil component of the field.</p>
 </dd>
-<dt>plantings<span class="classifier">List[PlantingEvent], default=None</span></dt><dd><p>List of all planting events that will occur over the run of the simulation in this field.</p>
+<dt>plantings<span class="classifier">list[PlantingEvent], optional</span></dt><dd><p>List of all planting events that will occur over the run of the simulation in this field.</p>
 </dd>
-<dt>harvestings<span class="classifier">List[HarvestEvent], default=None</span></dt><dd><p>List of all harvesting events that will occur over the run of the simulation in the field.</p>
+<dt>harvestings<span class="classifier">list[HarvestEvent], optional</span></dt><dd><p>List of all harvesting events that will occur over the run of the simulation in the field.</p>
 </dd>
-<dt>custom_crop_specifications<span class="classifier">dict[str, dict[str, Any]], default=None</span></dt><dd><p>Dictionary where keys are crop references and values are dictionaries containing crop specifications.</p>
+<dt>tillage_events<span class="classifier">list[TillageEvent], optional</span></dt><dd><p>List of all tillage events that will occur over the run of the simulation in this field.</p>
 </dd>
-<dt>tillage_events<span class="classifier">List[TillageEvent], default=None</span></dt><dd><p>List of all tillage events that will occur over the run of the simulation in this field.</p>
+<dt>fertilizer_events<span class="classifier">list[FertilizerEvent], optional</span></dt><dd><p>List of all fertilizer mixes available for application to this field.</p>
 </dd>
-<dt>fertilizer_events<span class="classifier">List[FertilizerEvent], default=None</span></dt><dd><p>List of all fertilizer mixes available for application to this field.</p>
+<dt>fertilizer_mixes<span class="classifier">dict[str, dict[str, float]], optional</span></dt><dd><p>List of all fertilizer mixes available for application to this field.</p>
 </dd>
-<dt>fertilizer_mixes<span class="classifier">Dict[str, Dict[str, float]], default=None</span></dt><dd><p>List of all fertilizer mixes available for application to this field.</p>
+<dt>manure_events<span class="classifier">list[ManureEvent], optional</span></dt><dd><p>Manure application interface.</p>
 </dd>
-<dt>manure_events<span class="classifier">List[ManureEvent], default=None</span></dt><dd><p>Manure application interface.</p>
+<dt>daily_spread_settings<span class="classifier">dict[str, Any], optional</span></dt><dd><p>Configuration for daily spread manure applications, taken from the <code class="docutils literal notranslate"><span class="pre">daily_spread</span></code> block of the field’s
+manure schedule. When <code class="docutils literal notranslate"><span class="pre">None</span></code> (or when its <code class="docutils literal notranslate"><span class="pre">is_daily_spreading</span></code> flag is false) no daily spread events
+are generated.</p>
 </dd>
 </dl>
 </section>
@@ -179,30 +189,31 @@ including planting and harvesting crops, adding manure and fertilizer to the soi
 </dd>
 <dt>soil<span class="classifier">Soil</span></dt><dd><p>Reference to the Soil object</p>
 </dd>
-<dt>crops<span class="classifier">List[Crop]</span></dt><dd><p>Reference to the list of Crop objects</p>
+<dt>crops<span class="classifier">list[Crop]</span></dt><dd><p>Reference to the list of Crop objects</p>
 </dd>
-<dt>planting_events<span class="classifier">List[PlantingEvent]</span></dt><dd><p>Reference to the list of PlantingEvent objects</p>
+<dt>planting_events<span class="classifier">list[PlantingEvent]</span></dt><dd><p>Reference to the list of PlantingEvent objects</p>
 </dd>
-<dt>harvest_events<span class="classifier">List[HarvestEvent]</span></dt><dd><p>Reference to the list of HarvestEvent objects</p>
-</dd>
-<dt>custom_crop_specifications<span class="classifier">dict[str, dict[str, Any]]</span></dt><dd><p>Reference to the custom crop specifications dictionary.</p>
+<dt>harvest_events<span class="classifier">list[HarvestEvent]</span></dt><dd><p>Reference to the list of HarvestEvent objects</p>
 </dd>
 <dt>fertilizer_applicator<span class="classifier">FertilizerApplication(self.soil)</span></dt><dd><p>Provides interface for adding fertilizer to the field</p>
 </dd>
-<dt>fertilizer_events<span class="classifier">List</span></dt><dd><p>Reference to the list of FertilizerEvent objects</p>
+<dt>fertilizer_events<span class="classifier">list</span></dt><dd><p>Reference to the list of FertilizerEvent objects</p>
 </dd>
-<dt>available_fertilizer_mixes<span class="classifier">Dict</span></dt><dd><p>List of all fertilizer mixes available for application to this field. The 100_0_0 and 26_4_24 mixes will
+<dt>available_fertilizer_mixes<span class="classifier">dict</span></dt><dd><p>List of all fertilizer mixes available for application to this field. The 100_0_0 and 26_4_24 mixes will
 always be available as supplements to unfulfilled manure nutrient demands.</p>
 </dd>
 <dt>ONLY_NITROGEN_MIX<span class="classifier">str</span></dt><dd><p>Constant with the name of the fertilizer mix that contains only Nitrogen.</p>
 </dd>
 <dt>tiller<span class="classifier">TillageApplication</span></dt><dd><p>Provides interface to till the field.</p>
 </dd>
-<dt>tillage_events: List[TillageEvent]</dt><dd><p>List of all tillage events that will occur over the run of the simulation in this field.</p>
+<dt>tillage_events: list[TillageEvent]</dt><dd><p>List of all tillage events that will occur over the run of the simulation in this field.</p>
 </dd>
-<dt>manure_applicator = ManureApplication</dt><dd><p>List of ManureApplication objects.</p>
+<dt>manure_applicator<span class="classifier">ManureApplication</span></dt><dd><p>List of ManureApplication objects.</p>
 </dd>
-<dt>manure_events: List[ManureEvent]</dt><dd><p>List of all manure applications that will be applied to this field.</p>
+<dt>manure_events: list[ManureEvent]</dt><dd><p>List of all manure applications that will be applied to this field.</p>
+</dd>
+<dt>daily_spread_settings<span class="classifier">dict[str, Any] | None</span></dt><dd><p>Configuration for daily spread manure applications, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the field does not daily spread.
+See <a class="reference internal" href="#RUFAS.biophysical.field.field.field.Field._create_daily_spread_event" title="RUFAS.biophysical.field.field.field.Field._create_daily_spread_event"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_create_daily_spread_event()</span></code></a> for the recognized keys.</p>
 </dd>
 </dl>
 </section>
@@ -214,7 +225,7 @@ always be available as supplements to unfulfilled manure nutrient demands.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData" title="RUFAS.biophysical.field.field.field_data.FieldData"><span class="pre">FieldData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil.html#RUFAS.biophysical.field.soil.soil.Soil" title="RUFAS.biophysical.field.soil.soil.Soil"><span class="pre">Soil</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plantings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.PlantingEvent" title="RUFAS.data_structures.events.PlantingEvent"><span class="pre">PlantingEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvestings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.HarvestEvent" title="RUFAS.data_structures.events.HarvestEvent"><span class="pre">HarvestEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.TillageEvent" title="RUFAS.data_structures.events.TillageEvent"><span class="pre">TillageEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.FertilizerEvent" title="RUFAS.data_structures.events.FertilizerEvent"><span class="pre">FertilizerEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_mixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.ManureEvent" title="RUFAS.data_structures.events.ManureEvent"><span class="pre">ManureEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.field.field_data.html#RUFAS.biophysical.field.field.field_data.FieldData" title="RUFAS.biophysical.field.field.field_data.FieldData"><span class="pre">FieldData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil.html#RUFAS.biophysical.field.soil.soil.Soil" title="RUFAS.biophysical.field.soil.soil.Soil"><span class="pre">Soil</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plantings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.PlantingEvent" title="RUFAS.data_structures.events.PlantingEvent"><span class="pre">PlantingEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvestings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.HarvestEvent" title="RUFAS.data_structures.events.HarvestEvent"><span class="pre">HarvestEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.TillageEvent" title="RUFAS.data_structures.events.TillageEvent"><span class="pre">TillageEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.FertilizerEvent" title="RUFAS.data_structures.events.FertilizerEvent"><span class="pre">FertilizerEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fertilizer_mixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.ManureEvent" title="RUFAS.data_structures.events.ManureEvent"><span class="pre">ManureEvent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_spread_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field.__init__'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field.manage_field">
@@ -299,7 +310,7 @@ the most efficiently.</p>
 </dd>
 <dt>requested_phosphorus<span class="classifier">float</span></dt><dd><p>Minimum amount of phosphorus to be included in this fertilizer application.</p>
 </dd>
-<dt>available_mixes<span class="classifier">Dict[str, Dict[str, float]]</span></dt><dd><p>List of fertilizer mixes available for application to the field.</p>
+<dt>available_mixes<span class="classifier">dict[str, dict[str, float]]</span></dt><dd><p>List of fertilizer mixes available for application to the field.</p>
 </dd>
 </dl>
 </section>
@@ -324,24 +335,24 @@ the requested nutrients with.</p>
 <section id="id7">
 <h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>nitrogen_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer mix that is nitrogen, in range [0.0, 1.0] (unitless)</p>
+<dt>nitrogen_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer mix that is nitrogen, in range [0.0, 1.0] (unitless).</p>
 </dd>
-<dt>phosphorus_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer mix that is phosphorus, in range [0.0, 1.0] (unitless)</p>
+<dt>phosphorus_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer mix that is phosphorus, in range [0.0, 1.0] (unitless).</p>
 </dd>
-<dt>potassium_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer mix that is potassium, in range [0.0, 1.0] (unitless)</p>
+<dt>potassium_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer mix that is potassium, in range [0.0, 1.0] (unitless).</p>
 </dd>
-<dt>requested_nitrogen<span class="classifier">float</span></dt><dd><p>Minimum mass of nitrogen to be included in fertilizer application (kg)</p>
+<dt>requested_nitrogen<span class="classifier">float</span></dt><dd><p>Minimum mass of nitrogen to be included in fertilizer application (kg).</p>
 </dd>
-<dt>requested_phosphorus<span class="classifier">float</span></dt><dd><p>Minimum mass of phosphorus to be included in fertilizer application (kg)</p>
+<dt>requested_phosphorus<span class="classifier">float</span></dt><dd><p>Minimum mass of phosphorus to be included in fertilizer application (kg).</p>
 </dd>
-<dt>requested_potassium<span class="classifier">float</span></dt><dd><p>Minimum mass of potassium to be included in fertilizer application (kg)</p>
+<dt>requested_potassium<span class="classifier">float</span></dt><dd><p>Minimum mass of potassium to be included in fertilizer application (kg).</p>
 </dd>
 </dl>
 </section>
 <section id="id8">
 <h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>Dict[str, float]</dt><dd><p>The total mass of fertilizer, and the masses of nitrogen, phosphorus, and potassium in the fertilizer.</p>
+<dt>dict[str, float]</dt><dd><p>The total mass of fertilizer, and the masses of nitrogen, phosphorus, and potassium in the fertilizer.</p>
 </dd>
 </dl>
 </section>
@@ -399,7 +410,7 @@ the requested nutrients with.</p>
 </dd>
 <dt>day<span class="classifier">int</span></dt><dd><p>Julian day on which this manure application occurs.</p>
 </dd>
-<dt>manure_supplied<span class="classifier">NutrientRequestResults | None</span></dt><dd><p>An object containing the information that defines a manure application.</p>
+<dt>manure_supplied<span class="classifier">NutrientRequestResults, optional</span></dt><dd><p>An object containing the information that defines a manure application.</p>
 </dd>
 <dt>manure_supplement_method<span class="classifier">ManureSupplementMethod</span></dt><dd><p>Enum option indicating how to supplement the manure application.</p>
 </dd>
@@ -457,7 +468,10 @@ the requested nutrients with.</p>
 <section id="id14">
 <h3>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>tuple[float, float]</dt><dd><p>The validated application depth and surface remainder fraction.</p>
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The validated application depth.</p></li>
+<li><p>The surface remainder fraction.</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -499,20 +513,22 @@ the requested nutrients with.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._record_manure_application">
-<span class="sig-name descname"><span class="pre">_record_manure_application</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_matter_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._record_manure_application" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._record_manure_application'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_record_manure_application</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_matter_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_types.html#RUFAS.data_structures.manure_types.ManureType" title="RUFAS.data_structures.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._record_manure_application" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._record_manure_application'"><span>#</span></a></dt>
 <dd><p>Records the amount of manure and related values for an individual manure application.</p>
 <section id="id17">
 <h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dry_matter_mass<span class="classifier">float</span></dt><dd><p>Dry weight equivalent of this application (kg)</p>
+<dt>dry_matter_mass<span class="classifier">float</span></dt><dd><p>Dry weight equivalent of this application (kg).</p>
 </dd>
-<dt>dry_matter_fraction<span class="classifier">float</span></dt><dd><p>Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)</p>
+<dt>dry_matter_fraction<span class="classifier">float</span></dt><dd><p>Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).</p>
 </dd>
-<dt>field_coverage<span class="classifier">float</span></dt><dd><p>Fraction of the field this manure is applied to (unitless)</p>
+<dt>field_coverage<span class="classifier">float</span></dt><dd><p>Fraction of the field this manure is applied to (unitless).</p>
 </dd>
-<dt>nitrogen<span class="classifier">float</span></dt><dd><p>Mass of nitrogen in the manure applied (kg)</p>
+<dt>nitrogen<span class="classifier">float</span></dt><dd><p>Mass of nitrogen in the manure applied (kg).</p>
 </dd>
-<dt>phosphorus<span class="classifier">float</span></dt><dd><p>Mass of phosphorus in the manure applied (kg)</p>
+<dt>phosphorus<span class="classifier">float</span></dt><dd><p>Mass of phosphorus in the manure applied (kg).</p>
+</dd>
+<dt>manure_type<span class="classifier">ManureType</span></dt><dd><p>Enum option indicating whether the manure is solid or liquid.</p>
 </dd>
 <dt>application_depth<span class="classifier">float</span></dt><dd><p>Depth at which fertilizer is injected into the soil (mm).</p>
 </dd>
@@ -522,7 +538,7 @@ the requested nutrients with.</p>
 </dd>
 <dt>day<span class="classifier">int</span></dt><dd><p>Julian day on which this manure application occurs.</p>
 </dd>
-<dt>potassium<span class="classifier">float, Optional</span></dt><dd><p>Mass of potassium in the manure applied (kg)</p>
+<dt>potassium<span class="classifier">float, optional</span></dt><dd><p>Mass of potassium in the manure applied (kg).</p>
 </dd>
 </dl>
 </section>
@@ -556,7 +572,7 @@ liters of water is implicit.</p>
 <dl class="simple">
 <dt>application_depth<span class="classifier">float</span></dt><dd><p>Depth of the manure or fertilizer application (mm).</p>
 </dd>
-<dt>surface_remainder_fraction<span class="classifier">Optional[float]</span></dt><dd><p>Fraction of manure or fertilizer applied that remains on the soil surface after application (unitless).</p>
+<dt>surface_remainder_fraction<span class="classifier">float, optional</span></dt><dd><p>Fraction of manure or fertilizer applied that remains on the soil surface after application (unitless).</p>
 </dd>
 <dt>error_name<span class="classifier">str</span></dt><dd><p>Name of the error, indicating whether it occurred during manure or fertilizer application.</p>
 </dd>
@@ -566,8 +582,8 @@ liters of water is implicit.</p>
 <h3>Notes<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h3>
 <p>There are two possible errors that this method can log. One is an invalid combination of application depth and
 surface remainder fraction, the other is an application depth deeper than the bottom of the soil profile. The
-two are differentiated by what is passed for <cite>surface_remainder_fraction</cite>. If it is a number, it is the former,
-and if None, then it is the latter.</p>
+two are differentiated by what is passed for <code class="docutils literal notranslate"><span class="pre">surface_remainder_fraction</span></code>. If it is a number, it is the
+former, and if None, then it is the latter.</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -629,18 +645,42 @@ on the current day.</p>
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._create_manure_request">
-<span class="sig-name descname"><span class="pre">_create_manure_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.ManureEvent" title="RUFAS.data_structures.events.ManureEvent"><span class="pre">ManureEvent</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest"><span class="pre">NutrientRequest</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._create_manure_request" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._create_manure_request'"><span>#</span></a></dt>
-<dd><p>Creates a NutrientRequest object from the attributes of a ManureEvent.</p>
+<dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._create_daily_spread_event">
+<span class="sig-name descname"><span class="pre">_create_daily_spread_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.ManureEvent" title="RUFAS.data_structures.events.ManureEvent"><span class="pre">ManureEvent</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._create_daily_spread_event" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._create_daily_spread_event'"><span>#</span></a></dt>
+<dd><p>Build the daily-spread manure event for the current day, if daily spreading is enabled.</p>
+<p>Daily spreading applies manure to the field every day as it is produced, in addition to any scheduled
+manure events. The settings are read from the <code class="docutils literal notranslate"><span class="pre">daily_spread</span></code> block of the manure schedule; if it is
+missing or <code class="docutils literal notranslate"><span class="pre">is_daily_spreading</span></code> is false, no event is created. Either a target amount
+(<code class="docutils literal notranslate"><span class="pre">nitrogen_spread_amount</span></code> / <code class="docutils literal notranslate"><span class="pre">phosphorus_spread_amount</span></code>) is requested, or, when
+<code class="docutils literal notranslate"><span class="pre">spread_all_available_manure</span></code> is true, all manure currently in DailySpread storage is applied.</p>
 <section id="id27">
 <h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>event<span class="classifier">ManureEvent</span></dt><dd><p>ManureEvent object containing the attributes needed to create a NutrientRequest.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The current simulation time, stamped onto the generated event.</p>
 </dd>
 </dl>
 </section>
 <section id="id28">
 <h3>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ManureEvent | None</dt><dd><p>The daily spread event for the current day, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if daily spreading is disabled.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._create_manure_request">
+<span class="sig-name descname"><span class="pre">_create_manure_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.ManureEvent" title="RUFAS.data_structures.events.ManureEvent"><span class="pre">ManureEvent</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.manure_to_crop_soil_connection.html#RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest" title="RUFAS.data_structures.manure_to_crop_soil_connection.NutrientRequest"><span class="pre">NutrientRequest</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._create_manure_request" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._create_manure_request'"><span>#</span></a></dt>
+<dd><p>Creates a NutrientRequest object from the attributes of a ManureEvent.</p>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>event<span class="classifier">ManureEvent</span></dt><dd><p>ManureEvent object containing the attributes needed to create a NutrientRequest.</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h3>Returns<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>NutrientRequest | None</dt><dd><p>Object containing the nutrient requests of the manure event or None if no nitrogen or phosphorus
 is requested.</p>
@@ -652,8 +692,8 @@ is requested.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._check_crop_harvest_schedule">
 <span class="sig-name descname"><span class="pre">_check_crop_harvest_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._check_crop_harvest_schedule" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._check_crop_harvest_schedule'"><span>#</span></a></dt>
 <dd><p>Checks for all crops for potential harvests that may happen on the current day.</p>
-<section id="id29">
-<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h3>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object containing the current day and year of the simulation.</p>
 </dd>
@@ -661,15 +701,15 @@ is requested.</p>
 </dd>
 </dl>
 </section>
-<section id="id30">
-<h3>Returns<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h3>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>list[HarvestedCrop]</dt><dd><p>A list of harvested crops.</p>
 </dd>
 </dl>
 </section>
-<section id="id31">
-<h3>Notes<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h3>
+<section id="id33">
+<h3>Notes<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
 <p>This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It calls the method that
 checks if crops should be harvested based on their heat fraction.</p>
 </section>
@@ -679,8 +719,8 @@ checks if crops should be harvested based on their heat fraction.</p>
 <span class="sig-name descname"><span class="pre">_harvest_heat_scheduled_crops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._harvest_heat_scheduled_crops" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._harvest_heat_scheduled_crops'"><span>#</span></a></dt>
 <dd><p>Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
 them if they meet the heat threshold.</p>
-<section id="id32">
-<h3>Parameters<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h3>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
 </dd>
@@ -688,8 +728,8 @@ them if they meet the heat threshold.</p>
 </dd>
 </dl>
 </section>
-<section id="id33">
-<h3>Returns<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h3>
+<section id="id35">
+<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>list[HarvestedCrop]</dt><dd><p>Harvested crops.</p>
 </dd>
@@ -702,11 +742,11 @@ them if they meet the heat threshold.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._filter_events">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_filter_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.BaseFieldManagementEvent" title="RUFAS.data_structures.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.BaseFieldManagementEvent" title="RUFAS.data_structures.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.events.html#RUFAS.data_structures.events.BaseFieldManagementEvent" title="RUFAS.data_structures.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._filter_events" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._filter_events'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_filter_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">FieldManagementEventT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">FieldManagementEventT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">FieldManagementEventT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._filter_events" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._filter_events'"><span>#</span></a></dt>
 <dd><p>Filters out all events from a list that occur on the current day, and creates a new list with all the events
 that were filtered out.</p>
-<section id="id34">
-<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h3>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>all_events<span class="classifier">List[BaseFieldManagementEvent]</span></dt><dd><p>List of all Events that will occur over the run of the simulation in this field.</p>
 </dd>
@@ -714,16 +754,18 @@ that were filtered out.</p>
 </dd>
 </dl>
 </section>
-<section id="id35">
-<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h3>
+<section id="id37">
+<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>Tuple</dt><dd><p>A tuple containing the list of all Events that will occur in this field after the current day, and a list of
-Events that will occur on the current day.</p>
+<dt>tuple[list[FieldManagementEventT], list[FieldManagementEventT]]</dt><dd><ul class="simple">
+<li><p>The list of all Events that will occur in this field after the current day.</p></li>
+<li><p>A list of Events that will occur on the current day.</p></li>
+</ul>
 </dd>
 </dl>
 </section>
-<section id="id36">
-<h3>Notes<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h3>
+<section id="id38">
+<h3>Notes<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
 <p>This method is written to work with generic Events so that it may be used on all the different child classes of
 Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEvent.</p>
 </section>
@@ -732,8 +774,8 @@ Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEve
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._plant_crop">
 <span class="sig-name descname"><span class="pre">_plant_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduled_harvesting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._plant_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._plant_crop'"><span>#</span></a></dt>
 <dd><p>Plants a crop in the field by creating a new Crop instance and adding it to the field’s list of current crops.</p>
-<section id="id37">
-<h3>Parameters<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h3>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>crop_reference<span class="classifier">str</span></dt><dd><p>Name used to get the specifications for the crop to be planted.</p>
 </dd>
@@ -743,8 +785,8 @@ Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEve
 </dd>
 </dl>
 </section>
-<section id="id38">
-<h3>Notes<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h3>
+<section id="id40">
+<h3>Notes<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
 <p>The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
 reference to a custom crop that has user-defined attributes.
 The harvest method is overwritten for the crop created because that is specified directly by the user, and the
@@ -756,8 +798,8 @@ crops.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._record_planting">
 <span class="sig-name descname"><span class="pre">_record_planting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heat_scheduled_harvest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._record_planting" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._record_planting'"><span>#</span></a></dt>
 <dd><p>Records a planting event to the OutputManager.</p>
-<section id="id39">
-<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h3>
+<section id="id41">
+<h3>Parameters<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>heat_scheduled_harvest<span class="classifier">bool</span></dt><dd><p>Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.</p>
 </dd>
@@ -774,8 +816,8 @@ crops.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._harvest_crop">
 <span class="sig-name descname"><span class="pre">_harvest_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.harvest_operations.html#RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation" title="RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html#RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection.HarvestedCrop"><span class="pre">HarvestedCrop</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._harvest_crop" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._harvest_crop'"><span>#</span></a></dt>
 <dd><p>Performs the specified crop operation on the specified crop.</p>
-<section id="id40">
-<h3>Parameters<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h3>
+<section id="id42">
+<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>crop_reference<span class="classifier">str</span></dt><dd><p>Name used to get the specifications for the crop to be harvested.</p>
 </dd>
@@ -787,15 +829,15 @@ crops.</p>
 </dd>
 </dl>
 </section>
-<section id="id41">
-<h3>Returns<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h3>
+<section id="id43">
+<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>list[HarvestedCrop]</dt><dd><p>Harvested crops.</p>
 </dd>
 </dl>
 </section>
-<section id="id42">
-<h3>Notes<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h3>
+<section id="id44">
+<h3>Notes<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
 <p>This method raises two different warnings, one if multiple active crops share the same id, and one if no active
 crop is found with an id that matches the given crop reference. These are both raised as warnings and not errors
 (which would stop the simulation run) because they could both plausibly happen in a simulation run. The first
@@ -818,8 +860,8 @@ that killed off a crop before it could be harvested.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._assess_dormancy">
 <span class="sig-name descname"><span class="pre">_assess_dormancy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daylength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._assess_dormancy" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._assess_dormancy'"><span>#</span></a></dt>
 <dd><p>Transition all crops to dormancy if they are capable of going dormant.</p>
-<section id="id43">
-<h3>Parameters<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h3>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>daylength<span class="classifier">float</span></dt><dd><p>Length of time from sunup to sundown on the current day (hours).</p>
 </dd>
@@ -832,8 +874,8 @@ that killed off a crop before it could be harvested.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._execute_daily_processes">
 <span class="sig-name descname"><span class="pre">_execute_daily_processes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._execute_daily_processes" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._execute_daily_processes'"><span>#</span></a></dt>
 <dd><p>Executes all daily updates on this field’s soil and crop objects.</p>
-<section id="id44">
-<h3>Parameters<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h3>
+<section id="id46">
+<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Object containing the environment conditions on this day.</p>
 </dd>
@@ -841,8 +883,8 @@ that killed off a crop before it could be harvested.</p>
 </dd>
 </dl>
 </section>
-<section id="id45">
-<h3>Notes<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h3>
+<section id="id47">
+<h3>Notes<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
 <p>This method is designed to make it easier to change the order of process execution, which is desirable because
 it will allow subject-matter experts to more easily experiment with different orders.</p>
 </section>
@@ -851,8 +893,8 @@ it will allow subject-matter experts to more easily experiment with different or
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._cycle_water">
 <span class="sig-name descname"><span class="pre">_cycle_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._cycle_water" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._cycle_water'"><span>#</span></a></dt>
 <dd><p>Allow water to cycle through the field.</p>
-<section id="id46">
-<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h3>
+<section id="id48">
+<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>A CurrentDayConditions object containing a collection of today’s weather variables needed for field
 processes.</p>
@@ -861,8 +903,8 @@ processes.</p>
 </dd>
 </dl>
 </section>
-<section id="id47">
-<h3>Notes<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h3>
+<section id="id49">
+<h3>Notes<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
 <p>This method executes all water-related processes that occur within Crop and Soil objects. Having a
 separate method to handle water processes altogether is necessary because processes that affect water in the
 soil are dependent on processes that affect water in crops and vice versa. The most complex process that is
@@ -885,8 +927,8 @@ of processes. This is necessary because there is not necessarily one correct ord
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._determine_watering_amount">
 <span class="sig-name descname"><span class="pre">_determine_watering_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">irrigation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._determine_watering_amount" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._determine_watering_amount'"><span>#</span></a></dt>
 <dd><p>Manages watering of the field.</p>
-<section id="id48">
-<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h3>
+<section id="id50">
+<h3>Parameters<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall that occurs on this day (mm).</p>
 </dd>
@@ -900,15 +942,15 @@ of processes. This is necessary because there is not necessarily one correct ord
 </dd>
 </dl>
 </section>
-<section id="id49">
-<h3>Returns<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h3>
+<section id="id51">
+<h3>Returns<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Amount of water used to irrigate the field on this day (mm).</p>
 </dd>
 </dl>
 </section>
-<section id="id50">
-<h3>Notes<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h3>
+<section id="id52">
+<h3>Notes<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
 <p>This method drives the engine of irrigation for RuFaS. It tracks how much water has been added to the field by
 rainfall over a user-defined interval, and when at the end of the interval it determines how much water still
 needs to be added to the field based on how much watering has to occur over said interval (also defined by the
@@ -923,8 +965,8 @@ user-specified data provided, the hard-coded irrigation will be ignored and only
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._get_manure_water">
 <span class="sig-name descname"><span class="pre">_get_manure_water</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._get_manure_water" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._get_manure_water'"><span>#</span></a></dt>
 <dd><p>Grabs water from a manure application and records it, if any.</p>
-<section id="id51">
-<h3>Returns<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h3>
+<section id="id53">
+<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Amount of water applied to the field via manure on the current day (mm).</p>
 </dd>
@@ -935,22 +977,22 @@ user-specified data provided, the hard-coded irrigation will be ignored and only
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._handle_water_in_crop_canopies">
 <span class="sig-name descname"><span class="pre">_handle_water_in_crop_canopies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precipitation_total</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._handle_water_in_crop_canopies" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._handle_water_in_crop_canopies'"><span>#</span></a></dt>
 <dd><p>Adds water to canopies of all the crops in the field and removes any excess water from them.</p>
-<section id="id52">
-<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>precipitation_total<span class="classifier">float</span></dt><dd><p>Total amount of precipitation that fell on the field today (mm)</p>
-</dd>
-</dl>
-</section>
-<section id="id53">
-<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>Amount of water that reaches the soil surface (mm)</p>
-</dd>
-</dl>
-</section>
 <section id="id54">
-<h3>Notes<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
+<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>precipitation_total<span class="classifier">float</span></dt><dd><p>Total amount of precipitation that fell on the field today (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id55">
+<h3>Returns<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of water that reaches the soil surface (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h3>Notes<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
 <p>This method accounts for the edge case that no water was lost from the crop canopy yesterday and the capacity in
 the canopy went down overnight, so water is lost from the canopy to the ground before any evapotranspiration can
 happen. A caveat is that if there is excess water in the canopy of one crop, it cannot be transferred to the
@@ -961,17 +1003,17 @@ canopy of another.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._evaporate_from_crop_canopies">
 <span class="sig-name descname"><span class="pre">_evaporate_from_crop_canopies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evapotranspirative_demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._evaporate_from_crop_canopies" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._evaporate_from_crop_canopies'"><span>#</span></a></dt>
 <dd><p>Evaporates water from crops’ canopies and reduces evapotranspirative demand accordingly.</p>
-<section id="id55">
-<h3>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h3>
+<section id="id57">
+<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>evapotranspirative_demand<span class="classifier">float</span></dt><dd><p>Evapotranspirative demand on the field on the current day (mm)</p>
+<dt>evapotranspirative_demand<span class="classifier">float</span></dt><dd><p>Evapotranspirative demand on the field on the current day (mm).</p>
 </dd>
 </dl>
 </section>
-<section id="id56">
-<h3>Returns<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h3>
+<section id="id58">
+<h3>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>Evapotranspirative demand after evaporating water from crops’ canopies (mm)</p>
+<dt>float</dt><dd><p>Evapotranspirative demand after evaporating water from crops’ canopies (mm).</p>
 </dd>
 </dl>
 </section>
@@ -985,8 +1027,8 @@ canopy of another.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._determine_potential_evapotranspiration">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_potential_evapotranspiration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extraterrestrial_radiation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._determine_potential_evapotranspiration" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._determine_potential_evapotranspiration'"><span>#</span></a></dt>
 <dd><p>Calculates the potential evapotranspiration for a given day.</p>
-<section id="id57">
-<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h3>
+<section id="id59">
+<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>extraterrestrial_radiation<span class="classifier">float</span></dt><dd><p>Radiation from sunlight (MJ per square meter per day).</p>
 </dd>
@@ -998,19 +1040,19 @@ canopy of another.</p>
 </dd>
 </dl>
 </section>
-<section id="id58">
-<h3>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h3>
+<section id="id60">
+<h3>Returns<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Potential evapotranspiration (mm).</p>
 </dd>
 </dl>
 </section>
-<section id="id59">
-<h3>References<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h3>
+<section id="id61">
+<h3>References<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
 <p>SWAT Reference: 2:2.2.24</p>
 </section>
-<section id="id60">
-<h3>Notes<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h3>
+<section id="id62">
+<h3>Notes<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
 <p>This method calculates the evapotranspirative demand for the entire field on any given day using the Hargreaves
 method. This method lower-bounds the potential evapotranspiration at 0.0 mm.</p>
 <p>If the average temperature for the day is not specified, then the average temperature for the day is calculated
@@ -1021,22 +1063,22 @@ as the average of the maximum and minimum temperatures of the day.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._determine_latent_heat_vaporization">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_latent_heat_vaporization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">avg_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._determine_latent_heat_vaporization" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._determine_latent_heat_vaporization'"><span>#</span></a></dt>
 <dd><p>Determine latent heat of vaporization for a given day.</p>
-<section id="id61">
-<h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>avg_air_temp<span class="classifier">float</span></dt><dd><p>Average air temperature (degrees C)</p>
-</dd>
-</dl>
-</section>
-<section id="id62">
-<h3>Returns<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>latent heat of vaporization (MJ per kg)</p>
-</dd>
-</dl>
-</section>
 <section id="id63">
-<h3>References<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
+<h3>Parameters<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>avg_air_temp<span class="classifier">float</span></dt><dd><p>Average air temperature (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="id64">
+<h3>Returns<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>latent heat of vaporization (MJ per kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id65">
+<h3>References<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h3>
 <p>SWAT Reference: 1:2.3.6</p>
 </section>
 </dd></dl>
@@ -1044,34 +1086,34 @@ as the average of the maximum and minimum temperatures of the day.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._determine_soil_evaporation_and_sublimation_adjusted">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_evaporation_and_sublimation_adjusted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">above_ground_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_water_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_evapotranspiration_adjusted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpiration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._determine_soil_evaporation_and_sublimation_adjusted" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._determine_soil_evaporation_and_sublimation_adjusted'"><span>#</span></a></dt>
 <dd><p>Calculate the amount of sublimation and soil evaporation for this day, adjusted for plant use.</p>
-<section id="id64">
-<h3>Parameters<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h3>
+<section id="id66">
+<h3>Parameters<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>above_ground_biomass<span class="classifier">float</span></dt><dd><p>Mass of plant above ground (kg per hectare)</p>
+<dt>above_ground_biomass<span class="classifier">float</span></dt><dd><p>Mass of plant above ground (kg per hectare).</p>
 </dd>
-<dt>residue<span class="classifier">float</span></dt><dd><p>Biomass separated from plant on the ground (kg per hectare)</p>
+<dt>residue<span class="classifier">float</span></dt><dd><p>Biomass separated from plant on the ground (kg per hectare).</p>
 </dd>
-<dt>snow_water_content<span class="classifier">float</span></dt><dd><p>Amount of water in the snow pack (mm)</p>
+<dt>snow_water_content<span class="classifier">float</span></dt><dd><p>Amount of water in the snow pack (mm).</p>
 </dd>
 <dt>potential_evapotranspiration_adjusted<span class="classifier">float</span></dt><dd><p>Potential evapotranspiration adjusted for evaporation of free water in canopy (mm)</p>
 </dd>
-<dt>transpiration<span class="classifier">float</span></dt><dd><p>Maximum transpiration for a given day (mm)</p>
+<dt>transpiration<span class="classifier">float</span></dt><dd><p>Maximum transpiration for a given day (mm).</p>
 </dd>
 </dl>
 </section>
-<section id="id65">
-<h3>Returns<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h3>
+<section id="id67">
+<h3>Returns<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Soil evaporation and sublimation, adjusted for plant water use (mm)</p>
 </dd>
 </dl>
 </section>
-<section id="id66">
-<h3>References<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h3>
+<section id="id68">
+<h3>References<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation eqn. 2:2.3.7, 9</p>
 </section>
-<section id="id67">
-<h3>Notes<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h3>
+<section id="id69">
+<h3>Notes<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h3>
 <p>If both the adjusted potential evapotranspiration and transpiration are 0, then it is assumed that all
 evapotranspirative demands have been met for the current day and no sublimation or evaporation from the soil
 will occur.</p>
@@ -1081,8 +1123,8 @@ will occur.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._determine_maximum_soil_evaporation">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_maximum_soil_evaporation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_evaporation_adj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_water_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._determine_maximum_soil_evaporation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._determine_maximum_soil_evaporation'"><span>#</span></a></dt>
 <dd><p>Calculates the maximum amount of evaporation from soil in a given day.</p>
-<section id="id68">
-<h3>Parameters<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h3>
+<section id="id70">
+<h3>Parameters<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_evaporation_adj<span class="classifier">float</span></dt><dd><p>Maximum soil evaporation adjusted for plant water use on a given day (mm).</p>
 </dd>
@@ -1090,15 +1132,15 @@ will occur.</p>
 </dd>
 </dl>
 </section>
-<section id="id69">
-<h3>Returns<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h3>
+<section id="id71">
+<h3>Returns<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Maximum soil water evaporation on a given day (mm).</p>
 </dd>
 </dl>
 </section>
-<section id="id70">
-<h3>References<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h3>
+<section id="id72">
+<h3>References<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation 2:2.3.3.1</p>
 </section>
 </dd></dl>
@@ -1106,8 +1148,8 @@ will occur.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._determine_soil_cover_index">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_soil_cover_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">above_ground_biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_water_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._determine_soil_cover_index" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._determine_soil_cover_index'"><span>#</span></a></dt>
 <dd><p>Calculate the soil cover index.</p>
-<section id="id71">
-<h3>Parameters<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h3>
+<section id="id73">
+<h3>Parameters<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>above_ground_biomass<span class="classifier">float</span></dt><dd><p>Mass of plant above ground (kg per hectare).</p>
 </dd>
@@ -1117,15 +1159,15 @@ will occur.</p>
 </dd>
 </dl>
 </section>
-<section id="id72">
-<h3>Returns<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h3>
+<section id="id74">
+<h3>Returns<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>Float</dt><dd><p>Soil cover index (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id73">
-<h3>References<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h3>
+<section id="id75">
+<h3>References<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h3>
 <p>SWAT Theoretical documentation eqn. 2:2.3.8</p>
 </section>
 </dd></dl>
@@ -1139,8 +1181,8 @@ file, and then reset all annual totals</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.field.field.Field._record_field_watering">
 <span class="sig-name descname"><span class="pre">_record_field_watering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watering_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.field.field.Field._record_field_watering" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.field.field.Field._record_field_watering'"><span>#</span></a></dt>
 <dd><p>Record the day, year and amount of irrigation</p>
-<section id="id74">
-<h3>Parameters<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h3>
+<section id="id76">
+<h3>Parameters<a class="headerlink" href="#id76" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id76'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>year<span class="classifier">int</span></dt><dd><p>Year in which this watering occurs.</p>
 </dd>
@@ -1150,8 +1192,8 @@ file, and then reset all annual totals</p>
 </dd>
 </dl>
 </section>
-<section id="id75">
-<h3>Returns<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h3>
+<section id="id77">
+<h3>Returns<a class="headerlink" href="#id77" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id77'"><span>#</span></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -1179,6 +1221,7 @@ file, and then reset all annual totals</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.field.field.Field._check_fertilizer_application_schedule'" class="reference internal" href="#RUFAS.biophysical.field.field.field.Field._check_fertilizer_application_schedule"><code class="docutils literal notranslate"><span class="pre">Field._check_fertilizer_application_schedule()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.field.field.Field._check_tillage_schedule'" class="reference internal" href="#RUFAS.biophysical.field.field.field.Field._check_tillage_schedule"><code class="docutils literal notranslate"><span class="pre">Field._check_tillage_schedule()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.field.field.Field.check_manure_application_schedule'" class="reference internal" href="#RUFAS.biophysical.field.field.field.Field.check_manure_application_schedule"><code class="docutils literal notranslate"><span class="pre">Field.check_manure_application_schedule()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.field.field.field.Field._create_daily_spread_event'" class="reference internal" href="#RUFAS.biophysical.field.field.field.Field._create_daily_spread_event"><code class="docutils literal notranslate"><span class="pre">Field._create_daily_spread_event()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.field.field.Field._create_manure_request'" class="reference internal" href="#RUFAS.biophysical.field.field.field.Field._create_manure_request"><code class="docutils literal notranslate"><span class="pre">Field._create_manure_request()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.field.field.Field._check_crop_harvest_schedule'" class="reference internal" href="#RUFAS.biophysical.field.field.field.Field._check_crop_harvest_schedule"><code class="docutils literal notranslate"><span class="pre">Field._check_crop_harvest_schedule()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.field.field.Field._harvest_heat_scheduled_crops'" class="reference internal" href="#RUFAS.biophysical.field.field.field.Field._harvest_heat_scheduled_crops"><code class="docutils literal notranslate"><span class="pre">Field._harvest_heat_scheduled_crops()</span></code></a></li>

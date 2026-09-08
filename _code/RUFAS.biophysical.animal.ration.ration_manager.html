@@ -29,8 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.biophysical.animal.reproduction.html" rel="next" title="RUFAS.biophysical.animal.reproduction package"/>
-<link href="RUFAS.biophysical.animal.ration.ration_optimizer.html" rel="prev" title="RUFAS.biophysical.animal.ration.ration_optimizer module"/>
+<link href="RUFAS.biophysical.animal.ration.ration_optimizer.html" rel="next" title="RUFAS.biophysical.animal.ration.ration_optimizer module"/>
+<link href="RUFAS.biophysical.animal.ration.ration_config.html" rel="prev" title="RUFAS.biophysical.animal.ration.ration_config module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -158,6 +159,8 @@ RuFaS ID of a feed and the value is the percentage it contributes to the ration.
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
+<dt>_om<span class="classifier">OutputManager</span></dt><dd><p>A private instance of OutputManager for use in this class.</p>
+</dd>
 <dt>user_defined_rations<span class="classifier">dict[AnimalCombination, dict[RUFAS_ID, float]]</span></dt><dd><p>A mapping of animal groupings to their respective ration formulations.</p>
 </dd>
 <dt>ration_feeds<span class="classifier">dict[AnimalCombination, list[RUFAS_ID]]</span></dt><dd><p>A mapping of animal groupings to the list of RuFaS feed IDs available to formulate their ration.</p>
@@ -194,12 +197,12 @@ ration formulation.</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_ration_feeds">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_ration_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_ration_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_ration_feeds'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_ration_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_ration_feeds" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_ration_feeds'"><span>#</span></a></dt>
 <dd><p>Maps the input feeds available for each ration to Animal combinations.</p>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>ration_config<span class="classifier">dict[str, list[int]]</span></dt><dd><p>Collection of animal requirements and feed supply information for ration formulation.</p>
+<dt>ration_config<span class="classifier">dict[str, Any]</span></dt><dd><p>Collection of animal requirements and feed supply information for ration formulation.</p>
 </dd>
 </dl>
 </section>
@@ -225,24 +228,31 @@ ration formulation.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_ration_tolerance">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_user_defined_ration_tolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_ration_tolerance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_ration_tolerance'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_user_defined_ration_tolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_ration_tolerance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_ration_tolerance'"><span>#</span></a></dt>
 <dd><p>Collects the tolerance value for user defined rations.</p>
 <section id="id2">
 <h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>ration_config<span class="classifier">dict[str, dict[str, list[dict[str, int | float]] | float]]</span></dt><dd><p>Collection of animal requirements and feed supply information for ration formulation.</p>
+<dt>feed_config<span class="classifier">dict[str, Any]</span></dt><dd><p>Collection of animal requirements and feed supply information for ration formulation.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_rations">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_user_defined_rations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_rations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_rations'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_user_defined_rations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_rations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.ration.ration_manager.RationManager.set_user_defined_rations'"><span>#</span></a></dt>
 <dd><p>Maps the input user-defined rations to Animal combinations.</p>
 <section id="id3">
 <h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>ration_config<span class="classifier">dict[str, dict[str, list[dict[str, int | float]] | float]]</span></dt><dd><p>Collection of animal requirements and feed supply information for ration formulation.</p>
+<dt>ration_config<span class="classifier">dict[str, Any]</span></dt><dd><p>Collection of animal requirements and feed supply information for ration formulation.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If one or more invalid rations is found.</p>
 </dd>
 </dl>
 </section>

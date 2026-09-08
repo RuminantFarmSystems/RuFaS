@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -206,6 +207,8 @@ body weight, nutrient details, fecal phosphorus, and urine phosphorus requiremen
 <dt>TypeError</dt><dd><p>If the animal type in digestive_system_inputs is not supported, a TypeError is raised
 with information about supported animal types.</p>
 </dd>
+<dt>RuntimeError</dt><dd><p>For any other unexpected errors related to processing digestion.</p>
+</dd>
 </dl>
 </section>
 </dd></dl>
@@ -235,9 +238,10 @@ Can be negative indicating a deficit.</p>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>tuple[float, float]</dt><dd><p>A tuple containing two values:
-- The amount of phosphorus excreted in urine (g).
-- The amount of phosphorus excreted in feces (g).</p>
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The amount of phosphorus excreted in urine (g).</p></li>
+<li><p>The amount of phosphorus excreted in feces (g).</p></li>
+</ul>
 </dd>
 </dl>
 </section>

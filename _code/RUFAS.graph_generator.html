@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -149,16 +150,28 @@
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.graph_generator.</span></span><span class="sig-name descname"><span class="pre">GraphGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Graph Generator is used to generate graphs from the simulation results.
-NOTE: This class is not multi-thread safe!!!</p>
+<p>GraphGenerator is used to generate graphs from the simulation results.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>metadata_prefix<span class="classifier">str, optional</span></dt><dd><p>Prefix applied to graph metadata. Defaults to <code class="docutils literal notranslate"><span class="pre">""</span></code>.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> object used to track simulation time. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>metadata_prefix<span class="classifier">str</span></dt><dd><p>A string to prefix the metadata of the graph.</p>
+<dt>metadata_prefix<span class="classifier">str, optional</span></dt><dd><p>Prefix applied to graph metadata. Defaults to <code class="docutils literal notranslate"><span class="pre">""</span></code>.</p>
 </dd>
-<dt>time<span class="classifier">RufasTime</span></dt><dd><p>A RufasTime object used to track the simulation time</p>
+<dt>time<span class="classifier">RufasTime, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> object used to track simulation time. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd>
 </dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<p>This class is not multi-thread safe!!!</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator.__init__'"><span>#</span></a></dt>
@@ -166,36 +179,27 @@ NOTE: This class is not multi-thread safe!!!</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator.generate_graph">
 <span class="sig-name descname"><span class="pre">generate_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filtered_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">produce_graphics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator.generate_graph" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator.generate_graph'"><span>#</span></a></dt>
-<dd><p>Generate a graph based on filtered data and graph details.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
+<dd><p>Generates a graph based on filtered data and graph details.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>filtered_pool<span class="classifier">dict[str, dict[str, list[Any]]]</span></dt><dd><p>The result pool after filtering with the provided RegEx filters.</p>
 </dd>
 <dt>graph_details: dict[str, str]</dt><dd><p>A dictionary containing details/metadata about the graph.</p>
 </dd>
-<dt>save_path: Path</dt><dd><p>The base folder path to save the output.</p>
-</dd>
 <dt>filter_file_name: str</dt><dd><p>The name of the filter file.</p>
 </dd>
 <dt>graphics_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving graphics.</p>
 </dd>
-<dt>produce_graphics: bool</dt><dd><p>Flag for whether or not the user wants to produce graphs at after the simulation.</p>
+<dt>produce_graphics: bool</dt><dd><p>Flag for whether the user wants to produce graphs after the simulation.</p>
 </dd>
 </dl>
 </section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>log_pool<span class="classifier">list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]</span></dt><dd><p>A list of log, warning, and error dictionaries containing all the components needed
+<dt>log_pool<span class="classifier">list[dict[str, str | dict[str, str]]]</span></dt><dd><p>A list of log, warning, and error dictionaries containing all the components needed
 to log the information to the appropriate pool.</p>
-</dd>
-</dl>
-</section>
-<section id="raises">
-<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>Exception</dt><dd><p>Generic exception raised by utility functions.</p>
 </dd>
 </dl>
 </section>
@@ -204,19 +208,19 @@ to log the information to the appropriate pool.</p>
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._set_graph_legend">
 <span class="sig-name descname"><span class="pre">_set_graph_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepared_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._set_graph_legend" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._set_graph_legend'"><span>#</span></a></dt>
 <dd><p>Sets the graph legend if there is no legend present in the graph details.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>graph_details<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
+<dt>graph_details<span class="classifier">dict[str, str | list[str]]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
 </dd>
 <dt>prepared_data: dict[str, list[Any]]</dt><dd><p>The data to be graphed that’s been prepared for graphing.</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dict[str, str]</dt><dd><p>A dictionary containing details/metadata about the graph with the legend field populated.</p>
+<dt>dict[str, str | list[str]]</dt><dd><p>A dictionary containing details/metadata about the graph with the legend field populated.</p>
 </dd>
 </dl>
 </section>
@@ -224,18 +228,23 @@ to log the information to the appropriate pool.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._add_var_units">
 <span class="sig-name descname"><span class="pre">_add_var_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filtered_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._add_var_units" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._add_var_units'"><span>#</span></a></dt>
-<dd><p>Adds variable units to variable name for graphing.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dd><p>Adds variable units to variable names for graphing.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>filtered_pool<span class="classifier">dict[str, list[Any]]</span></dt><dd><p>The data to be graphed.</p>
 </dd>
+<dt>graph_title<span class="classifier">str | list[str]</span></dt><dd><p>The title of the graph.</p>
+</dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>list[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]</dt><dd><p>The updated data with units added and logs if info_maps aren’t found to get units.</p>
+<dt>tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]</dt><dd><ul class="simple">
+<li><p>The updated data with units added.</p></li>
+<li><p>Logs if <code class="docutils literal notranslate"><span class="pre">info_maps</span></code> aren’t found to get units.</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -243,76 +252,78 @@ to log the information to the appropriate pool.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._generate_legend_keys">
 <span class="sig-name descname"><span class="pre">_generate_legend_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">combined_var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_legend_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omit_legend_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._generate_legend_keys" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._generate_legend_keys'"><span>#</span></a></dt>
-<dd><p>Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dd><p>Strip out the prefix and suffix (if exists) in the combined variable name and return the variable name.</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>combined_var_name: str</dt><dd><p>The combined variable name to be processed.</p>
 </dd>
+<dt>omit_legend_prefix: str | list[str] | bool, default False</dt><dd><p>Whether to omit the prefix from the combined variable name.</p>
+</dd>
+<dt>omit_legend_suffix: str | list[str] | bool, default False</dt><dd><p>Whether to omit the suffix from the combined variable name.</p>
+</dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>str</dt><dd><p>The stripped variable name.</p>
 </dd>
 </dl>
 </section>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
-<blockquote>
-<div><dl>
+<section id="id8">
+<h3>Notes<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<dl>
 <dt>This function identifies prefix and suffix according to the following logic:</dt><dd><dl>
 <dt>prefix:</dt><dd><blockquote>
 <div><dl class="simple">
 <dt>All combined variable names are guaranteed to have a prefix of the following types:</dt><dd><ul class="simple">
-<li><p>a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)</p></li>
+<li><p>a custom-defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)</p></li>
 <li><p>default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)</p></li>
 <li><dl class="simple">
-<dt>special cases =&gt; variables from the RufasTime and Weather classes (e.g. RufasTime.day,</dt><dd><p>Weather.rainfall)</p>
+<dt>special cases =&gt; variables from the <code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> and <code class="docutils literal notranslate"><span class="pre">Weather</span></code> classes (e.g. <code class="docutils literal notranslate"><span class="pre">RufasTime.day</span></code>,</dt><dd><p><code class="docutils literal notranslate"><span class="pre">Weather.rainfall</span></code>)</p>
 </dd>
 </dl>
 </li>
 </ul>
 </dd>
 </dl>
-<p>For the special cases of variables from the RufasTime and Weather classes, they do not have any
-suffixes, resulting in <cite>len(combined_var_name_list) == 2</cite>. Therefore, we can just return the second
+<p>For the special cases of variables from the <code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> and <code class="docutils literal notranslate"><span class="pre">Weather</span></code> classes, they do not have any
+suffixes, resulting in <code class="docutils literal notranslate"><span class="pre">len(combined_var_name_list)</span> <span class="pre">==</span> <span class="pre">2</span></code>. Therefore, we can just return the second
 element after splitting the combined variable name by “.”.</p>
 <blockquote>
-<div><p>We distinguish whether the prefix is a custom defined prefix or following the default pattern by
+<div><p>We distinguish whether the prefix is a custom-defined prefix or following the default pattern by
 string parsing:
-The class name in the default pattern prefixes follow the camel case pattern, a way to separate
+The class name in the default pattern prefixes follows the camel case pattern, a way to separate
 the words in a phrase by making the first letter of each word capitalized and not using spaces
-e.g. CamelCase. While the custom defined prefixes follow the snake case pattern, where each word is
+e.g., CamelCase. While the custom-defined prefixes follow the snake case pattern, where each word is
 separated by underscores.
-Therefore, by checking if <cite>combined_var_name_list[0]</cite> follows the camel case pattern
-(“([A-Z][a-z0-9]+)+”), we are able to find out if the variable is using the default pattern.</p>
+Therefore, by checking if <code class="docutils literal notranslate"><span class="pre">combined_var_name_list[0]</span></code> follows the camel case pattern
+<code class="docutils literal notranslate"><span class="pre">("([A-Z][a-z0-9]+)+")</span></code>, we are able to find out if the variable is using the default pattern.</p>
 <ul class="simple">
-<li><p><cite>if len(combined_var_name_list) == 1</cite> this check is here just for error proofing, this condition</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">len(combined_var_name_list)</span> <span class="pre">==</span> <span class="pre">1</span></code> this check is here just for error proofing, this condition</p></li>
 </ul>
 <p>is unlikely to appear.</p>
 </div></blockquote>
 </div></blockquote>
 <dl>
-<dt>suffix:</dt><dd><p>Currently, only the Crop and Soil module is utilizing the suffix feature while reporting variables.
-After some investigation, we found that all suffixes from the Crop and Soil module follows the
-pattern of field=’*’, for example:</p>
+<dt>suffix:</dt><dd><p>Currently, only the Crop and Soil module is using the suffix feature while reporting variables.
+After some investigation, we found that all suffixes from the Crop and Soil module follow the
+pattern of <code class="docutils literal notranslate"><span class="pre">field='*'</span></code>, for example:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field=’field’</p></li>
-<li><p>FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field=’field’,layer=’2’</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field='field'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field='field',layer='2'</span></code></p></li>
 </ul>
 </div></blockquote>
-<p>Therefore, by checking if hte last element in combined_var_name_list contains “=”, we are able to
-check if the variable name has suffix.</p>
+<p>Therefore, by checking if the last element in the <code class="docutils literal notranslate"><span class="pre">combined_var_name_list</span></code> contains “=”, we are able
+to check if the variable name has suffix.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </dd>
 </dl>
-</div></blockquote>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -320,19 +331,19 @@ check if the variable name has suffix.</p>
 <span class="sig-name descname"><span class="pre">_log_non_numerical_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filtered_pool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._log_non_numerical_data" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._log_non_numerical_data'"><span>#</span></a></dt>
 <dd><p>Identifies and logs entries in a filtered data pool that contain non-numeric data
 which cannot be used for plotting in a graph.</p>
-<section id="id7">
-<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>filtered_pool<span class="classifier">dict[str, pool_element_type]</span></dt><dd><p>The filtered pool of variables that the user wants to graph.</p>
+<dt>filtered_pool<span class="classifier">dict[str, dict[str, list[Any]]]</span></dt><dd><p>The filtered pool of variables that the user wants to graph.</p>
 </dd>
 <dt>graph_details: dict[str, str]</dt><dd><p>A dictionary containing details/metadata about the graph.</p>
 </dd>
 </dl>
 </section>
-<section id="id8">
-<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>list[dict[str, str | dict[str, str]]]</dt><dd><p>A list of logs, warnings, and errors to be reported to OutputManager.</p>
+<dt>list[dict[str, str | dict[str, str]]]</dt><dd><p>A list of logs, warnings, and errors to be reported to <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code>.</p>
 </dd>
 </dl>
 </section>
@@ -340,9 +351,9 @@ which cannot be used for plotting in a graph.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._draw_graph">
 <span class="sig-name descname"><span class="pre">_draw_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_calendar_dates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._draw_graph" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._draw_graph'"><span>#</span></a></dt>
-<dd><p>Draw the graph based on the provided graph type and data.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<dd><p>Draws the graph based on the provided graph type and data.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>graph_type<span class="classifier">str</span></dt><dd><p>The type of graph to draw.</p>
 </dd>
@@ -350,10 +361,10 @@ which cannot be used for plotting in a graph.</p>
 </dd>
 <dt>selected_variables<span class="classifier">list[str]</span></dt><dd><p>The variables selected to be plotted.</p>
 </dd>
-<dt>mask_values<span class="classifier">bool, default False</span></dt><dd><p>Whether data that will be plotted with non-tuple based functions should be masked to remove None or NaN
-values.</p>
+<dt>ax<span class="classifier">Axes</span></dt><dd><p>The matplotlib <code class="docutils literal notranslate"><span class="pre">Axes</span></code> object to plot the graph on.</p>
 </dd>
-<dt>ax<span class="classifier">Axes</span></dt><dd><p>The matplotlib Axes object to plot the graph on.</p>
+<dt>mask_values<span class="classifier">bool, default False</span></dt><dd><p>Whether data that will be plotted with non-tuple-based functions should be masked to remove
+<code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values.</p>
 </dd>
 <dt>use_calendar_dates<span class="classifier">bool, default False</span></dt><dd><p>Whether to use calendar dates on the x-axis.</p>
 </dd>
@@ -365,10 +376,10 @@ values.</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Raises<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>ValueError</dt><dd><p>if graph_type is not found in MATPLOTLIB_PLOT_FUNCTIONS.</p>
+<dt>ValueError</dt><dd><p>if graph_type is not found in <code class="docutils literal notranslate"><span class="pre">MATPLOTLIB_PLOT_FUNCTIONS</span></code>.</p>
 </dd>
 </dl>
 </section>
@@ -376,19 +387,21 @@ values.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._mask_values">
 <span class="sig-name descname"><span class="pre">_mask_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float32</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._mask_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._mask_values'"><span>#</span></a></dt>
-<dd><p>Masks values to remove None and NaN values.</p>
-<section id="id11">
-<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<dd><p>Masks values to remove <code class="docutils literal notranslate"><span class="pre">None</span></code> and <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>values<span class="classifier">list[Any]</span></dt><dd><p>list of data to be masked.</p>
 </dd>
 </dl>
 </section>
-<section id="id12">
-<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>tuple[NDArray[Any], NDArray[np.float32]]</dt><dd><p>list of NumPy arrays, the first containing the indices of the masked data and the second containing the
-actual masked data.</p>
+<dt>tuple[NDArray[Any], NDArray[np.float32]]</dt><dd><ul class="simple">
+<li><p>The indices of the masked data.</p></li>
+<li><p>The actual masked data.</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -396,11 +409,11 @@ actual masked data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._customize_graph">
 <span class="sig-name descname"><span class="pre">_customize_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customization_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._customize_graph" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._customize_graph'"><span>#</span></a></dt>
-<dd><p>Apply customizations to the graph.</p>
-<section id="id13">
-<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<dd><p>Applies customizations to the graph.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>fig<span class="classifier">Figure</span></dt><dd><p>The matplotlib Figure object to customize.</p>
+<dt>fig<span class="classifier">Figure</span></dt><dd><p>The matplotlib <code class="docutils literal notranslate"><span class="pre">Figure</span></code> object to customize.</p>
 </dd>
 <dt>customization_details<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary of customization details.</p>
 </dd>
@@ -410,29 +423,27 @@ actual masked data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._save_graph">
 <span class="sig-name descname"><span class="pre">_save_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._save_graph" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._save_graph'"><span>#</span></a></dt>
-<dd><p>Save the generated graph to a file.</p>
-<section id="id14">
-<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<dd><p>Saves the generated graph to a file.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>graph_details<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
 </dd>
 <dt>filter_file_name<span class="classifier">str</span></dt><dd><p>The name of the filter file.</p>
 </dd>
-<dt>save_path<span class="classifier">Path</span></dt><dd><p>The base folder path to save the output.</p>
-</dd>
 <dt>graphics_dir<span class="classifier">Path</span></dt><dd><p>The directory for saving graphics.</p>
 </dd>
 </dl>
 </section>
-<section id="id15">
-<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>str</dt><dd><p>The path to the saved graph.</p>
+<dt>Path</dt><dd><p>The path to the saved graph.</p>
 </dd>
 </dl>
 </section>
-<section id="id16">
-<h3>Raises<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<section id="id17">
+<h3>Raises<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>Exception</dt><dd><p>Generic exception raised if saving the graph fails.</p>
 </dd>
@@ -442,9 +453,9 @@ actual masked data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.graph_generator.GraphGenerator._generate_graph_path">
 <span class="sig-name descname"><span class="pre">_generate_graph_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graphics_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#RUFAS.graph_generator.GraphGenerator._generate_graph_path" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.graph_generator.GraphGenerator._generate_graph_path'"><span>#</span></a></dt>
-<dd><p>Generate the full path for the output graph and create parent folders if necessary.</p>
-<section id="id17">
-<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<dd><p>Generates the full path for the output graph and create parent folder if necessary.</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>graph_details<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary containing details/metadata about the graph.</p>
 </dd>
@@ -454,8 +465,8 @@ actual masked data.</p>
 </dd>
 </dl>
 </section>
-<section id="id18">
-<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>Path</dt><dd><p>The full path to the output graph file.</p>
 </dd>

@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -157,45 +158,108 @@ delivery, pregnancy checks, estrus detection, and pregnancy management.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>heifer_reproduction_program<span class="classifier">HeiferReproductionProtocol, optional</span></dt><dd><p>The reproduction program for heifers, by default None.</p>
+<dt>heifer_reproduction_program<span class="classifier">HeiferReproductionProtocol, optional</span></dt><dd><p>The reproduction program for heifers.</p>
 </dd>
-<dt>heifer_reproduction_sub_program<span class="classifier">HEIFER_REPRODUCTION_SUB_PROTOCOLS, optional</span></dt><dd><p>The sub-program for heifer reproduction, by default None.</p>
+<dt>heifer_reproduction_sub_program<span class="classifier">HEIFER_REPRODUCTION_SUB_PROTOCOLS, optional</span></dt><dd><p>The sub-program for heifer reproduction.</p>
 </dd>
-<dt>cow_reproduction_program<span class="classifier">CowReproductionProtocol, optional</span></dt><dd><p>The reproduction program for cows, by default None.</p>
+<dt>cow_reproduction_program<span class="classifier">CowReproductionProtocol, optional</span></dt><dd><p>The reproduction program for cows.</p>
 </dd>
-<dt>ai_day<span class="classifier">int, optional</span></dt><dd><p>The day of artificial insemination, by default 0.</p>
+<dt>cow_presynch_program: CowPreSynchSubProtocol, optional</dt><dd><p>The presynch program for cows.</p>
 </dd>
-<dt>estrus_day<span class="classifier">int, optional</span></dt><dd><p>The day estrus is expected, by default 0.</p>
+<dt>cow_ovsynch_program: CowTAISubProtocol, optional</dt><dd><p>The ovsynch program for cows.</p>
 </dd>
-<dt>abortion_day<span class="classifier">int, optional</span></dt><dd><p>The day of abortion, by default 0.</p>
+<dt>cow_resynch_program: CowReSynchSubProtocol, optional</dt><dd><p>The resynch program for cows.</p>
 </dd>
-<dt>breeding_to_preg_time<span class="classifier">int, optional</span></dt><dd><p>Time taken from breeding to pregnancy, by default 0.</p>
+<dt>ai_day<span class="classifier">int, default=0</span></dt><dd><p>The day of artificial insemination.</p>
 </dd>
-<dt>conception_rate<span class="classifier">float, optional</span></dt><dd><p>Conception rate of the animal, by default 0.0.</p>
+<dt>estrus_day<span class="classifier">int, default=0</span></dt><dd><p>The day estrus is expected.</p>
 </dd>
-<dt>TAI_conception_rate<span class="classifier">float, optional</span></dt><dd><p>Timed artificial insemination (TAI) conception rate, by default 0.0.
+<dt>abortion_day<span class="classifier">int, default=0</span></dt><dd><p>The day of abortion.</p>
+</dd>
+<dt>breeding_to_preg_time<span class="classifier">int, default=0</span></dt><dd><p>Time taken from breeding to pregnancy.</p>
+</dd>
+<dt>conception_rate<span class="classifier">float, default=0.0</span></dt><dd><p>Conception rate of the animal.</p>
+</dd>
+<dt>cow_TAI_conception_rate<span class="classifier">float, default=0.0</span></dt><dd><p>Timed artificial insemination (TAI) conception rate.
 We will only initialize the TAI conception rate for cows if this value is passed in as an input.
 The TAI conception rate for heifers will be dynamically determined later on.</p>
 </dd>
-<dt>num_conception_rate_decreases<span class="classifier">int, optional</span></dt><dd><p>Number of times the conception rate decreases, by default 0.</p>
+<dt>num_conception_rate_decreases<span class="classifier">int, default=0</span></dt><dd><p>Number of times the conception rate decreases.</p>
 </dd>
-<dt>hormone_schedule<span class="classifier">dict[int, dict[str, Any]], optional</span></dt><dd><p>The hormone schedule for the reproduction protocol, by default None.</p>
+<dt>hormone_schedule<span class="classifier">dict[int, dict[str, Any]], optional</span></dt><dd><p>The hormone schedule for the reproduction protocol.</p>
 </dd>
-<dt>gestation_length<span class="classifier">int, optional</span></dt><dd><p>Length of the gestation period, by default 0.</p>
+<dt>gestation_length<span class="classifier">int, default=0</span></dt><dd><p>Length of the gestation period.</p>
 </dd>
-<dt>conceptus_weight<span class="classifier">float, optional</span></dt><dd><p>Weight of the conceptus, by default 0.0.</p>
+<dt>conceptus_weight<span class="classifier">float, default=0.0</span></dt><dd><p>Weight of the conceptus.</p>
 </dd>
-<dt>calf_birth_weight<span class="classifier">float, optional</span></dt><dd><p>Birth weight of the calf, by default 0.0.</p>
+<dt>calf_birth_weight<span class="classifier">float, default=0.0</span></dt><dd><p>Birth weight of the calf.</p>
 </dd>
-<dt>calves<span class="classifier">int, optional</span></dt><dd><p>Number of calves, by default 0.</p>
+<dt>calves<span class="classifier">int, default=0</span></dt><dd><p>Number of calves.</p>
 </dd>
-<dt>calving_interval<span class="classifier">int, optional</span></dt><dd><p>Interval between calvings, by default 0.</p>
+<dt>calving_interval<span class="classifier">int, default=AnimalConfig.calving_interval</span></dt><dd><p>Interval between calvings.</p>
 </dd>
-<dt>calving_interval_history<span class="classifier">list[int], optional</span></dt><dd><p>History of calving intervals, by default None.</p>
+<dt>calving_interval_history<span class="classifier">list[int], optional</span></dt><dd><p>History of calving intervals.</p>
 </dd>
-<dt>body_weight_at_calving<span class="classifier">float, optional</span></dt><dd><p>Body weight of the animal at calving, by default 0.0.</p>
+<dt>body_weight_at_calving<span class="classifier">float, default=0.0</span></dt><dd><p>Body weight of the animal at calving.</p>
 </dd>
-<dt>do_not_breed<span class="classifier">bool, optional</span></dt><dd><p>Flag indicating if the animal should not breed, by default False.</p>
+<dt>do_not_breed<span class="classifier">bool, default=False</span></dt><dd><p>Flag indicating if the animal should not breed.</p>
+</dd>
+<dt>estrus_count<span class="classifier">int, default=0</span></dt><dd><p>The estrus count.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>heifer_reproduction_program<span class="classifier">HeiferReproductionProtocol</span></dt><dd><p>The reproduction program for heifers.</p>
+</dd>
+<dt>heifer_reproduction_sub_program<span class="classifier">HEIFER_REPRODUCTION_SUB_PROTOCOLS</span></dt><dd><p>The sub-program for heifer reproduction.</p>
+</dd>
+<dt>cow_reproduction_program<span class="classifier">CowReproductionProtocol</span></dt><dd><p>The reproduction program for cows.</p>
+</dd>
+<dt>cow_presynch_program: CowPreSynchSubProtocol</dt><dd><p>The presynch program for cows.</p>
+</dd>
+<dt>cow_ovsynch_program: CowTAISubProtocol</dt><dd><p>The ovsynch program for cows.</p>
+</dd>
+<dt>cow_resynch_program: CowReSynchSubProtocol</dt><dd><p>The resynch program for cows.</p>
+</dd>
+<dt>ai_day<span class="classifier">int</span></dt><dd><p>The day of artificial insemination.</p>
+</dd>
+<dt>estrus_day<span class="classifier">int</span></dt><dd><p>The day estrus is expected.</p>
+</dd>
+<dt>abortion_day<span class="classifier">int</span></dt><dd><p>The day of abortion.</p>
+</dd>
+<dt>breeding_to_preg_time<span class="classifier">int</span></dt><dd><p>Time taken from breeding to pregnancy.</p>
+</dd>
+<dt>conception_rate<span class="classifier">float</span></dt><dd><p>Conception rate of the animal.</p>
+</dd>
+<dt>TAI_conception_rate<span class="classifier">float</span></dt><dd><p>Timed artificial insemination (TAI) conception rate.
+We will only initialize the TAI conception rate for cows if this value is passed in as an input.
+The TAI conception rate for heifers will be dynamically determined later on.</p>
+</dd>
+<dt>num_conception_rate_decreases<span class="classifier">int, default=0</span></dt><dd><p>Number of times the conception rate decreases.</p>
+</dd>
+<dt>hormone_schedule<span class="classifier">dict[int, dict[str, Any]]</span></dt><dd><p>The hormone schedule for the reproduction protocol.</p>
+</dd>
+<dt>gestation_length<span class="classifier">int</span></dt><dd><p>Length of the gestation period.</p>
+</dd>
+<dt>conceptus_weight<span class="classifier">float</span></dt><dd><p>Weight of the conceptus.</p>
+</dd>
+<dt>calf_birth_weight<span class="classifier">float</span></dt><dd><p>Birth weight of the calf.</p>
+</dd>
+<dt>calves<span class="classifier">int</span></dt><dd><p>Number of calves.</p>
+</dd>
+<dt>calving_interval<span class="classifier">int</span></dt><dd><p>Interval between calvings.</p>
+</dd>
+<dt>calving_interval_history<span class="classifier">list[int]</span></dt><dd><p>History of calving intervals.</p>
+</dd>
+<dt>body_weight_at_calving<span class="classifier">float</span></dt><dd><p>Body weight of the animal at calving.</p>
+</dd>
+<dt>do_not_breed<span class="classifier">bool</span></dt><dd><p>Flag indicating if the animal should not breed.</p>
+</dd>
+<dt>repro_state_manager<span class="classifier">ReproStateManager</span></dt><dd><p>An instance of the <code class="docutils literal notranslate"><span class="pre">ReproStateManager</span></code>.</p>
+</dd>
+<dt>reproduction_statistics<span class="classifier">AnimalReproductionStatistics</span></dt><dd><p>An instance of the <code class="docutils literal notranslate"><span class="pre">AnimalReproductionStatistics</span></code> initialized with the <code class="docutils literal notranslate"><span class="pre">estrus_count</span></code> param</p>
 </dd>
 </dl>
 </section>
@@ -224,6 +288,13 @@ could lead to potential unexpected behaviors.</p>
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ReproductionOutputs</dt><dd><p>Updated reproduction outputs for the animal.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>TypeError</dt><dd><p>If unknown animal type is encountered.</p>
 </dd>
 </dl>
 </section>
@@ -327,7 +398,7 @@ could lead to potential unexpected behaviors.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._simulate_first_estrus">
-<span class="sig-name descname"><span class="pre">_simulate_first_estrus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estrus_note</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_estrus_cycle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cycle_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">ReproductionDataStream</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._simulate_first_estrus" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._simulate_first_estrus'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">_simulate_first_estrus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estrus_note</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_estrus_cycle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cycle_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9223372036854775807</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">ReproductionDataStream</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._simulate_first_estrus" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._simulate_first_estrus'"><span>#</span></a></dt>
 <dd><p>Calculate and set first next estrus day for an heiferII.</p>
 <section id="id6">
 <h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
@@ -340,7 +411,7 @@ could lead to potential unexpected behaviors.</p>
 </dd>
 <dt>avg_estrus_cycle<span class="classifier">float</span></dt><dd><p>Average length of the estrus cycle.</p>
 </dd>
-<dt>max_cycle_length<span class="classifier">float, optional</span></dt><dd><p>Maximum allowable length for the estrus cycle, by default inf.</p>
+<dt>max_cycle_length<span class="classifier">int, optional</span></dt><dd><p>Maximum allowable length for the estrus cycle, by default inf.</p>
 </dd>
 </dl>
 </section>
@@ -450,8 +521,11 @@ could lead to potential unexpected behaviors.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_estrus_not_detected_in_synch_ed">
 <span class="sig-name descname"><span class="pre">_handle_estrus_not_detected_in_synch_ed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">ReproductionDataStream</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_estrus_not_detected_in_synch_ed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_estrus_not_detected_in_synch_ed'"><span>#</span></a></dt>
 <dd><p>Handle the case where estrus is not detected for heifers in the SynchED program.</p>
+<section id="id10">
+<h3>Notes<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <p>If estrus is not detected, this method updates the reproduction program and sets up
 the next steps according to the fallback protocol.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.open_heifer">
@@ -491,22 +565,24 @@ the next steps according to the fallback protocol.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._calculate_calf_birth_weight">
 <span class="sig-name descname"><span class="pre">_calculate_calf_birth_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">breed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Breed</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._calculate_calf_birth_weight" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._calculate_calf_birth_weight'"><span>#</span></a></dt>
-<dd><blockquote>
-<div><p>Calculates the birth weight of the calf based on the breed.</p>
-</div></blockquote>
-<section id="id10">
-<h3>Notes<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
-<p>[AN.BWT.6]</p>
-<blockquote>
-<div><dl class="simple">
+<dd><p>Calculates the birth weight of the calf based on the breed.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<dl class="simple">
 <dt>breed: Breed</dt><dd><p>The breed of the animal.</p>
 </dd>
 </dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The birth weight for the calf (kg).</p>
 </dd>
 </dl>
-</div></blockquote>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h3>
+<p>[AN.BWT.6]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -543,6 +619,21 @@ the next steps according to the fallback protocol.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.execute_cow_ed_protocol">
 <span class="sig-name descname"><span class="pre">execute_cow_ed_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">ReproductionDataStream</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.execute_cow_ed_protocol" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.execute_cow_ed_protocol'"><span>#</span></a></dt>
 <dd><p>Execute the estrus detection (ED) protocol for cows.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._update_ed_days">
+<span class="sig-name descname"><span class="pre">_update_ed_days</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._update_ed_days" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._update_ed_days'"><span>#</span></a></dt>
+<dd><p>Update ED days statistic based on pregnancy status.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_ed_after_vwp">
+<span class="sig-name descname"><span class="pre">_handle_ed_after_vwp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">ReproductionDataStream</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_ed_after_vwp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_ed_after_vwp'"><span>#</span></a></dt>
+<dd><p>Handle ED protocol logic after the voluntary waiting period.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_estrus_day_states">
+<span class="sig-name descname"><span class="pre">_handle_estrus_day_states</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">ReproductionDataStream</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_estrus_day_states" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_estrus_day_states'"><span>#</span></a></dt>
+<dd><p>Handle estrus detection state transitions on the scheduled estrus day.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._enter_ovsynch_repro_state">
@@ -602,12 +693,83 @@ the next steps according to the fallback protocol.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._should_set_up_hormone_delivery_for_presynch">
 <span class="sig-name descname"><span class="pre">_should_set_up_hormone_delivery_for_presynch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ReproductionDataStream</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._should_set_up_hormone_delivery_for_presynch" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._should_set_up_hormone_delivery_for_presynch'"><span>#</span></a></dt>
-<dd><p>Determine if hormone delivery should be set up for presynch based on current status.</p>
+<dd><p>Determine whether hormone delivery should be set up for a cow in presynch.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>reproduction_data_stream<span class="classifier">ReproductionDataStream</span></dt><dd><p>Current reproduction data for the cow.</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>Current simulation day, used when recording reproduction events.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>tuple[bool, ReproductionDataStream]</dt><dd><ul class="simple">
+<li><p>Whether hormone delivery should be set up for presynch.</p></li>
+<li><p>The updated reproduction data stream.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Notes<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h3>
+<p>The checks are ordered from broad exclusion criteria to presynch-entry criteria:</p>
+<ol class="arabic simple">
+<li><p>Pregnant cows are excluded because they should not begin presynch.</p></li>
+<li><p>Cows not enrolled in a TAI reproduction program are excluded because presynch only applies to TAI.</p></li>
+<li><p>Unsupported presynch subprotocols are excluded before checking animal state.</p></li>
+<li><p>Cows with an existing hormone schedule are excluded to avoid overwriting or duplicating scheduled treatments.</p></li>
+<li><p>Cows exactly on the configured presynch start day may enter presynch from FRESH or ENTER_HERD_FROM_INIT.</p></li>
+<li><p>Cows already past the configured start day may enter presynch only from ENTER_HERD_FROM_INIT, which allows
+initialized animals to catch up without reopening the normal FRESH transition window.</p></li>
+</ol>
+<p>If the cow is already in the IN_PRESYNCH state, this method returns True even if no new state transition occurs.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._should_set_up_hormone_delivery_for_ovsynch">
 <span class="sig-name descname"><span class="pre">_should_set_up_hormone_delivery_for_ovsynch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reproduction_data_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproductionDataStream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ReproductionDataStream</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._should_set_up_hormone_delivery_for_ovsynch" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._should_set_up_hormone_delivery_for_ovsynch'"><span>#</span></a></dt>
-<dd><p>Determine if hormone delivery should be set up for OvSynch based on current status.</p>
+<dd><p>Determine whether hormone delivery should be set up for a cow in OvSynch.</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>reproduction_data_stream<span class="classifier">ReproductionDataStream</span></dt><dd><p>Current reproduction data for the cow.</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>Current simulation day, used when recording reproduction events.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>tuple[bool, ReproductionDataStream]</dt><dd><ul class="simple">
+<li><p>Whether hormone delivery should be set up for OvSynch.</p></li>
+<li><p>The updated reproduction data stream.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Notes<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h3>
+<p>The checks are ordered from broad exclusion criteria to OvSynch-entry criteria:</p>
+<ol class="arabic simple">
+<li><p>Pregnant cows are excluded because they should not begin OvSynch.</p></li>
+<li><p>Cows with an existing hormone schedule are excluded to avoid overwriting
+or duplicating scheduled treatments.</p></li>
+<li><p>Unsupported OvSynch subprotocols are excluded before checking animal state.</p></li>
+<li><p>Cows currently in presynch are excluded because they must complete presynch
+before transitioning to OvSynch.</p></li>
+<li><p>Cows exactly on the configured OvSynch start day may enter OvSynch from an
+empty state, FRESH, ENTER_HERD_FROM_INIT, or HAS_DONE_PRESYNCH.</p></li>
+<li><p>Cows already past the configured start day may enter OvSynch only from
+HAS_DONE_PRESYNCH or ENTER_HERD_FROM_INIT, allowing initialized animals
+and presynch-completed animals to catch up.</p></li>
+</ol>
+<p>If the cow is already in the IN_OVSYNCH state, this method returns True even
+if no new state transition occurs.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._increment_cow_ai_counts">
@@ -733,6 +895,9 @@ or estrus is detected.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._terminate_pregnancy'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._terminate_pregnancy"><code class="docutils literal notranslate"><span class="pre">Reproduction._terminate_pregnancy()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._calculate_conception_rate_on_ai_day'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._calculate_conception_rate_on_ai_day"><code class="docutils literal notranslate"><span class="pre">Reproduction._calculate_conception_rate_on_ai_day()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.execute_cow_ed_protocol'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.execute_cow_ed_protocol"><code class="docutils literal notranslate"><span class="pre">Reproduction.execute_cow_ed_protocol()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._update_ed_days'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._update_ed_days"><code class="docutils literal notranslate"><span class="pre">Reproduction._update_ed_days()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_ed_after_vwp'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_ed_after_vwp"><code class="docutils literal notranslate"><span class="pre">Reproduction._handle_ed_after_vwp()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_estrus_day_states'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._handle_estrus_day_states"><code class="docutils literal notranslate"><span class="pre">Reproduction._handle_estrus_day_states()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._enter_ovsynch_repro_state'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._enter_ovsynch_repro_state"><code class="docutils literal notranslate"><span class="pre">Reproduction._enter_ovsynch_repro_state()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._repeat_estrus_simulation_before_vwp'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._repeat_estrus_simulation_before_vwp"><code class="docutils literal notranslate"><span class="pre">Reproduction._repeat_estrus_simulation_before_vwp()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._setup_ai_day_after_estrus_detected'" class="reference internal" href="#RUFAS.biophysical.animal.reproduction.reproduction.Reproduction._setup_ai_day_after_estrus_detected"><code class="docutils literal notranslate"><span class="pre">Reproduction._setup_ai_day_after_estrus_detected()</span></code></a></li>

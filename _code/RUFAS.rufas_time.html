@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -149,10 +150,40 @@
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.rufas_time.</span></span><span class="sig-name descname"><span class="pre">RufasTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This object is responsible for creating and tracking time in the simulation.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>start_date<span class="classifier">datetime</span></dt><dd><p>The start date of the simulation.</p>
+</dd>
+<dt>end_date<span class="classifier">datetime</span></dt><dd><p>The end date of the simulation.</p>
+</dd>
+<dt>current_date<span class="classifier">datetime</span></dt><dd><p>The current date in the simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>om<span class="classifier">OutputManager</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code> instance.</p>
+</dd>
+<dt>im<span class="classifier">InputManager</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">InputManager</span></code> instance.</p>
+</dd>
+<dt>start_date<span class="classifier">datetime</span></dt><dd><p>The start date of the simulation.</p>
+</dd>
+<dt>end_date<span class="classifier">datetime</span></dt><dd><p>The end date of the simulation.</p>
+</dd>
+<dt>current_date<span class="classifier">datetime</span></dt><dd><p>The current date in the simulation.</p>
+</dd>
+<dt>simulation_length_days<span class="classifier">int</span></dt><dd><p>The number of days in the simulation.</p>
+</dd>
+<dt>simulation_length_years<span class="classifier">int</span></dt><dd><p>The number of years in the simulation.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.__init__'"><span>#</span></a></dt>
-<dd><p>This object is responsible for creating and tracking time in the simulation.</p>
+<dd><p>Initializes the <code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> object.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.advance">
@@ -162,58 +193,105 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.year_start_day">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">year_start_day</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.year_start_day" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.year_start_day'"><span>#</span></a></dt>
-<dd><p>Returns the first Julian day of the current year in integer.</p>
+<dd><p>Returns the first Julian day of the current year.</p>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>int</dt><dd><p>The first Julian day of the current year.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.year_end_day">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">year_end_day</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.year_end_day" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.year_end_day'"><span>#</span></a></dt>
-<dd><p>Returns the last Julian day of the current year in integer.</p>
+<dd><p>Returns the last Julian day of the current year.</p>
+<section id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>int</dt><dd><p>The last Julian day of the current year.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.current_julian_day">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_julian_day</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.current_julian_day" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.current_julian_day'"><span>#</span></a></dt>
-<dd><p>Returns the current Julian day of the current year in integer.</p>
+<dd><p>Returns the current Julian day of the current year.</p>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<blockquote>
+<div><p>The current Julian day of the current year.</p>
+</div></blockquote>
+</section>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.current_month">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_month</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.current_month" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.current_month'"><span>#</span></a></dt>
-<dd><p>Returns the current month in integer.</p>
+<dd><p>Returns the current month.</p>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>int</dt><dd><p>The current month.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.current_simulation_year">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_simulation_year</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.current_simulation_year" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.current_simulation_year'"><span>#</span></a></dt>
-<dd><p>Returns the current simulation year in integer.</p>
+<dd><p>Returns the current simulation year.</p>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<blockquote>
+<div><p>The current simulation year.</p>
+</div></blockquote>
+</section>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.current_calendar_year">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_calendar_year</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.current_calendar_year" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.current_calendar_year'"><span>#</span></a></dt>
-<dd><p>Returns the current calendar year in integer.</p>
+<dd><p>Returns the current calendar year.</p>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>int</dt><dd><p>The current calendar year.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.simulation_day">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">simulation_day</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.simulation_day" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.simulation_day'"><span>#</span></a></dt>
-<dd><p>Returns the current simulation day in integer.</p>
+<dd><p>Returns the current simulation day.</p>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>int</dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.record_time">
 <span class="sig-name descname"><span class="pre">record_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.record_time" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.record_time'"><span>#</span></a></dt>
-<dd><p>Records the current day, simulated year, and calendar year of the simulation in the OutputManager.</p>
+<dd><p>Records the current day, simulated year, and calendar year of the simulation in the <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code>.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.convert_simulation_day_to_date">
 <span class="sig-name descname"><span class="pre">convert_simulation_day_to_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">datetime</span></span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.convert_simulation_day_to_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.convert_simulation_day_to_date'"><span>#</span></a></dt>
-<dd><p>Convert the simulation day to a date object that is relative to the start date of the simulation.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dd><p>Convert the simulation day to a <code class="docutils literal notranslate"><span class="pre">datetime</span></code> object that is relative to the start date of the simulation.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The simulation day to convert to a date object.</p>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The simulation day to convert to a <code class="docutils literal notranslate"><span class="pre">datetime</span></code> object.</p>
 </dd>
 </dl>
 </section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>date</dt><dd><p>The date object that corresponds to the simulation day.</p>
+<dt>datetime</dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">datetime</span></code> object that corresponds to the simulation day.</p>
 </dd>
 </dl>
 </section>
@@ -221,9 +299,9 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.convert_year_jday_to_date">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">convert_year_jday_to_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">datetime</span></span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.convert_year_jday_to_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.convert_year_jday_to_date'"><span>#</span></a></dt>
-<dd><p>Converts the year and its day of the year to a datetime object.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<dd><p>Converts the year and its day of the year to a <code class="docutils literal notranslate"><span class="pre">datetime</span></code> object.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>year: int</dt><dd><p>Year of the date.</p>
 </dd>
@@ -231,10 +309,10 @@
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>datetime</dt><dd><p>The datetime object from the provided inputs.</p>
+<dt>datetime</dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">datetime</span></code> object from the provided inputs.</p>
 </dd>
 </dl>
 </section>
@@ -243,21 +321,22 @@
 <dt class="sig sig-object py" id="RUFAS.rufas_time.RufasTime.convert_slice_to_simulation_day">
 <span class="sig-name descname"><span class="pre">convert_slice_to_simulation_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.rufas_time.RufasTime.convert_slice_to_simulation_day" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.rufas_time.RufasTime.convert_slice_to_simulation_day'"><span>#</span></a></dt>
 <dd><p>Converts the slice day to a simulation day.</p>
-<section id="id3">
-<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>slice_day: int</dt><dd><p>The slice day to convert to a simulation day.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>int</dt><dd><p>The simulation day that corresponds to the slice day.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
+</section>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">

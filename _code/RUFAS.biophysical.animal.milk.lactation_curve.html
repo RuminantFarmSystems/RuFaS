@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -157,9 +158,9 @@ parameters.</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.milk.lactation_curve.N_ADJUSTMENT_SCALING_FACTOR">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.milk.lactation_curve.</span></span><span class="sig-name descname"><span class="pre">N_ADJUSTMENT_SCALING_FACTOR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0001</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.milk.lactation_curve.N_ADJUSTMENT_SCALING_FACTOR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.milk.lactation_curve.N_ADJUSTMENT_SCALING_FACTOR'"><span>#</span></a></dt>
-<dd><p>If user’s input for parity 1, 2, and 3+ fractions of the milking herd are invalid (i.e. do not sum to 1), then the below
-defaults will be used. Note that these defaults are ONLY used to adjust the lactation curve parameters, they are not
-used at all to determine herd structure. These numbers are from Li et al, 2023.</p>
+<dd><p>If users input for parity 1, 2, and 3+ fractions of the milking herd are invalid (i.e. do not sum to 1) then the below
+defaults will be used. Note that these defaults are ONLY used to adjust the lactation curve parameters. They are not
+used at all to determine herd structure.</p>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h2>
 <aside class="footnote-list brackets">
@@ -240,10 +241,6 @@ practices of the farm being simulated.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._calculate_adjusted_wood_parameters">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_adjusted_wood_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjustments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._calculate_adjusted_wood_parameters" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._calculate_adjusted_wood_parameters'"><span>#</span></a></dt>
 <dd><p>Computes Wood’s Lactation Curve parameters adjusted for different factors.</p>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
-<p>Parameter adjustments: [AN.MLK.1], [AN.MLK.2], [AN.MLK.3]</p>
-</section>
 <section id="id2">
 <h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
@@ -264,6 +261,10 @@ practices of the farm being simulated.</p>
 <dt>dict[str, float]</dt><dd><p>Dictionary containing the adjusted Wood l, m, and n parameters.</p>
 </dd>
 </dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<p>Parameter adjustments: [AN.MLK.1], [AN.MLK.2], [AN.MLK.3]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -295,12 +296,7 @@ practices of the farm being simulated.</p>
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_estimate_305_day_milk_yield_by_parity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annual_milk_yield</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_milking_cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_1_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_2_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_3_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_2_milk_yield_adjustment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_3_milk_yield_adjustment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._estimate_305_day_milk_yield_by_parity" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._estimate_305_day_milk_yield_by_parity'"><span>#</span></a></dt>
 <dd><p>Calculates the 305-day milk yield for each lactation group based on total farm milk production.</p>
 <section id="id5">
-<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
-<p>Herd average 305-day milk yield: [AN.MLK.4]
-Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]</p>
-</section>
-<section id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>annual_milk_yield<span class="classifier">float</span></dt><dd><p>Annual milk yield of the farm (kg).</p>
 </dd>
@@ -318,30 +314,32 @@ Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, float]</dt><dd><p>Mapping of the parity (1, 2, 3+) to the estimated 305 day milk production of an individual cow of that
 parity (kg).</p>
 </dd>
 </dl>
 </section>
+<section id="id7">
+<h3>References<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<p>Herd average 305-day milk yield: [AN.MLK.4]
+Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._calculate_305_day_milk_yield_error">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_305_day_milk_yield_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_yield</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._calculate_305_day_milk_yield_error" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._calculate_305_day_milk_yield_error'"><span>#</span></a></dt>
-<dd><p>Calculates absolute difference between an estimated 305 day milk yield and a predetermined one.</p>
+<dd><p>Calculate the absolute difference between Wood’s-curve-predicted 305-day milk yield
+and a target yield. Used as the objective in fitting Wood’s l parameter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._fit_wood_l_param_to_milk_yield">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_fit_wood_l_param_to_milk_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_yield</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._fit_wood_l_param_to_milk_yield" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve._fit_wood_l_param_to_milk_yield'"><span>#</span></a></dt>
 <dd><p>Modifies Wood’s l parameter to best fit a given 305 day milk yield.</p>
 <section id="id8">
-<h3>Notes<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
-<p>[AN.MLK.8]</p>
-</section>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>l_param<span class="classifier">float</span></dt><dd><p>Wood’s l lactation curve parameter.</p>
 </dd>
@@ -353,12 +351,16 @@ parity (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Wood’s l parameter adjusted to best fit the given milk yield.</p>
 </dd>
 </dl>
+</section>
+<section id="id10">
+<h3>References<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<p>[AN.MLK.8]</p>
 </section>
 </dd></dl>
 </section>

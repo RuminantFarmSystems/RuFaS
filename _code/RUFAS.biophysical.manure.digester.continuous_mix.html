@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -198,7 +199,7 @@ leakage and is not collected by the gas capture system (unitless).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_generated_carbon_dioxide">
 <span class="sig-name descname"><span class="pre">_calculate_generated_carbon_dioxide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generated_methane_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_generated_carbon_dioxide" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_generated_carbon_dioxide'"><span>#</span></a></dt>
-<dd><p>Calculate the mass and volume of carbon dioxide generated based on the generated methane volume.</p>
+<dd><p>Calculates the mass and volume of carbon dioxide generated based on the generated methane volume.</p>
 <section id="id1">
 <h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
@@ -208,18 +209,10 @@ leakage and is not collected by the gas capture system (unitless).</p>
 </section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
-<dl>
-<dt>tuple[float, float]</dt><dd><p>A tuple containing:
-- generated_carbon_dioxide_mass : float</p>
-<blockquote>
-<div><p>The calculated mass of generated carbon dioxide.</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>generated_carbon_dioxide_volume<span class="classifier">float</span></dt><dd><p>The calculated volume of generated carbon dioxide.</p>
-</dd>
-</dl>
-</li>
+<dl class="simple">
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The calculated mass of generated carbon dioxide.</p></li>
+<li><p>The calculated volume of generated carbon dioxide.</p></li>
 </ul>
 </dd>
 </dl>
@@ -234,24 +227,28 @@ the density, mass, and volume of the generated carbon dioxide.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_generated_methane">
 <span class="sig-name descname"><span class="pre">_calculate_generated_methane</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_generated_methane" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_generated_methane'"><span>#</span></a></dt>
 <dd><p>Calculates the generated methane mass and volume.</p>
-<p>Uses the supplied temperature set point and volatile solids in the digester
-to compute the density of methane and its corresponding volume and mass.</p>
 <section id="id2">
 <h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>tuple[float, float]</dt><dd><p>A tuple containing:
-- generated_methane_mass (float): The mass of generated methane.
-- generated_methane_volume (float): The volume of generated methane.</p>
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The mass of generated methane.</p></li>
+<li><p>The volume of generated methane.</p></li>
+</ul>
 </dd>
 </dl>
+</section>
+<section id="id3">
+<h3>Notes<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<p>Uses the supplied temperature set point and volatile solids in the digester to compute the density of methane
+and its corresponding volume and mass.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._destroy_volatile_solids">
 <span class="sig-name descname"><span class="pre">_destroy_volatile_solids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_volatile_solids_destruction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._destroy_volatile_solids" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._destroy_volatile_solids'"><span>#</span></a></dt>
 <dd><p>Adjusts the quantities of solids in the manure after volatile solids are destroyed.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>total_volatile_solids_destruction<span class="classifier">float</span></dt><dd><p>Amount of volatile solids removed from the manure (kg).</p>
 </dd>
@@ -259,8 +256,8 @@ to compute the density of methane and its corresponding volume and mass.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ManureStream</dt><dd><p>Manure being processed by the anaerobic digester after volatile solids are removed.</p>
 </dd>
@@ -272,8 +269,8 @@ to compute the density of methane and its corresponding volume and mass.</p>
 <span class="sig-name descname"><span class="pre">_report_continuous_mix_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">captured_biogas_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">captured_methane_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_leakage_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._report_continuous_mix_outputs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._report_continuous_mix_outputs'"><span>#</span></a></dt>
 <dd><p>Reports manure that was digested and the amounts of different things that were lost or generated in the
 anaerobic digestion process.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>captured_biogas_volume<span class="classifier">float</span></dt><dd><dl class="simple">
 <dt>Captured biogas (assumed to be composed of 40% CO2, 60% CH4) volume after accounting for leakage</dt><dd><p>on the current day (m^3).</p>
@@ -293,8 +290,8 @@ anaerobic digestion process.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_CSTR_methane_volume">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_CSTR_methane_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_production_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_CSTR_methane_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_CSTR_methane_volume'"><span>#</span></a></dt>
 <dd><p>Calculates volume of methane generated from a continuously-stirred tank reactor.</p>
-<section id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>total_volatile_solids<span class="classifier">float</span></dt><dd><p>Total volatile solids contained in manure (kg).</p>
 </dd>
@@ -302,15 +299,15 @@ anaerobic digestion process.</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Methane generation volume (m^3).</p>
 </dd>
 </dl>
 </section>
-<section id="id8">
-<h3>Notes<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Notes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <p>This function originates from personal communications with subject matter experts Wei Liao (<a class="reference external" href="mailto:liaow%40msu.edu">liaow<span>@</span>msu<span>.</span>edu</a>) and
 April Leytem (<a class="reference external" href="mailto:april.leytem%40usda.gov">april<span>.</span>leytem<span>@</span>usda<span>.</span>gov</a>). The equation is a simplification of the IPCC Tier II estimate of CH4
 emissions from anaerobic digesters, where CH4 generated in the digester is assumed to be equivalent to the
@@ -322,8 +319,8 @@ for dairy manure (240 L CH4 per kg of manure volatile solids).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_methane_leakage">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_methane_leakage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generated_methane_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_methane_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leakage_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_methane_leakage" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix._calculate_methane_leakage'"><span>#</span></a></dt>
 <dd><p>Calculates the mass of methane lost from an anaerobic digester as leakage.</p>
-<section id="id9">
-<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>generated_methane_mass<span class="classifier">float</span></dt><dd><p>The mass of methane generated within the digester (kg).</p>
 </dd>
@@ -333,8 +330,8 @@ for dairy manure (240 L CH4 per kg of manure volatile solids).</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>tuple[float, float]</dt><dd><ul class="simple">
 <li><p>Mass of methane lost as leakage (kg).</p></li>

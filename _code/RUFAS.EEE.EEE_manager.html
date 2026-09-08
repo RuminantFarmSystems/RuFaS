@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.EEE.emissions.html" rel="next" title="RUFAS.EEE.emissions module"/>
+<link href="RUFAS.EEE.html" rel="prev" title="RUFAS.EEE package"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,9 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.EEE.html">RUFAS.EEE package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.EEE.EEE_manager module</span>
 </nav>
 <div id="content" role="main">
@@ -145,14 +151,24 @@
 <dt class="sig sig-object py" id="RUFAS.EEE.EEE_manager.EEEManager">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.EEE.EEE_manager.</span></span><span class="sig-name descname"><span class="pre">EEEManager</span></span><a class="headerlink" href="#RUFAS.EEE.EEE_manager.EEEManager" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.EEE_manager.EEEManager'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.EEE.EEE_manager.EEEManager.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.EEE_manager.EEEManager.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.EEE_manager.EEEManager.__init__'"><span>#</span></a></dt>
-<dd></dd></dl>
+<p>Coordinates the energy and emissions estimations for the EEE module.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.EEE.EEE_manager.EEEManager.estimate_all">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">estimate_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.EEE_manager.EEEManager.estimate_all" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.EEE_manager.EEEManager.estimate_all'"><span>#</span></a></dt>
-<dd><p>Runs all estimation functions and records all results from them.</p>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">estimate_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulate_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_feed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.EEE.EEE_manager.EEEManager.estimate_all" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.EEE.EEE_manager.EEEManager.estimate_all'"><span>#</span></a></dt>
+<dd><p>Runs all emissions and energy estimations and records their results to the <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code>.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>simulate_animals<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the AnimalManager module.</p>
+</dd>
+<dt>simulate_feed<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the FeedManager module</p>
+</dd>
+<dt>simulate_fields<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the FieldManager module.</p>
+</dd>
+<dt>simulate_manure<span class="classifier">bool</span></dt><dd><p>Whether the simulation initialized and used the ManureManager module</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 </dd></dl>
 </section>
@@ -160,7 +176,6 @@
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#RUFAS.EEE.EEE_manager.EEEManager'" class="reference internal" href="#RUFAS.EEE.EEE_manager.EEEManager"><code class="docutils literal notranslate"><span class="pre">EEEManager</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.EEE.EEE_manager.EEEManager.__init__'" class="reference internal" href="#RUFAS.EEE.EEE_manager.EEEManager.__init__"><code class="docutils literal notranslate"><span class="pre">EEEManager.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.EEE.EEE_manager.EEEManager.estimate_all'" class="reference internal" href="#RUFAS.EEE.EEE_manager.EEEManager.estimate_all"><code class="docutils literal notranslate"><span class="pre">EEEManager.estimate_all()</span></code></a></li>
 </ul>
 </li>

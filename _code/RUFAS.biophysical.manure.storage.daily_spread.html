@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.manure.storage.open_lot.html" rel="next" title="RUFAS.biophysical.manure.storage.open_lot module"/>
+<link href="RUFAS.biophysical.manure.storage.composting_type.html" rel="prev" title="RUFAS.biophysical.manure.storage.composting_type module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.manure.html">RUFAS.biophysical.manure package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.manure.storage.html">RUFAS.biophysical.manure.storage package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.manure.storage.daily_spread module</span>
 </nav>
 <div id="content" role="main">
@@ -145,6 +153,19 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.daily_spread.DailySpread">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.storage.daily_spread.</span></span><span class="sig-name descname"><span class="pre">DailySpread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_time_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.manure.storage.storage_cover.html#RUFAS.biophysical.manure.storage.storage_cover.StorageCover" title="RUFAS.biophysical.manure.storage.storage_cover.StorageCover"><span class="pre">StorageCover</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">StorageCover.NO_COVER</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread'"><span>#</span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage" title="RUFAS.biophysical.manure.storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
+<p>The daily spread manure storage class.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>The name of the storage.</p>
+</dd>
+<dt>storage_time_period<span class="classifier">int, default=1</span></dt><dd><p>The length of time (days) manure is stored for between emptying events.</p>
+</dd>
+<dt>surface_area<span class="classifier">float, default=math.inf</span></dt><dd><p>The surface area of the manure storage (m^2).</p>
+</dd>
+<dt>cover<span class="classifier">StorageCover, default=StorageCover.NO_COVER</span></dt><dd><p>The type of cover used with the specified storage.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.daily_spread.DailySpread.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_time_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.manure.storage.storage_cover.html#RUFAS.biophysical.manure.storage.storage_cover.StorageCover" title="RUFAS.biophysical.manure.storage.storage_cover.StorageCover"><span class="pre">StorageCover</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">StorageCover.NO_COVER</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.__init__'"><span>#</span></a></dt>
@@ -154,8 +175,8 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.daily_spread.DailySpread.receive_manure">
 <span class="sig-name descname"><span class="pre">receive_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.receive_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.receive_manure'"><span>#</span></a></dt>
 <dd><p>Receives the manure.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <p>manure : ManureStream</p>
 </section>
 </dd></dl>
@@ -163,8 +184,8 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.daily_spread.DailySpread.process_manure">
 <span class="sig-name descname"><span class="pre">process_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.process_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.process_manure'"><span>#</span></a></dt>
 <dd><p>Processes manure in daily spread.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>current_day_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>The current day conditions.</p>
 </dd>
@@ -173,17 +194,31 @@
 </dl>
 </section>
 <section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>dict[str, ManureStream]</dt><dd><p>_The processed manure stream.</p>
+<dt>dict[str, ManureStream]</dt><dd><p>The processed manure stream.</p>
 </dd>
 </dl>
 </section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.daily_spread.DailySpread._report_emptied">
+<span class="sig-name descname"><span class="pre">_report_emptied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread._report_emptied" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread._report_emptied'"><span>#</span></a></dt>
+<dd><p>Suppress the parent’s full-throughput “emptied” report.</p>
+<p>For daily spread, “emptied” represents only the manure that was not spread on the field (exported
+off-farm). That quantity is the unspread remainder left in <code class="docutils literal notranslate"><span class="pre">available_for_field_application</span></code> after
+field operations, which <code class="docutils literal notranslate"><span class="pre">process_manure</span></code> reports directly.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.daily_spread.DailySpread.set_available_for_field_application">
+<span class="sig-name descname"><span class="pre">set_available_for_field_application</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.set_available_for_field_application" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.set_available_for_field_application'"><span>#</span></a></dt>
+<dd><p>Set remaining manure available for daily spread field application.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.daily_spread.DailySpread._abc_impl">
 <span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread._abc_impl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread._abc_impl'"><span>#</span></a></dt>
 <dd></dd></dl>
+</section>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -193,6 +228,8 @@
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.__init__'" class="reference internal" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.__init__"><code class="docutils literal notranslate"><span class="pre">DailySpread.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.receive_manure'" class="reference internal" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.receive_manure"><code class="docutils literal notranslate"><span class="pre">DailySpread.receive_manure()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.process_manure'" class="reference internal" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.process_manure"><code class="docutils literal notranslate"><span class="pre">DailySpread.process_manure()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread._report_emptied'" class="reference internal" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread._report_emptied"><code class="docutils literal notranslate"><span class="pre">DailySpread._report_emptied()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.set_available_for_field_application'" class="reference internal" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread.set_available_for_field_application"><code class="docutils literal notranslate"><span class="pre">DailySpread.set_available_for_field_application()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.daily_spread.DailySpread._abc_impl'" class="reference internal" href="#RUFAS.biophysical.manure.storage.daily_spread.DailySpread._abc_impl"><code class="docutils literal notranslate"><span class="pre">DailySpread._abc_impl</span></code></a></li>
 </ul>
 </li>

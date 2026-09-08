@@ -29,7 +29,7 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.biophysical.animal.herd_factory.html" rel="next" title="RUFAS.biophysical.animal.herd_factory module"/>
+<link href="RUFAS.biophysical.animal.calf_retention_policy.html" rel="next" title="RUFAS.biophysical.animal.calf_retention_policy module"/>
 <link href="RUFAS.biophysical.animal.animal_module_constants.html" rel="prev" title="RUFAS.biophysical.animal.animal_module_constants module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -151,44 +152,13 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_module_reporter.</span></span><span class="sig-name descname"><span class="pre">AnimalModuleReporter</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.data_padder">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">data_padder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_variable_to_add</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thing_to_add</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.data_padder" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.data_padder'"><span>#</span></a></dt>
-<dd><p>Pads a variable in OutputManager for entries that it “missed” relative to another variable.</p>
-<p>This is meant to be used prior to the addition of a variable to OutputManager, only in the cases where there
-may be a mismatch in variable lengths.
-A common case would be when a variable is stored in OutputManager by pen, and additional pens are created
-during the simulation.</p>
-<p>This method checks the length of a reference variable (in the previous example, Pen 0) in OutputManager and the
-variable of interest (in the previous example, a newly created Pen 15), and if there is a
-mismatch greater than one, it makes the number of calls to OutputManager necessary to ensure the length of the
-variable to add is one less than the reference variable using “blank” data.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>reference_variable<span class="classifier">str</span></dt><dd><p>The “reference” variable name as found in om.variables_pool. In the case of a pen, this should be pen 0 (as
-it will always be instantiated at the start of the simulation).</p>
-</dd>
-<dt>full_variable_to_add: str</dt><dd><p>The variable name as found in om.variables_pool.</p>
-</dd>
-<dt>thing_to_add<span class="classifier">Any</span></dt><dd><p>The variable data to pad the om.variables_pool with.</p>
-</dd>
-<dt>simulation_day: int</dt><dd><p>The day of the simulation.</p>
-</dd>
-<dt>info_map: Dict[str, Any]</dt><dd><p>The info_map to use when padding.</p>
-</dd>
-<dt>units: Dict[str, str] | str</dt><dd><p>Units for the variable being added, in the format provided in the main call to add_variable,
-(e.g., the one following the call of data_padder).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
+<p>The reporting class for the Animal module.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_daily_animal_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_statistics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HerdStatistics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population'"><span>#</span></a></dt>
 <dd><p>Adds daily totals for animal types to OutputManager.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>herd_statistics<span class="classifier">HerdStatistics</span></dt><dd><p>The HerdStatistics object containing the statistics for the animals in the herd.</p>
 </dd>
@@ -201,12 +171,31 @@ it will always be instantiated at the start of the simulation).</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_milk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">milk_reports</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">MilkProductionStatistics</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk'"><span>#</span></a></dt>
 <dd><p>Adds milk information for all cows in pen to output manager.</p>
-<section id="id2">
-<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>milk_reports<span class="classifier">list[MilkProductionStatistics]</span></dt><dd><p>A list of MilkProductionStatistics for each lactating cow in the herd.</p>
 </dd>
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_average_genetics">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_average_genetics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">average_genetics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_name_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_average_genetics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_average_genetics'"><span>#</span></a></dt>
+<dd><p>Reports the average genetics data with associated simulation metadata.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>average_genetics<span class="classifier">dict[str, float | None]</span></dt><dd><p>A dictionary containing genetic measurements, where the key is
+the measurement name and the value is the averaged measurement.</p>
+</dd>
+<dt>variable_name_prefix<span class="classifier">str</span></dt><dd><p>A prefix to be appended to the variable name for distinguishing
+the reported data in the output.</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The specific day in the simulation timeline, used to annotate the
+reported data for temporal tracking.</p>
 </dd>
 </dl>
 </section>
@@ -376,11 +365,30 @@ and the value is the AnimalManureExcretions object.</p>
 </section>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reproduction_statistics">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_daily_reproduction_statistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_herd_reproduction_statistics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HerdReproductionStatistics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reproduction_statistics" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reproduction_statistics'"><span>#</span></a></dt>
+<dd><p>Adds daily herd reproduction statistics to OutputManager.</p>
+<p>Reports the number of successful conceptions that occurred on the simulation day, at the
+herd, heifer, and cow level. These daily values form a time series that can be summed over
+any window (e.g. annually) for downstream analyses such as the economic layer. The
+whole-simulation totals and conception rates are reported separately at end-of-simulation
+(see <code class="docutils literal notranslate"><span class="pre">report_end_of_simulation</span></code>).</p>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>daily_herd_reproduction_statistics<span class="classifier">HerdReproductionStatistics</span></dt><dd><p>Reproduction statistics accumulated over the current simulation day only.</p>
+</dd>
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_pen_total">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_daily_pen_total</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_animal_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_animals_in_pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_pen_total" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_pen_total'"><span>#</span></a></dt>
 <dd><p>Reports the pen total animal numbers.</p>
-<section id="id12">
-<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<section id="id13">
+<h2>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>pen_id<span class="classifier">str</span></dt><dd><p>The pen ID.</p>
 </dd>
@@ -397,8 +405,8 @@ and the value is the AnimalManureExcretions object.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_sold_animal_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_statistics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HerdStatistics</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information'"><span>#</span></a></dt>
 <dd><p>Adds a dictionary of sold animal information to the output manager.</p>
-<section id="id13">
-<h2>Parameters<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
+<section id="id14">
+<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>herd_statistics<span class="classifier">HerdStatistics</span></dt><dd><p>The HerdStatistics object containing sold animal information.</p>
 </dd>
@@ -409,14 +417,14 @@ and the value is the AnimalManureExcretions object.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_stillborn_calves_information">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_stillborn_calves_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stillborn_calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">StillbornCalfTypedDict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_stillborn_calves_information" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_stillborn_calves_information'"><span>#</span></a></dt>
 <dd><p>Adds a dictionary of sold animal information to the output manager on daily basis.</p>
-<section id="id14">
-<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>stillborn_calves<span class="classifier">list[StillbornCalfTypedDict]</span></dt><dd><p>List of stillborn calves.</p>
 </dd>
 <dt>report_name<span class="classifier">str</span></dt><dd><p>The string to be appended to the variable being reported to the OM.</p>
 </dd>
-<dt>total_days<span class="classifier">int</span></dt><dd><p>The total number of days in the simulation</p>
+<dt>total_days<span class="classifier">int</span></dt><dd><p>The total number of days in the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -425,37 +433,42 @@ and the value is the AnimalManureExcretions object.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_sold_animal_information_sort_by_sell_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sold_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">SoldAnimalTypedDict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day'"><span>#</span></a></dt>
 <dd><p>Adds a dictionary of sold animal information to the output manager on daily basis.</p>
-<section id="id15">
-<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
+<section id="id16">
+<h2>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>sold_animals<span class="classifier">list[object]</span></dt><dd><p>List of sold animals.</p>
 </dd>
 <dt>report_name<span class="classifier">str</span></dt><dd><p>The string to be appended to the variable being reported to the OM.</p>
 </dd>
-<dt>total_days<span class="classifier">int</span></dt><dd><p>The total number of days in the simulation</p>
+<dt>total_days<span class="classifier">int</span></dt><dd><p>The total number of days in the simulation.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_305d_milk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">average_herd_305_days_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk'"><span>#</span></a></dt>
-<dd><p>Adds herd mean of latest_milk_production_305days to the output manager,
-though only for lactating cows with nonzero values.</p>
-<section id="id16">
-<h2>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305_day_milk_yield">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_305_day_milk_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l1_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l3_plus_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305_day_milk_yield" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305_day_milk_yield'"><span>#</span></a></dt>
+<dd><p>Adds herd-level average 305-day milk yield outputs to the output manager.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>average_herd_305_days_milk_production<span class="classifier">float</span></dt><dd><p>The herd average total past 305-day milk production.</p>
+<dt>herd_mean<span class="classifier">float</span></dt><dd><p>The whole-herd average 305-day milk yield across adult cows.</p>
+</dd>
+<dt>l1_mean<span class="classifier">float</span></dt><dd><p>The average 305-day milk yield for lactation 1 cows.</p>
+</dd>
+<dt>l2_mean<span class="classifier">float</span></dt><dd><p>The average 305-day milk yield for lactation 2 cows.</p>
+</dd>
+<dt>l3_plus_mean<span class="classifier">float</span></dt><dd><p>The average 305-day milk yield for lactation 3+ cows.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_end_of_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_statistics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HerdStatistics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_reproduction_statistics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HerdReproductionStatistics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">heiferII_events_by_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_events_by_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">report_end_of_simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_statistics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HerdStatistics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_reproduction_statistics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HerdReproductionStatistics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">heiferII_events_by_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalEvents</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_events_by_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalEvents</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_animals_genetic_history</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation'"><span>#</span></a></dt>
 <dd><p>Calls all reporter methods that should happen at the end of the simulation.</p>
-<section id="id17">
-<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
+<section id="id18">
+<h2>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>herd_statistics<span class="classifier">HerdStatistics</span></dt><dd><p>Instance of HerdStatistics class.</p>
 </dd>
@@ -463,21 +476,23 @@ though only for lactating cows with nonzero values.</p>
 </dd>
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime object with the current time information.</p>
 </dd>
-<dt>heiferII_events_by_id<span class="classifier">dict[str, str]</span></dt><dd><p>The dictionary of HeiferII events.</p>
+<dt>heiferII_events_by_id<span class="classifier">dict[str, AnimalEvents]</span></dt><dd><p>The dictionary of HeiferII events.</p>
 </dd>
-<dt>cow_events_by_id<span class="classifier">dict[str, str]</span></dt><dd><p>The dictionary of Cow events.</p>
+<dt>cow_events_by_id<span class="classifier">dict[str, AnimalEvents]</span></dt><dd><p>The dictionary of Cow events.</p>
+</dd>
+<dt>all_animals_genetic_history<span class="classifier">dict[int, str]</span></dt><dd><p>The dict of genetic histories for all animals in the herd by their IDs.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_animal_events">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_record_animal_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_events_by_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_animal_events" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_animal_events'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_record_animal_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_events_by_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalEvents</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_animal_events" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_animal_events'"><span>#</span></a></dt>
 <dd><p>Record the events of the animals.</p>
-<section id="id18">
-<h2>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>animal_events_by_id<span class="classifier">dict[str, str]</span></dt><dd><p>A dictionary of animal events, where the key is a string containing the animal id and the animal type,
+<dt>animal_events_by_id<span class="classifier">dict[str, AnimalEvents]</span></dt><dd><p>A dictionary of animal events, where the key is a string containing the animal id and the animal type,
 and the value is the string representation of the events of the animal.</p>
 </dd>
 <dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
@@ -494,6 +509,11 @@ and the value is the string representation of the events of the animal.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_cows_conception_rate">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_record_cows_conception_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_reproduction_statistics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HerdReproductionStatistics</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_cows_conception_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_cows_conception_rate'"><span>#</span></a></dt>
 <dd><p>Record the conception rate of cows.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._report_all_animals_genetic_history">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_report_all_animals_genetic_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_animals_genetic_history</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._report_all_animals_genetic_history" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._report_all_animals_genetic_history'"><span>#</span></a></dt>
+<dd><p>Report all animals genetic history.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_animal_population_statistics">
@@ -536,9 +556,9 @@ and the value is the string representation of the events of the animal.</p>
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter</span></code></a><ul>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.data_padder'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.data_padder"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.data_padder()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_animal_population"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_daily_animal_population()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_milk"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_milk()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_average_genetics'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_average_genetics"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_average_genetics()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_ration_per_animal'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_ration_per_animal"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_ration_per_animal()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_nutrient_amounts'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_nutrient_amounts"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_nutrient_amounts()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_average_nutrient_requirements'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_average_nutrient_requirements"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_average_nutrient_requirements()</span></code></a></li>
@@ -550,15 +570,17 @@ and the value is the string representation of the events of the animal.</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_streams'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_streams"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_manure_streams()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_excretions'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_excretions"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_manure_excretions()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_herd_statistics_data'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_herd_statistics_data"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_herd_statistics_data()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reproduction_statistics'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reproduction_statistics"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_daily_reproduction_statistics()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_pen_total'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_pen_total"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_daily_pen_total()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_sold_animal_information()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_stillborn_calves_information'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_stillborn_calves_information"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_stillborn_calves_information()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305d_milk"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_305d_milk()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305_day_milk_yield'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_305_day_milk_yield"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_305_day_milk_yield()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_end_of_simulation()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_animal_events'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_animal_events"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter._record_animal_events()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_heiferIIs_conception_rate'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_heiferIIs_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter._record_heiferIIs_conception_rate()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_cows_conception_rate'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._record_cows_conception_rate"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter._record_cows_conception_rate()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._report_all_animals_genetic_history'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter._report_all_animals_genetic_history"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter._report_all_animals_genetic_history()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_animal_population_statistics'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_animal_population_statistics"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_animal_population_statistics()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_total_disease_days'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_total_disease_days"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_total_disease_days()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_disease_incidence'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_disease_incidence"><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_disease_incidence()</span></code></a></li>

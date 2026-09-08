@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html" rel="next" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection module"/>
+<link href="RUFAS.data_structures.html" rel="prev" title="RUFAS.data_structures package"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,9 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.data_structures.html">RUFAS.data_structures package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.data_structures.animal_to_manure_connection module</span>
 </nav>
 <div id="content" role="main">
@@ -172,21 +178,21 @@
 <section id="id1">
 <h2>Attributes<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in this pen that created the manure.</p>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in this pen that created the manure (animals).</p>
 </dd>
 <dt>manure_deposition_surface_area<span class="classifier">float</span></dt><dd><p>The surface area of the manure deposition area in the pen (m^2).</p>
 </dd>
-<dt>animal_combination<span class="classifier">AnimalCombination</span></dt><dd><p>The combination of animals in the pen.</p>
+<dt>animal_combination<span class="classifier">AnimalCombination</span></dt><dd><p>The combination of animals in the pen (unitless).</p>
 </dd>
-<dt>pen_type<span class="classifier">str | None</span></dt><dd><p>The type of pen.</p>
+<dt>pen_type<span class="classifier">str | None</span></dt><dd><p>The type of pen (unitless).</p>
 </dd>
 <dt>manure_urine_mass<span class="classifier">float</span></dt><dd><p>The overall mass of urine in the manure stream (kg).</p>
 </dd>
 <dt>manure_urine_nitrogen<span class="classifier">float</span></dt><dd><p>The mass of nitrogen in the urine in the manure stream (kg).</p>
 </dd>
-<dt>stream_type<span class="classifier">StreamType</span></dt><dd><p>The type of manure stream in the pen.</p>
+<dt>stream_type<span class="classifier">StreamType</span></dt><dd><p>The type of manure stream in the pen (unitless).</p>
 </dd>
-<dt>first_processor<span class="classifier">str</span></dt><dd><p>The name of the first processor to handle the manure stream.</p>
+<dt>first_processor<span class="classifier">str</span></dt><dd><p>The name of the first processor to handle the manure stream (unitless).</p>
 </dd>
 <dt>total_bedding_mass: float</dt><dd><p>The total mass of the bedding applied to the manure stream (kg).</p>
 </dd>
@@ -240,11 +246,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.animal_to_manure_connection.PenManureData.set_first_processor">
 <span class="sig-name descname"><span class="pre">set_first_processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_structures.animal_to_manure_connection.PenManureData.set_first_processor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.animal_to_manure_connection.PenManureData.set_first_processor'"><span>#</span></a></dt>
-<dd></dd></dl>
+<dd><p>First-processor setter method.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.animal_to_manure_connection.PenManureData.set_bedding_mass_and_volume">
 <span class="sig-name descname"><span class="pre">set_bedding_mass_and_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_structures.animal_to_manure_connection.PenManureData.set_bedding_mass_and_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.animal_to_manure_connection.PenManureData.set_bedding_mass_and_volume'"><span>#</span></a></dt>
-<dd></dd></dl>
+<dd><p>Setter method for total_bedding_mass and total_bedding_volume.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.animal_to_manure_connection.PenManureData.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_deposition_surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_combination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalCombination</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_urine_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_urine_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.data_structures.animal_to_manure_connection.StreamType" title="RUFAS.data_structures.animal_to_manure_connection.StreamType"><span class="pre">StreamType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_processor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_bedding_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_bedding_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.data_structures.animal_to_manure_connection.PenManureData.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.animal_to_manure_connection.PenManureData.__init__'"><span>#</span></a></dt>
@@ -272,9 +280,11 @@ as well as for transfer between Manure module processors.</p>
 </dd>
 <dt>ash<span class="classifier">float</span></dt><dd><p>Mass of ash in the manure stream (kg).</p>
 </dd>
+<dt>degradable_volatile_solids<span class="classifier">float</span></dt><dd><p>Mass of degradable volatile solids in the manure stream (kg).</p>
+</dd>
 <dt>non_degradable_volatile_solids<span class="classifier">float</span></dt><dd><p>Mass of non-degradable volatile solids in the manure stream (kg).</p>
 </dd>
-<dt>degradable_volatile_solids<span class="classifier">float</span></dt><dd><p>Mass of degradable volatile solids in the manure stream (kg).</p>
+<dt>bedding_non_degradable_volatile_solids<span class="classifier">float</span></dt><dd><p>Amount of bedding non-degradable volatile solids (kg).</p>
 </dd>
 <dt>total_solids<span class="classifier">float</span></dt><dd><p>Mass of total solids in the manure stream (kg).</p>
 </dd>
@@ -282,9 +292,7 @@ as well as for transfer between Manure module processors.</p>
 </dd>
 <dt>methane_production_potential<span class="classifier">float</span></dt><dd><p>Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).</p>
 </dd>
-<dt>pen_manure_data<span class="classifier">PenManureData | None</span></dt><dd><p>Optional, more specific information about the manure and the pen or pens that produced it.</p>
-</dd>
-<dt>bedding_non_degradable_volatile_solids<span class="classifier">float</span></dt><dd><p>Amount of bedding non-degradable volatile solids (kg).</p>
+<dt>pen_manure_data<span class="classifier">PenManureData | None</span></dt><dd><p>Optional, more specific information about the manure and the pen or pens that produced it (unitless).</p>
 </dd>
 </dl>
 </section>
@@ -374,7 +382,7 @@ and pen_manure_data is None.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.animal_to_manure_connection.ManureStream.make_empty_manure_stream">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">make_empty_manure_stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></span><a class="headerlink" href="#RUFAS.data_structures.animal_to_manure_connection.ManureStream.make_empty_manure_stream" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.animal_to_manure_connection.ManureStream.make_empty_manure_stream'"><span>#</span></a></dt>
-<dd><p>Factory method for making empty ManureStreams.</p>
+<dd><p>Factory method for making an empty ManureStream.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.animal_to_manure_connection.ManureStream.split_stream">
@@ -402,7 +410,7 @@ if applicable. If None, the split_ratio will be used.</p>
 <section id="raises">
 <h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>ValueErrorcov</dt><dd><p>If split_ratio is not between 0 and 1.</p>
+<dt>ValueError</dt><dd><p>If split_ratio is not between 0 and 1.</p>
 </dd>
 </dl>
 </section>

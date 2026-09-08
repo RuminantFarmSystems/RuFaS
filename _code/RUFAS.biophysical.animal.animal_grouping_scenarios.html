@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -152,7 +153,7 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_grouping_scenarios.</span></span><span class="sig-name descname"><span class="pre">AnimalGroupingScenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>The different scenarios for grouping animals on a farm.
-Each scenario is a dictionary of the form: { AnimalCombination: [List of animal types/subtypes] }</p>
+Each scenario is a dictionary of the form: { AnimalCombination: [list of animal types/subtypes] }</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW">
 <span class="sig-name descname"><span class="pre">CALF__GROWING__CLOSE_UP__LACCOW</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{AnimalCombination.CALF:</span> <span class="pre">[AnimalType.CALF],</span> <span class="pre">AnimalCombination.CLOSE_UP:</span> <span class="pre">[AnimalType.HEIFER_III,</span> <span class="pre">AnimalType.DRY_COW],</span> <span class="pre">AnimalCombination.GROWING:</span> <span class="pre">[AnimalType.HEIFER_I,</span> <span class="pre">AnimalType.HEIFER_II],</span> <span class="pre">AnimalCombination.LAC_COW:</span> <span class="pre">[AnimalType.LAC_COW]}</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW'"><span>#</span></a></dt>
@@ -163,12 +164,12 @@ Each scenario is a dictionary of the form: { AnimalCombination: [List of animal 
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalCombination</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalCombination</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_grouping_scenarios.AnimalGroupingScenario.__init__'"><span>#</span></a></dt>
 <dd><p>Initialize the AnimalGroupingScenario.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>value<span class="classifier">Dict[AnimalCombination, List[str]]</span></dt><dd><p>The value of the AnimalGroupingScenario.</p>
+<dt>value<span class="classifier">dict[AnimalCombination, list[str]]</span></dt><dd><p>The value of the AnimalGroupingScenario.</p>
 </dd>
 </dl>
 </section>

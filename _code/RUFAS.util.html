@@ -30,7 +30,7 @@
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="RUFAS.weather.html" rel="next" title="RUFAS.weather module"/>
-<link href="RUFAS.units.html" rel="prev" title="RUFAS.units module"/>
+<link href="RUFAS.user_constants.html" rel="prev" title="RUFAS.user_constants module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -153,21 +154,22 @@
 <dt class="sig sig-object py" id="RUFAS.util.Utility">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.util.</span></span><span class="sig-name descname"><span class="pre">Utility</span></span><a class="headerlink" href="#RUFAS.util.Utility" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class contains utility functions that are used throughout the project.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">convert_list_of_dicts_to_dict_of_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_dicts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">convert_list_of_dicts_to_dict_of_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_dicts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists'"><span>#</span></a></dt>
 <dd><p>Convert a list of dictionaries into a dictionary of lists.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>list_of_dicts<span class="classifier">List[Dict[str, Any]]</span></dt><dd><p>A list of dictionaries with string keys and integer values.</p>
+<dt>list_of_dicts<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>A list of dictionaries with string keys and integer values.</p>
 </dd>
 </dl>
 </section>
 <section id="returns">
 <h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>Dict[str, List[Any]]</dt><dd><p>A dictionary where keys are unique keys from input dictionaries,
+<dt>dict[str, list[Any]]</dt><dd><p>A dictionary where keys are unique keys from input dictionaries,
 and values are lists of corresponding values from input dictionaries.</p>
 </dd>
 </dl>
@@ -194,14 +196,14 @@ and values are lists of corresponding values from input dictionaries.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.flatten_keys_to_nested_structure">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">flatten_keys_to_nested_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.flatten_keys_to_nested_structure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.flatten_keys_to_nested_structure'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">flatten_keys_to_nested_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.flatten_keys_to_nested_structure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.flatten_keys_to_nested_structure'"><span>#</span></a></dt>
 <dd><p>Convert a dictionary with flat, dot-separated keys into a nested structure composed of
 dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
 while non-numeric segments indicate dictionary keys.</p>
 <section id="id3">
 <h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>input_dict<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary where the keys are strings that may include dots to signify hierarchical
+<dt>input_dict<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary where the keys are strings that may include dots to signify hierarchical
 levels in the resulting nested structure. Numeric key segments result in list creations,
 and non-numeric segments result in dictionary creations.</p>
 </dd>
@@ -210,171 +212,263 @@ and non-numeric segments result in dictionary creations.</p>
 <section id="id4">
 <h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>Dict[str, Union[Dict, list]]</dt><dd><p>A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.</p>
+<dt>dict[str, Any]</dt><dd><p>A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.util.Utility.find_max_index_from_keys">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">find_max_index_from_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.find_max_index_from_keys" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.find_max_index_from_keys'"><span>#</span></a></dt>
-<dd><p>Extracts and returns the maximum index (n) from the keys of the given dictionary.
-Assumes keys follow the format <cite>&lt;prefix&gt;_&lt;number&gt;.&lt;suffix&gt;</cite> and number &gt;= 0.</p>
+<dt class="sig sig-object py" id="RUFAS.util.Utility.find_group_prefixes_from_keys">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">find_group_prefixes_from_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_suffixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.find_group_prefixes_from_keys" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.find_group_prefixes_from_keys'"><span>#</span></a></dt>
+<dd><p>Extracts unique group prefixes from flattened keys of the form:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">&lt;group_prefix&gt;.&lt;suffix&gt;</span></code></p>
+</div></blockquote>
+<dl class="simple">
+<dt>For example:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">Field._record_fertilizer_application.fertilizer_application.field='field_1'.mass</span></code>
+<code class="docutils literal notranslate"><span class="pre">Field._record_fertilizer_application.fertilizer_application.field='field_1'.year</span></code></p>
+</dd>
+<dt>would yield the group prefix:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">Field._record_fertilizer_application.fertilizer_application.field='field_1'</span></code></p>
+</dd>
+</dl>
 <section id="id5">
 <h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>data: Dict[str, Any]</dt><dd><p>The dictionary whose keys will be analyzed.</p>
+<dt>data<span class="classifier">dict[str, Any]</span></dt><dd><p>Dictionary whose keys are flattened variable names.</p>
+</dd>
+<dt>required_suffixes<span class="classifier">set[str] | None, default None</span></dt><dd><p>If provided, only prefixes that have at least one matching suffix from this set
+will be included.</p>
 </dd>
 </dl>
 </section>
 <section id="id6">
 <h2>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>int | None</dt><dd><p>The maximum index found among the keys, or None if no numeric index is found.</p>
+<dt>list[str]</dt><dd><p>Sorted list of unique group prefixes.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.expand_data_temporally">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">expand_data_temporally</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_to_expand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fill_value_in_gaps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fill_value_at_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.expand_data_temporally" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.expand_data_temporally'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">expand_data_temporally</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_to_expand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fill_value_before_start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fill_value_in_gaps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fill_value_at_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_data_to_observed_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.expand_data_temporally" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.expand_data_temporally'"><span>#</span></a></dt>
 <dd><p>Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
 recorded, so that values are present for all days in a certain range.</p>
 <section id="id7">
 <h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data_to_expand<span class="classifier">dict[str, dict[str, list[Any]]]</span></dt><dd><p>The data to be padded and expanded. The top level key is a variable name, and points to a dictionary that
-contains the keys “values” and optionally “info_maps”.</p>
+contains the keys <code class="docutils literal notranslate"><span class="pre">values</span></code> and optionally <code class="docutils literal notranslate"><span class="pre">info_maps</span></code>.</p>
 </dd>
-<dt>fill_value<span class="classifier">Any, default numpy.nan</span></dt><dd><p>Value that is used to pad the front of the data values, and optionally the values in between original values
-and after the last original value.</p>
+<dt>simulation_length<span class="classifier">int</span></dt><dd><p>Total number of simulation days.</p>
 </dd>
-<dt>use_fill_value_in_gaps<span class="classifier">bool, default True</span></dt><dd><p>If false, values between known data points are expanded with the last known value from the data set. If
-true, values between known data points are filled with <cite>fill_value</cite>.</p>
+<dt>fill_value<span class="classifier">Any, default numpy.nan</span></dt><dd><p>Value used when a region is configured to use fill values.</p>
 </dd>
-<dt>use_fill_value_at_end<span class="classifier">bool, default True</span></dt><dd><p>If false, values after last known data point are padded with the last known value from the data set. If
-true, values after the last known data point are filled with <cite>fill_value</cite>.</p>
+<dt>use_fill_value_before_start<span class="classifier">bool, default True</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, days before the first known datapoint are filled with <cite>fill_value</cite>; otherwise, they are filled
+with the first known value.</p>
+</dd>
+<dt>use_fill_value_in_gaps<span class="classifier">bool, default True</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, days between known datapoints are filled with <cite>fill_value</cite>; otherwise, they are filled with the
+last known value.</p>
+</dd>
+<dt>use_fill_value_at_end<span class="classifier">bool, default True</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, days after the last known datapoint are filled with <cite>fill_value</cite>; otherwise, they are filled
+with the last known value.</p>
+</dd>
+<dt>expand_data_to_observed_range<span class="classifier">bool, default False</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">False</span></code>, expands data from simulation day 1 through <code class="docutils literal notranslate"><span class="pre">simulation_length</span></code>. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, expands only
+from the first simulation day present in the dataset through the last simulation day present in the dataset.</p>
 </dd>
 </dl>
 </section>
 <section id="id8">
 <h2>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>dict[str, dict[str, list[Any]]]</dt><dd><p>The filled data, so that gaps in the data are filled in with the last known value or <cite>fill_value</cite>.</p>
+<dt>tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]</dt><dd><ul class="simple">
+<li><p>The expanded data.</p></li>
+<li><p>The logs generated from the expansion process.</p></li>
+</ul>
 </dd>
 </dl>
 </section>
 <section id="raises">
 <h2>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>TypeError</dt><dd><p>If a variable has no info maps.</p>
+<dt>TypeError</dt><dd><p>If a variable has no <code class="docutils literal notranslate"><span class="pre">info_map</span></code>.</p>
 </dd>
 <dt>ValueError</dt><dd><p>If there is no data to be filled.
-If the number of info maps does not match the number of values for a variable.
-If a value for “simulation_day” is not present in every info map.</p>
+If the number of <code class="docutils literal notranslate"><span class="pre">info_map</span></code> does not match the number of values for a variable.
+If a value for <code class="docutils literal notranslate"><span class="pre">simulation_day</span></code> is not present in every <code class="docutils literal notranslate"><span class="pre">info_map</span></code>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Utility._gather_data_sim_days">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_gather_data_sim_days</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_to_expand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility._gather_data_sim_days" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility._gather_data_sim_days'"><span>#</span></a></dt>
+<dd><p>Helper function for <code class="docutils literal notranslate"><span class="pre">expand_data_temporally()</span></code>.
+Validates the data structure and gathers the simulation days from the accompanying info maps.</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data_to_expand<span class="classifier">dict[str, dict[str, list[Any]]]</span></dt><dd><p>The data to be expanded.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>list[int]</dt><dd><p>A list of simulation days from the info maps of the <code class="docutils literal notranslate"><span class="pre">data_to_expand</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Raises<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>TypeError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">info_map``s</span> <span class="pre">are</span> <span class="pre">not</span> <span class="pre">present</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">``data_to_expand</span></code>.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If the lists of <a href="#id12"><span class="problematic" id="id13">``</span></a>info_map``s and values are different length.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">simulation_day</span></code> has not been reported in every <code class="docutils literal notranslate"><span class="pre">info_map</span></code> instance.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Utility.deep_merge">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">deep_merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.deep_merge" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.deep_merge'"><span>#</span></a></dt>
+<dd><p>Recursively merges <code class="docutils literal notranslate"><span class="pre">updates</span></code> into <code class="docutils literal notranslate"><span class="pre">target</span></code>. Supports deep merging for dictionaries and lists, including
+lists that contain dictionaries and dictionaries that contain lists.</p>
+<section id="id14">
+<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>target<span class="classifier">dict[Any, Any]</span></dt><dd><p>The primary dictionary to be updated.</p>
+</dd>
+<dt>updates<span class="classifier">dict[Any, Any]</span></dt><dd><p>The dictionary containing updates to be merged into target.</p>
 </dd>
 </dl>
 </section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<p>This method assumes there will never be multiple values recorded for a single variable on a single simulation
-day.</p>
-</section>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.util.Utility.deep_merge">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">deep_merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.deep_merge" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.deep_merge'"><span>#</span></a></dt>
-<dd><p>Recursively merges ‘updates’ into ‘target’. Supports deep merging for dictionaries and lists, including lists
-that contain dictionaries and dictionaries that contain lists.</p>
-<section id="id9">
-<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
-<dl class="simple">
-<dt>target<span class="classifier">Dict[Any, Any]</span></dt><dd><p>The primary dictionary to be updated.</p>
-</dd>
-<dt>updates<span class="classifier">Dict[Any, Any]</span></dt><dd><p>The dictionary containing updates to be merged into target.</p>
-</dd>
-</dl>
+<p>This function modifies the <code class="docutils literal notranslate"><span class="pre">target</span></code> dictionary in-place.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.calc_average">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">calc_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cur_avg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.calc_average" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.calc_average'"><span>#</span></a></dt>
-<dd><p>Calculate the new average given the number of values,
-the current average, and the new value.</p>
-<section id="id10">
-<h2>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
-<p>num_values: number of values for the current average
-cur_avg: the current average value
-new_value: the new value to be averaged</p>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">calc_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cur_avg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.calc_average" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.calc_average'"><span>#</span></a></dt>
+<dd><p>Calculates the new average given the number of values, the current average, and the new value.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>num_values<span class="classifier">int</span></dt><dd><p>Number of values in the current average.</p>
+</dd>
+<dt>cur_avg<span class="classifier">float</span></dt><dd><p>The current average value.</p>
+</dd>
+<dt>new_value<span class="classifier">float</span></dt><dd><p>The new value to incorporate into the average.</p>
+</dd>
+</dl>
 </section>
-<section id="id11">
-<h2>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
-<p>new_num_values: the new number of values for the new average
-new_avg: the new average value calculated</p>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>tuple[int, float]</dt><dd><ul class="simple">
+<li><p>Updated number of values.</p></li>
+<li><p>Updated average.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Utility.clamp">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">clamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.clamp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.clamp'"><span>#</span></a></dt>
+<dd><p>Constrain a value to the inclusive range [minimum, maximum].</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>value<span class="classifier">float</span></dt><dd><p>The value to constrain.</p>
+</dd>
+<dt>minimum<span class="classifier">float, default 0.0</span></dt><dd><p>The lower bound of the range.</p>
+</dd>
+<dt>maximum<span class="classifier">float, default 1.0</span></dt><dd><p>The upper bound of the range.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p><code class="docutils literal notranslate"><span class="pre">value</span></code> limited to the range, equivalent to <code class="docutils literal notranslate"><span class="pre">max(minimum,</span> <span class="pre">min(maximum,</span> <span class="pre">value))</span></code>.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.remove_items_from_list_by_indices">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">remove_items_from_list_by_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices_to_remove</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.remove_items_from_list_by_indices" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.remove_items_from_list_by_indices'"><span>#</span></a></dt>
-<dd><p>Remove items from a list given a list of indices.
-The operation is done in-place.</p>
-<section id="id12">
-<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h2>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">remove_items_from_list_by_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices_to_remove</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.remove_items_from_list_by_indices" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.remove_items_from_list_by_indices'"><span>#</span></a></dt>
+<dd><p>Remove items from a list given a list of indices.</p>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>data: List[Any] a list of items</dt><dd><p>The list to remove items from</p>
+<dt>data<span class="classifier">list[Any]</span></dt><dd><p>The list to remove items from.</p>
 </dd>
-<dt>indices_to_remove<span class="classifier">List[Any]</span></dt><dd><p>The list that contains indices of the items to be removed</p>
+<dt>indices_to_remove<span class="classifier">list[int]</span></dt><dd><p>The list that contains indices of the items to be removed.</p>
 </dd>
 </dl>
 </section>
-<section id="id13">
-<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h2>
-<p>None</p>
+<section id="id20">
+<h2>Notes<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
+<p>The operation is done in-place.
+Indices are sorted in reverse before removal to prevent index shifting from
+affecting later deletions.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.percent_calculator">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">percent_calculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">denominator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.percent_calculator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.percent_calculator'"><span>#</span></a></dt>
-<dd><p>Return a percent calculator closure that already stores the value of the given denominator.</p>
-<section id="id14">
-<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id14'"><span>#</span></a></h2>
-<p>denominator: the denominator to</p>
+<dd><p>Returns a percent calculator closure that already stores the value of the given denominator.</p>
+<section id="id21">
+<h2>Parameters<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>denominator<span class="classifier">float</span></dt><dd><p>The denominator for the percentage calculation.</p>
+</dd>
+</dl>
 </section>
-<section id="id15">
-<h2>Returns<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
-<p>A closure function that already stores the denominator internally
-so the user only needs to pass in the numerator.</p>
+<section id="id22">
+<h2>Returns<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Callable[[float], float]</dt><dd><p>A closure function that already stores the denominator internally so the user only needs to pass in the
+numerator.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.make_serializable">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">make_serializable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.make_serializable" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.make_serializable'"><span>#</span></a></dt>
 <dd><p>Converts the given object into a serializable object.</p>
-<section id="id16">
-<h2>Parameters<a class="headerlink" href="#id16" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'"><span>#</span></a></h2>
+<section id="id23">
+<h2>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>obj</dt><dd><p>The object to be serialized.</p>
+<dt>obj<span class="classifier">object</span></dt><dd><p>The object to be serialized.</p>
 </dd>
 <dt>max_depth<span class="classifier">int, optional</span></dt><dd><p>The maximum depth of recursion.</p>
 </dd>
 </dl>
 </section>
-<section id="id17">
-<h2>Returns<a class="headerlink" href="#id17" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'"><span>#</span></a></h2>
-<p>A serializable object.</p>
+<section id="id24">
+<h2>Returns<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>object</dt><dd><p>A serializable object.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility._make_serializable">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_make_serializable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#RUFAS.util.Utility._make_serializable" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility._make_serializable'"><span>#</span></a></dt>
 <dd><p>Makes the given object serializable.</p>
-<p>The object can be a primitive type, a list, a tuple, a set, a dictionary,
-or an instance of a custom class.</p>
 <p>A recursive algorithm is used to traverse the object and convert it into
 a serializable object. The maximum depth of recursion is specified by the
 parameter max_depth.</p>
-<section id="id18">
-<h2>Parameters<a class="headerlink" href="#id18" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'"><span>#</span></a></h2>
+<section id="id25">
+<h2>Parameters<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>obj<span class="classifier">object</span></dt><dd><p>The object to be serialized.</p>
 </dd>
@@ -384,74 +478,74 @@ parameter max_depth.</p>
 </dd>
 </dl>
 </section>
-<section id="id19">
-<h2>Returns<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
+<section id="id26">
+<h2>Returns<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>object</dt><dd><p>A serializable object.</p>
 </dd>
 </dl>
+</section>
+<section id="id27">
+<h2>Notes<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h2>
+<p>The object can be a primitive type, a list, a tuple, a set, a dictionary, or an instance of a custom class.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility._get_str">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_get_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.util.Utility._get_str" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility._get_str'"><span>#</span></a></dt>
 <dd><p>Returns a string representation of the given object.</p>
-<section id="id20">
-<h2>Parameters<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
+<section id="id28">
+<h2>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>obj<span class="classifier">object</span></dt><dd><p>The object to be converted to a string.</p>
 </dd>
 </dl>
 </section>
-<section id="id21">
-<h2>Returns<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h2>
+<section id="id29">
+<h2>Returns<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>str</dt><dd><p>A string representation of the given object.</p>
 </dd>
 </dl>
 </section>
-<section id="id22">
-<h2>Notes<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h2>
-<p>If the object has a custom __str__ method, then that method will be used.
-Otherwise, a variant of the default __str__ method will be used.</p>
-<p>Normally, the default __str__ method returns a string of the format:
-<cite>&lt;module&gt;.&lt;class&gt; object at &lt;memory address&gt;</cite>.
+<section id="id30">
+<h2>Notes<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h2>
+<p>If the object has a custom <code class="docutils literal notranslate"><span class="pre">__str__</span></code> method, then that method will be used.
+Otherwise, a variant of the default <code class="docutils literal notranslate"><span class="pre">__str__</span></code> method will be used.</p>
+<p>Normally, the default <code class="docutils literal notranslate"><span class="pre">__str__</span></code> method returns a string of the format:
+<code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.&lt;class&gt;</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">&lt;memory</span> <span class="pre">address&gt;</span></code>.
 Here, we want to simplify that string to the format:
-<cite>&lt;class&gt; object at &lt;memory address&gt;</cite>.</p>
+<code class="docutils literal notranslate"><span class="pre">&lt;class&gt;</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">&lt;memory</span> <span class="pre">address&gt;</span></code>.</p>
 <p>This turns out to be saving quite a bit of space when serializing objects.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.empty_dir">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">empty_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.empty_dir" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.empty_dir'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">empty_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.empty_dir" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.empty_dir'"><span>#</span></a></dt>
 <dd><p>Empties the given directory, except for the files or subdirectories in the keep list.</p>
-<section id="id23">
-<h2>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
+<section id="id31">
+<h2>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>dir_path<span class="classifier">Path</span></dt><dd><p>The path to the directory to be emptied.</p>
 </dd>
-<dt>keep<span class="classifier">List, optional</span></dt><dd><p>A list of file or subdirectory names to be kept.</p>
+<dt>keep<span class="classifier">list[str], optional</span></dt><dd><p>A list of file or subdirectory names to be kept.</p>
 </dd>
 </dl>
-</section>
-<section id="id24">
-<h2>Returns<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
-<p>None</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.get_timestamp">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_millis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.get_timestamp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.get_timestamp'"><span>#</span></a></dt>
 <dd><p>Produces the current system time as a timestamp string.</p>
-<section id="id25">
-<h2>Parameters<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h2>
+<section id="id32">
+<h2>Parameters<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>include_millis<span class="classifier">bool</span></dt><dd><p>If True, adds milliseconds to the timestamp.</p>
+<dt>include_millis<span class="classifier">bool</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, adds milliseconds to the timestamp.</p>
 </dd>
 </dl>
 </section>
-<section id="id26">
-<h2>Returns<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
+<section id="id33">
+<h2>Returns<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>str</dt><dd><p>The current time’s timestamp string.</p>
 </dd>
@@ -459,34 +553,36 @@ Here, we want to simplify that string to the format:
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#example'"><span>#</span></a></h2>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Utility</span><span class="o">.</span><span class="n">get_timestamp</span><span class="p">(</span><span class="n">include_millis</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-2"><span class="go">28-Jun-2023_Wed_15-48-21.406585</span>
-</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">Utility</span><span class="o">.</span><span class="n">get_timestamp</span><span class="p">(</span><span class="n">include_millis</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="line-4"><span class="go">28-Jun-2023_Wed_15-48-21</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Utility</span><span class="o">.</span><span class="n">get_timestamp</span><span class="p">(</span><span class="n">include_millis</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
+<p>28-Jun-2023_Wed_15-48-21.406585</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Utility</span><span class="o">.</span><span class="n">get_timestamp</span><span class="p">(</span><span class="n">include_millis</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>28-Jun-2023_Wed_15-48-21</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.filter_dictionary">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">filter_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_to_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_patterns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_by_exclusion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.filter_dictionary" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.filter_dictionary'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">filter_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_to_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_patterns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_by_exclusion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.filter_dictionary" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.filter_dictionary'"><span>#</span></a></dt>
 <dd><p>Returns a filtered dictionary based on either inclusion or exclusion.</p>
-<section id="id27">
-<h2>Parameters<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h2>
+<section id="id34">
+<h2>Parameters<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>dict_to_filter<span class="classifier">Dict[str, Any]</span></dt><dd><p>The dictionary to be filtered.</p>
+<dt>dict_to_filter<span class="classifier">dict[str, Any]</span></dt><dd><p>The dictionary to be filtered.</p>
 </dd>
-<dt>filter_patterns<span class="classifier">List[str]</span></dt><dd><p>A list of patterns by which to filter the dictionary.</p>
+<dt>filter_patterns<span class="classifier">list[str]</span></dt><dd><p>A list of patterns by which to filter the dictionary.</p>
 </dd>
 <dt>filter_by_exclusion<span class="classifier">bool</span></dt><dd><p>A flag indicating whether the dictionary should be filtered by exclusion
 or inclusion.</p>
 </dd>
 </dl>
 </section>
-<section id="id28">
-<h2>Returns<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
+<section id="id35">
+<h2>Returns<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>Dict[str, Any]</dt><dd><p>The filtered dictionary.</p>
+<dt>dict[str, Any]</dt><dd><p>The filtered dictionary.</p>
 </dd>
 </dl>
 </section>
@@ -495,15 +591,15 @@ or inclusion.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.remove_special_chars">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">remove_special_chars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.remove_special_chars" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.remove_special_chars'"><span>#</span></a></dt>
 <dd><p>Function to remove special characters from a string.</p>
-<section id="id29">
-<h2>Parameters<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
+<section id="id36">
+<h2>Parameters<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>input_string<span class="classifier">str</span></dt><dd><p>The string from which the special characters should be removed.</p>
+<dt>input_string<span class="classifier">str | list[str]</span></dt><dd><p>The string from which the special characters should be removed.</p>
 </dd>
 </dl>
 </section>
-<section id="id30">
-<h2>Returns<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h2>
+<section id="id37">
+<h2>Returns<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>str</dt><dd><p>The input string with the special characters filtered out.</p>
 </dd>
@@ -513,18 +609,18 @@ or inclusion.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.is_leap_year">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_leap_year</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.is_leap_year" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.is_leap_year'"><span>#</span></a></dt>
-<dd><p>Helper method determines if the given year is a leap year</p>
-<section id="id31">
-<h2>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h2>
+<dd><p>Determines if the given year is a leap year</p>
+<section id="id38">
+<h2>Parameters<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>year: int</dt><dd><p>The year.</p>
 </dd>
 </dl>
 </section>
-<section id="id32">
-<h2>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h2>
+<section id="id39">
+<h2>Returns<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>bool</dt><dd><p>True if the year is a leap year, otherwise False.</p>
+<dt>bool</dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the year is a leap year, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </dd>
 </dl>
 </section>
@@ -534,8 +630,8 @@ or inclusion.</p>
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">generate_time_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ending_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">date</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.generate_time_series" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.generate_time_series'"><span>#</span></a></dt>
 <dd><p>Generates a list of dates based on a given date and when the dates should start and end relative to the given
 date.</p>
-<section id="id33">
-<h2>Parameters<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h2>
+<section id="id40">
+<h2>Parameters<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>date<span class="classifier">datetime.date</span></dt><dd><p>Date around which the time series will be generated.</p>
 </dd>
@@ -545,100 +641,257 @@ date.</p>
 </dd>
 </dl>
 </section>
-<section id="id34">
-<h2>Raises<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
+<section id="id41">
+<h2>Raises<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>ValueError</dt><dd><p>If the starting_offset is greater than the ending_offset.</p>
+<dt>ValueError</dt><dd><p>If the <code class="docutils literal notranslate"><span class="pre">starting_offset</span></code> is greater than the <code class="docutils literal notranslate"><span class="pre">ending_offset</span></code>.</p>
 </dd>
 </dl>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#examples'"><span>#</span></a></h2>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">&gt;&gt;&gt; </span><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="line-2"><span class="go">[datetime.date(2024, 6, 1)]</span>
-</span><span id="line-3"><span class="gp">&gt;&gt;&gt; </span><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="line-4"><span class="go">[datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]</span>
-</span><span id="line-5"><span class="gp">&gt;&gt;&gt; </span><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="line-6"><span class="go">[datetime.date(2024, 5, 30)]</span>
-</span><span id="line-7"><span class="gp">&gt;&gt;&gt; </span><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-</span><span id="line-8"><span class="go">[datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]</span>
-</span><span id="line-9"><span class="gp">&gt;&gt;&gt; </span><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="line-10"><span class="go">[datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]</span>
-</span><span id="line-11"><span class="gp">&gt;&gt;&gt; </span><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span id="line-12"><span class="go">[datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
+<p>[datetime.date(2024, 6, 1)]</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>[datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>[datetime.date(2024, 5, 30)]</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>[datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>[datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">Utility</span><span class="o">.</span><span class="n">generate_time_series</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>[datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.convert_celsius_to_kelvin">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">convert_celsius_to_kelvin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.convert_celsius_to_kelvin" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.convert_celsius_to_kelvin'"><span>#</span></a></dt>
-<dd><p>Converts a temperature in degrees Celsius to degrees Kelvin.</p>
+<dd><p>Converts a temperature from Celsius to Kelvin.</p>
+<section id="id42">
+<h2>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>temperature<span class="classifier">float</span></dt><dd><p>Temperature in degrees Celsius.</p>
+</dd>
+</dl>
+</section>
+<section id="id43">
+<h2>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Temperature in Kelvin.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.convert_ordinal_date_to_month_date">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">convert_ordinal_date_to_month_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">date</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.convert_ordinal_date_to_month_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.convert_ordinal_date_to_month_date'"><span>#</span></a></dt>
-<dd><p>Generates a datetime.date based on a year and ordinal day.</p>
+<dd><p>Converts a year and ordinal day to a <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code>.</p>
+<section id="id44">
+<h2>Parameters<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>year<span class="classifier">int</span></dt><dd><p>The year.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>Ordinal day of the year.</p>
+</dd>
+</dl>
+</section>
+<section id="id45">
+<h2>Returns<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>datetime.date</dt><dd><p>Date corresponding to the given year and ordinal day.</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h2>Raises<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">day</span></code> is outside the valid range for the given year.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.generate_random_number">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">generate_random_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.generate_random_number" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.generate_random_number'"><span>#</span></a></dt>
-<dd><p>Generates a normally distributed random number using the provided mean and standard deviation.</p>
+<dd><p>Generates a normally distributed random number.</p>
+<section id="id47">
+<h2>Parameters<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>mean<span class="classifier">float</span></dt><dd><p>Mean of the normal distribution.</p>
+</dd>
+<dt>std_dev<span class="classifier">float</span></dt><dd><p>Standard deviation of the normal distribution.</p>
+</dd>
+</dl>
+</section>
+<section id="id48">
+<h2>Returns<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Random sample drawn from the specified normal distribution.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Utility.generate_bivariate_random_numbers">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">generate_bivariate_random_numbers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.generate_bivariate_random_numbers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.generate_bivariate_random_numbers'"><span>#</span></a></dt>
+<dd><p>Generates two correlated random numbers from a bivariate normal distribution.</p>
+<section id="id49">
+<h2>Parameters<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>mu_x<span class="classifier">float</span></dt><dd><p>Mean of the first random variable.</p>
+</dd>
+<dt>mu_y<span class="classifier">float</span></dt><dd><p>Mean of the second random variable.</p>
+</dd>
+<dt>sigma_x<span class="classifier">float</span></dt><dd><p>Standard deviation of the first random variable.</p>
+</dd>
+<dt>sigma_y<span class="classifier">float</span></dt><dd><p>Standard deviation of the second random variable.</p>
+</dd>
+<dt>rho<span class="classifier">float</span></dt><dd><p>Correlation coefficient between the two random variables.</p>
+</dd>
+</dl>
+</section>
+<section id="id50">
+<h2>Returns<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The first random number.</p></li>
+<li><p>The second random number.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="id51">
+<h2>Raises<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If either standard deviation is non-positive, or if <code class="docutils literal notranslate"><span class="pre">rho</span></code> is
+outside the range <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">1]</span></code>.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.flatten_dictionary">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">flatten_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.flatten_dictionary" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.flatten_dictionary'"><span>#</span></a></dt>
-<dd><p>Flatten a nested dictionary to a single level of depth by joining the keys with “.”</p>
+<dd><p>Flattens a nested dictionary to a single level by joining keys with a separator.</p>
+<section id="id52">
+<h2>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>input_dictionary<span class="classifier">dict[str, Any]</span></dt><dd><p>Nested dictionary to flatten.</p>
+</dd>
+<dt>parent_key<span class="classifier">str, optional</span></dt><dd><p>Prefix prepended to all keys. Defaults to <code class="docutils literal notranslate"><span class="pre">""</span></code>.</p>
+</dd>
+<dt>separator<span class="classifier">str, optional</span></dt><dd><p>String used to join nested keys. Defaults to <code class="docutils literal notranslate"><span class="pre">"."</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h2>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>dict[str, Any]</dt><dd><p>Flattened dictionary with all keys joined by the separator.</p>
+</dd>
+</dl>
+</section>
+<section id="id54">
+<h2>Notes<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h2>
+<p>List-of-dict values are flattened by index, with each index appended to the key as <code class="docutils literal notranslate"><span class="pre">_{i}</span></code>.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.combine_saved_input_csv">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">combine_saved_input_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">saved_csv_working_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_csv_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">import_csv_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.combine_saved_input_csv" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.combine_saved_input_csv'"><span>#</span></a></dt>
-<dd><p>Merge multiple saved input data CSVs files into one single CSV file for a direct side-by-side comparison.</p>
+<dd><p>Merges multiple saved input data CSV files into a single CSV for side-by-side comparison.</p>
+<section id="id55">
+<h2>Parameters<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>saved_csv_working_folder<span class="classifier">Path</span></dt><dd><p>Directory containing the CSV files to merge. Deleted after merging.</p>
+</dd>
+<dt>output_csv_path<span class="classifier">Path</span></dt><dd><p>Directory where the merged <code class="docutils literal notranslate"><span class="pre">saved_input_data.csv</span></code> file will be written.</p>
+</dd>
+<dt>import_csv_path<span class="classifier">Path or None</span></dt><dd><p>Optional path to an existing CSV to include as the base frame. Ignored
+if <code class="docutils literal notranslate"><span class="pre">None</span></code> or an empty path.</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h2>Notes<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h2>
+<p>All CSV files in <code class="docutils literal notranslate"><span class="pre">saved_csv_working_folder</span></code> are merged on <code class="docutils literal notranslate"><span class="pre">property_group</span></code> and <code class="docutils literal notranslate"><span class="pre">variable_name</span></code>.
+If an optional base CSV is provided via <code class="docutils literal notranslate"><span class="pre">import_csv_path</span></code>, it is included as the starting frame.
+Duplicate column prefixes are disambiguated by appending numeric suffixes. The working folder
+is deleted after the merged file is written.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.convert_list_to_dict_by_key">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">convert_list_to_dict_by_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_dicts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.convert_list_to_dict_by_key" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.convert_list_to_dict_by_key'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">convert_list_to_dict_by_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_dicts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.convert_list_to_dict_by_key" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.convert_list_to_dict_by_key'"><span>#</span></a></dt>
 <dd><p>Convert a list of dictionaries into a dictionary keyed by a specified identifier,
 where each value is the original dictionary minus the identifier key.</p>
-<section id="id35">
-<h2>Parameters<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h2>
+<section id="id57">
+<h2>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>list_of_dicts<span class="classifier">List[Dict[str, Any]]</span></dt><dd><p>A list of dictionaries, each containing a unique identifier and other data.</p>
+<dt>list_of_dicts<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>A list of dictionaries, each containing a unique identifier and other data.</p>
 </dd>
 <dt>id_key<span class="classifier">str</span></dt><dd><p>The key in each dictionary to use as the unique identifier.</p>
 </dd>
 </dl>
 </section>
-<section id="id36">
-<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h2>
+<section id="id58">
+<h2>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>Dict[Any, Dict[str, Any]]</dt><dd><p>A dictionary where each key is the unique identifier from the list and each
+<dt>Dict[Any, dict[str, Any]]</dt><dd><p>A dictionary where each key is the unique identifier from the list and each
 value is the corresponding dictionary minus the identifier key.</p>
 </dd>
 </dl>
 </section>
-<section id="id37">
-<h2>Notes<a class="headerlink" href="#id37" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id37'"><span>#</span></a></h2>
-<p>The use of <a href="#id69"><span class="problematic" id="id70">dict_</span></a>.pop(‘ID’) mutates the original dictionaries in list_of_dicts by removing their ‘ID’ keys.
-If you need to keep the original list and dictionaries intact, make a copy before calling this function.</p>
+<section id="id59">
+<h2>Raises<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>When the specified <code class="docutils literal notranslate"><span class="pre">id_key</span></code> is not found in any of the dictionaries in the list.</p>
+</dd>
+</dl>
 </section>
-<section id="id38">
-<h2>Example<a class="headerlink" href="#id38" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id38'"><span>#</span></a></h2>
-<p>Given a list of dictionaries like this:
-[</p>
-<blockquote>
-<div><p>{“ID”: 1, “value”: 2, “other_keys”: “other values”},
-{“ID”: 3, “value”: 4, “other_keys”: “other values”}</p>
-</div></blockquote>
-<p>]
-And using ‘ID’ as the id_key:</p>
-<p>convert_list_to_dict_by_key(list_of_dicts, ‘ID’)</p>
-<p>Would return:
-{</p>
-<blockquote>
-<div><p>1: {“value”: 2, “other_keys”: “other values”},
+<section id="id60">
+<h2>Notes<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h2>
+<p>The use of <code class="docutils literal notranslate"><span class="pre">dict_.pop('ID')</span></code> mutates the original dictionaries in <code class="docutils literal notranslate"><span class="pre">list_of_dicts</span></code> by removing their
+<code class="docutils literal notranslate"><span class="pre">ID</span></code> keys. If you need to keep the original list and dictionaries intact, make a copy before calling
+this function.</p>
+<p>The use <code class="docutils literal notranslate"><span class="pre">deepcopy</span></code> is necessary here because <code class="docutils literal notranslate"><span class="pre">dict_.pop('ID')</span></code> mutates <code class="docutils literal notranslate"><span class="pre">list_of_dicts</span></code> in place.
+To avoid side effects, we use <code class="docutils literal notranslate"><span class="pre">deepcopy</span></code> to make a copy before mutating the original list.</p>
+</section>
+<section id="id61">
+<h2>Example<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h2>
+<p>Given a list of dictionaries like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">[</span>
+</span><span id="line-2">    <span class="p">{</span><span class="s2">"ID"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"other_keys"</span><span class="p">:</span> <span class="s2">"other values"</span><span class="p">},</span>
+</span><span id="line-3">    <span class="p">{</span><span class="s2">"ID"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"other_keys"</span><span class="p">:</span> <span class="s2">"other values"</span><span class="p">}</span>
+</span><span id="line-4"><span class="p">]</span>
+</span></code></pre></div>
+</div>
+<p>And using <code class="docutils literal notranslate"><span class="pre">ID</span></code> as the <code class="docutils literal notranslate"><span class="pre">id_key</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">convert_list_to_dict_by_key</span><span class="p">(</span><span class="n">list_of_dicts</span><span class="p">,</span> <span class="s1">'ID'</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>Would return:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">
+</span></code></pre></div>
+</div>
+<dl class="simple">
+<dt>{</dt><dd><p>1: {“value”: 2, “other_keys”: “other values”},
 3: {“value”: 4, “other_keys”: “other values”}</p>
-</div></blockquote>
+</dd>
+</dl>
 <p>}</p>
 </section>
 </dd></dl>
@@ -646,8 +899,8 @@ And using ‘ID’ as the id_key:</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.elongate_list">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">elongate_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_to_elongate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_list_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.elongate_list" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.elongate_list'"><span>#</span></a></dt>
 <dd><p>Takes a list and lengthens it to match the length of the reference list, if the original length was 1.</p>
-<section id="id39">
-<h2>Parameters<a class="headerlink" href="#id39" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id39'"><span>#</span></a></h2>
+<section id="id62">
+<h2>Parameters<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>list_to_elongate<span class="classifier">list[Any]</span></dt><dd><p>List to be extended if its length is 1.</p>
 </dd>
@@ -655,15 +908,15 @@ And using ‘ID’ as the id_key:</p>
 </dd>
 </dl>
 </section>
-<section id="id40">
-<h2>Returns<a class="headerlink" href="#id40" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id40'"><span>#</span></a></h2>
+<section id="id63">
+<h2>Returns<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>list[Any]</dt><dd><p>The elongated list.</p>
 </dd>
 </dl>
 </section>
-<section id="id41">
-<h2>Notes<a class="headerlink" href="#id41" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id41'"><span>#</span></a></h2>
+<section id="id64">
+<h2>Notes<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h2>
 <p>In the context of Schedule-descendant classes, the reference list length will always be the length of the years
 list.</p>
 </section>
@@ -672,97 +925,111 @@ list.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.determine_if_all_non_negative_values">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">determine_if_all_non_negative_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.determine_if_all_non_negative_values" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.determine_if_all_non_negative_values'"><span>#</span></a></dt>
 <dd><p>Checks that all values in a list are &gt;= 0.</p>
-<section id="id42">
-<h2>Parameters<a class="headerlink" href="#id42" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id42'"><span>#</span></a></h2>
+<section id="id65">
+<h2>Parameters<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>values<span class="classifier">List[Any]</span></dt><dd><p>List of values to be checked.</p>
+<dt>values<span class="classifier">list[int | float]</span></dt><dd><p>List of values to be checked.</p>
 </dd>
 </dl>
 </section>
-<section id="id43">
-<h2>Returns<a class="headerlink" href="#id43" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id43'"><span>#</span></a></h2>
+<section id="id66">
+<h2>Returns<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>bool</dt><dd><p>True if all values are &gt;= 0, False otherwise.</p>
+<dt>bool</dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if all values are &gt;= 0, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.validate_fractions">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">validate_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.validate_fractions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.validate_fractions'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">validate_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.validate_fractions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.validate_fractions'"><span>#</span></a></dt>
 <dd><p>Checks that all fractions passed are valid.</p>
-<section id="id44">
-<h2>Parameters<a class="headerlink" href="#id44" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id44'"><span>#</span></a></h2>
+<section id="id67">
+<h2>Parameters<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>fractions<span class="classifier">List[float]</span></dt><dd><p>List of fractions to be valid</p>
+<dt>fractions<span class="classifier">list[float]</span></dt><dd><p>List of fractions to be validated.</p>
 </dd>
 </dl>
 </section>
-<section id="id45">
-<h2>Returns<a class="headerlink" href="#id45" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id45'"><span>#</span></a></h2>
+<section id="id68">
+<h2>Returns<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>bool</dt><dd><p>True if all fractions passed are valid, False otherwise.</p>
+<dt>bool</dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if all fractions passed are valid, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
 </dd>
 </dl>
 </section>
-<section id="id46">
-<h2>Notes<a class="headerlink" href="#id46" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'"><span>#</span></a></h2>
+<section id="id69">
+<h2>Notes<a class="headerlink" href="#id69" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id69'"><span>#</span></a></h2>
 <p>A fraction is valid if it is in the range[0.0, 1.0]</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.round_numeric_values_in_dict">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">round_numeric_values_in_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">significant_digits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.round_numeric_values_in_dict" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.round_numeric_values_in_dict'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">round_numeric_values_in_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">significant_digits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.round_numeric_values_in_dict" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.round_numeric_values_in_dict'"><span>#</span></a></dt>
 <dd><p>Rounds all numeric values in a dictionary to the specified number of significant digits.</p>
-<section id="id47">
-<h2>Parameters<a class="headerlink" href="#id47" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'"><span>#</span></a></h2>
+<section id="id70">
+<h2>Parameters<a class="headerlink" href="#id70" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id70'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>data<span class="classifier">dict[str, any]</span></dt><dd><p>The dictionary containing numeric values to be rounded.</p>
+<dt>data<span class="classifier">dict[str, Any]</span></dt><dd><p>The dictionary containing numeric values to be rounded.</p>
 </dd>
 <dt>significant_digits<span class="classifier">int</span></dt><dd><p>The number of significant digits to round the numeric values to.</p>
 </dd>
 </dl>
 </section>
-<section id="id48">
-<h2>Returns<a class="headerlink" href="#id48" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id48'"><span>#</span></a></h2>
+<section id="id71">
+<h2>Returns<a class="headerlink" href="#id71" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id71'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>dict[str, any]</dt><dd><p>The dictionary with numeric values rounded to the specified number of significant digits.</p>
+<dt>dict[str, Any]</dt><dd><p>The dictionary with numeric values rounded to the specified number of significant digits.</p>
 </dd>
 </dl>
 </section>
-<section id="id49">
-<h2>Notes<a class="headerlink" href="#id49" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id49'"><span>#</span></a></h2>
-<p>Some specific behavior of the round() function used by this method:</p>
-<p>If significant_digits is None or 0, floats are converted to ints.
-round(12.7) -&gt; 13 (int)
-round(12.3) -&gt; 12 (int)
-round(-12.7) -&gt; -13 (int)
-round(12.5) -&gt; 12 (int) - If rounded number is 5, Python rounds to the nearest even number.
-round(11.5) -&gt; 12 (int) - Because of this rule, both 11.5 and 12.5 round to 12.</p>
-<p>If significant_digits is less than 0, it rounds to the nearest multiple of 10, 100, 1000, etc.
-round(1234, -2) -&gt; 1200 (rounds to the nearest multiple of 100)
-round(1234, -3) -&gt; 1000 (rounds to the nearest multiple of 1000)
-round(-1234, -1) -&gt; -1230 (rounds to the nearest multiple of 10)</p>
-<p>If significant_digits is 0, it rounds to the nearest integer and converts it to a float.
-round(12.7, 0) -&gt; 13.0 (float)
-round(-12.3, 0) -&gt; -12.0 (float)</p>
+<section id="id72">
+<h2>Notes<a class="headerlink" href="#id72" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id72'"><span>#</span></a></h2>
+<p>Some specific behavior of the <code class="docutils literal notranslate"><span class="pre">round()</span></code> function used by this method:</p>
+<ul>
+<li><dl>
+<dt>If <code class="docutils literal notranslate"><span class="pre">significant_digits</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">0</span></code>, floats are converted to ints.</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="nb">round</span><span class="p">(</span><span class="mf">12.7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">13</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="line-2"><span class="nb">round</span><span class="p">(</span><span class="mf">12.3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">12</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="line-3"><span class="nb">round</span><span class="p">(</span><span class="o">-</span><span class="mf">12.7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">-</span><span class="mi">13</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="line-4"><span class="nb">round</span><span class="p">(</span><span class="mf">12.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">12</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>     <span class="c1"># If the rounded number is 5, Python rounds to the nearest even number.</span>
+</span><span id="line-5"><span class="nb">round</span><span class="p">(</span><span class="mf">11.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">12</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>     <span class="c1"># Because of this rule, both 11.5 and 12.5 round to 12.</span>
+</span></code></pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">significant_digits</span></code> is less than <code class="docutils literal notranslate"><span class="pre">0</span></code>, it rounds to the nearest multiple of 10, 100, 1000, etc.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="nb">round</span><span class="p">(</span><span class="mi">1234</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">1200</span>     <span class="c1"># (rounds to the nearest multiple of 100)</span>
+</span><span id="line-2"><span class="nb">round</span><span class="p">(</span><span class="mi">1234</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">1000</span>     <span class="c1"># (rounds to the nearest multiple of 1000)</span>
+</span><span id="line-3"><span class="nb">round</span><span class="p">(</span><span class="o">-</span><span class="mi">1234</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">-</span><span class="mi">1230</span>   <span class="c1"># (rounds to the nearest multiple of 10)</span>
+</span></code></pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">significant_digits</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code>, it rounds to the nearest integer and converts it to a float.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="nb">round</span><span class="p">(</span><span class="mf">12.7</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mf">13.0</span>          <span class="c1"># (float)</span>
+</span><span id="line-2"><span class="nb">round</span><span class="p">(</span><span class="o">-</span><span class="mf">12.3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">-</span><span class="mf">12.0</span>        <span class="c1"># (float)</span>
+</span></code></pre></div>
+</div>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.compare_randomized_rate_less_than">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">compare_randomized_rate_less_than</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.compare_randomized_rate_less_than" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.compare_randomized_rate_less_than'"><span>#</span></a></dt>
 <dd><p>Compare a random rate to a reference rate to determine if an event occurs.</p>
-<section id="id50">
-<h2>Parameters<a class="headerlink" href="#id50" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id50'"><span>#</span></a></h2>
+<section id="id73">
+<h2>Parameters<a class="headerlink" href="#id73" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id73'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>reference_rate<span class="classifier">float</span></dt><dd><p>Reference rate for comparison.</p>
 </dd>
 </dl>
 </section>
-<section id="id51">
-<h2>Returns<a class="headerlink" href="#id51" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id51'"><span>#</span></a></h2>
+<section id="id74">
+<h2>Returns<a class="headerlink" href="#id74" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id74'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>bool</dt><dd><p>True if the randomized rate is less than the reference rate, False otherwise.</p>
+<dt>bool</dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the randomized rate is less than the reference rate, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
 </dd>
 </dl>
 </section>
@@ -770,27 +1037,30 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.validate_date_format">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">validate_date_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.validate_date_format" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.validate_date_format'"><span>#</span></a></dt>
-<dd><p>Checks if date_format is a valid Python datetime format for both strftime() and strptime().</p>
-<section id="id52">
-<h2>Parameters<a class="headerlink" href="#id52" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id52'"><span>#</span></a></h2>
+<dd><p>Checks if date_format is a valid Python datetime format for both <code class="docutils literal notranslate"><span class="pre">strftime()</span></code> and <code class="docutils literal notranslate"><span class="pre">strptime()</span></code>.</p>
+<section id="id75">
+<h2>Parameters<a class="headerlink" href="#id75" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id75'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>date_format<span class="classifier">str</span></dt><dd><p>The date format to be validated.</p>
 </dd>
 </dl>
 </section>
-<section id="id53">
-<h2>Returns<a class="headerlink" href="#id53" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id53'"><span>#</span></a></h2>
-<p>bool</p>
+<section id="id76">
+<h2>Returns<a class="headerlink" href="#id76" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id76'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if valid, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.get_date_formatter">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_date_formatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">DateFormatter</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.get_date_formatter" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.get_date_formatter'"><span>#</span></a></dt>
-<dd><p>Get a <cite>matplotlib.dates.DateFormatter</cite> instance for the requested date format.</p>
-<section id="id54">
-<h2>Parameters<a class="headerlink" href="#id54" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id54'"><span>#</span></a></h2>
+<dd><p>Get a <code class="docutils literal notranslate"><span class="pre">matplotlib.dates.DateFormatter</span></code> instance for the requested date format.</p>
+<section id="id77">
+<h2>Parameters<a class="headerlink" href="#id77" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id77'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>date_format<span class="classifier">str</span></dt><dd><p>The format requested by the user. Common date formats are:
+<dt>date_format<span class="classifier">str | None</span></dt><dd><p>The format requested by the user. Common date formats are:
 - “%j/%Y”: Formats dates as “day_of_year/year” (e.g., “123/2024”).
 - “%d/%m/%Y”: Formats dates as “day/month/year” (e.g., “23/12/2024”).
 - “%m/%d/%Y”: Formats dates as “month/day/year” (e.g., “12/23/2024”).
@@ -802,16 +1072,37 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 </dd>
 </dl>
 </section>
-<section id="id55">
-<h2>Returns<a class="headerlink" href="#id55" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id55'"><span>#</span></a></h2>
+<section id="id78">
+<h2>Returns<a class="headerlink" href="#id78" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id78'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>matplotlib.dates.DateFormatter</dt><dd><p>A <cite>DateFormatter</cite> instance for the specified format.</p>
+<dt>matplotlib.dates.DateFormatter</dt><dd><p>A <code class="docutils literal notranslate"><span class="pre">DateFormatter</span></code> instance for the specified format.</p>
 </dd>
 </dl>
 </section>
-<section id="id56">
-<h2>Notes<a class="headerlink" href="#id56" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id56'"><span>#</span></a></h2>
-<p>If the date_format is None or invalid, the default format “%d/%m/%Y” will be used instead.</p>
+<section id="id79">
+<h2>Notes<a class="headerlink" href="#id79" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id79'"><span>#</span></a></h2>
+<p>If the <code class="docutils literal notranslate"><span class="pre">date_format</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> or invalid, the default format “%d/%m/%Y” will be used instead.</p>
+</section>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Utility.back_track_birth_date">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">back_track_birth_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">days_born</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">datetime</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.back_track_birth_date" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Utility.back_track_birth_date'"><span>#</span></a></dt>
+<dd><p>Calculates the birthdate by subtracting a given number of days from the current date.</p>
+<section id="id80">
+<h2>Parameters<a class="headerlink" href="#id80" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id80'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>days_born<span class="classifier">int</span></dt><dd><p>The number of days since the animal’s birth.</p>
+</dd>
+<dt>current_date<span class="classifier">datetime.datetime</span></dt><dd><p>The current date from which the days will be subtracted.</p>
+</dd>
+</dl>
+</section>
+<section id="id81">
+<h2>Returns<a class="headerlink" href="#id81" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id81'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>datetime.datetime</dt><dd><p>The calculated date of birth.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 </dd></dl>
@@ -819,19 +1110,20 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.util.</span></span><span class="sig-name descname"><span class="pre">Aggregator</span></span><a class="headerlink" href="#RUFAS.util.Aggregator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class houses the aggregation functions used in the simulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.average">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.average" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.average'"><span>#</span></a></dt>
 <dd><p>Calculates the average of a list of numbers.</p>
-<section id="id57">
-<h2>Parameters<a class="headerlink" href="#id57" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id57'"><span>#</span></a></h2>
+<section id="id82">
+<h2>Parameters<a class="headerlink" href="#id82" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id82'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose average is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id58">
-<h2>Returns<a class="headerlink" href="#id58" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id58'"><span>#</span></a></h2>
+<section id="id83">
+<h2>Returns<a class="headerlink" href="#id83" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id83'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The average of the input numbers.</p>
 </dd>
@@ -842,17 +1134,17 @@ round(-12.3, 0) -&gt; -12.0 (float)</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.division">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">division</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.division" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.division'"><span>#</span></a></dt>
 <dd><p>Divides the first number in the list by each of the subsequent numbers.</p>
-<section id="id59">
-<h2>Parameters<a class="headerlink" href="#id59" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id59'"><span>#</span></a></h2>
+<section id="id84">
+<h2>Parameters<a class="headerlink" href="#id84" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id84'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers for the division operation.</p>
 </dd>
 </dl>
 </section>
-<section id="id60">
-<h2>Returns<a class="headerlink" href="#id60" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id60'"><span>#</span></a></h2>
+<section id="id85">
+<h2>Returns<a class="headerlink" href="#id85" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id85'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>float</dt><dd><p>The result of dividing the first number by each subsequent number.
+<dt>float | None</dt><dd><p>The result of dividing the first number by each subsequent number.
 Returns None if the list is empty or has only one element.</p>
 </dd>
 </dl>
@@ -862,15 +1154,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.product">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.product" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.product'"><span>#</span></a></dt>
 <dd><p>Returns the product of a list of numbers.</p>
-<section id="id61">
-<h2>Parameters<a class="headerlink" href="#id61" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id61'"><span>#</span></a></h2>
+<section id="id86">
+<h2>Parameters<a class="headerlink" href="#id86" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id86'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose product is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id62">
-<h2>Returns<a class="headerlink" href="#id62" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id62'"><span>#</span></a></h2>
+<section id="id87">
+<h2>Returns<a class="headerlink" href="#id87" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id87'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The product of the input numbers. Returns 1 for an empty list.</p>
 </dd>
@@ -881,15 +1173,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.standard_deviation">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">standard_deviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.standard_deviation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.standard_deviation'"><span>#</span></a></dt>
 <dd><p>Calculates the standard deviation of a list of numbers.</p>
-<section id="id63">
-<h2>Parameters<a class="headerlink" href="#id63" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id63'"><span>#</span></a></h2>
+<section id="id88">
+<h2>Parameters<a class="headerlink" href="#id88" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id88'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose standard deviation is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id64">
-<h2>Returns<a class="headerlink" href="#id64" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id64'"><span>#</span></a></h2>
+<section id="id89">
+<h2>Returns<a class="headerlink" href="#id89" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id89'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The standard deviation of the input numbers.</p>
 </dd>
@@ -900,15 +1192,15 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.sum">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.sum" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.sum'"><span>#</span></a></dt>
 <dd><p>Returns the sum of a list of numbers.</p>
-<section id="id65">
-<h2>Parameters<a class="headerlink" href="#id65" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id65'"><span>#</span></a></h2>
+<section id="id90">
+<h2>Parameters<a class="headerlink" href="#id90" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id90'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers whose sum is to be calculated.</p>
 </dd>
 </dl>
 </section>
-<section id="id66">
-<h2>Returns<a class="headerlink" href="#id66" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id66'"><span>#</span></a></h2>
+<section id="id91">
+<h2>Returns<a class="headerlink" href="#id91" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id91'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>The sum of the input numbers.</p>
 </dd>
@@ -919,17 +1211,17 @@ Returns None if the list is empty or has only one element.</p>
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.subtraction">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">subtraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.subtraction" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.subtraction'"><span>#</span></a></dt>
 <dd><p>Subtracts each subsequent number in the list from the first number.</p>
-<section id="id67">
-<h2>Parameters<a class="headerlink" href="#id67" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id67'"><span>#</span></a></h2>
+<section id="id92">
+<h2>Parameters<a class="headerlink" href="#id92" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id92'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>data<span class="classifier">list[float]</span></dt><dd><p>A list of numbers for the subtraction operation.</p>
 </dd>
 </dl>
 </section>
-<section id="id68">
-<h2>Returns<a class="headerlink" href="#id68" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id68'"><span>#</span></a></h2>
+<section id="id93">
+<h2>Returns<a class="headerlink" href="#id93" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id93'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>float</dt><dd><p>The result of subtracting each subsequent number from the first number.
+<dt>float | None</dt><dd><p>The result of subtracting each subsequent number from the first number.
 Returns None if the list is empty or has only one element.</p>
 </dd>
 </dl>
@@ -938,7 +1230,22 @@ Returns None if the list is empty or has only one element.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Aggregator.no_op">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">no_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Aggregator.no_op" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.util.Aggregator.no_op'"><span>#</span></a></dt>
-<dd></dd></dl>
+<dd><p>Returns the data unchanged, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the data is empty or falsy.</p>
+<section id="id94">
+<h2>Parameters<a class="headerlink" href="#id94" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id94'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">list[Any]</span></dt><dd><p>Input data to pass through.</p>
+</dd>
+</dl>
+</section>
+<section id="id95">
+<h2>Returns<a class="headerlink" href="#id95" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id95'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>Any | None</dt><dd><p>The input data if it is not None, otherwise <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -949,10 +1256,12 @@ Returns None if the list is empty or has only one element.</p>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists'" class="reference internal" href="#RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists"><code class="docutils literal notranslate"><span class="pre">Utility.convert_list_of_dicts_to_dict_of_lists()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.convert_dict_of_lists_to_list_of_dicts'" class="reference internal" href="#RUFAS.util.Utility.convert_dict_of_lists_to_list_of_dicts"><code class="docutils literal notranslate"><span class="pre">Utility.convert_dict_of_lists_to_list_of_dicts()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.flatten_keys_to_nested_structure'" class="reference internal" href="#RUFAS.util.Utility.flatten_keys_to_nested_structure"><code class="docutils literal notranslate"><span class="pre">Utility.flatten_keys_to_nested_structure()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.util.Utility.find_max_index_from_keys'" class="reference internal" href="#RUFAS.util.Utility.find_max_index_from_keys"><code class="docutils literal notranslate"><span class="pre">Utility.find_max_index_from_keys()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Utility.find_group_prefixes_from_keys'" class="reference internal" href="#RUFAS.util.Utility.find_group_prefixes_from_keys"><code class="docutils literal notranslate"><span class="pre">Utility.find_group_prefixes_from_keys()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.expand_data_temporally'" class="reference internal" href="#RUFAS.util.Utility.expand_data_temporally"><code class="docutils literal notranslate"><span class="pre">Utility.expand_data_temporally()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Utility._gather_data_sim_days'" class="reference internal" href="#RUFAS.util.Utility._gather_data_sim_days"><code class="docutils literal notranslate"><span class="pre">Utility._gather_data_sim_days()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.deep_merge'" class="reference internal" href="#RUFAS.util.Utility.deep_merge"><code class="docutils literal notranslate"><span class="pre">Utility.deep_merge()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.calc_average'" class="reference internal" href="#RUFAS.util.Utility.calc_average"><code class="docutils literal notranslate"><span class="pre">Utility.calc_average()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Utility.clamp'" class="reference internal" href="#RUFAS.util.Utility.clamp"><code class="docutils literal notranslate"><span class="pre">Utility.clamp()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.remove_items_from_list_by_indices'" class="reference internal" href="#RUFAS.util.Utility.remove_items_from_list_by_indices"><code class="docutils literal notranslate"><span class="pre">Utility.remove_items_from_list_by_indices()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.percent_calculator'" class="reference internal" href="#RUFAS.util.Utility.percent_calculator"><code class="docutils literal notranslate"><span class="pre">Utility.percent_calculator()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.make_serializable'" class="reference internal" href="#RUFAS.util.Utility.make_serializable"><code class="docutils literal notranslate"><span class="pre">Utility.make_serializable()</span></code></a></li>
@@ -967,6 +1276,7 @@ Returns None if the list is empty or has only one element.</p>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.convert_celsius_to_kelvin'" class="reference internal" href="#RUFAS.util.Utility.convert_celsius_to_kelvin"><code class="docutils literal notranslate"><span class="pre">Utility.convert_celsius_to_kelvin()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.convert_ordinal_date_to_month_date'" class="reference internal" href="#RUFAS.util.Utility.convert_ordinal_date_to_month_date"><code class="docutils literal notranslate"><span class="pre">Utility.convert_ordinal_date_to_month_date()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.generate_random_number'" class="reference internal" href="#RUFAS.util.Utility.generate_random_number"><code class="docutils literal notranslate"><span class="pre">Utility.generate_random_number()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Utility.generate_bivariate_random_numbers'" class="reference internal" href="#RUFAS.util.Utility.generate_bivariate_random_numbers"><code class="docutils literal notranslate"><span class="pre">Utility.generate_bivariate_random_numbers()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.flatten_dictionary'" class="reference internal" href="#RUFAS.util.Utility.flatten_dictionary"><code class="docutils literal notranslate"><span class="pre">Utility.flatten_dictionary()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.combine_saved_input_csv'" class="reference internal" href="#RUFAS.util.Utility.combine_saved_input_csv"><code class="docutils literal notranslate"><span class="pre">Utility.combine_saved_input_csv()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.convert_list_to_dict_by_key'" class="reference internal" href="#RUFAS.util.Utility.convert_list_to_dict_by_key"><code class="docutils literal notranslate"><span class="pre">Utility.convert_list_to_dict_by_key()</span></code></a></li>
@@ -977,6 +1287,7 @@ Returns None if the list is empty or has only one element.</p>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.compare_randomized_rate_less_than'" class="reference internal" href="#RUFAS.util.Utility.compare_randomized_rate_less_than"><code class="docutils literal notranslate"><span class="pre">Utility.compare_randomized_rate_less_than()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.validate_date_format'" class="reference internal" href="#RUFAS.util.Utility.validate_date_format"><code class="docutils literal notranslate"><span class="pre">Utility.validate_date_format()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.util.Utility.get_date_formatter'" class="reference internal" href="#RUFAS.util.Utility.get_date_formatter"><code class="docutils literal notranslate"><span class="pre">Utility.get_date_formatter()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.util.Utility.back_track_birth_date'" class="reference internal" href="#RUFAS.util.Utility.back_track_birth_date"><code class="docutils literal notranslate"><span class="pre">Utility.back_track_birth_date()</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#RUFAS.util.Aggregator'" class="reference internal" href="#RUFAS.util.Aggregator"><code class="docutils literal notranslate"><span class="pre">Aggregator</span></code></a><ul>

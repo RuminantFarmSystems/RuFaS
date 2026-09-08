@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -153,12 +154,6 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.reproduction.repro_state_manager.</span></span><span class="sig-name descname"><span class="pre">ReproStateManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">ReproStateEnum</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class that manages the reproductive states of an animal.</p>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<p>This class provides methods to enter and exit reproductive states and check if a specific state is active.
-It is designed to handle cases where typically only one state is active, but it works the same
-if multiple active states coexist.</p>
-</section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
@@ -189,29 +184,23 @@ if multiple active states coexist.</p>
 <dt>is_in_empty_state() -&gt; bool</dt><dd><p>Check if the current state is in the empty state (NONE).</p>
 </dd>
 </dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<p>This class provides methods to enter and exit reproductive states and check if a specific state is active.
+It is designed to handle cases where typically only one state is active, but it works the same
+if multiple active states coexist.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">ReproStateEnum</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.__init__'"><span>#</span></a></dt>
 <dd><p>Initialize the ReproStateManager with the given initial states.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>initial_states<span class="classifier">set[ReproStateEnum] | None, optional</span></dt><dd><p>A set of initial reproductive states to start with. If None, initializes with {ReproStateEnum.NONE}.</p>
-</dd>
-</dl>
-</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.enter">
 <span class="sig-name descname"><span class="pre">enter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproStateEnum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_existing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.enter" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.enter'"><span>#</span></a></dt>
 <dd><p>Enter a reproductive state.</p>
-<section id="id2">
-<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
-<p>If <cite>keep_existing</cite> is False or the only current state is NONE, clears existing states before adding the new one.
-If entering NONE, it clears all other states.</p>
-</section>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>state<span class="classifier">ReproStateEnum</span></dt><dd><p>The reproductive state to enter.</p>
 </dd>
@@ -226,36 +215,41 @@ If entering NONE, it clears all other states.</p>
 </dd>
 </dl>
 </section>
+<section id="id2">
+<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<p>If <cite>keep_existing</cite> is False or the only current state is NONE, clears existing states before adding the new one.
+If entering NONE, it clears all other states.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.exit">
 <span class="sig-name descname"><span class="pre">exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproStateEnum</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.exit" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.exit'"><span>#</span></a></dt>
 <dd><p>Exit a reproductive state.</p>
-<section id="id4">
-<h3>Notes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
-<p>If the state to exit is NONE or the only current state is NONE, it performs no action.</p>
-</section>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>state<span class="classifier">ReproStateEnum</span></dt><dd><p>The reproductive state to exit.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Raises<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Raises<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If attempting to exit a state that is not currently active.</p>
 </dd>
 </dl>
+</section>
+<section id="id5">
+<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<p>If the state to exit is NONE or the only current state is NONE, it performs no action.</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in">
 <span class="sig-name descname"><span class="pre">is_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ReproStateEnum</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in'"><span>#</span></a></dt>
 <dd><p>Check if a specific reproductive state is currently active.</p>
-<section id="id7">
-<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>state<span class="classifier">ReproStateEnum</span></dt><dd><p>The reproductive state to check.</p>
 </dd>
@@ -273,15 +267,15 @@ If entering NONE, it clears all other states.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in_any">
 <span class="sig-name descname"><span class="pre">is_in_any</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">ReproStateEnum</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in_any" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in_any'"><span>#</span></a></dt>
 <dd><p>Check if any of the specified reproductive states are currently active.</p>
-<section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>states<span class="classifier">set[ReproStateEnum]</span></dt><dd><p>The reproductive states to check.</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if any of the specified states are active, False otherwise.</p>
 </dd>
@@ -297,8 +291,8 @@ If entering NONE, it clears all other states.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in_empty_state">
 <span class="sig-name descname"><span class="pre">is_in_empty_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in_empty_state" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.reproduction.repro_state_manager.ReproStateManager.is_in_empty_state'"><span>#</span></a></dt>
 <dd><p>Check if the current state is in the empty state (NONE).</p>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if the current state is NONE, False otherwise.</p>
 </dd>

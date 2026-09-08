@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -153,12 +154,20 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.handler.parlor_cleaning.</span></span><span class="sig-name descname"><span class="pre">ParlorCleaningHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleaning_water_use_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleaning_water_recycle_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_parlor_flush</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler'"><span>#</span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="RUFAS.biophysical.manure.handler.handler.html#RUFAS.biophysical.manure.handler.handler.Handler" title="RUFAS.biophysical.manure.handler.handler.Handler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Handler</span></code></a></p>
 <p>Handles the reception and processing of manure from parlor cleaning operations.</p>
-<blockquote>
-<div><dl class="simple">
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
 <dt>name<span class="classifier">str</span></dt><dd><p>Unique identifier of the processor.</p>
 </dd>
+<dt>processor_type<span class="classifier">str</span></dt><dd><p>The type of processor as a string.</p>
+</dd>
+<dt>cleaning_water_use_amount<span class="classifier">float</span></dt><dd><p>Amount of cleaning water used per animal per day (L).</p>
+</dd>
+<dt>cleaning_water_recycle_fraction<span class="classifier">float</span></dt><dd><p>Fraction of cleaning water that is from recycled (not fresh) water sources.</p>
+</dd>
+<dt>use_parlor_flush<span class="classifier">bool</span></dt><dd><p>Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.</p>
+</dd>
 </dl>
-</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleaning_water_use_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleaning_water_recycle_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_parlor_flush</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.__init__'"><span>#</span></a></dt>
@@ -168,8 +177,8 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.receive_manure">
 <span class="sig-name descname"><span class="pre">receive_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_stream</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.receive_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.receive_manure'"><span>#</span></a></dt>
 <dd><p>Receiving manure stream.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>manure_stream<span class="classifier">ManureStream</span></dt><dd><p>The ManureStream instance being received.</p>
 </dd>
@@ -180,8 +189,8 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.process_manure">
 <span class="sig-name descname"><span class="pre">process_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.process_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.process_manure'"><span>#</span></a></dt>
 <dd><p>Executes the daily manure processing operations.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Current weather and environmental conditions that manure is being processed in.</p>
 </dd>
@@ -189,8 +198,15 @@
 </dd>
 </dl>
 </section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>TypeError</dt><dd><p>If the ManureStream is a NoneType.</p>
+</dd>
+</dl>
+</section>
 <section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, ManureStream]</dt><dd><p>Mapping between classification of manure coming out of this processor to the ManureStream containing the
 manure information.</p>
@@ -202,15 +218,15 @@ manure information.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.determine_fresh_water_volume_used_for_milking">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">determine_fresh_water_volume_used_for_milking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.determine_fresh_water_volume_used_for_milking" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.determine_fresh_water_volume_used_for_milking'"><span>#</span></a></dt>
 <dd><p>Calculates the volume of fresh water used for milking.</p>
-<section id="id2">
-<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals.</p>
 </dd>
 </dl>
 </section>
-<section id="id3">
-<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The volume of fresh water used for milking (L).</p>
 </dd>
@@ -221,6 +237,7 @@ manure information.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler._abc_impl">
 <span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler._abc_impl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler._abc_impl'"><span>#</span></a></dt>
 <dd></dd></dl>
+</section>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">

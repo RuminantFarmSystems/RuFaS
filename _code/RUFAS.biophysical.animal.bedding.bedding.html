@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.animal.digestive_system.html" rel="next" title="RUFAS.biophysical.animal.digestive_system package"/>
+<link href="RUFAS.biophysical.animal.bedding.html" rel="prev" title="RUFAS.biophysical.animal.bedding package"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.animal.html">RUFAS.biophysical.animal package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.animal.bedding.html">RUFAS.biophysical.animal.bedding package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.animal.bedding.bedding module</span>
 </nav>
 <div id="content" role="main">
@@ -146,11 +154,29 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.bedding.bedding.</span></span><span class="sig-name descname"><span class="pre">Bedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_mass_per_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_dry_matter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_carbon_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_phosphorus_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BeddingType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sand_removal_efficiency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.bedding.bedding.Bedding" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.bedding.bedding.Bedding'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Abstract base class for all bedding types.</p>
-<p>This class provides a base for all bedding types. It initializes with a configuration of bedding
-attributes and includes methods for calculating various bedding properties. While bedding mass
-and nutrients are added to individual manure streams, which may represent only a fraction of the
-total manure excreted by a pen, the mass of bedding applied per animal is based on the total
-number of animals housed in the pen from which the manure stream originated.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Unique identifier to reference this bedding configuration.</p>
+</dd>
+<dt>bedding_mass_per_day<span class="classifier">float</span></dt><dd><p>The daily mass of fresh bedding added to the housing area per animal per day on a wet weight
+basis (kg/animal/day). Bedding mass is applied based on the total number of animals in the pen,
+and is not based on the stream proportion of the manure stream the bedding is assigned to.</p>
+</dd>
+<dt>bedding_density<span class="classifier">float</span></dt><dd><p>The density of the bedding on a wet weight basis (kg/<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd>
+<dt>bedding_dry_matter_content<span class="classifier">float</span></dt><dd><p>The fraction (0.XX) of dry matter in the bedding (unitless).</p>
+</dd>
+<dt>bedding_carbon_fraction<span class="classifier">float</span></dt><dd><p>The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).</p>
+</dd>
+<dt>bedding_phosphorus_content<span class="classifier">float</span></dt><dd><p>The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).</p>
+</dd>
+<dt>bedding_type<span class="classifier">str</span></dt><dd><p>The type of bedding material as a string.</p>
+</dd>
+<dt>sand_removal_efficiency<span class="classifier">float | None, default=None</span></dt><dd><p>The efficiency rate of sand removal from the bedding.</p>
+</dd>
+</dl>
+</section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
@@ -170,6 +196,8 @@ and is not based on the stream proportion of the manure stream the bedding is as
 </dd>
 <dt>bedding_type<span class="classifier">str</span></dt><dd><p>The type of bedding material as a string.</p>
 </dd>
+<dt>sand_removal_efficiency<span class="classifier">float | None, default=None</span></dt><dd><p>The efficiency rate of sand removal from the bedding.</p>
+</dd>
 </dl>
 </section>
 <section id="methods">
@@ -184,6 +212,14 @@ and is not based on the stream proportion of the manure stream the bedding is as
 <dt>calc_total_bedding_water(num_animals: int) -&gt; float</dt><dd><p>Calculates the mass of water in the bedding used.</p>
 </dd>
 </dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
+<p>This class provides a base for all bedding types. It initializes with a configuration of bedding
+attributes and includes methods for calculating various bedding properties. While bedding mass
+and nutrients are added to individual manure streams, which may represent only a fraction of the
+total manure excreted by a pen, the mass of bedding applied per animal is based on the total
+number of animals housed in the pen from which the manure stream originated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.bedding.bedding.Bedding.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_mass_per_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_dry_matter_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_carbon_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_phosphorus_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BeddingType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sand_removal_efficiency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.bedding.bedding.Bedding.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.bedding.bedding.Bedding.__init__'"><span>#</span></a></dt>
@@ -193,8 +229,8 @@ and is not based on the stream proportion of the manure stream the bedding is as
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_mass">
 <span class="sig-name descname"><span class="pre">calculate_total_bedding_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_mass" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_mass'"><span>#</span></a></dt>
 <dd><p>Calculate the total amount of bedding needed for all animals in the given pen.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h3>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
@@ -212,15 +248,15 @@ and is not based on the stream proportion of the manure stream the bedding is as
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_volume">
 <span class="sig-name descname"><span class="pre">calculate_total_bedding_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_volume" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_volume'"><span>#</span></a></dt>
 <dd><p>Calculate the total volume of bedding needed for all animals.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The total volume to be added to the ManureStream instance (<span class="math notranslate nohighlight">\(m^3\)</span>/day).</p>
 </dd>
@@ -231,15 +267,15 @@ and is not based on the stream proportion of the manure stream the bedding is as
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_dry_solids">
 <span class="sig-name descname"><span class="pre">calculate_total_bedding_dry_solids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_dry_solids" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_total_bedding_dry_solids'"><span>#</span></a></dt>
 <dd><p>Calculate the total amount of dry solids in the bedding.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The total amount of dry solids to be added to the ManureStream instance (kg/day).</p>
 </dd>
@@ -250,15 +286,15 @@ and is not based on the stream proportion of the manure stream the bedding is as
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_bedding_water">
 <span class="sig-name descname"><span class="pre">calculate_bedding_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_bedding_water" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.bedding.bedding.Bedding.calculate_bedding_water'"><span>#</span></a></dt>
 <dd><p>Calculate the total water in the bedding.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The total water to be added to the ManureStream instance (kg/day).</p>
 </dd>

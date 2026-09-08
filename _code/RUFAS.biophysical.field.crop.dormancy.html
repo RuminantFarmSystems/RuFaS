@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.crop.growth_constraints.html" rel="next" title="RUFAS.biophysical.field.crop.growth_constraints module"/>
+<link href="RUFAS.biophysical.field.crop.crop_management.html" rel="prev" title="RUFAS.biophysical.field.crop.crop_management module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.crop.html">RUFAS.biophysical.field.crop package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.crop.dormancy module</span>
 </nav>
 <div id="content" role="main">
@@ -149,19 +157,19 @@
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>crop_data<span class="classifier">Optional[CropData], optional</span></dt><dd><p>A <cite>CropData</cite> object containing specifications and attributes for a crop.
-If not provided, a default <cite>CropData</cite> object is used.</p>
+<dt>crop_data<span class="classifier">CropData, optional</span></dt><dd><p>A <code class="docutils literal notranslate"><span class="pre">CropData</span></code> object containing specifications and attributes for a crop.
+If not provided, a default <code class="docutils literal notranslate"><span class="pre">CropData</span></code> object is used.</p>
 </dd>
-<dt>minimum_lai_during_dormancy<span class="classifier">Optional[float], default 0.75</span></dt><dd><p>Minimum leaf area index for plants (perennials and trees only).</p>
+<dt>minimum_lai_during_dormancy<span class="classifier">float, optional, default 0.75</span></dt><dd><p>Minimum leaf area index for plants (perennials and trees only).</p>
 </dd>
 </dl>
 </section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>data<span class="classifier">CropData</span></dt><dd><p>A reference to the <cite>crop_data</cite> object on which dormancy operations will be conducted.</p>
+<dt>data<span class="classifier">CropData</span></dt><dd><p>A reference to the <code class="docutils literal notranslate"><span class="pre">crop_data</span></code> object on which dormancy operations will be conducted.</p>
 </dd>
-<dt>minimum_lai_during_dormancy<span class="classifier">Optional[float]</span></dt><dd><p>Minimum leaf area index for plants (perennials and trees only).</p>
+<dt>minimum_lai_during_dormancy<span class="classifier">float | None</span></dt><dd><p>Minimum leaf area index for plants (perennials and trees only).</p>
 </dd>
 </dl>
 </section>
@@ -186,18 +194,6 @@ no information about how this value can be measured or calculated.</p>
 <h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>SoilData instance of the soil profile that this crop is growing in.</p>
-</dd>
-</dl>
-</section>
-<section id="methods">
-<h3>Methods<a class="headerlink" href="#methods" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#methods'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>enter_dormancy(soil_data: SoilData) -&gt; None</dt><dd><p>Performs the transition of a crop from active to dormant. Warm Annuals and Warm Annual Legumes do not
-experience dormancy. Only Trees and Perennials experience biomass loss when entering dormancy.</p>
-</dd>
-<dt>find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -&gt; float</dt><dd><p>Calculates the threshold daylength for dormancy based on minimum daylength and dormancy threshold.</p>
-</dd>
-<dt>find_dormancy_threshold(abs_latitude: float) -&gt; float</dt><dd><p>Calculates the dormancy threshold based on the absolute latitude value.</p>
 </dd>
 </dl>
 </section>

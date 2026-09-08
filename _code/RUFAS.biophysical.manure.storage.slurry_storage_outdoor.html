@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -153,6 +154,20 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.storage.slurry_storage_outdoor.</span></span><span class="sig-name descname"><span class="pre">SlurryStorageOutdoor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.manure.storage.storage_cover.html#RUFAS.biophysical.manure.storage.storage_cover.StorageCover" title="RUFAS.biophysical.manure.storage.storage_cover.StorageCover"><span class="pre">StorageCover</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_time_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor'"><span>#</span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage" title="RUFAS.biophysical.manure.storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
 <p>Representation of slurry storage outdoor and its associated processes.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>The name of the storage.</p>
+</dd>
+<dt>cover<span class="classifier">StorageCover</span></dt><dd><p>The type of cover used with the specified storage.</p>
+</dd>
+<dt>storage_time_period<span class="classifier">int | None</span></dt><dd><p>The length of time (days) manure is stored for between emptying events.</p>
+</dd>
+<dt>surface_area<span class="classifier">float</span></dt><dd><p>The surface area of the manure storage (m^2).</p>
+</dd>
+<dt>capacity<span class="classifier">float, default=inf</span></dt><dd><p>The volumetric capacity of the storage (m^3).</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.manure.storage.storage_cover.html#RUFAS.biophysical.manure.storage.storage_cover.StorageCover" title="RUFAS.biophysical.manure.storage.storage_cover.StorageCover"><span class="pre">StorageCover</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_time_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor.__init__'"><span>#</span></a></dt>
@@ -163,8 +178,8 @@
 <span class="sig-name descname"><span class="pre">process_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.data_structures.animal_to_manure_connection.html#RUFAS.data_structures.animal_to_manure_connection.ManureStream" title="RUFAS.data_structures.animal_to_manure_connection.ManureStream"><span class="pre">ManureStream</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor.process_manure" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor.process_manure'"><span>#</span></a></dt>
 <dd><p>Calculates the methane, ammonia, and nitrous oxide emissions from stored manure,
 and updates relevant storage properties.</p>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>current_day_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>The weather conditions of the current day, including precipitation and mean
 air temperature.</p>
@@ -174,7 +189,7 @@ air temperature.</p>
 </dl>
 </section>
 <section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>dict[str, ManureStream]</dt><dd><p>A dictionary containing manure to be passed onto the next processor
 if it is the scheduled emptying day; otherwise an empty dictionary.</p>
@@ -188,19 +203,20 @@ if it is the scheduled emptying day; otherwise an empty dictionary.</p>
 <dd><p>This method computes the methane emissions from both degradable and non-degradable volatile solids in the
 manure, adjusts the manure’s composition based on the amount of methane emitted, and accounts for the burning
 of methane if the storage cover is a cover and flare system.</p>
-<section id="id1">
-<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h2>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>manure_temperature<span class="classifier">float</span></dt><dd><p>The temperature of the manure in, (degrees Celsius).</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>tuple[float, float]</dt><dd><p>A tuple containing:
-- The methane burned from manure storage on the current day, (kg).
-- The methane emitted from manure storage on the current day, (kg).</p>
+<dt>tuple[float, float]</dt><dd><ul class="simple">
+<li><p>The methane burned from manure storage on the current day, (kg).</p></li>
+<li><p>The methane emitted from manure storage on the current day, (kg).</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -208,17 +224,17 @@ of methane if the storage cover is a cover and flare system.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor._apply_ammonia_emissions">
 <span class="sig-name descname"><span class="pre">_apply_ammonia_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor._apply_ammonia_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor._apply_ammonia_emissions'"><span>#</span></a></dt>
-<dd><p>This method computes the ammonia emissions from stored manure, and accounts the nitrogen
-and ammoniacal nitrogen loss due to ammonia emissions.</p>
-<section id="id3">
-<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<dd><p>Computes the ammonia emissions from stored manure, and accounts the nitrogen and ammoniacal nitrogen loss due
+to ammonia emissions.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>manure_temperature<span class="classifier">float</span></dt><dd><p>The temperature of the manure, (0degrees Celsius).</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of nitrogen in the ammonia emitted from manure storage on the current day, (kg).</p>
 </dd>
@@ -230,15 +246,15 @@ and ammoniacal nitrogen loss due to ammonia emissions.</p>
 <span class="sig-name descname"><span class="pre">_apply_nitrous_oxide_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">received_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor._apply_nitrous_oxide_emissions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor._apply_nitrous_oxide_emissions'"><span>#</span></a></dt>
 <dd><p>Calculates nitrous oxide emissions from stored manure and accounts for the nitrogen
 loss due to nitrous oxide emissions.</p>
-<section id="id5">
-<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>received_manure_nitrogen<span class="classifier">float</span></dt><dd><p>The nitrogen in the received manure on the current day.</p>
 </dd>
 </dl>
 </section>
-<section id="id6">
-<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day, (kg).</p>
 </dd>
@@ -249,6 +265,7 @@ loss due to nitrous oxide emissions.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor._abc_impl">
 <span class="sig-name descname"><span class="pre">_abc_impl</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor._abc_impl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.slurry_storage_outdoor.SlurryStorageOutdoor._abc_impl'"><span>#</span></a></dt>
 <dd></dd></dl>
+</section>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">

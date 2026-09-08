@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -174,16 +175,14 @@
 </dd>
 <dt>total_solids_efficiency<span class="classifier">float</span></dt><dd><p>The efficiency of the separator in removing total solids from the manure.</p>
 </dd>
+<dt>processor_type<span class="classifier">str</span></dt><dd><p>The type of separator processor.</p>
+</dd>
 </dl>
 </section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>is_housing_emissions_calculator<span class="classifier">bool = False</span></dt><dd><p>A flag to indicate if the processor is a housing emissions calculator. Will always be false for a separator.</p>
-</dd>
-<dt>name<span class="classifier">str</span></dt><dd><p>The name of the separator.</p>
-</dd>
-<dt>prefix<span class="classifier">str</span></dt><dd><p>The prefix to be used for naming output variables.</p>
+<dt>held_manure<span class="classifier">ManureStream | None</span></dt><dd><p>Manure currently stored by the separator awaiting processing.</p>
 </dd>
 <dt>separated_solids_dry_matter<span class="classifier">float</span></dt><dd><p>The dry matter content (percent DM) of separated manure solids.</p>
 </dd>
@@ -201,7 +200,9 @@
 </dd>
 <dt>total_solids_efficiency<span class="classifier">float</span></dt><dd><p>The efficiency of the separator in removing total solids from the manure.</p>
 </dd>
-<dt>om<span class="classifier">OutputManager</span></dt><dd><p>The output manager instance used to store and manage output data.</p>
+<dt>separator_type<span class="classifier">str</span></dt><dd><p>The type of separator it is.</p>
+</dd>
+<dt>_prefix<span class="classifier">str</span></dt><dd><p>The prefix to be used for naming output variables.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -220,6 +221,13 @@
 </dd>
 </dl>
 </section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the Separator is set as the first processor (indicated by the manure compatibility failure).</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.separator.separator.Separator.process_manure">
@@ -231,6 +239,13 @@
 <dt>conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Current weather and environmental conditions that manure is being processed in.</p>
 </dd>
 <dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the simulations temporal information.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Raises<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the ManureStream’s liquid_manure_water &lt;= 0.0</p>
 </dd>
 </dl>
 </section>

@@ -8,9 +8,10 @@ Submodules
    :maxdepth: 1
 
    RUFAS.biophysical.manure.storage.anaerobic_lagoon
-   RUFAS.biophysical.manure.storage.compost_bedded_pack_barn
+   RUFAS.biophysical.manure.storage.bedded_pack
    RUFAS.biophysical.manure.storage.composting
    RUFAS.biophysical.manure.storage.composting_type
+   RUFAS.biophysical.manure.storage.daily_spread
    RUFAS.biophysical.manure.storage.open_lot
    RUFAS.biophysical.manure.storage.slurry_storage_outdoor
    RUFAS.biophysical.manure.storage.slurry_storage_underfloor

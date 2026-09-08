@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -291,6 +292,11 @@ simulation.</p>
 the inclusion rate bounds in user defined ration formulation method.</p>
 </dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR">
+<span class="sig-name descname"><span class="pre">DMI_RETRY_INCREASE_FACTOR</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.1</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR'"><span>#</span></a></dt>
+<dd><p>Multiplier applied to the dry matter intake when a lactating-cow ration retry is warranted.</p>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI">
 <span class="sig-name descname"><span class="pre">MINIMUM_DMI</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI'"><span>#</span></a></dt>
 <dd><p>Minimum estimated DMI instituted for all animals, kg/day</p>
@@ -302,15 +308,39 @@ the inclusion rate bounds in user defined ration formulation method.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT">
-<span class="sig-name descname"><span class="pre">MINIMUM_DMI_LACT</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.0</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT'"><span>#</span></a></dt>
-<dd><p>Minimum estimated DMI for lactating cows, kg/day. Note that in the dataset used to generate the equation,
-the mimimum DMI is 3.94 kg/day (Reed et al. 2015)</p>
+<span class="sig-name descname"><span class="pre">MINIMUM_DMI_LACT</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6.06</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT'"><span>#</span></a></dt>
+<dd><p>Minimum pen-level DMI for lactating cows, calculated as an average across the
+literature, kg/day (Appuhamy 2014; Appuhamy 2018; Reed 2015; Nennich 2015).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY">
-<span class="sig-name descname"><span class="pre">MINIMUM_DMI_DRY</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.0</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY'"><span>#</span></a></dt>
-<dd><p>Minimum estimated DMI for dry cows, kg/day. Note that in the dataset used to generate the equation,
-the minimum DMI is 7.1 kg/day (Appuhamy 2018)</p>
+<span class="sig-name descname"><span class="pre">MINIMUM_DMI_DRY</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.6</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY'"><span>#</span></a></dt>
+<dd><p>Minimum pen-level DMI for dry cows, calculated as an average across the
+literature, kg/day (Reed 2015; Nennich 2015).</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_HEIFER">
+<span class="sig-name descname"><span class="pre">MINIMUM_DMI_HEIFER</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.17</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_HEIFER" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_HEIFER'"><span>#</span></a></dt>
+<dd><p>Minimum pen-level DMI for heifers, calculated as an average across the
+literature, kg/day (Reed 2015; Nennich 2015).</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_CALF">
+<span class="sig-name descname"><span class="pre">MINIMUM_DMI_CALF</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.38</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_CALF" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_CALF'"><span>#</span></a></dt>
+<dd><p>Minimum pen-level DMI for calves, calculated as an average across the
+literature, kg/day (Nennich 2015).</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS">
+<span class="sig-name descname"><span class="pre">MINIMUM_DMI_LACT_FOR_MANURE_VS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7.1</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS'"><span>#</span></a></dt>
+<dd><p>Minimum DMI for lactating cows in the dataset used to generate the equation,
+kg/day (Appuhamy 2018).</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS">
+<span class="sig-name descname"><span class="pre">MINIMUM_DMI_DRY_FOR_MANURE_VS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7.1</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS'"><span>#</span></a></dt>
+<dd><p>Minimum DMI for dry cows in the dataset used to generate the equation,
+kg/day (Appuhamy 2018).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_PHOSPHORUS">
@@ -372,6 +402,13 @@ the minimum DMI is 7.1 kg/day (Appuhamy 2018)</p>
 <span class="sig-name descname"><span class="pre">EFF_OF_ME_USE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.66</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.EFF_OF_ME_USE" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.EFF_OF_ME_USE'"><span>#</span></a></dt>
 <dd><p>Efficiency of metabolizable energy use, e.g. conversion rate of metabolizable energy to net energy, unitless.</p>
 </dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION">
+<span class="sig-name descname"><span class="pre">HEIFER_MORTALITY_HEIFERI_FRACTION</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6666666666666666</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION'"><span>#</span></a></dt>
+<dd><p>Fraction of post-wean (heifer) mortality allocated to the HeiferI (pre-breeding) stage.
+The remaining (1 - fraction) is allocated to the HeiferII (post-breeding) stage. Per SME
+guidance, two-thirds of youngstock losses occur before breeding and one-third after, unitless.</p>
+</dd></dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
@@ -405,10 +442,15 @@ the minimum DMI is 7.1 kg/day (Appuhamy 2018)</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MILK_LACTOSE'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MILK_LACTOSE"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MILK_LACTOSE</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_CONSTRAINT_FRACTION'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_CONSTRAINT_FRACTION"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DMI_CONSTRAINT_FRACTION</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_REQUIREMENT_BOOST'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_REQUIREMENT_BOOST"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DMI_REQUIREMENT_BOOST</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI_LACT</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI_DRY</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_HEIFER'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_HEIFER"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI_HEIFER</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_CALF'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_CALF"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI_CALF</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI_LACT_FOR_MANURE_VS</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_DMI_DRY_FOR_MANURE_VS</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_PHOSPHORUS'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_PHOSPHORUS"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_PHOSPHORUS</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_CALCIUM'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_CALCIUM"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_CALCIUM</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_RATION_NDF'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_RATION_NDF"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_RATION_NDF</span></code></a></li>
@@ -421,6 +463,7 @@ the minimum DMI is 7.1 kg/day (Appuhamy 2018)</p>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_AVG_PEN_MILK'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_AVG_PEN_MILK"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_AVG_PEN_MILK</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_TDN_DISCOUNT'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.MINIMUM_TDN_DISCOUNT"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.MINIMUM_TDN_DISCOUNT</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.EFF_OF_ME_USE'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.EFF_OF_ME_USE"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.EFF_OF_ME_USE</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION'" class="reference internal" href="#RUFAS.biophysical.animal.animal_module_constants.AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION"><code class="docutils literal notranslate"><span class="pre">AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION</span></code></a></li>
 </ul>
 </li>
 </ul>

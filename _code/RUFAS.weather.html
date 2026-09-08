@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -147,57 +148,53 @@
 <span id="rufas-weather-module"></span><h1>RUFAS.weather module<a class="headerlink" href="#module-RUFAS.weather" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.weather.</span></span><span class="sig-name descname"><span class="pre">Weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.weather.</span></span><span class="sig-name descname"><span class="pre">Weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The <cite>Weather</cite> class manages all weather data used to run a single simulation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Weather</span></code> class manages all weather data used to run a single simulation.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>weather_file<span class="classifier">dict[str, List[Any]]</span></dt><dd><p>The weather dictionary read from the provided weather input source.</p>
+<dt>weather_file<span class="classifier">dict[str, list[int | float]]</span></dt><dd><p>The weather data file containing the weather data for the simulation.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> instance containing time configuration information of the simulation.</p>
 </dd>
 </dl>
 </section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>weather_data<span class="classifier">dict[datetime, CurrentDayCondition]</span></dt><dd><p>A dictionary that maps a date to the corresponding CurrentDayCondition.</p>
+<dt>weather_data<span class="classifier">dict[datetime.datetime, CurrentDayConditions]</span></dt><dd><p>A dictionary that maps a date to the corresponding <code class="docutils literal notranslate"><span class="pre">CurrentDayConditions</span></code>.</p>
 </dd>
-<dt>mean_annual_temperature<span class="classifier">int</span></dt><dd><p>Mean of mean daily temperatures over all the weather data used by the simulation (°C).</p>
+<dt>long_term_average_annual_temperature<span class="classifier">float</span></dt><dd><p>Mean of mean daily temperatures over all the weather data used by the simulation (°C).</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather.__init__'"><span>#</span></a></dt>
-<dd><p>Initializes the <cite>Weather</cite> instance using user-supplied whether data and overall simulation parameters.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
-<dl class="simple">
-<dt>weather_file<span class="classifier">dict</span></dt><dd><p>All the weather data available to be used by the simulation.</p>
-</dd>
-<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance containing time configuration information of the simulation.</p>
-</dd>
-</dl>
-</section>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather.__init__'"><span>#</span></a></dt>
+<dd><p>Initializes the <code class="docutils literal notranslate"><span class="pre">Weather</span></code> instance using user-supplied weather data and overall simulation parameters.</p>
 <section id="notes">
 <h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
-<p>Contains daily weather information stored in 2D lists. Data lists are in the format Data[year][julian_day].
-Allows daily information to be accessed by indexing to [time.year - 1][time.day - 1] (list indexing starts at 0,
-time starts at 1).</p>
+<p>Contains daily weather information stored in 2D lists. Data lists are in the format <code class="docutils literal notranslate"><span class="pre">Data[year][julian_day]</span></code>.
+Allows daily information to be accessed by indexing to <code class="docutils literal notranslate"><span class="pre">[time.year</span> <span class="pre">-</span> <span class="pre">1][time.day</span> <span class="pre">-</span> <span class="pre">1]</span></code> (list indexing starts
+at 0, time starts at 1).</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.set_linest_temperature_factors">
 <span class="sig-name descname"><span class="pre">set_linest_temperature_factors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.set_linest_temperature_factors" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather.set_linest_temperature_factors'"><span>#</span></a></dt>
-<dd><p>This function performs least-squares regression using cosine and sine components to model seasonal air
+<dd><p>Fits a sinusoidal seasonal temperature model using least-squares regression.</p>
+<section id="id1">
+<h3>Notes<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<p>This function performs least-squares regression using cosine and sine components to model seasonal air
 temperature. This enables determination of the amplitude and phase shift (peak) of the sinusoidal curve of
 seasonal air temperature. First, sin and cos coefficients are generated for each Julian day of the simulation.
 The function then fits the model:</p>
-<p>T(d) = A*cos(d) + B*sin(d) + C</p>
+<p><code class="docutils literal notranslate"><span class="pre">T(d)</span> <span class="pre">=</span> <span class="pre">A*cos(d)</span> <span class="pre">+</span> <span class="pre">B*sin(d)</span> <span class="pre">+</span> <span class="pre">C</span></code></p>
 <dl class="simple">
 <dt>where:</dt><dd><ul class="simple">
-<li><p>T(d) is the mean air temperature for day d in the simulation</p></li>
-<li><p>A and B are coefficients</p></li>
-<li><p>C is the intercept (mean)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T(d)</span></code> is the mean air temperature for day d in the simulation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> are coefficients</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C</span></code> is the intercept (mean)</p></li>
 </ul>
 </dd>
 </dl>
@@ -205,15 +202,16 @@ The function then fits the model:</p>
 temperature, amplitude of the modeled cos/sin function, and phase shift (peak temperature). These parameters are
 simulation-wide, i.e., only weather data utilized in the simulation is used. Days with missing (NaN) mean air
 temperatures are excluded from the regression.</p>
+</section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.get_current_day_conditions">
 <span class="sig-name descname"><span class="pre">get_current_day_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></span><a class="headerlink" href="#RUFAS.weather.Weather.get_current_day_conditions" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather.get_current_day_conditions'"><span>#</span></a></dt>
-<dd><p>Creates a CurrentDayConditions object containing all the weather conditions on the current day.</p>
+<dd><p>Creates a <code class="docutils literal notranslate"><span class="pre">CurrentDayConditions</span></code> object containing all the weather conditions on the current day.</p>
 <section id="id2">
 <h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>time: RufasTime</dt><dd><p>RufasTime object containing the current time of the simulation.</p>
+<dt>time: RufasTime</dt><dd><p><code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> object containing the current time of the simulation.</p>
 </dd>
 <dt>latitude<span class="classifier">float | None, default None</span></dt><dd><p>Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
 then the daylength will not be provided in the returned CurrentDayConditions instance.</p>
@@ -223,14 +221,14 @@ then the daylength will not be provided in the returned CurrentDayConditions ins
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>CurrentDayConditions</dt><dd><p>CurrentDayConditions instance including all the weather conditions of the specified date.</p>
+<dt>CurrentDayConditions</dt><dd><p><code class="docutils literal notranslate"><span class="pre">CurrentDayConditions</span></code> instance including all the weather conditions of the specified date.</p>
 </dd>
 </dl>
 </section>
 <section id="raises">
 <h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>KeyError</dt><dd><p>While attempting to collect weather conditions that are not contained in the Weather object.</p>
+<dt>KeyError</dt><dd><p>While attempting to collect weather conditions that are not contained in the <code class="docutils literal notranslate"><span class="pre">Weather</span></code> object.</p>
 </dd>
 </dl>
 </section>
@@ -238,11 +236,11 @@ then the daylength will not be provided in the returned CurrentDayConditions ins
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.get_conditions_series">
 <span class="sig-name descname"><span class="pre">get_conditions_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ending_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.get_conditions_series" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather.get_conditions_series'"><span>#</span></a></dt>
-<dd><p>Generates a series of CurrentDayConditions.</p>
+<dd><p>Generates a series of <code class="docutils literal notranslate"><span class="pre">CurrentDayConditions</span></code>.</p>
 <section id="id3">
 <h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>time<span class="classifier">RufasTime</span></dt><dd><p>A RufasTime instance containing the current time information of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>A <code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> instance containing the current time information of the simulation.</p>
 </dd>
 <dt>starting_offset<span class="classifier">int</span></dt><dd><p>Number of days before or after the given date to start the weather conditions series.</p>
 </dd>
@@ -256,7 +254,7 @@ provided, then no daylengths will be included in weather conditions returned.</p
 <section id="id4">
 <h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>list[CurrentDayConditions]</dt><dd><p>Series of current day conditions in chronological order.</p>
+<dt>list[CurrentDayConditions]</dt><dd><p>Series of <code class="docutils literal notranslate"><span class="pre">CurrentDayConditions</span></code> in chronological order.</p>
 </dd>
 </dl>
 </section>
@@ -264,30 +262,34 @@ provided, then no daylengths will be included in weather conditions returned.</p
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.record_weather">
 <span class="sig-name descname"><span class="pre">record_weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.record_weather" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather.record_weather'"><span>#</span></a></dt>
-<dd><p>Records the current weather conditions in the OutputManager.</p>
+<dd><p>Records the current weather conditions in the <code class="docutils literal notranslate"><span class="pre">OutputManager</span></code>.</p>
 <section id="id5">
 <h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>time: RufasTime</dt><dd><p>RufasTime object containing the current time of the simulation.</p>
+<dt>time: RufasTime</dt><dd><p><code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> object containing the current time of the simulation.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.weather.Weather._calculate_average_annual_temperature">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_average_annual_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_average_temperatures</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather._calculate_average_annual_temperature" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather._calculate_average_annual_temperature'"><span>#</span></a></dt>
-<dd><p>Calculates the average annual air temperature based on the daily average air temperatures.</p>
+<dt class="sig sig-object py" id="RUFAS.weather.Weather._calculate_long_term_average_annual_temperature">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_long_term_average_annual_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_average_temperatures</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather._calculate_long_term_average_annual_temperature" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.weather.Weather._calculate_long_term_average_annual_temperature'"><span>#</span></a></dt>
+<dd><p>Calculates a long-term average annual air temperature from all daily average air temperatures in the simulation
+period.</p>
+<p>The result is a single representative annual temperature for the entire simulation rather than a separate
+average for each simulated year.</p>
 <section id="id6">
 <h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>daily_average_temperatures<span class="classifier">list(float)</span></dt><dd><p>List of daily average air temperatures in the passed to be run by the simulation (degrees C).</p>
+<dt>daily_average_temperatures<span class="classifier">list[float]</span></dt><dd><p>List of daily average air temperatures in the past to be run by the simulation (degrees C).</p>
 </dd>
 </dl>
 </section>
 <section id="id7">
 <h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>The average annual air temperature (degrees C).</p>
+<dt>float</dt><dd><p>The long-term average annual air temperature represented by the daily temperatures across the entire
+simulation period (degrees C).</p>
 </dd>
 </dl>
 </section>
@@ -300,15 +302,13 @@ provided, then no daylengths will be included in weather conditions returned.</p
 </section>
 <section id="id9">
 <h3>Notes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
-<p>This method calculates the average annual air temperature by taking the average of all daily average air
-temperatures provided in the weather input file. Previous implementations calculated the average annual
-temperature for individual years, which led to the value fluctuating more than desired.</p>
-<p>Missing daily values (NaN) are excluded from the average, since weather stations commonly go offline for
-short periods. A warning is recorded when any values are missing.</p>
-<p>This method is intended to approximate SWAT’s method for calculating the average annual temperature. SWAT
-calculates average high and low temperatures for each month over every simulated year, then averages those
-values to get a single annual average air temperature for the entire simulation. The exact implementation for
-this can be found at in the SWAT source code file <a class="reference external" href="https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/readwgn.f">readwgn.f</a></p>
+<p>This method calculates one representative annual air temperature by averaging
+all available daily average air temperatures across the simulation period.
+It does not calculate a separate value for each simulated year.</p>
+<p>Previous implementations recalculated the annual average for individual years,
+which caused the value to fluctuate more than desired. Using the full simulation
+period provides a more stable approximation of the location’s typical annual
+air temperature.</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -320,13 +320,16 @@ this can be found at in the SWAT source code file <a class="reference external" 
 <dl class="simple">
 <dt>weather_file: dict</dt><dd><p>File containing weather data.</p>
 </dd>
-<dt>time: RufasTime</dt><dd><p>The RufasTime instance containing time configuration information of the simulation.</p>
+<dt>time: RufasTime</dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">RufasTime</span></code> instance containing time configuration information of the simulation.</p>
 </dd>
 </dl>
 </section>
 <section id="id11">
-<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
-<p>None</p>
+<h3>Raises<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there is not enough weather data to cover the simulation period.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 </section>
@@ -341,7 +344,7 @@ this can be found at in the SWAT source code file <a class="reference external" 
 <li><a :data-current="activeSection === '#RUFAS.weather.Weather.get_current_day_conditions'" class="reference internal" href="#RUFAS.weather.Weather.get_current_day_conditions"><code class="docutils literal notranslate"><span class="pre">Weather.get_current_day_conditions()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.weather.Weather.get_conditions_series'" class="reference internal" href="#RUFAS.weather.Weather.get_conditions_series"><code class="docutils literal notranslate"><span class="pre">Weather.get_conditions_series()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.weather.Weather.record_weather'" class="reference internal" href="#RUFAS.weather.Weather.record_weather"><code class="docutils literal notranslate"><span class="pre">Weather.record_weather()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.weather.Weather._calculate_average_annual_temperature'" class="reference internal" href="#RUFAS.weather.Weather._calculate_average_annual_temperature"><code class="docutils literal notranslate"><span class="pre">Weather._calculate_average_annual_temperature()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.weather.Weather._calculate_long_term_average_annual_temperature'" class="reference internal" href="#RUFAS.weather.Weather._calculate_long_term_average_annual_temperature"><code class="docutils literal notranslate"><span class="pre">Weather._calculate_long_term_average_annual_temperature()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.weather.Weather.check_adequate_weather_data'" class="reference internal" href="#RUFAS.weather.Weather.check_adequate_weather_data"><code class="docutils literal notranslate"><span class="pre">Weather.check_adequate_weather_data()</span></code></a></li>
 </ul>
 </li>

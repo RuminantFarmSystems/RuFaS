@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.data_structures.feed_storage_to_animal_connection.html" rel="next" title="RUFAS.data_structures.feed_storage_to_animal_connection module"/>
+<link href="RUFAS.data_structures.crop_soil_to_feed_storage_connection.html" rel="prev" title="RUFAS.data_structures.crop_soil_to_feed_storage_connection module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,23 +139,21 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.data_structures.html">RUFAS.data_structures package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.data_structures.events module</span>
 </nav>
 <div id="content" role="main">
 <section id="module-RUFAS.data_structures.events">
 <span id="rufas-data-structures-events-module"></span><h1>RUFAS.data_structures.events module<a class="headerlink" href="#module-RUFAS.data_structures.events" title="Link to this heading"><span>#</span></a></h1>
-<p>This module defines the various BaseFieldManagementEvent classes and helper functions</p>
-<p>Events are simple classes that will facilitate scheduling of different management operations. At their core, they
-are simply pairs of attributes (<cite>year</cite> and <cite>day</cite>), indicating when particular operations should occur. Children of
-the main <cite>BaseFieldManagementEvent</cite> class can extend the functionality by adding additional attributes specific to the
-type of management operation. For example, the <cite>HarvestEvent</cite> contains the <cite>operation</cite> attribute, which specifies which
-specific harvest method will be used when harvesting a crop, and a <cite>crop_reference</cite> attribute, which specifies which
-crop that is presently growing in a field will be harvested.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.data_structures.events.BaseFieldManagementEvent">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.events.</span></span><span class="sig-name descname"><span class="pre">BaseFieldManagementEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">120</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.events.BaseFieldManagementEvent" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.events.BaseFieldManagementEvent'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that will facilitate scheduling of different management operations.</p>
+<p>This class defines the various BaseFieldManagementEvent classes and helper functions.</p>
+<p>Events will facilitate scheduling of different management operations. At their core, they
+are simply pairs of attributes (<code class="docutils literal notranslate"><span class="pre">year</span></code> and <code class="docutils literal notranslate"><span class="pre">day</span></code>), indicating when particular operations should occur.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
@@ -217,6 +218,19 @@ harvested.</p>
 </dd>
 <dt>heat_scheduled_harvest<span class="classifier">bool, default=False</span></dt><dd><p>Flag indicating if the crop will be harvested when it has a certain amount of heat units.</p>
 </dd>
+<dt>year<span class="classifier">int</span></dt><dd><p>The year in which the planting will occur.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>The day on which the planting will occur.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h2>Attributes<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>crop_reference<span class="classifier">str</span></dt><dd><p>Name of the crop to be planted in the ground.</p>
+</dd>
+<dt>use_heat_scheduled_harvest<span class="classifier">bool</span></dt><dd><p>Flag indicating if the crop will be harvested when it has a certain amount of heat units.</p>
+</dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.events.PlantingEvent.__init__">
@@ -230,12 +244,25 @@ harvested.</p>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.data_structures.events.BaseFieldManagementEvent" title="RUFAS.data_structures.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
 <p>A child of BaseFieldManagementEvent class that determines when (and how) a harvest operation should occur for a
 crop.</p>
-<section id="id3">
-<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h2>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>crop_reference<span class="classifier">str</span></dt><dd><p>Name of the crop to be harvested.</p>
 </dd>
 <dt>operation<span class="classifier">HarvestOperation, default=HarvestOperation.HARVEST_KILL</span></dt><dd><p>A harvest operation from the Harvest Operations enum.</p>
+</dd>
+<dt>year<span class="classifier">int</span></dt><dd><p>The year in which the harvest will occur.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>The day on which the harvest will occur.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Attributes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>crop_reference<span class="classifier">str</span></dt><dd><p>Name of the crop to be harvested.</p>
+</dd>
+<dt>operation<span class="classifier">HarvestOperation, default=HarvestOperation.HARVEST_KILL</span></dt><dd><p>A harvest operation from the <code class="docutils literal notranslate"><span class="pre">HarvestOperations</span></code> enum.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -250,8 +277,25 @@ crop.</p>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.data_structures.events.BaseFieldManagementEvent" title="RUFAS.data_structures.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
 <p>A child of BaseFieldManagementEvent class that defines a tillage application to be applied on a specific day of a
 year.</p>
-<section id="id4">
-<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h2>
+<section id="id6">
+<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>tillage_depth<span class="classifier">float</span></dt><dd><p>The lowest depth the tilling implement reaches (mm).</p>
+</dd>
+<dt>incorporation_fraction<span class="classifier">float</span></dt><dd><p>Fraction of soil surface pool incorporated into the soil profile (unitless).</p>
+</dd>
+<dt>mixing_fraction<span class="classifier">float</span></dt><dd><p>Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).</p>
+</dd>
+<dt>implement<span class="classifier">TillageImplement</span></dt><dd><p>Tillage implement that is being used to execute this tillage application.</p>
+</dd>
+<dt>year<span class="classifier">int</span></dt><dd><p>The year in which the tillage event will occur.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>The day on which the tillage event will occur.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h2>Attributes<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>tillage_depth<span class="classifier">float</span></dt><dd><p>The lowest depth the tilling implement reaches (mm).</p>
 </dd>
@@ -270,17 +314,13 @@ year.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.data_structures.events.ManureEvent">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.events.</span></span><span class="sig-name descname"><span class="pre">ManureEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_types.html#RUFAS.data_structures.manure_types.ManureType" title="RUFAS.data_structures.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_supplement_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_supplement_methods.html#RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod" title="RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod"><span class="pre">ManureSupplementMethod</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.events.ManureEvent" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.events.ManureEvent'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.events.</span></span><span class="sig-name descname"><span class="pre">ManureEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_types.html#RUFAS.data_structures.manure_types.ManureType" title="RUFAS.data_structures.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_supplement_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_supplement_methods.html#RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod" title="RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod"><span class="pre">ManureSupplementMethod</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_daily_spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spread_all_available_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.events.ManureEvent" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.events.ManureEvent'"><span>#</span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.data_structures.events.BaseFieldManagementEvent" title="RUFAS.data_structures.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
 <p>A child of BaseFieldManagementEvent class that defines how manure much manure such be requested and applied to a
 field.</p>
-<section id="id5">
-<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<section id="id8">
+<h2>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>year<span class="classifier">int</span></dt><dd><p>Year in which this manure application occurs.</p>
-</dd>
-<dt>day<span class="classifier">int</span></dt><dd><p>Day in which this manure application occurs.</p>
-</dd>
 <dt>nitrogen_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of nitrogen that should be contained in this manure application (kg).</p>
 </dd>
 <dt>phosphorus_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of phosphorus that should be contained in this manure application (kg).</p>
@@ -295,10 +335,39 @@ field.</p>
 </dd>
 <dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of manure applied that remains on the soil surface (unitless).</p>
 </dd>
+<dt>year<span class="classifier">int</span></dt><dd><p>Year in which this manure application occurs.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>Day in which this manure application occurs.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h2>Attributes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>nitrogen_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of nitrogen that should be contained in this manure application (kg).</p>
+</dd>
+<dt>phosphorus_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of phosphorus that should be contained in this manure application (kg).</p>
+</dd>
+<dt>manure_type<span class="classifier">ManureType</span></dt><dd><p>The type of manure for which the application request will be made (unitless).</p>
+</dd>
+<dt>manure_supplement_method<span class="classifier">ManureSupplementMethod</span></dt><dd><p>The method that the event will use to supplement nutrient deficiencies (unitless).</p>
+</dd>
+<dt>field_coverage<span class="classifier">float</span></dt><dd><p>Fraction of the field covered by this manure application (unitless).</p>
+</dd>
+<dt>application_depth<span class="classifier">float</span></dt><dd><p>Depth that manure is injected into the soil at (mm).</p>
+</dd>
+<dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of manure applied that remains on the soil surface (unitless).</p>
+</dd>
+<dt>is_daily_spread<span class="classifier">bool</span></dt><dd><p>Whether this manure event is from daily spread handling.</p>
+</dd>
+<dt>spread_all_available_manure<span class="classifier">bool</span></dt><dd><p>If true, the event requests that all manure currently in DailySpread storages be spread, ignoring
+nutrient targets, caps, manure type, and supplemental manure settings. Only meaningful when
+<code class="docutils literal notranslate"><span class="pre">is_daily_spread</span></code> is also true.</p>
+</dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.data_structures.events.ManureEvent.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_types.html#RUFAS.data_structures.manure_types.ManureType" title="RUFAS.data_structures.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_supplement_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_supplement_methods.html#RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod" title="RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod"><span class="pre">ManureSupplementMethod</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.events.ManureEvent.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.events.ManureEvent.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_types.html#RUFAS.data_structures.manure_types.ManureType" title="RUFAS.data_structures.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_supplement_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_structures.manure_supplement_methods.html#RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod" title="RUFAS.data_structures.manure_supplement_methods.ManureSupplementMethod"><span class="pre">ManureSupplementMethod</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_daily_spread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spread_all_available_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.events.ManureEvent.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.events.ManureEvent.__init__'"><span>#</span></a></dt>
 <dd></dd></dl>
 </section>
 </dd></dl>
@@ -307,14 +376,10 @@ field.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.data_structures.events.</span></span><span class="sig-name descname"><span class="pre">FertilizerEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mix_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.data_structures.events.FertilizerEvent" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.data_structures.events.FertilizerEvent'"><span>#</span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.data_structures.events.BaseFieldManagementEvent" title="RUFAS.data_structures.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
 <p>A child of BaseFieldManagementEvent class that defines the parameters of a single fertilizer application.</p>
-<section id="id6">
-<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
+<section id="id10">
+<h2>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>mix_name<span class="classifier">str</span></dt><dd><p>Name of the fertilizer mix being used.</p>
-</dd>
-<dt>year<span class="classifier">int</span></dt><dd><p>Year in which this application occurs.</p>
-</dd>
-<dt>day<span class="classifier">int</span></dt><dd><p>Day on which this application occurs.</p>
+<dt>mix_name<span class="classifier">str</span></dt><dd><p>Name of the fertilizer mix being used (unitless).</p>
 </dd>
 <dt>nitrogen_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of nitrogen that should be in this application (kg).</p>
 </dd>
@@ -322,9 +387,30 @@ field.</p>
 </dd>
 <dt>potassium_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of potassium that should be in this application (kg).</p>
 </dd>
-<dt>depth<span class="classifier">float</span></dt><dd><p>Depth at which fertilizer is injected into the soil.</p>
+<dt>depth<span class="classifier">float</span></dt><dd><p>Depth at which fertilizer is injected into the soil (mm).</p>
 </dd>
-<dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer that remains on the soil surface after application.</p>
+<dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer that remains on the soil surface after application (unitless).</p>
+</dd>
+<dt>year<span class="classifier">int</span></dt><dd><p>Year in which this application occurs.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>Day on which this application occurs.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Attributes<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>mix_name<span class="classifier">str</span></dt><dd><p>Name of the fertilizer mix being used (unitless).</p>
+</dd>
+<dt>nitrogen_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of nitrogen that should be in this application (kg).</p>
+</dd>
+<dt>phosphorus_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of phosphorus that should be in this application (kg).</p>
+</dd>
+<dt>potassium_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of potassium that should be in this application (kg).</p>
+</dd>
+<dt>depth<span class="classifier">float</span></dt><dd><p>Depth at which fertilizer is injected into the soil (mm).</p>
+</dd>
+<dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer that remains on the soil surface after application (unitless).</p>
 </dd>
 </dl>
 <dl class="py method">

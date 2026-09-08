@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -152,7 +153,7 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.</span></span><span class="sig-name descname"><span class="pre">NRCRequirementsCalculator</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator'"><span>#</span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.NutritionRequirementsCalculator" title="RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.NutritionRequirementsCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">NutritionRequirementsCalculator</span></code></a></p>
-<p>Animal requirements calculator class, based on NRC’s methodology.</p>
+<p>Animal requirements calculator class based on NRC’s methodology.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator.calculate_requirements">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">calculate_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_of_pregnancy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_condition_score_5</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_daily_gain_heifer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calving_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_fat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_true_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_lactose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_energy_diet_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_born</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TDN_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_based_phosphorus_requirement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">NutritionRequirements</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator.calculate_requirements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator.calculate_requirements'"><span>#</span></a></dt>
@@ -198,6 +199,8 @@
 </dd>
 <dt>TDN_percentage<span class="classifier">float</span></dt><dd><p>Percentage of Total Digestible Nutrients in previously fed ration (%).</p>
 </dd>
+<dt>process_based_phosphorus_requirement<span class="classifier">float</span></dt><dd><p>The phosphorus requirement (kg).</p>
+</dd>
 </dl>
 </section>
 <section id="returns">
@@ -232,20 +235,17 @@
 <section id="id2">
 <h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>tuple[float, float, float]</dt><dd><p>Net energy requirement for maintenance (Mcal/day), conceptus weight (kg), and calf birth weight (kg).</p>
+<dt>tuple[float, float, float]</dt><dd><ul class="simple">
+<li><p>Net energy requirement for maintenance (Mcal/day).</p></li>
+<li><p>Conceptus weight (kg).</p></li>
+<li><p>Calf birth weight (kg).</p></li>
+</ul>
 </dd>
 </dl>
 </section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
-<p>[AN.NRC.1]
-[AN.NRC.2]
-[AN.NRC.3]
-[AN.NRC.4]
-[AN.NRC.5]
-[AN.NRC.6]
-[AN.NRC.7]
-Energy requirements for activity are not included within calculations for maintenance.</p>
+<p>Energy requirements for activity are not included within calculations for maintenance.</p>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#references'"><span>#</span></a></h2>
@@ -255,7 +255,14 @@ Energy requirements for activity are not included within calculations for mainte
 <p>National Research Council, “Nutrient Requirements of Dairy Cattle, 7th edition.” National Academic Press,</p>
 </aside>
 </aside>
-<p>Chapter 2 “Energy”,pp. 18-25, 2001.</p>
+<p>Chapter 2 “Energy”,pp. 18-25, 2001.
+[AN.NRC.1]
+[AN.NRC.2]
+[AN.NRC.3]
+[AN.NRC.4]
+[AN.NRC.5]
+[AN.NRC.6]
+[AN.NRC.7]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -283,15 +290,15 @@ Energy requirements for activity are not included within calculations for mainte
 </dl>
 </section>
 <section id="id5">
-<h2>Notes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
-<p>[AN.NRC.13], [AN.NRC.14], [AN.NRC.15], [AN.NRC.16], [AN.NRC.17], [AN.NRC.18], [AN.NRC.19]
-[AN.NRC.20], [AN.NRC.21], [AN.NRC.22], [AN.NRC.23], [AN.NRC.24]
-Returns
-——-
-tuple[float, float, float]</p>
-<blockquote>
-<div><p>Net energy requirement for growth (Mcal/d), average daily gain (g/d), equivalent shrunk body weight (kg).</p>
-</div></blockquote>
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h2>
+<dl class="simple">
+<dt>tuple[float, float, float]</dt><dd><ul class="simple">
+<li><p>Net energy requirement for growth (Mcal/d).</p></li>
+<li><p>Average daily gain (g/d).</p></li>
+<li><p>Equivalent shrunk body weight (kg).</p></li>
+</ul>
+</dd>
+</dl>
 </section>
 <section id="id6">
 <h2>References<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
@@ -302,6 +309,8 @@ tuple[float, float, float]</p>
 Chapter 11 “Growth”, pp. 234-243, 2001.</p>
 </aside>
 </aside>
+<p>[AN.NRC.13], [AN.NRC.14], [AN.NRC.15], [AN.NRC.16], [AN.NRC.17], [AN.NRC.18], [AN.NRC.19]
+[AN.NRC.20], [AN.NRC.21], [AN.NRC.22], [AN.NRC.23], [AN.NRC.24]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -326,8 +335,7 @@ Chapter 11 “Growth”, pp. 234-243, 2001.</p>
 </section>
 <section id="id10">
 <h2>Notes<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h2>
-<p>[AN.NRC.25], [AN.NRC.26]
-Day_of_pregnancy are counted from 190 day_of_pregnancy once pregnancy is confirmed. Otherwise, this nutritional
+<p>Day_of_pregnancy are counted from 190 day_of_pregnancy once pregnancy is confirmed. Otherwise, this nutritional
 requirement is assumed to be zero.</p>
 </section>
 <section id="id11">
@@ -339,6 +347,7 @@ requirement is assumed to be zero.</p>
 National Academic Press, Chapter 2 “Energy”, pp. 21-22, 2001.</p>
 </aside>
 </aside>
+<p>[AN.NRC.25], [AN.NRC.26]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -383,10 +392,6 @@ National Academic Press, Chapter 2 “Energy”, pp. 21-22, 2001.</p>
 </section>
 <section id="id15">
 <h2>Notes<a class="headerlink" href="#id15" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'"><span>#</span></a></h2>
-<blockquote>
-<div><p>[AN.NRC.29], [AN.NRC.31], [AN.NRC.32],[AN.NRC.33], [AN.NRC.34],[AN.NRC.35],
-[AN.NRC.36], [AN.NRC.37],[AN.NRC.38]</p>
-</div></blockquote>
 <p>bacteria_estimate: Bacteria metabolizable protein production (g).
 TDN: Total digestible nutrients
 maintenance: Metabolizable protein requirement for maintenance (g).
@@ -405,6 +410,8 @@ lactation: Metabolizable protein requirement for lactation (g).</p>
 National Academic Press, Chapter 5 “Protein and Amino acids”,pp. 67-69. 2001;</p>
 </aside>
 </aside>
+<p>[AN.NRC.29], [AN.NRC.31], [AN.NRC.32],[AN.NRC.33], [AN.NRC.34],[AN.NRC.35],
+[AN.NRC.36], [AN.NRC.37],[AN.NRC.38]</p>
 </section>
 </dd></dl>
 <dl class="py method">
@@ -429,33 +436,30 @@ National Academic Press, Chapter 5 “Protein and Amino acids”,pp. 67-69. 2001
 </dl>
 </section>
 <section id="id19">
-<h2>Notes<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
-<p>[AN.NRC.39],[AN.NRC.41], [AN.NRC.43], [AN.NRC.45],[AN.NRC.47], [AN.NRC.49]</p>
-</section>
-<section id="id20">
-<h2>Returns<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
+<h2>Returns<a class="headerlink" href="#id19" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>Calcium requirement (grams per day).</p>
 </dd>
 </dl>
 </section>
-<section id="id21">
-<h2>References<a class="headerlink" href="#id21" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'"><span>#</span></a></h2>
+<section id="id20">
+<h2>References<a class="headerlink" href="#id20" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'"><span>#</span></a></h2>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id22" role="doc-footnote">
+<aside class="footnote brackets" id="id21" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>National Research Council, “Nutrient Requirements of Dairy Cattle, 7th edition.” National Academic Press,
 Chapter 6 “Minerals”,pp. 106-109. 2001.</p>
 </aside>
 </aside>
+<p>[AN.NRC.39],[AN.NRC.41], [AN.NRC.43], [AN.NRC.45],[AN.NRC.47], [AN.NRC.49]</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_phosphorus_requirement">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_phosphorus_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_of_pregnancy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_daily_gain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_intake_estimate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_phosphorus_requirement" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_phosphorus_requirement'"><span>#</span></a></dt>
 <dd><p>Calculates total phosphorus requirement according to NRC (2001).</p>
-<section id="id23">
-<h2>Parameters<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
+<section id="id22">
+<h2>Parameters<a class="headerlink" href="#id22" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kilograms).</p>
 </dd>
@@ -473,34 +477,31 @@ Chapter 6 “Minerals”,pp. 106-109. 2001.</p>
 </dd>
 </dl>
 </section>
-<section id="id24">
-<h2>Notes<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
-<p>[AN.NRC.42], [AN.NRC.44], [AN.NRC.46],[AN.NRC.48], [AN.NRC.50]</p>
-</section>
-<section id="id25">
-<h2>Returns<a class="headerlink" href="#id25" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'"><span>#</span></a></h2>
+<section id="id23">
+<h2>Returns<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>Phosphorus requirement (grams per day).</p>
 </dd>
 </dl>
 </section>
-<section id="id26">
-<h2>References<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
+<section id="id24">
+<h2>References<a class="headerlink" href="#id24" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'"><span>#</span></a></h2>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id27" role="doc-footnote">
+<aside class="footnote brackets" id="id25" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>National Research Council, “Nutrient Requirements of Dairy Cattle, 7th edition.” National Academic Press,
 Chapter 6 “Minerals”,pp. 109-118. 2001.</p>
 </aside>
 </aside>
+<p>[AN.NRC.42], [AN.NRC.44], [AN.NRC.46],[AN.NRC.48], [AN.NRC.50]</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_dry_matter_intake">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_dry_matter_intake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_of_pregnancy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_fat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_energy_diet_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_born</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_dry_matter_intake" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_dry_matter_intake'"><span>#</span></a></dt>
 <dd><p>Calculates dry matter intake according to NRC (2001).</p>
-<section id="id28">
-<h2>Parameters<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
+<section id="id26">
+<h2>Parameters<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>animal_type<span class="classifier">AnimalType</span></dt><dd><p>A type or subtype of animal specified in the AnimalType enum.</p>
 </dd>
@@ -520,36 +521,36 @@ Chapter 6 “Minerals”,pp. 109-118. 2001.</p>
 </dd>
 </dl>
 </section>
-<section id="id29">
-<h2>Returns<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
+<section id="id27">
+<h2>Returns<a class="headerlink" href="#id27" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>dry_matter_intake_estimate<span class="classifier">float</span></dt><dd><p>Dry matter intake (kilograms per day).</p>
 </dd>
 </dl>
 </section>
-<section id="id30">
-<h2>Notes<a class="headerlink" href="#id30" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id30'"><span>#</span></a></h2>
-<p>[AN.NRC.51], [AN.NRC.52], [AN.NRC.53], [AN.NRC.54], [AN.NRC.55]
-The sum of dry matter intake of each feed is assumed to be less than
+<section id="id28">
+<h2>Notes<a class="headerlink" href="#id28" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'"><span>#</span></a></h2>
+<p>The sum of dry matter intake of each feed is assumed to be less than
 dry matter intake estimation (Sum of Feed &lt; dry_matter_intake_estimate).</p>
 </section>
-<section id="id31">
-<h2>References<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h2>
+<section id="id29">
+<h2>References<a class="headerlink" href="#id29" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'"><span>#</span></a></h2>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id32" role="doc-footnote">
+<aside class="footnote brackets" id="id30" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>National Research Council, “Nutrient Requirements of Dairy Cattle, 7th edition.” National Academic Press,
 Chapter 1 “Dry Matter Intake”, pp. 4; and pp. 325, 2001 (Equations 1 and 2), and pp. 326 for heifers</p>
 </aside>
 </aside>
+<p>[AN.NRC.51], [AN.NRC.52], [AN.NRC.53], [AN.NRC.54], [AN.NRC.55]</p>
 </section>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_activity_energy_requirements">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calculate_activity_energy_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_activity_energy_requirements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.NRCRequirementsCalculator._calculate_activity_energy_requirements'"><span>#</span></a></dt>
 <dd><p>Calculates the net energy for activity requirement portion of the energy requirements.</p>
-<section id="id33">
-<h2>Parameters<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h2>
+<section id="id31">
+<h2>Parameters<a class="headerlink" href="#id31" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id31'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg).</p>
 </dd>
@@ -559,29 +560,29 @@ Chapter 1 “Dry Matter Intake”, pp. 4; and pp. 325, 2001 (Equations 1 and 2),
 </dd>
 </dl>
 </section>
-<section id="id34">
-<h2>Returns<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
+<section id="id32">
+<h2>Returns<a class="headerlink" href="#id32" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id32'"><span>#</span></a></h2>
 <dl class="simple">
 <dt>float</dt><dd><p>Net energy requirement for activity (Mcal/day).</p>
 </dd>
 </dl>
 </section>
-<section id="id35">
-<h2>Notes<a class="headerlink" href="#id35" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id35'"><span>#</span></a></h2>
-<p>[AN.NRC.8],[AN.NRC.9], [AN.NRC.10], [AN.NRC.11], [AN.NRC.12]
-Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance. Grazing
+<section id="id33">
+<h2>Notes<a class="headerlink" href="#id33" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id33'"><span>#</span></a></h2>
+<p>Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance. Grazing
 system and hilly topography will cost additional energy. Grazing is not implemented yet in the current version
 of code.</p>
 </section>
-<section id="id36">
-<h2>References<a class="headerlink" href="#id36" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id36'"><span>#</span></a></h2>
+<section id="id34">
+<h2>References<a class="headerlink" href="#id34" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id34'"><span>#</span></a></h2>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id37" role="doc-footnote">
+<aside class="footnote brackets" id="id35" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
 8th edition.” National Academic Press, Chapter 3 “Energy”, pp. 30-31, 2021.</p>
 </aside>
 </aside>
+<p>[AN.NRC.8],[AN.NRC.9], [AN.NRC.10], [AN.NRC.11], [AN.NRC.12]</p>
 </section>
 </dd></dl>
 </dd></dl>

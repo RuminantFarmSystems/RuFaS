@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.crop.heat_units.html" rel="next" title="RUFAS.biophysical.field.crop.heat_units module"/>
+<link href="RUFAS.biophysical.field.crop.growth_constraints.html" rel="prev" title="RUFAS.biophysical.field.crop.growth_constraints module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.crop.html">RUFAS.biophysical.field.crop package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.crop.harvest_operations module</span>
 </nav>
 <div id="content" role="main">
@@ -161,7 +169,7 @@
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.harvest_operations.FINAL_HARVEST_OPERATIONS">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.crop.harvest_operations.</span></span><span class="sig-name descname"><span class="pre">FINAL_HARVEST_OPERATIONS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[HarvestOperation.HARVEST_KILL,</span> <span class="pre">HarvestOperation.KILL_ONLY]</span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.harvest_operations.FINAL_HARVEST_OPERATIONS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.harvest_operations.FINAL_HARVEST_OPERATIONS'"><span>#</span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.crop.harvest_operations.</span></span><span class="sig-name descname"><span class="pre">FINAL_HARVEST_OPERATIONS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation" title="RUFAS.biophysical.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({HarvestOperation.HARVEST_KILL,</span> <span class="pre">HarvestOperation.KILL_ONLY})</span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.harvest_operations.FINAL_HARVEST_OPERATIONS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.harvest_operations.FINAL_HARVEST_OPERATIONS'"><span>#</span></a></dt>
 <dd><p>This variable is a list of all the HarvestOperation instances that will terminate the Crop instance (either through
 via death. This list should be appended with any operation added to the HarvestOperation class that will ultimately
 kill the crop before another harvest operation can occur (a non-obvious example would be cutting the crop a final

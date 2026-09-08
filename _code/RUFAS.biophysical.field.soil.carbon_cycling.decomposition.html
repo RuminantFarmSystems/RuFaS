@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition.html" rel="next" title="RUFAS.biophysical.field.soil.carbon_cycling.pool_gas_partition module"/>
+<link href="RUFAS.biophysical.field.soil.carbon_cycling.carbon_cycle.html" rel="prev" title="RUFAS.biophysical.field.soil.carbon_cycling.carbon_cycle module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,12 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.html">RUFAS.biophysical.field.soil package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.carbon_cycling.html">RUFAS.biophysical.field.soil.carbon_cycling package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.soil.carbon_cycling.decomposition module</span>
 </nav>
 <div id="content" role="main">
@@ -152,7 +161,7 @@
 <dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>An instance of SoilData containing soil properties and carbon pool information. A new instance is created if not
 provided.</p>
 </dd>
-<dt>field_size<span class="classifier">float, optional, default None</span></dt><dd><p>The size of the field in hectares (ha). This is used to initialize a SoilData object if one is not provided.</p>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>The size of the field in hectares (ha). This is used to initialize a SoilData object if one is not provided.</p>
 </dd>
 </dl>
 </section>
@@ -172,7 +181,7 @@ Soil and Crop Module › Literature › Carbon Models › DAYCENT”</p>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h2>
 <p>The equations for this model, referenced in the soil psuedocode, are derived from an
-<a class="reference external" href="https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358">excel file</a> on Basecamp, but the meaning (and
+<a href="#id1"><span class="problematic" id="id2">``</span></a>excel file &lt;<a class="reference external" href="https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358">https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358</a>&gt;``_ on Basecamp, but the meaning (and
 validity) of terms is extremely unclear from both sources. The documentation cannot be adequately completed without
 a better understanding of these methods.</p>
 <dl class="py method">
@@ -188,9 +197,8 @@ a better understanding of these methods.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.carbon_cycling.decomposition.Decomposition._calc_temp_factor">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calc_temp_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_temp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_inflection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_inflection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">11.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">29.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inflection_slope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.80546</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.decomposition.Decomposition._calc_temp_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.decomposition.Decomposition._calc_temp_factor'"><span>#</span></a></dt>
 <dd><p>Calculate the temperature factor for each layer.</p>
-<p>This function implements the “pseudocode_soil” S.6.A.1 and uses defaults drawn from defac: course soil.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>layer_temp<span class="classifier">float</span></dt><dd><p>Temperature of the layer (Celsius).</p>
 </dd>
@@ -203,8 +211,12 @@ a better understanding of these methods.</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
+<section id="id4">
+<h3>References<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<p>“pseudocode_soil” S.6.A.1 and uses defaults drawn from defac: course soil.</p>
+</section>
+<section id="id5">
+<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <p>This temperature factor is lower-bounded at 0.0 because if negative, it may result in a negative amount
 of decomposition, which in this context would be considered a bug.</p>
 </section>
@@ -213,33 +225,36 @@ of decomposition, which in this context would be considered a bug.</p>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.carbon_cycling.decomposition.Decomposition._calc_moisture_factor">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_calc_moisture_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">water_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.55</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-0.007</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_exponent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.648115</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_exponent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.22</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.soil.carbon_cycling.decomposition.Decomposition._calc_moisture_factor" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.carbon_cycling.decomposition.Decomposition._calc_moisture_factor'"><span>#</span></a></dt>
 <dd><p>Calculate the moisture factor for carbon decomposition for the layer.</p>
-<p>This function implements the “pseudocode_soil” S.6.A.2 and uses defaults drawn from defac: course soil.</p>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>water_factor<span class="classifier">float</span></dt><dd><p>Relative water saturation (%).</p>
 </dd>
-<dt>a_term<span class="classifier">float, default 0.55</span></dt><dd><p>Coarse in defac row 3, column N</p>
+<dt>a_term<span class="classifier">float, default 0.55</span></dt><dd><p>Coarse in defac row 3, column N.</p>
 </dd>
-<dt>b_term<span class="classifier">float, default 1.7</span></dt><dd><p>Coarse in defac row 4, column N</p>
+<dt>b_term<span class="classifier">float, default 1.7</span></dt><dd><p>Coarse in defac row 4, column N.</p>
 </dd>
-<dt>c_term<span class="classifier">float, default -0.007</span></dt><dd><p>Coarse in defac row 5, column</p>
+<dt>c_term<span class="classifier">float, default -0.007</span></dt><dd><p>Coarse in defac row 5, column.</p>
 </dd>
-<dt>first_exponent<span class="classifier">float, default 6.648115</span></dt><dd><p>First exponent in defac spreadsheet</p>
+<dt>first_exponent<span class="classifier">float, default 6.648115</span></dt><dd><p>First exponent in defac spreadsheet.</p>
 </dd>
-<dt>second_exponent<span class="classifier">float, default 3.22</span></dt><dd><p>Second exponent in defac spreadsheet</p>
+<dt>second_exponent<span class="classifier">float, default 3.22</span></dt><dd><p>Second exponent in defac spreadsheet.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Moisture factor (unitless).</p>
 </dd>
 </dl>
 </section>
-<section id="id5">
-<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
+<section id="id8">
+<h3>References<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<p>This function implements the “pseudocode_soil” S.6.A.2 and uses defaults drawn from defac: course soil.</p>
+</section>
+<section id="id9">
+<h3>Notes<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <p>If negative bases are raised to exponents, they sometimes result in complex numbers instead of negative
 floats. This behavior can cause the program to crash. To avoid this, a sign correction factor is computed,
 allowing the absolute value of the bases to be used.</p>

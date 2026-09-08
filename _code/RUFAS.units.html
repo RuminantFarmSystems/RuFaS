@@ -29,7 +29,7 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.util.html" rel="next" title="RUFAS.util module"/>
+<link href="RUFAS.user_constants.html" rel="next" title="RUFAS.user_constants module"/>
 <link href="RUFAS.task_manager.html" rel="prev" title="RUFAS.task_manager module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -149,7 +150,7 @@
 <dt class="sig sig-object py" id="RUFAS.units.MeasurementUnits">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.units.</span></span><span class="sig-name descname"><span class="pre">MeasurementUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.units.MeasurementUnits" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.units.MeasurementUnits'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>A list of acceptable units used within the RuFaS model.</p>
+<p>An enumeration of acceptable units used within the RuFaS model.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.units.MeasurementUnits.ANIMALS">
 <span class="sig-name descname"><span class="pre">ANIMALS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'animals'</span></span><a class="headerlink" href="#RUFAS.units.MeasurementUnits.ANIMALS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.units.MeasurementUnits.ANIMALS'"><span>#</span></a></dt>
@@ -167,8 +168,8 @@
 <span class="sig-name descname"><span class="pre">CALENDAR_YEAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'calendar</span> <span class="pre">year'</span></span><a class="headerlink" href="#RUFAS.units.MeasurementUnits.CALENDAR_YEAR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.units.MeasurementUnits.CALENDAR_YEAR'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.units.MeasurementUnits.MCAL_PER_MJ">
-<span class="sig-name descname"><span class="pre">MCAL_PER_MJ</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Mcal/MJ'</span></span><a class="headerlink" href="#RUFAS.units.MeasurementUnits.MCAL_PER_MJ" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.units.MeasurementUnits.MCAL_PER_MJ'"><span>#</span></a></dt>
+<dt class="sig sig-object py" id="RUFAS.units.MeasurementUnits.MJ_PER_MCAL">
+<span class="sig-name descname"><span class="pre">MJ_PER_MCAL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MJ/Mcal'</span></span><a class="headerlink" href="#RUFAS.units.MeasurementUnits.MJ_PER_MCAL" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.units.MeasurementUnits.MJ_PER_MCAL'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.units.MeasurementUnits.CENTIMETERS">
@@ -440,7 +441,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.units.MeasurementUnits.MJ_CH4_PER_G_CH4">
-<span class="sig-name descname"><span class="pre">MJ_CH4_PER_G_CH4</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MJ/g'</span></span><a class="headerlink" href="#RUFAS.units.MeasurementUnits.MJ_CH4_PER_G_CH4" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.units.MeasurementUnits.MJ_CH4_PER_G_CH4'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">MJ_CH4_PER_G_CH4</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MJ/g</span> <span class="pre">CH4'</span></span><a class="headerlink" href="#RUFAS.units.MeasurementUnits.MJ_CH4_PER_G_CH4" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.units.MeasurementUnits.MJ_CH4_PER_G_CH4'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.units.MeasurementUnits.ORDINAL_DAY">
@@ -524,7 +525,7 @@
 <section id="returns">
 <h2>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>dict</dt><dd><p>A dictionary where the keys are unit names (str) and the values are their exponents (int).</p>
+<dt>dict[str, int]</dt><dd><p>A dictionary where the keys are unit names (str) and the values are their exponents (int).</p>
 </dd>
 </dl>
 </section>
@@ -543,9 +544,10 @@
 <section id="id2">
 <h2>Returns<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>tuple[dict, dict]</dt><dd><p>A tuple of the numerator and denominator units. If there is no denominator, the first element of tuple will
-have the units and the second will be an empty string. If no units are found, it will return a tuple with
-two empty strings.</p>
+<dt>tuple[dict[str, int], dict[str, int]]</dt><dd><ul class="simple">
+<li><p>Numerator units, mapping unit names to exponents.</p></li>
+<li><p>Denominator units. Empty dict if no denominator or no units are found.</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -587,9 +589,10 @@ two empty strings.</p>
 <section id="id6">
 <h2>Returns<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>tuple[dict[str, int], dict[str, int]]</dt><dd><p>A tuple containing two dictionaries:
-- The first dictionary represents the simplified numerator units with non-zero exponents.
-- The second dictionary represents the simplified denominator units with non-zero exponents.</p>
+<dt>tuple[dict[str, int], dict[str, int]]</dt><dd><ul class="simple">
+<li><p>The simplified numerator units with non-zero exponents.</p></li>
+<li><p>The the simplified denominator units with non-zero exponents.</p></li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -601,9 +604,9 @@ two empty strings.</p>
 <section id="id7">
 <h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>numerator<span class="classifier">dict</span></dt><dd><p>A dictionary where the keys are unit names (str) and the values are their exponents (int) for the numerator.</p>
+<dt>numerator<span class="classifier">dict[str, int]</span></dt><dd><p>A dictionary where the keys are unit names (str) and the values are their exponents (int) for the numerator.</p>
 </dd>
-<dt>denominator<span class="classifier">dict</span></dt><dd><p>A dictionary where the keys are unit names (str) and the values are their exponents (int) for the
+<dt>denominator<span class="classifier">dict[str, int]</span></dt><dd><p>A dictionary where the keys are unit names (str) and the values are their exponents (int) for the
 denominator.</p>
 </dd>
 </dl>
@@ -626,7 +629,7 @@ denominator.</p>
 <li><a :data-current="activeSection === '#RUFAS.units.MeasurementUnits.ARTIFICIAL_INSEMINATIONS'" class="reference internal" href="#RUFAS.units.MeasurementUnits.ARTIFICIAL_INSEMINATIONS"><code class="docutils literal notranslate"><span class="pre">MeasurementUnits.ARTIFICIAL_INSEMINATIONS</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.units.MeasurementUnits.BYTES'" class="reference internal" href="#RUFAS.units.MeasurementUnits.BYTES"><code class="docutils literal notranslate"><span class="pre">MeasurementUnits.BYTES</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.units.MeasurementUnits.CALENDAR_YEAR'" class="reference internal" href="#RUFAS.units.MeasurementUnits.CALENDAR_YEAR"><code class="docutils literal notranslate"><span class="pre">MeasurementUnits.CALENDAR_YEAR</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.units.MeasurementUnits.MCAL_PER_MJ'" class="reference internal" href="#RUFAS.units.MeasurementUnits.MCAL_PER_MJ"><code class="docutils literal notranslate"><span class="pre">MeasurementUnits.MCAL_PER_MJ</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.units.MeasurementUnits.MJ_PER_MCAL'" class="reference internal" href="#RUFAS.units.MeasurementUnits.MJ_PER_MCAL"><code class="docutils literal notranslate"><span class="pre">MeasurementUnits.MJ_PER_MCAL</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.units.MeasurementUnits.CENTIMETERS'" class="reference internal" href="#RUFAS.units.MeasurementUnits.CENTIMETERS"><code class="docutils literal notranslate"><span class="pre">MeasurementUnits.CENTIMETERS</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.units.MeasurementUnits.CENTIMETERS_PER_MILLIMETER'" class="reference internal" href="#RUFAS.units.MeasurementUnits.CENTIMETERS_PER_MILLIMETER"><code class="docutils literal notranslate"><span class="pre">MeasurementUnits.CENTIMETERS_PER_MILLIMETER</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.units.MeasurementUnits.CONCEPTIONS'" class="reference internal" href="#RUFAS.units.MeasurementUnits.CONCEPTIONS"><code class="docutils literal notranslate"><span class="pre">MeasurementUnits.CONCEPTIONS</span></code></a></li>

@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.crop.crop_management.html" rel="next" title="RUFAS.biophysical.field.crop.crop_management module"/>
+<link href="RUFAS.biophysical.field.crop.crop_data.html" rel="prev" title="RUFAS.biophysical.field.crop.crop_data module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.crop.html">RUFAS.biophysical.field.crop package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.crop.crop_data_factory module</span>
 </nav>
 <div id="content" role="main">
@@ -158,6 +166,10 @@ attributes are documented in both the metadata properties and the CropData class
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.is_nitrogen_fixer">
 <span class="sig-name descname"><span class="pre">is_nitrogen_fixer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.is_nitrogen_fixer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.is_nitrogen_fixer'"><span>#</span></a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.harvest_efficiency">
+<span class="sig-name descname"><span class="pre">harvest_efficiency</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.harvest_efficiency" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.harvest_efficiency'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.minimum_temperature">
@@ -389,6 +401,13 @@ attributes are documented in both the metadata properties and the CropData class
 </dd>
 </dl>
 </section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#notes'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>This method starts by trying to determine if the crop is of a supported species, if so it passes the</dt><dd><p><code class="docutils literal notranslate"><span class="pre">crop_type</span></code> to the supported crop creation method. If not, it passes it to the custom crop creation method.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 </section>
 </dd></dl>
@@ -400,6 +419,7 @@ attributes are documented in both the metadata properties and the CropData class
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.name'" class="reference internal" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.name"><code class="docutils literal notranslate"><span class="pre">CropConfiguration.name</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.plant_category'" class="reference internal" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.plant_category"><code class="docutils literal notranslate"><span class="pre">CropConfiguration.plant_category</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.is_nitrogen_fixer'" class="reference internal" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.is_nitrogen_fixer"><code class="docutils literal notranslate"><span class="pre">CropConfiguration.is_nitrogen_fixer</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.harvest_efficiency'" class="reference internal" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.harvest_efficiency"><code class="docutils literal notranslate"><span class="pre">CropConfiguration.harvest_efficiency</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.minimum_temperature'" class="reference internal" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.minimum_temperature"><code class="docutils literal notranslate"><span class="pre">CropConfiguration.minimum_temperature</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.optimal_temperature'" class="reference internal" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.optimal_temperature"><code class="docutils literal notranslate"><span class="pre">CropConfiguration.optimal_temperature</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.potential_heat_units'" class="reference internal" href="#RUFAS.biophysical.field.crop.crop_data_factory.CropConfiguration.potential_heat_units"><code class="docutils literal notranslate"><span class="pre">CropConfiguration.potential_heat_units</span></code></a></li>

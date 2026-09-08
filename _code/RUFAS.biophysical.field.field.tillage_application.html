@@ -29,6 +29,8 @@
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.manager.html" rel="next" title="RUFAS.biophysical.field.manager package"/>
+<link href="RUFAS.biophysical.field.field.manure_application.html" rel="prev" title="RUFAS.biophysical.field.field.manure_application module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -136,6 +139,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.field.html">RUFAS.biophysical.field.field package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.field.tillage_application module</span>
 </nav>
 <div id="content" role="main">
@@ -150,11 +158,11 @@ documentation section 6:1.6 and the SurPhos plow.f file.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>field_data<span class="classifier">FieldData, default=None</span></dt><dd><p>FieldData object that tracks attributes on the soil surface as they are updated by tillage applications.</p>
+<dt>field_data<span class="classifier">FieldData, optional</span></dt><dd><p>FieldData object that tracks attributes on the soil surface as they are updated by tillage applications.</p>
 </dd>
-<dt>soil_data<span class="classifier">SoilData, default=None</span></dt><dd><p>SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.</p>
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.</p>
 </dd>
-<dt>field_size<span class="classifier">float, default=None</span></dt><dd><p>Size of the field (ha)</p>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Size of the field (ha)</p>
 </dd>
 </dl>
 </section>
@@ -194,7 +202,7 @@ If no SoilData object is provided, one is created with the default configuration
 </dd>
 <dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.</p>
 </dd>
-<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Size of the field (ha)</p>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Size of the field (ha).</p>
 </dd>
 </dl>
 </section>
@@ -243,13 +251,13 @@ does not go deeper than the bottom of the soil profile.</p>
 <section id="id5">
 <h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>pool_name<span class="classifier">str</span></dt><dd><p>Name of the soil attribute that should be mixed within the soil profile (unitless)</p>
+<dt>pool_name<span class="classifier">str</span></dt><dd><p>Name of the soil attribute that should be mixed within the soil profile (unitless).</p>
 </dd>
-<dt>tillage_depth<span class="classifier">float</span></dt><dd><p>The lowest depth the tilling implement reaches (mm)</p>
+<dt>tillage_depth<span class="classifier">float</span></dt><dd><p>The lowest depth the tilling implement reaches (mm).</p>
 </dd>
-<dt>mixing_fraction<span class="classifier">float</span></dt><dd><p>Fraction taken from each layer that is mixed and redistributed back into the soil profile (unitless)</p>
+<dt>mixing_fraction<span class="classifier">float</span></dt><dd><p>Fraction taken from each layer that is mixed and redistributed back into the soil profile (unitless).</p>
 </dd>
-<dt>offset_top_layer<span class="classifier">bool, optional, by default=False</span></dt><dd><p>A flag that determines whether to offset the top layer of soil in redistribution calculations</p>
+<dt>offset_top_layer<span class="classifier">bool, optional, by default=False</span></dt><dd><p>A flag that determines whether to offset the top layer of soil in redistribution calculations.</p>
 </dd>
 </dl>
 </section>
@@ -279,14 +287,14 @@ present in the top soil layer and is not mixed into the top soil layer during ti
 </dd>
 <dt>attribute_name<span class="classifier">str</span></dt><dd><p>attribute of the manure pool instance from which to get the data.</p>
 </dd>
-<dt>incorporation_fraction<span class="classifier">float</span></dt><dd><p>Fraction of stuff incorporated into the soil profile from the soil surface (unitless)</p>
+<dt>incorporation_fraction<span class="classifier">float</span></dt><dd><p>Fraction of stuff incorporated into the soil profile from the soil surface (unitless).</p>
 </dd>
 </dl>
 </section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>Amount removed from soil surface and added to the top soil layer (units vary)</p>
+<dt>float</dt><dd><p>Amount removed from soil surface and added to the top soil layer (units vary).</p>
 </dd>
 </dl>
 </section>
@@ -315,11 +323,11 @@ pool being removed from.</p>
 <section id="id11">
 <h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>tillage_depth<span class="classifier">float</span></dt><dd><p>The lowest depth the tilling implement reaches (mm)</p>
+<dt>tillage_depth<span class="classifier">float</span></dt><dd><p>The lowest depth the tilling implement reaches (mm).</p>
 </dd>
-<dt>incorporation_fraction<span class="classifier">float</span></dt><dd><p>Fraction of soil surface pool incorporated into the soil profile (unitless)</p>
+<dt>incorporation_fraction<span class="classifier">float</span></dt><dd><p>Fraction of soil surface pool incorporated into the soil profile (unitless).</p>
 </dd>
-<dt>mixing_fraction<span class="classifier">float</span></dt><dd><p>Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)</p>
+<dt>mixing_fraction<span class="classifier">float</span></dt><dd><p>Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).</p>
 </dd>
 <dt>implement<span class="classifier">TillageImplement</span></dt><dd><p>The tillage implement used to execute this application.</p>
 </dd>
