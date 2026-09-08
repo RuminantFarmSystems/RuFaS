@@ -19,3 +19,4 @@ class CompostingType(Enum):
     INTENSIVE_WINDROW = "intensive windrow"
     PASSIVE_WINDROW = "passive windrow"
     STATIC_PILE = "static pile"
+    IN_VESSEL = "in vessel"
