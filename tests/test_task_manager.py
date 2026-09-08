@@ -159,7 +159,7 @@ def test_task_manager_start(
             "task_type": TaskType.END_TO_END_TESTING,
             "output_prefix": "test_prefix",
             "e2e_group": "test_group",
-            "random_seeds": [42, 44, 46],
+            "random_seed": 42,
             "json_output_directory": Path("out/e2e"),
         }
 
@@ -328,7 +328,7 @@ def test_task_manager_start(
                             "task_type": TaskType.END_TO_END_TESTING,
                             "output_prefix": "test_prefix",
                             "e2e_group": "test_group",
-                            "random_seeds": [42, 44, 46],
+                            "random_seed": 42,
                             "json_output_directory": Path("out/e2e"),
                             "task_id": "1/1",
                         }
@@ -352,7 +352,7 @@ def test_task_manager_start(
         mock_summarize.assert_called_once_with(
             Path("out/e2e"),
             ["test_group"],
-            {"test_group": [42, 44, 46]},
+            {"test_group": [42]},
         )
 
     else:
@@ -922,7 +922,7 @@ def test_task(
         "logs_directory": Path("/fake/logs"),
         "filters_directory": Path("/fake/filters"),
         "task_id": 1,
-        "random_seeds": [924],
+        "random_seed": 924,
         "suppress_log_files": True,
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
@@ -976,7 +976,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: OutputMan
         "output_prefix": "test",
         "logs_directory": Path("/fake/logs"),
         "task_id": 1,
-        "random_seeds": [924],
+        "random_seed": 924,
         "suppress_log_files": True,
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
