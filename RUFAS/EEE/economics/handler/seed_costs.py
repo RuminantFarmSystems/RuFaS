@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from RUFAS.EEE.economics.mapping import CROP_TO_SEED_KEY
-from RUFAS.biophysical.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
+from RUFAS.biophysical.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, HarvestOperation
 from RUFAS.biophysical.field.manager.schedule import Schedule
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
@@ -17,7 +17,7 @@ class SeedCostHandler(Handler):
     section = "Soil_and_crop"
     name = "Seeds costs"
 
-    def _growing_periods(self, schedule: dict[str, Any]) -> list[tuple[datetime, datetime]]:
+    def _gather_growing_periods(self, schedule: dict[str, Any]) -> list[tuple[datetime, datetime]]:
         """
         Return (planting_date, kill_date) pairs for one crop schedule entry.
 
@@ -90,7 +90,7 @@ class SeedCostHandler(Handler):
         for date, operation in events:
             if operation == "plant":
                 plant_date = date
-            elif operation in FINAL_HARVEST_OPERATIONS and plant_date is not None:
+            elif HarvestOperation(operation) in FINAL_HARVEST_OPERATIONS and plant_date is not None:
                 periods.append((plant_date, date))
                 plant_date = None
         return periods
@@ -112,7 +112,8 @@ class SeedCostHandler(Handler):
             start_date = datetime.strptime(str(config_data["start_date"]), "%Y:%j")
             end_date = datetime.strptime(str(config_data["end_date"]), "%Y:%j")
         except Exception:
-            self.context.om.add_warning(
+            om = OutputManager()
+            om.add_warning(
                 "MissingConfigDates",
                 "Could not parse simulation start/end dates for seed cost preprocessing",
                 {"class": self.__class__.__name__, "function": "_parse_simulation_window"},
@@ -195,19 +196,21 @@ class SeedCostHandler(Handler):
         """
         Build a daily time-series of allocated seeded area (m²) per seed key.
 
-        For each field, every crop's planting-to-kill growing periods are
-        located within the simulation window. The field's area in m² is spread
-        evenly over each period so that each day carries a share of it
-        (``field_size_m² / period_duration``); a period's daily shares sum back
-        to the field area. Shares are accumulated per simulation day, keyed by
-        seed commodity, so overlapping fields and periods add together.
-
         Returns
         -------
         dict[str, list[float]]
             Keys are seed commodity price keys; values are lists of length
             ``total_sim_days`` where each element is the total allocated area
             (m²) for that seed on that simulation day.
+
+        Notes
+        -----
+        For each field, every crop's planting-to-kill growing periods are
+        located within the simulation window. The field's area in m² is spread
+        evenly over each period so that each day carries a share of it
+        (``field_size_m² / period_duration``); a period's daily shares sum back
+        to the field area. Shares are accumulated per simulation day, keyed by
+        seed commodity, so overlapping fields and periods add together.
         """
         im = InputManager()
         om = OutputManager()
@@ -257,7 +260,7 @@ class SeedCostHandler(Handler):
                 seed_key = CROP_TO_SEED_KEY.get(crop_species, f"fallback_{crop_species}")
                 daily_area = daily_area_by_seed.setdefault(seed_key, [0.0] * total_simulation_days)
 
-                for plant_date, kill_date in self._growing_periods(schedule):
+                for plant_date, kill_date in self._gather_growing_periods(schedule):
                     daily_area = self._accumulate_growing_period(
                         daily_area, field_size_m2, plant_date, kill_date, start_date, total_simulation_days
                     )
@@ -266,7 +269,8 @@ class SeedCostHandler(Handler):
         return daily_area_by_seed
 
     def _extract_daily_seed_price(self, price_data: Any) -> list[float]:
-        """Extract a per-simulation-day price series from seed pricing payloads.
+        """
+        Extract a per-simulation-day price series from seed pricing payloads.
 
         Yearly prices are resolved per commodity key (with fallback prices for
         malformed payloads or missing years), then expanded so each simulation
@@ -284,8 +288,8 @@ class SeedCostHandler(Handler):
             One price per simulation day, matching the length of the daily
             area series produced by ``_preprocess_seed_costs``.
         """
-        im = self.context.im
-        om = self.context.om
+        im = InputManager()
+        om = OutputManager()
         info_map = {"class": self.__class__.__name__, "function": self._extract_daily_seed_price.__name__}
         start_date = datetime.strptime(str(im.get_data("config.start_date")), "%Y:%j")
         end_date = datetime.strptime(str(im.get_data("config.end_date")), "%Y:%j")
@@ -330,15 +334,48 @@ class SeedCostHandler(Handler):
         return daily_seed_price
 
     def process(self) -> dict[str, Any]:
-        """Build the full preprocessing result entry for the Seeds costs line item.
+        """
+        Build the full preprocessing result entry for the Seeds costs line item.
 
-        Scenario names are resolved from the OutputManager variables pool the
+        Returns
+        -------
+        dict[str, Any]
+            Preprocessing result entry with the following keys:
+
+            ``biophysical_values`` : dict[str, list[float]]
+                Per-seed daily planted area (m^2).
+            ``biophysical_aggregate`` : dict[str, float]
+                Per-seed total planted area (m^2).
+            ``biophysical_values_by_scenario`` : dict[str, dict[str, list[float]]]
+                Per-seed daily planted area (m^2), keyed by scenario name.
+            ``biophysical_aggregate_by_scenario`` : dict[str, dict[str, float]]
+                Per-seed total planted area (m^2), keyed by scenario name.
+            ``price_data`` : dict[str, Any]
+                Raw pricing data retrieved from the ``InputManager`` for each seed commodity.
+            ``price_values`` : dict[str, list[float]]
+                Extracted daily seed prices for each seed commodity.
+            ``price_aggregate`` : dict[str, float]
+                Average daily seed price for each seed commodity.
+            ``line_item_values_by_scenario`` : dict[str, float]
+                Total seed cost, keyed by scenario name.
+            ``flow_type`` : str
+                Cash flow direction for this line item; always ``"cost"``.
+
+        Notes
+        -----
+        Scenario names are resolved from the ``OutputManager`` variables pool the
         same way the generic pipeline does for regular line items. Field
-        schedules and sizes come from the InputManager and do not vary by
+        schedules and sizes come from the ``InputManager`` and do not vary by
         scenario, so every scenario receives the same seed cost values.
+
+        For each scenario, the per-seed daily planted area is combined with the
+        corresponding daily seed prices to produce the daily cost per seed
+        commodity, which is summed into a single total seed cost for the
+        scenario. Missing price data triggers a fallback price and a warning,
+        while an empty field schedule triggers a separate warning.
         """
 
-        om = self.context.om
+        om = OutputManager()
         info_map = {"class": self.__class__.__name__, "function": "process"}
 
         scenario_names = self.context.scenario_names()
