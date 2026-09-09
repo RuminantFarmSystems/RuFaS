@@ -410,7 +410,7 @@ class DailyManureSupplier:
 
     def _validate_stream_configs(self, daily_manure_stream_configs: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         """
-        Validates the daily manure stream configurations before the simulation starts.
+        Validates the daily manure stream configurations at initialization.
 
         Parameters
         ----------
