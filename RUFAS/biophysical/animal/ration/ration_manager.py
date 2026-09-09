@@ -209,6 +209,12 @@ class RationManager:
             other than predict DMI is missing an intake value, or if the DMI per X option is
             requested for an animal combination that does not support it.
 
+        Notes
+        -----
+        An intake value supplied alongside the predict DMI option is not used, since dry matter
+        intake is predicted in that case. A warning identifies the animal combination and the
+        unused value rather than halting the simulation.
+
         """
         info_map: dict[str, object] = {"class": cls.__name__, "function": cls.set_intake_options.__name__}
 
@@ -223,6 +229,15 @@ class RationManager:
             info_map["animal_combination"] = combination.value
             info_map["intake_value"] = intake_value
             info_map["units"] = MeasurementUnits.UNITLESS
+
+            if option is IntakeOption.PREDICT_DMI and ration.get("intake_value") is not None:
+                cls._om.add_warning(
+                    "unused_intake_value_for_predict_dmi",
+                    f"The {combination.value} ration provides an intake_value of "
+                    f"{ration['intake_value']}, but its intake_option is '{option.value}', so dry matter intake "
+                    "is predicted and the provided value is not used.",
+                    info_map,
+                )
 
             if option is not IntakeOption.PREDICT_DMI and intake_value is None:
                 error_msg = (

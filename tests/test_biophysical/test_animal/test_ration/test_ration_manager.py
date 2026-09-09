@@ -477,3 +477,34 @@ def test_resolve_target_dmi_per_x_with_nonpositive_x_falls_back_to_predicted(moc
 
     assert target == 7.5
     mock_warning.assert_called_once()
+
+
+def test_set_intake_options_warns_when_predict_dmi_ration_provides_an_intake_value(
+    mocker: MockerFixture, valid_ration_config: dict[str, Any]
+) -> None:
+    """An intake value alongside the predict DMI option is unused, so it warns rather than halting."""
+    mocker.patch.object(RationManager._om, "add_variable")
+    mock_warning = mocker.patch.object(RationManager._om, "add_warning")
+    for ration in valid_ration_config["rations"]:
+        if ration["animal_combination"] == "close_up":
+            ration["intake_option"] = "predict_DMI"
+            ration["intake_value"] = 5.0
+
+    RationManager.set_intake_options(valid_ration_config)
+
+    assert RationManager.intake_options[AnimalCombination.CLOSE_UP] is IntakeOption.PREDICT_DMI
+    assert RationManager.intake_values[AnimalCombination.CLOSE_UP] is None
+    mock_warning.assert_called_once()
+    assert "close_up" in mock_warning.call_args.args[1]
+
+
+def test_set_intake_options_does_not_warn_without_an_unused_intake_value(
+    mocker: MockerFixture, valid_ration_config: dict[str, Any]
+) -> None:
+    """No warning is raised when predict DMI rations omit an intake value."""
+    mocker.patch.object(RationManager._om, "add_variable")
+    mock_warning = mocker.patch.object(RationManager._om, "add_warning")
+
+    RationManager.set_intake_options(valid_ration_config)
+
+    mock_warning.assert_not_called()

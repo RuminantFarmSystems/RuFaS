@@ -179,39 +179,6 @@
           "relationship": "is_in"
         }
       ]
-    },
-    {
-      "description": "Rations using the predict_DMI intake option must not provide an intake_value",
-      "aliases": {
-        "variables": {
-          "rations": "feed.rations"
-        },
-        "constants": {
-          "predict_dmi": "predict_DMI",
-          "true_constant": true
-        }
-      },
-      "rules": [
-        {
-          "left_hand": {
-            "for_each": {
-              "mode": "filter",
-              "in": "rations",
-              "field": "intake_option",
-              "value_to_compare": "predict_dmi",
-              "relationship": "equal",
-              "field_to_save": "intake_value"
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "operands": ["true_constant"]
-            }
-          },
-          "relationship": "is_null"
-        }
-      ]
     }
   ]
 }

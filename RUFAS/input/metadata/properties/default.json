@@ -4429,7 +4429,7 @@
         },
         "intake_value": {
           "type": "number",
-          "description": "Dry matter intake value used for the ration of this animal combination. Units are kg/animal/day for set_DMI, and kg dry matter intake per kg milk yield (lac_cow) or per kg average daily gain (growing) for set_DMI_per_X. Must be null when intake_option is predict_DMI.",
+          "description": "Dry matter intake value used for the ration of this animal combination. Units are kg/animal/day for set_DMI, and kg dry matter intake per kg milk yield (lac_cow) or per kg average daily gain (growing) for set_DMI_per_X. Ignored when intake_option is predict_DMI.",
           "minimum": 0,
           "nullable": true,
           "default": null
