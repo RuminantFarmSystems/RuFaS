@@ -212,6 +212,7 @@ class HerdManager:
         if self.is_ration_defined_by_user:
             RationManager.set_user_defined_rations(ration_feed_config)
             RationManager.set_user_defined_ration_tolerance(ration_feed_config)
+            RationManager.set_intake_options(ration_feed_config)
         else:
             RationManager.set_ration_feeds(ration_feed_config)
         RationManager.maximum_ration_reformulation_attempts = animal_config_data["ration"][

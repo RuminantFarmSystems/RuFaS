@@ -1,8 +1,9 @@
 from typing import Any
 
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
+from RUFAS.biophysical.animal.data_types.intake_option import IntakeOption
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
@@ -28,6 +29,12 @@ class RationManager:
         ration formulation.
     maximum_ration_reformulation_attempts : int
         Maximum number of attempts to formulate a ration in a single ration interval for a single pen.
+    intake_options : dict[AnimalCombination, IntakeOption]
+        A mapping of animal groupings to their dry matter intake control options. Animal
+        combinations absent from this mapping use the predict DMI option (default behavior).
+    intake_values : dict[AnimalCombination, float | None]
+        A mapping of animal groupings to their user-provided dry matter intake values. Values are
+        None for animal combinations using the predict DMI option.
 
     """
 
@@ -38,6 +45,8 @@ class RationManager:
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]] | None
     tolerance: float | None = 0.0
     maximum_ration_reformulation_attempts: int
+    intake_options: dict[AnimalCombination, IntakeOption] = {}
+    intake_values: dict[AnimalCombination, float | None] = {}
 
     @classmethod
     def set_ration_feeds(cls, ration_config: dict[str, Any]) -> None:
@@ -49,7 +58,15 @@ class RationManager:
         ration_config : dict[str, Any]
             Collection of animal requirements and feed supply information for ration formulation.
 
+        Notes
+        -----
+        This method configures the automated ration formulation mode, so the dry matter intake
+        options (only applicable to user-defined rations) are reset to the default predict DMI
+        behavior.
+
         """
+        cls.intake_options = {}
+        cls.intake_values = {}
         cls.ration_feeds = {animal_combination: [] for animal_combination in AnimalCombination}
 
         cls.ration_feeds[AnimalCombination.CALF] = [
@@ -176,20 +193,250 @@ class RationManager:
         )
 
     @classmethod
-    def get_user_defined_ration(
-        cls,
-        animal_combination: AnimalCombination,
-        requirements: NutritionRequirements,
-    ) -> dict[RUFAS_ID, float]:
+    def set_intake_options(cls, feed_config: dict[str, Any]) -> None:
         """
-        Generate a ration for the given animal type scaled to the estimated dry matter intake requirement.
+        Maps the input dry matter intake options and values to Animal combinations.
+
+        Parameters
+        ----------
+        feed_config : dict[str, Any]
+            Collection of animal requirements and feed supply information for ration formulation.
+
+        Raises
+        ------
+        ValueError
+            If a ration names an unknown animal combination or intake option, if an intake option
+            other than predict DMI is missing an intake value, or if the DMI per X option is
+            requested for an animal combination that does not support it.
+
+        """
+        info_map: dict[str, object] = {"class": cls.__name__, "function": cls.set_intake_options.__name__}
+
+        cls.intake_options = {animal_combination: IntakeOption.PREDICT_DMI for animal_combination in AnimalCombination}
+        cls.intake_values = {animal_combination: None for animal_combination in AnimalCombination}
+
+        for ration in feed_config["rations"]:
+            combination = AnimalCombination(ration["animal_combination"])
+            option = IntakeOption(ration.get("intake_option") or IntakeOption.PREDICT_DMI.value)
+            intake_value = ration.get("intake_value") if option is not IntakeOption.PREDICT_DMI else None
+
+            info_map["animal_combination"] = combination.value
+            info_map["intake_value"] = intake_value
+            info_map["units"] = MeasurementUnits.UNITLESS
+
+            if option is not IntakeOption.PREDICT_DMI and intake_value is None:
+                error_msg = (
+                    f"Intake option '{option.value}' for {combination.value} requires an intake_value. "
+                    "Simulation will be halted."
+                )
+                cls._om.add_error("missing_intake_value_for_intake_option", error_msg, info_map)
+                raise ValueError(error_msg)
+            if option is IntakeOption.SET_DMI_PER_X and combination not in (
+                AnimalCombination.GROWING,
+                AnimalCombination.LAC_COW,
+            ):
+                error_msg = (
+                    f"Intake option '{option.value}' is only available for growing and lac_cow rations, "
+                    f"but was requested for {combination.value}. Simulation will be halted."
+                )
+                cls._om.add_error("invalid_intake_option_for_animal_combination", error_msg, info_map)
+                raise ValueError(error_msg)
+
+            cls.intake_options[combination] = option
+            cls.intake_values[combination] = intake_value
+            cls._om.add_variable("dmi_intake_option", option.value, info_map)
+
+        cls.intake_options[AnimalCombination.GROWING_AND_CLOSE_UP] = cls.intake_options[AnimalCombination.CLOSE_UP]
+        cls.intake_values[AnimalCombination.GROWING_AND_CLOSE_UP] = cls.intake_values[AnimalCombination.CLOSE_UP]
+
+    @classmethod
+    def get_intake_option(cls, animal_combination: AnimalCombination | None) -> IntakeOption:
+        """
+        Returns the dry matter intake option configured for the given animal combination.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination | None
+            The combination of animals in the pen, or None when no combination applies.
+
+        Returns
+        -------
+        IntakeOption
+            The configured intake option, or the predict DMI option when none is configured.
+
+        """
+        if animal_combination is None:
+            return IntakeOption.PREDICT_DMI
+        return cls.intake_options.get(animal_combination, IntakeOption.PREDICT_DMI)
+
+    @classmethod
+    def uses_dmi_input_option(cls, animal_combination: AnimalCombination | None) -> bool:
+        """
+        Returns True if the given animal combination uses a DMI input option (set DMI or DMI per X).
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination | None
+            The combination of animals in the pen, or None when no combination applies.
+
+        Returns
+        -------
+        bool
+            True if the animal combination uses a DMI input option, False otherwise.
+
+        """
+        return cls.get_intake_option(animal_combination) is not IntakeOption.PREDICT_DMI
+
+    @classmethod
+    def effective_dmi_constraint_fraction(cls, animal_combination: AnimalCombination | None) -> float:
+        """
+        Returns the effective DMI constraint fraction for the given animal combination.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination | None
+            The combination of animals in the pen, or None when no combination applies.
+
+        Returns
+        -------
+        float
+            0.0 when a DMI input option is used, so the dry matter intake may only deviate from the
+            user-provided target by the user-defined tolerance; the DMI_CONSTRAINT_FRACTION constant
+            otherwise.
+
+        """
+        if cls.uses_dmi_input_option(animal_combination):
+            return 0.0
+        return AnimalModuleConstants.DMI_CONSTRAINT_FRACTION
+
+    @classmethod
+    def effective_dmi_requirement_boost(cls, animal_combination: AnimalCombination | None) -> float:
+        """
+        Returns the effective DMI requirement boost for the given animal combination.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination | None
+            The combination of animals in the pen, or None when no combination applies.
+
+        Returns
+        -------
+        float
+            1.0 when a DMI input option is used, so the ingredient inclusion bounds are centered on
+            the user-provided target; the DMI_REQUIREMENT_BOOST constant otherwise.
+
+        """
+        if cls.uses_dmi_input_option(animal_combination):
+            return 1.0
+        return AnimalModuleConstants.DMI_REQUIREMENT_BOOST
+
+    @classmethod
+    def effective_dmi_retry_increase_factor(cls, animal_combination: AnimalCombination | None) -> float:
+        """
+        Returns the effective DMI retry increase factor for the given animal combination.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination | None
+            The combination of animals in the pen, or None when no combination applies.
+
+        Returns
+        -------
+        float
+            1.0 when a DMI input option is used, so formulation retries never adjust the
+            user-provided target; the DMI_RETRY_INCREASE_FACTOR constant otherwise.
+
+        """
+        if cls.uses_dmi_input_option(animal_combination):
+            return 1.0
+        return AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR
+
+    @classmethod
+    def resolve_target_dmi(cls, animal_combination: AnimalCombination, pen: Any) -> float:
+        """
+        Resolves the target dry matter intake for a pen based on its dry matter intake option.
 
         Parameters
         ----------
         animal_combination : AnimalCombination
             The combination of animals in the pen.
-        requirements : NutritionRequirements
-            The nutrition requirements of an animal or average of a group of animals.
+        pen : Any
+            The Pen whose target dry matter intake is resolved. Typed as Any because Pen imports
+            RationManager, so importing Pen here would create a circular import.
+
+        Returns
+        -------
+        float
+            The target dry matter intake (kg/animal/day). For the set DMI option this is the
+            user-provided intake value, and for the DMI per X option it is the intake value
+            multiplied by the pen's average milk production (lactating cows) or average daily gain
+            (growing heifers). For the predict DMI option this is the pen's average predicted dry
+            matter requirement, or the fixed calf dry matter intake for calf pens.
+
+        Raises
+        ------
+        ValueError
+            If a DMI input option is configured without an intake value.
+
+        Notes
+        -----
+        If the DMI per X option is selected but the pen's X value (average milk production or
+        average daily gain) is not positive, e.g. before the first daily growth update, the
+        predicted dry matter requirement is used for that formulation and a warning is logged.
+
+        """
+        option = cls.get_intake_option(animal_combination)
+
+        if option is IntakeOption.PREDICT_DMI:
+            if animal_combination is AnimalCombination.CALF:
+                return float(cls.CALF_DRY_MATTER_INTAKE)
+            return float(pen.average_nutrition_requirements.dry_matter)
+
+        intake_value = cls.intake_values.get(animal_combination)
+        if intake_value is None:
+            raise ValueError(f"Intake option '{option.value}' for {animal_combination.value} requires an intake_value.")
+
+        if option is IntakeOption.SET_DMI:
+            return intake_value
+
+        if animal_combination is AnimalCombination.LAC_COW:
+            x_value = pen.average_milk_production
+            x_description = "average milk production"
+        else:
+            x_value = pen.average_growth
+            x_description = "average daily gain"
+        if x_value <= 0.0:
+            cls._om.add_warning(
+                "dmi_per_x_value_unavailable",
+                f"The {option.value} option for {animal_combination.value} could not be applied because the pen's "
+                f"{x_description} is not positive ({x_value}). The predicted dry matter requirement is used for "
+                "this ration formulation instead.",
+                {
+                    "class": cls.__name__,
+                    "function": cls.resolve_target_dmi.__name__,
+                    "animal_combination": animal_combination.value,
+                    "units": MeasurementUnits.KILOGRAMS,
+                },
+            )
+            return float(pen.average_nutrition_requirements.dry_matter)
+        return float(intake_value * x_value)
+
+    @classmethod
+    def get_user_defined_ration(
+        cls,
+        animal_combination: AnimalCombination,
+        target_dry_matter_intake: float,
+    ) -> dict[RUFAS_ID, float]:
+        """
+        Generate a ration for the given animal type scaled to the target dry matter intake.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination
+            The combination of animals in the pen.
+        target_dry_matter_intake : float
+            The dry matter intake the ration is scaled to (kg/animal/day), as resolved by
+            resolve_target_dmi.
 
         Returns
         -------
@@ -200,11 +447,7 @@ class RationManager:
         ration_formulation = cls.user_defined_rations[animal_combination]
 
         ration: dict[RUFAS_ID, float] = {
-            rufas_id: (
-                requirements.dry_matter * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-                if animal_combination != AnimalCombination.CALF
-                else cls.CALF_DRY_MATTER_INTAKE * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-            )
+            rufas_id: target_dry_matter_intake * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
             for rufas_id, percentage in ration_formulation.items()
         }
 
