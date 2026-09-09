@@ -15,6 +15,7 @@ append it to ``SPECIAL_CASE_HANDLERS`` in
 
 from RUFAS.EEE.economics.special_cases.base import SpecialCaseHandler
 from RUFAS.EEE.economics.special_cases.digester_revenue import DigesterRevenueHandler
+from RUFAS.EEE.economics.special_cases.slurry_storage_cost import SlurryStorageCostHandler
 
 
-__all__ = ["SpecialCaseHandler", "DigesterRevenueHandler"]
+__all__ = ["SpecialCaseHandler", "DigesterRevenueHandler", "SlurryStorageCostHandler"]

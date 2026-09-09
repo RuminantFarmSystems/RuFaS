@@ -35,6 +35,7 @@ from RUFAS.EEE.economics.preprocessing_context import PreprocessingContext
 from RUFAS.EEE.economics.special_cases import (
     SpecialCaseHandler,
     DigesterRevenueHandler,
+    SlurryStorageCostHandler,
 )
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
@@ -48,6 +49,7 @@ COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.prepro
 
 SPECIAL_CASE_HANDLERS: list[type[SpecialCaseHandler]] = [
     DigesterRevenueHandler,
+    SlurryStorageCostHandler,
 ]
 
 
