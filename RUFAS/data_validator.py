@@ -2181,7 +2181,9 @@ class CrossValidator:
         is_cross_validation_successful = True
         validation_rules = cross_validation_block.get("rules", [])
         for rule in validation_rules:
-            is_cross_validation_successful = self._evaluate_condition(rule, eager_termination)
+            is_cross_validation_successful = self._evaluate_condition(rule, eager_termination) and (
+                is_cross_validation_successful
+            )
             if not is_cross_validation_successful and eager_termination:
                 break
         return is_cross_validation_successful
