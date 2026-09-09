@@ -4423,7 +4423,7 @@
         },
         "intake_option": {
           "type": "string",
-          "description": "Dry matter intake control mode used for this animal combination's ration. predict_DMI keeps the model-predicted intake (current behavior), set_DMI fixes intake at intake_value (kg/animal/day), and set_DMI_per_X multiplies intake_value by the pen's average milk yield (lac_cow) or average daily gain (growing).",
+          "description": "Dry matter intake control mode used for this animal combination's ration. predict_DMI utilizes NASEM (2021) or NRC (2001) DMI prediction equations, set_DMI fixes intake at intake_value (kg/animal/day), and set_DMI_per_X multiplies intake_value by the pen's average milk yield (lac_cow) or average daily gain (growing).",
           "pattern": "^(predict_DMI|set_DMI|set_DMI_per_X)$",
           "default": "predict_DMI"
         },
