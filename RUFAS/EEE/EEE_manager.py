@@ -31,6 +31,7 @@ class EEEManager:
                 "Failed to load runtime metadata for 'EEE_econ'. Aborting emissions estimation.",
                 info_map,
             )
+            print("Failed to load runtime metadata for 'EEE_econ'. Aborting emissions estimation.")
             return
         om.add_log("Economics Processing", "Starting processing of economics.", info_map)
         EconomicFramework().run_economic_analysis()
