@@ -386,7 +386,7 @@ class DailyManureSupplier:
     """
     Supplies the manure module with user-defined daily manure streams when the animal module is not simulated.
 
-    Each stream configuration describes the manure that one group of animals deposits at one location on every
+    Each stream configuration describes the manure that one group of animals would deposit at one location on every
     simulation day. The supplier builds a fresh ManureStream, with attached PenManureData, from each configuration
     every day, taking the place of the streams that the animal module's pens would otherwise produce.
 
