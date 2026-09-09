@@ -100,7 +100,7 @@ def test_emptying_fraction(configured_emptying_fraction: float | None, expected_
     """Tests that a user-configured emptying fraction overrides the lagoon's default retention behavior."""
     lagoon = AnaerobicLagoon(
         name="dummy_name",
-        cover="no_crust_or_cover",
+        cover=StorageCover.NO_COVER,
         storage_time_period=18,
         surface_area=6.6,
         capacity=123456.789,

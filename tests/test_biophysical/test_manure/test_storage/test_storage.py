@@ -300,6 +300,7 @@ def test_process_manure_partial_emptying(emptying_fraction: float, storage: Stor
     """
     mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
     mock_time = MagicMock(spec=RufasTime)
+    assert storage._storage_time_period is not None
     mock_time.simulation_day = storage._storage_time_period - 1
     storage._configured_emptying_fraction = emptying_fraction
 
@@ -335,6 +336,7 @@ def test_process_manure_zero_emptying_fraction(storage: Storage, mocker: MockerF
     """Test that on an emptying day with an emptying fraction of 0.0, no manure leaves the storage."""
     mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
     mock_time = MagicMock(spec=RufasTime)
+    assert storage._storage_time_period is not None
     mock_time.simulation_day = storage._storage_time_period - 1
     storage._configured_emptying_fraction = 0.0
 
