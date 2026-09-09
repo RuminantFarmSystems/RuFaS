@@ -28,6 +28,8 @@ from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEval
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.data_types.intake_option import IntakeOption
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
 from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
@@ -2253,6 +2255,38 @@ def test_run_formulation_attempts_breaks_when_lactation_handler_returns_true(moc
 
     assert result is failing
     mock_lac.assert_called_once()
+
+
+def test_run_formulation_attempts_single_attempt_with_dmi_input_and_no_milk_reduction(
+    mocker: MockerFixture, pen: Pen
+) -> None:
+    """With a DMI input option and milk reduction maximum of 0, LAC_COW pens get a single attempt."""
+    pen.animal_combination = AnimalCombination.LAC_COW
+    mocker.patch.object(RationManager, "intake_options", {AnimalCombination.LAC_COW: IntakeOption.SET_DMI})
+    mocker.patch.object(RationManager, "intake_values", {AnimalCombination.LAC_COW: 24.0})
+    mocker.patch.object(AnimalConfig, "milk_reduction_maximum", 0.0, create=True)
+    failing = _mock_solution(False)
+    mock_attempt = mocker.patch.object(pen, "_attempt_formulation", return_value=(failing, MagicMock()))
+    mock_handle = mocker.patch.object(pen.ration_optimizer, "handle_failed_constraints", return_value=[])
+    mock_lac = mocker.patch.object(pen, "_handle_lactation_failure_in_loop")
+    mock_dmi = mocker.patch.object(pen, "_maybe_increased_dmi_for_retry")
+
+    result = pen._run_formulation_attempts(
+        is_ration_defined_by_user=True,
+        pen_available_feeds=_mock_feeds(),
+        temperature=20.0,
+        previous_ration=None,
+        original_dmi_requirement=24.0,
+        initial_protein_requirement=2.0,
+        simulation_day=1,
+        info_map={},
+    )
+
+    assert result is failing
+    assert mock_attempt.call_count == 1
+    mock_handle.assert_called_once()
+    mock_lac.assert_not_called()
+    mock_dmi.assert_not_called()
 
 
 def test_attempt_formulation(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
