@@ -425,7 +425,8 @@ class DailyManureSupplier:
         Raises
         ------
         ValueError
-            - If a parlor stream is configured for an animal combination other than lactating cows.
+            - If a stream's configuration is rejected by ``PenManureData``, such as a parlor stream configured for
+              an animal combination other than lactating cows.
             - If a stream's total solids mass is greater than its total manure mass.
 
         Notes
@@ -447,17 +448,17 @@ class DailyManureSupplier:
                 )
                 continue
 
-            stream_type = StreamType[str(stream_config["stream_type"])]
-            animal_combination = AnimalCombination[str(stream_config["animal_combination"])]
-            if stream_type == StreamType.PARLOR and animal_combination != AnimalCombination.LAC_COW:
+            try:
+                self._build_pen_manure_data(stream_config)
+            except (ValueError, KeyError) as invalid_stream:
                 self._om.add_error(
-                    "Invalid daily manure stream type",
-                    f"The daily manure stream '{stream_name}' is a parlor stream for the animal combination "
-                    f"'{animal_combination.name}'. Only the '{AnimalCombination.LAC_COW.name}' animal combination "
-                    "can supply a parlor stream.",
+                    "Invalid daily manure stream",
+                    f"The daily manure stream '{stream_name}' is not a valid manure stream: {invalid_stream}",
                     info_map,
                 )
-                raise ValueError(f"Parlor manure stream '{stream_name}' must use the LAC_COW animal combination.")
+                raise ValueError(
+                    f"Daily manure stream '{stream_name}' is not a valid manure stream: {invalid_stream}"
+                ) from invalid_stream
 
             total_manure_mass = float(stream_config["total_manure_mass"])
             total_solids = float(stream_config["total_solids"])
@@ -474,6 +475,37 @@ class DailyManureSupplier:
 
             stream_configs_by_name[stream_name] = stream_config
         return stream_configs_by_name
+
+    def _build_pen_manure_data(self, stream_config: dict[str, Any]) -> PenManureData:
+        """
+        Builds the pen manure data described by one daily manure stream configuration.
+
+        Parameters
+        ----------
+        stream_config : dict[str, Any]
+            The configuration of a single daily manure stream.
+
+        Returns
+        -------
+        PenManureData
+            The pen manure data described by the stream configuration.
+
+        Notes
+        -----
+        ``PenManureData`` validates itself on construction, so building it here is also what enforces the manure
+        stream rules shared with animal-produced manure, such as a parlor stream only being valid for lactating cows.
+
+        """
+        return PenManureData(
+            num_animals=int(stream_config["num_animals"]),
+            manure_deposition_surface_area=float(stream_config["manure_deposition_surface_area"]),
+            animal_combination=AnimalCombination[str(stream_config["animal_combination"])],
+            pen_type=None,
+            manure_urine_mass=float(stream_config["urine_mass"]),
+            manure_urine_nitrogen=float(stream_config["urine_nitrogen"]),
+            stream_type=StreamType[str(stream_config["stream_type"])],
+            first_processor=str(stream_config["first_processor"]),
+        )
 
     def get_daily_manure_streams(self) -> dict[str, ManureStream]:
         """
@@ -498,16 +530,7 @@ class DailyManureSupplier:
         for stream_name, stream_config in self._daily_manure_stream_configs.items():
             total_manure_mass = float(stream_config["total_manure_mass"])
             total_solids = float(stream_config["total_solids"])
-            pen_manure_data = PenManureData(
-                num_animals=int(stream_config["num_animals"]),
-                manure_deposition_surface_area=float(stream_config["manure_deposition_surface_area"]),
-                animal_combination=AnimalCombination[str(stream_config["animal_combination"])],
-                pen_type=None,
-                manure_urine_mass=float(stream_config["urine_mass"]),
-                manure_urine_nitrogen=float(stream_config["urine_nitrogen"]),
-                stream_type=StreamType[str(stream_config["stream_type"])],
-                first_processor=str(stream_config["first_processor"]),
-            )
+            pen_manure_data = self._build_pen_manure_data(stream_config)
             daily_manure_streams[stream_name] = ManureStream(
                 water=total_manure_mass - total_solids,
                 ammoniacal_nitrogen=float(stream_config["ammoniacal_nitrogen"]),

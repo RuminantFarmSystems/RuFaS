@@ -483,10 +483,18 @@ def test_daily_manure_supplier_duplicate_stream_names(mocker: MockerFixture) -> 
 
 
 def test_daily_manure_supplier_parlor_stream_requires_lactating_cows() -> None:
-    """Checks that a parlor stream for a non-lactating animal combination fails validation."""
+    """
+    Checks that a parlor stream for a non-lactating animal combination fails validation.
+
+    The rule itself belongs to PenManureData, so the supplier reports it with the offending stream name attached.
+    """
     parlor_stream_config = make_daily_manure_stream_config(stream_type="PARLOR", animal_combination="CALF")
 
-    with pytest.raises(ValueError, match="must use the LAC_COW animal combination"):
+    with pytest.raises(
+        ValueError,
+        match="Daily manure stream 'lac_pen' is not a valid manure stream: "
+        "Manure from a non-lactating pen assigned to parlor manure stream.",
+    ):
         DailyManureSupplier([parlor_stream_config])
 
 
