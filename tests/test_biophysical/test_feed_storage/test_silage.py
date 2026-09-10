@@ -1,4 +1,5 @@
 import copy
+import math
 from typing import Any
 from unittest.mock import call
 from dataclasses import replace
@@ -469,3 +470,75 @@ def test_process_degradations_skips_already_finalized_crop(
     silage.process_degradations(mock_weather, mock_time)
 
     finalize.assert_not_called()
+
+
+@pytest.mark.component
+@pytest.mark.parametrize(
+    "storage_class,extra_config",
+    [
+        (Bunker, {"width_m": 10.0, "height_m": 3.0, "dry_matter_density_kg_per_m3": 180.0}),
+        (Bag, {"diameter_m": 3.0, "dry_matter_density_kg_per_m3": 180.0}),
+    ],
+)
+def test_preseal_full_cycle_stays_within_bounds(
+    mock_silage_config: dict[str, str | float | list[str]],
+    storage_class: type[Silage],
+    extra_config: dict[str, float],
+) -> None:
+    """Two crops received in sequence: the first's Preseal loss finalizes on the second's arrival, stays in (0, 1)."""
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    config.update(extra_config)
+    storage = storage_class(config=config)
+    first_crop = HarvestedCrop(**{**sample_crop_data, "config_name": "corn_silage", "dry_matter_percentage": 35.0})
+    second_crop = replace(
+        HarvestedCrop(**{**sample_crop_data, "config_name": "corn_silage", "dry_matter_percentage": 35.0}),
+        storage_time=first_crop.storage_time + timedelta(days=1),
+    )
+
+    storage.receive_crop(first_crop, simulation_day=1)
+    storage.receive_crop(second_crop, simulation_day=2)
+
+    assert first_crop.preseal_finalized is True
+    assert 0.0 < first_crop.dry_matter_mass < sample_crop_data["dry_matter_mass"]
+    assert first_crop.temperature > 8.0
+    assert second_crop.preseal_finalized is False
+
+
+@pytest.mark.component
+def test_preseal_full_cycle_bunker_matches_hand_calculation(
+    mock_silage_config: dict[str, str | float | list[str]],
+) -> None:
+    """The Bunker case's dry-matter loss matches an independently-derived expected value for the same
+    exposure/geometry/crop inputs, not just a bounds check (spec §8's component-test requirement).
+
+    ``calculate_preseal_loss`` is already unit-tested in isolation (Task 3); calling it directly here,
+    against the same inputs `receive_crop` will use internally, gives an exact expected value without
+    hand-transcribing decimal literals into this plan (a real risk of introducing its own arithmetic
+    error) — the assertion below is what actually catches a Task 1-4 integration bug, e.g. a wrong
+    `exposed_area_m2`/`dry_matter_density_kg_per_m3` being passed through `receive_crop`.
+    """
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    config.update({"width_m": 10.0, "height_m": 3.0, "dry_matter_density_kg_per_m3": 180.0})
+    bunker = Bunker(config=config)
+    first_crop = HarvestedCrop(**{**sample_crop_data, "config_name": "corn_silage", "dry_matter_percentage": 35.0})
+    second_crop = replace(
+        HarvestedCrop(**{**sample_crop_data, "config_name": "corn_silage", "dry_matter_percentage": 35.0}),
+        storage_time=first_crop.storage_time + timedelta(days=1),
+    )
+    reference_crop = HarvestedCrop(**{**sample_crop_data, "config_name": "corn_silage", "dry_matter_percentage": 35.0})
+    expected = calculate_preseal_loss(
+        reference_crop,
+        exposure_days=1.0,
+        exposed_area_m2=math.sqrt(5.0) * 10.0 * 3.0,
+        dry_matter_density_kg_per_m3=180.0,
+    )
+    expected_dry_matter_loss_kg = reference_crop.dry_matter_mass * expected["dry_matter_loss_fraction"]
+
+    bunker.receive_crop(first_crop, simulation_day=1)
+    bunker.receive_crop(second_crop, simulation_day=2)
+
+    assert first_crop.dry_matter_mass == pytest.approx(
+        sample_crop_data["dry_matter_mass"] - expected_dry_matter_loss_kg
+    )
