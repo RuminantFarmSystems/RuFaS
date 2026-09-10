@@ -8,7 +8,16 @@ from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.output_manager import OutputManager
-from RUFAS.biophysical.feed_storage.silage import Bag, Bunker, Pile, Silage
+from RUFAS.biophysical.feed_storage.silage import (  # noqa: F401
+    Bag,
+    Bunker,
+    Pile,
+    Silage,
+    calculate_preseal_loss,
+    _clamp_preseal_fraction,
+    PRESEAL_FALLBACK_EXPOSURE_DAYS,
+    PRESEAL_EXPOSURE_CAP_DAYS,
+)
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -339,3 +348,52 @@ def test_bag_stores_geometry_and_density(mock_silage_config: dict[str, str | flo
 
     assert bag.diameter_m == 3.0
     assert bag.dry_matter_density_kg_per_m3 == 180.0
+
+
+@pytest.mark.unit
+def test_calculate_preseal_loss_zero_exposure() -> None:
+    """Zero exposure time produces zero dry matter loss and no temperature change."""
+    crop = HarvestedCrop(**sample_crop_data)
+    initial_temperature = crop.temperature
+
+    result = calculate_preseal_loss(crop, exposure_days=0.0, exposed_area_m2=50.0, dry_matter_density_kg_per_m3=180.0)
+
+    assert result["dry_matter_loss_fraction"] == 0.0
+    assert result["final_temperature"] == initial_temperature
+
+
+@pytest.mark.unit
+def test_calculate_preseal_loss_alfalfa_positive_and_bounded() -> None:
+    """Alfalfa preseal loss over 3 days of exposure is positive, less than 100%, and raises temperature."""
+    crop = HarvestedCrop(**{**sample_crop_data, "config_name": "alfalfa_data", "dry_matter_percentage": 35.0})
+
+    result = calculate_preseal_loss(crop, exposure_days=3.0, exposed_area_m2=50.0, dry_matter_density_kg_per_m3=180.0)
+
+    assert 0.0 < result["dry_matter_loss_fraction"] < 1.0
+    assert result["final_temperature"] > crop.temperature
+
+
+@pytest.mark.unit
+def test_calculate_preseal_loss_fallback_exposure() -> None:
+    """The 0.125-day fallback exposure (newest plot, no successor yet) produces a small but positive loss."""
+    crop = HarvestedCrop(**{**sample_crop_data, "config_name": "corn_silage", "dry_matter_percentage": 35.0})
+
+    result = calculate_preseal_loss(
+        crop, exposure_days=PRESEAL_FALLBACK_EXPOSURE_DAYS, exposed_area_m2=30.0, dry_matter_density_kg_per_m3=180.0
+    )
+
+    assert 0.0 < result["dry_matter_loss_fraction"] < 0.01
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("raw_fraction,expected", [(-0.2, 0.0), (0.5, 0.5), (1.3, 1.0)])
+def test_clamp_preseal_fraction_bounds(raw_fraction: float, expected: float) -> None:
+    """`_clamp_preseal_fraction` floors at 0.0, ceilings at 1.0, and passes through in-range values.
+
+    (`/challenge-plan` finding #3, cycle 3: realistic inputs at the exposure cap only reach ~1-2%
+    loss — no physically plausible area/density/exposure combination drives the day-stepping equation
+    itself near 1.0, so a test built on realistic physics inputs would pass identically with or
+    without the clamp. Testing the clamp as its own pure function, directly, is the only way to
+    actually exercise the boundary — see spec §6's floor/ceiling requirement for new Preseal code.)
+    """
+    assert _clamp_preseal_fraction(raw_fraction) == expected
