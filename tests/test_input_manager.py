@@ -47,7 +47,7 @@ def input_manager_original_method_states(
         "_load_metadata": mock_input_manager._load_metadata,
         "_load_properties": mock_input_manager._load_properties,
         "_load_data_from_json": mock_input_manager._load_data_from_json,
-        "_load_data_from_csv": mock_input_manager._load_data_from_csv,
+        "load_data_from_csv": mock_input_manager.load_data_from_csv,
         "_populate_pool": mock_input_manager._populate_pool,
         "get_data": mock_input_manager.get_data,
         "get_metadata": mock_input_manager.get_metadata,
@@ -344,16 +344,15 @@ def test_load_data_from_json_invalid_data_raises_error(
 def test_load_data_from_csv(
     mock_input_manager: InputManager,
 ) -> None:
-    """Unit test for function _load_data_from_csv with valid csv file in file input_manager.py"""
+    """Unit test for function load_data_from_csv with valid csv file in file input_manager.py"""
     dummy_csv_data = "key1,key2\na,1\nb,2\n"
     dummy_expected_data = {"key1": ["a", "b"], "key2": [1, 2]}
     file_path = Path("path/to/csv/file")
     with patch("builtins.open", mock_open(read_data=dummy_csv_data)):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-            result_data = mock_input_manager._load_data_from_csv(file_path)
-
-            assert result_data == dummy_expected_data
-            assert add_log.call_count == 2
+            result_data = mock_input_manager.load_data_from_csv(file_path)
+        assert result_data == dummy_expected_data
+        assert add_log.call_count == 2
 
 
 def test_load_data_from_csv_missing_file_raises_error(
@@ -363,7 +362,7 @@ def test_load_data_from_csv_missing_file_raises_error(
     with patch("builtins.open", side_effect=FileNotFoundError):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             with pytest.raises(FileNotFoundError):
-                mock_input_manager._load_data_from_csv(Path("non_existent_file.csv"))
+                mock_input_manager.load_data_from_csv(Path("non_existent_file.csv"))
             assert add_log.call_count == 1
 
 
@@ -375,7 +374,7 @@ def test_load_data_from_csv_invalid_data_raises_error(
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             with patch("pandas.read_csv", side_effect=pd.errors.ParserError("Invalid CSV")):
                 with pytest.raises(pd.errors.ParserError):
-                    mock_input_manager._load_data_from_csv(Path("dummy_file.csv"))
+                    mock_input_manager.load_data_from_csv(Path("dummy_file.csv"))
                 assert add_log.call_count == 1
 
 
@@ -731,7 +730,7 @@ def test_populate_pool_valid(
         input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
     )
     mocker.patch.object(
-        input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
+        input_manager, "load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: True)
     mocker.patch.object(OutputManager, "add_log")
@@ -761,7 +760,7 @@ def test_populate_pool_invalid(
         input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
     )
     mocker.patch.object(
-        input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
+        input_manager, "load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: False)
     mocker.patch.object(OutputManager, "add_log")
@@ -792,7 +791,7 @@ def test_populate_pool_partial_invalid(
         input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
     )
     mocker.patch.object(
-        input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
+        input_manager, "load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=[True, False, True, False])
     mocker.patch.object(OutputManager, "add_log")
@@ -827,7 +826,7 @@ def test_populate_pool_eager_termination(
         input_manager, "_load_data_from_json", side_effect=lambda _: {"element1": "value1", "element2": "value2"}
     )
     mocker.patch.object(
-        input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
+        input_manager, "load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: False)
     mocker.patch.object(OutputManager, "add_log")
@@ -3677,7 +3676,7 @@ def test_load_runtime_metadata_success(mock_input_manager: InputManager, mocker:
         mock_input_manager.data_validator, "validate_metadata", return_value=(True, "")
     )
     mock_input_manager.input_root = tmp_path
-    mocked_loader = mocker.patch.object(mock_input_manager, "_load_data_from_csv", return_value={"value": [1]})
+    mocked_loader = mocker.patch.object(mock_input_manager, "load_data_from_csv", return_value={"value": [1]})
     mocked_add = mocker.patch.object(mock_input_manager, "add_runtime_variable_to_pool", return_value=True)
     metadata_exists_spy = mocker.spy(mock_input_manager, "_metadata_properties_exist")
 
