@@ -1,6 +1,6 @@
 # Silage Preseal + Infiltration Phases — Design Spec
 
-Status: Draft, awaiting user review
+Status: Draft, ready for whiteboard/SME + team review (rufas-design-doc gate) — updated 2026-09-08
 Date: 2026-08-19
 Scope: `RUFAS/biophysical/feed_storage/silage.py`, `storage.py`, `crop_soil_to_feed_storage_connection.py`, feed-storage input schema
 
@@ -98,8 +98,32 @@ Two implementations, dispatched by storage class:
 
 | RuFaS class | Source subroutine | Front geometry | Permeability role (reference table only) |
 |---|---|---|---|
-| `Bunker`, `Pile` | `BUNKER` (`Silostg.for:879-984`) | Vertical section, front sinks from open top | Cover permeability (~4 cm/atm-h class of value per manual, exact value from reference table) |
-| `Bag` | `TOWER` (`Silostg.for:794-876`), radial-diffusion portion only | Radial front shrinks inward from wall | Plastic-film permeability (~1 cm/atm-h class of value, exact value from reference table) |
+| `Bunker` | `BUNKER` (`Silostg.for:879-984`) | Vertical section, front sinks from open top | Wall 4, cover 1 (cm/h) — `hf_silo_types.bunker_silo`, Buckmaster 1989. **Sourced.** |
+| `Pile` | `BUNKER` (`Silostg.for:879-984`) | Vertical section, front sinks from open top | Wall 4, cover 4 (cm/h) — `hf_silo_types.pile_silo`, Buckmaster 1989. **Sourced.** |
+| `Bag` | `TOWER` (`Silostg.for:794-876`), radial-diffusion portion only | Radial front shrinks inward from wall | 1.0 cm/h. **Sourced 2026-09-09** — IFSM Reference Manual (Rotz et al. 2023, v4.7), p.76-77: "Oxygen permeability is set to that for sealed plastic (1.0 cm/h) rather than that for a silo structure (4.0 cm/hr)" for bags/bales. Primary-source citation, supersedes the MSF table's blank `source` column. |
+
+Reference table: `05-dev/msf/fourrager/02_Architecture/2026-08-26-hf-rt16-rt18-rt19-erd-proposal.md`
+(`hf_silo_types`, RT-19), status "Draft — for supervisor validation before Jira/DDL" as of 2026-09-01.
+RuFaS has no DB/CSV ingestion layer for this class of data (confirmed prior investigation) — these
+values get mirrored as a hardcoded Python constant (e.g. `SILAGE_PERMEABILITY_CONSTANTS`, same pattern
+as `ALFALFA_FERMENTATION_CONSTANTS` in `storage.py`), not queried live from the MSF DB.
+
+**Unit question — RESOLVED 2026-09-09.** Checked directly against the primary source (Buckmaster,
+Rotz & Muck 1989, *A Comprehensive Model of Forage Changes in the Silo*, Trans. ASAE 32(4):1143-1152
+— `fourrager/04_Resources/1989 A Comprehensive Model of Forage Changes in the Silo.pdf`). The paper's
+own Nomenclature (p. 1152) defines `U` plainly as "permeability, cm/h" — no `/atm` term anywhere in
+the paper, including the equation that consumes it (`Q = 2100 U_eff A`, eq. [27]). The earlier "class
+of value ~cm/atm-h" note in this spec was an unconfirmed assumption about general gas-permeability
+convention, not something drawn from this source. **No unit conversion needed** — the MSF table's
+plain cm/h matches the primary literature exactly.
+
+Also worth noting for the reviewer: the paper's own baseline permeabilities used in its sensitivity
+analysis (p. 1149) are "2, 4, and 6 cm/h for the wall of a bottom-unloaded tower silo, the wall of a
+top-unloaded tower silo, and the cover of a bunker silo respectively" — a different split than the
+MSF table's per-class wall/cover pairs (bunker wall 4/cover 1, pile wall 4/cover 4, bag wall 1/cover
+1). Not a contradiction (different classification: unloading direction vs. storage shape), but the
+MSF table's specific wall-vs-cover assignment per class isn't a direct one-to-one lift from this
+paper's own stated baseline values — worth the reviewer knowing it's a synthesis, not a verbatim copy.
 
 Note: `TOWER`'s additional "downward diffusion into the top plot" branch (`Silostg.for:836-863`, using a hardcoded top-cover constant distinct from the general wall permeability) applies only to a physically stacked tower silo with a distinguishable top plot being unloaded from above. A `Bag` doesn't have that structure — only the radial-diffusion portion of `TOWER` applies.
 
@@ -132,7 +156,68 @@ These were identified auditing the *existing* Effluent/Fermentation code. Per Se
 
 ## 7. Prerequisites / blocking work
 
-- **Reference table sourcing** (blocks real-world use of Infiltration, does not block writing the code): typical width/height for Bunker/Pile, typical diameter for Bag, and permeability values for both classes. No placeholder numbers will be hardcoded into production code paths — the lookup mechanism will be built, but calling it without a sourced table should fail loudly (explicit error), not silently return an invented number.
+**Updated 2026-09-08** — partial progress from the MSF `hf_silo_types` (RT-19) reference table
+(`05-dev/msf/fourrager/02_Architecture/2026-08-26-hf-rt16-rt18-rt19-erd-proposal.md`):
+
+- **Permeability, Bunker/Pile — RESOLVED.** Wall/cover values sourced to Buckmaster 1989 (see §5.2
+  table). Units confirmed cm/h, no conversion needed (see §5.2). Safe to hardcode as a Python constant.
+- **Permeability, Bag — RESOLVED 2026-09-09.** Sourced directly to the IFSM Reference Manual itself
+  (see §5.2) — 1.0 cm/h for sealed plastic. Permeability is now sourced for all three in-scope
+  storage types.
+
+**Updated 2026-09-09** — checked Buckmaster, Rotz & Muck (1989) directly for geometry defaults
+(`fourrager/04_Resources/1989 A Comprehensive Model of Forage Changes in the Silo.pdf`). Result is
+partial, with real caveats:
+
+- **Bunker — a usable citable example exists, but read the caveat.** p. 1149 (sensitivity analysis):
+  for a 150 t DM capacity comparison, "the comparably sized bunker was 9.14 x 3.05 x 28.9 m." Axis
+  labels aren't stated explicitly in the paper's text; by ordinary bunker convention this reads as
+  width 9.14 m × height 3.05 m × length 28.9 m, but that assignment is my inference, not a paper
+  quote — confirm before hardcoding. **Caveat:** this is one specific worked example used to compare
+  silo types in the paper's own sensitivity figures (Fig. 5, 7), not a general survey of typical
+  bunker dimensions across farms. Citable, but the reviewer should know it's "the example the authors
+  happened to run," not "the industry-typical size."
+- **Tower — same page, same caveat:** "6.1 m in dia. 21.3 m high," same 150 t DM comparison set.
+- **Pile — NOT COVERED.** The paper's own scope (title, abstract) is tower and bunker silos only —
+  no pile silo appears anywhere in it. Zero geometry data available from this source for `Pile`.
+- **Bag — NOT SAFELY COVERED, despite `Bag` reusing `TOWER`'s radial math.** The tower dimensions
+  above (6.1 m diameter) belong to an upright tower silo — a structure roughly the diameter of a
+  small building. A plastic bag silo is a laid tube typically ~2.4-3.66 m in diameter (order-of-
+  magnitude smaller). Reusing the tower's 6.1 m figure as a "Bag diameter default" would not be an
+  unsourced placeholder, it would be an actively wrong number carrying a false citation. Do not
+  borrow it. Bag's diameter remains fully unsourced.
+
+**Updated 2026-09-09 — Pile checked against three more sources, decision now resolved (not just
+narrowed).** Checked the IFSM Reference Manual directly (never mentions "pile" as a distinct
+structure — only tower/bunker, extended to bag/bale via the tower equations), MSF's own live
+Django DB schema, and a UW-Extension pile-density spreadsheet doc
+(`CA-12_CA-14_Silage_Average_Density_Formula.md`):
+
+- MSF's production DB already treats geometry as per-farm data for **every** storage type, not just
+  Pile — `feed_inventory_bunkersilostorage.{full_length,wall_height,average_width}_meter`,
+  `feed_inventory_bagsilostorage.{diameter,full_length}_meter`,
+  `feed_inventory_pilesilostorage.{length_excluding_ramps,base_width}_meter` all exist as real
+  per-farm input columns already in production. There is no reference-default geometry table
+  anywhere in the live MSF system, for any storage type.
+- This matches the IFSM manual's own explicit statement for bag/bale (§5.2 above): dimensions are
+  "set to reflect those of a bag or bale" — i.e., real input, not a literature default.
+- Separately, Pile's actual shape isn't width/height at all — the UW-Extension doc models it as a
+  domed trapezoidal cross-section needing 5 inputs (bottom width, pile depth, dome height, top
+  width, length), not the simple two-number shape this spec assumed for Bunker/Pile. Even a found
+  "typical size" wouldn't have dropped cleanly into §3's width/height framing.
+
+**Decision: geometry dimensions get no reference-table fallback, for any of Bunker/Pile/Bag.**
+Two independent, authoritative sources (the primary IFSM manual and MSF's own production schema)
+converge on the same answer — this isn't a compromise from failing to find data, it's the
+architecturally correct choice. Drop the "optional, reference-table fallback" half of §3's scope;
+geometry becomes a required field in each storage's own config JSON, same as MSF's DB already
+requires. The Bunker/Tower worked-example numbers found above (Buckmaster 1989, p.1149) are kept in
+this doc for context but are **not** to be wired in as a code fallback.
+
+No placeholder numbers will be hardcoded into production code paths — the lookup mechanism will be
+built, but calling it for Bag permeability or for any geometry dimension without a sourced/decided value
+should fail loudly (explicit error), not silently return an invented number, until the open items above
+are closed.
 
 ## 8. Testing strategy
 
