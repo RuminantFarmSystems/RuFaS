@@ -38,8 +38,6 @@ class RationManager:
 
     """
 
-    # CALF_DRY_MATTER_INTAKE = 3
-
     _om = OutputManager()
     ration_feeds: dict[AnimalCombination, list[RUFAS_ID]] | None
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]] | None
