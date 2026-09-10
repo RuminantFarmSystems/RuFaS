@@ -278,7 +278,7 @@ class Silage(Storage):
             If called on a `Silage` subclass with no `dry_matter_density_kg_per_m3` config. Mirrors
             `_preseal_exposed_area_m2`'s guard above — added per `/challenge-plan` finding #2: the
             base `Silage` class has no `dry_matter_density_kg_per_m3` attribute (only Task 1's
-            `_RectangularSilage`/`Bag` subclasses do), so `_finalize_preseal_loss` cannot read it as
+            `Bunker`/`Pile`/`Bag` subclasses do), so `_finalize_preseal_loss` cannot read it as
             a plain attribute without a real mypy-strict error.
 
         """
