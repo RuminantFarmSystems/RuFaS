@@ -44,19 +44,25 @@ class DummyOutputManager:
 
 
 class DummyInputManager:
-    def __init__(self, data):
+    def __init__(self, data, field_keys=None):
         self._data = {
-            "config.start_date": "2020:01:01",
-            "config.end_date": "2020:12:31",
+            "config.start_date": "2020:1",
+            "config.end_date": "2020:365",
             "config.FIPS_county_code": 1001,
             "_default_values": {"commodity": [], "2020": []},
             "_default_fallback_values": {"commodity": [], "2020": []},
             **data,
         }
+        self._field_keys = field_keys or []
         self.added_runtime = []
 
     def get_data(self, key):
         return self._data.get(key)
+
+    def get_data_keys_by_properties(self, properties_key):
+        if properties_key == "field_properties":
+            return self._field_keys
+        return []
 
     def add_runtime_variable_to_pool(
         self, variable_name, data, properties_blob_key, eager_termination=False, input_path=None

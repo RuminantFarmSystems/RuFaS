@@ -5,9 +5,9 @@ This file is generated to decouple the economics preprocessing from runtime JSON
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
-ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
+ECONOMIC_MAP: dict[str, dict[str, dict[str, dict[str, Any]]]] = {
     "Animal": {
         "Costs": {
             "Animal - Labor hours": {
@@ -726,3 +726,22 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
         },
     },
 }
+
+CROP_TO_SEED_KEY: dict[str, str] = {
+        "corn_grain": "commodity_prices_corn_seed_dollar_per_square_meter",
+        "corn_silage": "commodity_prices_corn_seed_dollar_per_square_meter",
+        "soybean_grain": "commodity_prices_soybean_seed_dollar_per_square_meter",
+        "soybean_hay": "commodity_prices_soybean_seed_dollar_per_square_meter",
+        "winter_wheat_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+    }
