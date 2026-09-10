@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, Tuple
+from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,7 @@ class DCFRORCalculator:
         self.om = OutputManager()
         self.inputs = self._load_inputs()
 
-    def _load_inputs(self) -> Dict[str, Any]:
+    def _load_inputs(self) -> dict[str, Any]:
         info_map = {"class": self.__class__.__name__, "function": self._load_inputs.__name__}
         try:
 
@@ -50,7 +50,7 @@ class DCFRORCalculator:
 
             cost_capital_multiple = _get_input("economic_inputs.capital_costs.capital_cost_breakdown")
 
-            inputs: Dict[str, Any] = {
+            inputs: dict[str, Any] = {
                 "cost_capital_multiple": cost_capital_multiple,
                 "cost_operational_units": _get_input("economic_inputs.cashflow_inputs.operating_units"),
                 "cost_operational_unit_cost": _get_input("economic_inputs.cashflow_inputs.operating_unit_costs"),
@@ -85,7 +85,7 @@ class DCFRORCalculator:
             self.om.add_error("MissingInputKey", f"Missing input key: {str(e)}", info_map)
             raise
 
-    def calculate(self, override_inputs: Dict[str, Any] | None = None) -> None:
+    def calculate(self, override_inputs: dict[str, Any] | None = None) -> None:
         """Run the DCFROR cash-flow model and export summary outputs.
 
         Parameters
@@ -131,7 +131,7 @@ class DCFRORCalculator:
             self.om.add_error("DCFRORCalculationFailed", f"DCFROR calculation failed: {exc}", info_map)
             raise
 
-    def _prepare_costs(self, input_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def _prepare_costs(self, input_dict: dict[str, Any]) -> dict[str, Any]:
         """Build capital, operating-cost, and revenue schedules from inputs."""
 
         info_map = {"class": self.__class__.__name__, "function": self._prepare_costs.__name__}
@@ -267,7 +267,7 @@ class DCFRORCalculator:
         except (KeyError, TypeError):
             return []
 
-    def _prepare_financing(self, input_dict: Dict[str, Any], project_term: int) -> Dict[str, Any]:
+    def _prepare_financing(self, input_dict: dict[str, Any], project_term: int) -> dict[str, Any]:
         """Normalise financing inputs and enforce valid borrowing shares."""
         depreciation_rate = input_dict["depreciation_rate"]
         depreciation_rate = depreciation_rate[~np.isnan(depreciation_rate)]
@@ -320,7 +320,7 @@ class DCFRORCalculator:
         operating_costs: np.ndarray,
         tax_rate: float,
         internal_rate_of_return: float,
-    ) -> Tuple[np.ndarray, pd.DataFrame]:
+    ) -> tuple[np.ndarray, pd.DataFrame]:
         """Build the annual cash flow table using Equations 7–26."""
 
         years = EconomicEquations.construct_timeline(construction_term, loan_term, project_term)
@@ -497,15 +497,11 @@ class DCFRORCalculator:
             cash_flow_df.loc[construction_mask, "NPVCapitalPlusInterest"].to_numpy(),
         )
 
-        positive_benefits = float(CF[CF > 0].sum())
-        investment_costs = float(-CF[CF < 0].sum())
-        roi = EconomicMetrics.calculate_roi(positive_benefits, investment_costs)
         payback = EconomicMetrics.calculate_payback_period(CF)
         net_cash_flow = EconomicMetrics.calculate_net_annual_cash_flow(revenue, operating_costs)
         mpsp = EconomicMetrics.calculate_mpsp(capital_cost + operating_costs.sum(), revenue.sum())
 
         self.om.add_variable("econ_dcfror_npv", npv, {**info_map, "units": MeasurementUnits.DOLLARS})
-        self.om.add_variable("econ_dcfror_roi", roi, {**info_map, "units": MeasurementUnits.UNITLESS})
         self.om.add_variable(
             "econ_dcfror_payback_period",
             payback,
@@ -532,7 +528,7 @@ class DCFRORCalculator:
         self,
         variable_name: str,
         target_npv: float = 0.0,
-        bounds: Tuple[float, float] = (0.01, 100.0),
+        bounds: tuple[float, float] = (0.01, 100.0),
         tol: float = 1e-6,
         max_iter: int = 100,
     ) -> float:

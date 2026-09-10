@@ -545,7 +545,7 @@ class InputManager:
         """Helper function for runtime data mapping."""
         return {
             "json": self._load_data_from_json,
-            "csv": self._load_data_from_csv,
+            "csv": self.load_data_from_csv,
         }
 
     def _process_runtime_file(
@@ -889,7 +889,7 @@ class InputManager:
             self.om.add_error(f"Unexpected error when loading file at path {file_path}: {e}", str(e), info_map)
             raise
 
-    def _load_data_from_csv(self, file_path: Path) -> dict[str, Any]:
+    def load_data_from_csv(self, file_path: Path) -> dict[str, Any]:
         """
         Loads data from input csv file.
 
@@ -917,7 +917,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._load_data_from_csv.__name__,
+            "function": self.load_data_from_csv.__name__,
         }
         self.om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
         try:
@@ -972,7 +972,7 @@ class InputManager:
         self.input_root = input_root
         data_type_to_loader_map: dict[str, Callable[[Path], dict[str, Any]]] = {
             "json": self._load_data_from_json,
-            "csv": self._load_data_from_csv,
+            "csv": self.load_data_from_csv,
         }
         valid_data = True
         for file_blob_key, file_details in self.__metadata["files"].items():
