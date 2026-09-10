@@ -23,8 +23,11 @@ This **changelog** file keeps a record of updates included in existing version r
 
 ### Current version
 
-v1.0.5
+### v1.0.6
 - [3247](https://github.com/RuminantFarmSystems/RuFaS/pull/3247) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Fix for edge case error introduced in 3202, a div0 error already fixed on dev, and labels pregnant cows during initialization using Repro Enum.
+
+### v1.0.5
+- [3243](https://github.com/RuminantFarmSystems/RuFaS/pull/3243) - [minor change] [NoInputChange] [NoOutputChange] Corrects version number
 
 ### v1.0.4
 
