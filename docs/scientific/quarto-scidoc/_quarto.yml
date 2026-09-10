@@ -1,17 +1,19 @@
 project:
   type: book
+  output-dir: _book # where the output is saved
 
 book:
   title: "Ruminant Farm Systems (RuFaS)"
   subtitle: "Scientific Documentation"
   date: "4/1/2026"
-  output-file: "rufas-scientific-documentation"
+  output-file: "rufas-scientific-documentation" # name of output file (non-html)
   search: true
   page-navigation: true
+  favicon: "resources/images/rufas_icon.png" # browser tab icon
   chapters:
     - index.qmd
     - qmd/versionupdates.qmd
-    - qmd/example_structures.qmd
+    - qmd/example_structures.qmd # should be removed from final build
     - qmd/animal.qmd
     - qmd/manure.qmd
     - qmd/soil_and_crop.qmd
@@ -52,3 +54,4 @@ format:
   #   lot: true
   #   number-sections: true
   #   keep-tex: true
+  #   cover-image: "resources/images/rufas_cover_img"

@@ -1,6 +1,8 @@
 <!-- reuse code to import functions from "../scripts/": -->
 {{< include ../scripts/_import-from-scripts.qmd >}}
-# Example Inserts
+
+# Example quarto structures {.unnumbered}
+
 ## Sectioning and Structure
 
 There is some variation between modules and documentation bassed on structure and needs of the model. However there are some materials, or ingredients if you will, that will remain consistent between modules. These include: Module Header, module introduction, sections representing components of module, section introductions, methodologies, relevant inputs, and relevant outputs.
