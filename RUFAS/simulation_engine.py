@@ -279,13 +279,19 @@ class SimulationEngine:
         """
         Gathers the configurations of the manure streams that enter the manure module on every simulation day.
 
-        All daily manure supply input files are combined. Logs a warning if no daily manure supply input files are
-        found, since without the animal module no manure would then enter the manure system for the whole simulation.
+        All daily manure supply input files are combined.
 
         Returns
         -------
         list[dict[str, Any]]
-            The configurations of the daily manure streams. Empty if no daily manure supply inputs are provided.
+            The configurations of the daily manure streams.
+
+        Raises
+        ------
+        ValueError
+            If no daily manure supply input files are found. Without the animal module, nothing else can put manure
+            into the manure system, so the simulation stops before it starts rather than running with empty
+            processors.
         """
         info_map = {
             "class": SimulationEngine.__name__,
@@ -293,11 +299,13 @@ class SimulationEngine:
         }
         daily_manure_supply_names: list[str] = self.im.get_data_keys_by_properties("daily_manure_supply_properties")
         if not daily_manure_supply_names:
-            self.om.add_warning(
+            self.om.add_error(
                 "No daily manure supply input files.",
-                "No manure will enter the manure system, and there are no animals to produce manure.",
+                "There are no animals to produce manure, so a daily manure supply input is required for manure to "
+                "enter the manure system.",
                 info_map,
             )
+            raise ValueError("A simulation without animals requires at least one daily manure supply input file.")
 
         daily_manure_stream_configs: list[dict[str, Any]] = []
         for daily_manure_supply_name in daily_manure_supply_names:

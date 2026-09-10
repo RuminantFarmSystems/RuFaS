@@ -1648,14 +1648,17 @@ def test_gather_daily_manure_supply_no_supply_inputs(mocker: MockerFixture) -> N
 
     mock_input_manager.get_data_keys_by_properties.return_value = []
 
-    # Act
-    result = simulation_engine._gather_daily_manure_supply()
+    # Act / Assert
+    with pytest.raises(
+        ValueError, match="A simulation without animals requires at least one daily manure supply input file."
+    ):
+        simulation_engine._gather_daily_manure_supply()
 
-    # Assert
-    assert result == []
     mock_input_manager.get_data.assert_not_called()
-    mock_output_manager.add_warning.assert_called_once_with(
+    mock_output_manager.add_error.assert_called_once_with(
         "No daily manure supply input files.",
-        "No manure will enter the manure system, and there are no animals to produce manure.",
+        "There are no animals to produce manure, so a daily manure supply input is required for manure to "
+        "enter the manure system.",
         {"class": "SimulationEngine", "function": "_gather_daily_manure_supply"},
     )
+    mock_output_manager.add_warning.assert_not_called()

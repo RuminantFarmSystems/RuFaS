@@ -467,19 +467,16 @@ def test_daily_manure_supplier_builds_fresh_streams_every_day() -> None:
 
 
 def test_daily_manure_supplier_duplicate_stream_names(mocker: MockerFixture) -> None:
-    """Checks that only the first configuration is kept, with a warning, when stream names are duplicated."""
+    """Checks that duplicated stream names fail validation instead of silently dropping a stream."""
     mock_output_manager = mocker.MagicMock()
     mocker.patch("RUFAS.data_structures.animal_to_manure_connection.OutputManager", return_value=mock_output_manager)
     duplicate_stream_config = make_daily_manure_stream_config(num_animals=1)
 
-    supplier = DailyManureSupplier([make_daily_manure_stream_config(), duplicate_stream_config])
+    with pytest.raises(ValueError, match="Daily manure stream 'lac_pen' is specified more than once."):
+        DailyManureSupplier([make_daily_manure_stream_config(), duplicate_stream_config])
 
-    daily_manure_streams = supplier.get_daily_manure_streams()
-    assert list(daily_manure_streams.keys()) == ["lac_pen"]
-    pen_manure_data = daily_manure_streams["lac_pen"].pen_manure_data
-    assert pen_manure_data is not None
-    assert pen_manure_data.num_animals == 88
-    mock_output_manager.add_warning.assert_called_once()
+    mock_output_manager.add_error.assert_called_once()
+    mock_output_manager.add_warning.assert_not_called()
 
 
 def test_daily_manure_supplier_parlor_stream_requires_lactating_cows() -> None:

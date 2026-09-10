@@ -425,14 +425,10 @@ class DailyManureSupplier:
         Raises
         ------
         ValueError
+            - If more than one stream is configured with the same name.
             - If a stream's configuration is rejected by ``PenManureData``, such as a parlor stream configured for
               an animal combination other than lactating cows.
             - If a stream's total solids mass is greater than its total manure mass.
-
-        Notes
-        -----
-        Streams that share a name with an earlier stream are skipped with a warning, and only the first
-        configuration is used.
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._validate_stream_configs.__name__}
@@ -440,13 +436,13 @@ class DailyManureSupplier:
         for stream_config in daily_manure_stream_configs:
             stream_name = str(stream_config["stream_name"])
             if stream_name in stream_configs_by_name:
-                self._om.add_warning(
+                self._om.add_error(
                     "Duplicate daily manure stream name",
-                    f"The daily manure stream '{stream_name}' is specified more than once. Only the first "
-                    "specification will supply manure.",
+                    f"The daily manure stream '{stream_name}' is specified more than once. Every daily manure stream "
+                    "must have a unique name, since stream names label the manure module's outputs.",
                     info_map,
                 )
-                continue
+                raise ValueError(f"Daily manure stream '{stream_name}' is specified more than once.")
 
             try:
                 self._build_pen_manure_data(stream_config)
