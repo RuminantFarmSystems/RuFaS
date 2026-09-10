@@ -110,6 +110,41 @@ These mirror the RuFaS wiki — see
 - **Design-doc-driven for large work** — a change ≈ 1 engineer-month or more needs
   a design doc agreed before coding. Use the `rufas-design-doc` skill.
 
+### Naming conventions
+
+| Construct | Style | Example |
+|---|---|---|
+| Module / file | `snake_case.py` | `feed_manager.py` |
+| Class | `PascalCase` | `FeedManager` |
+| Function / method | `snake_case` | `calculate_dry_matter_loss_to_gas` |
+| Constant | `UPPER_SNAKE_CASE` | `ALFALFA_FERMENTATION_CONSTANTS` |
+| Test file | `test_<module>.py` | `test_storage.py` |
+| Test function | `test_<function_name>` | `test_calculate_dry_matter_loss_to_gas` |
+
+### pytest markers
+
+Tag every test with the appropriate marker (defined in `pyproject.toml`):
+
+| Marker | Use for |
+|---|---|
+| `unit` | Single isolated function |
+| `component` | Single class or module |
+| `integration` | 2–3 modules together |
+| `regression` | Existing dairy regression suite |
+| `validation` | NRC 2016 published benchmark checks |
+| `nrc2016` | Specifically NRC 2016 Chapter 20 |
+| `smoke` | Import / instantiation check |
+| `slow` | Tests taking > 5 seconds |
+
+### Changelog entry format
+
+Every PR must add one entry per logical change under `### Next Version Updates`
+in `changelog.md`. Format (see `changelog.md` README for full guidance):
+
+```
+- [<PR#>](<link>) - [Major change / minor change] [Impact Area] [InputChange / NoInputChange] [OutputChange / NoOutputChange] Short description — say "update X to Y", not "update X".
+```
+
 ## Branching & PRs
 
 Upstream flow: feature branch → `dev` → `test` → `main`. **This fork integrates on

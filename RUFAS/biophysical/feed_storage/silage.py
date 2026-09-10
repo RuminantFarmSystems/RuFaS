@@ -1,5 +1,6 @@
 import math
 from dataclasses import replace
+from typing import Any
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
@@ -37,9 +38,9 @@ Fraction of respired dry matter retained as water rather than lost as gas, per S
 (spec §5.1's own citation for this fact). Silostg.for:707-708's PLOT(NPL,11)/PLOT(NPL,3) update uses
 a 72/180 gas-loss ratio; solving for the resulting fresh-mass change shows only that 72/180 leaves the
 crop, while the complementary 108/180 stays as retained moisture. This constant is that retained
-(1 - 72/180) fraction — see the `moisture_loss_kg` sign in `_finalize_preseal_loss` (Task 4).
-Corrected per `/challenge-plan` finding #1 (cycle 1): the original ratio and its use in
-`moisture_loss_kg` were inverted (wrong sign, ~4x wrong magnitude).
+(1 - 72/180) fraction — see the `moisture_loss_kg` sign in `_finalize_preseal_loss`: only the
+gas-lost fraction of dry matter leaves the crop as fresh mass, while the water-retained fraction
+stays behind.
 """
 PRESEAL_WATER_RETENTION_FRACTION = 1.0 - 72.0 / 180.0
 
@@ -49,7 +50,7 @@ def _clamp_preseal_fraction(fraction: float) -> float:
     Clamps a Preseal dry-matter-loss fraction to [0.0, 1.0] (spec §6's floor/ceiling requirement for
     new Preseal/Infiltration code). Extracted as its own pure function so the boundary is directly
     unit-testable, since no realistic physical input drives the day-stepping loop in
-    `calculate_preseal_loss` anywhere near this range on its own (`/challenge-plan` finding #3, cycle 3).
+    `calculate_preseal_loss` anywhere near this range on its own.
 
     Parameters
     ----------
@@ -232,8 +233,7 @@ class Silage(Storage):
         )
         # Silostg.for:707-708: only the gas-lost fraction of DM leaves the crop as fresh mass; the
         # water-retained fraction stays behind, so moisture_loss_kg is negative here (a moisture
-        # gain that offsets most of dry_matter_loss_kg). Corrected per /challenge-plan finding #1 —
-        # the prior formula had the wrong sign and was ~4x too large.
+        # gain that offsets most of dry_matter_loss_kg).
         moisture_loss_kg = -dry_matter_loss_kg * PRESEAL_WATER_RETENTION_FRACTION
         mass_values = self._calculate_mass_attributes_after_loss(crop, dry_matter_loss_kg, moisture_loss_kg)
         crop.dry_matter_mass = mass_values["dry_matter_mass"]
@@ -276,10 +276,10 @@ class Silage(Storage):
         ------
         NotImplementedError
             If called on a `Silage` subclass with no `dry_matter_density_kg_per_m3` config. Mirrors
-            `_preseal_exposed_area_m2`'s guard above — added per `/challenge-plan` finding #2: the
-            base `Silage` class has no `dry_matter_density_kg_per_m3` attribute (only Task 1's
-            `Bunker`/`Pile`/`Bag` subclasses do), so `_finalize_preseal_loss` cannot read it as
-            a plain attribute without a real mypy-strict error.
+            `_preseal_exposed_area_m2`'s guard above: the base `Silage` class has no
+            `dry_matter_density_kg_per_m3` attribute (only the `Bunker`/`Pile`/`Bag` subclasses do),
+            so `_finalize_preseal_loss` cannot read it as a plain attribute without a real
+            mypy-strict error.
 
         """
         self.om.add_error(
@@ -358,7 +358,7 @@ class Silage(Storage):
         """
         crops_projected_with_effluent_loss: list[HarvestedCrop] = []
         for crop in crops:
-            effluent_loss_values = self._calculate_effluent_loss(crop, time)
+            effluent_loss_values: dict[str, Any] = self._calculate_effluent_loss(crop, time)
             del effluent_loss_values["dry_matter_loss"]
             del effluent_loss_values["moisture_loss"]
             projected_crop = replace(crop, **effluent_loss_values)
@@ -601,7 +601,7 @@ class Bunker(Silage):
     height_m : float
         Bunker wall height (m). Required per-storage input — no reference-table fallback.
     dry_matter_density_kg_per_m3 : float
-        Packed dry-matter density (kg DM / m3). Required per-storage input (see Open Decisions §1).
+        Packed dry-matter density (kg DM / m3). Required per-storage input — no reference-table fallback.
 
     """
 
@@ -654,7 +654,7 @@ class Pile(Silage):
     height_m : float
         Pile height (m). Required per-storage input — no reference-table fallback.
     dry_matter_density_kg_per_m3 : float
-        Packed dry-matter density (kg DM / m3). Required per-storage input (see Open Decisions §1).
+        Packed dry-matter density (kg DM / m3). Required per-storage input — no reference-table fallback.
 
     """
 
@@ -705,7 +705,7 @@ class Bag(Silage):
     diameter_m : float
         Bag diameter (m). Required per-storage input — no reference-table fallback.
     dry_matter_density_kg_per_m3 : float
-        Packed dry-matter density (kg DM / m3). Required per-storage input (see Open Decisions §1).
+        Packed dry-matter density (kg DM / m3). Required per-storage input — no reference-table fallback.
 
     """
 
@@ -741,7 +741,7 @@ class Bag(Silage):
         Returns
         -------
         float
-            ``self.dry_matter_density_kg_per_m3``, set from config in ``__init__`` (Task 1).
+            ``self.dry_matter_density_kg_per_m3``, set from config in ``__init__``.
 
         """
         return self.dry_matter_density_kg_per_m3

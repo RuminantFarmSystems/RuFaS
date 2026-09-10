@@ -676,7 +676,7 @@ class Storage:
         """
         projected_crops: list[HarvestedCrop] = []
         for crop in crops:
-            moisture_loss_values = self._calculate_values_after_moisture_loss(
+            moisture_loss_values: dict[str, Any] = self._calculate_values_after_moisture_loss(
                 crop, time, loss_period, final_moisture_percentage
             )
             del moisture_loss_values["moisture_loss"]

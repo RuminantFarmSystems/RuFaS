@@ -9,7 +9,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.output_manager import OutputManager
-from RUFAS.biophysical.feed_storage.silage import (  # noqa: F401
+from RUFAS.biophysical.feed_storage.silage import (
     Bag,
     Bunker,
     Pile,
@@ -151,7 +151,7 @@ def test_project_degradations(
         "dry_matter_loss": 20.0,
         "moisture_loss": 20.0,
     }
-    expected_loss_values = {
+    expected_loss_values: dict[str, Any] = {
         "dry_matter_mass": 800.0,
         "dry_matter_percentage": 14.0,
         "non_protein_nitrogen": 3.0,
@@ -285,6 +285,21 @@ def test_bunker_requires_positive_geometry_and_density(mock_silage_config: dict[
         del bad_config[missing_key]
         with pytest.raises(ValueError, match=missing_key):
             Bunker(config=bad_config)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("bad_value", [0.0, -5.0])
+@pytest.mark.parametrize("field_name", ["width_m", "height_m", "dry_matter_density_kg_per_m3"])
+def test_bunker_requires_positive_geometry_and_density_rejects_non_positive_values(
+    mock_silage_config: dict[str, str | float | list[str]], field_name: str, bad_value: float
+) -> None:
+    """Bunker raises ValueError if width_m, height_m, or dry_matter_density_kg_per_m3 is zero or negative."""
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    bad_config = {**config, "width_m": 10.0, "height_m": 3.0, "dry_matter_density_kg_per_m3": 180.0}
+    bad_config[field_name] = bad_value
+    with pytest.raises(ValueError, match=field_name):
+        Bunker(config=bad_config)
 
 
 @pytest.mark.unit
