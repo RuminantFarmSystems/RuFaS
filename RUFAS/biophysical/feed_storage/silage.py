@@ -296,25 +296,87 @@ class Silage(Storage):
         return max(0.0, new_percentage)
 
 
-class Bunker(Silage):
-    """Represents the Bunker type of Silage storage."""
+def _require_positive_config_float(config: dict[str, str | float | list[str]], key: str, class_name: str) -> float:
+    """
+    Reads and validates a required positive float from a storage config dict.
+
+    Parameters
+    ----------
+    config : dict[str, str | float | list[str]]
+        Configuration dictionary for the storage.
+    key : str
+        The config key to read.
+    class_name : str
+        Name of the calling storage class, for the error message.
+
+    Returns
+    -------
+    float
+        The validated, positive config value.
+
+    Raises
+    ------
+    ValueError
+        If the key is missing or its value is not a positive number.
+
+    """
+    value = config.get(key)
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+        raise ValueError(f"{class_name} requires a positive '{key}' in its config, got {value!r}.")
+    return float(value)
+
+
+class _RectangularSilage(Silage):
+    """
+    Shared base for Bunker and Pile: identical config shape (`width_m`, `height_m`,
+    `dry_matter_density_kg_per_m3`) and, per Task 4, identical Preseal exposed-area geometry.
+    Introduced per `/challenge-plan` finding #6 to remove byte-for-byte duplication between the two
+    classes without adding a strategy/registry (still just plain subclassing — see YAGNI CHECK).
+
+    Attributes
+    ----------
+    width_m : float
+        Storage width (m). Required per-storage input — no reference-table fallback.
+    height_m : float
+        Storage wall height (m). Required per-storage input — no reference-table fallback.
+    dry_matter_density_kg_per_m3 : float
+        Packed dry-matter density (kg DM / m3). Required per-storage input (see Open Decisions §1).
+
+    """
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
-        self.bunker_size = config["size"]
+        self.width_m = _require_positive_config_float(config, "width_m", self.__class__.__name__)
+        self.height_m = _require_positive_config_float(config, "height_m", self.__class__.__name__)
+        self.dry_matter_density_kg_per_m3 = _require_positive_config_float(
+            config, "dry_matter_density_kg_per_m3", self.__class__.__name__
+        )
 
 
-class Pile(Silage):
-    """Represents the Pile type of Silage storage."""
+class Bunker(_RectangularSilage):
+    """Represents the Bunker type of Silage storage. Config fields: see `_RectangularSilage`."""
 
-    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
-        super().__init__(config)
-        self.pile_size = config["size"]
+
+class Pile(_RectangularSilage):
+    """Represents the Pile type of Silage storage. Config fields: see `_RectangularSilage`."""
 
 
 class Bag(Silage):
-    """Represents the Bag type of Silage storage."""
+    """
+    Represents the Bag type of Silage storage.
+
+    Attributes
+    ----------
+    diameter_m : float
+        Bag diameter (m). Required per-storage input — no reference-table fallback.
+    dry_matter_density_kg_per_m3 : float
+        Packed dry-matter density (kg DM / m3). Required per-storage input (see Open Decisions §1).
+
+    """
 
     def __init__(self, config: dict[str, str | float | list[str]]) -> None:
         super().__init__(config)
-        self.bag_size = config["size"]
+        self.diameter_m = _require_positive_config_float(config, "diameter_m", self.__class__.__name__)
+        self.dry_matter_density_kg_per_m3 = _require_positive_config_float(
+            config, "dry_matter_density_kg_per_m3", self.__class__.__name__
+        )

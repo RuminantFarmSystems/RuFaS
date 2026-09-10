@@ -24,7 +24,10 @@ def mock_silage_config() -> dict[str, str | float | list[str]]:
         "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
-        "size": 1000.0,
+        "width_m": 10.0,
+        "height_m": 3.0,
+        "diameter_m": 3.0,
+        "dry_matter_density_kg_per_m3": 180.0,
         "capacity": 1_000_000.0,
     }
 
@@ -256,5 +259,83 @@ def test_bag_init(mock_silage_config: dict[str, Any], mocker: MockerFixture) -> 
     """Tests that the Bag class is initialized correctly."""
     mock_silage_init = mocker.patch("RUFAS.biophysical.feed_storage.silage.Silage.__init__")
     bag = Bag(config=mock_silage_config)
-    assert bag.bag_size == mock_silage_config.get("size")
+    assert bag.diameter_m == mock_silage_config.get("diameter_m")
+    assert bag.dry_matter_density_kg_per_m3 == mock_silage_config.get("dry_matter_density_kg_per_m3")
     mock_silage_init.assert_called_once_with(mock_silage_config)
+
+
+@pytest.mark.unit
+def test_bunker_requires_positive_geometry_and_density(mock_silage_config: dict[str, str | float | list[str]]) -> None:
+    """Bunker raises ValueError if width_m, height_m, or dry_matter_density_kg_per_m3 is missing or non-positive."""
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    for missing_key in ("width_m", "height_m", "dry_matter_density_kg_per_m3"):
+        bad_config = {**config, "width_m": 10.0, "height_m": 3.0, "dry_matter_density_kg_per_m3": 180.0}
+        del bad_config[missing_key]
+        with pytest.raises(ValueError, match=missing_key):
+            Bunker(config=bad_config)
+
+
+@pytest.mark.unit
+def test_bunker_stores_geometry_and_density(mock_silage_config: dict[str, str | float | list[str]]) -> None:
+    """Bunker stores width_m, height_m, and dry_matter_density_kg_per_m3 from config."""
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    config.update({"width_m": 10.0, "height_m": 3.0, "dry_matter_density_kg_per_m3": 180.0})
+
+    bunker = Bunker(config=config)
+
+    assert bunker.width_m == 10.0
+    assert bunker.height_m == 3.0
+    assert bunker.dry_matter_density_kg_per_m3 == 180.0
+
+
+@pytest.mark.unit
+def test_pile_requires_positive_geometry_and_density(mock_silage_config: dict[str, str | float | list[str]]) -> None:
+    """Pile raises ValueError if width_m, height_m, or dry_matter_density_kg_per_m3 is missing or non-positive."""
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    for missing_key in ("width_m", "height_m", "dry_matter_density_kg_per_m3"):
+        bad_config = {**config, "width_m": 10.0, "height_m": 3.0, "dry_matter_density_kg_per_m3": 180.0}
+        del bad_config[missing_key]
+        with pytest.raises(ValueError, match=missing_key):
+            Pile(config=bad_config)
+
+
+@pytest.mark.unit
+def test_pile_stores_geometry_and_density(mock_silage_config: dict[str, str | float | list[str]]) -> None:
+    """Pile stores width_m, height_m, and dry_matter_density_kg_per_m3 from config."""
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    config.update({"width_m": 10.0, "height_m": 3.0, "dry_matter_density_kg_per_m3": 180.0})
+
+    pile = Pile(config=config)
+
+    assert pile.width_m == 10.0
+    assert pile.height_m == 3.0
+    assert pile.dry_matter_density_kg_per_m3 == 180.0
+
+
+@pytest.mark.unit
+def test_bag_requires_positive_geometry_and_density(mock_silage_config: dict[str, str | float | list[str]]) -> None:
+    """Bag raises ValueError if diameter_m or dry_matter_density_kg_per_m3 is missing or non-positive."""
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    for missing_key in ("diameter_m", "dry_matter_density_kg_per_m3"):
+        bad_config = {**config, "diameter_m": 3.0, "dry_matter_density_kg_per_m3": 180.0}
+        del bad_config[missing_key]
+        with pytest.raises(ValueError, match=missing_key):
+            Bag(config=bad_config)
+
+
+@pytest.mark.unit
+def test_bag_stores_geometry_and_density(mock_silage_config: dict[str, str | float | list[str]]) -> None:
+    """Bag stores diameter_m and dry_matter_density_kg_per_m3 from config."""
+    config = dict(mock_silage_config)
+    config.pop("size", None)
+    config.update({"diameter_m": 3.0, "dry_matter_density_kg_per_m3": 180.0})
+
+    bag = Bag(config=config)
+
+    assert bag.diameter_m == 3.0
+    assert bag.dry_matter_density_kg_per_m3 == 180.0

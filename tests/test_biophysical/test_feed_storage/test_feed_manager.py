@@ -207,7 +207,9 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
         "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
-        "size": 1000.0,
+        "width_m": 10.0,
+        "height_m": 3.0,
+        "dry_matter_density_kg_per_m3": 180.0,
         "capacity": 1_000_000.0,
     }
 
@@ -344,7 +346,9 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 500.0,
+                        "width_m": 10.0,
+                        "height_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     },
                 ],
                 "Bag": [
@@ -356,7 +360,8 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F2"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 200.0,
+                        "diameter_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     },
                 ],
             },
@@ -377,7 +382,9 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 500.0,
+                        "width_m": 10.0,
+                        "height_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     },
                 ],
                 "Bag": [
@@ -389,7 +396,8 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F2"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 200.0,
+                        "diameter_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     },
                 ],
             },
@@ -410,7 +418,9 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 500.0,
+                        "width_m": 10.0,
+                        "height_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     }
                 ]
             },
@@ -1094,7 +1104,8 @@ def test_deduct_feeds_from_inventory(
         "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
-        "size": 1000.0,
+        "diameter_m": 3.0,
+        "dry_matter_density_kg_per_m3": 180.0,
         "capacity": 1_000_000.0,
     }
     feed_manager.active_storages["example_bag"] = Bag(config=bag_config)
@@ -1129,7 +1140,8 @@ def test_deduct_feeds_from_inventory_error(
         "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
-        "size": 1000.0,
+        "diameter_m": 3.0,
+        "dry_matter_density_kg_per_m3": 180.0,
         "capacity": 1_000_000.0,
     }
     feed_manager.active_storages["example_bag"] = Bag(config=bag_config)
