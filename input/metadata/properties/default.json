@@ -6521,6 +6521,30 @@
           "minimum": 0.0,
           "default": 0.0
         },
+        "width_m": {
+          "type": "number",
+          "description": "Width of the Bunker/Pile silage storage structure (meters). Used with height_m and dry_matter_density_kg_per_m3 to derive Preseal exposed-surface-area geometry. Required (positive) for Bunker and Pile storage types; unused by Bag.",
+          "minimum": 0.0,
+          "default": 0.0
+        },
+        "height_m": {
+          "type": "number",
+          "description": "Height of the Bunker/Pile silage storage structure (meters). Used with width_m and dry_matter_density_kg_per_m3 to derive Preseal exposed-surface-area geometry. Required (positive) for Bunker and Pile storage types; unused by Bag.",
+          "minimum": 0.0,
+          "default": 0.0
+        },
+        "diameter_m": {
+          "type": "number",
+          "description": "Diameter of the Bag silage storage structure (meters). Used with dry_matter_density_kg_per_m3 to derive Preseal exposed-surface-area geometry. Required (positive) for Bag storage type; unused by Bunker/Pile.",
+          "minimum": 0.0,
+          "default": 0.0
+        },
+        "dry_matter_density_kg_per_m3": {
+          "type": "number",
+          "description": "Packed dry-matter density of the silage storage structure (kg per cubic meter). Used to derive Preseal exposed-surface-area geometry. Required (positive) for Bunker, Pile, and Bag storage types.",
+          "minimum": 0.0,
+          "default": 0.0
+        },
         "capacity": {
           "type": "number",
           "description": "Maximum capacity of the storage (kg dry matter).",

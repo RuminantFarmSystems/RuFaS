@@ -590,19 +590,16 @@ def _require_positive_config_float(config: dict[str, str | float | list[str]], k
     return float(value)
 
 
-class _RectangularSilage(Silage):
+class Bunker(Silage):
     """
-    Shared base for Bunker and Pile: identical config shape (`width_m`, `height_m`,
-    `dry_matter_density_kg_per_m3`) and, per Task 4, identical Preseal exposed-area geometry.
-    Introduced per `/challenge-plan` finding #6 to remove byte-for-byte duplication between the two
-    classes without adding a strategy/registry (still just plain subclassing — see YAGNI CHECK).
+    Represents the Bunker type of Silage storage.
 
     Attributes
     ----------
     width_m : float
-        Storage width (m). Required per-storage input — no reference-table fallback.
+        Bunker width (m). Required per-storage input — no reference-table fallback.
     height_m : float
-        Storage wall height (m). Required per-storage input — no reference-table fallback.
+        Bunker wall height (m). Required per-storage input — no reference-table fallback.
     dry_matter_density_kg_per_m3 : float
         Packed dry-matter density (kg DM / m3). Required per-storage input (see Open Decisions §1).
 
@@ -640,18 +637,63 @@ class _RectangularSilage(Silage):
         Returns
         -------
         float
-            ``self.dry_matter_density_kg_per_m3``, set from config in ``__init__`` (Task 1).
+            ``self.dry_matter_density_kg_per_m3``, set from config in ``__init__``.
 
         """
         return self.dry_matter_density_kg_per_m3
 
 
-class Bunker(_RectangularSilage):
-    """Represents the Bunker type of Silage storage. Config fields: see `_RectangularSilage`."""
+class Pile(Silage):
+    """
+    Represents the Pile type of Silage storage.
 
+    Attributes
+    ----------
+    width_m : float
+        Pile width (m). Required per-storage input — no reference-table fallback.
+    height_m : float
+        Pile height (m). Required per-storage input — no reference-table fallback.
+    dry_matter_density_kg_per_m3 : float
+        Packed dry-matter density (kg DM / m3). Required per-storage input (see Open Decisions §1).
 
-class Pile(_RectangularSilage):
-    """Represents the Pile type of Silage storage. Config fields: see `_RectangularSilage`."""
+    """
+
+    def __init__(self, config: dict[str, str | float | list[str]]) -> None:
+        super().__init__(config)
+        self.width_m = _require_positive_config_float(config, "width_m", self.__class__.__name__)
+        self.height_m = _require_positive_config_float(config, "height_m", self.__class__.__name__)
+        self.dry_matter_density_kg_per_m3 = _require_positive_config_float(
+            config, "dry_matter_density_kg_per_m3", self.__class__.__name__
+        )
+
+    def _preseal_exposed_area_m2(self) -> float:
+        """
+        Exposed surface area for the Preseal phase, accounting for a 50% filling grade.
+
+        Returns
+        -------
+        float
+            Exposed area (m2).
+
+        Notes
+        -----
+        ``Silostg.for:329``: ``EXPAR = SQRT(5) * DIM1 * DIM2``. Buckmaster et al. (1989), p.1144:
+        "Estimation of surface area is based on a 50% grade during filling."
+
+        """
+        return math.sqrt(5.0) * self.width_m * self.height_m
+
+    def _preseal_dry_matter_density_kg_per_m3(self) -> float:
+        """
+        Packed dry-matter density for the Preseal calculation.
+
+        Returns
+        -------
+        float
+            ``self.dry_matter_density_kg_per_m3``, set from config in ``__init__``.
+
+        """
+        return self.dry_matter_density_kg_per_m3
 
 
 class Bag(Silage):
