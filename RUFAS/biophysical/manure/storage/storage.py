@@ -47,6 +47,9 @@ class Storage(Processor):
         The surface area of the manure storage (m^2).
     capacity : float, default math.inf
         Volumetric capacity of the storage (m^3).
+    emptying_fraction : float | None, default None
+        Fraction of the stored manure that is removed at each emptying event (unitless, 0.0-1.0). If None, the
+        storage falls back to its default emptying behavior (full emptying for most storages).
 
     Attributes
     ----------
@@ -60,6 +63,8 @@ class Storage(Processor):
         The cover of the storage.
     _storage_time_period : int | None
         Interval between emptyings of the storage (days). If the storage is never emptied, this is None.
+    _configured_emptying_fraction : float | None
+        User-configured fraction of stored manure removed at each emptying event. None if not configured.
     _surface_area : float
         Surface area of the manure storage (m^2).
     _manure_to_process : ManureStream
@@ -81,6 +86,7 @@ class Storage(Processor):
         storage_time_period: int | None,
         surface_area: float,
         capacity: float = inf,
+        emptying_fraction: float | None = None,
     ) -> None:
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
@@ -89,6 +95,8 @@ class Storage(Processor):
         self._capacity = capacity
         self._cover = StorageCover(cover)
         self._storage_time_period = storage_time_period
+        self._configured_emptying_fraction = emptying_fraction
+        self._validate_emptying_fraction()
         self._surface_area = surface_area
         self._manure_to_process = ManureStream.make_empty_manure_stream()
         self.__post_init__()
@@ -113,8 +121,10 @@ class Storage(Processor):
     def _emptying_fraction(self) -> float:
         """
         The fraction of the accumulated stored manure that is removed from storage when the emptying time is reached.
-        Defaults to 1.0.
+        Uses the user-configured emptying fraction if one was provided, and defaults to 1.0 otherwise.
         """
+        if self._configured_emptying_fraction is not None:
+            return self._configured_emptying_fraction
         return 1.0
 
     def _determine_outdoor_storage_temperature(
@@ -230,7 +240,7 @@ class Storage(Processor):
                 retained_stream = self.stored_manure.split_stream(1.0 - self._emptying_fraction)
                 self._report_emptied(emptied_stream, time.simulation_day)
                 self.stored_manure = retained_stream
-                manure_to_be_returned = {"manure": replace(self.stored_manure)}
+                manure_to_be_returned = {"manure": replace(emptied_stream)}
             elif self._emptying_fraction == 0.0:
                 empty_stream = ManureStream.make_empty_manure_stream()
                 self._report_emptied(empty_stream, time.simulation_day)
@@ -259,7 +269,7 @@ class Storage(Processor):
         if not 0.0 <= self._emptying_fraction <= 1.0:
             info_map = {
                 "class": self.__class__.__name__,
-                "function": self.process_manure.__name__,
+                "function": self._validate_emptying_fraction.__name__,
                 "processor_name": self.name,
             }
             error_message = (
