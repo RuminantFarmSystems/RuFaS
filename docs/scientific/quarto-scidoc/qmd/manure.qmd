@@ -96,7 +96,7 @@ The following are important assumptions made in the manure handler submodules, a
 **Classes**
 
 ```{python}
-#| label: tbl-mn-HDL-classes
+#| label: tbl-mn-hdl-classes
 #| tbl-cap: The classes of handlers that are used in this module.
 import_table(
   "../resources/table_data/manure/tbl-mn-HDL-classes.csv",
@@ -107,7 +107,7 @@ import_table(
 #### Required User Inputs
 
 ```{python}
-#| label: tbl-mn-HDL-inputs
+#| label: tbl-mn-hdl-inputs
 #| tbl-cap: "Required inputs for the Manure Handler (`refreshed_manure_management.json`)."
 import_table(
   "../resources/table_data/manure/tbl-mn-HDL-inputs.csv",
@@ -433,7 +433,7 @@ The formulas below may be a summarization of multiple steps detailed above, and 
 Equations in the table below are in the format of "Output/exiting value" = "Entering processor value" +/- XYZ. "Entering" refers to the manure entering the processor (i.e., being loaded into the digester) and output variables reflect the manure leaving the processor (i.e., digestate leaving the digester). The Calculation column describes how the variable is updated in the processor.
 
 ```{python}
-#| label: tbl-mn-HDL-manure-update
+#| label: tbl-mn-hdl-manure-update
 #| tbl-cap: Calculated manure storage variables and their units.
 import_table(
   "../resources/table_data/manure/tbl-mn-HDL-manure-update.csv",
@@ -466,7 +466,7 @@ Currently, SLS inputs are simply nutrient-specific separation efficiencies that 
 **Classes**
 
 ```{python}
-#| label: tbl-mn-SLS-classes
+#| label: tbl-mn-sls-classes
 #| tbl-cap: Classes for solid liquid separators.
 import_table(
   "../resources/table_data/manure/tbl-mn-SLS-classes.csv",
@@ -477,7 +477,7 @@ import_table(
 ### Required User Inputs
 
 ```{python}
-#| label: tbl-mn-SLS-inputs
+#| label: tbl-mn-sls-inputs
 #| tbl-cap: Classes for solid liquid separators.
 import_table(
   "../resources/table_data/manure/tbl-mn-SLS-inputs.csv",
@@ -538,7 +538,7 @@ $$
 Nutrients that are separated according to this pattern are presented in the table below. The default separation efficiencies, as well as minimum and maximum allowable separation efficiencies, for the rotary screen and screw press separators are also provided [@Hegg1981; @Mukhtar1999; @Varma2021]. Note that separate removal efficiencies for manure degradable and non-degradable VS or bedding non-degradable VS are not specifiable at this time; all VS fractions are assumed to be removed at the rate of total VS removal. 
 
 ```{python}
-#| label: tbl-mn-SLS-sep-eff-rotary
+#| label: tbl-mn-sls-sep-eff-rotary
 #| tbl-cap: Classes for solid liquid separators.
 import_table(
   "../resources/table_data/manure/tbl-mn-SLS-sep-eff-rotary.csv",
@@ -549,7 +549,7 @@ import_table(
 ```
 
 ```{python}
-#| label: tbl-mn-SLS-sep-eff-screw
+#| label: tbl-mn-sls-sep-eff-screw
 #| tbl-cap: Classes for solid liquid separators.
 import_table(
   "../resources/table_data/manure/tbl-mn-SLS-sep-eff-screw.csv",
@@ -625,7 +625,7 @@ Below is a summary of updates to `ManureStream` variables. Note that the formula
 Equations in the table below are in the format of “Output/exiting value” = “Entering processor value” +/- XYZ. “Entering” refers to the manure entering the processor (i.e., being loaded into the digester) and output variables reflect the manure leaving the processor (i.e., digestate leaving the digester). The Calculation column describes how the variable is updated in the processor.
 
 ```{python}
-#| label: tbl-mn-SLS-frac-calc
+#| label: tbl-mn-sls-frac-calc
 #| tbl-cap: Solids and liquid fraction calculations for separated manure components.
 import_table(
   "../resources/table_data/manure/tbl-mn-SLS-frac-calc.csv",
@@ -663,7 +663,7 @@ The anaerobic submodule has two primary functions in RuFaS:
 **Classes**
 
 ```{python}
-#| label: tbl-mn-AD-classes
+#| label: tbl-mn-ad-classes
 #| tbl-cap: List of classes for anaerobic digesters.
 import_table(
   "../resources/table_data/manure/tbl-mn-AD-classes.csv",
@@ -674,7 +674,7 @@ import_table(
 ### Required User Inputs
 
 ```{python}
-#| label: tbl-mn-AD-inputs
+#| label: tbl-mn-ad-inputs
 #| tbl-cap: Required inputs for Anaerobic Digestion.
 import_table(
   "../resources/table_data/manure/tbl-mn-AD-inputs.csv",
@@ -918,7 +918,7 @@ Below is a summary of updates to `ManureStream` variables. Note that the formula
 Equations in the table below are in the format of “Output/exiting value” = “Entering processor value” +/- XYZ. “Entering” refers to the manure entering the processor (i.e., being loaded into the digester) and output variables reflect the manure leaving the processor (i.e., digestate leaving the digester). The Calculation column describes how the variable is updated in the processor.
 
 ```{python}
-#| label: tbl-mn-AD-calc
+#| label: tbl-mn-ad-calc
 #| tbl-cap: Calculated anaerobic digestion outputs.
 import_table(
   "../resources/table_data/manure/tbl-mn-AD-calc.csv",
@@ -936,11 +936,12 @@ Compared to anaerobic lagoons, slurry storages are typically of a smaller capaci
 
 **Implementation in RuFaS**
 
-There are two options for slurry storage in RuFaS, slurry storage outdoor and slurry storage underfloor, which function almost identically. The key differences between the two methods are presented in @tbl-mn-SS-options. Because the two methods are highly similar, both are covered in this document.
+There are two options for slurry storage in RuFaS, slurry storage outdoor and slurry storage underfloor, which function almost identically. The key differences between the two methods are presented in @tbl-mn-ss-options . Because the two methods are highly similar, both are covered in this document.
 
 ```{python}
-#| label: tbl-mn-SS-options
+#| label: tbl-mn-ss-options
 #| tbl-cap: Key differences for two options for slurry storage
+
 import_table(
   "../resources/table_data/manure/tbl-mn-SS-options.csv",
   colalign = ["left", "left", "left"]
@@ -951,10 +952,10 @@ In the slurry storage submodules, accumulated manure in storage is modeled on a 
 
 **Classes**
 
-Note that both slurry storage methods inherit some behavior from the base class, Storage. Because the two methods are highly similar, the content below is representative of both types of slurry storage, with specific differences between the two noted explicitly (@tbl-mn-SS-options).
+Note that both slurry storage methods inherit some behavior from the base class, Storage. Because the two methods are highly similar, the content below is representative of both types of slurry storage, with specific differences between the two noted explicitly (@tbl-mn-ss-classes).
 
 ```{python}
-#| label: tbl-mn-SS-classes
+#| label: tbl-mn-ss-classes
 #| tbl-cap: Classes for slurry storage
 import_table(
   "../resources/table_data/manure/tbl-mn-SS-classes.csv",
@@ -965,7 +966,7 @@ import_table(
 ### Required User Inputs
 
 ```{python}
-#| label: tbl-mn-SS-inputs
+#| label: tbl-mn-ss-inputs
 #| tbl-cap: Required inputs for the slurry storage section
 import_table(
   "../resources/table_data/manure/tbl-mn-SS-inputs.csv",
@@ -1262,7 +1263,7 @@ Below is a summary of updates to ManureStream variables representing the stored 
 Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. 
 
 ```{python}
-#| label: tbl-mn-SS-calc
+#| label: tbl-mn-ss-calc
 #| tbl-cap: Manure storage variable calculations.
 import_table(
   "../resources/table_data/manure/tbl-mn-SS-calc.csv",
@@ -1289,7 +1290,7 @@ In RuFaS, the underlying biological and gas emission methods are identical for s
 **Classes**
 
 ```{python}
-#| label: tbl-mn-AL-classes
+#| label: tbl-mn-al-classes
 #| tbl-cap: List of classes for anaerobic lagoon.
 import_table(
   "../resources/table_data/manure/tbl-mn-AL-classes.csv",
@@ -1299,7 +1300,7 @@ import_table(
 
 ### Required User Inputs
 ```{python}
-#| label: tbl-mn-AL-inputs
+#| label: tbl-mn-al-inputs
 #| tbl-cap: Required inputs for the anaerobic lagoon section (`refreshed_manure_management.json`)
 import_table(
   "../resources/table_data/manure/tbl-mn-AL-inputs.csv",
@@ -1627,7 +1628,7 @@ Below is a summary of updates to ManureStream variables representing the stored 
 Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. 
 
 ```{python}
-#| label: tbl-mn-AL-calc
+#| label: tbl-mn-al-calc
 #| tbl-cap: Manure storage variable calculations.
 import_table(
   "../resources/table_data/manure/tbl-mn-AL-calc.csv",
@@ -1658,7 +1659,7 @@ The two types of bedded pack are modeled differently in RuFaS as their decomposi
 **Classes**
 
 ```{python}
-#| label: tbl-mn-BP-classes
+#| label: tbl-mn-bp-classes
 #| tbl-cap: List of classes for bedded pack.
 import_table(
   "../resources/table_data/manure/tbl-mn-BP-classes.csv",
@@ -1669,7 +1670,7 @@ import_table(
 ### Required User Inputs
 
 ```{python}
-#| label: tbl-mn-BP-inputs
+#| label: tbl-mn-bp-inputs
 #| tbl-cap: Required inputs for the bedded pack section (`refreshed_manure_management.json`)
 import_table(
   "../resources/table_data/manure/tbl-mn-BP-inputs.csv",
@@ -1717,7 +1718,7 @@ The quantity of volatile solids utilized in determination of CH<sub>4</sub> incl
 :::
 
 ```{python}
-#| label: tbl-mn-BP-met-conv
+#| label: tbl-mn-bp-met-conv
 #| tbl-cap: Methane conversion factor values for bedded pack pens, based on presence or absence of mixing and average annual air temperature.
 import_table(
   "../resources/table_data/manure/tbl-mn-BP-met-conv.csv",
@@ -1736,7 +1737,7 @@ $$
 
 * B$_0$ = methane production potential (kg CH<sub>4</sub> per kg manure VS) of manure excreted onto the lot on a specified simulation day
 * Constant Value = 0.24 m$^3$ CH<sub>4</sub>/kg VS
-* MCF = methane conversion factor (@tbl-mn-BP-met-conv). This is based on simulation average ambient temperature
+* MCF = methane conversion factor (@tbl-mn-bp-met-conv). This is based on simulation average ambient temperature
 * tVS (kg) = daily mass (kg) of manure-excreted total VS in the bedded pack manure, received from `ManureStream(s)`; note that bedding VS are not included in this value
 
 **Calculate Carbon Decomposition**
@@ -1975,7 +1976,7 @@ Below is a summary of updates to `ManureStream` variables representing the store
 Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. 
 
 ```{python}
-#| label: tbl-mn-BP-calc
+#| label: tbl-mn-bp-calc
 #| tbl-cap: Calculated manure storage variables and their units.
 import_table(
   "../resources/table_data/manure/tbl-mn-BP-calc.csv",
@@ -2005,7 +2006,7 @@ Important assumptions:
 **Classes**
 
 ```{python}
-#| label: tbl-mn-OL-classes
+#| label: tbl-mn-ol-classes
 #| tbl-cap: Classes available in open lots.
 import_table(
   "../resources/table_data/manure/tbl-mn-OL-classes.csv",
@@ -2016,7 +2017,7 @@ import_table(
 ### Required User Inputs
 
 ```{python}
-#| label: tbl-mn-OL-inputs
+#| label: tbl-mn-ol-inputs
 #| tbl-cap: Required inputs for the open lots section.
 import_table(
   "../resources/table_data/manure/tbl-mn-OL-inputs.csv",
@@ -2314,7 +2315,7 @@ Below is a summary of updates to ManureStream variables representing the stored 
 Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. 
 
 ```{python}
-#| label: tbl-mn-OL-calc
+#| label: tbl-mn-ol-calc
 #| tbl-cap: Calculated manure storage variables and their units.
 import_table(
   "../resources/table_data/manure/tbl-mn-OL-calc.csv",
@@ -2350,7 +2351,7 @@ At this time, turning frequency, pile composition, composting duration, C:N rati
 **Classes**
 
 ```{python}
-#| label: tbl-mn-CP-classes
+#| label: tbl-mn-cp-classes
 #| tbl-cap: Classes available in composting.
 import_table(
   "../resources/table_data/manure/tbl-mn-CP-classes.csv",
@@ -2361,7 +2362,7 @@ import_table(
 ### Required User Inputs
 
 ```{python}
-#| label: tbl-mn-CP-inputs
+#| label: tbl-mn-cp-inputs
 #| tbl-cap: Required inputs for the composting section (`refreshed_manure_management.json`).
 import_table(
   "../resources/table_data/manure/tbl-mn-CP-inputs.csv",
@@ -2401,18 +2402,19 @@ Instance(s) of `ManureStream` for each manure stream defined by the user that re
 
 **Calculate Daily Methane Generation** `_calculate_composting_methane_emissions`
 
-Calculates the daily mass of methane emitted from the compost based on manure volatile solids (VS) added to compost (from animal excretion and bedding addition) and an emission factor based on composting method and simulation average temperature described in the (#tbl-mn-CP-met-conv) [@Hanson2024]. Here and in other equations, ‘daily’ denotes the value associated with received manure added to the open lot on a specified simulation day.
+Calculates the daily mass of methane emitted from the compost based on manure volatile solids (VS) added to compost (from animal excretion and bedding addition) and an emission factor based on composting method and simulation average temperature described in the (@tbl-mn-cp-met-conv) [@Hanson2024]. Here and in other equations, ‘daily’ denotes the value associated with received manure added to the open lot on a specified simulation day.
 
 ::: {.callout-note}
 The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded.
 ::: 
 
 ```{python}
-#| label: tbl-mn-CP-met-conv
-#| tbl-cap: Required inputs for the composting section (`refreshed_manure_management.json`).
+#| label: tbl-mn-cp-met-conv
+#| tbl-cap: "Required inputs for the composting section (`refreshed_manure_management.json`)"
+
 import_table(
   "../resources/table_data/manure/tbl-mn-CP-met-conv.csv",
-  colalign = ["left", "center", "center", "center",]
+  colalign = ["left", "center", "center"]
 )
 ```
 
@@ -2571,7 +2573,7 @@ $$
 Manure nitrogen being added to and accumulating in the compost results in NH<sub>3</sub> emissions. Here we utilize daily manure N addition to compost and an emission factor based on composting method @Hanson2024 to estimate total kg of NH<sub>3</sub>-N loss.
 
 ```{python}
-#| label: tbl-mn-CP-NH3-fac
+#| label: tbl-mn-cp-nh3-fac
 #| tbl-cap: NH$_3$-N emission factors for compost by composting method.
 import_table(
   "../resources/table_data/manure/tbl-mn-CP-NH3-fac.csv",
@@ -2594,7 +2596,7 @@ $$
 In addition to NH<sub>3</sub>-N emissions, nitrogen added to and accumulating in the compost also results in  N$_2$O emissions. Similar to NH<sub>3</sub>, here we utilize daily manure N addition to compost and an emission factor based on composting method @Hanson2024 to estimate total kg of  N$_2$O-N loss.
 
 ```{python}
-#| label: tbl-mn-CP-N2O-fac-a
+#| label: tbl-mn-cp-n2o-fac-a
 #| tbl-cap: N$_2$O-N emission factors for compost by composting method.
 import_table(
   "../resources/table_data/manure/tbl-mn-CP-N2O-fac-a.csv",
@@ -2617,7 +2619,7 @@ $$
 Nitrogen in compost may also be lost to leaching. Leaching of compost N may occur when fecal and urinary N are converted to nitrate in the soil beneath the compost, if the compost is not contained in a vessel. Nitrate can then be carried away via water movement through the subsoil. Similar to NH<sub>3</sub> and N<sub>2</sub>O, we use daily manure N addition to compost and an emission factor based on composting method @Hanson2024 to estimate total kg of leaching N loss.
 
 ```{python}
-#| label: tbl-mn-CP-N2O-fac
+#| label: tbl-mn-cp-n2o-fac
 #| tbl-cap: N$_2$O-N emission factors for compost by composting method.
 import_table(
   "../resources/table_data/manure/tbl-mn-CP-N2O-fac.csv",
@@ -2673,7 +2675,7 @@ Below is a summary of updates to `ManureStream` variables representing the store
 Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. 
 
 ```{python}
-#| label: tbl-mn-CP-calc
+#| label: tbl-mn-cp-calc
 #| tbl-cap: Manure storage variable calculations
 import_table(
   "../resources/table_data/manure/tbl-mn-CP-calc.csv",
@@ -2704,7 +2706,7 @@ Note that this section covers strictly the Manure Module daily spread functional
 **Classes**
 
 ```{python}
-#| label: tbl-mn-DS-classes
+#| label: tbl-mn-ds-classes
 #| tbl-cap: List of classes for daily spread
 import_table(
   "../resources/table_data/manure/tbl-mn-DS-classes.csv",
@@ -2715,7 +2717,7 @@ import_table(
 ### Required User Inputs
 
 ```{python}
-#| label: tbl-mn-DS-inputs
+#| label: tbl-mn-ds-inputs
 #| tbl-cap: Required inputs for the daily spread section (`refreshed_manure_management.json`)
 import_table(
   "../resources/table_data/manure/tbl-mn-DS-inputs.csv",
