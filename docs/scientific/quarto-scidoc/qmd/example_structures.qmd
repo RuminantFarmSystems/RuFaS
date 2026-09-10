@@ -128,6 +128,8 @@ import_table(
 )
 ```
 
+to reference this table within the text (like this: @tbl-an-example-struct), use `@tbl-an-example-struct`
+
 ```markdown
 Each time you create a new table, you need to update 3 things within this code block: 
 * label: this should match the label of the .csv file you are using. For example, if your .csv file is named "tbl-an-example-struct.csv", then your label should be "tbl-an-example-struct". This will help with traceback and auditing. (Every file and label name should start with 'tbl' and followed with the appropriate 2 letter module abbreviation if applicable).
