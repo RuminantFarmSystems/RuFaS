@@ -70,7 +70,9 @@
       "initial_storage_dry_matter": 0.35,
       "rufas_id": 110,
       "capacity": 1e10,
-      "size": 0.0
+      "width_m": 9.14,
+      "height_m": 3.05,
+      "dry_matter_density_kg_per_m3": 180.0
     },
     {
       "name": "cereal_rye_silage_storage_1",
@@ -80,7 +82,9 @@
       "initial_storage_dry_matter": 0.35,
       "rufas_id": 144,
       "capacity": 1e10,
-      "size": 0.0
+      "width_m": 9.14,
+      "height_m": 3.05,
+      "dry_matter_density_kg_per_m3": 180.0
     },
     {
       "name": "corn_silage_storage_1",
@@ -90,7 +94,9 @@
       "initial_storage_dry_matter": 0.35,
       "rufas_id": 51,
       "capacity": 1e10,
-      "size": 0.0
+      "width_m": 9.14,
+      "height_m": 3.05,
+      "dry_matter_density_kg_per_m3": 180.0
     },
     {
       "name": "tall_fescue_silage_storage_1",
@@ -100,7 +106,9 @@
       "initial_storage_dry_matter": 0.39,
       "rufas_id": 100,
       "capacity": 1e10,
-      "size": 0.0
+      "width_m": 9.14,
+      "height_m": 3.05,
+      "dry_matter_density_kg_per_m3": 180.0
     },
     {
       "name": "triticale_silage_storage_1",
@@ -110,7 +118,9 @@
       "initial_storage_dry_matter": 0.33,
       "rufas_id": 187,
       "capacity": 1e10,
-      "size": 0.0
+      "width_m": 9.14,
+      "height_m": 3.05,
+      "dry_matter_density_kg_per_m3": 180.0
     },
     {
       "name": "winter_wheat_silage_storage_1",
@@ -120,7 +130,9 @@
       "initial_storage_dry_matter": 0.35,
       "rufas_id": 198,
       "capacity": 1e10,
-      "size": 0.0
+      "width_m": 9.14,
+      "height_m": 3.05,
+      "dry_matter_density_kg_per_m3": 180.0
     }
   ],
   "baleage_storage": [
