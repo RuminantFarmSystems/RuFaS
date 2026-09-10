@@ -88,6 +88,7 @@ def test_process_degradations(
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_time = mocker.MagicMock(autospec=RufasTime)
     mock_time.simulation_day = 15
+    mocker.patch.object(silage, "_finalize_preseal_loss")
     effluent_loss_days = mocker.patch.object(
         silage, "calculate_days_of_effluent_loss_to_process", return_value=days_of_loss
     )
@@ -397,3 +398,74 @@ def test_clamp_preseal_fraction_bounds(raw_fraction: float, expected: float) -> 
     actually exercise the boundary — see spec §6's floor/ceiling requirement for new Preseal code.)
     """
     assert _clamp_preseal_fraction(raw_fraction) == expected
+
+
+@pytest.mark.unit
+def test_receive_crop_finalizes_predecessor_preseal(
+    mocker: MockerFixture, silage: Silage, harvested_crop: HarvestedCrop
+) -> None:
+    """Receiving a second crop finalizes the first crop's preseal loss using the storage-time gap."""
+    first_crop = harvested_crop
+    second_crop = replace(harvested_crop, storage_time=harvested_crop.storage_time + timedelta(days=2))
+    finalize = mocker.patch.object(silage, "_finalize_preseal_loss")
+
+    silage.receive_crop(first_crop, simulation_day=1)
+    silage.receive_crop(second_crop, simulation_day=3)
+
+    finalize.assert_called_once_with(first_crop, 2.0)
+
+
+@pytest.mark.unit
+def test_receive_crop_caps_exposure_at_three_days(
+    mocker: MockerFixture, silage: Silage, harvested_crop: HarvestedCrop
+) -> None:
+    """A storage-time gap longer than 3 days is capped at PRESEAL_EXPOSURE_CAP_DAYS."""
+    first_crop = harvested_crop
+    second_crop = replace(harvested_crop, storage_time=harvested_crop.storage_time + timedelta(days=10))
+    finalize = mocker.patch.object(silage, "_finalize_preseal_loss")
+
+    silage.receive_crop(first_crop, simulation_day=1)
+    silage.receive_crop(second_crop, simulation_day=11)
+
+    finalize.assert_called_once_with(first_crop, PRESEAL_EXPOSURE_CAP_DAYS)
+
+
+@pytest.mark.unit
+def test_process_degradations_finalizes_newest_crop_with_fallback(
+    mocker: MockerFixture, silage: Silage, harvested_crop: HarvestedCrop
+) -> None:
+    """A crop with no successor yet gets finalized with the fallback exposure on its first degradation pass."""
+    mock_weather = mocker.MagicMock(autospec=Weather)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
+    mock_time.simulation_day = 5
+    finalize = mocker.patch.object(silage, "_finalize_preseal_loss")
+    mocker.patch.object(silage, "calculate_days_of_effluent_loss_to_process", return_value=0)
+    mocker.patch("RUFAS.biophysical.feed_storage.storage.Storage.process_degradations")
+    silage.stored = [harvested_crop]
+
+    silage.process_degradations(mock_weather, mock_time)
+
+    finalize.assert_called_once_with(harvested_crop, PRESEAL_FALLBACK_EXPOSURE_DAYS)
+    # NOTE: _finalize_preseal_loss is mocked above, so its real body (which sets
+    # preseal_finalized = True) never runs — there is deliberately no assertion on
+    # harvested_crop.preseal_finalized here. That behavior is covered unmocked by Task 5's
+    # test_preseal_full_cycle_stays_within_bounds. (/challenge-plan finding #2, cycle 2 — removed a
+    # prior assertion here that could never pass against a mocked method.)
+
+
+@pytest.mark.unit
+def test_process_degradations_skips_already_finalized_crop(
+    mocker: MockerFixture, silage: Silage, harvested_crop: HarvestedCrop
+) -> None:
+    """A crop already finalized is not finalized again."""
+    harvested_crop.preseal_finalized = True
+    mock_weather = mocker.MagicMock(autospec=Weather)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
+    finalize = mocker.patch.object(silage, "_finalize_preseal_loss")
+    mocker.patch.object(silage, "calculate_days_of_effluent_loss_to_process", return_value=0)
+    mocker.patch("RUFAS.biophysical.feed_storage.storage.Storage.process_degradations")
+    silage.stored = [harvested_crop]
+
+    silage.process_degradations(mock_weather, mock_time)
+
+    finalize.assert_not_called()

@@ -175,10 +175,132 @@ class Silage(Storage):
         super().__init__(config)
         self.om = OutputManager()
 
+    def receive_crop(self, crop: HarvestedCrop, simulation_day: int) -> None:
+        """
+        Receives a harvested crop, then finalizes the Preseal loss of the previously-received crop
+        in this storage (if any and not already finalized), since its exposure time is now known.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The harvested crop being added to the storage.
+        simulation_day : int
+            The day of the simulation when the crop is being added.
+
+        Notes
+        -----
+        See design spec §2.1/§4: a crop's Preseal loss cannot be computed the instant it arrives,
+        because RuFaS does not yet know how long it will sit exposed. It is finalized here, the
+        first moment that becomes knowable — when the next crop arrives in the same storage.
+
+        """
+        predecessor = self.stored[-1] if self.stored else None
+        super().receive_crop(crop, simulation_day)
+
+        if predecessor is not None and not predecessor.preseal_finalized:
+            exposure_days = min(
+                PRESEAL_EXPOSURE_CAP_DAYS, max(0.0, (crop.storage_time - predecessor.storage_time).days)
+            )
+            self._finalize_preseal_loss(predecessor, exposure_days)
+
+    def _finalize_preseal_loss(self, crop: HarvestedCrop, exposure_days: float) -> None:
+        """
+        Computes and permanently applies this crop's Preseal dry-matter loss.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The crop whose Preseal loss is being finalized. Mutated in place.
+        exposure_days : float
+            The resolved exposure duration to use (already capped/floored by the caller).
+
+        Notes
+        -----
+        Applied exactly once per crop (matches ``Silostg.for``'s one-shot-per-plot semantics) — the
+        caller is responsible for only invoking this on crops with ``preseal_finalized is False``.
+        ``[FS.SIL.9]``.
+
+        """
+        preseal_result = calculate_preseal_loss(
+            crop, exposure_days, self._preseal_exposed_area_m2(), self._preseal_dry_matter_density_kg_per_m3()
+        )
+        dry_matter_loss_kg = crop.dry_matter_mass * preseal_result["dry_matter_loss_fraction"]
+
+        crop.ndf = self.recalculate_nutrient_percentage(crop.ndf, 0.0, dry_matter_loss_kg, crop.dry_matter_mass)
+        crop.crude_protein_percent = self.recalculate_nutrient_percentage(
+            crop.crude_protein_percent, 0.0, dry_matter_loss_kg, crop.dry_matter_mass
+        )
+        # Silostg.for:707-708: only the gas-lost fraction of DM leaves the crop as fresh mass; the
+        # water-retained fraction stays behind, so moisture_loss_kg is negative here (a moisture
+        # gain that offsets most of dry_matter_loss_kg). Corrected per /challenge-plan finding #1 —
+        # the prior formula had the wrong sign and was ~4x too large.
+        moisture_loss_kg = -dry_matter_loss_kg * PRESEAL_WATER_RETENTION_FRACTION
+        mass_values = self._calculate_mass_attributes_after_loss(crop, dry_matter_loss_kg, moisture_loss_kg)
+        crop.dry_matter_mass = mass_values["dry_matter_mass"]
+        crop.dry_matter_percentage = mass_values["dry_matter_percentage"]
+        crop.temperature = preseal_result["final_temperature"]
+        crop.preseal_finalized = True
+
+    def _preseal_exposed_area_m2(self) -> float:
+        """
+        Returns the exposed surface area used by the Preseal calculation for this storage class.
+
+        Returns
+        -------
+        float
+            Exposed area (m2).
+
+        Raises
+        ------
+        NotImplementedError
+            If called on a `Silage` subclass that has not defined its own exposed-area geometry.
+
+        """
+        self.om.add_error(
+            "Missing Preseal geometry error",
+            f"{self.__class__.__name__} has no _preseal_exposed_area_m2 implementation.",
+            info_map={"class": self.__class__.__name__, "function": self._preseal_exposed_area_m2.__name__},
+        )
+        raise NotImplementedError(f"{self.__class__.__name__} must implement _preseal_exposed_area_m2.")
+
+    def _preseal_dry_matter_density_kg_per_m3(self) -> float:
+        """
+        Returns the packed dry-matter density used by the Preseal calculation for this storage class.
+
+        Returns
+        -------
+        float
+            Packed dry-matter density (kg DM / m3).
+
+        Raises
+        ------
+        NotImplementedError
+            If called on a `Silage` subclass with no `dry_matter_density_kg_per_m3` config. Mirrors
+            `_preseal_exposed_area_m2`'s guard above — added per `/challenge-plan` finding #2: the
+            base `Silage` class has no `dry_matter_density_kg_per_m3` attribute (only Task 1's
+            `_RectangularSilage`/`Bag` subclasses do), so `_finalize_preseal_loss` cannot read it as
+            a plain attribute without a real mypy-strict error.
+
+        """
+        self.om.add_error(
+            "Missing Preseal density error",
+            f"{self.__class__.__name__} has no _preseal_dry_matter_density_kg_per_m3 implementation.",
+            info_map={
+                "class": self.__class__.__name__,
+                "function": self._preseal_dry_matter_density_kg_per_m3.__name__,
+            },
+        )
+        raise NotImplementedError(f"{self.__class__.__name__} must implement _preseal_dry_matter_density_kg_per_m3.")
+
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the losses of nutrients and mass to effluent in the ensiled crops, and calls the parent
         implementation of ``process_degradations`` to handle the fermentative loss.
+
+        Any crop that has not yet had its Preseal loss finalized (i.e. has not yet been superseded by a
+        newer crop via ``receive_crop``) is finalized here first, using the fallback exposure time
+        (``PRESEAL_FALLBACK_EXPOSURE_DAYS``) — this covers the newest crop in storage, whose real
+        exposure time cannot yet be known.
 
         Parameters
         ----------
@@ -198,6 +320,8 @@ class Silage(Storage):
         total_effluent_dry_matter_loss = 0.0
         total_effluent_moisture_loss = 0.0
         for crop in self.stored:
+            if not crop.preseal_finalized:
+                self._finalize_preseal_loss(crop, PRESEAL_FALLBACK_EXPOSURE_DAYS)
             effluent_loss_values = self._calculate_effluent_loss(crop, time)
             total_effluent_dry_matter_loss += effluent_loss_values["dry_matter_loss"]
             total_effluent_moisture_loss += effluent_loss_values["moisture_loss"]
@@ -492,6 +616,35 @@ class _RectangularSilage(Silage):
             config, "dry_matter_density_kg_per_m3", self.__class__.__name__
         )
 
+    def _preseal_exposed_area_m2(self) -> float:
+        """
+        Exposed surface area for the Preseal phase, accounting for a 50% filling grade.
+
+        Returns
+        -------
+        float
+            Exposed area (m2).
+
+        Notes
+        -----
+        ``Silostg.for:329``: ``EXPAR = SQRT(5) * DIM1 * DIM2``. Buckmaster et al. (1989), p.1144:
+        "Estimation of surface area is based on a 50% grade during filling."
+
+        """
+        return math.sqrt(5.0) * self.width_m * self.height_m
+
+    def _preseal_dry_matter_density_kg_per_m3(self) -> float:
+        """
+        Packed dry-matter density for the Preseal calculation.
+
+        Returns
+        -------
+        float
+            ``self.dry_matter_density_kg_per_m3``, set from config in ``__init__`` (Task 1).
+
+        """
+        return self.dry_matter_density_kg_per_m3
+
 
 class Bunker(_RectangularSilage):
     """Represents the Bunker type of Silage storage. Config fields: see `_RectangularSilage`."""
@@ -520,3 +673,33 @@ class Bag(Silage):
         self.dry_matter_density_kg_per_m3 = _require_positive_config_float(
             config, "dry_matter_density_kg_per_m3", self.__class__.__name__
         )
+
+    def _preseal_exposed_area_m2(self) -> float:
+        """
+        Exposed surface area for the Preseal phase — the bag's circular cross-section.
+
+        Returns
+        -------
+        float
+            Exposed area (m2).
+
+        Notes
+        -----
+        Bags reuse tower relationships per the IFSM Reference Manual (p.76-77); ``Silostg.for:310-313``'s
+        tower branch sets ``EXPAR = CSA = pi * RAD**2``.
+
+        """
+        radius_m = self.diameter_m / 2.0
+        return math.pi * radius_m**2
+
+    def _preseal_dry_matter_density_kg_per_m3(self) -> float:
+        """
+        Packed dry-matter density for the Preseal calculation.
+
+        Returns
+        -------
+        float
+            ``self.dry_matter_density_kg_per_m3``, set from config in ``__init__`` (Task 1).
+
+        """
+        return self.dry_matter_density_kg_per_m3
