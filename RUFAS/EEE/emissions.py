@@ -620,7 +620,7 @@ class EmissionsEstimator:
         -------
         dict[RUFAS_ID, dict[int, dict[str, float]]]
             A nested dictionary structured as
-            ``{feed_id: {simulation_day: {variable: value}}}``, where each record
+            ``{feed_id: {simulation_day: {emission_or_resource: value}}}``, where each record
             contains the per-unit nitrous oxide emissions, ammonia emissions,
             fertilizer N, fertilizer P, fertilizer K, and manure N for that day.
         """
@@ -635,7 +635,7 @@ class EmissionsEstimator:
         farmgrown_feed_inventory_by_feed_id = self._gather_farmgrown_feed_inventory_data(all_simulation_days)
 
         for field_name in harvest_yield_by_field:
-            daily_values_by_variable = self._get_daily_emission_and_resource_values_for_field(
+            daily_emission_and_resource_values = self._get_daily_emission_and_resource_values_for_field(
                 emission_data, resource_data, field_name
             )
             harvest_dates = sorted(list(harvest_yield_by_field[field_name].keys()))
@@ -660,13 +660,14 @@ class EmissionsEstimator:
                     and last_harvest_operation == "harvest_kill"
                 ) or feed_id not in total_farmgrown_feed_emission_and_resource_by_feed_id:
                     total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = {
-                        variable: 0.0 for variable in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.keys()
+                        emission_or_resource: 0.0
+                        for emission_or_resource in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.keys()
                     }
-                for variable, daily_values in daily_values_by_variable.items():
-                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][variable] += sum(
+                for emission_or_resource, daily_values in daily_emission_and_resource_values.items():
+                    total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][emission_or_resource] += sum(
                         [
-                            value
-                            for simulation_day, value in daily_values.items()
+                            daily_value
+                            for simulation_day, daily_value in daily_values.items()
                             if last_harvest_date < simulation_day <= harvest_date
                         ],
                         start=0.0,
@@ -686,7 +687,8 @@ class EmissionsEstimator:
                 total_emission_and_resource = total_farmgrown_feed_emission_and_resource_by_feed_id[feed_id]
                 for simulation_day in range(harvest_date, next_harvest_date_for_feed_id + 1):
                     daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][simulation_day] = {
-                        variable: total / total_dry_yield for variable, total in total_emission_and_resource.items()
+                        emission_or_resource: total / total_dry_yield
+                        for emission_or_resource, total in total_emission_and_resource.items()
                     }
 
                 last_harvest_date = harvest_date
@@ -701,7 +703,7 @@ class EmissionsEstimator:
             ]
             for remaining_day in remaining_days:
                 daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id][remaining_day] = {
-                    variable: 0.0 for variable in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.keys()
+                    emission_or_resource: 0.0 for emission_or_resource in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.keys()
                 }
             daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id] = dict(
                 sorted(daily_farmgrown_feed_emission_and_resource_by_feed_id[feed_id].items())
@@ -715,8 +717,7 @@ class EmissionsEstimator:
         field_name: str,
     ) -> dict[str, dict[int, float]]:
         """
-        Collects a field's daily emission and resource values for each tracked
-        emission and resource variable.
+        Collects a field's daily emission and resource values.
 
         Parameters
         ----------
@@ -732,10 +733,10 @@ class EmissionsEstimator:
         Returns
         -------
         dict[str, dict[int, float]]
-            A nested dictionary structured as ``{variable: {simulation_day: value}}``
-            for each variable in ``FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES``.
-            Variables whose application type has no data for the field map to empty
-            dictionaries.
+            A nested dictionary structured as ``{emission_or_resource: {simulation_day: value}}``
+            for each emission and resource in ``FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES``.
+            Emissions and resources whose application type (fertilizer or manure) has no data for
+            the field map to empty dictionaries.
         """
         fertilizer_applications = resource_data.get("fertilizer_applications", {}).get(field_name, {})
         manure_applications = resource_data.get("manure_applications", {}).get(field_name, {})
@@ -868,7 +869,7 @@ class EmissionsEstimator:
         ----------
         daily_farmgrown_feed_emissions_and_resources : dict[RUFAS_ID, dict[int, dict[str, float]]]
             Per-unit daily emissions and resource values for each farmgrown feed,
-            keyed by feed ID, simulation day, and variable name.
+            keyed by feed ID, simulation day, and emission or resource name.
         feed_deductions_data : dict[RUFAS_ID, dict[int, float]]
             Daily feed deduction amounts for each farmgrown feed, keyed by feed ID
             and simulation day.
@@ -879,7 +880,7 @@ class EmissionsEstimator:
         -------
         dict[RUFAS_ID, dict[int, dict[str, float]]]
             A nested dictionary structured as
-            ``{feed_id: {simulation_day: {variable: value}}}``, where each record
+            ``{feed_id: {simulation_day: {emission_or_resource: value}}}``, where each record
             contains the total nitrous oxide emissions, ammonia emissions,
             fertilizer N, fertilizer P, fertilizer K, and manure N attributable
             to the feed consumed on that day, (kg/day).
@@ -895,7 +896,8 @@ class EmissionsEstimator:
                 feed_deduction = feed_deductions.get(simulation_day, 0.0)
                 data_for_feed_id_for_day = daily_farmgrown_feed_emissions_and_resources[feed_id][simulation_day]
                 daily_farmgrown_feed_fed_emissions_and_resources[feed_id][simulation_day] = {
-                    variable: value * feed_deduction for variable, value in data_for_feed_id_for_day.items()
+                    emission_or_resource: daily_value * feed_deduction
+                    for emission_or_resource, daily_value in data_for_feed_id_for_day.items()
                 }
         return daily_farmgrown_feed_fed_emissions_and_resources
 
@@ -906,7 +908,7 @@ class EmissionsEstimator:
         """
         Reports the emissions and resources for daily farmgrown feeds fed to the animals.
 
-        Each tracked variable is reported as a daily output variable named
+        Each tracked emission and resource is reported as a daily output variable named
         ``"<prefix>_<feed_id>"``, where the prefixes are defined in
         ``FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES``.
 
@@ -914,17 +916,17 @@ class EmissionsEstimator:
         ----------
         daily_farmgrown_feed_fed_emissions_and_resources : dict[RUFAS_ID, dict[int, dict[str, float]]]
             The daily emissions and resources attributable to the farmgrown feed fed to animals, keyed by feed ID,
-            simulation day, and variable name.
+            simulation day, and emission or resource name.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._report_daily_farmgrown_feed_fed_emissions_and_resources.__name__,
         }
         for feed_id, daily_data_for_feed_id in daily_farmgrown_feed_fed_emissions_and_resources.items():
-            for variable, output_name_prefix in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.items():
-                variable_outputs = [
+            for emission_or_resource, output_name_prefix in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.items():
+                emission_or_resource_outputs = [
                     (
-                        {f"{output_name_prefix}_{feed_id}": data_for_day[variable]},
+                        {f"{output_name_prefix}_{feed_id}": data_for_day[emission_or_resource]},
                         {
                             **info_map,
                             "units": MeasurementUnits.KILOGRAMS,
@@ -934,7 +936,7 @@ class EmissionsEstimator:
                     )
                     for simulation_day, data_for_day in daily_data_for_feed_id.items()
                 ]
-                self.om.add_variable_bulk(variable_outputs, first_info_map_only=False)
+                self.om.add_variable_bulk(emission_or_resource_outputs, first_info_map_only=False)
 
     def _calculate_and_report_lca_emissions(
         self, farm_grown_feeds_fed_to_animals: list[RUFAS_ID], feed_deductions_data: dict[RUFAS_ID, dict[int, float]]
