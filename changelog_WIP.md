@@ -120,3 +120,5 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3237](https://github.com/RuminantFarmSystems/RuFaS/pull/3237) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Extracts repetitive logic from the farmgrown feed emissions calculation and reporting functions.
 - [3223](https://github.com/RuminantFarmSystems/RuFaS/pull/3223) - [minor change] [PostProcessing] [OutputManager] [NoInputChange] [NoOutputChange] Establishes new overhauled version of OutputManager and the subclasses it oversees.
 - [3235](https://github.com/RuminantFarmSystems/RuFaS/pull/3235) - [minor change] [Dependabot] [NoInputChange] [NoOutputChange] Updates file-target of dependabot-change PRs for tagging dev-team members for review.
+- [3256](https://github.com/RuminantFarmSystems/RuFaS/pull/3256) - [minor change] [Branch Alignment] [NoInputChange] [NoOutputChange] Aligning `dev` branch with bug-fixing code from PR 3214 that was merged into `test`.
+- [3260](https://github.com/RuminantFarmSystems/RuFaS/pull/3260) - [minor change] [OutputManager] [NoInputChange] [NoOutputChange] Removes duplicative `report` naming mechanism in `OutputManager`.
