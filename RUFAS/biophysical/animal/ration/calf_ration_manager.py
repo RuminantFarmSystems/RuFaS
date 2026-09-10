@@ -324,5 +324,6 @@ class CalfRationManager:
         for key in individual_calf_rations[0]:
             ration_per_animal[key] = ration_per_animal[key] / len(individual_calf_rations)
         ration_per_animal["status"] = "Optimal"
+        # TODO investigate what to set objective, 4.5 was from old code
         ration_per_animal["objective"] = 4.5
         return ration_per_animal
