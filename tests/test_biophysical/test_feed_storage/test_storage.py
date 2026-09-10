@@ -650,3 +650,58 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
         mocker.call(mock_crop.ash, storage.ash_loss_coefficient, 50.0, 300.0),
     ]
     mock_recalc.assert_has_calls(expected_calls)
+
+
+@pytest.fixture
+def sample_initial_contents() -> dict[str, float]:
+    """Initial contents block as it appears in a storage configuration."""
+    return {
+        "dry_matter_mass": 200000.0,
+        "dry_matter_percentage": 35.0,
+        "dry_matter_digestibility": 40.0,
+        "crude_protein_percent": 7.7,
+        "non_protein_nitrogen": 4.6,
+        "starch": 31.0,
+        "adf": 24.0,
+        "ndf": 40.9,
+        "lignin": 3.1,
+        "sugar": 1.5,
+        "ash": 3.8,
+    }
+
+
+def test_stock_initial_contents(storage: Storage, sample_initial_contents: dict[str, float]) -> None:
+    """Tests that stocked initial contents become a stored crop with the stated mass and composition."""
+    start_date = date(2013, 1, 1)
+
+    storage.stock_initial_contents(sample_initial_contents, start_date, simulation_day=0)
+
+    assert len(storage.stored) == 1
+    crop = storage.stored[0]
+    assert crop.config_name == "corn_silage"
+    assert crop.field_name == "Test Field"
+    assert crop.harvest_time == start_date
+    assert crop.storage_time == start_date
+    assert crop.dry_matter_mass == sample_initial_contents["dry_matter_mass"]
+    assert crop.dry_matter_percentage == sample_initial_contents["dry_matter_percentage"]
+    assert crop.dry_matter_digestibility == sample_initial_contents["dry_matter_digestibility"]
+    assert crop.ash == sample_initial_contents["ash"]
+
+
+def test_stock_initial_contents_applies_arrival_losses(sample_initial_contents: dict[str, float]) -> None:
+    """Tests that initial contents of a grain crop receive the same arrival loss as a harvested grain crop."""
+    storage = Storage(
+        storage_config={
+            "name": "Test Grain Storage",
+            "field_names": ["Test Field"],
+            "crop_name": "corn_grain",
+            "rufas_id": 1,
+            "initial_storage_dry_matter": 0.86,
+            "capacity": 1_000_000.0,
+        }
+    )
+
+    storage.stock_initial_contents(sample_initial_contents, date(2013, 1, 1), simulation_day=0)
+
+    expected_dry_matter_mass = sample_initial_contents["dry_matter_mass"] * (1 - 0.01)
+    assert storage.stored[0].dry_matter_mass == pytest.approx(expected_dry_matter_mass)
