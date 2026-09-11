@@ -68,44 +68,44 @@ class ResiduePartition:
 
         """
         layer = self.data.soil_layers[0]
-        layer.plant_metabolic_active_carbon_usage = self._determine_plant_metabolic_active_carbon_usage(
+        layer.residue_metabolic_active_carbon_usage = self._determine_residue_metabolic_active_carbon_usage(
             layer.decomposition_moisture_effect,
             layer.decomposition_temperature_effect,
             layer.metabolic_litter_amount,
         )
 
-        layer.metabolic_litter_amount = self._determine_plant_metabolic_carbon_amount(
+        layer.metabolic_litter_amount = self._determine_residue_metabolic_carbon_amount(
             layer.metabolic_litter_amount,
             layer.plant_residue_metabolic_fraction,
             layer.plant_dry_matter_residue_amount,
-            layer.plant_metabolic_active_carbon_usage,
-            layer.plant_metabolic_to_soil_carbon_amount,
+            layer.residue_metabolic_active_carbon_usage,
+            layer.residue_metabolic_to_soil_carbon_amount,
         )
 
-        layer.plant_structural_to_slow_or_active_rate = self._determine_plant_structural_to_slow_or_active_rate(
+        layer.residue_structural_to_slow_or_active_rate = self._determine_residue_structural_to_slow_or_active_rate(
             self.data.plant_residue_metabolic_fraction
         )
 
-        layer.plant_structural_active_carbon_usage = self._determine_plant_structural_to_slow_active_carbon_amount(
-            layer.plant_structural_to_slow_or_active_rate,
+        layer.residue_structural_active_carbon_usage = self._determine_residue_structural_to_slow_active_carbon_amount(
+            layer.residue_structural_to_slow_or_active_rate,
             layer.decomposition_moisture_effect,
             layer.decomposition_temperature_effect,
             layer.structural_litter_amount,
         )
 
-        layer.plant_structural_slow_carbon_usage = self._determine_plant_structural_to_slow_active_carbon_amount(
-            layer.plant_structural_to_slow_or_active_rate,
+        layer.residue_structural_slow_carbon_usage = self._determine_residue_structural_to_slow_active_carbon_amount(
+            layer.residue_structural_to_slow_or_active_rate,
             layer.decomposition_moisture_effect,
             layer.decomposition_temperature_effect,
             layer.structural_litter_amount,
         )
 
-        layer.structural_litter_amount = self._determine_plant_structural_carbon_amount(
+        layer.structural_litter_amount = self._determine_residue_structural_carbon_amount(
             layer.plant_dry_matter_residue_amount,
             layer.plant_residue_metabolic_fraction,
             layer.structural_carbon_transfer_amount,
-            layer.plant_structural_active_carbon_usage,
-            layer.plant_structural_slow_carbon_usage,
+            layer.residue_structural_active_carbon_usage,
+            layer.residue_structural_slow_carbon_usage,
             layer.structural_litter_amount,
         )
 
@@ -144,7 +144,7 @@ class ResiduePartition:
 
             layer.metabolic_litter_amount = self._determine_soil_metabolic_carbon_amount(
                 layer.metabolic_litter_amount,
-                layer.plant_metabolic_to_soil_carbon_amount,
+                layer.residue_metabolic_to_soil_carbon_amount,
                 0.0,
                 layer.soil_residue_metabolic_fraction,
                 layer.soil_metabolic_active_carbon_usage,
@@ -173,6 +173,58 @@ class ResiduePartition:
                 layer.structural_litter_amount,
             )
 
+    def partition_manure_residue(self) -> None:
+        """
+        Partitions the manure carbon residue pool of each soil layer into the metabolic and structural litter
+        pools.
+
+        This method is the manure analog of ``_add_litter_to_pools`` and should be called daily (by the carbon
+        cycling routine) so manure carbon added by manure applications enters the litter pools, where the
+        existing decomposition framework routes the metabolic fraction to the active carbon pool and the
+        structural fraction to the slow carbon pool.
+
+        The fraction of the manure carbon residue that is metabolic is determined from the lignin to nitrogen
+        ratio of the applied manure, in the same way as for plant residue. The lignin and nitrogen accumulated
+        from manure applications since the previous partitioning define that ratio and are reset afterwards.
+
+        References
+        ----------
+        DayCent (Parton et al. 1987): above and below ground non-woody plant residues and organic animal
+        excreta are partitioned into structural and metabolic pools as a function of the lignin to N ratio in
+        the residue.
+
+        """
+        assert self.data.soil_layers is not None
+        for layer in self.data.soil_layers:
+            layer.manure_carbon_to_metabolic_amount = 0.0
+            layer.manure_carbon_to_structural_amount = 0.0
+
+        manure_carbon_residue = self.data.get_vectorized_layer_attribute("manure_carbon_residue")
+        if not any(manure_carbon_residue):
+            return
+
+        self.data.manure_lignin_nitrogen_ratio = self._determine_manure_lignin_nitrogen_ratio(
+            self.data.manure_residue_lignin, self.data.manure_residue_nitrogen
+        )
+        self.data.manure_residue_metabolic_fraction = self._determine_manure_residue_metabolic_fraction(
+            self.data.manure_lignin_nitrogen_ratio
+        )
+
+        for layer in self.data.soil_layers:
+            layer.manure_carbon_to_metabolic_amount = (
+                self.data.manure_residue_metabolic_fraction * layer.manure_carbon_residue
+            )
+            layer.manure_carbon_to_structural_amount = (
+                1 - self.data.manure_residue_metabolic_fraction
+            ) * layer.manure_carbon_residue
+            layer.metabolic_litter_amount += layer.manure_carbon_to_metabolic_amount
+            layer.structural_litter_amount += layer.manure_carbon_to_structural_amount
+            layer.manure_carbon_residue = 0.0
+        self._set_soil_structural_litter_decomposition_rate(self.data.manure_residue_metabolic_fraction)
+
+        self.data.manure_residue_lignin = 0.0
+        self.data.manure_residue_nitrogen = 0.0
+
     def _add_litter_to_pools(self) -> None:
         """
         Partitions residue between metabolic and structural pools in all layers of the soil profile.
@@ -184,15 +236,20 @@ class ResiduePartition:
                 layer.metabolic_litter_amount += self.data.plant_residue_metabolic_fraction * layer.plant_residue
                 layer.structural_litter_amount += (1 - self.data.plant_residue_metabolic_fraction) * layer.plant_residue
                 layer.plant_residue = 0.0
-            self._set_soil_structural_litter_decomposition_rate()
+            self._set_soil_structural_litter_decomposition_rate(self.data.plant_residue_metabolic_fraction)
 
-    def _set_soil_structural_litter_decomposition_rate(self) -> None:
+    def _set_soil_structural_litter_decomposition_rate(self, residue_metabolic_fraction: float) -> None:
         """
         Sets the soil structural litter decomposition rate using the same methodology as the
-        ``_determine_plant_structural_to_slow_or_active_rate``.
+        ``_determine_residue_structural_to_slow_or_active_rate``.
+
+        Parameters
+        ----------
+        residue_metabolic_fraction : float
+            Metabolic fraction of the residue most recently added to the litter pools (unitless).
 
         """
-        structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - self.data.plant_residue_metabolic_fraction)
+        structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - residue_metabolic_fraction)
         rates = [structural_litter_decomposition_rate] * len(self.data.soil_layers)
         self.data.set_vectorized_layer_attribute("soil_structural_to_slow_or_active_rate", rates)
 
@@ -278,6 +335,61 @@ class ResiduePartition:
             )
 
     @staticmethod
+    def _determine_manure_lignin_nitrogen_ratio(manure_residue_lignin: float, manure_residue_nitrogen: float) -> float:
+        """
+        This method calculates the manure lignin to nitrogen ratio of applied manure.
+
+        Parameters
+        ----------
+        manure_residue_lignin : float
+            Lignin in the applied manure awaiting partitioning (kg/ha).
+        manure_residue_nitrogen : float
+            Nitrogen in the applied manure awaiting partitioning (kg/ha).
+
+        Returns
+        -------
+        float
+            Manure lignin to nitrogen ratio (unitless). Zero when the applied manure contains no nitrogen.
+
+        Notes
+        -----
+        Follows the same formulation as ``_determine_plant_lignin_nitrogen_fraction``, where the residue lignin
+        composition is divided by 100 before being divided by the residue nitrogen fraction. Because both the
+        lignin and nitrogen fractions share the applied manure dry matter as their basis, the ratio reduces to
+        the lignin mass divided by 100 times the nitrogen mass.
+
+        """
+        if manure_residue_nitrogen <= 0.0:
+            return 0.0
+        return (manure_residue_lignin / 100) / manure_residue_nitrogen
+
+    @staticmethod
+    def _determine_manure_residue_metabolic_fraction(
+        manure_lignin_nitrogen_ratio: float,
+    ) -> float:
+        """
+        This method calculates the fraction of manure carbon residue that is metabolic.
+
+        Parameters
+        ----------
+        manure_lignin_nitrogen_ratio : float
+            Manure lignin to nitrogen ratio (unitless).
+
+        Returns
+        -------
+        float
+            Manure carbon residue fraction that is metabolic, bounded below at zero (unitless).
+
+        Notes
+        -----
+        Uses the same relationship as ``_determine_plant_residue_metabolic_fraction``, following the DayCent
+        treatment of organic animal excreta, which partitions it into structural and metabolic pools as a
+        function of the lignin to N ratio in the same way as non-woody plant residues.
+
+        """
+        return max(0.0, 0.85 - 0.18 * manure_lignin_nitrogen_ratio)
+
+    @staticmethod
     def _determine_plant_residue_metabolic_fraction(
         plant_lignin_nitrogen_ratio: float,
     ) -> float:
@@ -303,54 +415,54 @@ class ResiduePartition:
         return 0.85 - 0.18 * plant_lignin_nitrogen_ratio
 
     @staticmethod
-    def _determine_plant_metabolic_carbon_amount(
-        plant_metabolic_carbon_amount: float,
+    def _determine_residue_metabolic_carbon_amount(
+        residue_metabolic_carbon_amount: float,
         plant_residue_metabolic_fraction: float,
         plant_dry_matter_residue_amount: float,
-        plant_metabolic_active_carbon_usage: float,
-        plant_metabolic_to_soil_carbon_amount: float,
+        residue_metabolic_active_carbon_usage: float,
+        residue_metabolic_to_soil_carbon_amount: float,
     ) -> float:
         """
-        This method calculates the updated plant metabolic carbon amount after adding the metabolic carbon
+        This method calculates the updated residue metabolic carbon amount after adding the metabolic carbon
         in dry matter at harvest and reduced by the amount that's decomposed and incorporated.
 
         Parameters
         ----------
-        plant_metabolic_carbon_amount: float
-            Plant metabolic carbon amount (kg/ha).
+        residue_metabolic_carbon_amount: float
+            Residue metabolic carbon amount (kg/ha).
         plant_residue_metabolic_fraction: float
             Fraction of plant residue that is metabolic (unitless).
         plant_dry_matter_residue_amount: float
             Amount of dry matter residue at harvest (kg/ha).
-        plant_metabolic_active_carbon_usage: float
-            Plant metabolic carbon decomposed into active carbon (kg/ha).
-        plant_metabolic_to_soil_carbon_amount: float
+        residue_metabolic_active_carbon_usage: float
+            Residue metabolic carbon decomposed into active carbon (kg/ha).
+        residue_metabolic_to_soil_carbon_amount: float
             Metabolic carbon incorporated into soil during tillage (kg/ha).
 
         Returns
         -------
         float
-            Updated plant metabolic carbon amount (hg/ha).
+            Updated residue metabolic carbon amount (hg/ha).
 
         References
         ----------
         pseudocode_soil S.6.B.I.4, S.6.B.I.7
 
         """
-        plant_metabolic_carbon_amount += plant_dry_matter_residue_amount * plant_residue_metabolic_fraction - (
-            plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount
+        residue_metabolic_carbon_amount += plant_dry_matter_residue_amount * plant_residue_metabolic_fraction - (
+            residue_metabolic_active_carbon_usage + residue_metabolic_to_soil_carbon_amount
         )
-        return plant_metabolic_carbon_amount
+        return residue_metabolic_carbon_amount
 
     @staticmethod
-    def _determine_plant_metabolic_active_carbon_usage(
+    def _determine_residue_metabolic_active_carbon_usage(
         decomposition_moisture_effect: float,
         decomposition_temperature_effect: float,
-        plant_metabolic_carbon_amount: float,
-        plant_metabolic_active_carbon_rate=0.28,
+        residue_metabolic_carbon_amount: float,
+        residue_metabolic_active_carbon_rate=0.28,
     ) -> float:
         """
-        Calculates the amount of plant metabolic carbon decomposed to active carbon (kg/ha).
+        Calculates the amount of residue metabolic carbon decomposed to active carbon (kg/ha).
 
         Parameters
         ----------
@@ -358,9 +470,9 @@ class ResiduePartition:
             Moisture effect on decomposition factor (unitless).
         decomposition_temperature_effect: float
             Temperature effect on decomposition factor (unitless).
-        plant_metabolic_carbon_amount: float
-            Plant metabolic carbon amount (kg/ha).
-        plant_metabolic_active_carbon_rate: float default = 0.28 (Parton et al. 1987)
+        residue_metabolic_carbon_amount: float
+            Residue metabolic carbon amount (kg/ha).
+        residue_metabolic_active_carbon_rate: float default = 0.28 (Parton et al. 1987)
             Rate of decomposition from metabolic to active carbon (unitless).
 
         Returns
@@ -376,12 +488,12 @@ class ResiduePartition:
         return (
             decomposition_moisture_effect
             * decomposition_temperature_effect
-            * plant_metabolic_carbon_amount
-            * plant_metabolic_active_carbon_rate
+            * residue_metabolic_carbon_amount
+            * residue_metabolic_active_carbon_rate
         )
 
     @staticmethod
-    def _determine_plant_structural_to_slow_or_active_rate(
+    def _determine_residue_structural_to_slow_or_active_rate(
         plant_residue_metabolic_fraction: float, structural_decomposition_factor=0.076
     ) -> float:
         """
@@ -411,30 +523,30 @@ class ResiduePartition:
         return structural_decomposition_factor * math.exp(-3) * (1 - plant_residue_metabolic_fraction)
 
     @staticmethod
-    def _determine_plant_structural_to_slow_active_carbon_amount(
-        plant_structural_to_slow_or_active_rate: float,
+    def _determine_residue_structural_to_slow_active_carbon_amount(
+        residue_structural_to_slow_or_active_rate: float,
         decomposition_moisture_effect: float,
         decomposition_temperature_effect: float,
-        plant_structural_carbon_amount: float,
+        residue_structural_carbon_amount: float,
     ) -> float:
         """
-        This method determines the amount of plant structural carbon decomposed into slow or active carbon.
+        This method determines the amount of residue structural carbon decomposed into slow or active carbon.
 
         Parameters
         ----------
-        plant_structural_to_slow_or_active_rate: float
+        residue_structural_to_slow_or_active_rate: float
             Rate at which above ground structural carbon decomposes into slow or active carbon (unitless).
         decomposition_moisture_effect: float
             Moisture effect on decomposition factor (unitless).
         decomposition_temperature_effect: float
             Temperature effect on decomposition factor (unitless).
-        plant_structural_carbon_amount: float
-            Plant structural carbon amount (kg/ha).
+        residue_structural_carbon_amount: float
+            Residue structural carbon amount (kg/ha).
 
         Returns
         -------
         float
-            Amount of plant structural carbon decomposed into slow or active carbon (kg/ha).
+            Amount of residue structural carbon decomposed into slow or active carbon (kg/ha).
 
         References
         ----------
@@ -442,23 +554,23 @@ class ResiduePartition:
 
         """
         return (
-            plant_structural_to_slow_or_active_rate
+            residue_structural_to_slow_or_active_rate
             * decomposition_moisture_effect
             * decomposition_temperature_effect
-            * plant_structural_carbon_amount
+            * residue_structural_carbon_amount
         )
 
     @staticmethod
     def _determine_structural_carbon_transfer_amount(
-        plant_structural_carbon_amount: float, tillage_fraction: float
+        residue_structural_carbon_amount: float, tillage_fraction: float
     ) -> float:
         """
         Determines the amount of transfer of plant structural to soil structural carbon during tillage.
 
         Parameters
         ----------
-        plant_structural_carbon_amount: float
-            Amount of plant structural carbon (kg/ha).
+        residue_structural_carbon_amount: float
+            Amount of residue structural carbon (kg/ha).
         tillage_fraction: float
             Fraction of metabolic carbon incorporated into soil during tillage (unitless).
 
@@ -472,19 +584,19 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.11
 
         """
-        return plant_structural_carbon_amount * tillage_fraction
+        return residue_structural_carbon_amount * tillage_fraction
 
     @staticmethod
-    def _determine_plant_structural_carbon_amount(
+    def _determine_residue_structural_carbon_amount(
         plant_dry_matter_residue_amount: float,
         plant_residue_metabolic_fraction: float,
         structural_carbon_transfer_amount: float,
-        plant_structural_to_active_carbon_amount: float,
-        plant_structural_to_slow_carbon_amount: float,
-        plant_structural_carbon_amount: float,
+        residue_structural_to_active_carbon_amount: float,
+        residue_structural_to_slow_carbon_amount: float,
+        residue_structural_carbon_amount: float,
     ) -> float:
         """
-        Calculates the updated plant structural carbon amount.
+        Calculates the updated residue structural carbon amount.
 
         Parameters
         ----------
@@ -494,17 +606,17 @@ class ResiduePartition:
             Fraction of plant residue that is metabolic (unitless).
         structural_carbon_transfer_amount: float
             The amount of transfer of structural carbon during tillage (kg/ha).
-        plant_structural_to_active_carbon_amount: float
-            Amount of plant structural carbon decomposed into slow carbon (kg/ha).
-        plant_structural_to_slow_carbon_amount: float
-            Amount of plant structural carbon decomposed into active carbon (kg/ha).
-        plant_structural_carbon_amount: float
-            Plant structural carbon amount (kg/ha).
+        residue_structural_to_active_carbon_amount: float
+            Amount of residue structural carbon decomposed into slow carbon (kg/ha).
+        residue_structural_to_slow_carbon_amount: float
+            Amount of residue structural carbon decomposed into active carbon (kg/ha).
+        residue_structural_carbon_amount: float
+            Residue structural carbon amount (kg/ha).
 
         Returns
         -------
         float
-            Updated plant structural carbon amount (kg/ha).
+            Updated residue structural carbon amount (kg/ha).
 
         References
         ----------
@@ -512,11 +624,11 @@ class ResiduePartition:
 
         """
         updated_amount = (
-            plant_structural_carbon_amount
+            residue_structural_carbon_amount
             + plant_dry_matter_residue_amount * (1 - plant_residue_metabolic_fraction)
             - structural_carbon_transfer_amount
-            - plant_structural_to_active_carbon_amount
-            - plant_structural_to_slow_carbon_amount
+            - residue_structural_to_active_carbon_amount
+            - residue_structural_to_slow_carbon_amount
         )
 
         return updated_amount
@@ -665,7 +777,7 @@ class ResiduePartition:
     @staticmethod
     def _determine_soil_metabolic_carbon_amount(
         soil_metabolic_carbon_amount: float,
-        plant_metabolic_to_soil_carbon_amount: float,
+        residue_metabolic_to_soil_carbon_amount: float,
         root_biomass: float,
         soil_residue_metabolic_fraction: float,
         soil_metabolic_active_carbon_usage: float,
@@ -677,7 +789,7 @@ class ResiduePartition:
         ----------
         soil_metabolic_carbon_amount: float
             The amount of soil metabolic carbon (kg/ha).
-        plant_metabolic_to_soil_carbon_amount: float
+        residue_metabolic_to_soil_carbon_amount: float
             The amount of metabolic carbon incorporated into soil during tillage (kg/ha).
         root_biomass: float
             Root biomass (kg/ha).
@@ -698,7 +810,7 @@ class ResiduePartition:
         """
         result = (
             soil_metabolic_carbon_amount
-            + plant_metabolic_to_soil_carbon_amount
+            + residue_metabolic_to_soil_carbon_amount
             + (root_biomass * soil_residue_metabolic_fraction)
             - soil_metabolic_active_carbon_usage
         )
