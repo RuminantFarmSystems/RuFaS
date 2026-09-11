@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
@@ -9,8 +10,8 @@ from pytest_mock import MockerFixture
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler, MUST_CHANGE_VARIABLES_KEY, ResultPathType
 
 
-def write_must_change_file(path: Path, contents: Any) -> None:
-    """Writes a must-change variables file used by the must-change tests."""
+def write_json_file(path: Path, contents: Any) -> None:
+    """Writes JSON, or the raw text of a string, to the given path."""
     with open(path, "w", encoding="utf-8") as file:
         if isinstance(contents, str):
             file.write(contents)
@@ -677,8 +678,8 @@ def test_load_must_change_variables(mocker: MockerFixture, tmp_path: Path) -> No
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     file_one = tmp_path / "must_change_one.json"
     file_two = tmp_path / "must_change_two.json"
-    write_must_change_file(file_one, {"description": "ignored", MUST_CHANGE_VARIABLES_KEY: ["A.x", "A.y"]})
-    write_must_change_file(file_two, {MUST_CHANGE_VARIABLES_KEY: ["A.y", "B.z"]})
+    write_json_file(file_one, {"description": "ignored", MUST_CHANGE_VARIABLES_KEY: ["A.x", "A.y"]})
+    write_json_file(file_two, {MUST_CHANGE_VARIABLES_KEY: ["A.y", "B.z"]})
     path_sets = [
         make_result_path_set(str(file_one)),
         make_result_path_set(str(file_one)),
@@ -725,7 +726,7 @@ def test_load_must_change_variables_invalid_contents(mocker: MockerFixture, tmp_
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     file_path = tmp_path / "must_change.json"
-    write_must_change_file(file_path, file_contents)
+    write_json_file(file_path, file_contents)
 
     with pytest.raises(ValueError):
         E2ETestResultsHandler._load_must_change_variables([make_result_path_set(str(file_path))])
@@ -848,7 +849,7 @@ def test_compare_actual_and_expected_results_with_must_change(
     with open(expected_results_path, "w", encoding="utf-8") as file:
         json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
     must_change_path = tmp_path / "must_change_variables.json"
-    write_must_change_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
+    write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
     path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1, str(must_change_path))
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
@@ -873,3 +874,131 @@ def test_compare_actual_and_expected_results_with_must_change(
         assert "must_change_violations" not in reported
     else:
         assert set(reported["must_change_violations"].keys()) == expect_violations
+
+
+def patch_output_manager(mocker: MockerFixture) -> tuple[MagicMock, MagicMock]:
+    """Stubs the OutputManager used by the handler and returns its add_log and add_error mocks."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    return add_log, add_error
+
+
+def write_expected_results_file(path: Path, expected_results: dict[str, Any]) -> None:
+    """Writes a valid expected results file used by the configuration validation tests."""
+    write_json_file(path, {"name": path.stem, "filters": ["A.*"], "expected_results": expected_results})
+
+
+def make_validation_path_sets(tmp_path: Path, must_change_names: list[str] | None = None) -> list[ResultPathType]:
+    """Writes valid expected results and must-change files under tmp_path and returns path sets referencing them."""
+    animal_path = tmp_path / "e2e_json_animal_filter.json"
+    feed_path = tmp_path / "e2e_json_feed_filter.json"
+    must_change_path = tmp_path / "must_change_variables.json"
+    write_expected_results_file(animal_path, {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}})
+    write_expected_results_file(feed_path, {"F.z": {"values": [3.0]}})
+    write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names or []})
+    return [
+        ResultPathType("Animal", str(animal_path), "animal_actual_", 0.1, str(must_change_path)),
+        ResultPathType("Feed", str(feed_path), "feed_actual_", 0.1, str(must_change_path)),
+    ]
+
+
+@pytest.mark.parametrize("use_conversion_table", [False, True])
+def test_validate_comparison_configuration(mocker: MockerFixture, tmp_path: Path, use_conversion_table: bool) -> None:
+    """Tests that a valid configuration passes, matching must-change names after any variable name conversion."""
+    add_log, add_error = patch_output_manager(mocker)
+    conversion_csv_path: str | None = None
+    flagged_feed_name = "F.z"
+    if use_conversion_table:
+        conversion_csv_path = str(tmp_path / "conversion.csv")
+        pd.DataFrame({"Original": ["F.z"], "New": ["F.renamed"]}).to_csv(conversion_csv_path, index=False)
+        flagged_feed_name = "F.renamed"
+    path_sets = make_validation_path_sets(tmp_path, ["A.y", flagged_feed_name])
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", conversion_csv_path)
+
+    add_error.assert_not_called()
+    assert add_log.call_count == 2
+
+
+def test_validate_comparison_configuration_unknown_must_change_variable(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a must-change name absent from every domain's expected results fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path, ["A.y", "A.typo"])
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match=r"\['A\.typo'\]"):
+        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", None)
+    add_error.assert_called_once()
+    assert "A.typo" in add_error.call_args.args[1]
+    assert "A.y" not in add_error.call_args.args[1]
+
+
+def test_validate_comparison_configuration_missing_must_change_file(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a missing must-change variables file fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    (tmp_path / "must_change_variables.json").unlink()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(FileNotFoundError):
+        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", None)
+    add_error.assert_called_once()
+
+
+def test_validate_comparison_configuration_missing_expected_results_file(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a missing expected results file fails the validation even when no variable is flagged."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    (tmp_path / "e2e_json_feed_filter.json").unlink()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(FileNotFoundError):
+        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", None)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "file_contents",
+    [
+        '// WARNING: This is an autogenerated file. Remove this line for valid JSON.\n{"expected_results": {}}',
+        ["A.x"],
+        {"name": "test", "filters": ["A.*"]},
+        {"expected_results": ["A.x"]},
+    ],
+)
+def test_validate_comparison_configuration_invalid_expected_results_file(
+    mocker: MockerFixture, tmp_path: Path, file_contents: Any
+) -> None:
+    """Tests that an unparsable or malformed expected results file fails the validation without flagged variables."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    write_json_file(tmp_path / "e2e_json_feed_filter.json", file_contents)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError):
+        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", None)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "conversion_table, expected_exception",
+    [
+        (None, FileNotFoundError),
+        (pd.DataFrame({"Original": ["F.z"], "Renamed": ["F.renamed"]}), KeyError),
+    ],
+)
+def test_validate_comparison_configuration_invalid_conversion_table(
+    mocker: MockerFixture, tmp_path: Path, conversion_table: pd.DataFrame | None, expected_exception: type[Exception]
+) -> None:
+    """Tests that a missing or malformed conversion table fails the validation."""
+    patch_output_manager(mocker)
+    conversion_csv_path = tmp_path / "conversion.csv"
+    if conversion_table is not None:
+        conversion_table.to_csv(conversion_csv_path, index=False)
+    path_sets = make_validation_path_sets(tmp_path)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(expected_exception):
+        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", str(conversion_csv_path))

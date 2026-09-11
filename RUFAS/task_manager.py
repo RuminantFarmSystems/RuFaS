@@ -919,13 +919,17 @@ class TaskManager:
         produce_graphics: bool,
         should_flush_im_pool: bool,
     ) -> None:
-        """Runs end-to-end testing routine."""
+        """Validates the comparison configuration, then runs the end-to-end testing routine."""
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager._handle_end_to_end_testing.__name__,
             "task_id": task_id,
             "produce_graphics": produce_graphics,
         }
+
+        E2ETestResultsHandler.validate_comparison_configuration(
+            args["output_prefix"], args["convert_variable_table_path"]
+        )
 
         output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
         TaskManager._handle_simulation_engine_run_tasks(
