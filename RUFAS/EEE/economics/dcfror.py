@@ -181,57 +181,29 @@ class DCFRORCalculator:
         # configured for the farm. The authoritative trigger is the presence of
         # digesters in the manure configuration -- not the naming of rows in the
         # capital-cost breakdown -- so the documented digester costing methods
-        # always influence project CAPEX/OPEX when a farm runs digesters
-        # (see issue #3063). Costs are aggregated across every configured
-        # digester rather than only the first one.
+        # always influence project CAPEX/OPEX when a farm runs digesters.
+        # Costs are aggregated across every configured digester.
         digester_config = self._get_digester_config()
         if digester_config:
             cow_count = float(self.im.get_data("animal.herd_information.cow_num"))
-            discount_rate = float(input_dict["loan_interest_rate"])
-            project_life_years = int(input_dict["project_term"])
-            crf = DigesterCostCalculator.capital_recovery_factor(discount_rate, project_life_years)
 
             digester_capex_total = 0.0
             annual_opex_total = 0.0
+
             for digester in digester_config:
-                hydraulic_retention_time_days = float(digester["hydraulic_retention_time"])
-                # NOTE: the ``cow_count * HRT`` volume proxy and the Equation-1
-                # capital-cost method below are carried over unchanged from the
-                # original implementation. The canonical CAPEX method and the
-                # true digester "volume" remain a maintainer decision (see the
-                # issue #3063 investigation); this fix only makes the existing
-                # costing reachable from real inputs and aggregates it.
-                digester_volume_proxy = max(1.0, cow_count * hydraulic_retention_time_days)
+                digester_system = DigesterCostCalculator.get_digester_system_name(digester)
+                digester_costs = DigesterCostCalculator.estimate_digester_costs(digester_system, cow_count)
 
-                annual_fixed_cost = DigesterCostCalculator.calculate_digester_capital_cost(
-                    animal_units=cow_count,
-                    digester_volume=digester_volume_proxy,
-                )
-                digester_capex = DigesterCostCalculator.calculate_digester_capex(annual_fixed_cost, crf)
-                # Equation-5 scaling factor (six-tenths rule) for installed cost
-                # adjusted by effective digester volume proxy.
-                digester_capex = DigesterCostCalculator.scale_installed_cost(
-                    base_cost=digester_capex,
-                    volume=digester_volume_proxy,
-                    base_volume=max(1.0, cow_count),
-                    install_factor=0.6,
-                )
-                digester_capex_total += digester_capex
-                annual_opex_total += DigesterCostCalculator.calculate_digester_operational_cost(
-                    True,
-                    animal_units=cow_count,
-                    farm_type_flag=1.0,
-                    below_ground_flag=1.0,
-                    concrete_flag=1.0,
-                    steel_flag=0.0,
-                )
+                digester_capex_total += float(digester_costs["capital_expenditure"])
 
-            # Subtract any placeholder digester line items already present in the
-            # capital-cost breakdown so the computed CAPEX is not double counted,
-            # then add the computed digester CAPEX on top of the remaining
-            # (non-digester) capital cost.
+                digester_operating_costs = digester_costs["operating_costs"]
+                annual_opex_total += sum(float(cost) for cost in digester_operating_costs.values())
+
+                if "rng" in digester_system.lower():
+                    annual_opex_total += DigesterCostCalculator.estimate_digester_trucking_cost(cow_count)
+
             prior_digester_capex = float(
-                sum(float(r.get("Cost", 0.0)) for r in cap_breakdown if "digester" in str(r.get("Item", "")).lower())
+                sum(float(row.get("Cost", 0.0)) for row in cap_breakdown if "digester" in str(row.get("Item", "")).lower())
             )
             base_cost = base_cost - prior_digester_capex + digester_capex_total
             operating_costs = operating_costs + annual_opex_total
