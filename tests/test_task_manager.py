@@ -569,15 +569,26 @@ def test_handle_end_to_end_testing(
         "json_output_directory": "json_path",
         "convert_variable_table_path": "compare_path",
         "output_prefix": "dummy_prefix",
+        "filters_directory": Path("filters"),
     }
+    validate_configuration = mocker.patch(
+        "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.validate_comparison_configuration"
+    )
     compare_outputs = mocker.patch(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results"
     )
     mock_input_manager = mocker.MagicMock()
     add_log = mocker.patch.object(mock_output_manager, "add_log")
+    call_order = mocker.MagicMock()
+    call_order.attach_mock(validate_configuration, "validate_configuration")
+    call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
     task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
+    validate_configuration.assert_called_once_with(
+        args["output_prefix"], args["convert_variable_table_path"], args["filters_directory"]
+    )
+    assert [name for name, _, _ in call_order.mock_calls] == ["validate_configuration", "sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
         args=args,
         input_manager=mock_input_manager,
@@ -593,6 +604,34 @@ def test_handle_end_to_end_testing(
     assert post_processing.call_count == 1
 
 
+def test_handle_end_to_end_testing_invalid_configuration(
+    mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
+) -> None:
+    """Test that an invalid comparison configuration stops end-to-end testing before the simulation runs."""
+    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
+    post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+    mocker.patch(
+        "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.validate_comparison_configuration",
+        side_effect=ValueError("invalid configuration"),
+    )
+    compare_outputs = mocker.patch(
+        "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results"
+    )
+    args = {
+        "json_output_directory": "json_path",
+        "convert_variable_table_path": None,
+        "output_prefix": "dummy_prefix",
+        "filters_directory": Path("filters"),
+    }
+
+    with pytest.raises(ValueError, match="invalid configuration"):
+        task_manager._handle_end_to_end_testing(args, mocker.MagicMock(), mock_output_manager, "test_task", True, True)
+
+    sim_engine_run_tasks.assert_not_called()
+    compare_outputs.assert_not_called()
+    post_processing.assert_not_called()
+
+
 def test_handle_update_e2e_test_results(
     mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
 ) -> None:
@@ -601,15 +640,21 @@ def test_handle_update_e2e_test_results(
     # Arrange
     sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
     update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
+    validate_configuration = mocker.patch.object(E2ETestResultsHandler, "validate_update_configuration")
     add_log = mocker.patch.object(mock_output_manager, "add_log")
+    call_order = mocker.MagicMock()
+    call_order.attach_mock(validate_configuration, "validate_configuration")
+    call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
     mock_input_manager = MagicMock()
-    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix"}
+    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix", "filters_directory": Path("filters")}
 
     # Act
     task_manager._handle_update_e2e_test_results(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     # Assert
+    validate_configuration.assert_called_once_with(args["output_prefix"], args["filters_directory"])
+    assert [name for name, _, _ in call_order.mock_calls] == ["validate_configuration", "sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
         args=args,
         input_manager=mock_input_manager,
@@ -632,6 +677,24 @@ def test_handle_update_e2e_test_results(
         "Completed generation of new set of end-to-end expected test results",
         {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
     )
+
+
+def test_handle_update_e2e_test_results_invalid_configuration(
+    mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
+) -> None:
+    """Test that an invalid update configuration stops the expected results update before the simulation runs."""
+    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
+    update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
+    mocker.patch.object(
+        E2ETestResultsHandler, "validate_update_configuration", side_effect=ValueError("invalid configuration")
+    )
+    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix", "filters_directory": Path("filters")}
+
+    with pytest.raises(ValueError, match="invalid configuration"):
+        task_manager._handle_update_e2e_test_results(args, MagicMock(), mock_output_manager, "test_task", True, True)
+
+    sim_engine_run_tasks.assert_not_called()
+    update_test_results.assert_not_called()
 
 
 def test_handle_post_processing_load_pool(
