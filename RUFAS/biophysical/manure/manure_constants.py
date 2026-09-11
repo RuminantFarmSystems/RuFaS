@@ -242,3 +242,39 @@ class ManureConstants:
 
     SLURRY_OUTDOOR_MINIMUM_TEMPERATURE: float = -20.0
     """The minimum temperature of manure stored in slurry storage outdoors (C)."""
+
+    # Manure carbon-related constants
+    VOLATILE_SOLIDS_CARBON_FRACTION: float = 0.45
+    """
+    Fraction of manure volatile solids that is organic carbon (unitless, [0, 1]).
+
+    Notes
+    -----
+    Used to estimate the organic carbon content of manure applied to fields from the volatile solids in
+    storage at the time of application (Peterson et al., 2024).
+
+    """
+
+    MINIMUM_MANURE_CARBON_TO_NITROGEN_RATIO: float = 4.24
+    """
+    Minimum allowable carbon to nitrogen ratio of manure applied to fields (kg carbon / kg nitrogen).
+
+    Notes
+    -----
+    Lower bound of the manure C:N ratio range reported by Appuhamy et al. (2014). The manure carbon applied
+    to a field is calculated from the applied manure nitrogen and the C:N ratio of the manure in storage,
+    clamped to this range.
+
+    """
+
+    MAXIMUM_MANURE_CARBON_TO_NITROGEN_RATIO: float = 19.6
+    """
+    Maximum allowable carbon to nitrogen ratio of manure applied to fields (kg carbon / kg nitrogen).
+
+    Notes
+    -----
+    Upper bound of the manure C:N ratio range reported by Appuhamy et al. (2014). The manure carbon applied
+    to a field is calculated from the applied manure nitrogen and the C:N ratio of the manure in storage,
+    clamped to this range.
+
+    """
