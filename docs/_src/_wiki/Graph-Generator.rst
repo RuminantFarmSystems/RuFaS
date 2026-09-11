@@ -10,7 +10,7 @@ graphical formats, making it an invaluable resource for data analysis
 and presentation. Its flexible nature allows for future expansion,
 ensuring it remains a versatile resource for users. The Graph Generator
 was initially introduced to the code base in
-https://github.com/RuminantFarmSystems/MASM/pull/779
+https://github.com/RuminantFarmSystems/RuFaS/pull/779
 
 .. figure:: /_static/GG_diagram.png
    :alt: RuFaS Overview - GG
@@ -96,7 +96,7 @@ configuring graph generation and include the following key information:
 - **Expand Data**: Graph filters support the same data expansion options
   that Report filters do: "expand_data", "fill_value",
   "use_fill_value_in_gaps" and "use_fill_value_at_end". Please refer to
-  the Report Generator wiki for an explanation of how these function.
+  the Report Generator documentation for an explanation of how these function.
   Graph filters support one additional option, "mask_values". This is a
   boolean flag which essentially removes ``nan`` values from data that
   is being graphed, resulting in much better looking graphs when gaps
@@ -107,7 +107,7 @@ configuring graph generation and include the following key information:
   is a boolean flag ``use_calendar_dates`` which is set to ``false`` by
   default. The user can also specify the format of the date along the
   x-axis using the ``date_format`` option (`see examples
-  below <https://github.com/RuminantFarmSystems/MASM/wiki/Graph-Generator#using-calendar-dates-on-x-axis>`__).
+  below <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Graph-Generator.html#using-calendar-dates-on-x-axis>`__).
 
 - **Specify Significant Digits of Graphed Data**: User can specify the
   number of significant digits to which the data being graphed is

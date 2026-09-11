@@ -3,7 +3,7 @@ Data Origins
 
 When variables are added to the Output Manager, they are required to
 have an `info
-map <https://github.com/RuminantFarmSystems/MASM/wiki/Output-Manager#info_maps>`__
+map <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Output-Manager.html#info-maps>`__
 which tracks the class and function that is sending the data to Output
 Manager. Each biophysical modules reports its data to a respective
 reporter class to ensure that data from each daily update is added to
