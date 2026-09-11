@@ -45,7 +45,13 @@ def test_compare_simulation_outputs_to_expected_outputs(
         ],
     )
     mocked_open = mocker.patch("builtins.open", mocker.mock_open(read_data="file contents"))
-    mocked_load = mocker.patch("json.load", side_effect=[{"a": 1}, {"expected_results": {"a": 1}}])
+    expected_results_file_content = {
+        "name": "e2e_test",
+        "filters": ["a"],
+        "expected_results_last_updated": "",
+        "expected_results": {"a": 1},
+    }
+    mocked_load = mocker.patch("json.load", side_effect=[{"a": 1}, expected_results_file_content])
     mocked_deepdiff = mocker.patch("RUFAS.e2e_test_results_handler.DeepDiff", return_value=diff)
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
@@ -847,7 +853,15 @@ def test_compare_actual_and_expected_results_with_must_change(
         json.dump(actual_results, file)
     expected_results_path = tmp_path / "e2e_json_test_filter.json"
     with open(expected_results_path, "w", encoding="utf-8") as file:
-        json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
+        json.dump(
+            {
+                "name": "test",
+                "filters": ["A.*"],
+                "expected_results_last_updated": "",
+                "expected_results": expected_results,
+            },
+            file,
+        )
     must_change_path = tmp_path / "must_change_variables.json"
     write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
     path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1, str(must_change_path))
@@ -876,6 +890,9 @@ def test_compare_actual_and_expected_results_with_must_change(
         assert set(reported["must_change_violations"].keys()) == expect_violations
 
 
+VALIDATION_OUTPUT_PREFIX = "dummy_prefix"
+
+
 def patch_output_manager(mocker: MockerFixture) -> tuple[MagicMock, MagicMock]:
     """Stubs the OutputManager used by the handler and returns its add_log and add_error mocks."""
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
@@ -885,8 +902,16 @@ def patch_output_manager(mocker: MockerFixture) -> tuple[MagicMock, MagicMock]:
 
 
 def write_expected_results_file(path: Path, expected_results: dict[str, Any]) -> None:
-    """Writes a valid expected results file used by the configuration validation tests."""
-    write_json_file(path, {"name": path.stem, "filters": ["A.*"], "expected_results": expected_results})
+    """Writes a valid expected results file, named after the file stem, for the configuration validation tests."""
+    write_json_file(
+        path,
+        {
+            "name": path.stem,
+            "filters": ["A.*"],
+            "expected_results_last_updated": "2026-09-11T00:00:00",
+            "expected_results": expected_results,
+        },
+    )
 
 
 def make_validation_path_sets(tmp_path: Path, must_change_names: list[str] | None = None) -> list[ResultPathType]:
@@ -898,8 +923,20 @@ def make_validation_path_sets(tmp_path: Path, must_change_names: list[str] | Non
     write_expected_results_file(feed_path, {"F.z": {"values": [3.0]}})
     write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names or []})
     return [
-        ResultPathType("Animal", str(animal_path), "animal_actual_", 0.1, str(must_change_path)),
-        ResultPathType("Feed", str(feed_path), "feed_actual_", 0.1, str(must_change_path)),
+        ResultPathType(
+            "Animal",
+            str(animal_path),
+            f"{VALIDATION_OUTPUT_PREFIX}_saved_variables_{animal_path.stem}_",
+            0.1,
+            str(must_change_path),
+        ),
+        ResultPathType(
+            "Feed",
+            str(feed_path),
+            f"{VALIDATION_OUTPUT_PREFIX}_saved_variables_{feed_path.stem}_",
+            0.1,
+            str(must_change_path),
+        ),
     ]
 
 
@@ -916,7 +953,7 @@ def test_validate_comparison_configuration(mocker: MockerFixture, tmp_path: Path
     path_sets = make_validation_path_sets(tmp_path, ["A.y", flagged_feed_name])
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
-    E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", conversion_csv_path)
+    E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, conversion_csv_path, tmp_path)
 
     add_error.assert_not_called()
     assert add_log.call_count == 2
@@ -929,7 +966,7 @@ def test_validate_comparison_configuration_unknown_must_change_variable(mocker: 
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
     with pytest.raises(ValueError, match=r"\['A\.typo'\]"):
-        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", None)
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path)
     add_error.assert_called_once()
     assert "A.typo" in add_error.call_args.args[1]
     assert "A.y" not in add_error.call_args.args[1]
@@ -943,7 +980,7 @@ def test_validate_comparison_configuration_missing_must_change_file(mocker: Mock
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
     with pytest.raises(FileNotFoundError):
-        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", None)
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path)
     add_error.assert_called_once()
 
 
@@ -955,7 +992,7 @@ def test_validate_comparison_configuration_missing_expected_results_file(mocker:
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
     with pytest.raises(FileNotFoundError):
-        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", None)
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path)
     add_error.assert_called_once()
 
 
@@ -964,8 +1001,14 @@ def test_validate_comparison_configuration_missing_expected_results_file(mocker:
     [
         '// WARNING: This is an autogenerated file. Remove this line for valid JSON.\n{"expected_results": {}}',
         ["A.x"],
-        {"name": "test", "filters": ["A.*"]},
-        {"expected_results": ["A.x"]},
+        {"name": "e2e_json_feed_filter", "filters": ["A.*"], "expected_results_last_updated": ""},
+        {"name": "e2e_json_feed_filter", "filters": ["A.*"], "expected_results": {}},
+        {
+            "name": "e2e_json_feed_filter",
+            "filters": ["A.*"],
+            "expected_results_last_updated": "",
+            "expected_results": ["A.x"],
+        },
     ],
 )
 def test_validate_comparison_configuration_invalid_expected_results_file(
@@ -978,8 +1021,46 @@ def test_validate_comparison_configuration_invalid_expected_results_file(
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
     with pytest.raises(ValueError):
-        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", None)
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path)
     add_error.assert_called_once()
+
+
+def test_validate_comparison_configuration_expected_results_outside_filters_directory(
+    mocker: MockerFixture, tmp_path: Path
+) -> None:
+    """Tests that an expected results file outside the task's filters directory fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    filters_directory = tmp_path / "filters"
+    filters_directory.mkdir()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="filters directory"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, filters_directory)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "actual_results_path",
+    [
+        "",
+        f"{VALIDATION_OUTPUT_PREFIX}_saved_variables_e2e_json_feeed_filter_",
+        "other_prefix_saved_variables_e2e_json_feed_filter_",
+    ],
+)
+def test_validate_comparison_configuration_actual_results_path_mismatch(
+    mocker: MockerFixture, tmp_path: Path, actual_results_path: str
+) -> None:
+    """Tests that an actual_results_path the run's output file names will not start with fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    path_sets[1] = path_sets[1]._replace(actual_results_path=actual_results_path)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="actual_results_path"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path)
+    add_error.assert_called_once()
+    assert "Feed" in add_error.call_args.args[0]
 
 
 @pytest.mark.parametrize(
@@ -1001,4 +1082,47 @@ def test_validate_comparison_configuration_invalid_conversion_table(
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
     with pytest.raises(expected_exception):
-        E2ETestResultsHandler.validate_comparison_configuration("dummy_prefix", str(conversion_csv_path))
+        E2ETestResultsHandler.validate_comparison_configuration(
+            VALIDATION_OUTPUT_PREFIX, str(conversion_csv_path), tmp_path
+        )
+
+
+def test_validate_update_configuration(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a valid update configuration passes without reading the must-change variables files."""
+    add_log, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    (tmp_path / "must_change_variables.json").unlink()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    E2ETestResultsHandler.validate_update_configuration(VALIDATION_OUTPUT_PREFIX, tmp_path)
+
+    add_error.assert_not_called()
+    assert add_log.call_count == 2
+
+
+@pytest.mark.parametrize(
+    "mistake, expected_exception",
+    [
+        ("missing_expected_results_file", FileNotFoundError),
+        ("expected_results_file_missing_keys", ValueError),
+        ("actual_results_path_mismatch", ValueError),
+    ],
+)
+def test_validate_update_configuration_failures(
+    mocker: MockerFixture, tmp_path: Path, mistake: str, expected_exception: type[Exception]
+) -> None:
+    """Tests that a result path set that the update could not resolve after the simulation fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    feed_path = tmp_path / "e2e_json_feed_filter.json"
+    if mistake == "missing_expected_results_file":
+        feed_path.unlink()
+    elif mistake == "expected_results_file_missing_keys":
+        write_json_file(feed_path, {"name": feed_path.stem, "expected_results": {}})
+    else:
+        path_sets[1] = path_sets[1]._replace(actual_results_path="freestall_e2e_saved_variables_e2e_feed_")
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(expected_exception):
+        E2ETestResultsHandler.validate_update_configuration(VALIDATION_OUTPUT_PREFIX, tmp_path)
+    add_error.assert_called_once()
