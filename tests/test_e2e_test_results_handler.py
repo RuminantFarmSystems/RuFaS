@@ -495,19 +495,18 @@ def test_filter_nested() -> None:
 
 
 @pytest.mark.parametrize(
-    "diff, should_update, matching_path, raise_exception",
+    "diff, matching_path, raise_exception",
     [
-        ({}, False, "output_dir/actual_results.json", None),
-        ({"diff": "some_differences"}, True, "output_dir/actual_results.json", None),
-        ({}, False, None, None),
-        ({}, False, "output_dir/actual_results.json", IOError("File read error")),
-        ({}, False, "output_dir/actual_results.json", json.JSONDecodeError("Invalid JSON", doc="", pos=0)),
+        ({}, "output_dir/actual_results.json", None),
+        ({"diff": "some_differences"}, "output_dir/actual_results.json", None),
+        ({}, None, None),
+        ({}, "output_dir/actual_results.json", IOError("File read error")),
+        ({}, "output_dir/actual_results.json", json.JSONDecodeError("Invalid JSON", doc="", pos=0)),
     ],
 )
 def test_update_expected_test_results(
     mocker: MockerFixture,
     diff: dict[str, str],
-    should_update: bool,
     matching_path: str | None,
     raise_exception: Exception | None,
 ) -> None:
@@ -516,7 +515,6 @@ def test_update_expected_test_results(
     output_dir = Path("output_dir")
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
-    add_warning = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_warning")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
 
     results_path = mocker.MagicMock()
@@ -564,11 +562,8 @@ def test_update_expected_test_results(
             mock_move.assert_called_once_with(Path(expected_backup_path), results_path.expected_results_path)
         else:
             assert add_error.call_count == 0
-            expected_log_count = 3 if should_update else 2
-            assert add_log.call_count == expected_log_count
+            assert add_log.call_count == 1
             mock_write_json.assert_called_once()
-            if diff:
-                add_warning.assert_called_once()
     else:
         assert add_error.call_count == 1
         assert add_log.call_count == 1
