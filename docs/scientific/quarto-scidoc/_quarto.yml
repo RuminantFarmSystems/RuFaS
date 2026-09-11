@@ -20,7 +20,7 @@ book:
     - qmd/feed_storage.qmd
     - qmd/economics.qmd
     - qmd/connections.qmd
-    - abbrevs.qmd
+    - qmd/abbrevs.qmd
     
 execute: 
   echo: false
