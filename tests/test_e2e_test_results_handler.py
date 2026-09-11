@@ -495,19 +495,18 @@ def test_filter_nested() -> None:
 
 
 @pytest.mark.parametrize(
-    "diff, should_update, matching_path, raise_exception",
+    "diff, matching_path, raise_exception",
     [
-        ({}, False, "output_dir/actual_results.json", None),
-        ({"diff": "some_differences"}, True, "output_dir/actual_results.json", None),
-        ({}, False, None, None),
-        ({}, False, "output_dir/actual_results.json", IOError("File read error")),
-        ({}, False, "output_dir/actual_results.json", json.JSONDecodeError("Invalid JSON", doc="", pos=0)),
+        ({}, "output_dir/actual_results.json", None),
+        ({"diff": "some_differences"}, "output_dir/actual_results.json", None),
+        ({}, None, None),
+        ({}, "output_dir/actual_results.json", IOError("File read error")),
+        ({}, "output_dir/actual_results.json", json.JSONDecodeError("Invalid JSON", doc="", pos=0)),
     ],
 )
 def test_update_expected_test_results(
     mocker: MockerFixture,
     diff: dict[str, str],
-    should_update: bool,
     matching_path: str | None,
     raise_exception: Exception | None,
 ) -> None:
