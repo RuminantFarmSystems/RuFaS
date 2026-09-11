@@ -23,18 +23,16 @@ class Mixing(Enum):
 
 BEDDED_PACK_MCF_TABLE: dict[Mixing, dict[tuple[float, float], float]] = {
     Mixing.MIXED: {
-        (-math.inf, 4.6): 0.5,
-        (4.6, 5.8): 0.5,
-        (5.8, 13.9): 1.0,
-        (13.9, 25.1): 1.0,
-        (25.1, math.inf): 1.5,
+        (-math.inf, 0): 0.5,
+        (0, 10): 0.5,
+        (10, 18): 1,
+        (18, math.inf): 1.5,
     },
     Mixing.UNMIXED: {
-        (-math.inf, 4.6): 21.0,
-        (4.6, 5.8): 26.0,
-        (5.8, 13.9): 37.0,
-        (13.9, 25.1): 41.0,
-        (25.1, math.inf): 74.0,
+        (-math.inf, 0): 14.0,
+        (0, 10): 21.0,
+        (10, 18): 37.0,
+        (18, math.inf): 73.0,
     },
 }
 
