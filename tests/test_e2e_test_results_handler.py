@@ -516,7 +516,6 @@ def test_update_expected_test_results(
     output_dir = Path("output_dir")
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
-    add_warning = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_warning")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
 
     results_path = mocker.MagicMock()
