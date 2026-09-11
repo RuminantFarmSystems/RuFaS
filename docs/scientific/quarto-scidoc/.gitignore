@@ -1,19 +1,16 @@
-# some quarto files
-/.quarto/
-**/*.quarto_ipynb
-site_libs/
-
-# rendered output (uncomment to exclude) - ignore local version, since rendered by GitHub Actions
-#_book/
+# ----------------------------------------------------
+# This .gitignore sub-file filters files that are
+# tracked by git anywhere within this folder
+# (docs/scientific/quarto-scidoc) and its subfolders
+# ----------------------------------------------------
 
 # raw LaTeX files
 *.tex
-animal_files
-example_structures_files
 
-# ipynb files and checkpoints for example structure file
-*.quarto_ipynb
-.ipynb_checkpoints/
+# ignore all intermediate index files except index.qmd and index.html
+index.*
+!index.qmd
+!index.html
 
 # ------------------------------------------------------------
 # Quarto generated build/cache/output directories
@@ -22,9 +19,13 @@ example_structures_files
 # Ignoring them does NOT affect HTML/PDF compilation.
 # ------------------------------------------------------------
 
-docs/scientific/quarto-test/output/
-docs/scientific/quarto-test/_book/
-docs/scientific/quarto-test/.quarto/
+# ignore quarto specific files
+/.quarto/
 
-docs/scientific/quarto-scidoc/_book/
-docs/scientific/quarto-scidoc/.quarto/
+# temporarily ignore the rendered output
+_book/
+
+# Intermediate jupyter notebook files
+*.quarto_ipynb*
+.ipynb_checkpoints/
+**/*.quarto_ipynb
