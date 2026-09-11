@@ -31,7 +31,7 @@ class Genetics:
 
     The standard deviations and correlations of the true breeding value, permanent environmental effect, and
     temporary environmental effect distributions are read from ``AnimalConfig``, where they are user inputs in
-    the ``herd_information`` section of the animal input that default to the CDCB national averages.
+    the ``genetics`` section of the animal input that default to the CDCB national averages.
 
     Attributes
     ----------

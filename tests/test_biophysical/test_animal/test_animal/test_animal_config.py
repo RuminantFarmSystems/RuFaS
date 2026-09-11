@@ -44,10 +44,9 @@ def reset_animal_config_state() -> Generator[None, None, None]:
         setattr(AnimalConfig, name, value)
 
 
-def _make_herd_information() -> dict[str, Any]:
-    """Builds the ``herd_information`` blob that ``AnimalConfig.initialize_animal_config()`` reads."""
+def _make_genetics() -> dict[str, Any]:
+    """Builds the ``genetics`` blob that ``AnimalConfig.initialize_animal_config()`` reads."""
     return {
-        "simulate_genetics": False,
         "tbv_fat_std": 25.8,
         "tbv_protein_std": 13.4,
         "tbv_correlation": 0.59,
@@ -209,7 +208,8 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
         "methane_mitigation": {
             "methane_mitigation_method": "None",
         },
-        "herd_information": _make_herd_information(),
+        "herd_information": {"simulate_genetics": False},
+        "genetics": _make_genetics(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -278,7 +278,8 @@ def test_initialize_animal_config_selects_dose_of_chosen_mitigation_method(
             "essential_oils_additive_amount": 50,
             "seaweed_additive_amount": 55,
         },
-        "herd_information": _make_herd_information(),
+        "herd_information": {"simulate_genetics": False},
+        "genetics": _make_genetics(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -313,7 +314,8 @@ def test_initialize_animal_config_warns_when_selected_mitigation_dose_field_is_m
         "methane_model": {"dummy": "model"},
         # "3-NOP" is selected, but "3-NOP_additive_amount" is absent from the blob.
         "methane_mitigation": {"methane_mitigation_method": "3-NOP"},
-        "herd_information": _make_herd_information(),
+        "herd_information": {"simulate_genetics": False},
+        "genetics": _make_genetics(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -466,7 +468,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
         "methane_mitigation": {
             "methane_mitigation_method": "None",
         },
-        "herd_information": _make_herd_information(),
+        "herd_information": {"simulate_genetics": False},
+        "genetics": _make_genetics(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -493,7 +496,7 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
 
 
 def test_initialize_animal_config_reads_genetics_inputs(mocker: pytest_mock.MockerFixture) -> None:
-    """The farm-specific genetic distribution inputs in ``herd_information`` are read into ``AnimalConfig``."""
+    """The farm-specific genetic distribution inputs in the ``genetics`` section are read into ``AnimalConfig``."""
     mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
     mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
 
@@ -503,8 +506,8 @@ def test_initialize_animal_config_reads_genetics_inputs(mocker: pytest_mock.Mock
         "animal_config": _make_base_animal_config("5dCG2P", "TAI"),
         "methane_model": {"dummy": "model"},
         "methane_mitigation": {"methane_mitigation_method": "None"},
-        "herd_information": {
-            "simulate_genetics": True,
+        "herd_information": {"simulate_genetics": True},
+        "genetics": {
             "tbv_fat_std": 1.1,
             "tbv_protein_std": 2.2,
             "tbv_correlation": 0.3,

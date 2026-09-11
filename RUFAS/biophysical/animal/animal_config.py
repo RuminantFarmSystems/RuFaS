@@ -623,14 +623,15 @@ class AnimalConfig:
             for trait, values in top_listing_semen.items()
             if trait != "year_month"
         }
-        herd_information = animal_data["herd_information"]
-        cls.simulate_genetics = herd_information["simulate_genetics"]
-        cls.tbv_fat_std = herd_information["tbv_fat_std"]
-        cls.tbv_protein_std = herd_information["tbv_protein_std"]
-        cls.tbv_correlation = herd_information["tbv_correlation"]
-        cls.permanent_environment_fat_std = herd_information["permanent_environment_fat_std"]
-        cls.permanent_environment_protein_std = herd_information["permanent_environment_protein_std"]
-        cls.permanent_environment_correlation = herd_information["permanent_environment_correlation"]
-        cls.temporary_environment_fat_std = herd_information["temporary_environment_fat_std"]
-        cls.temporary_environment_protein_std = herd_information["temporary_environment_protein_std"]
-        cls.temporary_environment_correlation = herd_information["temporary_environment_correlation"]
+        cls.simulate_genetics = animal_data["herd_information"]["simulate_genetics"]
+
+        genetics_data = animal_data["genetics"]
+        cls.tbv_fat_std = genetics_data["tbv_fat_std"]
+        cls.tbv_protein_std = genetics_data["tbv_protein_std"]
+        cls.tbv_correlation = genetics_data["tbv_correlation"]
+        cls.permanent_environment_fat_std = genetics_data["permanent_environment_fat_std"]
+        cls.permanent_environment_protein_std = genetics_data["permanent_environment_protein_std"]
+        cls.permanent_environment_correlation = genetics_data["permanent_environment_correlation"]
+        cls.temporary_environment_fat_std = genetics_data["temporary_environment_fat_std"]
+        cls.temporary_environment_protein_std = genetics_data["temporary_environment_protein_std"]
+        cls.temporary_environment_correlation = genetics_data["temporary_environment_correlation"]

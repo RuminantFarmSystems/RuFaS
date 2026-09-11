@@ -20,7 +20,9 @@
     },
 	"milking_cow_fraction": 0.8356,
     "annual_milk_yield": null,
-    "simulate_genetics": false,
+    "simulate_genetics": false
+  },
+  "genetics": {
     "tbv_fat_std": 25.8,
     "tbv_protein_std": 13.4,
     "tbv_correlation": 0.59,

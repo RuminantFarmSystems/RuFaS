@@ -158,7 +158,11 @@
         "type": "bool",
         "description": "Whether or not to simulate genetics for animals",
         "default": false
-      },
+      }
+    },
+    "genetics": {
+      "type": "object",
+      "description": "Genetics -- Farm-specific standard deviations and correlations of the genetic distributions used when simulate_genetics is true. Omitted values default to the CDCB national averages",
       "tbv_fat_std": {
         "type": "number",
         "description": "True Breeding Value Fat Standard Deviation (kg) -- The standard deviation of the true breeding value (TBV) for fat yield in the herd. Defaults to the CDCB national average",
