@@ -79,11 +79,6 @@ There are three sets of inputs set up:
 
 For Each E2E test run:
 
-- **Before the simulation starts, the input set's comparison configuration
-  (expected results files, must-change variables files, and the optional
-  variable name conversion table) is validated, so a configuration mistake
-  fails the task in seconds instead of after the full simulation.**
-
 - **A domain’s E2E test passes if there are no differences between the
   expected and actual results.**
 
