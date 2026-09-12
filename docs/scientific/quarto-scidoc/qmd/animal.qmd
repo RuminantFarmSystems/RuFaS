@@ -224,7 +224,7 @@ meets the nutritional requirements of the animal class and is cost-optimized.
 
 
 ::: {.callout-note}
-For the time being, only one set of feeds and ration recipe can be provided for each animal class. 
+At this time, only one set of feeds and ration recipe can be provided for each animal class. 
 :::
 
 Below are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by @nrc_2001 and more 
@@ -248,12 +248,12 @@ Where appropriate, requirement calculations are differentiated by animal age and
 For details about the variables included in each calculation, please refer to @tbl-an-energy-nrc for a full list.
 
 **Maintenance** <br>
-The maintenance requirement is calculated based on metabolic body weight ($\text{body weight}^{0.75}$).
+The maintenance requirement is calculated based on metabolic body weight ($\text{BW}^{0.75}$).
 
-* Lactating and Dry Cows
+* **Lactating and Dry Cows**
 
 First the conceptus weight ($\text{CW}$) is estimated as a function of the expected calf
-birth weight ($\text{CBW}$): 
+birth weight ($\text{CBW}$) which is estimated as fraction of the cow's mature bodyweight ($\text{MW}$): 
 
 :::{#eq-an-nrc-1}
 [[**AN.NRC.1**]]{.aside .content-visible when-format="html"}
@@ -285,24 +285,11 @@ $$
 $$
 :::
 
-* Heifers: The maintenance requirement is calculated based on metabolic body weight $(\text{body weight}^{0.75})$, body condition score, and the previous month's temperatures.
+* **Heifers** 
 
-:::{}
-[See [AN.NRC.1](#eq-an-nrc-1)]{.aside .content-visible when-format="html"}
-$$
-\text{CBW} = \text{MW} \times 0.06275
-$$
-:::
+The maintenance requirement is calculated based on metabolic body weight $(\text{BW}^{0.75})$, body condition score, and the previous month's temperatures.
 
-
-:::{}
-[See [AN.NRC.2](#eq-an-nrc-2)]{.aside .content-visible when-format="html"}
-$$
-\text{CW} = (18 + (\text{DOP} - 190) \times 0.665) \times \left(\frac{\text{CBW}}{45}\right), \text{if DOP} > 190.0 
-$$
-:::
-
-*Otherwise*
+First the body condition score must be translated to a 9 point scale $(\text{BSC9})$. The conceptus weight $(\text{CW})$ is calculated the same as for lactating and dry cows.
 
 :::{#eq-an-nrc-6}
 [[**AN.NRC.6**]]{.aside .content-visible when-format="html"}
@@ -319,9 +306,9 @@ $$
 :::
 
 **Activity** <br>
-Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy. 
+Activity requirement is proportional to body weight and daily walking distance in kilometers. A grazing system and hilly topography will cost additional energy. 
 
-* Lactating and Dry Cows
+* **Lactating and Dry Cows**
 
 :::{#eq-an-nrc-8}
 [[**AN.NRC.8**]]{.aside .content-visible when-format="html"}
@@ -372,7 +359,11 @@ $$
 
 **Growth** <br>
 
-* Lactating and Dry Cows - will continue to grow toward their mature body weight until the end of their second lactation.
+* **Lactating and Dry Cows**
+Cows will continue to grow toward their mature body weight until the end of their second lactation. Their growth rate is estimated as a linear increase to reach the expected proportion of their mature bodyweight $\text{MW}$ at the beginning of their next parity. 
+
+
+First the shrunk bodweight $(\text{SBW})$, the mature shrunk bodyweight $(\text{MSBW})$ and the equivalent shrunk bodyweight are calculated $(\text{EQSBW})$ to remove the effect of gut fill on bodyweight, the conceptus, and relate the animal's weight to the reference animal of 478 kg. 
 
 :::{#eq-an-nrc-13}
 [[**AN.NRC.13**]]{.aside .content-visible when-format="html"}
@@ -388,19 +379,14 @@ $$
 $$
 :::
 
-:::{#eq-an-nrc-15}
-[[**AN.NRC.15**]]{.aside .content-visible when-format="html"}
-$$
-\text{EBW} = 0.96 \times \text{SBW}
-$$
-:::
-
 :::{#eq-an-nrc-16}
 [[**AN.NRC.16**]]{.aside .content-visible when-format="html"}
 $$
 \text{EQSBW} = (\text{SBW} - \text{CW}) \times \frac{478}{\text{MSBW}} \times \text{SBW}
 $$
 :::
+
+Next the average daily gain $(\text{ADG})$, is calculated as the difference between the target fraction of $(\text{MSBW})$ at the start of the current parity and the start of the next parity divided by the calving interval ($(\text{CI})$). Specifically, cows are expected to be 82%, 92% and 100% of their $(\text{MSBW})$ at the start of their 1st, 2nd, and 3rd parities. 
 
 :::{#eq-an-nrc-17}
 [[**AN.NRC.17**]]{.aside .content-visible when-format="html"}
@@ -413,6 +399,8 @@ $$
 \end{cases}
 $$
 :::
+
+Finally, the expected $(\text{ADG})$ and $(\text{EQSBW})$ are adjusted for the weight associated with internal organs to get the equivalent empty bodyweight gain $(\text{EQEBG})$ and the equivalent empty body weight $(\text{EQEBW})$ which is then used to estimate the net energy for gain.
 
 :::{#eq-an-nrc-18}
 [[**AN.NRC.18**]]{.aside .content-visible when-format="html"}
@@ -435,7 +423,9 @@ $$
 $$
 :::
 
-* Heifers
+* **Heifers**
+
+Heifer growth is estimated according to a similar principal as lactating cow growth. Growth targets for heifers are set based on their expected weights at the start of breeding (55% of $\text{MSBW}$) and age at first calving (82% of $(\text{BSC9})$ which is equivalent to the start of parity 1). 
 
 :::{#eq-an-nrc-21}
 [[**AN.NRC.21**]]{.aside .content-visible when-format="html"}
