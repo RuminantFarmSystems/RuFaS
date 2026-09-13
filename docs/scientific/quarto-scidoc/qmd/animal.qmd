@@ -514,9 +514,7 @@ $$
 
 * Lactating and Dry Cows
 
-Maintenance protein requirements are estimated as a function of animal bodyweight
-excluding conceptus weight if pregnant, dry matter intake, and the amount of 
-rumen bacterial protein supply $(\text{MPbact})$. 
+Maintenance protein requirements are estimated as a function of animal bodyweight excluding conceptus weight if pregnant, dry matter intake, and the amount of  rumen bacterial protein supply $(\text{MPbact})$. 
 
 :::{#eq-an-nrc-29}
 [[**AN.NRC.29**]]{.aside .content-visible when-format="html"}
@@ -605,8 +603,7 @@ $$
 
 **Pregnancy** <br>
 
-Similar to energy, protein requirements for pregnancy are estimated as a function
-of the days in pregnancy $(\text{DOP})$ and the calf birthweight $(\text{CBW})$. 
+Similar to energy, protein requirements for pregnancy are estimated as a function of the days in pregnancy $(\text{DOP})$ and the calf birthweight $(\text{CBW})$. 
 
 :::{#eq-an-nrc-37}
 [[**AN.NRC.37**]]{.aside .content-visible when-format="html"}
@@ -618,12 +615,14 @@ $$
 **Lactation** <br>
 
 Protein requirements for lactation are a function of the protein secreted in milk.
+
 :::{#eq-an-nrc-38}
 [[**AN.NRC.38**]]{.aside .content-visible when-format="html"}
 $$
 \text{MPlact} = \text{MilkYield} \times \frac{\text{TP}_{\text{Milk}}}{100} \times \frac{1000}{0.67}
 $$
 :::
+
 
 ```{python}
 #| label: tbl-an-prot-req-var
@@ -742,7 +741,7 @@ $$
 :::{#eq-an-nrc-47}
 [[**AN.NRC.47**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{lact}} = 1.22 \times \text{Milk}
+\text{Ca}_{\text{lact}} = 1.22 \times \text{MilkYield}
 $$
 :::
 
@@ -751,7 +750,7 @@ $$
 :::{#eq-an-nrc-48}
 [[**AN.NRC.48**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{lact}} = 0.9 \times \text{Milk}
+\text{P}_{\text{lact}} = 0.9 \times \text{MilkYield}
 $$
 :::
 
@@ -786,13 +785,15 @@ import_table(
 
 ##### DMI Estimation
 
-Estimations are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-dmi-var. The sum of DMI of each feed is assumed to be less than the estimated DMI:
+Methods for estimating DMI are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-dmi-var. The sum of DMI of each feed is assumed to be less or equal to than the estimated DMI:
 
 $$
-\sum_{i} \text{Feed}_{i} < \text{DMIest}
+\sum_{i} \text{Feed}_{i} \le \text{DMIest}
 $$
 
 **Lactating Cows** <br>
+
+For lactating cows, the estimated DMI $(\text{DIMest})$ is calculated as a function of the fat corrected milk $(\text{FCM})$, bodyweight $(\text{BW})$, and week of lactation $(\text{WOL})$. 
 
 :::{#eq-an-nrc-51}
 [[**AN.NRC.51**]]{.aside .content-visible when-format="html"}
@@ -810,6 +811,8 @@ $$
 
 **Dry Cows** <br>
 
+For dry cows, $\text{DIMest}$ is a function of day of pregnancy $(\text{DOP})$ and $\text{BW}$.
+
 :::{#eq-an-nrc-53}
 [[**AN.NRC.53**]]{.aside .content-visible when-format="html"}
 $$
@@ -819,16 +822,16 @@ $$
 
 **Heifers** <br>
 
-* If the heifer is *LESS* than 365 days old:
+* If a heifer is *LESS* than 365 days old her $\text{DIMest}$ is calculated as a function of her metabolic bodyweight $(\text{BW}^{0.75})$ with an adjustment for the energy concentration of the diet:
 
 :::{#eq-an-nrc-54}
 [[**AN.NRC.54**]]{.aside .content-visible when-format="html"}
 $$
-\text{DMIest} = (\text{BW}^{0.75} \times \frac{(0.2435 \times \text{NEadj}) - (0.0466 \times \text{NEadj}^{2}) - 0.0869}{\text{NEadj}}) - \text{PREGadj}
+\text{DMIest} = (\text{BW}^{0.75} \times \frac{(0.2435 \times \text{NEadj}) - (0.0466 \times \text{NEadj}^{2}) - 0.0869}{\text{NEadj}})
 $$
 :::
 
-* If the heifer is *MORE* than 365 days old:
+* If the heifer is *MORE* than 365 days old, a separate intercept is used and adjustment is also made for the pregnacy status if she is greater than 210 $\text{DOP}$:
 
 :::{#eq-an-nrc-55}
 [[**AN.NRC.55**]]{.aside .content-visible when-format="html"}
@@ -855,34 +858,29 @@ The maintenance requirement is calculated based on metabolic body weight (MBW, b
 
 * Lactating and Dry Cows
 
-For Lactating cows, the body weight is adjusted both for the gravid uterine tissues and the uterine tissues for normal activity in confinement conditions, otherwise include adjustments for activity requirements under grazing conditions. 
+For Lactating cows, the body weight is adjusted both for the weight of the gravid uterine tissues $(\text{GrUterW})$ and the uterine tissues $(\text{UterW})$ for normal activity in confinement conditions; otherwise include adjustments for activity requirements under grazing conditions. 
 
 :::{#eq-an-nsm-1}
 [[**AN.NSM.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEmaint} = 0.10 \times (\text{MBW} - \text{GrUterW} - \text{UterW})^{0.75}
+\text{NEmaint} = 0.10 \times (\text{BW} - \text{GrUterW} - \text{UterW})^{0.75}
 $$
 :::
 
 :::{#eq-an-nsm-2}
 [[**AN.NSM.2**]]{.aside .content-visible when-format="html"}
 $$
-\text{GrUterW} = (\text{CBW} \times 1.825) \times e^{-0.0243 - (0.0000245 \times \text{DOP})} \times (280 - \text{DOP}))
+\text{GrUterW} = (\text{CBW} \times 1.825) \times e^{(-0.0243 - (0.0000245 \times \text{DOP}) \times (280 - \text{DOP}))}
 $$
 :::
 
 :::{#eq-an-nsm-3}
 [[**AN.NSM.3**]]{.aside .content-visible when-format="html"}
 $$
-\text{UterW} = (\text{CBW} \times 0.2288 - 0.204) \times e^{(-0.2 \times \text{DyLact})} + 0.204
+\text{UterW} = (\text{CBW} \times 0.2288 - 0.204) \times e^{(-0.2 \times \text{DIM})} + 0.204
 $$
 :::
 
-$$
-\text{CW} = \text{inputvariable}
-$$
-
-*Otherwise*
 
 :::{#eq-an-nsm-4}
 [[**AN.NSM.4**]]{.aside .content-visible when-format="html"}
@@ -903,18 +901,10 @@ $$
 :::
 
 **Activity** <br>
-Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy.
+Activity energy requirements are the sum of energy required for grazing activity, walking to the parlor, and for gaining elevation. 
 
-:::{#eq-an-nsm-6}
-[[**AN.NSM.6**]]{.aside .content-visible when-format="html"}
-$$
-\text{NEa1} =
-\begin{cases}
-0, & \text{if } \frac{\text{Dt\_PastIn}}{\text{DtDMIn}} < 0.005 \\[8pt]
-\frac{\text{Dt\_PastIn}}{\text{DtDMIn}}, & \text{otherwise}
-\end{cases}
-$$
-:::
+If the DMI from pasture $(\text{DMI}_{Pasture})$ is greater that 0.5% of the total DMI $(\text{DMI}_{Total})$, then the energy requirements for grazing activities are a function of $\text{BW}$ and the amount of supplemental feed that is provided $(\text{DMI}_{Supp})$.
+
 
 *Otherwise*
 
@@ -923,8 +913,8 @@ $$
 $$
 \text{NEa1} =
 \begin{cases}
-0.0075 \times \text{BW}^{0.75} \times \frac{(600 - 12 \times \text{DtPastSupplIn})}{600},& \text{if } \frac{\text{Dt\_PastIn}}{\text{DtDMIn}} \geq 0.005 \\[8pt]
-0, & \text{otherwise}
+0.0075 \times \text{BW}^{0.75} \times \frac{(600 - 12 \times \text{DMI}_{Supp})}{600},& \text{if } \frac{\text{DMI}_{Pasture}}{\text{DMI}_{Total}} \geq 0.005 \\[8pt]
+0 & \text{otherwise}
 \end{cases}
 $$
 :::
@@ -937,6 +927,8 @@ $$
 \text{NEa2} = 0.00035 \times \frac{\text{DistParlor}}{1000} \times \text{TripParlor} \times \text{BW}
 $$
 :::
+
+The energy required for an animal to gain elevation is calculated as a function of $\text{BW}$ and the gain in elevation:
 
 :::{#eq-an-nsm-9}
 [[**AN.NSM.9**]]{.aside .content-visible when-format="html"}
