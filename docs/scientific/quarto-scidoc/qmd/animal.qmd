@@ -461,6 +461,8 @@ $$
 
 **Pregnancy** <br>
 
+The energy requirements for pregnancy are based on the days in pregnancy $(\text{DOP})$ and calf birth weight $(\text{CBW})$ and only applies when the $\text{DOP}$ advanced beyond 190 days. 
+
 :::{#eq-an-nrc-25}
 [[**AN.NRC.25**]]{.aside .content-visible when-format="html"}
 $$
@@ -477,6 +479,9 @@ $$
 
 **Lactation** <br>
 
+Energy requirements for lactation are based on the total fat, true protein and
+lactose produced. First the energy required per kg of milk $(\text{Milk}_{\text{Energy}})$ is estimated based on the milk fat, protein, and lactose composition. 
+
 :::{#eq-an-nrc-27}
 [[**AN.NRC.27**]]{.aside .content-visible when-format="html"}
 $$
@@ -484,17 +489,19 @@ $$
 $$
 :::
 
+Then the total net energy for lactation is estimated by multiplying the $\text{Milk}_{\text{Energy}}$ by the total milk produced $(\text{MilkYeild, kg})$. 
+
 :::{#eq-an-nrc-28}
 [[**AN.NRC.28**]]{.aside .content-visible when-format="html"}
 $$
-\text{NElact} = \text{Milken} \times \text{Milk}
+\text{NElact} = \text{Milk}_{\text{Energy}} \times \text{MilkYeild}
 $$
 :::
 
 ##### Protein Requirements
 
 **Total Protein** <br>
-Reporting of protein requirements is divided into four components: maintenance, growth, pregnancy, and lactation (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
+Reporting of protein requirements is divided into four components: maintenance $(\text{MPm})$, growth $(\text{MPg})$, pregnancy $(\text{MPpreg})$, and lactation $(\text{MPlact})$ (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
 
 :::{#eq-an-nrc-36}
 [[**AN.NRC.36**]]{.aside .content-visible when-format="html"}
@@ -507,6 +514,10 @@ $$
 
 * Lactating and Dry Cows
 
+Maintenance protein requirements are estimated as a function of animal bodyweight
+excluding conceptus weight if pregnant, dry matter intake, and the amount of 
+rumen bacterial protein supply $(\text{MPbact})$. 
+
 :::{#eq-an-nrc-29}
 [[**AN.NRC.29**]]{.aside .content-visible when-format="html"}
 $$
@@ -518,6 +529,8 @@ $$
 :::
 
 **Growth** <br>
+
+Protein requirements for growth are a function of average daily gain $(\text{ADG})$.
 
 * Lactating and Dry Cows
 
@@ -592,6 +605,9 @@ $$
 
 **Pregnancy** <br>
 
+Similar to energy, protein requirements for pregnancy are estimated as a function
+of the days in pregnancy $(\text{DOP})$ and the calf birthweight $(\text{CBW})$. 
+
 :::{#eq-an-nrc-37}
 [[**AN.NRC.37**]]{.aside .content-visible when-format="html"}
 $$
@@ -601,10 +617,11 @@ $$
 
 **Lactation** <br>
 
+Protein requirements for lactation are a function of the protein secreted in milk.
 :::{#eq-an-nrc-38}
 [[**AN.NRC.38**]]{.aside .content-visible when-format="html"}
 $$
-\text{MPlact} = \text{Milk} \times \frac{\text{TP}_{\text{Milk}}}{100} \times \frac{1000}{0.67}
+\text{MPlact} = \text{MilkYield} \times \frac{\text{TP}_{\text{Milk}}}{100} \times \frac{1000}{0.67}
 $$
 :::
 
