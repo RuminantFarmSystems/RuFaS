@@ -395,7 +395,7 @@ def test_calculate_bedded_pack_mcf_returns_expected(
     is_mixed: bool,
     manure_temperature: float,
     expected_mcf: float,
-    storage_duration: int | None
+    storage_duration: int | None,
 ) -> None:
     """Tests calculate_bedded_pack_mcf_returns_expected()."""
     result = bedded_pack.calculate_bedded_pack_methane_conversion_factor(is_mixed, manure_temperature, storage_duration)

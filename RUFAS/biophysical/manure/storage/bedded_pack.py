@@ -20,6 +20,7 @@ class Mixing(Enum):
     MIXED = True
     UNMIXED = False
 
+
 BEDDED_PACK_MCF_MIXED: dict[tuple[float, float], float] = {
     (-math.inf, 0): 0.5,
     (0, 10): 0.5,
@@ -40,6 +41,7 @@ BEDDED_PACK_MCF_UNMIXED_LONG: dict[tuple[float, float], float] = {
     (10, 18): 37.0,
     (18, math.inf): 73.0,
 }
+
 
 class BeddedPack(Storage):
     """
@@ -111,7 +113,7 @@ class BeddedPack(Storage):
                 + self._manure_to_process.non_degradable_volatile_solids,
                 self._determine_barn_temperature(manure_annual_temperature),
                 self._manure_to_process.methane_production_potential,
-                self._storage_time_period
+                self._storage_time_period,
             )
         else:
             storage_methane = 0
@@ -379,8 +381,11 @@ class BeddedPack(Storage):
 
     @staticmethod
     def calculate_bedded_pack_methane_emission(
-        is_mixed: bool, manure_volatile_solids: float, manure_temperature: float, methane_production_potential: float,
-        storage_time_period: int | None
+        is_mixed: bool,
+        manure_volatile_solids: float,
+        manure_temperature: float,
+        methane_production_potential: float,
+        storage_time_period: int | None,
     ) -> float:
         """
         Calculates emission of methane on the current day based on methodology from IPCC 2019
@@ -429,8 +434,9 @@ class BeddedPack(Storage):
         return methane_emissions_in_kg
 
     @staticmethod
-    def calculate_bedded_pack_methane_conversion_factor(is_mixed: bool, manure_temperature: float,
-                                                        storage_time_period: int | None) -> float:
+    def calculate_bedded_pack_methane_conversion_factor(
+        is_mixed: bool, manure_temperature: float, storage_time_period: int | None
+    ) -> float:
         """
         Calculates the Methane Conversion Factor (MCF) for the bedded pack based on annual temperature and
         whether or not the bedded pack is mixed.
