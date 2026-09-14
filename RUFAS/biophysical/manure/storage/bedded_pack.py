@@ -28,14 +28,14 @@ BEDDED_PACK_MCF_MIXED: dict[tuple[float, float], float] = {
     (18, math.inf): 1.5,
 }
 
-BEDDED_PACK_MCF_UNMIXED_SHORT: dict[tuple[float, float], float] = {
+BEDDED_PACK_MCF_UNMIXED_UNDER_30_DAYS: dict[tuple[float, float], float] = {
     (-math.inf, 0): 2.75,
     (0, 10): 2.75,
     (10, 18): 6.5,
     (18, math.inf): 18.0,
 }
 
-BEDDED_PACK_MCF_UNMIXED_LONG: dict[tuple[float, float], float] = {
+BEDDED_PACK_MCF_UNMIXED_30_DAYS_OR_MORE: dict[tuple[float, float], float] = {
     (-math.inf, 0): 14.0,
     (0, 10): 21.0,
     (10, 18): 37.0,
@@ -468,9 +468,9 @@ class BeddedPack(Storage):
         if is_mixed:
             mcf_table = BEDDED_PACK_MCF_MIXED
         elif storage_time_period is not None and storage_time_period < 30:
-            mcf_table = BEDDED_PACK_MCF_UNMIXED_SHORT
+            mcf_table = BEDDED_PACK_MCF_UNMIXED_UNDER_30_DAYS
         else:
-            mcf_table = BEDDED_PACK_MCF_UNMIXED_LONG
+            mcf_table = BEDDED_PACK_MCF_UNMIXED_30_DAYS_OR_MORE
 
         for (lower_bound, upper_bound), mcf in mcf_table.items():
             if lower_bound < manure_temperature <= upper_bound:

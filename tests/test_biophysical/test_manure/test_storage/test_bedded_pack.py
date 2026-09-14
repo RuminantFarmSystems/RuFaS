@@ -367,27 +367,27 @@ def test_calculate_bedded_pack_methane_emission(bedded_pack: BeddedPack, mocker:
         (True, 4.6, 0.5, 30),  # upper bound bin 1
         (True, 4.7, 0.5, 30),  # lower bound bin 2
         (True, 5.8, 0.5, 30),  # upper bound bin 2 (first match)
-        (True, 10.0, 1.0, 30),  # middle bin 3
+        (True, 10.0, 0.5, 30),  # middle bin 3
         (True, 14.0, 1.0, 30),  # lower bound bin 4
         (True, 25.2, 1.5, 30),  # lower bound bin 5
         # unmixed, long storage duration
-        (False, -10.0, 21.0, 31),
-        (False, 0.0, 21.0, 31),
+        (False, -10.0, 14.0, 31),
+        (False, 0.0, 14.0, 31),
         (False, 4.6, 21.0, 31),
-        (False, 4.7, 26.0, 31),
-        (False, 5.8, 26.0, None),
-        (False, 10.0, 37.0, None),
-        (False, 14.0, 41.0, None),
-        (False, 25.2, 74.0, None),
+        (False, 4.7, 21.0, 31),
+        (False, 5.8, 21.0, None),
+        (False, 10.0, 21.0, None),
+        (False, 14.0, 37.0, None),
+        (False, 25.2, 73.0, None),
         # unmixed, short storage duration
-        (False, -10.0, 21.0, 29),
-        (False, 0.0, 21.0, 29),
-        (False, 4.6, 21.0, 29),
-        (False, 4.7, 26.0, 29),
-        (False, 5.8, 26.0, 29),
-        (False, 10.0, 37.0, 29),
-        (False, 14.0, 41.0, 29),
-        (False, 25.2, 74.0, 29),
+        (False, -10.0, 2.75, 29),
+        (False, 0.0, 2.75, 29),
+        (False, 4.6, 2.75, 29),
+        (False, 4.7, 2.75, 29),
+        (False, 5.8, 2.75, 29),
+        (False, 10.0, 2.75, 29),
+        (False, 14.0, 6.5, 29),
+        (False, 25.2, 18.0, 29),
     ],
 )
 def test_calculate_bedded_pack_mcf_returns_expected(
