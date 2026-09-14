@@ -438,11 +438,12 @@ class DailyManureSupplier:
             if stream_name in stream_configs_by_name:
                 self._om.add_error(
                     "Duplicate daily manure stream name",
-                    f"The daily manure stream '{stream_name}' is specified more than once. Every daily manure stream "
-                    "must have a unique name, since stream names label the manure module's outputs.",
+                    f"The stream name '{stream_name}' is used by more than one daily manure stream. "
+                    "Each daily manure stream must have a unique name because stream names are used to "
+                    "label manure module outputs.",
                     info_map,
                 )
-                raise ValueError(f"Daily manure stream '{stream_name}' is specified more than once.")
+                raise ValueError(f"The stream name '{stream_name}' is used by more than one daily manure stream.")
 
             try:
                 self._build_pen_manure_data(stream_config)
@@ -466,7 +467,7 @@ class DailyManureSupplier:
                     info_map,
                 )
                 raise ValueError(
-                    f"Daily manure stream '{stream_name}' total solids cannot exceed its total manure mass."
+                    f"Daily manure stream '{stream_name}' 'total_solids' cannot exceed its 'total_manure_mass'."
                 )
 
             stream_configs_by_name[stream_name] = stream_config

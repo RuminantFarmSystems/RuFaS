@@ -472,7 +472,7 @@ def test_daily_manure_supplier_duplicate_stream_names(mocker: MockerFixture) -> 
     mocker.patch("RUFAS.data_structures.animal_to_manure_connection.OutputManager", return_value=mock_output_manager)
     duplicate_stream_config = make_daily_manure_stream_config(num_animals=1)
 
-    with pytest.raises(ValueError, match="Daily manure stream 'lac_pen' is specified more than once."):
+    with pytest.raises(ValueError, match="The stream name 'lac_pen' is used by more than one daily manure stream."):
         DailyManureSupplier([make_daily_manure_stream_config(), duplicate_stream_config])
 
     mock_output_manager.add_error.assert_called_once()
@@ -499,5 +499,5 @@ def test_daily_manure_supplier_total_solids_cannot_exceed_total_manure_mass() ->
     """Checks that a stream whose total solids exceed its total manure mass fails validation."""
     invalid_stream_config = make_daily_manure_stream_config(total_solids=1200.0)
 
-    with pytest.raises(ValueError, match="total solids cannot exceed its total manure mass"):
+    with pytest.raises(ValueError, match="'total_solids' cannot exceed its 'total_manure_mass'"):
         DailyManureSupplier([invalid_stream_config])
