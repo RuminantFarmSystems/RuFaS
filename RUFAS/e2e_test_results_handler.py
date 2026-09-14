@@ -29,7 +29,10 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def compare_actual_and_expected_test_results(
-        json_output_path: Path, convert_variable_table_path: str | None, output_prefix: str
+        json_output_path: Path,
+        convert_variable_table_path: str | None,
+        output_prefix: str,
+        must_change_variables: set[str],
     ) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
@@ -43,6 +46,8 @@ class E2ETestResultsHandler:
             variable names in the actual results.
         output_prefix : str
             The output prefix for the current e2e run.
+        must_change_variables : set[str]
+            The names of the variables flagged as must change, as returned by ``validate_comparison_configuration``.
 
         Notes
         -----
@@ -58,7 +63,6 @@ class E2ETestResultsHandler:
             "function": E2ETestResultsHandler.compare_actual_and_expected_test_results.__name__,
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
-        must_change_variables = E2ETestResultsHandler._load_must_change_variables(test_result_path_sets)
 
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
@@ -115,7 +119,7 @@ class E2ETestResultsHandler:
     @staticmethod
     def validate_comparison_configuration(
         output_prefix: str, convert_variable_table_path: str | None, filters_directory: Path
-    ) -> None:
+    ) -> set[str]:
         """
         Validates the comparison configuration of an end-to-end testing input set before the simulation runs.
 
@@ -128,6 +132,11 @@ class E2ETestResultsHandler:
             variable names in the actual results.
         filters_directory : Path
             The directory the task loads its filter files from.
+
+        Returns
+        -------
+        set[str]
+            The names of the variables flagged as must change, for ``compare_actual_and_expected_test_results``.
 
         Raises
         ------
@@ -177,6 +186,7 @@ class E2ETestResultsHandler:
                 "E2E testing error: Must-change variables not found in the expected results of any domain: "
                 f"{sorted(unknown_must_change_variables)}"
             )
+        return must_change_variables
 
     @staticmethod
     def validate_update_configuration(output_prefix: str, filters_directory: Path) -> None:

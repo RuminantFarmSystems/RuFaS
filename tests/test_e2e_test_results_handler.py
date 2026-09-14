@@ -50,13 +50,12 @@ def test_compare_simulation_outputs_to_expected_outputs(
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     add_var = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
-    mocker.patch.object(E2ETestResultsHandler, "_load_must_change_variables", return_value=set())
     mock_convert_variable_name = mocker.patch(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names"
     )
 
     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix"
+        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix", set()
     )
 
     get_result_paths.assert_called_once()
@@ -849,16 +848,16 @@ def test_compare_actual_and_expected_results_with_must_change(
     expected_results_path = tmp_path / "e2e_json_test_filter.json"
     with open(expected_results_path, "w", encoding="utf-8") as file:
         json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
-    must_change_path = tmp_path / "must_change_variables.json"
-    write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
-    path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1, str(must_change_path))
+    path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1)
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
 
-    E2ETestResultsHandler.compare_actual_and_expected_test_results(json_output_path, None, "dummy_prefix")
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(
+        json_output_path, None, "dummy_prefix", set(must_change_names)
+    )
 
     reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
     assert reported["end_to_end_testing_passing"] is expect_passing
@@ -940,8 +939,11 @@ def test_validate_comparison_configuration(mocker: MockerFixture, tmp_path: Path
     path_sets = make_validation_path_sets(tmp_path, ["A.y", flagged_feed_name])
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
-    E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, conversion_csv_path, tmp_path)
+    must_change_variables = E2ETestResultsHandler.validate_comparison_configuration(
+        VALIDATION_OUTPUT_PREFIX, conversion_csv_path, tmp_path
+    )
 
+    assert must_change_variables == {"A.y", flagged_feed_name}
     add_error.assert_not_called()
 
 

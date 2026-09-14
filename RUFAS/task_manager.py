@@ -927,7 +927,7 @@ class TaskManager:
             "produce_graphics": produce_graphics,
         }
 
-        E2ETestResultsHandler.validate_comparison_configuration(
+        must_change_variables = E2ETestResultsHandler.validate_comparison_configuration(
             args["output_prefix"], args["convert_variable_table_path"], args["filters_directory"]
         )
 
@@ -946,7 +946,10 @@ class TaskManager:
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
         E2ETestResultsHandler.compare_actual_and_expected_test_results(
-            args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
+            args["json_output_directory"],
+            args["convert_variable_table_path"],
+            args["output_prefix"],
+            must_change_variables,
         )
 
         TaskManager.handle_post_processing(
