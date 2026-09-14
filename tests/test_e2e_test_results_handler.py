@@ -830,8 +830,9 @@ def test_extract_changed_variable_names(diff_result: dict[str, Any], expected_na
         ({"A.y": {"values": [2.0]}}, ["A.x"], False, 1, None, [], {"A.x"}),
         # Unflagged variable changed: the run fails and the variable is compiled into changed_variables.
         ({"A.x": {"values": [1.0]}, "A.y": {"values": [9.0]}}, [], False, 1, ["A.y"], None, None),
-        # Flagged variable does not exist in the expected results: configuration error.
-        ({"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}, ["A.z"], True, 1, None, None, None),
+        # Flagged variable does not exist in the expected results: ignored by the comparison, which relies on
+        # validate_comparison_configuration having rejected it before the simulation.
+        ({"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}, ["A.z"], True, 0, None, None, None),
     ],
 )
 def test_compare_actual_and_expected_results_with_must_change(

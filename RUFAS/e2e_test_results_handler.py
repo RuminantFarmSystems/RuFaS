@@ -59,8 +59,6 @@ class E2ETestResultsHandler:
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
         must_change_variables = E2ETestResultsHandler._load_must_change_variables(test_result_path_sets)
-        matched_must_change_variables: set[str] = set()
-        all_domains_compared: bool = True
 
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
@@ -78,7 +76,6 @@ class E2ETestResultsHandler:
                     "Could not find actual end-to-end testing results",
                     info_map,
                 )
-                all_domains_compared = False
                 continue
             with open(path_to_actual_results, "r", encoding="utf-8") as results:
                 actual_results = json.load(results)
@@ -87,7 +84,6 @@ class E2ETestResultsHandler:
             ]
 
             domain_must_change_variables = sorted(name for name in must_change_variables if name in expected_results)
-            matched_must_change_variables.update(domain_must_change_variables)
             comparison_expected_not_must_change = {
                 k: v for k, v in expected_results.items() if k not in must_change_variables
             }
@@ -114,17 +110,6 @@ class E2ETestResultsHandler:
                 must_change_satisfied=must_change_satisfied,
                 must_change_violations=must_change_violations,
                 info_map=info_map,
-            )
-
-        unknown_must_change_variables = must_change_variables - matched_must_change_variables
-        if unknown_must_change_variables and all_domains_compared:
-            info_map.pop("domain", None)
-            info_map.pop("prefix", None)
-            om.add_error(
-                "End-to-end testing must-change configuration error",
-                "Must-change variables not found in the expected results of any domain: "
-                f"{sorted(unknown_must_change_variables)}",
-                info_map,
             )
 
     @staticmethod
@@ -162,7 +147,7 @@ class E2ETestResultsHandler:
         result path set must resolve to actual results the run will write, and every must-change variable must be a
         key of at least one domain's expected results. Running these checks before the simulation makes a
         configuration mistake, such as a mistyped path or variable name, fail the task in seconds instead of after
-        the full simulation. The comparison repeats the checks afterwards as a backstop.
+        the full simulation. The comparison does not repeat them, so it relies on this validation having passed.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
