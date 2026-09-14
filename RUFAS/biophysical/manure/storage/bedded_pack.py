@@ -20,22 +20,26 @@ class Mixing(Enum):
     MIXED = True
     UNMIXED = False
 
-
-BEDDED_PACK_MCF_TABLE: dict[Mixing, dict[tuple[float, float], float]] = {
-    Mixing.MIXED: {
-        (-math.inf, 0): 0.5,
-        (0, 10): 0.5,
-        (10, 18): 1,
-        (18, math.inf): 1.5,
-    },
-    Mixing.UNMIXED: {
-        (-math.inf, 0): 14.0,
-        (0, 10): 21.0,
-        (10, 18): 37.0,
-        (18, math.inf): 73.0,
-    },
+BEDDED_PACK_MCF_MIXED: dict[tuple[float, float], float] = {
+    (-math.inf, 0): 0.5,
+    (0, 10): 0.5,
+    (10, 18): 1.0,
+    (18, math.inf): 1.5,
 }
 
+BEDDED_PACK_MCF_UNMIXED_SHORT: dict[tuple[float, float], float] = {
+    (-math.inf, 0): 2.75,
+    (0, 10): 2.75,
+    (10, 18): 6.5,
+    (18, math.inf): 18.0,
+}
+
+BEDDED_PACK_MCF_UNMIXED_LONG: dict[tuple[float, float], float] = {
+    (-math.inf, 0): 14.0,
+    (0, 10): 21.0,
+    (10, 18): 37.0,
+    (18, math.inf): 73.0,
+}
 
 class BeddedPack(Storage):
     """
@@ -107,6 +111,7 @@ class BeddedPack(Storage):
                 + self._manure_to_process.non_degradable_volatile_solids,
                 self._determine_barn_temperature(manure_annual_temperature),
                 self._manure_to_process.methane_production_potential,
+                self._storage_time_period
             )
         else:
             storage_methane = 0
@@ -374,7 +379,8 @@ class BeddedPack(Storage):
 
     @staticmethod
     def calculate_bedded_pack_methane_emission(
-        is_mixed: bool, manure_volatile_solids: float, manure_temperature: float, methane_production_potential: float
+        is_mixed: bool, manure_volatile_solids: float, manure_temperature: float, methane_production_potential: float,
+        storage_time_period: int | None
     ) -> float:
         """
         Calculates emission of methane on the current day based on methodology from IPCC 2019
@@ -390,6 +396,7 @@ class BeddedPack(Storage):
             The annual average temperature of the barn (Celsius).
         methane_production_potential : float
             Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
+        storage_time_period : int | None
 
         Raises
         ------
@@ -414,7 +421,7 @@ class BeddedPack(Storage):
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
         Bo = methane_production_potential
         methane_conversion_factor = BeddedPack.calculate_bedded_pack_methane_conversion_factor(
-            is_mixed, manure_temperature
+            is_mixed, manure_temperature, storage_time_period
         )
         methane_emissions_in_kg = (
             manure_volatile_solids * Bo * UserConstants.METHANE_FACTOR * methane_conversion_factor
@@ -422,7 +429,8 @@ class BeddedPack(Storage):
         return methane_emissions_in_kg
 
     @staticmethod
-    def calculate_bedded_pack_methane_conversion_factor(is_mixed: bool, manure_temperature: float) -> float:
+    def calculate_bedded_pack_methane_conversion_factor(is_mixed: bool, manure_temperature: float,
+                                                        storage_time_period: int | None) -> float:
         """
         Calculates the Methane Conversion Factor (MCF) for the bedded pack based on annual temperature and
         whether or not the bedded pack is mixed.
@@ -433,6 +441,8 @@ class BeddedPack(Storage):
             Indicates whether this bedded pack is mixed or not.
         manure_temperature : float
             The annual average temperature of the barn (Celsius).
+        storage_time_period : int | None
+            How long manure is stored for before emptying the storage (days). None if the storage is never emptied.
 
         Raises
         ------
@@ -449,10 +459,17 @@ class BeddedPack(Storage):
         2024 USDA GHG inventory methods table 4-9.
 
         """
-        mix = Mixing.MIXED if is_mixed else Mixing.UNMIXED
-        for (lower_bound, upper_bound), mcf in BEDDED_PACK_MCF_TABLE[mix].items():
+        if is_mixed:
+            mcf_table = BEDDED_PACK_MCF_MIXED
+        elif storage_time_period is not None and storage_time_period < 30:
+            mcf_table = BEDDED_PACK_MCF_UNMIXED_SHORT
+        else:
+            mcf_table = BEDDED_PACK_MCF_UNMIXED_LONG
+
+        for (lower_bound, upper_bound), mcf in mcf_table.items():
             if lower_bound < manure_temperature <= upper_bound:
                 return mcf
+
         OutputManager().add_error(
             "BeddedPack manure temp error",
             f"Temperature {manure_temperature}°C out of any defined bin",
