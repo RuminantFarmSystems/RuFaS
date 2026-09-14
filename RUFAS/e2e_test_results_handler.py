@@ -138,7 +138,8 @@ class E2ETestResultsHandler:
             resolved once the simulation has run (see ``_validate_result_path_set``), or if a must-change variable is
             not found in the expected results of any domain.
         KeyError
-            If the conversion table does not contain both "Original" and "New" columns.
+            If an expected results file has no ``expected_results`` entry, or if the conversion table does not contain
+            both "Original" and "New" columns.
 
         Notes
         -----
@@ -154,11 +155,6 @@ class E2ETestResultsHandler:
             "class": E2ETestResultsHandler.__class__.__name__,
             "function": E2ETestResultsHandler.validate_comparison_configuration.__name__,
         }
-        om.add_log(
-            "End-to-end testing configuration validation",
-            "Validating the comparison configuration before the simulation.",
-            info_map,
-        )
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
         must_change_variables = E2ETestResultsHandler._load_must_change_variables(test_result_path_sets)
         matched_must_change_variables: set[str] = set()
@@ -181,11 +177,6 @@ class E2ETestResultsHandler:
                 "E2E testing error: Must-change variables not found in the expected results of any domain: "
                 f"{sorted(unknown_must_change_variables)}"
             )
-        om.add_log(
-            "End-to-end testing configuration validation",
-            "The comparison configuration is valid.",
-            info_map,
-        )
 
     @staticmethod
     def validate_update_configuration(output_prefix: str, filters_directory: Path) -> None:
@@ -204,8 +195,10 @@ class E2ETestResultsHandler:
         FileNotFoundError
             If an expected results file does not exist.
         ValueError
-            If an expected results file is not valid or is missing a key that the update writes back, or if a result
-            path set cannot be resolved once the simulation has run (see ``_validate_result_path_set``).
+            If an expected results file is not valid JSON or is missing a required key, or if a result path set cannot
+            be resolved once the simulation has run (see ``_validate_result_path_set``).
+        KeyError
+            If an expected results file has no ``expected_results`` entry.
 
         Notes
         -----
@@ -213,35 +206,9 @@ class E2ETestResultsHandler:
         mistyped path or an incomplete expected results file fails the task in seconds instead of after the full
         simulation. The must-change variables files are not checked because the update does not read them.
         """
-        om = OutputManager()
-        info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
-            "function": E2ETestResultsHandler.validate_update_configuration.__name__,
-        }
-        om.add_log(
-            "End-to-end testing configuration validation",
-            "Validating the expected results update configuration before the simulation.",
-            info_map,
-        )
         for path_set in E2ETestResultsHandler._get_test_result_paths(output_prefix):
             file_content = E2ETestResultsHandler._validate_result_path_set(path_set, output_prefix, filters_directory)
-            missing_keys = [key for key in ORDERED_EXPECTED_RESULTS_FILE_KEYS if key not in file_content]
-            if missing_keys:
-                om.add_error(
-                    f"End-to-end testing configuration error for {path_set.domain}",
-                    f"Expected results file {path_set.expected_results_path} is missing the keys {missing_keys} that "
-                    "the update writes back.",
-                    info_map,
-                )
-                raise ValueError(
-                    f"E2E testing error: Expected results file {path_set.expected_results_path} is missing the keys "
-                    f"{missing_keys} that the update writes back."
-                )
-        om.add_log(
-            "End-to-end testing configuration validation",
-            "The expected results update configuration is valid.",
-            info_map,
-        )
+            E2ETestResultsHandler._check_expected_results_file_keys(file_content)
 
     @staticmethod
     def _report_domain_comparison_results(
@@ -567,7 +534,7 @@ class E2ETestResultsHandler:
         path_set: ResultPathType, convert_variable_table_path: str | None = None
     ) -> dict[str, Any]:
         """
-        Loads and checks the expected results file of a domain.
+        Loads the expected results file of a domain.
 
         Parameters
         ----------
@@ -581,8 +548,8 @@ class E2ETestResultsHandler:
         Returns
         -------
         dict[str, Any]
-            The content of the expected results file: the filter ``name``, ``filters``,
-            ``expected_results_last_updated``, and ``expected_results`` keyed by (converted) variable name.
+            The content of the expected results file, with the variable names of its ``expected_results`` converted
+            when a conversion table is given.
 
         Raises
         ------
@@ -590,50 +557,19 @@ class E2ETestResultsHandler:
             If the expected results file does not exist.
         ValueError
             If the expected results file is not valid JSON, e.g. because it still starts with the warning line written
-            by ``update_expected_test_results``, or has no ``expected_results`` entry.
+            by ``update_expected_test_results``.
+        KeyError
+            If the expected results file has no ``expected_results`` entry.
         """
-        om = OutputManager()
-        info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
-            "function": E2ETestResultsHandler._load_expected_results_file.__name__,
-            "domain": path_set.domain,
-        }
-        expected_results_path = Path(path_set.expected_results_path)
-        try:
-            with open(expected_results_path, "r", encoding="utf-8") as expected_results_file:
-                file_content = json.load(expected_results_file)
-        except FileNotFoundError:
-            om.add_error(
-                f"End-to-end testing configuration error for {path_set.domain}",
-                f"Expected results file not found: {expected_results_path}",
-                info_map,
-            )
-            raise
-        except json.JSONDecodeError as e:
-            om.add_error(
-                f"End-to-end testing configuration error for {path_set.domain}",
-                f"Expected results file {expected_results_path} is not valid JSON: {e}. If the file starts with an "
-                "autogenerated '// WARNING' line, remove that line.",
-                info_map,
-            )
-            raise ValueError(
-                f"E2E testing error: Expected results file {expected_results_path} is not valid JSON."
-            ) from e
-        if not isinstance(file_content, dict) or "expected_results" not in file_content:
-            om.add_error(
-                f"End-to-end testing configuration error for {path_set.domain}",
-                f"Expected results file {expected_results_path} has no 'expected_results' entry.",
-                info_map,
-            )
-            raise ValueError(
-                f"E2E testing error: Expected results file {expected_results_path} has no 'expected_results' entry."
-            )
-        if convert_variable_table_path is not None:
-            file_content["expected_results"] = E2ETestResultsHandler._convert_expected_result_variable_names(
-                expected_results=file_content["expected_results"],
-                conversion_csv_path=Path(convert_variable_table_path),
-            )
-        return file_content
+        with open(f"{path_set.expected_results_path}", "r", encoding="utf-8") as e_to_e_results:
+            filter_and_results: dict[str, Any] = json.load(e_to_e_results)
+            expected_results = filter_and_results["expected_results"]
+            if convert_variable_table_path is not None:
+                expected_results = E2ETestResultsHandler._convert_expected_result_variable_names(
+                    expected_results=expected_results, conversion_csv_path=Path(convert_variable_table_path)
+                )
+        filter_and_results["expected_results"] = expected_results
+        return filter_and_results
 
     @staticmethod
     def _validate_result_path_set(
@@ -1019,6 +955,34 @@ class E2ETestResultsHandler:
         return path_to_actual_results
 
     @staticmethod
+    def _check_expected_results_file_keys(data: dict[str, Any]) -> None:
+        """
+        Checks that the content of an expected results file has every key in ``ORDERED_EXPECTED_RESULTS_FILE_KEYS``.
+
+        Parameters
+        ----------
+        data : dict[str, Any]
+            The content of an expected results file.
+
+        Raises
+        ------
+        ValueError
+            If the data is missing required keys.
+        """
+        missing_keys = [key for key in ORDERED_EXPECTED_RESULTS_FILE_KEYS if key not in data]
+        if missing_keys:
+            om = OutputManager()
+            om.add_error(
+                "End-to-end testing expected results update failure.",
+                f"Expected results file missing required keys in data: {missing_keys}",
+                {
+                    "class": E2ETestResultsHandler.__class__.__name__,
+                    "function": E2ETestResultsHandler._check_expected_results_file_keys.__name__,
+                },
+            )
+            raise ValueError(f"E2E testing error: Missing required keys in data for JSON file: {missing_keys}")
+
+    @staticmethod
     def _write_formatted_json(file_path: Path, data: dict[str, str]) -> None:
         """
         Writes a JSON file with custom serialization settings for the ``expected_results`` field.
@@ -1035,20 +999,8 @@ class E2ETestResultsHandler:
         ValueError
             If the input data is missing required keys.
         """
+        E2ETestResultsHandler._check_expected_results_file_keys(data)
         key_order = ORDERED_EXPECTED_RESULTS_FILE_KEYS
-        missing_keys = [key for key in key_order if key not in data]
-        if missing_keys:
-            om = OutputManager()
-            om.add_error(
-                "End-to-end testing expected results update failure.",
-                f"Expected results file missing required keys in data: {missing_keys}",
-                {
-                    "class": E2ETestResultsHandler.__class__.__name__,
-                    "function": E2ETestResultsHandler._write_formatted_json.__name__,
-                },
-            )
-            raise ValueError(f"E2E testing error: Missing required keys in data for JSON file: {missing_keys}")
-
         ordered_data = {key: data[key] for key in key_order}
         compact_expected_results = json.dumps(ordered_data["expected_results"], separators=(",", ":"))
         ordered_data["expected_results"] = "__EXPECTED_RESULTS_PLACEHOLDER__"
