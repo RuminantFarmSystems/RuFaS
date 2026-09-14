@@ -204,14 +204,14 @@ class E2ETestResultsHandler:
         FileNotFoundError
             If an expected results file does not exist.
         ValueError
-            If an expected results file is not valid, or if a result path set cannot be resolved once the simulation
-            has run (see ``_validate_result_path_set``).
+            If an expected results file is not valid or is missing a key that the update writes back, or if a result
+            path set cannot be resolved once the simulation has run (see ``_validate_result_path_set``).
 
         Notes
         -----
         Runs the checks of ``update_expected_test_results`` that do not depend on the actual results, so that a
-        mistyped path fails the task in seconds instead of after the full simulation. The must-change variables files
-        are not checked because the update does not read them.
+        mistyped path or an incomplete expected results file fails the task in seconds instead of after the full
+        simulation. The must-change variables files are not checked because the update does not read them.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -224,7 +224,19 @@ class E2ETestResultsHandler:
             info_map,
         )
         for path_set in E2ETestResultsHandler._get_test_result_paths(output_prefix):
-            E2ETestResultsHandler._validate_result_path_set(path_set, output_prefix, filters_directory)
+            file_content = E2ETestResultsHandler._validate_result_path_set(path_set, output_prefix, filters_directory)
+            missing_keys = [key for key in ORDERED_EXPECTED_RESULTS_FILE_KEYS if key not in file_content]
+            if missing_keys:
+                om.add_error(
+                    f"End-to-end testing configuration error for {path_set.domain}",
+                    f"Expected results file {path_set.expected_results_path} is missing the keys {missing_keys} that "
+                    "the update writes back.",
+                    info_map,
+                )
+                raise ValueError(
+                    f"E2E testing error: Expected results file {path_set.expected_results_path} is missing the keys "
+                    f"{missing_keys} that the update writes back."
+                )
         om.add_log(
             "End-to-end testing configuration validation",
             "The expected results update configuration is valid.",
@@ -578,8 +590,7 @@ class E2ETestResultsHandler:
             If the expected results file does not exist.
         ValueError
             If the expected results file is not valid JSON, e.g. because it still starts with the warning line written
-            by ``update_expected_test_results``, or does not contain every key in ``ORDERED_EXPECTED_RESULTS_FILE_KEYS``
-            with a dictionary under ``expected_results``.
+            by ``update_expected_test_results``, or has no ``expected_results`` entry.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -608,20 +619,14 @@ class E2ETestResultsHandler:
             raise ValueError(
                 f"E2E testing error: Expected results file {expected_results_path} is not valid JSON."
             ) from e
-        if (
-            not isinstance(file_content, dict)
-            or any(key not in file_content for key in ORDERED_EXPECTED_RESULTS_FILE_KEYS)
-            or not isinstance(file_content["expected_results"], dict)
-        ):
+        if not isinstance(file_content, dict) or "expected_results" not in file_content:
             om.add_error(
                 f"End-to-end testing configuration error for {path_set.domain}",
-                f"Expected results file {expected_results_path} must contain the keys "
-                f"{ORDERED_EXPECTED_RESULTS_FILE_KEYS} with a dictionary of expected results under 'expected_results'.",
+                f"Expected results file {expected_results_path} has no 'expected_results' entry.",
                 info_map,
             )
             raise ValueError(
-                f"E2E testing error: Expected results file {expected_results_path} must contain the keys "
-                f"{ORDERED_EXPECTED_RESULTS_FILE_KEYS} with a dictionary of expected results under 'expected_results'."
+                f"E2E testing error: Expected results file {expected_results_path} has no 'expected_results' entry."
             )
         if convert_variable_table_path is not None:
             file_content["expected_results"] = E2ETestResultsHandler._convert_expected_result_variable_names(
