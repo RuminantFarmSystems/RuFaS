@@ -227,4 +227,4 @@ Example input
      ]
    }
 
-.. |RuFaS Overview - TM| image:: https://github.com/RuminantFarmSystems/MASM/assets/70217952/c67517b2-14fb-4d84-adee-b422523c27b3
+.. |RuFaS Overview - TM| image:: https://github.com/RuminantFarmSystems/RuFaS/assets/70217952/c67517b2-14fb-4d84-adee-b422523c27b3
