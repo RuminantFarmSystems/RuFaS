@@ -128,12 +128,8 @@ class AnimalModuleReporter:
             else:
                 parity_group = "parity_3_and_above"
 
-            parity_data[parity_group]["milk"].append(
-                milk_stats.estimated_daily_milk_produced
-            )
-            parity_data[parity_group]["days_in_milk"].append(
-                milk_stats.days_in_milk
-            )
+            parity_data[parity_group]["milk"].append(milk_stats.estimated_daily_milk_produced)
+            parity_data[parity_group]["days_in_milk"].append(milk_stats.days_in_milk)
             if milk_stats.days_in_milk < 50:
                 fresh_cows += 1
             else:
@@ -172,15 +168,9 @@ class AnimalModuleReporter:
         om.add_variable("cows_at_or_above_50_dim", cows_at_or_above_50_dim, info_map)
 
         for parity_group, data in parity_data.items():
-            average_milk = (
-                sum(data["milk"]) / len(data["milk"])
-                if data["milk"]
-                else 0.0
-            )
+            average_milk = sum(data["milk"]) / len(data["milk"]) if data["milk"] else 0.0
             average_days_in_milk = (
-                sum(data["days_in_milk"]) / len(data["days_in_milk"])
-                if data["days_in_milk"]
-                else 0.0
+                sum(data["days_in_milk"]) / len(data["days_in_milk"]) if data["days_in_milk"] else 0.0
             )
 
             om.add_variable(
