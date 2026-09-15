@@ -5687,6 +5687,13 @@
           "minimum": 0,
           "nullable": true
         },
+        "emptying_fraction": {
+          "type": "number",
+          "description": "Fraction of the stored manure that is removed at each emptying event (unitless). If omitted, the storage is fully emptied, except anaerobic lagoons which retain a default sludge fraction. Not applicable to the daily spread storage type.",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "nullable": true
+        },
         "surface_area": {
           "type": "number",
           "description": "The surface area of the manure storage (m^2).",
