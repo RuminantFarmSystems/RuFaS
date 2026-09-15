@@ -1049,6 +1049,13 @@
           "minimum": 0,
           "maximum": 1
         },
+        "bedding_lignin_fraction": {
+          "type": "number",
+          "description": "The bedding lignin content as a fraction (0.XX) of total mass, on a wet weight basis (unitless). Lignin in bedding joins the excreted manure lignin and is used to partition manure carbon between the soil metabolic and structural residue pools when manure is applied to fields.",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.0
+        },
         "sand_removal_efficiency": {
           "type": "number",
           "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
