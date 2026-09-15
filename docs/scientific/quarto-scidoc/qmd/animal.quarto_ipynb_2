@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "6df949dc",
+   "id": "f4262b49",
    "metadata": {},
    "source": [
     "![Animal module icon](../resources/images/ani_icon.png){width=25%}\n",
@@ -13,7 +13,7 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "7d5b13ea",
+   "id": "73f22461",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -24,7 +24,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a3bf202d",
+   "id": "80f23e3e",
    "metadata": {},
    "source": [
     "## Introduction\n",
@@ -121,7 +121,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ea722da8",
+   "id": "bfeeb1db",
    "metadata": {},
    "source": [
     "#### Required User Inputs"
@@ -179,7 +179,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "60121202",
+   "id": "d42b9260",
    "metadata": {},
    "source": [
     "#### Relevant Outputs\n",
@@ -290,7 +290,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c3353675",
+   "id": "7480d318",
    "metadata": {},
    "source": [
     "#### Relevant Outputs\n",
@@ -350,7 +350,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "8e080d5a",
+   "id": "ba43f6da",
    "metadata": {},
    "source": [
     "Currently there are only two options for assigning `AnimalCombinations` to pens. \n",
@@ -847,7 +847,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2327da97",
+   "id": "aa973fc4",
    "metadata": {},
    "source": [
     "##### Mineral Requirements\n",
@@ -1046,7 +1046,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ca2a3bc6",
+   "id": "8a9dd7cb",
    "metadata": {},
    "source": [
     "##### DMI Estimation\n",
@@ -1149,7 +1149,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e2a9319c",
+   "id": "9aa52042",
    "metadata": {},
    "source": [
     "#### Nutrient Requirements of Dairy Cattle: NASEM\n",
@@ -1250,14 +1250,8 @@
     "**Growth** <br>\n",
     "In @nrc_2021, body frame gain (fat + protein) corresponds to the true growth and it is part of the calculation which is further partitioned into body reserves or condition gain (or loss), and pregnancy-associated gain (considered a pregnancy requirement).\n",
     "\n",
-    "The value shown below was calculated but was never utilized in any further calculations in the model’s current version. Thus, it has been omitted from the model and remains solely as a reference to past versions of the model.\n",
+    "First the empty bodyweight grain $(\\text{EBG})$ is estimated from the $\\text{ADG}$ which is calculated as described in [AN.NRC.17](#eq-an-nrc-17) and [AN.NRC.21](#eq-an-nrc-21). \n",
     "\n",
-    ":::{#eq-an-nsm-11}\n",
-    "[[**AN.NSM.11**]]{.aside .content-visible when-format=\"html\"}\n",
-    "$$\n",
-    "\\text{EBW} = 0.85 \\times \\text{BW}\n",
-    "$$\n",
-    ":::\n",
     "\n",
     ":::{#eq-an-nsm-12}\n",
     "[[**AN.NSM.12**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -1265,6 +1259,8 @@
     "\\text{EBG} = 0.85 \\times \\text{ADG}\n",
     "$$\n",
     ":::\n",
+    "\n",
+    "Then amount of fat $(\\text{FatADG})$ and lean tissue $(\\text{ProtADG})$ daily gain is estiated from the $(\\text{EBG})$.\n",
     "\n",
     ":::{#eq-an-nsm-13}\n",
     "[[**AN.NSM.13**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -1279,6 +1275,8 @@
     "\\text{ProtADG} = (0.201 + 0.081 \\times \\frac{\\text{BW}}{\\text{MW}}) \\times \\frac{\\text{EBG}}{\\text{ADG}}\n",
     "$$\n",
     ":::\n",
+    "\n",
+    "Finally the amount of energy associated with the energy in the $(\\text{FatADG})$ and $(\\text{ProtADG})$ as retained energy $(\\text{REFADG})$ and the amount of metabolizable $(\\text{MEFrameADG})$ and net $(\\text{NElFrameADG})$ energy needed for frame grown is estimated.\n",
     "\n",
     ":::{#eq-an-nsm-15}\n",
     "[[**AN.NSM.15**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -1302,7 +1300,7 @@
     ":::\n",
     "\n",
     "**Pregnancy** <br>\n",
-    "Daily rates of wet tissue deposition (kg/d) are derived from equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.2](#eq-an-nsm-3) as defined above.\n",
+    "The daily rate of gravid uterine tissue deposition ($\\text{GrUterWGain}$, kg/d) is estimated from the current gravid uterine weight $(\\text{GrUterW})$ estimated in equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.3](#eq-an-nsm-3) as defined above. Then the energy required to support this weight gain is estimated. \n",
     "\n",
     "* During Gestation\n",
     "\n",
@@ -1326,7 +1324,7 @@
     "$$\n",
     ":::\n",
     "\n",
-    "*Otherwise*\n",
+    "\n",
     "\n",
     ":::{#eq-an-nsm-20}\n",
     "[[**AN.NSM.20**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -1340,7 +1338,7 @@
     ":::{#eq-an-nsm-21}\n",
     "[[**AN.NSM.21**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
-    "\\text{MilkEn} = (0.0929 \\times \\text{Fat\\_Milk}) + (0.0547 \\times \\text{Prot\\_Milk}) + (0.0395 \\times \\text{Lact\\_Milk})\n",
+    "\\text{MilkEn} = (0.0929 \\times \\text{Fat}_{Milk}) + (0.0547 \\times \\text{Prot}_{Milk}) + (0.0395 \\times \\text{Lact}_{Milk})\n",
     "$$\n",
     ":::\n",
     "\n",
@@ -1349,7 +1347,7 @@
     ":::{#eq-an-nsm-22}\n",
     "[[**AN.NSM.22**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
-    "\\text{MilkEn} = (0.0929 \\times \\text{Fat\\_Milk}) + (0.0585 \\times \\text{TP\\_Milk}) + (0.0395 \\times \\text{Lact\\_Milk})\n",
+    "\\text{MilkEn} = (0.0929 \\times \\text{Fat}_{Milk}) + (0.0585 \\times \\text{TP}_{Milk}) + (0.0395 \\times \\text{Lact}_{Milk})\n",
     "$$\n",
     ":::\n",
     "\n",
@@ -1602,7 +1600,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9e01f1b6",
+   "id": "345a1c17",
    "metadata": {},
    "source": [
     "::: {.callout-note}\n",
@@ -1796,7 +1794,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e75b54c7",
+   "id": "7c3b9b8e",
    "metadata": {},
    "source": [
     "##### DMI Estimation\n",
@@ -1880,7 +1878,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "40730c64",
+   "id": "cbf82bf6",
    "metadata": {},
    "source": [
     "##### Amino Acid Requirements\n",
@@ -1944,7 +1942,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "dd0fdf65",
+   "id": "999781b9",
    "metadata": {},
    "source": [
     "The AA requirements for lactating cows are categorized into maintenance, growth, pregnancy, and lactation. Notice that the first variable from each equation comes from the outputs of the metabolizable protein equations that are already in the RuFaS model. The second variable corresponds to the composition of AA used or secreted for each metabolic state (maintenance, growth, pregnancy, and lactation) of the cow, we can find those values in Table 6-2 (page 79) of @nrc_2021. The subscript \"i\" in the equations represents each specific amino acid being calculated; for example, TotalAArequirementsi_ii refers to the total requirements for individual amino acids such as methionine, lysine, arginine, and others.\n",
@@ -2122,7 +2120,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "4936c5bb",
+   "id": "d7839cd6",
    "metadata": {},
    "source": [
     "::: {.callout-note}\n",
@@ -2196,7 +2194,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "1dc6ce8b",
+   "id": "9b6558a9",
    "metadata": {},
    "source": [
     "**Total Digestible Nutrients (TDN)**\n",
@@ -2394,7 +2392,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "319eb3f4",
+   "id": "82bcaa96",
    "metadata": {},
    "source": [
     "The nutrient compositions of each feed ($\\text{NDF}_\\text{i}$, $\\text{Starch}_\\text{i}$, $\\text{EE}_\\text{i}$, $\\text{RUP}_\\text{i}$) are provided in the feed library. \n",
@@ -2709,7 +2707,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "73e1245d",
+   "id": "d0b74355",
    "metadata": {},
    "source": [
     "##### Relevant Outputs\n",
@@ -2816,7 +2814,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ebc27e82",
+   "id": "8c965ce6",
    "metadata": {},
    "source": [
     "#### User-Defined Ration Formulation\n",
@@ -2867,7 +2865,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "8663bb7a",
+   "id": "1d2ad850",
    "metadata": {},
    "source": [
     "##### Methodology\n",
@@ -3105,7 +3103,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d418db46",
+   "id": "7c7f7c6e",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -3341,7 +3339,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "412194f7",
+   "id": "d21a7437",
    "metadata": {},
    "source": [
     "During the dry period, the net tissue change is assumed to be restored during the dry period. The net tissue change is \n",
@@ -3581,7 +3579,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3d3501cb",
+   "id": "0c197a78",
    "metadata": {},
    "source": [
     "::: {.callout-note}\n",
@@ -3627,7 +3625,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d47b2fe1",
+   "id": "f91912cf",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -3792,7 +3790,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "022014be",
+   "id": "b1c34a72",
    "metadata": {},
    "source": [
     "### Milk Production\n",
@@ -3930,7 +3928,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "8d10a872",
+   "id": "a91fed8b",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -4280,7 +4278,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "fe38106f",
+   "id": "dae31a9d",
    "metadata": {},
    "source": [
     "#### Expected Outputs"
@@ -4324,7 +4322,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9cad291d",
+   "id": "1771688d",
    "metadata": {},
    "source": [
     "#### Methodology\n",
@@ -4550,7 +4548,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "26985698",
+   "id": "af0cd9e4",
    "metadata": {},
    "source": [
     "::: {.callout-note}\n",
@@ -4622,7 +4620,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "cfb76ec1",
+   "id": "4a126922",
    "metadata": {},
    "source": [
     "Determination of death date (once already determined that death will occur this lactation): \n",
@@ -4752,7 +4750,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c8724708",
+   "id": "7be2607c",
    "metadata": {},
    "source": [
     "Determination of sale date (once already determined that death will occur this lactation): \n",
@@ -4977,7 +4975,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "cb712c3a",
+   "id": "ed15c853",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -5082,7 +5080,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "6951e80c",
+   "id": "4fb1cfa8",
    "metadata": {},
    "source": [
     "### Methodology\n",
@@ -5706,7 +5704,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f0a335e2",
+   "id": "a1cd39e1",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -5748,7 +5746,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0cf628e8",
+   "id": "b364d30f",
    "metadata": {},
    "source": [
     "### Methodology\n",
@@ -5989,7 +5987,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "83fcbe00",
+   "id": "cb469f38",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",

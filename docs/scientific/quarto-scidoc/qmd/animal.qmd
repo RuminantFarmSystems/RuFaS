@@ -947,14 +947,8 @@ $$
 **Growth** <br>
 In @nrc_2021, body frame gain (fat + protein) corresponds to the true growth and it is part of the calculation which is further partitioned into body reserves or condition gain (or loss), and pregnancy-associated gain (considered a pregnancy requirement).
 
-The value shown below was calculated but was never utilized in any further calculations in the model’s current version. Thus, it has been omitted from the model and remains solely as a reference to past versions of the model.
+First the empty bodyweight grain $(\text{EBG})$ is estimated from the $\text{ADG}$ which is calculated as described in [AN.NRC.17](#eq-an-nrc-17) and [AN.NRC.21](#eq-an-nrc-21). 
 
-:::{#eq-an-nsm-11}
-[[**AN.NSM.11**]]{.aside .content-visible when-format="html"}
-$$
-\text{EBW} = 0.85 \times \text{BW}
-$$
-:::
 
 :::{#eq-an-nsm-12}
 [[**AN.NSM.12**]]{.aside .content-visible when-format="html"}
@@ -962,6 +956,8 @@ $$
 \text{EBG} = 0.85 \times \text{ADG}
 $$
 :::
+
+Then amount of fat $(\text{FatADG})$ and lean tissue $(\text{ProtADG})$ daily gain is estiated from the $(\text{EBG})$.
 
 :::{#eq-an-nsm-13}
 [[**AN.NSM.13**]]{.aside .content-visible when-format="html"}
@@ -976,6 +972,8 @@ $$
 \text{ProtADG} = (0.201 + 0.081 \times \frac{\text{BW}}{\text{MW}}) \times \frac{\text{EBG}}{\text{ADG}}
 $$
 :::
+
+Finally the amount of energy associated with the energy in the $(\text{FatADG})$ and $(\text{ProtADG})$ as retained energy $(\text{REFADG})$ and the amount of metabolizable $(\text{MEFrameADG})$ and net $(\text{NElFrameADG})$ energy needed for frame grown is estimated.
 
 :::{#eq-an-nsm-15}
 [[**AN.NSM.15**]]{.aside .content-visible when-format="html"}
@@ -999,7 +997,7 @@ $$
 :::
 
 **Pregnancy** <br>
-Daily rates of wet tissue deposition (kg/d) are derived from equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.2](#eq-an-nsm-3) as defined above.
+The daily rate of gravid uterine tissue deposition ($\text{GrUterWGain}$, kg/d) is estimated from the current gravid uterine weight $(\text{GrUterW})$ estimated in equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.3](#eq-an-nsm-3) as defined above. Then the energy required to support this weight gain is estimated. 
 
 * During Gestation
 
@@ -1023,7 +1021,7 @@ $$
 $$
 :::
 
-*Otherwise*
+
 
 :::{#eq-an-nsm-20}
 [[**AN.NSM.20**]]{.aside .content-visible when-format="html"}
@@ -1037,7 +1035,7 @@ $$
 :::{#eq-an-nsm-21}
 [[**AN.NSM.21**]]{.aside .content-visible when-format="html"}
 $$
-\text{MilkEn} = (0.0929 \times \text{Fat\_Milk}) + (0.0547 \times \text{Prot\_Milk}) + (0.0395 \times \text{Lact\_Milk})
+\text{MilkEn} = (0.0929 \times \text{Fat}_{Milk}) + (0.0547 \times \text{Prot}_{Milk}) + (0.0395 \times \text{Lact}_{Milk})
 $$
 :::
 
@@ -1046,7 +1044,7 @@ If true protein, (`TP_Milk`) is measured, its energy content is adjusted to acco
 :::{#eq-an-nsm-22}
 [[**AN.NSM.22**]]{.aside .content-visible when-format="html"}
 $$
-\text{MilkEn} = (0.0929 \times \text{Fat\_Milk}) + (0.0585 \times \text{TP\_Milk}) + (0.0395 \times \text{Lact\_Milk})
+\text{MilkEn} = (0.0929 \times \text{Fat}_{Milk}) + (0.0585 \times \text{TP}_{Milk}) + (0.0395 \times \text{Lact}_{Milk})
 $$
 :::
 
