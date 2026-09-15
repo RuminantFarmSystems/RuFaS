@@ -348,16 +348,133 @@ def test_filter_insignificant_changes(
     assert remaining_keys == expected_keys
 
 
-def test_is_significant() -> None:
-    """Unit test for is_significant()."""
-    assert E2ETestResultsHandler.is_significant({"old_value": 10.0, "new_value": 10.2}, 0.01) is True
-    assert E2ETestResultsHandler.is_significant({"old_value": 10.0, "new_value": 10.001}, 0.01) is False
-    assert E2ETestResultsHandler.is_significant({"old_value": "a", "new_value": "b"}, 0.01) is True
+@pytest.mark.parametrize(
+    ("changes", "tolerance", "expected"),
+    [
+        # Significant numeric change
+        ({"old_value": 10.0, "new_value": 10.2}, 0.01, True),
+        # Insignificant numeric change
+        ({"old_value": 10.0, "new_value": 10.001}, 0.01, False),
+        # Non-numeric values are treated as significant
+        ({"old_value": "a", "new_value": "b"}, 0.01, True),
+        # Nested dict with only insignificant changes
+        (
+            {
+                "old_value": {
+                    "a": 100.0,
+                    "b": 200.0,
+                },
+                "new_value": {
+                    "a": 100.0001,
+                    "b": 200.0001,
+                },
+            },
+            0.01,
+            False,
+        ),
+        # Nested dict with one significant change
+        (
+            {
+                "old_value": {
+                    "a": 100.0,
+                    "b": 200.0,
+                },
+                "new_value": {
+                    "a": 100.0001,
+                    "b": 250.0,
+                },
+            },
+            0.01,
+            True,
+        ),
+        # Missing key in new_value
+        (
+            {
+                "old_value": {
+                    "a": 100.0,
+                    "b": 200.0,
+                },
+                "new_value": {
+                    "a": 100.0,
+                },
+            },
+            0.01,
+            True,
+        ),
+        # Missing key in old_value
+        (
+            {
+                "old_value": {
+                    "a": 100.0,
+                },
+                "new_value": {
+                    "a": 100.0,
+                    "b": 200.0,
+                },
+            },
+            0.01,
+            True,
+        ),
+        # Deep recursive nested dict with insignificant changes
+        (
+            {
+                "old_value": {
+                    "outer": {
+                        "inner": 50.0,
+                    }
+                },
+                "new_value": {
+                    "outer": {
+                        "inner": 50.00001,
+                    }
+                },
+            },
+            0.01,
+            False,
+        ),
+        # Deep recursive nested dict with significant changes
+        (
+            {
+                "old_value": {
+                    "outer": {
+                        "inner": 50.0,
+                    }
+                },
+                "new_value": {
+                    "outer": {
+                        "inner": 60.0,
+                    }
+                },
+            },
+            0.01,
+            True,
+        ),
+        # Nested dict with non-numeric change
+        (
+            {
+                "old_value": {
+                    "status": "active",
+                },
+                "new_value": {
+                    "status": "inactive",
+                },
+            },
+            0.01,
+            True,
+        ),
+    ],
+)
+def test_is_significant(
+    changes: dict[str, object],
+    tolerance: float,
+    expected: bool,
+) -> None:
+    assert E2ETestResultsHandler.is_significant(changes, tolerance) is expected
 
 
 def test_filter_nested() -> None:
     """Unit test for filter_nested()."""
-    diff = {
+    diff: dict[str, dict[str, float | str]] = {
         "key1": {"old_value": 100.0, "new_value": 100.0001},
         "key2": {"old_value": 50.0, "new_value": 51.0},
     }
@@ -367,19 +484,18 @@ def test_filter_nested() -> None:
 
 
 @pytest.mark.parametrize(
-    "diff, should_update, matching_path, raise_exception",
+    "diff, matching_path, raise_exception",
     [
-        ({}, False, "output_dir/actual_results.json", None),
-        ({"diff": "some_differences"}, True, "output_dir/actual_results.json", None),
-        ({}, False, None, None),
-        ({}, False, "output_dir/actual_results.json", IOError("File read error")),
-        ({}, False, "output_dir/actual_results.json", json.JSONDecodeError("Invalid JSON", doc="", pos=0)),
+        ({}, "output_dir/actual_results.json", None),
+        ({"diff": "some_differences"}, "output_dir/actual_results.json", None),
+        ({}, None, None),
+        ({}, "output_dir/actual_results.json", IOError("File read error")),
+        ({}, "output_dir/actual_results.json", json.JSONDecodeError("Invalid JSON", doc="", pos=0)),
     ],
 )
 def test_update_expected_test_results(
     mocker: MockerFixture,
     diff: dict[str, str],
-    should_update: bool,
     matching_path: str | None,
     raise_exception: Exception | None,
 ) -> None:
@@ -388,7 +504,6 @@ def test_update_expected_test_results(
     output_dir = Path("output_dir")
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
-    add_warning = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_warning")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
 
     results_path = mocker.MagicMock()
@@ -436,11 +551,8 @@ def test_update_expected_test_results(
             mock_move.assert_called_once_with(Path(expected_backup_path), results_path.expected_results_path)
         else:
             assert add_error.call_count == 0
-            expected_log_count = 3 if should_update else 2
-            assert add_log.call_count == expected_log_count
+            assert add_log.call_count == 1
             mock_write_json.assert_called_once()
-            if diff:
-                add_warning.assert_called_once()
     else:
         assert add_error.call_count == 1
         assert add_log.call_count == 1
