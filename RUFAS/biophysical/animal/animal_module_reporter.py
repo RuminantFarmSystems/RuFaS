@@ -112,7 +112,23 @@ class AnimalModuleReporter:
             ),
         }
 
+        milk_by_parity_group: dict[str, list[float]] = {
+            "parity_1": [],
+            "parity_2": [],
+            "parity_3_and_above": [],
+        }
+
         for milk_stats in milk_reports:
+            if milk_stats.parity == 1:
+                parity_group = "parity_1"
+            elif milk_stats.parity == 2:
+                parity_group = "parity_2"
+            else:
+                parity_group = "parity_3_and_above"
+
+            milk_by_parity_group[parity_group].append(
+                milk_stats.estimated_daily_milk_produced
+            )
             updated_milk_data: dict[str, int | float | str] = {
                 "cow_id": milk_stats.cow_id,
                 "pen_id": milk_stats.pen_id,
@@ -142,6 +158,19 @@ class AnimalModuleReporter:
                 updated_milk_data["ranking_index"] = milk_stats.ranking_index
 
             om.add_variable("milk_data_at_milk_update", updated_milk_data, info_map)
+
+        for parity_group, milk_values in milk_by_parity_group.items():
+            average_milk = (
+                sum(milk_values) / len(milk_values)
+                if milk_values
+                else 0.0
+            )
+
+            om.add_variable(
+                f"average_estimated_daily_milk_produced_{parity_group}",
+                average_milk,
+                info_map,
+            )
 
     @classmethod
     def report_average_genetics(
