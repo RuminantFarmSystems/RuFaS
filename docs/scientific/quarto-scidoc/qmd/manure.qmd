@@ -2078,7 +2078,7 @@ $$
 
 **Calculate Daily Methane Generation** `calculate_ifsm_methane_emission`
 
-Calculates the daily mass of methane emitted from the open lot based on daily manure volatile solids (VS) added to lot manure (through animal excretion and bedding addition) and the emission factor calculated in [MN.MET.5]{#eq-mn-met-5}. Here and in other equations, ‘daily’ denotes the value associated with received manure added to the open lot on a specified simulation day.
+Calculates the daily mass of methane emitted from the open lot based on daily manure volatile solids (VS) added to lot manure (through animal excretion and bedding addition) and the emission factor calculated in [MN.MET.5](#eq-mn-met-5). Here and in other equations, ‘daily’ denotes the value associated with received manure added to the open lot on a specified simulation day.
 
 ::: {.callout-note}
 The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded
@@ -2241,7 +2241,7 @@ $$
 
 **Calculate N Loss to Ammonia** `_calculate_cbcp_ammonia_emission`
 
-Manure nitrogen being deposited and accumulating in the bedded pack results in NH<sub>3</sub> emissions. Here we utilize an emission factor based on mixing activity [@Hanson2024] to estimate total kg of ammonia loss based on the daily manure N deposition by animals. 
+Manure nitrogen being deposited and accumulating in the bedded pack results in NH<sub>3</sub> emissions. Here we utilize an emission factor based on mixing activity to estimate total kg of ammonia loss based on the daily manure N deposition by animals [@Hanson2024]. 
       
 ::: {#eq-mn-amm-8}
 [[**MN.AMM.8**]]{.aside .content-visible when-format="html"}
@@ -2316,9 +2316,9 @@ Received manure simply refers to the manure being loaded into the manure storage
 
 **Stored Manure**
 
-Below is a summary of updates to ManureStream variables representing the stored manure. Note that the formulas below may be a summarization of multiple steps detailed above, and are intended to provide an overview of what mass losses/gains are reflected in the value of each variable.
+Below is a summary of updates to `ManureStream` variables representing the stored manure. Note that the formulas below may be a summarization of multiple steps detailed above, and are intended to provide an overview of what mass losses/gains are reflected in the value of each variable.
 
-Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. 
+Equations in the table below (See [Table](#tbl-mn-ol-calc), calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. 
 
 ```{python}
 #| label: tbl-mn-ol-calc
@@ -2331,7 +2331,11 @@ import_table(
 
 ::: {.callout-note}
 The “Max(0, )” notation prevents the ammoniacal N value from becoming negative. This is especially important early in a simulation when accumulated manure quantities that are very small compared to the fixed surface area value can lead to high ammonia emissions.
-degradable_volatile_solids_frac = received manure degradable_volatile_solids / received manure total_volatile_solids
+`degradable_volatile_solids_frac = received manure degradable_volatile_solids / received manure total_volatile_solids
+
+$$
+\text{`degradable_volatile_solids_frac`} = received manure degradable_volatile_solids
+$$
 ::: 
 
 
@@ -2408,7 +2412,7 @@ Instance(s) of `ManureStream` for each manure stream defined by the user that re
 
 **Calculate Daily Methane Generation** `_calculate_composting_methane_emissions`
 
-Calculates the daily mass of methane emitted from the compost based on manure volatile solids (VS) added to compost (from animal excretion and bedding addition) and an emission factor based on composting method and simulation average temperature described in the (#tbl-mn-cp-met-conv) [@Hanson2024]. Here and in other equations, ‘daily’ denotes the value associated with received manure added to the open lot on a specified simulation day.
+Calculates the daily mass of methane emitted from the compost based on manure volatile solids (VS) added to compost (from animal excretion and bedding addition) and an emission factor based on composting method and simulation average temperature described in the [table below](#tbl-mn-cp-met-conv) [@Hanson2024]. Here and in other equations, ‘daily’ denotes the value associated with received manure added to the open lot on a specified simulation day.
 
 ::: {.callout-note}
 The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded.
@@ -2691,7 +2695,8 @@ import_table(
 ::: {.callout-note}
 The “Max(0, )” notation prevents the ammoniacal N value from becoming negative. This is especially important early in a simulation when accumulated manure quantities that are very small compared to the fixed surface area value can lead to high ammonia emissions.
 
-degradable_volatile_solids_frac = received manure degradable_volatile_solids / received manure total_volatile_solids
+`degradable_volatile_solids_frac` = received manure `degradable_volatile_solids` / received manure `total_volatile_solids`
+
 ::: 
 
 ## Daily Spread
