@@ -5,8 +5,8 @@ nitrogen, kg , stored manure nitrogen + received manure nitrogen - NH$_3$N emiss
 phosphorus, kg , stored manure phosphorus + received manure phosphorus
 potassium, kg , stored manure potassium + received manure potassium 
 ash, kg , stored manure ash + received manure ash
-degradable_volatile_solids, -- , stored degradable VS + received degradable VS - VSd loss
-manure_non_degradable_volatile_solids, -- , stored manure non-degradable VS + received manure non-degradable VS - manure VSnd loss 
-bedding_non_degradable_volatile_solids, -- , stored bedding non-degradable VS + received bedding non-degradable VS - bedding VSnd loss
+degradable_volatile_solids, kg , stored degradable VS + received degradable VS - VSd loss
+manure_non_degradable_volatile_solids, kg , stored manure non-degradable VS + received manure non-degradable VS - manure VSnd loss 
+bedding_non_degradable_volatile_solids, kg , stored bedding non-degradable VS + received bedding non-degradable VS - bedding VSnd loss
 total_solids, kg , stored total solids + received total solids - VSd loss - VSnd los)
 volume, m$^3$, stored volume + Received volume- $\frac{\text{VSd loss}+\text{VSnd loss}}{\text{SLURRY\_MANURE\_DENSITY}}$
