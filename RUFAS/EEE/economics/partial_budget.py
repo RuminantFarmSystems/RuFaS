@@ -12,9 +12,6 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
-# Units for each field of the ``econ_pba_breakdown`` rows exported by
-# ``PartialBudget.export_line_item_breakdown``. Biophysical quantities and prices mix units
-# across line items (kg, head, hours, ...), so they are reported as unitless.
 LINE_ITEM_BREAKDOWN_UNITS: dict[str, MeasurementUnits] = {
     "module": MeasurementUnits.UNITLESS,
     "flow_type": MeasurementUnits.UNITLESS,
@@ -106,10 +103,6 @@ class PartialBudget:
             return float(value)
         except (TypeError, ValueError):
             return None
-
-    # Supporting multi-year scenarios will require accumulating results across
-    # scenarios as outlined in `Documentation of Economic Data and Analytical
-    # Methods (2).pdf`.
 
     def _calculate_from_preprocessed(
         self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None
