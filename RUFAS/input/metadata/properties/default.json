@@ -282,9 +282,9 @@
             "minimum": 0,
             "maximum": 1
           },
-          "keep_female_calf_rate": {
+          "keep_dairy_female_rate": {
             "type": "number",
-            "description": "Female Calf Retention Rate (fraction) -- The fraction of female calves kept and raised on-farm; used when Female Calf Retention Method is 'rate'",
+            "description": "Dairy Female Calf Retention Rate (fraction) -- The fraction of dairy female calves kept and raised on-farm; used when Female Calf Retention Method is 'rate'",
             "default": 1,
             "minimum": 0,
             "maximum": 1

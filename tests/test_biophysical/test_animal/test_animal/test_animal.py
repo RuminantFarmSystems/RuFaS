@@ -206,6 +206,7 @@ def assert_animal_init_properties(
             initial_phosphorus=10.0,
             dam_tbv_fat=10.0,
             dam_tbv_protein=10.0,
+            bred_from_semen=None,
         )
     ],
 )
@@ -255,6 +256,7 @@ def test_initialize_newborn_calf(
         initial_phosphorus=10.0,
         dam_tbv_fat=10.0,
         dam_tbv_protein=10.0,
+        bred_from_semen=None,
     )
 
     # Sex is taken directly from the newborn calf config; the only remaining

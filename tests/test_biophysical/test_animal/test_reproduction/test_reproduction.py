@@ -2472,9 +2472,9 @@ def test_open_cow_sets_do_not_breed_and_returns_when_dryoff_before_third_check(
 @pytest.mark.parametrize(
     "animal_type, conception_rate, expected_conception_success, selective_repro_strategy, assigned_semen_type",
     [
-        # Non-selective strategy always uses conventional dairy semen.
-        (AnimalType.HEIFER_II, 0.7, True, False, SemenType.CONVENTIONAL_DAIRY),
-        (AnimalType.LAC_COW, 0.2, False, False, SemenType.CONVENTIONAL_DAIRY),
+        # Non-selective strategy always uses user-defined semen.
+        (AnimalType.HEIFER_II, 0.7, True, False, SemenType.USER_DEFINED),
+        (AnimalType.LAC_COW, 0.2, False, False, SemenType.USER_DEFINED),
         # Selective strategy defers to assign_semen_type (mocked here).
         (AnimalType.HEIFER_II, 0.3, False, True, SemenType.SEXED_DAIRY),
         (AnimalType.LAC_COW, 0.8, True, True, SemenType.BEEF),

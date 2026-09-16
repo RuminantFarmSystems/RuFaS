@@ -46,7 +46,7 @@
     "farm_level": {
       "calf": {
         "user_defined_male_calf_rate": 0.53,
-        "keep_female_calf_rate": 1,
+        "keep_dairy_female_rate": 1,
         "calf_retention_method": "rate",
         "annual_keep_female_calf_num": 0,
         "wean_day": 60,
@@ -62,8 +62,8 @@
         "std_gestation_len": 6,
         "prefresh_day": 21,
         "calving_interval": 400,
-        "selective_repro_strategy": true,
-        "ranking_method": "genetic",
+        "selective_repro_strategy": false,
+        "ranking_method": null,
         "genetic_selection_index_weights": {
 			"fat": 0.318,
 			"protein": 0.13

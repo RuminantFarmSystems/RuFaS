@@ -64,9 +64,8 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
         },
         "farm_level": {
             "calf": {
-                "male_calf_rate_sexed_semen": 0.1,
-                "male_calf_rate_conventional_semen": 0.53,
-                "keep_female_calf_rate": 1,
+                "user_defined_male_calf_rate": 0.1,
+                "keep_dairy_female_rate": 1,
                 "calf_retention_method": "rate",
                 "annual_keep_female_calf_num": 0,
                 "wean_day": 60,
@@ -377,9 +376,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
         },
         "farm_level": {
             "calf": {
-                "male_calf_rate_sexed_semen": 0.1,
-                "male_calf_rate_conventional_semen": 0.53,
-                "keep_female_calf_rate": 1,
+                "user_defined_male_calf_rate": 0.1,
+                "keep_dairy_female_rate": 1,
                 "calf_retention_method": "rate",
                 "annual_keep_female_calf_num": 0,
                 "wean_day": 60,

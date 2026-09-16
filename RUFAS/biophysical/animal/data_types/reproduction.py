@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from enum import Enum
 
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents

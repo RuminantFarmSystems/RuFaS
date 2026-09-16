@@ -44,7 +44,7 @@ class CalfRetentionPolicy:
     user-selectable methods are supported:
 
     * ``"rate"`` (the historical default): each live female calf is kept with probability
-      :attr:`AnimalConfig.keep_female_calf_rate`.
+      :attr:`AnimalConfig.keep_dairy_female_rate`.
     * ``"count"``: the user specifies a target number of female calves to keep per year
       (:attr:`AnimalConfig.annual_keep_female_calf_num`). That target is spread evenly across
       the simulation year as "keep tags"; each live female calf born consumes an outstanding
@@ -163,7 +163,8 @@ class CalfRetentionPolicy:
 
     @staticmethod
     def _is_sold_rate_based(calf: "Animal") -> bool:
-        """Sell males; keep each live female with probability keep_female_calf_rate.
+        """
+        Sell males; keep each live female with probability keep_dairy_female_rate.
 
         Notes
         -----
@@ -172,7 +173,7 @@ class CalfRetentionPolicy:
         is preserved.
 
         """
-        return calf.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate
+        return calf.sex == Sex.MALE or random() > AnimalConfig.keep_dairy_female_rate
 
     def _is_sold_count_based(self, calf: "Animal") -> bool:
         """Keep a live female calf only if an outstanding keep tag is available."""

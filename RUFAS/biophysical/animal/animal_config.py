@@ -39,12 +39,12 @@ class AnimalConfig:
         The duration after which breeding is stopped, (simulation day).
     user_defined_male_calf_rate : float
         Proportion of male calves, (unitless).
-    keep_female_calf_rate : float
-        Rate at which female calves are kept, used when ``calf_retention_method`` is
+    keep_dairy_female_rate : float
+        Rate at which dairy female calves are kept, used when ``calf_retention_method`` is
         ``"rate"`` (unitless).
     calf_retention_method : str
         Method used to decide female-calf retention: ``"rate"`` (keep each live female
-        calf with probability ``keep_female_calf_rate``) or ``"count"`` (keep a target
+        calf with probability ``keep_dairy_female_rate``) or ``"count"`` (keep a target
         number of female calves per year, ``annual_keep_female_calf_num``).
     annual_keep_female_calf_num : int
         Target number of female calves to keep per year, used when
@@ -220,7 +220,7 @@ class AnimalConfig:
         "conventional_dairy": 0.5,
         "beef": 0.3,
     }
-    keep_female_calf_rate: float = 1
+    keep_dairy_female_rate: float = 1
     calf_retention_method: str = "rate"
     annual_keep_female_calf_num: int = 0
     still_birth_rate: float = 0.065
@@ -456,7 +456,7 @@ class AnimalConfig:
         cls.cow_semen_allocation_proportions["beef"] = animal_config_data["farm_level"]["repro"]["cows"][
             "semen_allocation_proportions"
         ]["beef"]
-        cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
+        cls.keep_dairy_female_rate = animal_config_data["farm_level"]["calf"]["keep_dairy_female_rate"]
         cls.calf_retention_method = animal_config_data["farm_level"]["calf"].get("calf_retention_method", "rate")
         cls.annual_keep_female_calf_num = int(
             animal_config_data["farm_level"]["calf"].get("annual_keep_female_calf_num", 0)
