@@ -119,19 +119,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$ and manure methane potential, m$^3$/kgVS):
 
-* water
-* ammoniacal_nitrogen
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `water`
+* `ammoniacal_nitrogen`
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 Manure handlers also make use of information contained in the `PenManureData` subclass. This includes the following information specific to the pen from which the manure was generated:
@@ -488,19 +488,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$, and manure methane potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -685,19 +685,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
 
-* water
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -976,19 +976,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$, and manure methane production potential, m$^3$/kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* `total volatile solids` (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -1310,19 +1310,19 @@ import_table(
 
 Instance(s) of ManureStream for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$/kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* `total volatile solids` (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -2734,19 +2734,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
