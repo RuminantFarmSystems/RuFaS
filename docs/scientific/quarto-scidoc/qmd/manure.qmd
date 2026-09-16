@@ -1680,19 +1680,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -1709,7 +1709,7 @@ Instance(s) of `ManureStream` for each manure stream defined by the user that re
 
 **Calculate Daily Methane Generation**
 
-Calculates the daily mass of methane emitted from the bedded pack based on daily manure VS added to the bedded pack (through animal excretion and bedding addition) and an emission factor based on mixing activity and simulation average temperature @Hanson2024. Here and in other equations, ‘daily’ denotes the value associated with received manure added to the bedded pack on a specified simulation day.
+Calculates the daily mass of methane emitted from the bedded pack based on daily manure VS added to the bedded pack (through animal excretion and bedding addition) and an emission factor based on mixing activity and simulation average temperature [@Hanson2024]. Here and in other equations, 'daily' denotes the value associated with received manure added to the bedded pack on a specified simulation day.
 
 ::: {.callout-note}
 The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded
@@ -1736,7 +1736,7 @@ $$
 * B$_0$ = methane production potential (kg CH<sub>4</sub> per kg manure VS) of manure excreted onto the lot on a specified simulation day
 * Constant Value = 0.24 m$^3$ CH<sub>4</sub>/kg VS
 * MCF = methane conversion factor (@tbl-mn-bp-met-conv). This is based on simulation average ambient temperature
-* tVS (kg) = daily mass (kg) of manure-excreted total VS in the bedded pack manure, received from `ManureStream(s)`; note that bedding VS are not included in this value
+* tVS (kg) = daily mass (kg) of manure-excreted total VS in the bedded pack manure, received from `ManureStream`; note that bedding VS are not included in this value
 
 **Calculate Carbon Decomposition**
 
@@ -1870,7 +1870,9 @@ $$
 * `DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP` = The effect of moisture on microbial decomposition, set at 0.65. This is a simplification as moisture content of the manure pack is not currently modeled. 
 * `anaerobic_effect` = the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. Set to 0.9664 by default.
 
-**Calculate Total VS Loss** `_apply_dry_matter_loss`
+**Calculate Total VS Loss** 
+
+`_apply_dry_matter_loss`
 
 The quantity of total and volatile solids remaining in the accumulated bedded pack must be updated according to estimated CH<sub>4</sub> and C decomposition losses. To do this, we calculate the total loss of VS through CH<sub>4</sub> emission and C decomposition. Loss of mass through CH<sub>4</sub> emissions is assumed to be equal to the mass of CH<sub>4</sub> emitted. Manure volatile solids are assumed to be 50% C, therefore, to determine total mass loss through C decomposition, we divide the mass of C decomposition by 0.50. Importantly, volatile solids destruction is attributed only to manure-excreted volatile solids; bedding volatile solids destruction is not considered at this time.
 
@@ -1886,7 +1888,9 @@ $$
 * `methane` (kg) = The daily methane loss, calculated with [MN.MET.6](#eq-mn-met-6), based on the daily quantity of manure VS added to the bedded pack
 * `total_carbon_decomposition` (kg) = quantity of C lost through microbial decomposition (kg), calculated with [MN.STO.10](#eq-mn-sto-10), based on the daily quantity of manure VS added to the bedded pack
 
-**Calculate N Loss to Ammonia** `_calculate_cbpb_ammonia_emission`
+**Calculate N Loss to Ammonia** 
+
+`_calculate_cbpb_ammonia_emission`
 
 Manure nitrogen being deposited and accumulating in the bedded pack results in NH<sub>3</sub> emissions. Here we utilize an emission factor based on mixing activity [@Hanson2024]  to estimate total kg of ammonia loss based on the daily manure N deposition by animals. 
 
@@ -1904,7 +1908,9 @@ $$
     * Bedded pack (no mixing) = `AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING` (0.25) 
     * Compost bedded pack (mixing) = `AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING` (0.50)
 
-**Calculate N loss to Nitrous Oxide** `_calculate_cbpb_nitrous_oxide_emission`
+**Calculate N loss to Nitrous Oxide** 
+
+`_calculate_cbpb_nitrous_oxide_emission`
 
 In addition to NH<sub>3</sub>-N emissions, manure nitrogen deposition in the bedded pack also results in N<sub>2</sub>O emissions. Similar to NH<sub>3</sub>, we estimate daily N<sub>2</sub>O-N loss using an emissions factor from @Hanson2024 based on the type of management used. 
 
@@ -1920,7 +1926,9 @@ $$
     * Bedded pack (no mixing) = `NITROUS_OXIDE_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING` (0.01) 
     * Compost bedded pack (mixing) = `NITROUS_OXIDE_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING` (0.07)
 
-**Calculate N Loss to Leaching** `calculate_nitrogen_loss_to_leaching`
+**Calculate N Loss to Leaching** 
+
+`calculate_nitrogen_loss_to_leaching`
 
 Manure nitrogen deposited in bedded packs may also be lost to leaching. Leaching of manure N may occur when fecal and urinary N are converted to nitrate in the soil beneath the bedded pack, if the pack is not concrete, lined, or otherwise sealed. Nitrate can then be carried away via water movement through the subsoil. Similar to NH<sub>3</sub> and N<sub>2</sub>O, we estimate daily leaching-N loss using an emissions factor from @Hanson2024, which is not influenced by management of the bedded pack (i.e., mixing activity). 
 
@@ -2027,19 +2035,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$ and manure methane potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -2372,19 +2380,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
