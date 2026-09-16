@@ -2356,7 +2356,6 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
     animal.animal_type = AnimalType.HEIFER_II
     mock_determine_days_in_milk = mocker.patch.object(animal, "_determine_days_in_milk", return_value=3)
     mock_set_wood_parameters = mocker.patch.object(MilkProduction, "set_wood_parameters")
-    mock_assess_removal_risk = mocker.patch.object(animal, "_assess_removal_risk")
     mock_get_wood_parameters = mocker.patch.object(
         LactationCurve, "get_wood_parameters", return_value={"l": 10.2, "m": 41.2, "n": 41.8}
     )
@@ -2391,7 +2390,6 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
     mock_get_wood_parameters.assert_called_once()
     mock_set_wood_parameters.assert_called_once()
     mock_determine_days_in_milk.assert_called_once()
-    mock_assess_removal_risk.assert_called_once()
 
     assert animal.days_in_milk == 3
     assert animal.body_weight == 10
@@ -3039,7 +3037,7 @@ def test_will_die_tomorrow_no_death(mock_lactating_cow: Animal, mocker: MockerFi
     animal.calves = 1
     animal.days_born = 150
     mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.95)
-    assert animal.will_die_tomorrow() is False
+    assert animal.is_selected_for_death(percent_fresh=0.15) is False
 
 
 def test_will_die_tomorrow_with_death(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
@@ -3048,7 +3046,7 @@ def test_will_die_tomorrow_with_death(mock_lactating_cow: Animal, mocker: Mocker
     animal.calves = 5
     # daily death rate = parity_death_probability[3] (0.117) / 365 ~= 0.00032.
     mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.0001)
-    assert animal.will_die_tomorrow() is True
+    assert animal.is_selected_for_death(percent_fresh=0.15) is True
 
 
 def test_setup_calf_mortality_disabled_when_rate_zero(mock_calf: Animal, mocker: MockerFixture) -> None:
@@ -3217,13 +3215,13 @@ def test_will_be_sold_tomorrow_with_acute_sale(mock_lactating_cow: Animal, mocke
     animal.calves = 1
     # daily acute-sale rate = parity_acute_sale_probability[0] (0.169) / 365 ~= 0.00046.
     mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.0001)
-    assert animal.will_be_sold_tomorrow() is True
+    assert animal.is_selected_for_acute_sale(percent_fresh=0.15) is True
 
 
 def test_will_be_sold_tomorrow_no_acute_sale(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 1
     mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.95)
-    assert mock_lactating_cow.will_be_sold_tomorrow() is False
+    assert mock_lactating_cow.is_selected_for_acute_sale(percent_fresh=0.15) is False
 
 
 def test_set_nutrient_standard() -> None:

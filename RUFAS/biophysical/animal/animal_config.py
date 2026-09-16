@@ -240,9 +240,6 @@ class AnimalConfig:
     third_pregnancy_check_day: int = 200
     third_pregnancy_check_loss_rate: float = 0.017
 
-    # Annual, parity-indexed probabilities that a cow dies (parity_death_probability) or is sold
-    # for an acute / involuntary reason (parity_acute_sale_probability) during a given year. See
-    # issue #2694: these were formerly evaluated once per lactation and are now evaluated annually.
     parity_death_probability: list[float] = [0.039, 0.056, 0.085, 0.117]
     parity_acute_sale_probability: list[float] = [0.169, 0.233, 0.301, 0.408]
 

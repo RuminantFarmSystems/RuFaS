@@ -1767,8 +1767,6 @@ class Animal:
                 self.milk_production.set_wood_parameters(
                     wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
                 )
-                if self.calves == 1:
-                    self._assess_removal_risk()
 
         self.events += reproduction_outputs.events
 
@@ -1805,9 +1803,6 @@ class Animal:
         self.daily_growth_update(time)
 
         newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
-
-        if self.animal_type.is_cow:
-            self._assess_removal_risk()
 
         daily_routines_output.animal_status, daily_routines_output.newborn_calf_config = self.animal_life_stage_update(
             time
@@ -2424,74 +2419,73 @@ class Animal:
             parity=self.calves,
         )
 
-    def _assess_removal_risk(self) -> None:
+    def assess_removal_risk(self, percent_fresh: float, time: RufasTime) -> None:
         """
         Roll a cow's daily mortality and acute-sale risk and schedule any resulting removal.
 
-        Called each day for every cow, and once when a heifer first calves, so removal risk
-        accrues with time spent in the herd rather than only at calving (issue #2694). Death and
-        acute sale are rolled independently. A risk type that already has a pending future event is
-        left untouched, preventing a later roll from overwriting a removal a prior roll scheduled.
-        A cow selected for removal is scheduled to leave the herd immediately (on the current day).
+        Parameters
+        ----------
+        percent_fresh : float
+            Fraction of the herd currently fresh, used to scale the daily death and
+            acute-sale selection probabilities.
+        time : RufasTime
+            Current simulation time, used to record the day of death or sale.
 
-        Notes
+        Returns
         -------
-        [AN.ANM.1], [AN.ANM.2]
-
+        None
         """
         if self.future_death_date == sys.maxsize:
-            if self.will_die_tomorrow():
+            if self.is_selected_for_death(percent_fresh):
                 self.future_death_date = self.days_born
-                self._future_death_reason = animal_constants.DEATH_CULL
+                self.cull_reason = self._future_death_reason = animal_constants.DEATH_CULL
+                self.dead_at_day = time.simulation_day
 
         if self.future_cull_date == sys.maxsize:
-            if self.will_be_sold_tomorrow():
+            if self.is_selected_for_acute_sale(percent_fresh):
                 self.future_cull_date = self.days_born
                 self.cull_reason = animal_constants.ACUTE_SALE_CULL
+                self.sold_at_day = time.simulation_day
 
     def _parity_index(self) -> int:
         """Return the 0-based index into a by-parity array, capping parity 4+ at the last entry."""
         return 3 if self.calves >= 4 else self.calves - 1
 
-    def will_die_tomorrow(self) -> bool:
+    def is_selected_for_death(self, percent_fresh: float) -> bool:
         """
         Roll the cow's daily mortality risk.
-
-        The parity-indexed annual :attr:`AnimalConfig.parity_death_probability` is converted to a
-        daily rate by dividing by 365 and rolled once per day (issue #2694).
 
         Returns
         -------
         bool
             ``True`` if the cow is selected to die, ``False`` otherwise.
-
-        Notes
-        -------
-        [AN.ANM.1]
-
         """
-        death_rate = AnimalConfig.parity_death_probability[self._parity_index()] / 365
-        return random() <= death_rate
+        average_daily_death_rate = AnimalConfig.parity_death_probability[self._parity_index()] / 365
+        percent_other = 1 - percent_fresh
 
-    def will_be_sold_tomorrow(self) -> bool:
+        daily_death_risk_other = average_daily_death_rate / (2.55 * percent_fresh + percent_other)
+        daily_death_risk_fresh = 2.55 * daily_death_risk_other
+
+        daily_death_risk = daily_death_risk_fresh if self.days_in_milk < 50 else daily_death_risk_other
+        return random() <= daily_death_risk
+
+    def is_selected_for_acute_sale(self, percent_fresh: float) -> bool:
         """
         Roll the cow's daily acute-sale (forced / involuntary) risk.
-
-        The parity-indexed annual :attr:`AnimalConfig.parity_acute_sale_probability` is converted to
-        a daily rate by dividing by 365 and rolled once per day (issue #2694).
 
         Returns
         -------
         bool
             ``True`` if the cow is selected for an acute sale, ``False`` otherwise.
-
-        Notes
-        -------
-        [AN.ANM.2]
-
         """
-        acute_sale_rate = AnimalConfig.parity_acute_sale_probability[self._parity_index()] / 365
-        return random() <= acute_sale_rate
+        average_daily_removal_rate = AnimalConfig.parity_acute_sale_probability[self._parity_index()] / 365
+        percent_other = 1 - percent_fresh
+
+        daily_removal_risk_other = average_daily_removal_rate / (2.55 * percent_fresh + percent_other)
+        daily_removal_risk_fresh = 2.55 * daily_removal_risk_other
+
+        daily_removal_risk = daily_removal_risk_fresh if self.days_in_milk < 50 else daily_removal_risk_other
+        return random() <= daily_removal_risk
 
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """
