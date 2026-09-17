@@ -942,7 +942,10 @@ class TaskManager:
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
         E2ETestResultsHandler.compare_actual_and_expected_test_results(
-            args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"]
+            args["json_output_directory"],
+            args["convert_variable_table_path"],
+            args["output_prefix"],
+            args["use_accepted_ranges"],
         )
 
         TaskManager.handle_post_processing(

@@ -124,3 +124,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3256](https://github.com/RuminantFarmSystems/RuFaS/pull/3256) - [minor change] [Branch Alignment] [NoInputChange] [NoOutputChange] Aligning `dev` branch with bug-fixing code from PR 3214 that was merged into `test`.
 - [3260](https://github.com/RuminantFarmSystems/RuFaS/pull/3260) - [minor change] [OutputManager] [NoInputChange] [NoOutputChange] Removes duplicative `report` naming mechanism in `OutputManager`.
 - [3275](https://github.com/RuminantFarmSystems/RuFaS/pull/3260) - [minor change] [E2E Testing] [NoInputChange] [NoOutputChange] Removes `deepdiff` check from the process to update e2e expected results.
+- [3290](https://github.com/RuminantFarmSystems/RuFaS/pull/3290) - [minor change] [E2E Testing] [InputChange] [OutputChange] Adds accepted-range support to end-to-end testing.
