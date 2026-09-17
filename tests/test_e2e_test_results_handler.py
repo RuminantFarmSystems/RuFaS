@@ -6,11 +6,16 @@ import pandas as pd
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.e2e_test_results_handler import E2ETestResultsHandler, MUST_CHANGE_VARIABLES_KEY, ResultPathType
+from RUFAS.e2e_test_results_handler import (
+    ACCEPTED_RANGES_KEY,
+    E2ETestResultsHandler,
+    MUST_CHANGE_VARIABLES_KEY,
+    ResultPathType,
+)
 
 
-def write_must_change_file(path: Path, contents: Any) -> None:
-    """Writes a must-change variables file used by the must-change tests."""
+def write_json_file(path: Path, contents: Any) -> None:
+    """Writes a JSON file, or the given raw text, used by the must-change and accepted-range tests."""
     with open(path, "w", encoding="utf-8") as file:
         if isinstance(contents, str):
             file.write(contents)
@@ -55,7 +60,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
     )
 
     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix"
+        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix", True
     )
 
     get_result_paths.assert_called_once()
@@ -245,12 +250,14 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
                 "expected_results_path": "expected_2",
                 "actual_results_path": "actual_2",
                 "tolerance": 0.01,
+                "must_change_variables_path": "must_change_2",
+                "accepted_ranges_path": "ranges_2",
             },
         ],
     )
     expected = [
         ResultPathType("one", "expected_1", "actual_1", 0.01),
-        ResultPathType("two", "expected_2", "actual_2", 0.01),
+        ResultPathType("two", "expected_2", "actual_2", 0.01, "must_change_2", "ranges_2"),
     ]
 
     actual = E2ETestResultsHandler._get_test_result_paths("dummy_prefix")
@@ -661,9 +668,9 @@ def test_write_formatted_json(data: dict[str, dict[str, str]], should_raise: boo
         assert written_data.count(expected_results_str) == 1
 
 
-def make_result_path_set(must_change_variables_path: str) -> ResultPathType:
-    """Returns a ResultPathType with dummy paths and the given must-change variables path."""
-    return ResultPathType("domain", "expected", "actual_", 0.1, must_change_variables_path)
+def make_result_path_set(must_change_variables_path: str = "", accepted_ranges_path: str = "") -> ResultPathType:
+    """Returns a ResultPathType with dummy paths and the given must-change variables and accepted ranges paths."""
+    return ResultPathType("domain", "expected", "actual_", 0.1, must_change_variables_path, accepted_ranges_path)
 
 
 def test_load_must_change_variables(mocker: MockerFixture, tmp_path: Path) -> None:
@@ -672,8 +679,8 @@ def test_load_must_change_variables(mocker: MockerFixture, tmp_path: Path) -> No
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     file_one = tmp_path / "must_change_one.json"
     file_two = tmp_path / "must_change_two.json"
-    write_must_change_file(file_one, {"description": "ignored", MUST_CHANGE_VARIABLES_KEY: ["A.x", "A.y"]})
-    write_must_change_file(file_two, {MUST_CHANGE_VARIABLES_KEY: ["A.y", "B.z"]})
+    write_json_file(file_one, {"description": "ignored", MUST_CHANGE_VARIABLES_KEY: ["A.x", "A.y"]})
+    write_json_file(file_two, {MUST_CHANGE_VARIABLES_KEY: ["A.y", "B.z"]})
     path_sets = [
         make_result_path_set(str(file_one)),
         make_result_path_set(str(file_one)),
@@ -720,7 +727,7 @@ def test_load_must_change_variables_invalid_contents(mocker: MockerFixture, tmp_
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     file_path = tmp_path / "must_change.json"
-    write_must_change_file(file_path, file_contents)
+    write_json_file(file_path, file_contents)
 
     with pytest.raises(ValueError):
         E2ETestResultsHandler._load_must_change_variables([make_result_path_set(str(file_path))])
@@ -843,7 +850,7 @@ def test_compare_actual_and_expected_results_with_must_change(
     with open(expected_results_path, "w", encoding="utf-8") as file:
         json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
     must_change_path = tmp_path / "must_change_variables.json"
-    write_must_change_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
+    write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
     path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1, str(must_change_path))
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
@@ -851,7 +858,7 @@ def test_compare_actual_and_expected_results_with_must_change(
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
 
-    E2ETestResultsHandler.compare_actual_and_expected_test_results(json_output_path, None, "dummy_prefix")
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(json_output_path, None, "dummy_prefix", True)
 
     reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
     assert reported["end_to_end_testing_passing"] is expect_passing
@@ -868,3 +875,300 @@ def test_compare_actual_and_expected_results_with_must_change(
         assert "must_change_violations" not in reported
     else:
         assert set(reported["must_change_violations"].keys()) == expect_violations
+
+
+def test_load_accepted_ranges(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that _load_accepted_ranges merges the files referenced by the path sets and keeps extra range keys."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    file_one = tmp_path / "accepted_ranges_one.json"
+    file_two = tmp_path / "accepted_ranges_two.json"
+    write_json_file(
+        file_one,
+        {
+            "description": "ignored",
+            ACCEPTED_RANGES_KEY: {
+                "A.x": {"min": 0, "max": 10, "reference": "NRC 2001"},
+                "A.y": {"min": 1.5, "max": 1.5},
+            },
+        },
+    )
+    write_json_file(file_two, {ACCEPTED_RANGES_KEY: {"B.z": {"min": -5, "max": 5}}})
+    path_sets = [
+        make_result_path_set(accepted_ranges_path=str(file_one)),
+        make_result_path_set(accepted_ranges_path=str(file_one)),
+        make_result_path_set(accepted_ranges_path=str(file_two)),
+        make_result_path_set(),
+    ]
+
+    result = E2ETestResultsHandler._load_accepted_ranges(path_sets)
+
+    assert result == {
+        "A.x": {"min": 0, "max": 10, "reference": "NRC 2001"},
+        "A.y": {"min": 1.5, "max": 1.5},
+        "B.z": {"min": -5, "max": 5},
+    }
+    add_error.assert_not_called()
+
+
+def test_load_accepted_ranges_without_configured_paths(mocker: MockerFixture) -> None:
+    """Tests that _load_accepted_ranges returns an empty dictionary when no paths are configured."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+
+    assert E2ETestResultsHandler._load_accepted_ranges([make_result_path_set()]) == {}
+
+
+def test_load_accepted_ranges_missing_file(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that _load_accepted_ranges raises when a referenced file does not exist."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    path_sets = [make_result_path_set(accepted_ranges_path=str(tmp_path / "no_such_file.json"))]
+
+    with pytest.raises(FileNotFoundError):
+        E2ETestResultsHandler._load_accepted_ranges(path_sets)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "file_contents",
+    [
+        "{not valid json",
+        [{"A.x": {"min": 0, "max": 1}}],
+        {"wrong_key": {"A.x": {"min": 0, "max": 1}}},
+        {ACCEPTED_RANGES_KEY: [{"min": 0, "max": 1}]},
+        {ACCEPTED_RANGES_KEY: {"A.x": [0, 1]}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": 0}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": "0", "max": 1}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": False, "max": 1}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": 0, "max": None}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": 2, "max": 1}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": 0, "max": 1}, "A.y": {"min": 2, "max": 1}}},
+    ],
+)
+def test_load_accepted_ranges_invalid_contents(mocker: MockerFixture, tmp_path: Path, file_contents: Any) -> None:
+    """Tests that _load_accepted_ranges raises for unparsable or malformed files."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    file_path = tmp_path / "accepted_ranges.json"
+    write_json_file(file_path, file_contents)
+
+    with pytest.raises(ValueError):
+        E2ETestResultsHandler._load_accepted_ranges([make_result_path_set(accepted_ranges_path=str(file_path))])
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "value, expected_numbers",
+    [
+        ({"values": [1.0, 2, 3.5]}, [1.0, 2, 3.5]),
+        # None entries of a daily series are skipped
+        ({"values": [None, -2.75, None, 3.5]}, [-2.75, 3.5]),
+        # Booleans are not numbers
+        ({"values": [True, False, 1]}, [1]),
+        ({"values": [["Holstein"]]}, []),
+        ({"values": ["BARE", "CROP"]}, []),
+        # Numbers nested inside records
+        ({"values": [{"202": 1.5, "dry_matter_intake_total": 3.0, "name": "x"}, {"202": 2.5}]}, [1.5, 3.0, 2.5]),
+        ({"values": []}, []),
+        (7, [7]),
+        (None, []),
+    ],
+)
+def test_collect_numerical_values(value: Any, expected_numbers: list[int | float]) -> None:
+    """Tests that _collect_numerical_values finds numbers at any depth and skips booleans, strings, and None."""
+    assert E2ETestResultsHandler._collect_numerical_values(value) == expected_numbers
+
+
+@pytest.mark.parametrize(
+    "actual_value, accepted_range, expected_observed, expected_reason_fragment",
+    [
+        # Every value within the range
+        ({"values": [1.0, 5.0, 9.5]}, {"min": 0, "max": 10}, {"observed_min": 1.0, "observed_max": 9.5}, None),
+        # The bounds are inclusive
+        ({"values": [0, 10]}, {"min": 0, "max": 10}, {"observed_min": 0, "observed_max": 10}, None),
+        # None values are skipped and extra range keys are echoed
+        (
+            {"values": [None, 3.0]},
+            {"min": 0, "max": 10, "reference": "NRC 2001"},
+            {"observed_min": 3.0, "observed_max": 3.0},
+            None,
+        ),
+        # A value above the range
+        ({"values": [1.0, 12.0]}, {"min": 0, "max": 10}, {"observed_min": 1.0, "observed_max": 12.0}, "1 of 2 values"),
+        # A value below the range
+        ({"values": [-0.5, 1.0]}, {"min": 0, "max": 10}, {"observed_min": -0.5, "observed_max": 1.0}, "1 of 2 values"),
+        # Numbers nested inside records
+        (
+            {"values": [{"amount": 13.5}, {"amount": 25.0}]},
+            {"min": 0, "max": 20},
+            {"observed_min": 13.5, "observed_max": 25.0},
+            "1 of 2 values",
+        ),
+        # No numerical values to check
+        ({"values": ["Calf", "Cow"]}, {"min": 0, "max": 10}, {}, "no numerical values"),
+    ],
+)
+def test_evaluate_accepted_ranges(
+    actual_value: dict[str, Any],
+    accepted_range: dict[str, Any],
+    expected_observed: dict[str, float],
+    expected_reason_fragment: str | None,
+) -> None:
+    """Tests _evaluate_accepted_ranges on satisfied and violated ranges."""
+    actual_results = {"A.x": actual_value, "A.y": {"values": [2.0]}}
+
+    satisfied, violations = E2ETestResultsHandler._evaluate_accepted_ranges(actual_results, {"A.x": accepted_range})
+
+    if expected_reason_fragment is None:
+        assert violations == {}
+        assert satisfied == {"A.x": {**accepted_range, **expected_observed}}
+    else:
+        assert satisfied == {}
+        assert list(violations.keys()) == ["A.x"]
+        reason = violations["A.x"].pop("reason")
+        assert expected_reason_fragment in reason
+        assert violations["A.x"] == {**accepted_range, **expected_observed}
+
+
+def test_evaluate_accepted_ranges_missing_from_actual() -> None:
+    """Tests that a ranged variable missing from the actual results is reported as a violation."""
+    satisfied, violations = E2ETestResultsHandler._evaluate_accepted_ranges({}, {"A.x": {"min": 0, "max": 1}})
+
+    assert satisfied == {}
+    assert list(violations.keys()) == ["A.x"]
+    assert violations["A.x"]["min"] == 0
+    assert violations["A.x"]["max"] == 1
+    assert "missing" in violations["A.x"]["reason"]
+
+
+@pytest.mark.parametrize(
+    "actual_results, accepted_ranges, must_change_names, use_accepted_ranges, expect_passing, expect_error_count,"
+    " expect_changed, expect_satisfied, expect_violations",
+    [
+        # Ranged variable changed but stayed within its range: the run passes.
+        (
+            {"A.x": {"values": [5.0]}, "A.y": {"values": [2.0]}},
+            {"A.x": {"min": 0, "max": 10}},
+            [],
+            True,
+            True,
+            0,
+            None,
+            ["A.x"],
+            set(),
+        ),
+        # Ranged variable outside its range: the run fails.
+        (
+            {"A.x": {"values": [50.0]}, "A.y": {"values": [2.0]}},
+            {"A.x": {"min": 0, "max": 10}},
+            [],
+            True,
+            False,
+            1,
+            None,
+            [],
+            {"A.x"},
+        ),
+        # Ranged variable missing from the actual results: the run fails.
+        ({"A.y": {"values": [2.0]}}, {"A.x": {"min": 0, "max": 10}}, [], True, False, 1, None, [], {"A.x"}),
+        # Ranges disabled: the changed ranged variable is graded by the regular comparison and reported as changed.
+        (
+            {"A.x": {"values": [5.0]}, "A.y": {"values": [2.0]}},
+            {"A.x": {"min": 0, "max": 10}},
+            [],
+            False,
+            False,
+            1,
+            ["A.x"],
+            None,
+            None,
+        ),
+        # Ranged variable does not exist in the expected results: configuration error.
+        (
+            {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}},
+            {"A.z": {"min": 0, "max": 10}},
+            [],
+            True,
+            True,
+            1,
+            None,
+            None,
+            None,
+        ),
+        # Variable both flagged as must change and ranged: it must change and stay within its range.
+        (
+            {"A.x": {"values": [5.0]}, "A.y": {"values": [2.0]}},
+            {"A.x": {"min": 0, "max": 10}},
+            ["A.x"],
+            True,
+            True,
+            0,
+            None,
+            ["A.x"],
+            set(),
+        ),
+    ],
+)
+def test_compare_actual_and_expected_results_with_accepted_ranges(
+    mocker: MockerFixture,
+    tmp_path: Path,
+    actual_results: dict[str, Any],
+    accepted_ranges: dict[str, dict[str, Any]],
+    must_change_names: list[str],
+    use_accepted_ranges: bool,
+    expect_passing: bool,
+    expect_error_count: int,
+    expect_changed: list[str] | None,
+    expect_satisfied: list[str] | None,
+    expect_violations: set[str] | None,
+) -> None:
+    """End-to-end tests of compare_actual_and_expected_test_results with accepted ranges, on real files."""
+    expected_results = {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}
+    json_output_path = tmp_path / "output"
+    json_output_path.mkdir()
+    with open(json_output_path / "actual_prefix_results.json", "w", encoding="utf-8") as file:
+        json.dump(actual_results, file)
+    expected_results_path = tmp_path / "e2e_json_test_filter.json"
+    with open(expected_results_path, "w", encoding="utf-8") as file:
+        json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
+    must_change_path = tmp_path / "must_change_variables.json"
+    write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
+    accepted_ranges_path = tmp_path / "accepted_ranges.json"
+    write_json_file(accepted_ranges_path, {ACCEPTED_RANGES_KEY: accepted_ranges})
+    path_set = ResultPathType(
+        "Animal", str(expected_results_path), "actual_prefix_", 0.1, str(must_change_path), str(accepted_ranges_path)
+    )
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
+
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(
+        json_output_path, None, "dummy_prefix", use_accepted_ranges
+    )
+
+    reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
+    assert list(reported.keys())[-1] == "end_to_end_testing_passing"
+    assert reported["end_to_end_testing_passing"] is expect_passing
+    assert add_error.call_count == expect_error_count
+    if expect_changed is None:
+        assert "changed_variables" not in reported
+    else:
+        assert reported["changed_variables"] == expect_changed
+    if expect_satisfied is None:
+        assert "accepted_range_satisfied" not in reported
+    else:
+        assert list(reported["accepted_range_satisfied"].keys()) == expect_satisfied
+        for name in expect_satisfied:
+            assert reported["accepted_range_satisfied"][name] == {
+                **accepted_ranges[name],
+                "observed_min": 5.0,
+                "observed_max": 5.0,
+            }
+    if expect_violations is None:
+        assert "accepted_range_violations" not in reported
+    else:
+        assert set(reported["accepted_range_violations"].keys()) == expect_violations
+    if must_change_names:
+        assert reported["must_change_satisfied"] == must_change_names
