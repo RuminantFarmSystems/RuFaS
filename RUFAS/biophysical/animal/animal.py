@@ -2435,17 +2435,17 @@ class Animal:
         -------
         None
         """
-        if self.future_death_date == sys.maxsize:
-            if self.is_selected_for_death(percent_fresh):
-                self.future_death_date = self.days_born
-                self.cull_reason = self._future_death_reason = animal_constants.DEATH_CULL
-                self.dead_at_day = time.simulation_day
-
         if self.future_cull_date == sys.maxsize:
             if self.is_selected_for_acute_sale(percent_fresh):
                 self.future_cull_date = self.days_born
                 self.cull_reason = animal_constants.ACUTE_SALE_CULL
                 self.sold_at_day = time.simulation_day
+                return
+        if self.future_death_date == sys.maxsize:
+            if self.is_selected_for_death(percent_fresh):
+                self.future_death_date = self.days_born
+                self.cull_reason = self._future_death_reason = animal_constants.DEATH_CULL
+                self.dead_at_day = time.simulation_day
 
     def _parity_index(self) -> int:
         """Return the 0-based index into a by-parity array, capping parity 4+ at the last entry."""
