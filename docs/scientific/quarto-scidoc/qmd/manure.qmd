@@ -2331,11 +2331,10 @@ import_table(
 
 ::: {.callout-note}
 The “Max(0, )” notation prevents the ammoniacal N value from becoming negative. This is especially important early in a simulation when accumulated manure quantities that are very small compared to the fixed surface area value can lead to high ammonia emissions.
-`degradable_volatile_solids_frac = received manure degradable_volatile_solids / received manure total_volatile_solids
 
-$$
-\text{`degradable_volatile_solids_frac`} = received manure degradable_volatile_solids
-$$
+`degradable_volatile_solids_frac` = received manure `degradable_volatile_solids` / received manure `total_volatile_solids`
+
+
 ::: 
 
 

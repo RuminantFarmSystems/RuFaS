@@ -1,0 +1,47 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "![Economics module icon](../resources/images/ecn_icon.png){width=25%}\n",
+        "# Economics Module\n",
+        "<!-- reuse code to import functions from \"../scripts/\": -->"
+      ],
+      "id": "9c14ae35"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import sys\n",
+        "sys.path.append(\"../scripts\")\n",
+        "from markdown_tables import import_table, display_md_tbl, read_tbl"
+      ],
+      "id": "8071cce0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "plenty of text\n",
+        "## Introduction\n",
+        "\n",
+        "## References"
+      ],
+      "id": "fa3ad115"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "C:\\Users\\gmg228\\AppData\\Local\\Python\\pythoncore-3.14-64\\share\\jupyter\\kernels\\python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
