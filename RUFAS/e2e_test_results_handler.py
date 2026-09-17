@@ -266,14 +266,14 @@ class E2ETestResultsHandler:
         return test_result_paths
 
     @staticmethod
-    def is_significant(changes: dict[str, float | str], tolerance: float) -> bool:
+    def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
         """
         Determines if a numerical change is significant based if the change between the
         "old_value" and "new_value" exceeds the specified tolerance.
 
         Parameters
         ----------
-        changes : dict[str, float | str]
+        changes : dict[str, Any]
             A dictionary representing changes with "old_value" and "new_value".
         tolerance : float
             The threshold for considering a difference as significant.
@@ -289,17 +289,37 @@ class E2ETestResultsHandler:
         relative to the "old_value". If the "old_value" is zero, a fallback reference value of 1 is used
         to ensure the tolerance comparison remains meaningful.
         """
-        if isinstance(changes, dict) and "old_value" in changes and "new_value" in changes:
-            old_value = changes["old_value"]
-            new_value = changes["new_value"]
-            if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
-                reference = abs(old_value) if abs(old_value) > 0 else 1
-                difference = abs(new_value - old_value)
-                return difference > tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+        if not (isinstance(changes, dict) and "old_value" in changes and "new_value" in changes):
+            return True
+
+        old_value = changes["old_value"]
+        new_value = changes["new_value"]
+
+        if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
+            reference = abs(old_value) if abs(old_value) > 0 else 1
+            difference = abs(new_value - old_value)
+            threshold = tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+            return difference > threshold
+
+        if isinstance(old_value, dict) and isinstance(new_value, dict):
+            for key in old_value.keys() | new_value.keys():
+                if key not in old_value or key not in new_value:
+                    return True
+
+                nested_change = {
+                    "old_value": old_value[key],
+                    "new_value": new_value[key],
+                }
+
+                if E2ETestResultsHandler.is_significant(nested_change, tolerance):
+                    return True
+
+            return False
+
         return True
 
     @staticmethod
-    def filter_nested(values_changed: dict[str, dict[str, float | str]], tolerance: float) -> None:
+    def filter_nested(values_changed: dict[str, Any], tolerance: float) -> None:
         """
         Recursively filters out insignificant numerical changes from a nested structure.
 
@@ -398,24 +418,6 @@ class E2ETestResultsHandler:
                 with open(expected_results_path, "r") as expected_results_file:
                     expected_results = json.load(expected_results_file)
 
-                diff = DeepDiff(
-                    expected_results["expected_results"], actual_results, ignore_order=True, verbose_level=2
-                )
-                is_difference_in_results: bool = False if (diff == {}) else True
-                if is_difference_in_results:
-                    om.add_warning(
-                        "End-to-end testing expected results different from new actual results",
-                        f"Differences will be saved in {output_dir} for {path_set.domain} domain.",
-                        info_map,
-                    )
-                    save_path = output_dir / f"{path_set.domain}_update_diff.json"
-                    om.dict_to_file_json(data_dict=diff, path=save_path)
-                else:
-                    om.add_log(
-                        "End-to-end testing expected results matched new actual results",
-                        f"No differences detected in actual and expected results for {path_set.domain} domain.",
-                        info_map,
-                    )
                 minified_actual_results = Utility.make_serializable(
                     actual_results, max_depth=om.JSON_OUTPUT_MAX_RECURSIVE_DEPTH
                 )
