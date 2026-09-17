@@ -1101,13 +1101,24 @@ class TaskManager:
             return None
 
         except Exception as e:
+            info_map = {
+                "class": TaskManager.__name__,
+                "function": TaskManager._process_end_to_end_testing_group.__name__,
+            }
+
             output_manager.add_error(
                 f"E2E comparison failed for {e2e_group}",
-                f"Failed to average and compare E2E results: {e}",
-                {
-                    "class": TaskManager.__name__,
-                    "function": (TaskManager._process_end_to_end_testing_group.__name__),
-                },
+                (
+                    f"Failed to average and compare E2E results: {e}; "
+                    f"traceback: {traceback.format_exc()}"
+                ),
+                info_map,
+            )
+
+            output_manager.dump_all_nondata_pools(
+                group_args["logs_directory"],
+                group_args["exclude_info_maps"],
+                "block",
             )
 
             return e2e_group

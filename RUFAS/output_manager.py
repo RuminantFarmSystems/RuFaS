@@ -2557,7 +2557,7 @@ class OutputManager(object):
             "Opening e2e test results directory to read results files",
             info_map,
         )
-        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure"]
+        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure", "Feed"]
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
             prefix: {header: "n/a" for header in module_headers} for prefix in output_prefixes
         }
