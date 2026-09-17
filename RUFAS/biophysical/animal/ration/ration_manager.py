@@ -239,12 +239,12 @@ class RationManager:
                     info_map,
                 )
 
-            if option is not IntakeOption.PREDICT_DMI and intake_value is None:
+            if option is not IntakeOption.PREDICT_DMI and (intake_value is None or intake_value <= 0):
                 error_msg = (
-                    f"Intake option '{option.value}' for {combination.value} requires an intake_value. "
-                    "Simulation will be halted."
+                    f"Intake option '{option.value}' for {combination.value} requires an intake_value greater "
+                    f"than 0, but got {intake_value}. Simulation will be halted."
                 )
-                cls._om.add_error("missing_intake_value_for_intake_option", error_msg, info_map)
+                cls._om.add_error("invalid_intake_value_for_intake_option", error_msg, info_map)
                 raise ValueError(error_msg)
             if option is IntakeOption.SET_DMI_PER_X and combination not in (
                 AnimalCombination.GROWING,

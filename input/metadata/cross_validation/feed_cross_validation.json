@@ -35,14 +35,15 @@
       ]
     },
     {
-      "description": "Rations using the set_DMI intake option must provide an intake_value",
+      "description": "Rations using the set_DMI intake option must provide an intake_value greater than 0",
       "aliases": {
         "variables": {
           "rations": "feed.rations"
         },
         "constants": {
           "set_dmi": "set_DMI",
-          "true_constant": true
+          "true_constant": true,
+          "zero": 0
         }
       },
       "rules": [
@@ -64,6 +65,63 @@
             }
           },
           "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "rations",
+              "field": "intake_option",
+              "value_to_compare": "set_dmi",
+              "relationship": "equal"
+            },
+            "save_as": "set_dmi_rations"
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "set_dmi_rations",
+              "field": "intake_value",
+              "value_to_compare": "true_constant",
+              "relationship": "is_not_null"
+            },
+            "save_as": "set_dmi_rations_with_values"
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        },
+        {
+          "left_hand": {
+            "for_each": {
+              "mode": "enforce",
+              "in": "set_dmi_rations_with_values",
+              "field": "intake_value",
+              "value_to_compare": "zero",
+              "relationship": "greater"
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "mode": "element_wise",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
         }
       ]
     },

@@ -353,6 +353,22 @@ def test_set_intake_options_missing_value_raises(mocker: MockerFixture, valid_ra
     mock_error.assert_called_once()
 
 
+@pytest.mark.parametrize("option", ["set_DMI", "set_DMI_per_X"])
+@pytest.mark.parametrize("intake_value", [0, 0.0, -1.5])
+def test_set_intake_options_non_positive_value_raises(
+    mocker: MockerFixture, valid_ration_config: dict[str, Any], option: str, intake_value: float
+) -> None:
+    """A DMI input option with an intake value that is not greater than 0 halts the simulation."""
+    mock_error = mocker.patch.object(RationManager._om, "add_error")
+    valid_ration_config["rations"][3]["intake_option"] = option
+    valid_ration_config["rations"][3]["intake_value"] = intake_value
+
+    with pytest.raises(ValueError, match="greater than 0"):
+        RationManager.set_intake_options(valid_ration_config)
+
+    mock_error.assert_called_once()
+
+
 def test_set_intake_options_per_x_invalid_combination_raises(
     mocker: MockerFixture, valid_ration_config: dict[str, Any]
 ) -> None:
