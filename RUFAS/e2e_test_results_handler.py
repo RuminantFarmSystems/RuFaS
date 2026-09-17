@@ -59,7 +59,7 @@ class E2ETestResultsHandler:
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
+            "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler.compare_actual_and_expected_test_results.__name__,
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
@@ -161,7 +161,7 @@ class E2ETestResultsHandler:
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
+            "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler.validate_comparison_configuration.__name__,
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
@@ -326,7 +326,7 @@ class E2ETestResultsHandler:
         """
         om: OutputManager = OutputManager()
         info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
+            "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler._convert_expected_result_variable_names.__name__,
         }
 
@@ -410,7 +410,7 @@ class E2ETestResultsHandler:
             If any duplicate mappings are found, returns ``True``. Otherwise, returns ``False``.
         """
         info_map: dict[str, str] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
+            "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler._duplicate_mappings_exist.__name__,
         }
         om = OutputManager()
@@ -496,7 +496,7 @@ class E2ETestResultsHandler:
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
+            "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler._load_must_change_variables.__name__,
         }
         must_change_variables: set[str] = set()
@@ -625,7 +625,7 @@ class E2ETestResultsHandler:
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
+            "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler._validate_result_path_set.__name__,
             "domain": path_set.domain,
         }
@@ -866,7 +866,7 @@ class E2ETestResultsHandler:
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
-            "class": E2ETestResultsHandler.__class__.__name__,
+            "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler.update_expected_test_results.__name__,
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
@@ -968,7 +968,7 @@ class E2ETestResultsHandler:
                 "End-to-end testing expected results update failure.",
                 f"Expected results file missing required keys in data: {missing_keys}",
                 {
-                    "class": E2ETestResultsHandler.__class__.__name__,
+                    "class": E2ETestResultsHandler.__name__,
                     "function": E2ETestResultsHandler._check_expected_results_file_keys.__name__,
                 },
             )

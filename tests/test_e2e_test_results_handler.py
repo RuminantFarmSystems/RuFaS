@@ -193,7 +193,7 @@ def test_duplicate_mappings_exist(
     mock_add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
 
     info_map: dict[str, str] = {
-        "class": E2ETestResultsHandler.__class__.__name__,
+        "class": E2ETestResultsHandler.__name__,
         "function": E2ETestResultsHandler._duplicate_mappings_exist.__name__,
     }
     dummy_df = pd.DataFrame({"Original": [], "New": []})
