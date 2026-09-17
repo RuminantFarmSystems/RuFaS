@@ -33,7 +33,6 @@ Navigation
    :caption: Getting Started:
 
    _wiki/onboarding
-   _wiki/Onboarding-videos
 
 .. toctree::
    :maxdepth: 2
@@ -68,7 +67,6 @@ Team Culture
 
    _wiki/RuFaS-Versioning-Policy
    _wiki/SCRUM-at-RuFaS
-   _wiki/Version-Update-Workflows
 
 Release Notes
 -------------

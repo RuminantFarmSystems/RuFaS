@@ -9,7 +9,6 @@ Submodules
 
    RUFAS.biophysical.feed_storage.baleage
    RUFAS.biophysical.feed_storage.feed_manager
-   RUFAS.biophysical.feed_storage.feed_storage_enum
    RUFAS.biophysical.feed_storage.grain
    RUFAS.biophysical.feed_storage.hay
    RUFAS.biophysical.feed_storage.purchased_feed_storage
