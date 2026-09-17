@@ -569,6 +569,42 @@ class HerdManager:
             animal.update_genetic_history(simulation_day=time.simulation_day)
         return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
 
+    def _assess_removal_risk(self, animals: list[Animal], time: RufasTime) -> tuple[list[Animal], list[Animal]]:
+        """
+        Assess daily removal risk for each cow and collect those removed.
+
+        Computes the fresh fraction across all cows in the herd, then rolls death and
+        acute-sale risk for every cow in ``animals`` via
+        :meth:`Animal.assess_removal_risk`. Non-cow animals are skipped.
+
+        Parameters
+        ----------
+        animals : list of Animal
+            Animals to assess on the current day.
+        time : RufasTime
+            Current simulation time, passed through to the per-animal risk assessment.
+
+        Returns
+        -------
+        tuple[list[Animal], list[Animal]]
+            A ``(sold_cows, dead_cows)`` pair listing the cows selected for acute sale
+            and the cows selected to die, respectively.
+        """
+        sold_cows: list[Animal] = []
+        dead_cows: list[Animal] = []
+
+        all_cows = [animal for animal in self.all_animals if animal.animal_type.is_cow]
+        fresh_cows: list[Animal] = [cow for cow in all_cows if cow.days_in_milk < 50]
+        percent_fresh_cows = len(fresh_cows) / len(all_cows) if len(all_cows) > 0 else 0
+        for animal in animals:
+            if animal.animal_type.is_cow:
+                animal.assess_removal_risk(percent_fresh_cows, time)
+                if animal.sold:
+                    sold_cows.append(animal)
+                if animal.dead:
+                    dead_cows.append(animal)
+        return (sold_cows, dead_cows)
+
     def _update_genetic_values_at_lactation_start(self, animal: Animal, time: RufasTime) -> None:
         """
         Updates the genetic values of an animal at the start of a new lactation.
@@ -642,17 +678,26 @@ class HerdManager:
                 group_sold_newborn_calves,
             ) = self._perform_daily_routines_for_animals(time, animals)
             collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
-            daily_herd_updates.graduated_animals += group_graduated_animals
-            daily_herd_updates.removed_animals += sold_animals
             if collect_birth_results:
                 daily_herd_updates.stillborn_newborn_calves += group_stillborn_newborn_calves
                 daily_herd_updates.newborn_calves += group_newborn_calves
                 daily_herd_updates.sold_newborn_calves += group_sold_newborn_calves
             if animal_group_name == "heiferIIs":
                 daily_herd_updates.sold_heiferIIs = sold_animals
+            elif animal_group_name == "heiferIIIs":
+                sold_cows, dead_cows = self._assess_removal_risk(group_graduated_animals, time)
+                sold_animals.extend(sold_cows)
+                sold_animals.extend(dead_cows)
+                daily_herd_updates.sold_and_died_cows.extend(sold_cows)
+                daily_herd_updates.sold_and_died_cows.extend(dead_cows)
             elif animal_group_name == "cows":
-                daily_herd_updates.sold_and_died_cows = sold_animals
+                sold_cows, dead_cows = self._assess_removal_risk(animals, time)
+                sold_animals.extend(sold_cows)
+                sold_animals.extend(dead_cows)
+                daily_herd_updates.sold_and_died_cows.extend(sold_animals)
 
+            daily_herd_updates.graduated_animals += group_graduated_animals
+            daily_herd_updates.removed_animals += sold_animals
         return daily_herd_updates
 
     def _apply_daily_herd_structure_updates(
