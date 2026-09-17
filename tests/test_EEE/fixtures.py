@@ -8207,7 +8207,7 @@ def raw_harvest_data() -> dict[str, dict[str, list[Any]]]:
                 100.0,
                 100.0,
                 100.0]
-            },
+        },
         "crop": {
             "values": [
                 "corn_silage",
