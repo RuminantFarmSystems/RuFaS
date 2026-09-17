@@ -83,6 +83,7 @@ def test_slurry_storage_outdoor_init(mocker: MockerFixture) -> None:
         storage_time_period=dummy_storage_time_period,
         surface_area=dummy_surface_area,
         capacity=dummy_capacity,
+        emptying_fraction=None,
     )
 
 

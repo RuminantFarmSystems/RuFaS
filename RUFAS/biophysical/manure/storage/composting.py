@@ -64,6 +64,9 @@ class Composting(Storage):
         The storage time period.
     surface_area : float, default=inf
         The surface area of the manure storage (m^2).
+    emptying_fraction : float | None, default None
+        Fraction of the stored manure that is removed at each emptying event (unitless, 0.0-1.0). If None, the
+        storage is fully emptied.
 
     Attributes
     ----------
@@ -86,6 +89,7 @@ class Composting(Storage):
         composting_type: str,
         storage_time_period: int,
         surface_area: float = inf,
+        emptying_fraction: float | None = None,
     ):
         super().__init__(
             name=name,
@@ -93,6 +97,7 @@ class Composting(Storage):
             cover=StorageCover.NO_COVER,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
+            emptying_fraction=emptying_fraction,
         )
         self._composting_type: CompostingType = CompostingType(composting_type)
 
