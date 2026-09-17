@@ -1096,6 +1096,7 @@ def test_calculate_total_pen_manure_stream(pen: Pen, mocker: MockerFixture) -> N
         non_degradable_volatile_solids=10.0,
         phosphorus=500.0,
         potassium=800.0,
+        manure_lignin=1.6,
     )
     methane_potential = 0.25
     surface_area = 150.0
@@ -1119,6 +1120,7 @@ def test_calculate_total_pen_manure_stream(pen: Pen, mocker: MockerFixture) -> N
     assert stream.volume == approx(excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY)
     assert stream.methane_production_potential == approx(methane_potential)
     assert stream.bedding_non_degradable_volatile_solids == approx(0.0)
+    assert stream.lignin == approx(excretions.manure_lignin)  # 1.6
 
     assert stream.pen_manure_data is not None
     pmd = stream.pen_manure_data
@@ -1542,6 +1544,7 @@ def test_apply_bedding(
     mock_bedding = MagicMock(auto_spec=Bedding)
     mock_bedding.bedding_type = bedding_type
     mock_bedding.bedding_phosphorus_content = 5.5
+    mock_bedding.bedding_lignin_fraction = 0.08
     pen.beddings = {"dummy_bedding_name": mock_bedding}
     if input_manure_stream.pen_manure_data is not None:
         num_animals = input_manure_stream.pen_manure_data.num_animals
@@ -1569,6 +1572,7 @@ def test_apply_bedding(
     assert pytest.approx(result.degradable_volatile_solids) == expected_result.degradable_volatile_solids
     assert pytest.approx(result.total_solids) == expected_result.total_solids
     assert pytest.approx(result.volume) == expected_result.volume
+    assert pytest.approx(result.lignin) == input_manure_stream.lignin + 5.0 * 0.08
 
     mock_calculate_bedding_water.assert_called_once_with(num_animals)
     mock_calculate_total_bedding_mass.assert_called_once_with(num_animals)
