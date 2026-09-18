@@ -1108,10 +1108,7 @@ class TaskManager:
 
             output_manager.add_error(
                 f"E2E comparison failed for {e2e_group}",
-                (
-                    f"Failed to average and compare E2E results: {e}; "
-                    f"traceback: {traceback.format_exc()}"
-                ),
+                (f"Failed to average and compare E2E results: {e}; " f"traceback: {traceback.format_exc()}"),
                 info_map,
             )
 

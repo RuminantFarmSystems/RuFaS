@@ -380,11 +380,7 @@ class E2ETestResultsHandler:
                         averaged_values.append(reference_value)
                         continue
 
-                    numeric_values = [
-                        float(value)
-                        for value in matching_values
-                        if not math.isnan(float(value))
-                    ]
+                    numeric_values = [float(value) for value in matching_values if not math.isnan(float(value))]
 
                     averaged_value = sum(numeric_values) / len(numeric_values) if numeric_values else float("nan")
 
