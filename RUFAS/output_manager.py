@@ -1758,7 +1758,7 @@ class OutputManager(object):
                         csv_dir,
                         direction,
                     )
-            report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
+            report_file_path = report_dir / self.generate_file_name(f"{filter_file}", "csv")
             if report_generator.reports:
                 if has_cross_references and has_data_significant_digits:
                     significant_digits_limited_reports = ", ".join(
