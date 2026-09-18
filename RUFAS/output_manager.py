@@ -1758,7 +1758,7 @@ class OutputManager(object):
                         csv_dir,
                         direction,
                     )
-            report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
+            report_file_path = report_dir / self.generate_file_name(f"{filter_file}", "csv")
             if report_generator.reports:
                 if has_cross_references and has_data_significant_digits:
                     significant_digits_limited_reports = ", ".join(
@@ -2557,7 +2557,7 @@ class OutputManager(object):
             "Opening e2e test results directory to read results files",
             info_map,
         )
-        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure"]
+        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure", "Feed"]
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
             prefix: {header: "n/a" for header in module_headers} for prefix in output_prefixes
         }
