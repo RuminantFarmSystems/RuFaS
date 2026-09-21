@@ -152,7 +152,7 @@ def test_task_manager_start(
             tm, "_expand_multi_runs_to_single_runs", return_value=[{}]
         )
 
-    mock_run_tasks = mocker.patch.object(tm, "_run_tasks")
+    mock_run_tasks = mocker.patch.object(tm, "_run_tasks", return_value=["test_prefix (1/1)"])
     mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
 
     tm.start(
@@ -233,7 +233,7 @@ def test_task_manager_start(
             "Gathering e2e results for ['test_prefix']...",
             info_map,
         )
-        mock_summarize.assert_called_once_with(Path("out/e2e"), ["test_prefix"])
+        mock_summarize.assert_called_once_with(Path("out/e2e"), ["test_prefix"], ["test_prefix"])
     else:
         args, _kwargs = mock_run_tasks.call_args
         runnable_passed = args[0]
@@ -1828,7 +1828,7 @@ def test_run_tasks(
     task_manager.pool = None
     verbosity = None
 
-    task_manager._run_tasks(
+    failed_tasks = task_manager._run_tasks(
         single_run_tasks,
         produce_graphics=produce_graphics,
         metadata_depth_limit=metadata_depth_limit,
@@ -1837,6 +1837,8 @@ def test_run_tasks(
         output_directory=Path("output"),
         verbosity=verbosity,
     )
+
+    assert failed_tasks == []
 
     mock_task_call_list = [
         call(
@@ -1969,7 +1971,7 @@ def test_run_tasks_fail(
     task_manager.pool = None
     verbosity = LogVerbosity.LOGS
 
-    task_manager._run_tasks(
+    failed_tasks = task_manager._run_tasks(
         single_run_tasks,
         produce_graphics=produce_graphics,
         metadata_depth_limit=metadata_depth_limit,
@@ -1982,6 +1984,7 @@ def test_run_tasks_fail(
     mock_om_init.assert_called_once()
     info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
     failed = [fail for fail in task_return_values if fail is not None]
+    assert failed_tasks == failed
     mock_add_error.assert_called_once_with(
         "Task(s) failed",
         f"Failed task(s) and output prefix are: {failed}",

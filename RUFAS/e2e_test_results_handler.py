@@ -47,7 +47,7 @@ class E2ETestResultsHandler:
         output_prefix : str
             The output prefix for the current e2e run.
         must_change_variables : set[str]
-            The names of the variables flagged as must change, as returned by ``validate_comparison_configuration``.
+            The names of the variables flagged as must-change, as returned by ``validate_comparison_configuration``.
 
         Notes
         -----
@@ -140,15 +140,11 @@ class E2ETestResultsHandler:
 
         Raises
         ------
-        FileNotFoundError
-            If a must-change variables file, an expected results file, or the conversion table does not exist.
         ValueError
-            If a must-change variables file or an expected results file is not valid, if a result path set cannot be
-            resolved once the simulation has run (see ``_validate_result_path_set``), or if a must-change variable is
-            not found in the expected results of any domain.
-        KeyError
-            If an expected results file has no ``expected_results`` entry, or if the conversion table does not contain
-            both "Original" and "New" columns.
+            If the configuration is not valid. The message lists every problem found: must-change variables files,
+            expected results files, or a conversion table that cannot be loaded, result path sets that cannot be
+            resolved once the simulation has run (see ``_validate_result_path_set``), and must-change variables that
+            are not found in the expected results of any domain.
 
         Notes
         -----
@@ -158,34 +154,51 @@ class E2ETestResultsHandler:
         key of at least one domain's expected results. Running these checks before the simulation makes a
         configuration mistake, such as a mistyped path or variable name, fail the task in seconds instead of after
         the full simulation. The comparison does not repeat them, so it relies on this validation having passed.
+
+        Every check runs before the error is raised, so one run reports all the problems of the input set. The
+        must-change variable names are only checked when every expected results file could be loaded, because a name
+        may belong to a file that could not be read.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
             "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler.validate_comparison_configuration.__name__,
         }
+        errors: list[str] = []
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(output_prefix)
-        must_change_variables = E2ETestResultsHandler._load_must_change_variables(test_result_path_sets)
+
+        must_change_variables: set[str] = set()
+        checked_must_change_paths: set[str] = set()
+        for path_set in test_result_path_sets:
+            if path_set.must_change_variables_path in checked_must_change_paths:
+                continue
+            checked_must_change_paths.add(path_set.must_change_variables_path)
+            try:
+                must_change_variables.update(E2ETestResultsHandler._load_must_change_variables([path_set]))
+            except (FileNotFoundError, ValueError) as e:
+                E2ETestResultsHandler._record_configuration_error(errors, str(e))
+
         matched_must_change_variables: set[str] = set()
+        all_expected_results_loaded = True
         for path_set in test_result_path_sets:
             file_content = E2ETestResultsHandler._validate_result_path_set(
-                path_set, output_prefix, filters_directory, convert_variable_table_path
+                path_set, output_prefix, filters_directory, errors, convert_variable_table_path
             )
+            if file_content is None:
+                all_expected_results_loaded = False
+                continue
             expected_results = file_content["expected_results"]
             matched_must_change_variables.update(name for name in must_change_variables if name in expected_results)
 
         unknown_must_change_variables = must_change_variables - matched_must_change_variables
-        if unknown_must_change_variables:
-            om.add_error(
-                "End-to-end testing must-change configuration error",
+        if unknown_must_change_variables and all_expected_results_loaded:
+            message = (
                 "Must-change variables not found in the expected results of any domain: "
-                f"{sorted(unknown_must_change_variables)}",
-                info_map,
-            )
-            raise ValueError(
-                "E2E testing error: Must-change variables not found in the expected results of any domain: "
                 f"{sorted(unknown_must_change_variables)}"
             )
+            om.add_error("End-to-end testing must-change configuration error", message, info_map)
+            E2ETestResultsHandler._record_configuration_error(errors, message)
+        E2ETestResultsHandler._raise_configuration_errors(errors)
         return must_change_variables
 
     @staticmethod
@@ -202,23 +215,34 @@ class E2ETestResultsHandler:
 
         Raises
         ------
-        FileNotFoundError
-            If an expected results file does not exist.
         ValueError
-            If an expected results file is not valid JSON or is missing a required key, or if a result path set cannot
-            be resolved once the simulation has run (see ``_validate_result_path_set``).
-        KeyError
-            If an expected results file has no ``expected_results`` entry.
+            If the configuration is not valid. The message lists every problem found: expected results files that
+            cannot be loaded or are missing a required key, and result path sets that cannot be resolved once the
+            simulation has run (see ``_validate_result_path_set``).
 
         Notes
         -----
         Runs the checks of ``update_expected_test_results`` that do not depend on the actual results, so that a
         mistyped path or an incomplete expected results file fails the task in seconds instead of after the full
-        simulation. The must-change variables files are not checked because the update does not read them.
+        simulation. The must-change variables files are not checked because the update does not read them. Every
+        check runs before the error is raised, so one run reports all the problems of the input set.
         """
+        errors: list[str] = []
         for path_set in E2ETestResultsHandler._get_test_result_paths(output_prefix):
-            file_content = E2ETestResultsHandler._validate_result_path_set(path_set, output_prefix, filters_directory)
-            E2ETestResultsHandler._check_expected_results_file_keys(file_content)
+            file_content = E2ETestResultsHandler._validate_result_path_set(
+                path_set, output_prefix, filters_directory, errors
+            )
+            if file_content is None:
+                continue
+            try:
+                E2ETestResultsHandler._check_expected_results_file_keys(file_content)
+            except ValueError as e:
+                E2ETestResultsHandler._record_configuration_error(
+                    errors,
+                    f"Expected results file {path_set.expected_results_path} for {path_set.domain}: "
+                    + str(e).removeprefix("E2E testing error: "),
+                )
+        E2ETestResultsHandler._raise_configuration_errors(errors)
 
     @staticmethod
     def _report_domain_comparison_results(
@@ -582,12 +606,41 @@ class E2ETestResultsHandler:
         return filter_and_results
 
     @staticmethod
+    def _record_configuration_error(errors: list[str], message: str) -> None:
+        """Appends a configuration problem to ``errors``, without the common message prefix and without duplicates."""
+        message = message.removeprefix("E2E testing error: ")
+        if message not in errors:
+            errors.append(message)
+
+    @staticmethod
+    def _raise_configuration_errors(errors: list[str]) -> None:
+        """
+        Raises a single error listing every configuration problem recorded by a validation, if there are any.
+
+        Parameters
+        ----------
+        errors : list[str]
+            The configuration problems recorded by the validation.
+
+        Raises
+        ------
+        ValueError
+            If ``errors`` is not empty.
+        """
+        if errors:
+            raise ValueError(
+                "E2E testing error: invalid end-to-end testing configuration:\n"
+                + "\n".join(f"  - {error}" for error in errors)
+            )
+
+    @staticmethod
     def _validate_result_path_set(
         path_set: ResultPathType,
         output_prefix: str,
         filters_directory: Path,
+        errors: list[str],
         convert_variable_table_path: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> dict[str, Any] | None:
         """
         Checks that a domain's result path set can be resolved once the simulation has run.
 
@@ -599,29 +652,26 @@ class E2ETestResultsHandler:
             The output prefix of the end-to-end testing input set, which prefixes the run's output file names.
         filters_directory : Path
             The directory the task loads its filter files from.
+        errors : list[str]
+            The list that every problem found is appended to, so that the caller can report them all together.
         convert_variable_table_path : str | None, optional
             String path to the csv lookup table to convert the variable names in the expected results, passed on to
             ``_load_expected_results_file``. No conversion is applied when ``None`` (the default).
 
         Returns
         -------
-        dict[str, Any]
-            The content of the domain's expected results file, as returned by ``_load_expected_results_file``.
-
-        Raises
-        ------
-        FileNotFoundError
-            If the expected results file does not exist.
-        ValueError
-            If the expected results file is not valid, is not in ``filters_directory``, or if the path set's
-            ``actual_results_path`` is not a prefix of the actual results file name the run will write.
+        dict[str, Any] | None
+            The content of the domain's expected results file, as returned by ``_load_expected_results_file``, or
+            ``None`` when the file could not be loaded.
 
         Notes
         -----
         The expected results file doubles as the filter that collects the domain's actual results, so it has to be in
         the task's filters directory, and the run writes those actual results to
         ``{output_prefix}_saved_variables_{filter name}_{timestamp}.json``, which ``actual_results_path`` has to match
-        as a prefix for the results to be found afterwards.
+        as a prefix for the results to be found afterwards. When the filter name is unknown because the expected
+        results file could not be loaded, ``actual_results_path`` is only checked against the part of the file name
+        that does not depend on it, ``{output_prefix}_saved_variables_``.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -629,32 +679,44 @@ class E2ETestResultsHandler:
             "function": E2ETestResultsHandler._validate_result_path_set.__name__,
             "domain": path_set.domain,
         }
-        file_content = E2ETestResultsHandler._load_expected_results_file(path_set, convert_variable_table_path)
+        error_title = f"End-to-end testing configuration error for {path_set.domain}"
         expected_results_path = Path(path_set.expected_results_path)
-        if expected_results_path.resolve().parent != Path(filters_directory).resolve():
-            om.add_error(
-                f"End-to-end testing configuration error for {path_set.domain}",
+        file_content: dict[str, Any] | None = None
+        try:
+            file_content = E2ETestResultsHandler._load_expected_results_file(path_set, convert_variable_table_path)
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            message = (
+                f"Expected results file {expected_results_path} for {path_set.domain} could not be loaded: "
+                f"{type(e).__name__}: {e}"
+            )
+            om.add_error(error_title, message, info_map)
+            E2ETestResultsHandler._record_configuration_error(errors, message)
+
+        if file_content is not None and expected_results_path.resolve().parent != Path(filters_directory).resolve():
+            message = (
                 f"Expected results file {expected_results_path} is not in the task's filters directory "
-                f"{filters_directory}, so the run will not collect the domain's actual results from it.",
-                info_map,
+                f"{filters_directory}, so the run will not collect the domain's actual results from it."
             )
-            raise ValueError(
-                f"E2E testing error: Expected results file {expected_results_path} is not in the task's filters "
-                f"directory {filters_directory}."
-            )
-        actual_results_file_prefix = f"{output_prefix}_saved_variables_{file_content['name']}_"
+            om.add_error(error_title, message, info_map)
+            E2ETestResultsHandler._record_configuration_error(errors, message)
+
+        filter_name = file_content.get("name") if file_content is not None else None
         actual_results_path_name = Path(path_set.actual_results_path).name
-        if not actual_results_path_name or not actual_results_file_prefix.startswith(actual_results_path_name):
-            om.add_error(
-                f"End-to-end testing configuration error for {path_set.domain}",
-                f"actual_results_path '{path_set.actual_results_path}' is not a prefix of the actual results file "
-                f"name '{actual_results_file_prefix}' the run will write.",
-                info_map,
+        if filter_name is not None:
+            actual_results_file_prefix = f"{output_prefix}_saved_variables_{filter_name}_"
+            is_matching = actual_results_file_prefix.startswith(actual_results_path_name)
+        else:
+            actual_results_file_prefix = f"{output_prefix}_saved_variables_"
+            is_matching = actual_results_file_prefix.startswith(
+                actual_results_path_name
+            ) or actual_results_path_name.startswith(actual_results_file_prefix)
+        if not actual_results_path_name or not is_matching:
+            message = (
+                f"actual_results_path '{path_set.actual_results_path}' for {path_set.domain} does not match the "
+                f"actual results file name the run will write, which starts with '{actual_results_file_prefix}'."
             )
-            raise ValueError(
-                f"E2E testing error: actual_results_path '{path_set.actual_results_path}' for {path_set.domain} is "
-                f"not a prefix of the actual results file name '{actual_results_file_prefix}' the run will write."
-            )
+            om.add_error(error_title, message, info_map)
+            E2ETestResultsHandler._record_configuration_error(errors, message)
         return file_content
 
     @staticmethod

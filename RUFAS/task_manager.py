@@ -214,7 +214,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(
+        failed_tasks = self._run_tasks(
             runnable_args, produce_graphics, metadata_depth_limit, workers, metadata_path, output_directory, verbosity
         )
 
@@ -238,8 +238,15 @@ class TaskManager:
                 info_map,
             )
             json_output_directory = runnable_args[0]["json_output_directory"]
+            failed_output_prefixes: list[str] = [
+                task["output_prefix"]
+                for task in runnable_args
+                if f"{task['output_prefix']} ({task['task_id']})" in failed_tasks
+            ]
 
-            self.output_manager.summarize_e2e_test_results(json_output_directory, output_prefixes)
+            self.output_manager.summarize_e2e_test_results(
+                json_output_directory, output_prefixes, failed_output_prefixes
+            )
 
         TaskManager.handle_post_processing(
             args={
@@ -611,7 +618,7 @@ class TaskManager:
         metadata_path: Path,
         output_directory: Path,
         verbosity: LogVerbosity | None,
-    ) -> None:
+    ) -> list[str]:
         """
         Runs all single-run tasks, in parallel if a process pool is available.
 
@@ -631,6 +638,11 @@ class TaskManager:
             Directory where task outputs will be written.
         verbosity : LogVerbosity or None
             Log verbosity level for each run.
+
+        Returns
+        -------
+        list[str]
+            The failed tasks, each as ``"{output_prefix} ({task_id})"``. Empty when every task succeeded.
 
         Notes
         -----
@@ -658,6 +670,7 @@ class TaskManager:
             info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
             om = OutputManager()
             om.add_error("Task(s) failed", f"Failed task(s) and output prefix are: {failed}", info_map)
+        return failed
 
     @staticmethod
     def call_handler(
