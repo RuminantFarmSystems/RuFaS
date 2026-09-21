@@ -198,7 +198,8 @@ class E2ETestResultsHandler:
             )
             om.add_error("End-to-end testing must-change configuration error", message, info_map)
             E2ETestResultsHandler._record_configuration_error(errors, message)
-        E2ETestResultsHandler._raise_configuration_errors(errors)
+        if errors:
+            E2ETestResultsHandler._raise_configuration_errors(errors)
         return must_change_variables
 
     @staticmethod
@@ -242,7 +243,8 @@ class E2ETestResultsHandler:
                     f"Expected results file {path_set.expected_results_path} for {path_set.domain}: "
                     + str(e).removeprefix("E2E testing error: "),
                 )
-        E2ETestResultsHandler._raise_configuration_errors(errors)
+        if errors:
+            E2ETestResultsHandler._raise_configuration_errors(errors)
 
     @staticmethod
     def _report_domain_comparison_results(
@@ -615,7 +617,7 @@ class E2ETestResultsHandler:
     @staticmethod
     def _raise_configuration_errors(errors: list[str]) -> None:
         """
-        Raises a single error listing every configuration problem recorded by a validation, if there are any.
+        Raises a single error listing every configuration problem recorded by a validation.
 
         Parameters
         ----------
@@ -625,13 +627,12 @@ class E2ETestResultsHandler:
         Raises
         ------
         ValueError
-            If ``errors`` is not empty.
+            Always, with a message listing every problem in ``errors``.
         """
-        if errors:
-            raise ValueError(
-                "E2E testing error: invalid end-to-end testing configuration:\n"
-                + "\n".join(f"  - {error}" for error in errors)
-            )
+        raise ValueError(
+            "E2E testing error: invalid end-to-end testing configuration:\n"
+            + "\n".join(f"  - {error}" for error in errors)
+        )
 
     @staticmethod
     def _validate_result_path_set(
