@@ -256,6 +256,8 @@ class TaskManager:
                 workers=workers,
                 output_directory=output_directory,
                 verbosity=verbosity,
+                is_end_to_end_test_task=is_end_to_end_test_task,
+                is_update_end_to_end_test_task=is_update_end_to_end_test_task
             )
 
             if is_end_to_end_test_task:
@@ -981,7 +983,7 @@ class TaskManager:
         """Helper function to group together end to end testing runs by simulation type."""
         e2e_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for args in runnable_args:
-            if args["task_type"] == TaskType.END_TO_END_TESTING:
+            if args["task_type"] in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS]:
                 e2e_groups[args["e2e_group"]].append(args)
         return e2e_groups
 
@@ -993,6 +995,8 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
+        is_end_to_end_test_task: bool,
+        is_update_end_to_end_test_task: bool,
     ) -> None:
         """Run one averaging/comparison task per E2E group."""
 
@@ -1003,6 +1007,8 @@ class TaskManager:
             workers=workers,
             output_directory=output_directory,
             verbosity=verbosity,
+            is_end_to_end_test_task=is_end_to_end_test_task,
+            is_update_end_to_end_test_task=is_update_end_to_end_test_task
         )
 
         if self.pool is not None:
@@ -1038,6 +1044,8 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
+        is_end_to_end_test_task: bool,
+        is_update_end_to_end_test_task: bool,
     ) -> str | None:
         """Average, compare, and save results for one E2E group."""
 
@@ -1088,15 +1096,37 @@ class TaskManager:
                 e2e_runs=e2e_runs,
             )
 
-            if is_end
-
             output_manager.is_first_post_processing = False
 
-            E2ETestResultsHandler.compare_actual_and_expected_test_results(
-                json_output_path=averaged_results_path,
-                convert_variable_table_path=group_args["convert_variable_table_path"],
-                output_prefix=e2e_group,
-            )
+            if is_end_to_end_test_task:
+                E2ETestResultsHandler.compare_actual_and_expected_test_results(
+                    json_output_path=averaged_results_path,
+                    convert_variable_table_path=group_args["convert_variable_table_path"],
+                    output_prefix=e2e_group,
+                )
+            elif is_update_end_to_end_test_task:
+                E2ETestResultsHandler.update_expected_test_results(averaged_results_path,
+                                                                   e2e_group)
+
+                output_manager.add_log(
+                    "End-to-end testing",
+                    "Completed generation of new set of end-to-end expected test results",
+                    info_map={
+                        "class": TaskManager.__name__,
+                        "function": TaskManager._process_end_to_end_testing_group.__name__,
+                        "units": MeasurementUnits.UNITLESS,
+                    },
+                )
+            else:
+                output_manager.add_error(
+                    "E2E Testing Error",
+                    "At stage of processing e2e testing group and task is neither e2e task or update e2e results task.",
+                    info_map={
+                        "class": TaskManager.__name__,
+                        "function": TaskManager._process_end_to_end_testing_group.__name__,
+                        "units": MeasurementUnits.UNITLESS,
+                    },
+                )
 
             TaskManager.handle_post_processing(
                 args=group_args,
