@@ -4055,6 +4055,28 @@ def test_summarize_e2e_test_results_good_path(
     assert summary_arg == {"E2E_Animal": {"Animal": True, "CropAndSoil": False, "Manure": "n/a"}}
 
 
+def test_summarize_e2e_test_results_failed_task(
+    tmp_path: Path, mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Unit test for the summarize_e2e_test_results() method in OutputManager class with a failed task."""
+    mock_print = mocker.patch.object(mock_output_manager, "_print_e2e_results_summary")
+    mocker.patch.object(mock_output_manager, "add_log")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+    results_of_an_earlier_run = {"Animal.something": {"values": [True]}}
+    (tmp_path / "E2E_Failed_comparison.json").write_text(json.dumps(results_of_an_earlier_run))
+    (tmp_path / "E2E_Animal_comparison.json").write_text(json.dumps(results_of_an_earlier_run))
+
+    mock_output_manager.summarize_e2e_test_results(tmp_path, ["E2E_Failed", "E2E_Animal"], ["E2E_Failed"])
+
+    mock_add_error.assert_not_called()
+    (summary_arg,) = mock_print.call_args.args
+    not_run = "not run (task failed)"
+    assert summary_arg == {
+        "E2E_Failed": {"Animal": not_run, "CropAndSoil": not_run, "Manure": not_run},
+        "E2E_Animal": {"Animal": True, "CropAndSoil": "n/a", "Manure": "n/a"},
+    }
+
+
 def test_summarize_e2e_test_results_invalid_prefix_logs_error(
     tmp_path: Path, mock_output_manager: OutputManager, mocker: MockerFixture
 ) -> None:
