@@ -126,6 +126,20 @@ class NutrientRequestResults:
     dry_matter_fraction: float = 0.0
     """Fraction of manure that is dry matter, between 0 and 1 (unitless). Default to 0."""
 
+    carbon: float = 0.0
+    """Amount of manure organic carbon in the supplied manure (kg). Default to 0.
+
+    Estimated from the volatile solids of the manure in storage at the time of application, bounded by the
+    allowable manure C:N ratio range. Carbon is informational cargo for the crop and soil module: it is never
+    considered when deciding how much manure fulfills a nutrient request. Supplemental (off-farm) manure
+    carries no carbon estimate."""
+
+    lignin: float = 0.0
+    """Amount of lignin in the supplied manure (kg). Default to 0.
+
+    Used by the crop and soil module to partition manure carbon between the metabolic and structural residue
+    pools. Supplemental (off-farm) manure carries no lignin estimate."""
+
     def __post_init__(self) -> None:
         """
         Validate the dataclass fields.
@@ -242,6 +256,8 @@ class NutrientRequestResults:
             inorganic_phosphorus_fraction=Utility.clamp(combined_inorganic_phosphorus_fraction),
             dry_matter=combined_total_dry_matter,
             dry_matter_fraction=Utility.clamp(combined_dry_matter_fraction),
+            carbon=self.carbon + other.carbon,
+            lignin=self.lignin + other.lignin,
         )
 
 
