@@ -6361,6 +6361,11 @@
             "type": "string",
             "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
             "default": ""
+          },
+          "accepted_ranges_path": {
+            "type": "string",
+            "description": "Path to the file listing the accepted ranges of variables for this input set. When the end-to-end testing task enables accepted ranges, each listed variable is compared against its range instead of the recorded expected results, and every numerical value of the variable must fall within the range for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6389,6 +6394,11 @@
           "must_change_variables_path": {
             "type": "string",
             "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
+          },
+          "accepted_ranges_path": {
+            "type": "string",
+            "description": "Path to the file listing the accepted ranges of variables for this input set. When the end-to-end testing task enables accepted ranges, each listed variable is compared against its range instead of the recorded expected results, and every numerical value of the variable must fall within the range for the end-to-end test to pass.",
             "default": ""
           }
         }
@@ -6419,6 +6429,11 @@
             "type": "string",
             "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
             "default": ""
+          },
+          "accepted_ranges_path": {
+            "type": "string",
+            "description": "Path to the file listing the accepted ranges of variables for this input set. When the end-to-end testing task enables accepted ranges, each listed variable is compared against its range instead of the recorded expected results, and every numerical value of the variable must fall within the range for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6447,6 +6462,11 @@
           "must_change_variables_path": {
             "type": "string",
             "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
+          },
+          "accepted_ranges_path": {
+            "type": "string",
+            "description": "Path to the file listing the accepted ranges of variables for this input set. When the end-to-end testing task enables accepted ranges, each listed variable is compared against its range instead of the recorded expected results, and every numerical value of the variable must fall within the range for the end-to-end test to pass.",
             "default": ""
           }
         }
