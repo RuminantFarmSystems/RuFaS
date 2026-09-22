@@ -1104,10 +1104,19 @@ class TaskManager:
                     convert_variable_table_path=group_args["convert_variable_table_path"],
                     output_prefix=e2e_group,
                 )
+
+                TaskManager.handle_post_processing(
+                    args=group_args,
+                    input_manager=input_manager,
+                    output_manager=output_manager,
+                    task_id=task_id,
+                    should_flush_im_pool=True,
+                    produce_graphics=produce_graphics,
+                    save_results=True,
+                )
             elif is_update_end_to_end_test_task:
                 E2ETestResultsHandler.update_expected_test_results(averaged_results_path,
                                                                    e2e_group)
-
                 output_manager.add_log(
                     "End-to-end testing",
                     "Completed generation of new set of end-to-end expected test results",
@@ -1127,16 +1136,6 @@ class TaskManager:
                         "units": MeasurementUnits.UNITLESS,
                     },
                 )
-
-            TaskManager.handle_post_processing(
-                args=group_args,
-                input_manager=input_manager,
-                output_manager=output_manager,
-                task_id=task_id,
-                should_flush_im_pool=True,
-                produce_graphics=produce_graphics,
-                save_results=True,
-            )
 
             return None
 
