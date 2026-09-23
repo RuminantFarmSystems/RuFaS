@@ -201,18 +201,6 @@ class E2ETestResultsHandler:
             om.add_variable(comparison_type, difference, info_map)
 
     @staticmethod
-    def _write_problematic_averaging_variables(
-        e2e_group: str,
-        problematic_variables: set[str],
-        output_directory: Path,
-    ) -> None:
-        output_path = output_directory / "problematic_averaging_variables.txt"
-
-        with open(output_path, "w", encoding="utf-8") as output_file:
-            for variable_name in sorted(problematic_variables):
-                output_file.write(f"{e2e_group}: {variable_name}\n")
-
-    @staticmethod
     def average_test_results(
         e2e_group: str,
         e2e_runs: list[dict[str, Any]],
@@ -238,48 +226,37 @@ class E2ETestResultsHandler:
 
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(e2e_group)
 
-        problematic_variables: set[str] = set()
-
-        try:
-            for path_set in test_result_path_sets:
-                result_paths = E2ETestResultsHandler._extract_results_paths(
-                    e2e_runs=e2e_runs,
-                    json_output_directory=json_output_directory,
-                    actual_results_path=Path(path_set.actual_results_path),
-                )
-
-                averaged_results = E2ETestResultsHandler._average_results(
-                    result_paths,
-                    problematic_variables,
-                )
-
-                averaged_result_path = (
-                    averaged_results_directory / f"{Path(path_set.actual_results_path).name}_averaged.json"
-                )
-
-                with open(
-                    averaged_result_path,
-                    "w",
-                    encoding="utf-8",
-                ) as averaged_file:
-                    json.dump(
-                        averaged_results,
-                        averaged_file,
-                        separators=(",", ":"),
-                    )
-        finally:
-            E2ETestResultsHandler._write_problematic_averaging_variables(
-                e2e_group,
-                problematic_variables,
-                averaged_results_directory,
+        for path_set in test_result_path_sets:
+            result_paths = E2ETestResultsHandler._extract_results_paths(
+                e2e_runs=e2e_runs,
+                json_output_directory=json_output_directory,
+                actual_results_path=Path(path_set.actual_results_path),
             )
+
+            averaged_results = E2ETestResultsHandler._average_results(
+                result_paths,
+            )
+
+            averaged_result_path = (
+                averaged_results_directory / f"{Path(path_set.actual_results_path).name}_averaged.json"
+            )
+
+            with open(
+                averaged_result_path,
+                "w",
+                encoding="utf-8",
+            ) as averaged_file:
+                json.dump(
+                    averaged_results,
+                    averaged_file,
+                    separators=(",", ":"),
+                )
 
         return averaged_results_directory
 
     @staticmethod
     def _average_results(
         results_paths: list[Path],
-        problematic_variables: set[str],
     ) -> dict[str, Any]:
         test_results = E2ETestResultsHandler._load_results(results_paths)
 
@@ -290,7 +267,6 @@ class E2ETestResultsHandler:
             results_paths,
             test_results,
             reference_keys,
-            problematic_variables,
         )
 
         averaged_results: dict[str, Any] = {}
@@ -303,7 +279,6 @@ class E2ETestResultsHandler:
                 result_path for result_path, result in zip(results_paths, test_results) if output_name not in result
             ]
             if missing_results_paths:
-                problematic_variables.add(output_name)
                 OutputManager().add_warning(
                     "E2E Results Averaging Warning",
                     (
@@ -323,7 +298,6 @@ class E2ETestResultsHandler:
 
             if not isinstance(reference_output, dict) or "values" not in reference_output:
                 if not all(output == reference_output for output in matching_outputs):
-                    problematic_variables.add(output_name)
                     OutputManager().add_warning(
                         "E2E Results Averaging Error",
                         f"Non-matching data in reference output for {output_name}",
@@ -346,7 +320,6 @@ class E2ETestResultsHandler:
             )
 
             if not values_are_valid:
-                problematic_variables.add(output_name)
                 continue
 
             averaged_values: list[Any] = []
@@ -358,7 +331,6 @@ class E2ETestResultsHandler:
 
                 if is_numeric:
                     if not all(isinstance(value, Number) and not isinstance(value, bool) for value in matching_values):
-                        problematic_variables.add(output_name)
 
                         OutputManager().add_warning(
                             "E2E Results Averaging Error",
@@ -388,7 +360,6 @@ class E2ETestResultsHandler:
 
                 else:
                     if not all(value == reference_value for value in matching_values):
-                        problematic_variables.add(output_name)
                         OutputManager().add_warning(
                             "E2E Results Averaging Error",
                             f"Non-numeric values differ for '{output_name}' at index {index}.",
@@ -449,7 +420,6 @@ class E2ETestResultsHandler:
         result_paths: list[Path],
         test_results: list[dict[str, Any]],
         reference_keys: set[str],
-        problematic_variables: set[str],
     ) -> None:
         for result_path, result in zip(
             result_paths[1:],
@@ -461,8 +431,6 @@ class E2ETestResultsHandler:
             unexpected_keys = result_keys - reference_keys
 
             if missing_keys or unexpected_keys:
-                problematic_variables.update(missing_keys)
-                problematic_variables.update(unexpected_keys)
                 OutputManager().add_warning(
                     "E2E Results Averaging Warning",
                     (
