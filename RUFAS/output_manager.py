@@ -2533,6 +2533,7 @@ class OutputManager(object):
         json_output_directory: Path,
         output_prefixes: list[str],
         e2e_random_seeds: dict[str, list[int]],
+        failed_output_prefixes: list[str] | None = None
     ) -> None:
         """
         Summarizes the end-to-end test results by gathering the results from all the e2e tests and prepares them to be
@@ -2547,11 +2548,15 @@ class OutputManager(object):
             A list of output prefixes to look for in the filenames.
         e2e_random_seeds : dict[str, list[int]]
             The random seeds used for each e2e test group.
+        failed_output_prefixes : list[str] | None, default None
+            The output prefixes of the tasks that failed. They are summarized as not run, and any results files found
+            for them are ignored because they were left by an earlier run.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.summarize_e2e_test_results.__name__,
         }
+        failed_output_prefixes = failed_output_prefixes or []
         self.add_log(
             "Attempting to open e2e test results directory",
             "Opening e2e test results directory to read results files",
@@ -2559,7 +2564,11 @@ class OutputManager(object):
         )
         module_headers: list[str] = ["Animal", "CropAndSoil", "Manure", "Feed"]
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
-            prefix: {header: "n/a" for header in module_headers} for prefix in output_prefixes
+            prefix: {
+                header: "not run (task failed)" if prefix in failed_output_prefixes else "n/a"
+                for header in module_headers
+            }
+            for prefix in output_prefixes
         }
         all_results_files = os.listdir(json_output_directory)
         for filename in all_results_files:
@@ -2578,6 +2587,8 @@ class OutputManager(object):
                 self.add_error(
                     "Invalid e2e output prefix", f"No matching output_prefix found in filename: {filename}", info_map
                 )
+                continue
+            if matched_prefix in failed_output_prefixes:
                 continue
 
             for key, value in data.items():
