@@ -1300,6 +1300,19 @@ class Animal:
             else self.digestive_system.enteric_methane_emission
         )
 
+    @property
+    def is_calving_today(self) -> bool:
+        """
+        Determines whether a currently dry cow calves during today's daily routine.
+
+        Returns
+        -------
+        bool
+            True if the cow is dry (``days_in_milk == 0``) and reaches the end of gestation today,
+            meaning the reproduction update will start a new lactation later in the routine.
+        """
+        return self.days_in_milk == 0 and self.is_pregnant and self.days_in_pregnancy == self.gestation_length
+
     def _assign_sex_to_newborn_calf(self) -> None:
         """
         Assign a sex to a newborn calf based on the semen type and male calf rate.
@@ -1552,28 +1565,6 @@ class Animal:
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
 
-    def _is_calving_today(self) -> bool:
-        """
-        Determines whether a currently-dry cow calves during today's daily routine.
-
-        Returns
-        -------
-        bool
-            True if the cow is dry (``days_in_milk == 0``) and reaches the end of gestation today,
-            meaning the reproduction update will start a new lactation later in the routine.
-
-        Notes
-        -----
-        This mirrors the calving condition used by the reproduction update
-        (pregnant and ``days_in_pregnancy == gestation_length``). Because milking runs before
-        reproduction within a daily routine, this lets the milking update record the first day in
-        milk (DIM = 1) on the calving day instead of a dry-day record. It intentionally excludes
-        lactating cows (``days_in_milk > 0``), leaving the rare dry-off-and-calve-same-day case to
-        the existing ``_determine_days_in_milk`` handling.
-
-        """
-        return self.days_in_milk == 0 and self.is_pregnant and self.days_in_pregnancy == self.gestation_length
-
     def daily_milking_update(self, time: RufasTime) -> None:
         """
         Performs the daily milk production update.
@@ -1596,7 +1587,7 @@ class Animal:
             days_in_milk=self.days_in_milk,
             days_born=self.days_born,
             days_in_pregnancy=self.days_in_pregnancy,
-            just_calved=self._is_calving_today(),
+            just_calved=self.is_calving_today,
         )
         milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
             milk_production_inputs, time

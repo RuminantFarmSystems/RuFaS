@@ -2210,7 +2210,7 @@ def test_is_calving_today(
     cow.days_in_pregnancy = days_in_pregnancy
     cow.gestation_length = gestation_length
 
-    assert cow._is_calving_today() is expected
+    assert cow.is_calving_today is expected
 
 
 def test_daily_milking_update_passes_just_calved_flag(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
