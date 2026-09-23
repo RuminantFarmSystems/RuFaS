@@ -331,8 +331,8 @@ class E2ETestResultsHandler:
         e2e_group : str
             The name of the E2E test group whose results are being averaged.
         e2e_runs : list[dict[str, Any]]
-            The E2E run configurations belonging to the test group. Each run must contain the information needed to locate
-            its generated result files.
+            The E2E run configurations belonging to the test group. Each run must contain the information needed to
+            locate its generated result files.
 
         Returns
         -------
@@ -405,14 +405,16 @@ class E2ETestResultsHandler:
         Notes
         -----
         Loads and validates the result files and uses the first result file as the reference structure. Outputs that are
-        missing from one or more runs or have invalid value structures are excluded from the averaged results. Outputs that
-        do not contain a ``values`` list are preserved when they are identical across all runs. Numeric values within valid
-        ``values`` lists are averaged across runs, while non-numeric values are preserved from the reference result.
+        missing from one or more runs or have invalid value structures are excluded from the averaged results. Outputs
+        that do not contain a ``values`` list are preserved when they are identical across all runs. Numeric values
+        within valid ``values`` lists are averaged across runs, while non-numeric values are preserved from the
+        reference result.
 
         Returns
         -------
         dict[str, Any]
-            The averaged E2E test results, retaining the structure and metadata of the reference result where applicable.
+            The averaged E2E test results, retaining the structure and metadata of the reference result where
+            applicable.
         """
         test_results = E2ETestResultsHandler._load_results(results_paths)
 
@@ -516,8 +518,8 @@ class E2ETestResultsHandler:
         -----
         Numeric values are averaged across runs after excluding NaN values. If all numeric values are identical, the
         reference value is preserved without conversion. Non-numeric values are not averaged and the reference value is
-        preserved. If numeric types are inconsistent or non-numeric values differ between runs, a warning is logged and the
-        reference value is retained.
+        preserved. If numeric types are inconsistent or non-numeric values differ between runs, a warning is logged and
+        the reference value is retained.
 
         Returns
         -------
@@ -597,15 +599,16 @@ class E2ETestResultsHandler:
 
         Notes
         -----
-        Verifies that each matching output contains a ``values`` list and that the number of values matches the number in
-        the reference output. If an output does not contain a ``values`` list, an error is logged and validation immediately
-        fails. If an output contains a different number of values, a warning is logged and validation continues so that all
-        matching outputs can be checked.
+        Verifies that each matching output contains a ``values`` list and that the number of values matches the number
+        in the reference output. If an output does not contain a ``values`` list, an error is logged and validation
+        immediately fails. If an output contains a different number of values, a warning is logged and validation
+        continues so that all matching outputs can be checked.
 
         Returns
         -------
         bool
-            True if every matching output contains a ``values`` list with the expected number of values, otherwise False.
+            True if every matching output contains a ``values`` list with the expected number of values, otherwise
+            False.
         """
         values_are_valid = True
 
@@ -651,16 +654,16 @@ class E2ETestResultsHandler:
         result_paths : list[Path]
             The paths to the E2E result files being validated.
         test_results : list[dict[str, Any]]
-            The loaded E2E test results. The first result is treated as the reference result and is not validated against
-            itself.
+            The loaded E2E test results. The first result is treated as the reference result and is not validated
+            against itself.
         reference_keys : set[str]
             The top-level keys from the reference E2E result that are expected in the other results.
 
         Notes
         -----
         Compares the top-level keys of each test result after the reference result with the expected reference keys. A
-        warning is logged for any result containing missing or unexpected keys. Structural differences are reported but do
-        not stop validation or raise an exception.
+        warning is logged for any result containing missing or unexpected keys. Structural differences are reported but
+        do not stop validation or raise an exception.
         """
         for result_path, result in zip(
             result_paths[1:],
@@ -691,7 +694,8 @@ class E2ETestResultsHandler:
         """
         Loads E2E test results from JSON files.
 
-        Reads each provided JSON result file and collects the deserialized contents in the same order as the provided paths.
+        Reads each provided JSON result file and collects the deserialized contents in the same order as the provided
+        paths.
 
         Parameters
         ----------
@@ -722,8 +726,8 @@ class E2ETestResultsHandler:
         Parameters
         ----------
         e2e_runs : list[dict[str, Any]]
-            The E2E run configurations for which result files should be located. Each run must contain an ``output_prefix``
-            and ``e2e_group``.
+            The E2E run configurations for which result files should be located. Each run must contain an
+            ``output_prefix`` and ``e2e_group``.
         json_output_directory : Path
             The directory containing the generated E2E JSON result files.
         actual_results_path : Path
@@ -732,8 +736,8 @@ class E2ETestResultsHandler:
         Notes
         -----
         Determines the expected result filename prefix for each E2E run using the run's output prefix and the provided
-        actual results path. Searches the JSON output directory for the corresponding result file and requires exactly one
-        matching file for each run.
+        actual results path. Searches the JSON output directory for the corresponding result file and requires exactly
+        one matching file for each run.
 
         Returns
         -------
