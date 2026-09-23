@@ -1,12 +1,3 @@
-"""Special-case preprocessing for per-digester, per-year revenue line items.
-
-Anaerobic-digester energy products (electricity, renewable natural gas) are
-emitted by the biophysical model as one daily series per digester. Revenue is
-not a simple quantity times average price: each day's production must be bucketed
-into its calendar year and priced at that year's commodity rate. This handler
-owns the two ``Manure``/``Revenue`` line items that carry those daily series.
-"""
-
 from __future__ import annotations
 
 import json
@@ -41,15 +32,7 @@ class DigesterRevenueHandler(Handler):
         return tuple((self.section, name) for name in self._NAMES)
 
     def process(self, item: EconomicItem | None = None) -> dict[str, Any]:
-        """Compute revenue for a per-digester daily series priced by year.
-
-        For each biophysical pattern (matching one variable per digester), the
-        daily values are summed into calendar-year buckets using each value's
-        ``simulation_day``. Every year's quantity is multiplied by that year's
-        commodity price (falling back to the average price for years without an
-        explicit entry), and the results are summed into the total revenue line
-        item.
-        """
+        """Compute revenue for a per-digester daily series priced by year."""
         im = InputManager()
         om = OutputManager()
         info_map = {"class": self.__class__.__name__, "function": "process"}
@@ -107,7 +90,6 @@ class DigesterRevenueHandler(Handler):
                         continue
                     bio_values_by_digester[digester_name].append(numeric_value)
                     if simulation_day is None or start_date is None:
-                        # Without a day we cannot place the value in a year; fold it into the start year.
                         year = start_year if start_year is not None else 0
                     else:
                         year = (start_date + timedelta(days=int(simulation_day))).year
