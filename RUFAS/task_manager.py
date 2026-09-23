@@ -270,16 +270,14 @@ class TaskManager:
             }
             json_output_directory = next(iter(e2e_groups.values()))[0]["json_output_directory"]
 
-            self.output_manager.summarize_e2e_test_results(json_output_directory, output_prefixes, e2e_random_seeds)
-            json_output_directory = runnable_args[0]["json_output_directory"]
-            failed_output_prefixes: list[str] = [
-                task["output_prefix"]
-                for task in runnable_args
-                if f"{task['output_prefix']} ({task['task_id']})" in failed_tasks
+            failed_e2e_groups: list[str] = [
+                e2e_group
+                for e2e_group, e2e_runs in e2e_groups.items()
+                if any(f"{run['output_prefix']} ({run['task_id']})" in failed_tasks for run in e2e_runs)
             ]
 
             self.output_manager.summarize_e2e_test_results(
-                json_output_directory, output_prefixes, failed_output_prefixes
+                json_output_directory, output_prefixes, e2e_random_seeds, failed_e2e_groups
             )
 
         TaskManager.handle_post_processing(
@@ -1098,10 +1096,15 @@ class TaskManager:
 
             output_manager.is_first_post_processing = False
 
+            must_change_variables = E2ETestResultsHandler.validate_comparison_configuration(
+                group_args["output_prefix"], group_args["convert_variable_table_path"], group_args["filters_directory"]
+            )
+
             E2ETestResultsHandler.compare_actual_and_expected_test_results(
                 json_output_path=averaged_results_path,
                 convert_variable_table_path=group_args["convert_variable_table_path"],
                 output_prefix=e2e_group,
+                must_change_variables=must_change_variables
             )
 
             TaskManager.handle_post_processing(
@@ -1152,10 +1155,6 @@ class TaskManager:
             "task_id": task_id,
             "produce_graphics": produce_graphics,
         }
-
-        must_change_variables = E2ETestResultsHandler.validate_comparison_configuration(
-            args["output_prefix"], args["convert_variable_table_path"], args["filters_directory"]
-        )
 
         output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
         TaskManager._handle_simulation_engine_run_tasks(

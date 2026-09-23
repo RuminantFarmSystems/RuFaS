@@ -2533,7 +2533,7 @@ class OutputManager(object):
         json_output_directory: Path,
         output_prefixes: list[str],
         e2e_random_seeds: dict[str, list[int]],
-        failed_output_prefixes: list[str] | None = None,
+        failed_e2e_groups: list[str] | None = None,
     ) -> None:
         """
         Summarizes the end-to-end test results by gathering the results from all the e2e tests and prepares them to be
@@ -2548,7 +2548,7 @@ class OutputManager(object):
             A list of output prefixes to look for in the filenames.
         e2e_random_seeds : dict[str, list[int]]
             The random seeds used for each e2e test group.
-        failed_output_prefixes : list[str] | None, default None
+        failed_e2e_groups : list[str] | None, default None
             The output prefixes of the tasks that failed. They are summarized as not run, and any results files found
             for them are ignored because they were left by an earlier run.
         """
@@ -2556,7 +2556,7 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self.summarize_e2e_test_results.__name__,
         }
-        failed_output_prefixes = failed_output_prefixes or []
+        failed_e2e_groups = failed_e2e_groups or []
         self.add_log(
             "Attempting to open e2e test results directory",
             "Opening e2e test results directory to read results files",
@@ -2565,7 +2565,7 @@ class OutputManager(object):
         module_headers: list[str] = ["Animal", "CropAndSoil", "Manure", "Feed"]
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
             prefix: {
-                header: "not run (task failed)" if prefix in failed_output_prefixes else "n/a"
+                header: "not run (task failed)" if prefix in failed_e2e_groups else "n/a"
                 for header in module_headers
             }
             for prefix in output_prefixes
@@ -2588,7 +2588,7 @@ class OutputManager(object):
                     "Invalid e2e output prefix", f"No matching output_prefix found in filename: {filename}", info_map
                 )
                 continue
-            if matched_prefix in failed_output_prefixes:
+            if matched_prefix in failed_e2e_groups:
                 continue
 
             for key, value in data.items():
