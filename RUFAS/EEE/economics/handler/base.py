@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TYPE_CHECKING
 
 from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
+if TYPE_CHECKING:
+    from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
 class Handler(ABC):
@@ -29,12 +33,14 @@ class Handler(ABC):
         self.context = context
 
     @property
-    def economic_map_key(self) -> tuple[str, str]:
+    def economic_map_keys(self) -> tuple[tuple[str, str], ...]:
         """Return the ``(section, name)`` pair this handler is keyed on."""
-        return (self.section, self.name)
+        if self.section is not None and self.name is not None:
+            return ((self.section, self.name),)
+        return ()
 
     @abstractmethod
-    def process(self) -> dict[str, Any]:
+    def process(self, item: EconomicItem | None = None) -> dict[str, Any]:
         """Build the preprocessing result entry for this line item.
 
         Returns
