@@ -31,15 +31,7 @@ class SlurryStorageCostHandler(SpecialCaseHandler):
         return tuple((self.section, name) for name in self._NAMES)
 
     def process(self, item: EconomicItem) -> dict[str, Any]:
-        """Compute cost for one slurry-processor field across every processor.
-
-        The processor-specific quantity for this line item (the single
-        ``slurry_storage`` field named by ``item.input_manager``) is multiplied
-        by the item's commodity price, averaged across the simulation window.
-        Costs are summed across processors into ``line_item_values_by_scenario`` and
-        also reported per processor, keyed by each processor's ``name``, under
-        ``cost_by_processor``.
-        """
+        """Compute cost for one slurry-processor field across every processor."""
         im = InputManager()
         om = OutputManager()
         info_map = {"class": self.__class__.__name__, "function": "process"}
