@@ -1,22 +1,22 @@
 {
   "herd_information": {
-	"calf_num": 8,
-	"heiferI_num": 44,
-	"heiferII_num": 38,
-	"heiferIII_num_springers": 5,
-	"cow_num": 100,
-	"replace_num": 500,
-	"herd_num": 100,
+	"calf_num": 80,
+	"heiferI_num": 440,
+	"heiferII_num": 380,
+	"heiferIII_num_springers": 50,
+	"cow_num": 1000,
+	"replace_num": 5000,
+	"herd_num": 1000,
 	"breed": "HO",
 	"parity_fractions": {
-		"1": 0.36,
+		"1": 0.35,
 		"2": 0.26,
-		"3": 0.18,
-		"4": 0.11,
-		"5": 0.09
+		"3": 0.17,
+		"4": 0.10,
+		"5": 0.12
     },
 	"milking_cow_fraction": 0.8356,
-    "annual_milk_yield": 1120300
+    "annual_milk_yield": 11203000
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
