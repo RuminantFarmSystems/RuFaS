@@ -957,7 +957,7 @@ $$
 $$
 :::
 
-Then amount of fat $(\text{FatADG})$ and lean tissue $(\text{ProtADG})$ daily gain is estiated from the $(\text{EBG})$.
+Then amount of fat $(\text{FatADG})$ and lean tissue $(\text{ProtADG})$ daily gain is estimated from the $(\text{EBG})$.
 
 :::{#eq-an-nsm-13}
 [[**AN.NSM.13**]]{.aside .content-visible when-format="html"}
@@ -1049,14 +1049,14 @@ $$
 :::
 
 ##### Protein Requirements
-These are divided into 4 components: maintenance, growth, pregnancy, and lactation (all in MP). The last is defined as the sum of rumen undegraded protein (RUP + microbial protein (MICP)). Requirements for EEA are also included in @nrc_2021 but have not yet been implemented.
+These are divided into 4 components: maintenance, growth, pregnancy, and lactation (all in Metabolizable Protein or MP). Requirements for EEA are also included in @nrc_2021 but have not yet been implemented.
 
-Each physiological function is quantified in terms of TP (true protein), instead of CP (crude protein).
+The requirements for each physiological function are first quantified in terms of the net TP (true protein), instead of CP (crude protein).
 
-To convert both net protein and net amino acid values to a metabolizable basis, net values have to be divided into the calculated efficiencies for each physiological function. Efficiencies can be either fixed or combined for lactating cows. For simplicity, requirements were included on a fixed basis. For details about the variables included in each calculation, please refer to @tbl-an-nasem-prot-req-var.
+To convert both net TP and net amino acid values to a metabolizable basis, net values are divided by the calculated efficiencies of use for each physiological function. For simplicity, fixed efficiences were applied. For details about the variables included in each calculation, please refer to @tbl-an-nasem-prot-req-var.
 
 **Maintenance** <br>
-The protein requirements for non-productive functions (the quantification of protein secretion and accretion), include: scurf + endogenous urinary loss + metabolic fecal protein.
+The protein requirements for non-productive functions include scurf,  endogenous urinary loss, and metabolic fecal protein.
 
 * Scurf Protein
 
@@ -1101,6 +1101,8 @@ $$
 $$
 :::
 
+The CP lost as MFP is assumed to be 73% TP:
+
 :::{#eq-an-nsm-28}
 [[**AN.NSM.28**]]{.aside .content-visible when-format="html"}
 $$
@@ -1117,9 +1119,9 @@ $$
 
 **Growth**
 
-There are two important concepts: frame growth and BW changes related to the mobilization of body reserves.
+Two distinct growth processes are represented: frame growth and BW changes related to the deposition (and mobilization) of body reserves.
 
-The following are the protein requirements associated with growth associated with increased frame size:
+The following are the protein requirements for growth associated with increased frame size, where $\text{FrameWG}$ is the sum of $ \text{FatADG} $ and $ \text{ProtADG} $ as described in [AN.NSM.13](#eq-an-nsm-13) and [AN.NSM.14](#eq-an-nsm-14):
 
 :::{#eq-an-nsm-30}
 [[**AN.NSM.30**]]{.aside .content-visible when-format="html"}
