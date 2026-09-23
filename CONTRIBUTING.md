@@ -84,6 +84,21 @@ Contributions to RuFaS can fall in any of the five categories described below. T
 
 ---
 
+## Shared Values and Operating Principles
+
+All participation and decision-making in RuFaS is guided by the values and operating principles, along with strategic pillars, defined in [Strategy.md](Strategy.md).
+
+Contributors, maintainers, sponsors, and PML members are expected to act in accordance with:
+
+- Scientific Integrity
+- Openness and Accessibility
+- Inclusive Collaboration
+- Shared Stewardship
+- Systems Thinking
+
+
+---
+
 ## Code of Conduct
 
 RuFaS adopted the [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) code of conduct to ensure a welcoming and inclusive environment for all users, contributors, sponsors, and maintainers. By participating in RuFaS, you agree to uphold its standards. Report code violations by email at contact@rufas.org.

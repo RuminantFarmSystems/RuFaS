@@ -1829,6 +1829,7 @@ def test_execute_manure_application(
                 field_coverage=coverage,
                 nitrogen=supplied_manure.nitrogen,
                 phosphorus=supplied_manure.phosphorus,
+                manure_type=manure_type,
                 potassium=None,
                 application_depth=depth,
                 surface_remainder_fraction=remainder,
@@ -1842,6 +1843,7 @@ def test_execute_manure_application(
                 field_coverage=coverage,
                 nitrogen=expected_request.nitrogen,
                 phosphorus=expected_request.phosphorus,
+                manure_type=manure_type,
                 potassium=None,
                 application_depth=depth,
                 surface_remainder_fraction=remainder,
@@ -1970,6 +1972,7 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
         field_coverage=coverage,
         nitrogen=60.0,
         phosphorus=30.0,
+        manure_type=manure_type,
         potassium=None,
         application_depth=validated_depth,
         surface_remainder_fraction=validated_remainder,
@@ -2251,6 +2254,7 @@ def test_execute_manure_application_with_invalid_args(
                 nitrogen=50.0,
                 output_name="manure_application",
                 phosphorus=50.0,
+                manure_type=ManureType.LIQUID,
                 potassium=None,
                 application_depth=expected_depth,
                 surface_remainder_fraction=expected_remainder,
@@ -2263,6 +2267,7 @@ def test_execute_manure_application_with_invalid_args(
                 field_coverage=0.8,
                 nitrogen=50.0,
                 phosphorus=50.0,
+                manure_type=ManureType.LIQUID,
                 potassium=None,
                 application_depth=expected_depth,
                 surface_remainder_fraction=expected_remainder,
@@ -2278,7 +2283,7 @@ def test_execute_manure_application_with_invalid_args(
 
 @pytest.mark.parametrize(
     "field_name,field_size,dry_mass,dry_fraction,coverage,nitrogen,phosphorus,depth,remainder,"
-    "year,day,expected_info,expected_values,potassium",
+    "year,day,expected_info,expected_values,potassium,manure_type",
     [
         (
             "test_1",
@@ -2303,6 +2308,7 @@ def test_execute_manure_application_with_invalid_args(
                     "nitrogen": MeasurementUnits.KILOGRAMS.value,
                     "phosphorus": MeasurementUnits.KILOGRAMS.value,
                     "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "manure_type": MeasurementUnits.UNITLESS.value,
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
                     "field_size": MeasurementUnits.HECTARE.value,
@@ -2319,6 +2325,7 @@ def test_execute_manure_application_with_invalid_args(
                 "nitrogen": 10,
                 "phosphorus": 15,
                 "potassium": 12.5,
+                "manure_type": "solid",
                 "year": 1991,
                 "day": 75,
                 "field_size": 1.3,
@@ -2326,6 +2333,7 @@ def test_execute_manure_application_with_invalid_args(
                 "average_clay_percent": 10.0,
             },
             12.5,
+            ManureType.SOLID,
         ),
         (
             "test_2",
@@ -2350,6 +2358,7 @@ def test_execute_manure_application_with_invalid_args(
                     "nitrogen": MeasurementUnits.KILOGRAMS.value,
                     "phosphorus": MeasurementUnits.KILOGRAMS.value,
                     "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "manure_type": MeasurementUnits.UNITLESS.value,
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
                     "field_size": MeasurementUnits.HECTARE.value,
@@ -2366,6 +2375,7 @@ def test_execute_manure_application_with_invalid_args(
                 "nitrogen": 40,
                 "phosphorus": 43.1,
                 "potassium": 14.55,
+                "manure_type": "liquid",
                 "year": 1994,
                 "day": 200,
                 "field_size": 2.4,
@@ -2373,6 +2383,7 @@ def test_execute_manure_application_with_invalid_args(
                 "average_clay_percent": 10.0,
             },
             14.55,
+            ManureType.LIQUID,
         ),
         (
             "test_3",
@@ -2397,6 +2408,7 @@ def test_execute_manure_application_with_invalid_args(
                     "nitrogen": MeasurementUnits.KILOGRAMS.value,
                     "phosphorus": MeasurementUnits.KILOGRAMS.value,
                     "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "manure_type": MeasurementUnits.UNITLESS.value,
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
                     "field_size": MeasurementUnits.HECTARE.value,
@@ -2415,11 +2427,13 @@ def test_execute_manure_application_with_invalid_args(
                 "nitrogen": 100.5,
                 "phosphorus": 78.0,
                 "potassium": None,
+                "manure_type": "solid",
                 "field_size": 0.66,
                 "field_name": "test_3",
                 "average_clay_percent": 10.0,
             },
             None,
+            ManureType.SOLID,
         ),
     ],
 )
@@ -2438,6 +2452,7 @@ def test_record_manure_application(
     expected_info: dict[str, Any],
     expected_values: dict[str, Any],
     potassium: float,
+    manure_type: ManureType,
 ) -> None:
     """Tests that manure applications are recorded correctly."""
     field = Field(
@@ -2455,6 +2470,7 @@ def test_record_manure_application(
             field_coverage=coverage,
             nitrogen=nitrogen,
             phosphorus=phosphorus,
+            manure_type=manure_type,
             application_depth=depth,
             surface_remainder_fraction=remainder,
             year=year,

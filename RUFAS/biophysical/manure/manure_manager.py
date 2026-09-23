@@ -39,7 +39,6 @@ STORAGE_CLASS_TO_TYPE: dict[type[Storage], ManureType] = {
     BeddedPack: ManureType.SOLID,
     Composting: ManureType.SOLID,
     OpenLot: ManureType.SOLID,
-    DailySpread: ManureType.SOLID,
 }
 
 NON_LIMITING_STREAM_FIELDS = [
@@ -1017,7 +1016,9 @@ class ManureManager:
         -----
         The storages of the requested ``manure_type`` are aggregated into a single nutrient pool, the proportion
         of the limiting nutrient (nitrogen or phosphorus) consumed by ``results`` is computed against that pool,
-        and then that same proportion is removed from each matching storage. For ``DailySpread`` storages the
+        and then that same proportion is removed from each matching storage. ``DailySpread`` storages always
+        match the requested type, because daily-spread manure takes the manure type declared on the request
+        rather than a type intrinsic to the storage. For ``DailySpread`` storages the
         ``available_for_field_application`` stream is drawn down; for all other storages the ``stored_manure``
         stream is drawn down.
 
@@ -1048,7 +1049,7 @@ class ManureManager:
         )
 
         for processor in storage_processors:
-            storage_manure_type = STORAGE_CLASS_TO_TYPE.get(type(processor))
+            storage_manure_type = self._effective_storage_manure_type(processor, manure_type)
             if storage_manure_type != manure_type:
                 continue
             updated_stream, removal_details = self._compute_stream_after_removal(
@@ -1083,12 +1084,28 @@ class ManureManager:
         """Return the stream a field application draws from: daily-spread availability, else stored manure."""
         return storage.available_for_field_application if isinstance(storage, DailySpread) else storage.stored_manure
 
+    @staticmethod
+    def _effective_storage_manure_type(storage: Storage, requested_type: ManureType) -> ManureType | None:
+        """
+        Return the manure type ``storage`` is matched against a nutrient request with.
+
+        ``DailySpread`` storages have no intrinsic manure type: daily-spread manure is spread as it is
+        produced, and the user declares whether it is handled as liquid or solid in the field's
+        ``daily_spread`` settings, which arrive on the request. They therefore always match the requested
+        type. All other storages are typed by their class through ``STORAGE_CLASS_TO_TYPE``.
+        """
+        if isinstance(storage, DailySpread):
+            return requested_type
+        return STORAGE_CLASS_TO_TYPE.get(type(storage))
+
     def _aggregate_storage_nutrients(self, storages: list[Storage], manure_type: ManureType) -> ManureNutrients:
         """
         Aggregate the available manure across ``storages`` of ``manure_type`` into a single nutrient pool.
 
-        Storages whose type does not match ``manure_type`` are skipped. For ``DailySpread`` storages the
-        ``available_for_field_application`` stream is summed; for all others the ``stored_manure`` stream is.
+        Storages whose type does not match ``manure_type`` are skipped. ``DailySpread`` storages always
+        match, because daily-spread manure takes the manure type declared on the request rather than a type
+        intrinsic to the storage. For ``DailySpread`` storages the ``available_for_field_application``
+        stream is summed; for all others the ``stored_manure`` stream is.
 
         Parameters
         ----------
@@ -1109,7 +1126,7 @@ class ManureManager:
         total_manure_mass = 0.0
         dry_matter = 0.0
         for storage in storages:
-            if STORAGE_CLASS_TO_TYPE.get(type(storage)) != manure_type:
+            if self._effective_storage_manure_type(storage, manure_type) != manure_type:
                 continue
             source_stream = self._storage_source_stream(storage)
             nitrogen += source_stream.nitrogen
