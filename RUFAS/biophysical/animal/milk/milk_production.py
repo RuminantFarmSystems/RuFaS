@@ -154,9 +154,7 @@ class MilkProduction:
 
         milk_production_outputs.days_in_milk += 1
         self._update_daily_milk_production(
-            days_in_milk=milk_production_outputs.days_in_milk,
-            days_born=milk_production_inputs.days_born,
-            time=time
+            days_in_milk=milk_production_outputs.days_in_milk, days_born=milk_production_inputs.days_born, time=time
         )
 
         return milk_production_outputs
