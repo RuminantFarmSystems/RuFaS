@@ -1075,7 +1075,7 @@ class TaskManager:
             return None
 
         try:
-            averaged_results_path = E2ETestResultsHandler.average_test_results(
+            averaged_results_path = E2ETestResultsHandler.process_test_result_averaging(
                 e2e_group=e2e_group,
                 e2e_runs=e2e_runs,
             )
