@@ -4073,7 +4073,7 @@ def test_summarize_e2e_test_results_good_path(
         "E2E_Animal": {
             "Animal": True,
             "CropAndSoil": False,
-            'Feed': 'n/a',
+            "Feed": "n/a",
             "Manure": "n/a",
         }
     }

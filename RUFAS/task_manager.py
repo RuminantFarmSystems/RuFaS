@@ -1104,7 +1104,7 @@ class TaskManager:
                 json_output_path=averaged_results_path,
                 convert_variable_table_path=group_args["convert_variable_table_path"],
                 output_prefix=e2e_group,
-                must_change_variables=must_change_variables
+                must_change_variables=must_change_variables,
             )
 
             TaskManager.handle_post_processing(
