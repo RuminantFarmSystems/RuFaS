@@ -316,54 +316,6 @@ ECONOMIC_MAP: dict[str, dict[str, dict[str, dict[str, Any]]]] = {
     },
     "Manure": {
         "Costs": {
-            "Digester operational costs": {
-                "biophysical_simulation": ["SEE " "NOTES"],
-                "economics_files": [
-                    "commodity_prices_natgas_industrial_dollar_per_megajoule",
-                    "commodity_prices_elec_industrial_dollar_per_kwh",
-                    "commodity_prices_digester_carbon_credits_dollar_per_tonne_CO2e",
-                ],
-                "notes": "Get outputs " "from methods in " "digester_costs.py",
-            },
-            "Digester operational costs - Diesel consumption": {
-                "input_manager": ["economic_inputs.Manure.digester.diesel_liters_per_day"],
-                "economics_files": ["commodity_prices_diesel_dollar_per_liter"],
-                "notes": "",
-            },
-            "Digester operational costs - Electricity consumption": {
-                "input_manager": ["economic_inputs.Manure.digester.kwh_per_day"],
-                "economics_files": [
-                    "commodity_prices_elec_residential_dollar_per_kwh",
-                    "commodity_prices_elec_commercial_dollar_per_kwh",
-                    "commodity_prices_elec_industrial_dollar_per_kwh",
-                ],
-                "notes": "",
-            },
-            "Digester operational costs - Gasoline consumption": {
-                "input_manager": ["economic_inputs.Manure.digester.gasoline_liters_per_day"],
-                "economics_files": ["commodity_prices_gasoline_dollar_per_liter"],
-                "notes": "",
-            },
-            "Digester operational costs - Labor hours": {
-                "input_manager": ["economic_inputs.Manure.digester.labor_hours_per_day"],
-                "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
-                "notes": "",
-            },
-            "Digester operational costs - Natural gas consumption": {
-                "input_manager": ["economic_inputs.Manure.digester.megajoules_per_day"],
-                "economics_files": ["commodity_prices_natgas_industrial_dollar_per_megajoule"],
-                "notes": "",
-            },
-            "Digester operational costs - Propane consumption": {
-                "input_manager": ["economic_inputs.Manure.digester.propane_liters_per_day"],
-                "economics_files": ["commodity_prices_propane_wholesale_dollar_per_liter"],
-                "notes": "",
-            },
-            "Digester operational costs - Water consumption": {
-                "input_manager": ["economic_inputs.Manure.digester.cubic_meters_water_per_day"],
-                "economics_files": ["commodity_prices_water_municipal_dollar_per_cubic_meter"],
-                "notes": "",
-            },
             "General manure operational costs - Labor hours": {
                 "input_manager": ["economic_inputs.Manure.general.labor_hours"],
                 "economics_files": ["farm_services_labor_hours_dollar_per_hour"],

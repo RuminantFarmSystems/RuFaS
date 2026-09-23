@@ -72,9 +72,12 @@ class EconomicPreprocessor:
 
     def _build_special_case_handlers(self) -> dict[tuple[str, str], Handler]:
         """Instantiate registered special-case handlers keyed by ``(section, name)``."""
-
-        handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
-        return {handler.economic_map_key: handler for handler in handlers}
+        handlers: dict[tuple[str, str], Handler] = {}
+        for handler_cls in SPECIAL_CASE_HANDLERS:
+            handler = handler_cls(self.context)
+            for key in handler.economic_map_keys:
+                handlers[key] = handler
+        return handlers
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""
@@ -508,7 +511,7 @@ class EconomicPreprocessor:
 
             handler = self.special_case_handlers.get((item.section, item.name))
             if handler is not None:
-                category_data[item.name] = handler.process()
+                category_data[item.name] = handler.process(item)
                 continue
 
             values_by_scenario = self.context.fetch_values_by_scenario(item.biophysical_simulation)
@@ -599,4 +602,4 @@ class EconomicPreprocessor:
         return results
 
 
-__all__ = ["EconomicPreprocessor"]
+__all__ = ["EconomicPreprocessor", "EconomicItem"]

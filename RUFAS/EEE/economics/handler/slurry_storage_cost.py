@@ -26,7 +26,7 @@ class SlurryStorageCostHandler(Handler):
     )
 
     @property
-    def keys(self) -> tuple[tuple[str, str], ...]:
+    def economic_map_keys(self) -> tuple[tuple[str, str], ...]:
         """Own every slurry-storage operational-cost line item under ``Manure``/``Costs``."""
         return tuple((self.section, name) for name in self._NAMES)
 

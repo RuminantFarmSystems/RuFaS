@@ -14,35 +14,33 @@ import re
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
-from RUFAS.EEE.economics.special_cases.base import SpecialCaseHandler
+from RUFAS.EEE.economics.handler.base import Handler
 
 if TYPE_CHECKING:
     from RUFAS.EEE.economics.preprocessing import EconomicItem
 
-# Captures the digester name from a variable like
-# ``Manure.Digester.energy.<digester_name>.electricity_produced_kwh``.
 _DIGESTER_NAME_PATTERN = re.compile(r"energy\.(.+?)\.[^.]+$")
 
 
-class DigesterRevenueHandler(SpecialCaseHandler):
+class DigesterRevenueHandler(Handler):
     """Aggregate per-digester daily energy production into per-year revenue."""
 
     section = "Manure"
-    # The two Manure/Revenue line items whose daily per-digester series this
-    # handler prices by year.
     _NAMES = (
         "Electricity production from anaerobic digester",
         "Renewable natural gas (RNG) production",
     )
 
     @property
-    def keys(self) -> tuple[tuple[str, str], ...]:
+    def economic_map_keys(self) -> tuple[tuple[str, str], ...]:
         """Own both digester energy-product line items under ``Manure``/``Revenue``."""
         return tuple((self.section, name) for name in self._NAMES)
 
-    def process(self, item: EconomicItem) -> dict[str, Any]:
+    def process(self, item: EconomicItem | None = None) -> dict[str, Any]:
         """Compute revenue for a per-digester daily series priced by year.
 
         For each biophysical pattern (matching one variable per digester), the
@@ -52,8 +50,8 @@ class DigesterRevenueHandler(SpecialCaseHandler):
         explicit entry), and the results are summed into the total revenue line
         item.
         """
-        im = self.context.im
-        om = self.context.om
+        im = InputManager()
+        om = OutputManager()
         info_map = {"class": self.__class__.__name__, "function": "process"}
 
         start_date_str = im.get_data("config.start_date")
