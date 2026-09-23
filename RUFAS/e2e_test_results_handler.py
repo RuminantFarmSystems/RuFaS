@@ -232,7 +232,7 @@ class E2ETestResultsHandler:
         if not e2e_runs:
             OutputManager().add_error(
                 "E2E Results Averaging Error",
-                "No e2e runs data sent to 'average_test_results()' function.",
+                "No E2E runs data sent to 'process_test_result_averaging()' function.",
                 info_map={
                     "class": E2ETestResultsHandler.__class__.__name__,
                     "function": E2ETestResultsHandler.process_test_result_averaging.__name__,
@@ -243,7 +243,7 @@ class E2ETestResultsHandler:
         json_output_directory = Path(e2e_runs[0]["json_output_directory"])
 
         averaged_results_directory = json_output_directory / "averaged" / e2e_group
-        OutputManager().create_directory(averaged_result_path)
+        OutputManager().create_directory(averaged_results_directory)
 
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(e2e_group)
 
