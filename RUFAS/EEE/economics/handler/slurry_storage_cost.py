@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
-from RUFAS.EEE.economics.special_cases.base import SpecialCaseHandler
+from RUFAS.EEE.economics.handler.base import Handler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
-class SlurryStorageCostHandler(SpecialCaseHandler):
+class SlurryStorageCostHandler(Handler):
     """Compute per-slurry-store operational costs from a ``list[dict]`` input."""
 
     section = "Manure"

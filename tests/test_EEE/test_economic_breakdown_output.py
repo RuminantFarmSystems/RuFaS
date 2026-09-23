@@ -18,11 +18,18 @@ class DummyOutputManager:
 
 
 class DummyPartialBudget:
+    def __init__(self) -> None:
+        self.exported = []
+
     def has_partial_budget_activity(self, _preprocessed):
         return False
 
     def calculate_partial_budget(self, _preprocessed):
         return None
+
+    def export_line_item_breakdown(self, preprocessed):
+        self.exported.append(preprocessed)
+        return []
 
 
 def test_framework_exports_line_item_breakdown(monkeypatch):
@@ -48,6 +55,7 @@ def test_framework_exports_line_item_breakdown(monkeypatch):
     }
 
     dummy_om = DummyOutputManager()
+    dummy_pb = DummyPartialBudget()
 
     monkeypatch.setattr(
         framework, "InputManager", lambda: type("IM", (), {"get_data": lambda *_: pd.DataFrame({"Cost": []})})()
@@ -56,7 +64,7 @@ def test_framework_exports_line_item_breakdown(monkeypatch):
     monkeypatch.setattr(
         framework, "EconomicPreprocessor", lambda: type("Pre", (), {"preprocess": lambda *_: preprocessed})()
     )
-    monkeypatch.setattr(framework, "PartialBudget", lambda: DummyPartialBudget())
+    monkeypatch.setattr(framework, "PartialBudget", lambda: dummy_pb)
 
     ef = framework.EconomicFramework()
     ef.run_economic_analysis()
@@ -72,3 +80,5 @@ def test_framework_exports_line_item_breakdown(monkeypatch):
 
     milk = breakdown["Animal"]["revenues"]["milk"]
     assert milk["total"] == 32.0
+
+    assert dummy_pb.exported == [preprocessed]

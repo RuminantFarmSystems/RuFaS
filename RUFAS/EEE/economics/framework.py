@@ -149,6 +149,7 @@ class EconomicFramework:
             self._build_line_item_breakdown(preprocessed_results),
             info_map=info_map,
         )
+        self.partial_budget.export_line_item_breakdown(preprocessed_results)
         capital_present = self._capital_cost_present()
         partial_budget_requested = self.partial_budget.has_partial_budget_activity(preprocessed_results)
 

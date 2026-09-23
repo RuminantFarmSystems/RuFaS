@@ -10,7 +10,8 @@ BIOPHYSICAL_FALLBACKS: Dict[str, List[float]] = {
     "Economic_preprocessing.Animal.FPCM": [250.0],
     "AnimalModuleReporter.report_life_cycle_manager_data.sold_heiferII_num": [2.0],
     "AnimalModuleReporter.report_life_cycle_manager_data.sold_heiferIII_oversupply_num": [1.0],
-    "FeedManager.purchase_feed.ration_interval_*_cost": [100.0],
+    "FeedManager.purchase_feed.ration_interval_.*_amount_purchased": [100.0],
+    "FeedManager.purchase_feed.ration_interval_.*_cost": [100.0],
     "SEE NOTES": [10.0],
     "ManureManager._record_manure_request_results.off_farm_manure.total_manure_mass": [50.0],
     "see future_expansion": [5.0],
@@ -19,6 +20,7 @@ BIOPHYSICAL_FALLBACKS: Dict[str, List[float]] = {
     "field.crop_specification": [20.0],
     "field.field_size": [30.0],
     "Waiting on tractor_implement and other parts of EEE outputs": [6.0],
+    "seed_cost": [0.0],
 }
 
 # Default quantity used when no biophysical or input values are available.

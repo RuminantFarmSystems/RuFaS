@@ -1,14 +1,20 @@
 import pytest
 import re
+from types import SimpleNamespace
 
+from RUFAS.EEE.economics import mapping as economics_mapping
 from RUFAS.EEE.economics import preprocessing
+from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
+from RUFAS.util import Utility
 
 
 class DummyOutputManager:
-    def __init__(self, pool):
+    def __init__(self, pool, time=None):
         self._pool = pool
+        self.time = time
         self.warnings = []
         self.logs = []
+        self.added_variables = []
 
     def _get_flat_variables_pool(self):
         return self._pool
@@ -18,7 +24,14 @@ class DummyOutputManager:
         if not filters:
             return {}
         pattern = re.compile(filters[0])
-        return {name: data for name, data in self._pool.items() if pattern.search(name)}
+        results = {name: data for name, data in self._pool.items() if pattern.search(name)}
+        if filter_content.get("expand_data", False) and results:
+            results, _ = Utility.expand_data_temporally(
+                results,
+                simulation_length=self.time.simulation_length_days,
+                fill_value=filter_content.get("fill_value", 0.0),
+            )
+        return results
 
     def add_warning(self, code, message, info):
         self.warnings.append((code, message, info))
@@ -26,21 +39,30 @@ class DummyOutputManager:
     def add_log(self, title, message, info):
         self.logs.append((title, message, info))
 
+    def add_variable(self, variable_name, value, info_map=None, **kwargs):
+        self.added_variables.append((variable_name, value))
+
 
 class DummyInputManager:
-    def __init__(self, data):
+    def __init__(self, data, field_keys=None):
         self._data = {
-            "config.start_date": "2020:01:01",
-            "config.end_date": "2020:12:31",
+            "config.start_date": "2020:1",
+            "config.end_date": "2020:365",
             "config.FIPS_county_code": 1001,
             "_default_values": {"commodity": [], "2020": []},
             "_default_fallback_values": {"commodity": [], "2020": []},
             **data,
         }
+        self._field_keys = field_keys or []
         self.added_runtime = []
 
     def get_data(self, key):
         return self._data.get(key)
+
+    def get_data_keys_by_properties(self, properties_key):
+        if properties_key == "field_properties":
+            return self._field_keys
+        return []
 
     def add_runtime_variable_to_pool(
         self, variable_name, data, properties_blob_key, eager_termination=False, input_path=None
@@ -531,3 +553,569 @@ def test_preprocess_expands_input_wildcard_with_value_map(monkeypatch: pytest.Mo
         {"X": "A", "Y": "B", "Z": "C"},
     )
     assert values == [5.0, 6.0, 7.0]
+
+
+def test_preprocess_purchased_feed_costs_derives_weighted_price(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_1_amount_purchased": {"values": [100000.0]},
+            "FeedManager.purchase_feed.ration_interval_1_cost": {"values": [10000.0]},
+            "FeedManager.purchase_feed.ration_interval_2_amount_purchased": {"values": [50000.0]},
+            "FeedManager.purchase_feed.ration_interval_2_cost": {"values": [25000.0]},
+        }
+    )
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Feed_storage": {
+                "Costs": {
+                    "Purchased feed costs": {
+                        "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_.*_amount_purchased"],
+                        "cost_simulation": ["FeedManager.purchase_feed.ration_interval_.*_cost"],
+                        "economics_files": ["feed_prices"],
+                    }
+                }
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Feed_storage"]["Costs"]["Purchased feed costs"]
+    # Quantities are the purchased amounts; prices are the per-feed prices actually paid.
+    assert item["biophysical_aggregate"] == 150000.0
+    assert item["price_values"] == [pytest.approx(0.1), pytest.approx(0.5)]
+    assert item["price_aggregate"] == pytest.approx(35000.0 / 150000.0)
+    assert item["line_item_values_by_scenario"] == {"baseline": 35000.0}
+    # The commodity reference prices are not fetched for the special-cased item.
+    assert item["price_data"] == {}
+    assert item["biophysical_aggregate"] * item["price_aggregate"] == pytest.approx(
+        item["line_item_values_by_scenario"]["baseline"]
+    )
+
+
+def test_context_expands_interval_values_to_daily() -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_1_cost": {
+                "values": [100.0, 200.0],
+                "info_maps": [
+                    {"units": "dollars", "simulation_day": 0},
+                    {"units": "dollars", "simulation_day": 3},
+                ],
+            }
+        },
+        time=SimpleNamespace(simulation_length_days=5),
+    )
+
+    context = EconomicDataProcessor(dummy_im, dummy_om)
+    values_by_scenario = context.fetch_values_by_scenario(
+        ["FeedManager.purchase_feed.ration_interval_.*_cost"], expand_interval_to_daily=True
+    )
+
+    assert values_by_scenario == {"baseline": [100.0, 0.0, 0.0, 200.0, 0.0]}
+
+
+def test_context_interval_expansion_skipped_without_time() -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_1_cost": {
+                "values": [100.0, 200.0],
+                "info_maps": [
+                    {"units": "dollars", "simulation_day": 0},
+                    {"units": "dollars", "simulation_day": 3},
+                ],
+            }
+        }
+    )
+
+    context = EconomicDataProcessor(dummy_im, dummy_om)
+    values_by_scenario = context.fetch_values_by_scenario(
+        ["FeedManager.purchase_feed.ration_interval_.*_cost"], expand_interval_to_daily=True
+    )
+
+    assert values_by_scenario == {"baseline": [100.0, 200.0]}
+    warning_codes = [code for code, _, _ in dummy_om.warnings]
+    assert "MissingTimeForIntervalExpansion" in warning_codes
+
+
+def test_purchased_feed_costs_handler_registration_and_fallback_keys() -> None:
+    from RUFAS.EEE.economics.fallback_values import BIOPHYSICAL_FALLBACKS
+    from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
+    from RUFAS.EEE.economics.handler import PurchasedFeedCostHandler
+
+    assert PurchasedFeedCostHandler in preprocessing.SPECIAL_CASE_HANDLERS
+
+    entry = ECONOMIC_MAP["Feed_storage"]["Costs"]["Purchased feed costs"]
+    assert entry["biophysical_simulation"] == PurchasedFeedCostHandler.amount_patterns
+    assert entry["cost_simulation"] == PurchasedFeedCostHandler.cost_patterns
+
+    assert PurchasedFeedCostHandler.amount_patterns[0] in BIOPHYSICAL_FALLBACKS
+    assert PurchasedFeedCostHandler.cost_patterns[0] in BIOPHYSICAL_FALLBACKS
+
+
+def test_preprocess_purchased_feed_costs_uses_fallback_when_no_data(monkeypatch: pytest.MonkeyPatch) -> None:
+    from RUFAS.EEE.economics.mapping import ECONOMIC_MAP as REAL_MAP
+
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager({}, time=SimpleNamespace(simulation_length_days=5))
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Feed_storage": {
+                "Costs": {"Purchased feed costs": REAL_MAP["Feed_storage"]["Costs"]["Purchased feed costs"]}
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Feed_storage"]["Costs"]["Purchased feed costs"]
+    assert item["biophysical_values"] == [100.0]
+    assert item["line_item_values_by_scenario"] == {"baseline": 100.0}
+    # No purchases in the pool means no derived price.
+    assert item["price_values"] == []
+    assert item["price_aggregate"] is None
+
+
+def test_preprocess_purchased_feed_costs_real_mapping_entry(monkeypatch: pytest.MonkeyPatch) -> None:
+    from RUFAS.EEE.economics.mapping import ECONOMIC_MAP as REAL_MAP
+
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "FeedManager.purchase_feed.ration_interval_1_amount_purchased": {
+                "values": [1000.0, 500.0],
+                "info_maps": [
+                    {"units": "kilograms", "simulation_day": 0},
+                    {"units": "kilograms", "simulation_day": 3},
+                ],
+            },
+            "FeedManager.purchase_feed.ration_interval_1_cost": {
+                "values": [100.0, 50.0],
+                "info_maps": [
+                    {"units": "dollars", "simulation_day": 0},
+                    {"units": "dollars", "simulation_day": 3},
+                ],
+            },
+            "FeedManager.purchase_feed.ration_interval_2_amount_purchased": {
+                "values": [200.0, 100.0],
+                "info_maps": [
+                    {"units": "kilograms", "simulation_day": 0},
+                    {"units": "kilograms", "simulation_day": 3},
+                ],
+            },
+            "FeedManager.purchase_feed.ration_interval_2_cost": {
+                "values": [100.0, 50.0],
+                "info_maps": [
+                    {"units": "dollars", "simulation_day": 0},
+                    {"units": "dollars", "simulation_day": 3},
+                ],
+            },
+        },
+        time=SimpleNamespace(simulation_length_days=5),
+    )
+
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {
+            "Feed_storage": {
+                "Costs": {"Purchased feed costs": REAL_MAP["Feed_storage"]["Costs"]["Purchased feed costs"]}
+            }
+        },
+    )
+
+    preprocessor = preprocessing.EconomicPreprocessor()
+    results = preprocessor.preprocess()
+
+    item = results["Feed_storage"]["Costs"]["Purchased feed costs"]
+    # Each feed's purchased amounts are expanded to one value per simulation day, zero-filled.
+    assert len(item["biophysical_values"]) == 10
+    assert item["biophysical_aggregate"] == 1800.0
+    # Prices come from the feed input file via the simulation's cost outputs: the
+    # per-feed prices paid and their purchase-amount-weighted average.
+    assert item["price_values"] == [pytest.approx(0.1), pytest.approx(0.5)]
+    assert item["price_aggregate"] == pytest.approx(300.0 / 1800.0)
+    assert item["price_data"] == {}
+    assert item["line_item_values_by_scenario"] == {"baseline": 300.0}
+    assert item["biophysical_aggregate"] * item["price_aggregate"] == pytest.approx(
+        item["line_item_values_by_scenario"]["baseline"]
+    )
+    assert item["flow_type"] == "cost"
+
+
+def _daily(head_per_day: int, days: int, start_day: int = 0) -> dict:
+    """Build a pen daily-head payload with one ``simulation_day`` per value."""
+
+    return {
+        "values": [head_per_day] * days,
+        "info_maps": [{"simulation_day": day} for day in range(start_day, start_day + days)],
+    }
+
+
+def _pen(pen_id: int, bedding_name: str) -> dict:
+    """Build a ``pen_information`` entry referencing a bedding config by name."""
+
+    return {"id": pen_id, "manure_streams": [{"bedding_name": bedding_name}]}
+
+
+def _run_bedding(
+    monkeypatch: pytest.MonkeyPatch,
+    im_data: dict,
+    pool: dict,
+    *,
+    pens: list,
+    type_to_key: dict,
+    economics_files: dict,
+    configs_path: str = "animal.bedding_configs",
+    billable_pen_combinations: list | None = None,
+):
+    """Run the bedding special-case handler and return its result item + OM.
+
+    ``pens`` is injected as the real ``animal.pen_information`` list so the
+    processor resolves bedding by each pen's ``id`` field (not list position).
+    """
+
+    dummy_im = DummyInputManager({**im_data, "animal.pen_information": pens})
+    dummy_om = DummyOutputManager(pool)
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    bedding_entry = {
+        "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
+        "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
+        "bedding_configs_path": configs_path,
+        "bedding_type_to_file_key": type_to_key,
+        "economics_files": economics_files,
+    }
+    if billable_pen_combinations is not None:
+        bedding_entry["billable_pen_combinations"] = billable_pen_combinations
+    economic_map = {"Animal": {"Costs": {"Bedding requirements": bedding_entry}}}
+    monkeypatch.setattr(preprocessing, "ECONOMIC_MAP", economic_map)
+    monkeypatch.setattr(economics_mapping, "ECONOMIC_MAP", economic_map)
+    results = preprocessing.EconomicPreprocessor().preprocess()
+    return results["Animal"]["Costs"]["Bedding requirements"], dummy_om
+
+
+def test_preprocess_bedding_bills_only_billable_pen_combinations(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, dummy_om = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "calf_straw", "bedding_type": "straw"},
+                {"name": "lac_and_growing_sand", "bedding_type": "sand"},
+            ],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+            "sand_price": {"fips": [1001], "2021": [120.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_3_LAC_COW": _daily(90, 365),
+        },
+        pens=[_pen(0, "calf_straw"), _pen(3, "lac_and_growing_sand")],
+        type_to_key={"straw": "straw", "sand": "sand"},
+        economics_files={"straw": "straw_price", "sand": "sand_price"},
+        billable_pen_combinations=["LAC_COW"],
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(10800.0)
+    assert bedding["biophysical_aggregate"] == pytest.approx(90.0)
+    assert set(bedding["price_data"].keys()) == {"sand"}
+    emitted = dict(dummy_om.added_variables)
+    assert emitted["econ_bedding_total_cost"] == pytest.approx(10800.0)
+    assert emitted["econ_bedding_billed_head_years"] == pytest.approx(90.0)
+    assert emitted["econ_bedding_avg_price_per_head_year"] == pytest.approx(120.0)
+
+
+def test_preprocess_bedding_pairs_each_pen_with_its_own_price(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "calf_straw", "bedding_type": "straw"},
+                {"name": "lac_and_growing_sand", "bedding_type": "sand"},
+            ],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+            "sand_price": {"fips": [1001], "2021": [120.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_2_GROWING": _daily(20, 365),
+        },
+        pens=[_pen(1, "calf_straw"), _pen(2, "lac_and_growing_sand")],
+        type_to_key={"straw": "straw", "sand": "sand"},
+        economics_files={"straw": "straw_price", "sand": "sand_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(2900.0)
+    assert bedding["flow_type"] == "cost"
+    assert set(bedding["price_data"].keys()) == {"straw", "sand"}
+
+
+def test_preprocess_bedding_total_equals_quantity_times_price(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "calf_straw", "bedding_type": "straw"},
+                {"name": "lac_and_growing_sand", "bedding_type": "sand"},
+            ],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+            "sand_price": {"fips": [1001], "2021": [50.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_2_GROWING": _daily(20, 365),
+        },
+        pens=[_pen(1, "calf_straw"), _pen(2, "lac_and_growing_sand")],
+        type_to_key={"straw": "straw", "sand": "sand"},
+        economics_files={"straw": "straw_price", "sand": "sand_price"},
+    )
+    assert bedding["biophysical_aggregate"] == pytest.approx(30.0)
+    assert bedding["price_aggregate"] == pytest.approx(50.0)
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(1500.0)
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(
+        bedding["biophysical_aggregate"] * bedding["price_aggregate"]
+    )
+
+
+def test_preprocess_bedding_resolves_by_pen_id_not_list_position(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "straw_cfg", "bedding_type": "straw"},
+                {"name": "sand_cfg", "bedding_type": "sand"},
+                {"name": "sawdust_cfg", "bedding_type": "sawdust"},
+            ],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+            "sand_price": {"fips": [1001], "2021": [120.0]},
+            "sawdust_price": {"fips": [1001], "2021": [70.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_GROWING": _daily(20, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_2_CLOSE_UP": _daily(30, 365),
+        },
+        pens=[_pen(2, "sawdust_cfg"), _pen(0, "straw_cfg"), _pen(1, "sand_cfg")],
+        type_to_key={"straw": "straw", "sand": "sand", "sawdust": "sawdust"},
+        economics_files={"straw": "straw_price", "sand": "sand_price", "sawdust": "sawdust_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(5000.0)
+
+
+def test_preprocess_bedding_normalizes_compound_types(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "cbpb_mix", "bedding_type": "CBPB sawdust"},
+                {"name": "recycled", "bedding_type": "manure solids"},
+            ],
+            "cbpb_price": {"fips": [1001], "2021": [10.0]},
+            "ms_price": {"fips": [1001], "2021": [5.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_LAC_COW": _daily(2, 365),
+        },
+        pens=[_pen(0, "cbpb_mix"), _pen(1, "recycled")],
+        type_to_key={"CBPB sawdust": "CBPB", "manure solids": "manure_solids"},
+        economics_files={"CBPB": "cbpb_price", "manure_solids": "ms_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(110.0)
+    assert set(bedding["price_data"].keys()) == {"CBPB", "manure_solids"}
+
+
+def test_preprocess_bedding_skips_none_type_with_no_cost(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, dummy_om = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "calf_straw", "bedding_type": "straw"},
+                {"name": "none (no bedding)", "bedding_type": "none"},
+            ],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_GROWING": _daily(99, 365),
+        },
+        pens=[_pen(0, "calf_straw"), _pen(1, "none (no bedding)")],
+        type_to_key={"straw": "straw"},
+        economics_files={"straw": "straw_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(500.0)
+    assert "UnmappedBeddingType" not in [code for code, _, _ in dummy_om.warnings]
+
+
+def test_preprocess_bedding_uses_leap_year_denominator(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2020:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [{"name": "calf_straw", "bedding_type": "straw"}],
+            "straw_price": {"fips": [1001], "2020": [50.0]},
+        },
+        {"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(1, 366)},
+        pens=[_pen(0, "calf_straw")],
+        type_to_key={"straw": "straw"},
+        economics_files={"straw": "straw_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(50.0)
+
+
+def test_preprocess_bedding_prorates_partial_year(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [{"name": "calf_straw", "bedding_type": "straw"}],
+            "straw_price": {"fips": [1001], "2021": [365.0]},
+        },
+        {"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 20)},
+        pens=[_pen(0, "calf_straw")],
+        type_to_key={"straw": "straw"},
+        economics_files={"straw": "straw_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(200.0)
+
+
+def test_preprocess_bedding_falls_back_to_nearest_price_year(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, dummy_om = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2018:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [{"name": "calf_straw", "bedding_type": "straw"}],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+        },
+        {"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 365)},
+        pens=[_pen(0, "calf_straw")],
+        type_to_key={"straw": "straw"},
+        economics_files={"straw": "straw_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(500.0)
+    assert "MissingPriceYear" in [code for code, _, _ in dummy_om.warnings]
+
+
+def test_preprocess_bedding_warns_on_missing_fips(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, dummy_om = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 9999,
+            "animal.bedding_configs": [{"name": "calf_straw", "bedding_type": "straw"}],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+        },
+        {"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 365)},
+        pens=[_pen(0, "calf_straw")],
+        type_to_key={"straw": "straw"},
+        economics_files={"straw": "straw_price"},
+    )
+    assert "MissingPriceData" in [code for code, _, _ in dummy_om.warnings]
+
+
+def test_preprocess_bedding_unloadable_price_file_costs_nothing(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, dummy_om = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [
+                {"name": "calf_straw", "bedding_type": "straw"},
+                {"name": "lac_and_growing_sand", "bedding_type": "sand"},
+            ],
+            "sand_price": {"fips": [1001], "2021": [120.0]},
+        },
+        {
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(10, 365),
+            "AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_1_GROWING": _daily(20, 365),
+        },
+        pens=[_pen(0, "calf_straw"), _pen(1, "lac_and_growing_sand")],
+        type_to_key={"straw": "straw", "sand": "sand"},
+        economics_files={"straw": "straw_price", "sand": "sand_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(2400.0)
+    assert "MissingBeddingPriceFile" in [code for code, _, _ in dummy_om.warnings]
+
+
+def test_preprocess_bedding_pairs_each_year_with_its_own_price(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2020:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [{"name": "calf_straw", "bedding_type": "straw"}],
+            "straw_price": {"fips": [1001], "2020": [10.0], "2021": [20.0]},
+        },
+        {"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_0_CALF": _daily(5, 366 + 365)},
+        pens=[_pen(0, "calf_straw")],
+        type_to_key={"straw": "straw"},
+        economics_files={"straw": "straw_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(150.0)
+
+
+def test_preprocess_bedding_derives_pen_id_from_underscored_name(monkeypatch: pytest.MonkeyPatch) -> None:
+    bedding, _ = _run_bedding(
+        monkeypatch,
+        {
+            "config.start_date": "2021:1",
+            "config.FIPS_county_code": 1001,
+            "animal.bedding_configs": [{"name": "calf_straw", "bedding_type": "straw"}],
+            "straw_price": {"fips": [1001], "2021": [50.0]},
+        },
+        {"AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_7_CLOSE_UP": _daily(3, 365)},
+        pens=[_pen(7, "calf_straw")],
+        type_to_key={"straw": "straw"},
+        economics_files={"straw": "straw_price"},
+    )
+    assert bedding["line_item_values_by_scenario"]["baseline"] == pytest.approx(150.0)
+
+
+def test_bedding_line_item_flows_into_framework_breakdown() -> None:
+    from RUFAS.EEE.economics.framework import EconomicFramework
+
+    framework = EconomicFramework.__new__(EconomicFramework)
+    preprocessed = {
+        "Animal": {
+            "Costs": {
+                "Bedding requirements": {
+                    "flow_type": "cost",
+                    "line_item_values_by_scenario": {"baseline": 2900.0},
+                    "biophysical_values": [],
+                    "price_values": [50.0, 120.0],
+                }
+            }
+        }
+    }
+    breakdown = framework._build_line_item_breakdown(preprocessed)
+    assert breakdown["Animal"]["costs"]["Bedding requirements"]["total"] == pytest.approx(2900.0)

@@ -5,9 +5,9 @@ This file is generated to decouple the economics preprocessing from runtime JSON
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
-ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
+ECONOMIC_MAP: dict[str, dict[str, dict[str, dict[str, Any]]]] = {
     "Animal": {
         "Costs": {
             "Animal - Labor hours": {
@@ -49,8 +49,15 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
             "Bedding requirements": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
                 "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
-                "match_source": "input_manager",
-                "wildcard_value_map": {"0_CALF": "0", "1_GROWING": "1", "2_CLOSE_UP": "2", "3_LAC_COW": "3"},
+                "bedding_configs_path": "animal.bedding_configs",
+                "billable_pen_combinations": ["LAC_COW"],
+                "bedding_type_to_file_key": {
+                    "sand": "sand",
+                    "sawdust": "sawdust",
+                    "straw": "straw",
+                    "CBPB sawdust": "CBPB",
+                    "manure solids": "manure_solids",
+                },
                 "economics_files": {
                     "CBPB": "commodity_prices_bedding_compost_bedded_pack_dollar_per_head",
                     "manure_solids": "commodity_prices_bedding_manure_solids_dollar_per_head",
@@ -58,7 +65,7 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                     "sawdust": "commodity_prices_bedding_sawdust_dollar_per_head",
                     "straw": "commodity_prices_bedding_straw_dollar_per_head",
                 },
-                "preprocessing": "average number of animals in each pen",
+                "preprocessing": "per-pen annual bedding cost: average head per year x dollar-per-head-per-year",
             },
             "Purchased heifers": {
                 "biophysical_simulation": ["AnimalModuleReporter.report_life_cycle_manager_data.bought_heifer_num"],
@@ -128,7 +135,8 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
                 "economics_files": ["farm_services_labor_hours_dollar_per_hour"],
             },
             "Purchased feed costs": {
-                "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_.*_cost"],
+                "biophysical_simulation": ["FeedManager.purchase_feed.ration_interval_.*_amount_purchased"],
+                "cost_simulation": ["FeedManager.purchase_feed.ration_interval_.*_cost"],
                 "economics_files": [
                     "commodity_prices_alfalfa_hay_dollar_per_kilogram",
                     "commodity_prices_alfalfa_silage_dollar_per_kilogram",
@@ -704,3 +712,22 @@ ECONOMIC_MAP: Dict[str, Dict[str, Dict[str, Dict[str, Any]]]] = {
         },
     },
 }
+
+CROP_TO_SEED_KEY: dict[str, str] = {
+        "corn_grain": "commodity_prices_corn_seed_dollar_per_square_meter",
+        "corn_silage": "commodity_prices_corn_seed_dollar_per_square_meter",
+        "soybean_grain": "commodity_prices_soybean_seed_dollar_per_square_meter",
+        "soybean_hay": "commodity_prices_soybean_seed_dollar_per_square_meter",
+        "winter_wheat_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "winter_wheat_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "triticale_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_grain": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_silage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_baleage": "commodity_prices_wheat_seed_dollar_per_square_meter",
+        "cereal_rye_hay": "commodity_prices_wheat_seed_dollar_per_square_meter",
+    }
