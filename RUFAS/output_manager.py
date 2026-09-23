@@ -2529,7 +2529,11 @@ class OutputManager(object):
             )
 
     def summarize_e2e_test_results(
-        self, json_output_directory: Path, output_prefixes: list[str], failed_output_prefixes: list[str] | None = None
+        self,
+        json_output_directory: Path,
+        output_prefixes: list[str],
+        e2e_random_seeds: dict[str, list[int]],
+        failed_output_prefixes: list[str] | None = None
     ) -> None:
         """
         Summarizes the end-to-end test results by gathering the results from all the e2e tests and prepares them to be
@@ -2542,6 +2546,8 @@ class OutputManager(object):
             The directory where the JSON output files are located.
         output_prefixes : list[str]
             A list of output prefixes to look for in the filenames.
+        e2e_random_seeds : dict[str, list[int]]
+            The random seeds used for each e2e test group.
         failed_output_prefixes : list[str] | None, default None
             The output prefixes of the tasks that failed. They are summarized as not run, and any results files found
             for them are ignored because they were left by an earlier run.
@@ -2556,7 +2562,7 @@ class OutputManager(object):
             "Opening e2e test results directory to read results files",
             info_map,
         )
-        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure"]
+        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure", "Feed"]
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
             prefix: {
                 header: "not run (task failed)" if prefix in failed_output_prefixes else "n/a"
@@ -2595,13 +2601,21 @@ class OutputManager(object):
             "Successfully opened e2e test results directory", "Directory opened and files successfully read", info_map
         )
 
-        self._print_e2e_results_summary(e2e_results_summary)
+        self._print_e2e_results_summary(e2e_results_summary, e2e_random_seeds)
 
-    def _print_e2e_results_summary(self, e2e_results_summary: dict[str, dict[str, bool | str]]) -> None:
+    def _print_e2e_results_summary(
+        self,
+        e2e_results_summary: dict[str, dict[str, bool | str]],
+        e2e_random_seeds: dict[str, list[int]],
+    ) -> None:
         """Prints the end-to-end results summary to the console."""
-        sys.stdout.write("Summary of e2e results:\n\n")
+        sys.stdout.write("\nSummary of e2e results:\n\n")
         for prefix, results in e2e_results_summary.items():
             sys.stdout.write(f"{prefix} results:\n")
+            random_seeds = e2e_random_seeds.get(prefix)
+            if random_seeds:
+                formatted_seeds = ", ".join(str(seed) for seed in random_seeds)
+                sys.stdout.write(f"  Results averaged across random seeds: " f"{formatted_seeds}\n")
             for module, result in results.items():
                 result = "Passing" if result is True else "Failing" if result is False else result
                 sys.stdout.write(f"  {module}: {result}\n")
