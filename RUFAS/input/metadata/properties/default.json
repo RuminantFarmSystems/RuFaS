@@ -6364,7 +6364,7 @@
           },
           "accepted_ranges_path": {
             "type": "string",
-            "description": "Path to the file listing the accepted ranges of variables for this input set. When the end-to-end testing task enables accepted ranges, each listed variable is compared against its range instead of the recorded expected results, and every numerical value of the variable must fall within the range for the end-to-end test to pass.",
+            "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
             "default": ""
           }
         }
@@ -6398,7 +6398,7 @@
           },
           "accepted_ranges_path": {
             "type": "string",
-            "description": "Path to the file listing the accepted ranges of variables for this input set. When the end-to-end testing task enables accepted ranges, each listed variable is compared against its range instead of the recorded expected results, and every numerical value of the variable must fall within the range for the end-to-end test to pass.",
+            "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
             "default": ""
           }
         }
@@ -6432,7 +6432,7 @@
           },
           "accepted_ranges_path": {
             "type": "string",
-            "description": "Path to the file listing the accepted ranges of variables for this input set. When the end-to-end testing task enables accepted ranges, each listed variable is compared against its range instead of the recorded expected results, and every numerical value of the variable must fall within the range for the end-to-end test to pass.",
+            "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
             "default": ""
           }
         }
@@ -6466,7 +6466,7 @@
           },
           "accepted_ranges_path": {
             "type": "string",
-            "description": "Path to the file listing the accepted ranges of variables for this input set. When the end-to-end testing task enables accepted ranges, each listed variable is compared against its range instead of the recorded expected results, and every numerical value of the variable must fall within the range for the end-to-end test to pass.",
+            "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
             "default": ""
           }
         }

@@ -64,7 +64,7 @@
         },
         "use_accepted_ranges": {
           "type": "bool",
-          "description": "Whether end-to-end testing compares the variables listed in the input set's accepted ranges file against their accepted range instead of the recorded expected results.",
+          "description": "Whether end-to-end testing grades the variables listed in the accepted ranges file against their range instead of the expected results.",
           "default": true
         },
         "output_prefix": {
