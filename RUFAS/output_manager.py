@@ -2533,7 +2533,7 @@ class OutputManager(object):
         json_output_directory: Path,
         output_prefixes: list[str],
         e2e_random_seeds: dict[str, list[int]],
-        failed_output_prefixes: list[str] | None = None
+        failed_output_prefixes: list[str] | None = None,
     ) -> None:
         """
         Summarizes the end-to-end test results by gathering the results from all the e2e tests and prepares them to be

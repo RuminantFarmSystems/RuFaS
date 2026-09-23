@@ -433,9 +433,7 @@ class E2ETestResultsHandler:
                 continue
 
             missing_results_paths = [
-                result_path
-                for result_path, result in zip(results_paths, test_results)
-                if output_name not in result
+                result_path for result_path, result in zip(results_paths, test_results) if output_name not in result
             ]
 
             if missing_results_paths:
@@ -657,7 +655,7 @@ class E2ETestResultsHandler:
             itself.
         reference_keys : set[str]
             The top-level keys from the reference E2E result that are expected in the other results.
-        
+
         Notes
         -----
         Compares the top-level keys of each test result after the reference result with the expected reference keys. A

@@ -583,10 +583,7 @@ def test_validate_results(
     test_results: list[dict[str, Any]],
     expected_warnings: list[tuple[Path, list[str], list[str]]],
 ) -> None:
-    result_paths = [
-        Path(f"run_{index}.json")
-        for index in range(1, len(test_results) + 1)
-    ]
+    result_paths = [Path(f"run_{index}.json") for index in range(1, len(test_results) + 1)]
     reference_keys = {"output_1", "output_2"}
 
     add_warning = mocker.patch.object(OutputManager, "add_warning")
