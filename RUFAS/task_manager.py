@@ -940,8 +940,11 @@ class TaskManager:
             "produce_graphics": produce_graphics,
         }
 
-        must_change_variables = E2ETestResultsHandler.validate_comparison_configuration(
-            args["output_prefix"], args["convert_variable_table_path"], args["filters_directory"]
+        must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
+            args["output_prefix"],
+            args["convert_variable_table_path"],
+            args["filters_directory"],
+            args["use_accepted_ranges"],
         )
 
         output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
@@ -963,6 +966,7 @@ class TaskManager:
             args["convert_variable_table_path"],
             args["output_prefix"],
             must_change_variables,
+            accepted_ranges,
         )
 
         TaskManager.handle_post_processing(
