@@ -1388,8 +1388,8 @@ $$
 [[**AN.NSM.51**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{DMIest} &= (0.0226 \times \text{MatBW} \times(1 - e^{(-1.47 \times \frac{\text{BW}}{\text{MatBW}})}) \\[10pt]
-& \qquad - (0.082 \times (\text{NDF} - (23.1 + 56 \times \frac{\text{BW}}{\text{MatBW}} - 30.6 \times (\frac{\text{BW}}{\text{MatBW}})^2)))
+\text{DMIest} &= (0.0226 \times \text{MW} \times(1 - e^{(-1.47 \times \frac{\text{BW}}{\text{MW}})}) \\[10pt]
+& \qquad - (0.082 \times (\text{NDF} - (23.1 + 56 \times \frac{\text{BW}}{\text{MW}} - 30.6 \times (\frac{\text{BW}}{\text{MW}})^2)))
 \end{aligned}
 $$
 :::
