@@ -1363,7 +1363,7 @@ import_table(
 ```
 
 ##### DMI Estimation
-Dry matter intake estimation is different for lactating cows and dry cows. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation For details about the variables included in each calculation, please refer to the DMI estimation key.
+Dry matter intake estimation is different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-nasem-dmi-var. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation:
 
 $$
 \sum_{i} \text{Feed}_{i} < \text{DMIest}
