@@ -56,7 +56,12 @@
       "destinations": []
     },{
       "processor_name": "anaerobic_digester_1",
-      "destinations": []
+      "destinations": [
+        {
+          "receiving_processor_name": "anaerobic_lagoon",
+          "proportion": 1.0
+        }
+      ]
     },{
       "processor_name": "slurry_storage_outdoor",
       "destinations": []
