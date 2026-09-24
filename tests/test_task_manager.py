@@ -698,8 +698,9 @@ def test_run_end_to_end_testing_simulation(
     call_order = mocker.MagicMock()
     call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
-    task_manager._run_end_to_end_testing_simulation(args, mock_input_manager, mock_output_manager, "test_task", True,
-                                                    True)
+    task_manager._run_end_to_end_testing_simulation(
+        args, mock_input_manager, mock_output_manager, "test_task", True, True
+    )
 
     assert [name for name, _, _ in call_order.mock_calls] == ["sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
