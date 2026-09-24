@@ -2332,9 +2332,9 @@ daily tissue mobilized during lactation.
 :::{#eq-an-bwt-18}
 [[**AN.BWT.18**]]{.aside .content-visible when-format="html"}
 $$     
-\text{bodyweight\_tissue\_change} = \frac{\text{P1}}{\text{P2}} \times \
-  exp\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg) + \
-  \text{DIM} \times exp\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg)
+\text{lactation\_tissue\_change} = -\frac{\text{P1}}{\text{P2}} \times \
+  e^{\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg)} + \
+  \frac{\text{P1}}{\text{P2}^{2}} \times \text{DIM} \times e^{\bigg(1 - \frac{\text{DIM}}{\text{P2}}\bigg)}
 $$
 :::
 
@@ -2349,13 +2349,12 @@ import_table(
 )
 ```
 
-During the dry period, the net tissue change is assumed to be restored during the dry period. The net tissue change is 
-estimated on the last day of lactation as: 
+During the dry period, the net tissue change is assumed to be restored. 
 
 :::{#eq-an-bwt-19}
 [[**AN.BWT.19**]]{.aside .content-visible when-format="html"}
 $$
-\text{tissue\_changed} = \text{P1} \times \frac{\text{DIMlast}}{\text{P2}} \times e^{(1 - \frac{\text{DIMlast}}{\text{P2}})} + \text{DIM} \times e^{(1 - \frac{\text{DIM}}{\text{P2}})}
+\text{dry\_tissue\_change\_numerator} = \text{P1} \times \frac{\text{DIM}}{\text{P2}} \times e^{(1 - \frac{\text{DIMdry}}{\text{P2}})} 
 $$
 :::
 and 
@@ -2363,7 +2362,7 @@ and
 :::{#eq-an-bwt-20}
 [[**AN.BWT.20**]]{.aside .content-visible when-format="html"}
 $$
-\text{bodyweight\_tissue\_change} = \frac{\text{tissue changed}}{\text{gestation length} - \text{DIPdry}}
+\text{bodyweight\_tissue\_change} = \frac{\text{dry\_tissue\_change\_numerator}}{\text{gestation length} - \text{DIPdry}}
 $$
 :::
 
