@@ -1,9 +1,12 @@
 import json
+import math
 from pathlib import Path
+import re
 from typing import Any
 from unittest.mock import MagicMock
 
 import pandas as pd
+from RUFAS.output_manager import OutputManager
 import pytest
 from pytest_mock import MockerFixture
 
@@ -75,6 +78,787 @@ def test_compare_simulation_outputs_to_expected_outputs(
         mock_convert_variable_name.assert_called_once()
     else:
         mock_convert_variable_name.assert_not_called()
+
+
+def test_process_test_result_averaging(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests process_test_result_averaging in E2ETestResultsHandler."""
+    e2e_group = "test_e2e_group"
+    e2e_runs = [
+        {
+            "output_prefix": "run_1",
+            "e2e_group": e2e_group,
+            "json_output_directory": str(tmp_path),
+        },
+        {
+            "output_prefix": "run_2",
+            "e2e_group": e2e_group,
+            "json_output_directory": str(tmp_path),
+        },
+    ]
+
+    path_set_1 = mocker.Mock(actual_results_path="test_e2e_group_animal_results.json")
+    path_set_2 = mocker.Mock(actual_results_path="test_e2e_group_field_results.json")
+
+    result_paths_1 = [
+        tmp_path / "run_1_animal_results.json",
+        tmp_path / "run_2_animal_results.json",
+    ]
+    result_paths_2 = [
+        tmp_path / "run_1_field_results.json",
+        tmp_path / "run_2_field_results.json",
+    ]
+
+    averaged_results_1 = {"animal_output": {"values": [1.0, 2.0]}}
+    averaged_results_2 = {"field_output": {"values": [3.0, 4.0]}}
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_get_test_result_paths",
+        return_value=[path_set_1, path_set_2],
+    )
+    extract_results_paths = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_extract_results_paths",
+        side_effect=[result_paths_1, result_paths_2],
+    )
+    average_test_results = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_test_results",
+        side_effect=[averaged_results_1, averaged_results_2],
+    )
+
+    result = E2ETestResultsHandler.process_test_result_averaging(
+        e2e_group,
+        e2e_runs,
+    )
+
+    expected_directory = tmp_path / "averaged" / e2e_group
+
+    assert result == expected_directory
+    assert expected_directory.exists()
+
+    assert extract_results_paths.call_args_list == [
+        mocker.call(
+            e2e_runs=e2e_runs,
+            json_output_directory=tmp_path,
+            actual_results_path=Path(path_set_1.actual_results_path),
+        ),
+        mocker.call(
+            e2e_runs=e2e_runs,
+            json_output_directory=tmp_path,
+            actual_results_path=Path(path_set_2.actual_results_path),
+        ),
+    ]
+
+    assert average_test_results.call_args_list == [
+        mocker.call(result_paths_1),
+        mocker.call(result_paths_2),
+    ]
+
+    with open(
+        expected_directory / "test_e2e_group_animal_results.json_averaged.json",
+        "r",
+        encoding="utf-8",
+    ) as averaged_file:
+        assert json.load(averaged_file) == averaged_results_1
+
+    with open(
+        expected_directory / "test_e2e_group_field_results.json_averaged.json",
+        "r",
+        encoding="utf-8",
+    ) as averaged_file:
+        assert json.load(averaged_file) == averaged_results_2
+
+
+def test_process_test_result_averaging_raises_error_when_no_runs_are_provided(
+    mocker: MockerFixture,
+) -> None:
+    e2e_group = "test_e2e_group"
+    add_error = mocker.patch.object(OutputManager, "add_error")
+
+    with pytest.raises(
+        ValueError,
+        match=f"Cannot average E2E results for '{e2e_group}' because no runs were provided.",
+    ):
+        E2ETestResultsHandler.process_test_result_averaging(
+            e2e_group,
+            [],
+        )
+
+    add_error.assert_called_once_with(
+        "E2E Results Averaging Error",
+        "No E2E runs data sent to 'process_test_result_averaging()' function.",
+        info_map={
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler.process_test_result_averaging.__name__,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "test_results, validate_values_return, expected_result, expected_warning",
+    [
+        (
+            [
+                {"DISCLAIMER": "Test disclaimer"},
+                {"DISCLAIMER": "Different disclaimer"},
+            ],
+            True,
+            {"DISCLAIMER": "Test disclaimer"},
+            None,
+        ),
+        (
+            [
+                {"test_output": {"metadata": "test"}},
+                {"test_output": {"metadata": "test"}},
+            ],
+            True,
+            {"test_output": {"metadata": "test"}},
+            None,
+        ),
+        (
+            [
+                {"test_output": {"metadata": "first"}},
+                {"test_output": {"metadata": "second"}},
+            ],
+            True,
+            {},
+            "Non-matching data in reference output for test_output",
+        ),
+        (
+            [
+                {"test_output": {"values": [1.0]}},
+                {"test_output": {"values": [2.0]}},
+            ],
+            False,
+            {},
+            None,
+        ),
+    ],
+)
+def test_average_test_results_special_cases(
+    mocker: MockerFixture,
+    test_results: list[dict[str, Any]],
+    validate_values_return: bool,
+    expected_result: dict[str, Any],
+    expected_warning: str | None,
+) -> None:
+    results_paths = [
+        Path("run_1.json"),
+        Path("run_2.json"),
+    ]
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_load_results",
+        return_value=test_results,
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_results",
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_values",
+        return_value=validate_values_return,
+    )
+    average_output_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_output_values",
+    )
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    actual = E2ETestResultsHandler._average_test_results(results_paths)
+
+    assert actual == expected_result
+    average_output_values.assert_not_called()
+
+    if expected_warning is None:
+        add_warning.assert_not_called()
+    else:
+        add_warning.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_warning,
+            info_map={
+                "class": E2ETestResultsHandler.__class__.__name__,
+                "function": E2ETestResultsHandler._average_test_results.__name__,
+            },
+        )
+
+
+def test_average_test_results_averages_valid_output_values(mocker: MockerFixture) -> None:
+    results_paths = [
+        Path("run_1.json"),
+        Path("run_2.json"),
+    ]
+    test_results = [
+        {
+            "test_output": {
+                "values": [1.0, 2.0],
+                "units": "kg",
+            },
+        },
+        {
+            "test_output": {
+                "values": [3.0, 4.0],
+                "units": "kg",
+            },
+        },
+    ]
+    averaged_values = [2.0, 3.0]
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_load_results",
+        return_value=test_results,
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_results",
+    )
+    validate_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_values",
+        return_value=True,
+    )
+    average_output_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_output_values",
+        return_value=averaged_values,
+    )
+
+    actual = E2ETestResultsHandler._average_test_results(results_paths)
+
+    assert actual == {
+        "test_output": {
+            "values": averaged_values,
+            "units": "kg",
+        },
+    }
+
+    validate_values.assert_called_once_with(
+        results_paths,
+        "test_output",
+        [test_results[0]["test_output"], test_results[1]["test_output"]],
+        [1.0, 2.0],
+    )
+    average_output_values.assert_called_once_with(
+        "test_output",
+        [1.0, 2.0],
+        [test_results[0]["test_output"], test_results[1]["test_output"]],
+    )
+
+
+@pytest.mark.parametrize(
+    "reference_values, matching_values, expected_values, expected_warning",
+    [
+        (
+            ["test"],
+            ["test", "test"],
+            ["test"],
+            None,
+        ),
+        (
+            ["test"],
+            ["test", "different"],
+            ["test"],
+            "Non-numeric values differ for 'test_output' at index 0.",
+        ),
+        (
+            [1.0],
+            [1.0, "invalid"],
+            [1.0],
+            (
+                "Inconsistent numeric value types for 'test_output' at index 0. "
+                "Values: [1.0, 'invalid']. "
+                "Types: ['float', 'str']."
+            ),
+        ),
+        (
+            [1],
+            [1, 1],
+            [1],
+            None,
+        ),
+        (
+            [1.0],
+            [1.0, 3.0],
+            [2.0],
+            None,
+        ),
+        (
+            [float("nan")],
+            [float("nan"), float("nan")],
+            [float("nan")],
+            None,
+        ),
+    ],
+)
+def test_average_output_values(
+    mocker: MockerFixture,
+    reference_values: list[Any],
+    matching_values: list[Any],
+    expected_values: list[Any],
+    expected_warning: str | None,
+) -> None:
+    output_name = "test_output"
+    matching_outputs = [{"values": [value]} for value in matching_values]
+
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    actual = E2ETestResultsHandler._average_output_values(
+        output_name,
+        reference_values,
+        matching_outputs,
+    )
+
+    if all(isinstance(value, float) and math.isnan(value) for value in expected_values):
+        assert len(actual) == 1
+        assert math.isnan(actual[0])
+    else:
+        assert actual == expected_values
+
+    if expected_warning is None:
+        add_warning.assert_not_called()
+    else:
+        add_warning.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_warning,
+            info_map={
+                "class": E2ETestResultsHandler.__class__.__name__,
+                "function": E2ETestResultsHandler._average_output_values.__name__,
+            },
+        )
+
+
+@pytest.mark.parametrize(
+    "matching_output, expected_result, expected_error, expected_warning",
+    [
+        (
+            {"values": [1.0, 2.0]},
+            True,
+            None,
+            None,
+        ),
+        (
+            {},
+            False,
+            "E2E output 'test_output' in 'run_1.json' does not contain a 'values' list.",
+            None,
+        ),
+        (
+            "invalid_output",
+            False,
+            "E2E output 'test_output' in 'run_1.json' does not contain a 'values' list.",
+            None,
+        ),
+        (
+            {"values": [1.0]},
+            False,
+            None,
+            "E2E output 'test_output' has 1 values in 'run_1.json', but 2 were expected.",
+        ),
+    ],
+)
+def test_validate_values(
+    mocker: MockerFixture,
+    matching_output: Any,
+    expected_result: bool,
+    expected_error: str | None,
+    expected_warning: str | None,
+) -> None:
+    result_paths = [Path("run_1.json")]
+    output_name = "test_output"
+    reference_values = [1.0, 2.0]
+    matching_outputs = [matching_output]
+
+    add_error = mocker.patch.object(OutputManager, "add_error")
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    actual = E2ETestResultsHandler._validate_values(
+        result_paths,
+        output_name,
+        matching_outputs,
+        reference_values,
+    )
+
+    assert actual is expected_result
+
+    info_map = {
+        "class": E2ETestResultsHandler.__class__.__name__,
+        "function": E2ETestResultsHandler._validate_values.__name__,
+    }
+
+    if expected_error is None:
+        add_error.assert_not_called()
+    else:
+        add_error.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_error,
+            info_map=info_map,
+        )
+
+    if expected_warning is None:
+        add_warning.assert_not_called()
+    else:
+        add_warning.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_warning,
+            info_map=info_map,
+        )
+
+
+@pytest.mark.parametrize(
+    "test_results, expected_warnings",
+    [
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}, "output_2": {}},
+            ],
+            [],
+        ),
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}},
+            ],
+            [
+                (
+                    Path("run_2.json"),
+                    ["output_2"],
+                    [],
+                ),
+            ],
+        ),
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}, "output_2": {}, "output_3": {}},
+            ],
+            [
+                (
+                    Path("run_2.json"),
+                    [],
+                    ["output_3"],
+                ),
+            ],
+        ),
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}, "output_3": {}},
+            ],
+            [
+                (
+                    Path("run_2.json"),
+                    ["output_2"],
+                    ["output_3"],
+                ),
+            ],
+        ),
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}},
+                {"output_2": {}, "output_3": {}},
+            ],
+            [
+                (
+                    Path("run_2.json"),
+                    ["output_2"],
+                    [],
+                ),
+                (
+                    Path("run_3.json"),
+                    ["output_1"],
+                    ["output_3"],
+                ),
+            ],
+        ),
+    ],
+)
+def test_validate_results(
+    mocker: MockerFixture,
+    test_results: list[dict[str, Any]],
+    expected_warnings: list[tuple[Path, list[str], list[str]]],
+) -> None:
+    result_paths = [Path(f"run_{index}.json") for index in range(1, len(test_results) + 1)]
+    reference_keys = {"output_1", "output_2"}
+
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    E2ETestResultsHandler._validate_results(
+        result_paths,
+        test_results,
+        reference_keys,
+    )
+
+    expected_calls = [
+        mocker.call(
+            "E2E Results Averaging Warning",
+            (
+                f"E2E result structure differs for '{result_path}'. "
+                f"Missing keys: {missing_keys}. "
+                f"Unexpected keys: {unexpected_keys}."
+            ),
+            info_map={
+                "class": E2ETestResultsHandler.__class__.__name__,
+                "function": E2ETestResultsHandler._validate_results.__name__,
+            },
+        )
+        for result_path, missing_keys, unexpected_keys in expected_warnings
+    ]
+
+    assert add_warning.call_args_list == expected_calls
+
+
+def test_load_results(tmp_path: Path) -> None:
+    result_1 = {
+        "output_1": {"values": [1.0, 2.0]},
+        "DISCLAIMER": "First result",
+    }
+    result_2 = {
+        "output_2": {"values": [3.0, 4.0]},
+        "DISCLAIMER": "Second result",
+    }
+
+    result_path_1 = tmp_path / "run_1.json"
+    result_path_2 = tmp_path / "run_2.json"
+
+    result_path_1.write_text(json.dumps(result_1), encoding="utf-8")
+    result_path_2.write_text(json.dumps(result_2), encoding="utf-8")
+
+    actual = E2ETestResultsHandler._load_results(
+        [result_path_1, result_path_2],
+    )
+
+    assert actual == [
+        result_1,
+        result_2,
+    ]
+
+
+def test_extract_results_paths(tmp_path: Path) -> None:
+    e2e_runs = [
+        {
+            "output_prefix": "run_1",
+            "e2e_group": "animals_e2e",
+        },
+        {
+            "output_prefix": "run_2",
+            "e2e_group": "animals_e2e",
+        },
+    ]
+    actual_results_path = Path("animals_e2e_animal_results.json")
+
+    result_path_1 = tmp_path / "run_1_animal_results.json"
+    result_path_2 = tmp_path / "run_2_animal_results.json"
+    unrelated_path = tmp_path / "unrelated_results.json"
+
+    result_path_1.touch()
+    result_path_2.touch()
+    unrelated_path.touch()
+
+    actual = E2ETestResultsHandler._extract_results_paths(
+        e2e_runs,
+        tmp_path,
+        actual_results_path,
+    )
+
+    assert actual == [
+        result_path_1,
+        result_path_2,
+    ]
+
+
+@pytest.mark.parametrize(
+    "matching_filenames, expected_match_count",
+    [
+        ([], 0),
+        (
+            [
+                "run_1_animal_results.json",
+                "run_1_animal_results.json_extra",
+            ],
+            2,
+        ),
+    ],
+)
+def test_extract_results_paths_raises_error_for_invalid_number_of_matches(
+    mocker: MockerFixture,
+    tmp_path: Path,
+    matching_filenames: list[str],
+    expected_match_count: int,
+) -> None:
+    e2e_runs = [
+        {
+            "output_prefix": "run_1",
+            "e2e_group": "animals_e2e",
+        },
+    ]
+    actual_results_path = Path("animals_e2e_animal_results.json")
+
+    for filename in matching_filenames:
+        (tmp_path / filename).touch()
+
+    add_error = mocker.patch.object(OutputManager, "add_error")
+
+    expected_message = (
+        "Expected exactly one E2E result file for "
+        "'run_1' matching "
+        "'animal_results.json', but found "
+        f"{expected_match_count}."
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape(expected_message),
+    ):
+        E2ETestResultsHandler._extract_results_paths(
+            e2e_runs,
+            tmp_path,
+            actual_results_path,
+        )
+
+    add_error.assert_called_once_with(
+        "E2E Results Averaging Error",
+        expected_message,
+        info_map={
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._extract_results_paths.__name__,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "test_results, expected_result, expected_warning",
+    [
+        (
+            [
+                {"DISCLAIMER": "Test disclaimer"},
+                {"DISCLAIMER": "Different disclaimer"},
+            ],
+            {"DISCLAIMER": "Test disclaimer"},
+            None,
+        ),
+        (
+            [
+                {"test_output": {"metadata": "test"}},
+                {"test_output": {"metadata": "test"}},
+            ],
+            {"test_output": {"metadata": "test"}},
+            None,
+        ),
+        (
+            [
+                {"test_output": {"metadata": "first"}},
+                {"test_output": {"metadata": "second"}},
+            ],
+            {},
+            "Non-matching data in reference output for test_output",
+        ),
+    ],
+)
+def test_average_test_results_handles_non_averaged_outputs(
+    mocker: MockerFixture,
+    test_results: list[dict[str, Any]],
+    expected_result: dict[str, Any],
+    expected_warning: str | None,
+) -> None:
+    results_paths = [
+        Path("run_1.json"),
+        Path("run_2.json"),
+    ]
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_load_results",
+        return_value=test_results,
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_results",
+    )
+    validate_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_values",
+    )
+    average_output_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_output_values",
+    )
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    actual = E2ETestResultsHandler._average_test_results(results_paths)
+
+    assert actual == expected_result
+    validate_values.assert_not_called()
+    average_output_values.assert_not_called()
+
+    if expected_warning is None:
+        add_warning.assert_not_called()
+    else:
+        add_warning.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_warning,
+            info_map={
+                "class": E2ETestResultsHandler.__class__.__name__,
+                "function": E2ETestResultsHandler._average_test_results.__name__,
+            },
+        )
+
+
+def test_average_test_results_excludes_output_missing_from_run(mocker: MockerFixture) -> None:
+    results_paths = [
+        Path("run_1.json"),
+        Path("run_2.json"),
+        Path("run_3.json"),
+    ]
+    test_results = [
+        {"test_output": {"values": [1.0]}},
+        {},
+        {"test_output": {"values": [3.0]}},
+    ]
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_load_results",
+        return_value=test_results,
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_results",
+    )
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+    validate_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_values",
+    )
+    average_output_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_output_values",
+    )
+
+    actual = E2ETestResultsHandler._average_test_results(results_paths)
+
+    assert actual == {}
+
+    add_warning.assert_called_once_with(
+        "E2E Results Averaging Warning",
+        (
+            "E2E output 'test_output' is missing from 1 of 3 runs "
+            "and will be excluded from the averaged results. "
+            f"Missing from: [{results_paths[1]!r}]."
+        ),
+        info_map={
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._average_test_results.__name__,
+        },
+    )
+
+    validate_values.assert_not_called()
+    average_output_values.assert_not_called()
 
 
 @pytest.mark.parametrize(
