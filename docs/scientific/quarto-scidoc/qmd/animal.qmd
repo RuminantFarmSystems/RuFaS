@@ -1113,7 +1113,7 @@ $$
 :::{#eq-an-nsm-29}
 [[**AN.NSM.29**]]{.aside .content-visible when-format="html"}
 $$
-\text{NPAAMFP} = \text{NPMFP} \times \frac{\text{AACorrMFP}}{100}
+\text{NetAAMFP} = \text{NPMFP} \times \frac{\text{AACorrMFP}}{100}
 $$
 :::
 
@@ -1121,7 +1121,7 @@ $$
 
 Two distinct growth processes are represented: frame growth and BW changes related to the deposition (and mobilization) of body reserves.
 
-The following are the protein requirements for growth associated with increased frame size, where $\text{FrameWG}$ is the sum of $ \text{FatADG} $ and $ \text{ProtADG} $ as described in [AN.NSM.13](#eq-an-nsm-13) and [AN.NSM.14](#eq-an-nsm-14):
+The following are the protein requirements for growth associated with increased frame size, where $\text{FrameWG}$ is the sum of $\text{FatADG}$ and $\text{ProtADG}$ as described in [AN.NSM.13](#eq-an-nsm-13) and [AN.NSM.14](#eq-an-nsm-14):
 
 :::{#eq-an-nsm-30}
 [[**AN.NSM.30**]]{.aside .content-visible when-format="html"}
@@ -1130,7 +1130,7 @@ $$
 $$
 :::
 
-If the change in BW is not frame growth but rather a change in body reserves, then the following equation is used because the protein content is assumed to be 8.0 percent protein.
+If the change in BW is not frame growth but rather a change in body reserves during lactation, then the following equation is used because the protein content is assumed to be 8.0 percent protein where the $\text{TissueWG}$ is drawn from equations described in [AN.BWT.18](#eq-an-bwt-18), [AN.BWT.19](#eq-an-bwt-19), and [AN.BWT.20](#eq-an-bwt-20).
 
 :::{#eq-an-nsm-31}
 [[**AN.NSM.31**]]{.aside .content-visible when-format="html"}
@@ -1149,6 +1149,8 @@ $$
 :::
 
 **Pregnancy**
+
+The protein requirements for pregnancy are based on the gravid uterine weight gain estimated in [AN.NSM.2](#eq-an-nsm.2), assuming 125 g of protein per kg of weight gain:
 
 :::{#eq-an-nsm-33}
 [[**AN.NSM.33**]]{.aside .content-visible when-format="html"}
@@ -1175,13 +1177,15 @@ $$
 
 **Total Requirements**
 
+The total MP requirements are the sum of the NP requirements divided by the relevant efficiency of conversion of MP to NP for each physiological process:
+
 * Lactating Cows
 
 :::{#eq-an-nsm-36}
 [[**AN.NSM.36**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{RecomMPSupply1} &= \frac{\text{NetAAScurf} + \text{NetAAMFP} + \text{NetAAMilk} + \text{NetAAGrowth}}{\text{TargetEffMP}} \\[8pt]
+\text{MPReq\_Lac} &= \frac{\text{NPScurf} + \text{NPMFP} + \text{NPMilk} + \text{NPGrowth}}{\text{EffMP}} \\[8pt]
 & \qquad + \frac{\text{NPGest}}{0.33} + \text{NPEndUrin}
 \end{aligned}
 $$
@@ -1191,7 +1195,7 @@ $$
 [[**AN.NSM.37**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{RecomMPAASupply1} &= \frac{\text{NPScurf} + \text{NPMFP} + \text{NPMilk} + \text{NPGrowth}}{\text{TargetEffAA}} \\[8pt]
+\text{MPAAReq\_Lac} &= \frac{\text{NetAAScurf} + \text{NetAAMFP} + \text{NetAAMilk} + \text{NetAAGrowth}}{\text{EffAA}} \\[8pt]
 & \qquad + \frac{\text{NetAAGest}}{0.33} + \text{NetAAEndUrin}
 \end{aligned}
 $$
@@ -1202,7 +1206,7 @@ $$
 :::{#eq-an-nsm-38}
 [[**AN.NSM.38**]]{.aside .content-visible when-format="html"}
 $$
-\text{RecomMPSupply2} = \frac{text{NPScurf} + \text{NPMFP}}{\text{TargetEffMP}} + \frac{\text{NPGest}}{0.33} + \frac{\text{NPGrowth}}{0.4} + \text{NPEndUrin}
+\text{MPReq\_NonLac} = \frac{\text{NPScurf} + \text{NPMFP}}{\text{EffMP}} + \frac{\text{NPGest}}{0.33} + \frac{\text{NPGrowth}}{0.4} + \text{NPEndUrin}
 $$
 :::
 
@@ -1210,8 +1214,8 @@ $$
 [[**AN.NSM.39**]]{.aside .content-visible when-format="html"}
 $$
 \begin{aligned}
-\text{RecomMPAASupply2} &= \frac{\text{NetAAScurf} + \text{NetAAMFP}}{\text{NetAAMFP}} + \frac{\text{NetAAGest}}{0.33} + \frac{\text{NetAAGrowth}}{0.4} \\[8pt]
-& \qquad + \text{NPEndUrin}
+\text{MPAAReq\_NonLac} &= \frac{\text{NetAAScurf} + \text{NetAAMFP}}{\text{NetAAMFP}} + \frac{\text{NetAAGest}}{0.33} + \frac{\text{NetAAGrowth}}{0.4} \\[8pt]
+& \qquad + \text{NetAAEndUrin}
 \end{aligned}
 $$
 :::
@@ -1235,7 +1239,7 @@ Only calcium and phosphorus requirements are included in the code at present. Fo
 
 **Maintenance** <br>
 
-* Calcium Equation
+* Calcium maintenance requirements are based on DMI:
 
 :::{#eq-an-nsm-40}
 [[**AN.NSM.40**]]{.aside .content-visible when-format="html"}
@@ -1244,7 +1248,7 @@ $$
 $$
 :::
 
-* Phosphorus Equation
+* Phosphorus maintenance requirements are based on DMI and BW:
 
 :::{#eq-an-nsm-41}
 [[**AN.NSM.41**]]{.aside .content-visible when-format="html"}
@@ -1255,7 +1259,7 @@ $$
 
 **Growth** <br>
 
-* Calcium Equation
+* Calcium requirements for growth are a function of the mature bodyweight, current bodyweight and ADG:
 
 :::{#eq-an-nsm-42}
 [[**AN.NSM.42**]]{.aside .content-visible when-format="html"}
@@ -1264,18 +1268,20 @@ $$
 $$
 :::
 
-* Phosphorus Equation
+* Phosphorus growth requirements are also a function of mature bodyweight, current bodyweight and ADG:
 
 :::{#eq-an-nsm-43}
 [[**AN.NSM.43**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{growth}} = 1.2 + (4.635 \times \text{MW}^{0.22} \times \text{BW}^{-0.22}) + \text{ADG}
+\text{P}_{\text{growth}} = 1.2 + (4.635 \times \text{MW}^{0.22} \times \text{BW}^{-0.22}) \times \text{ADG}
 $$
 :::
 
 **Pregnancy** <br>
 
-* Calcium Equation
+Calcium and Phosphorus requirements for pregnancy are only considered after 190 days in pregnancy and are both estimated as a function of bodyweight and days in pregnanchy.
+
+* Calcium requirements:
 
 :::{#eq-an-nsm-44}
 [[**AN.NSM.44**]]{.aside .content-visible when-format="html"}
@@ -1289,7 +1295,7 @@ $$
 $$
 :::
 
-* Phosphorus Equations
+* Phosphorus requirements:
 
 :::{#eq-an-nsm-45}
 [[**AN.NSM.45**]]{.aside .content-visible when-format="html"}
@@ -1303,16 +1309,18 @@ $$
 $$
 :::
 
-The denominator, 715 kg, is the average cow weight in the study by @house1993; therefore, the pregnancy (gestation) requirement is scaled to that BW. For details see Page 107 in the Minerals chapter of [@nrc_2021]. IF DOP $<$ 190; then it is assumed that `Ca_Preg` is equal to zero.
+The denominator, 715 kg, is the average cow weight in the study by @house1993; therefore, the pregnancy (gestation) requirement is scaled to that BW. For details see Page 107 in the Minerals chapter of [@nrc_2021]. 
 
 **Lactation** <br>
+
+Calcium and Phosphorus requirements for lactation are a function of milk production and milk TP content:
 
 * Calcium Equation
 
 :::{#eq-an-nsm-46}
 [[**AN.NSM.46**]]{.aside .content-visible when-format="html"}
 $$
-\text{Ca}_{\text{lact}} = (0.295 + 0.239 \times \text{MilkTP}) \times \text{Milk}
+\text{Ca}_{\text{lact}} = \text{Milk} \times (0.295 + 0.239 \times \text{MilkTP}) 
 $$
 :::
 
@@ -1321,7 +1329,7 @@ $$
 :::{#eq-an-nsm-47}
 [[**AN.NSM.47**]]{.aside .content-visible when-format="html"}
 $$
-\text{P}_{\text{lact}} = \text{Milk} \times (0.496 + 0.13 \times \text{TPMilk}); \text{Milk} \times 0.90
+\text{P}_{\text{lact}} = \text{Milk} \times (0.496 + 0.13 \times \text{TPMilk})
 $$
 :::
 
