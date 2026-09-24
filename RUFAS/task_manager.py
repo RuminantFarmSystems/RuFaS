@@ -651,7 +651,27 @@ class TaskManager:
         self,
         e2e_args: dict[str, Any],
     ) -> list[dict[str, Any]]:
-        """Expand one E2E scenario into one runnable task per random seed."""
+        """
+        Expands an E2E testing argument dictionary into one runnable argument dictionary per random seed.
+
+        Parameters
+        ----------
+        e2e_args : dict[str, Any]
+            E2E testing configuration dictionary. Must contain ``output_prefix`` and ``random_seeds`` keys.
+
+        Notes
+        -----
+        Each expanded dictionary is a copy of the original E2E arguments configured for a single simulation run. The
+        ``random_seeds`` list is replaced by the run's ``random_seed``, the original output prefix is retained as the
+        ``e2e_group``, and the run number is used to create a unique ``output_prefix`` for the simulation.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            List of runnable E2E simulation argument dictionaries, one per configured random seed. Each dictionary
+            contains the individual ``random_seed``, its ``e2e_group`` and ``e2e_run_number``, and a unique
+            ``output_prefix``.
+        """
         expanded_args = []
 
         base_output_prefix = e2e_args["output_prefix"]
@@ -831,7 +851,7 @@ class TaskManager:
             TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
-            TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
+            TaskType.END_TO_END_TESTING: TaskManager._run_end_to_end_testing_simulation,
             TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
             TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._handle_update_e2e_test_results,
         }
@@ -1000,7 +1020,31 @@ class TaskManager:
         output_directory: Path,
         verbosity: LogVerbosity | None,
     ) -> None:
-        """Run one averaging/comparison task per E2E group."""
+        """
+        Runs all E2E result averaging and comparison tasks, in parallel if a process pool is available.
+
+        Parameters
+        ----------
+        comparison_args : list[dict[str, Any]]
+            List of argument dictionaries, one per E2E group to average and compare. Each dictionary contains the E2E
+            group name, its completed simulation runs, and the task identifier for the comparison.
+        produce_graphics : bool
+            Whether to produce graphics output for each E2E comparison.
+        metadata_depth_limit : int
+            Maximum allowed metadata nesting depth.
+        workers : int
+            Number of worker processes available for E2E result processing.
+        output_directory : Path
+            Directory containing the E2E simulation outputs and where comparison outputs will be written.
+        verbosity : LogVerbosity or None
+            Log verbosity level for each E2E comparison.
+
+        Notes
+        -----
+        Each E2E group is processed independently by ``_process_end_to_end_testing_group``, which averages the results
+        from the group's simulation runs and compares the averaged results against the expected E2E results. Failed
+        comparison tasks are collected and reported as an error via the ``OutputManager``.
+        """
 
         comparison_with_args = partial(
             self._process_end_to_end_testing_group,
@@ -1045,11 +1089,42 @@ class TaskManager:
         output_directory: Path,
         verbosity: LogVerbosity | None,
     ) -> str | None:
-        """Average, compare, and save results for one E2E group."""
+        """
+        Processes the completed simulation results for one E2E testing group.
 
-        e2e_group = comparison_args["e2e_group"]
-        e2e_runs = comparison_args["e2e_runs"]
-        task_id = comparison_args["task_id"]
+        Parameters
+        ----------
+        comparison_args : dict[str, Any]
+            Arguments for the E2E group being processed. Must contain ``e2e_group``, ``e2e_runs``, and ``task_id``. The
+            ``e2e_runs`` value contains the completed simulation run configurations whose results will be averaged.
+        produce_graphics : bool
+            Whether to produce graphics during E2E post-processing.
+        metadata_depth_limit : int
+            Maximum allowed metadata nesting depth used when initializing the ``InputManager``.
+        workers : int
+            Number of worker processes used to determine the memory limits available to this E2E processing task.
+        output_directory : Path
+            Directory containing the E2E simulation outputs and where comparison outputs will be written.
+        verbosity : LogVerbosity or None
+            Log verbosity level for the E2E group. If ``None``, the verbosity configured in the E2E run arguments is
+            used.
+
+        Notes
+        -----
+        Initializes the input and output managers for the E2E group, validates the group's input data, averages the
+        results from its individual simulation runs, compares the averaged results against the expected E2E results,
+        and performs post-processing. Any exception raised during averaging, comparison, or post-processing is logged
+        and reported as a failed E2E group.
+
+        Returns
+        -------
+        str or None
+            The E2E group name if averaging, comparison, or post-processing fails; otherwise ``None``.
+        """
+
+        e2e_group: str = comparison_args["e2e_group"]
+        e2e_runs: list[dict[str, Any]] = comparison_args["e2e_runs"]
+        task_id: str = comparison_args["task_id"]
 
         group_args = e2e_runs[0].copy()
         group_args["output_prefix"] = e2e_group
@@ -1140,7 +1215,7 @@ class TaskManager:
             return e2e_group
 
     @staticmethod
-    def _handle_end_to_end_testing(
+    def _run_end_to_end_testing_simulation(
         args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
@@ -1148,10 +1223,32 @@ class TaskManager:
         produce_graphics: bool,
         should_flush_im_pool: bool,
     ) -> None:
-        """Validates the comparison configuration, then runs the end-to-end testing routine."""
+        """Runs a simulation as part of end-to-end testing.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
+            The arguments used to configure the simulation.
+        input_manager : InputManager
+            The input manager associated with the simulation.
+        output_manager : OutputManager
+            The output manager associated with the simulation.
+        task_id : str
+            The identifier for the E2E simulation task.
+        produce_graphics : bool
+            Whether graphics should be generated for the simulation.
+        should_flush_im_pool : bool
+            Whether the InputManager pool should be flushed during simulation processing.
+
+        Notes
+        -----
+        Logs the start and completion of the E2E simulation and delegates the simulation execution to the standard
+        simulation engine task handler. Averaging and comparison of E2E results are performed separately after all
+        simulations in the E2E group have completed.
+        """
         info_map = {
             "class": TaskManager.__name__,
-            "function": TaskManager._handle_end_to_end_testing.__name__,
+            "function": TaskManager._run_end_to_end_testing_simulation.__name__,
             "task_id": task_id,
             "produce_graphics": produce_graphics,
         }

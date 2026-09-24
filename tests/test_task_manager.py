@@ -682,7 +682,7 @@ def test_handle_post_processing_export_input_tocsv(
     )
 
 
-def test_handle_end_to_end_testing(
+def test_run_end_to_end_testing_simulation(
     mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
 ) -> None:
     """Test that end-to-end testing is executed correctly."""
@@ -698,7 +698,8 @@ def test_handle_end_to_end_testing(
     call_order = mocker.MagicMock()
     call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
-    task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", True, True)
+    task_manager._run_end_to_end_testing_simulation(args, mock_input_manager, mock_output_manager, "test_task", True,
+                                                    True)
 
     assert [name for name, _, _ in call_order.mock_calls] == ["sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
