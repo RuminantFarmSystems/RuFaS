@@ -726,6 +726,7 @@ class Pen:
             methane_production_potential=methane_production_potential,
             pen_manure_data=total_pen_manure_data,
             bedding_non_degradable_volatile_solids=0.0,
+            lignin=pen_animal_excretions.manure_lignin,
         )
         return total_stream
 
@@ -893,6 +894,7 @@ class Pen:
             bedding_non_degradable_volatile_solids=(
                 0 if bedding.bedding_type == BeddingType.SAND else total_bedding_dry_solids
             ),
+            lignin=manure_stream.lignin + (total_bedding_mass * bedding.bedding_lignin_fraction),
         )
 
     def _calculate_manure_surface_area(self) -> float:
