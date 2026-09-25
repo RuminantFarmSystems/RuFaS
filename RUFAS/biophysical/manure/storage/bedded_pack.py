@@ -402,6 +402,7 @@ class BeddedPack(Storage):
         methane_production_potential : float
             Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
         storage_time_period : int | None
+            How long manure is stored for before emptying the storage (days). None if the storage is never emptied.
 
         Raises
         ------
