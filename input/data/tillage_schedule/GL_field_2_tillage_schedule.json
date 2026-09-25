@@ -1,0 +1,40 @@
+{
+    "years": [
+        2024,
+        2024,
+        2025,
+        2025
+    ],
+    "days": [
+        103,
+        130,
+        102,
+        129
+    ],
+    "tillage_depths": [
+        150,
+        60,
+        150,
+        60
+    ],
+    "incorporation_fractions": [
+        0.5,
+        0.1,
+        0.5,
+        0.1
+    ],
+    "mixing_fractions": [
+        0.5,
+        0.1,
+        0.5,
+        0.1
+    ],
+    "implements": [
+        "coulter-chisel-plow",
+        "seedbed-conditioner",
+        "coulter-chisel-plow",
+        "seedbed-conditioner"
+    ],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}

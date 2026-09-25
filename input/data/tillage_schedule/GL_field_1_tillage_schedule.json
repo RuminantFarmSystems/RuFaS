@@ -1,0 +1,52 @@
+{
+    "years": [
+        2021,
+        2021,
+        2022,
+        2022,
+        2023,
+        2023
+    ],
+    "days": [
+        107,
+        135,
+        107,
+        135,
+        107,
+        135
+    ],
+    "tillage_depths": [
+        150,
+        60,
+        150,
+        60,
+        150,
+        60
+    ],
+    "incorporation_fractions": [
+        0.5,
+        0.1,
+        0.5,
+        0.1,
+        0.5,
+        0.1
+    ],
+    "mixing_fractions": [
+        0.5,
+        0.1,
+        0.5,
+        0.1,
+        0.5,
+        0.1
+    ],
+    "implements": [
+        "coulter-chisel-plow",
+        "seedbed-conditioner",
+        "coulter-chisel-plow",
+        "seedbed-conditioner",
+        "coulter-chisel-plow",
+        "seedbed-conditioner"
+    ],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}

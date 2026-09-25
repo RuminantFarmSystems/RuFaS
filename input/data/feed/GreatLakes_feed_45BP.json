@@ -197,7 +197,7 @@
       "buffer": 0.15
      }
    ],
-  "milk_reduction_maximum": 0,  
+  "milk_reduction_maximum": 0.3,  
   "user_defined_ration_percentages": {
     "calf": [
       {
@@ -276,11 +276,11 @@
       },
       {
         "feed_type": 328,
-        "ration_percentage": 10.28
+        "ration_percentage": 12.34
       },
       {
         "feed_type": 330,
-        "ration_percentage": 2.06
+        "ration_percentage": 0
       },
       {
         "feed_type": 325,

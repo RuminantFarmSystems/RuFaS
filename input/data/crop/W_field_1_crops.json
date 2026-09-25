@@ -1,0 +1,110 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "triticale_silage",
+            "harvest_days": [
+                107,
+                107,
+                107,
+                107
+            ],
+            "harvest_years": [
+                2021,
+                2022,
+                2023,
+                2025
+            ],
+            "harvest_operations": [
+                "harvest_kill",
+                "harvest_kill",
+                "harvest_kill",
+                "harvest_kill"
+            ],
+            "harvest_type": "scheduled",
+            "planting_days": [
+                297,
+                296,
+                296,
+                297,
+                296
+            ],
+            "planting_years": [
+                2020,
+                2021,
+                2022,
+                2024,
+                2025
+            ],
+            "pattern_repeat": 0,
+            "planting_skip": 0,
+            "harvesting_skip": 0
+        },
+        {
+            "crop_species": "corn_silage",
+            "harvest_days": [
+                264,
+                264,
+                264,
+                265,
+                264
+            ],
+            "harvest_years": [
+                2021,
+                2022,
+                2023,
+                2024,
+                2025
+            ],
+            "harvest_operations": [
+                "harvest_kill",
+                "harvest_kill",
+                "harvest_kill",
+                "harvest_kill",
+                "harvest_kill"
+            ],
+            "harvest_type": "scheduled",
+            "planting_days": [
+                121,
+                121,
+                121,
+                122,
+                121
+            ],
+            "planting_years": [
+                2021,
+                2022,
+                2023,
+                2024,
+                2025
+            ],
+            "pattern_repeat": 0,
+            "planting_skip": 0,
+            "harvesting_skip": 0
+        },
+        {
+            "crop_species": "alfalfa_silage",
+            "harvest_days": [
+                108,
+                1
+            ],
+            "harvest_years": [
+                2024,
+                2026
+            ],
+            "harvest_operations": [
+                "harvest_only",
+                "harvest_kill"
+            ],
+            "harvest_type": "scheduled",
+            "planting_days": [
+                296
+            ],
+            "planting_years": [
+                2023
+            ],
+            "pattern_repeat": 0,
+            "planting_skip": 0,
+            "harvesting_skip": 0
+        }
+    ]
+}

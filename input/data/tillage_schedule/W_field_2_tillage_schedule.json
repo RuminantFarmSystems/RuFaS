@@ -1,0 +1,82 @@
+{
+    "years": [
+        2023,
+        2023,
+        2023,
+        2024,
+        2024,
+        2024,
+        2024,
+        2025,
+        2025,
+        2025,
+        2025
+    ],
+    "days": [
+        264,
+        266,
+        282,
+        110,
+        119,
+        262,
+        266,
+        109,
+        118,
+        261,
+        265
+    ],
+    "tillage_depths": [
+        350,
+        25,
+        60,
+        150,
+        60,
+        150,
+        60,
+        150,
+        60,
+        150,
+        60
+    ],
+    "incorporation_fractions": [
+        0.7,
+        0.5,
+        0.1,
+        0.5,
+        0.1,
+        0.5,
+        0.1,
+        0.5,
+        0.1,
+        0.5,
+        0.1
+    ],
+    "mixing_fractions": [
+        0.7,
+        0.5,
+        0.1,
+        0.5,
+        0.1,
+        0.5,
+        0.1,
+        0.5,
+        0.1,
+        0.5,
+        0.1
+    ],
+    "implements": [
+        "subsoiler",
+        "disk-harrow",
+        "seedbed-conditioner",
+        "coulter-chisel-plow",
+        "seedbed-conditioner",
+        "coulter-chisel-plow",
+        "seedbed-conditioner",
+        "coulter-chisel-plow",
+        "seedbed-conditioner",
+        "coulter-chisel-plow",
+        "seedbed-conditioner"
+    ],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}

@@ -101,7 +101,7 @@
     "manure_processor_connection": {
       "title": "Manure Processor Connections",
       "description": "The connection configs for all manure processors.",
-      "path": "input/data/manure/example_freestall_processor_connections.json",
+      "path": "input/data/manure/example_freestall_processor_connections_NE.json",
       "type": "json",
       "properties": "manure_processor_connection_properties"
     },
@@ -199,7 +199,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/example_temperate_weather.csv",
+      "path": "input/data/weather/northeast_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
@@ -237,7 +237,7 @@
     "feed_storage_configurations": {
       "title": "Feed Management",
       "description": "Configurations for feed storage units.",
-      "path": "input/data/feed_management/example_feed_storage_configs.json",
+      "path": "input/data/feed_management/NE_feed_storage_configs.json",
       "type": "json",
       "properties": "feed_storage_configurations"
     },
