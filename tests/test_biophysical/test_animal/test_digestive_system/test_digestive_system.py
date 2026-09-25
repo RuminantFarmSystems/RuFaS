@@ -117,7 +117,7 @@ def test_process_digestion_cow(mocker: MockerFixture) -> None:
     )
 
     mock_manure_excretion = mocker.MagicMock(spec=AnimalManureExcretions)
-    mock_methane = mocker.patch.object(EntericMethaneCalculator, "calculate_cow_methane", return_value=8.0)
+    mock_methane = mocker.patch.object(EntericMethaneCalculator, "calculate_cow_methane", return_value=(8.0, 9.0))
     mock_manure = mocker.patch.object(
         ManureExcretionCalculator, "calculate_cow_manure", return_value=(0.6, mock_manure_excretion)
     )
@@ -127,6 +127,7 @@ def test_process_digestion_cow(mocker: MockerFixture) -> None:
     mock_methane.assert_called()
     mock_manure.assert_called()
     assert digestive_system.enteric_methane_emission == 8.0
+    assert digestive_system.enteric_methane_for_energy == 9.0
     assert digestive_system.phosphorus_excreted == 0.6
     assert digestive_system.manure_excretion is mock_manure_excretion
 

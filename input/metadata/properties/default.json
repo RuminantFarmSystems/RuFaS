@@ -6594,7 +6594,7 @@
       "description": "The maximum throughput of the implement (tons dm/hour)",
       "properties": {
         "type": "number",
-        "default": 0
+        "default": 0.0
       }
     }
   },

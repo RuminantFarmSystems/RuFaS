@@ -98,11 +98,11 @@ def test_heifer_methane_no_model(nutrient_concentrations: NutritionSupply, expec
 
 @pytest.mark.parametrize(
     "is_lactating, methane_mitigation_method, methane_mitigation_additive_amount, "
-    "expected_methane, expected_mitigation_called",
+    "expected_mitigated_methane, expected_unmitigated_methane, expected_mitigation_called",
     [
-        (True, "3-NOP", 500.0, 299.7, True),
-        (True, "", 0.0, 300.0, False),
-        (False, "", 0.0, 180.0, False),
+        (True, "3-NOP", 500.0, 299.7, 300.0, True),
+        (True, "", 0.0, 300.0, 300.0, False),
+        (False, "", 0.0, 180.0, 180.0, False),
     ],
 )
 def test_calculate_cow_methane(
@@ -110,7 +110,8 @@ def test_calculate_cow_methane(
     is_lactating: bool,
     methane_mitigation_method: str,
     methane_mitigation_additive_amount: float,
-    expected_methane: float,
+    expected_mitigated_methane: float,
+    expected_unmitigated_methane: float,
     expected_mitigation_called: bool,
 ) -> None:
     """
@@ -135,7 +136,7 @@ def test_calculate_cow_methane(
         MethaneMitigationCalculator, "mitigate_methane", return_value=mock_methane_yield_reduction
     )
 
-    result = EntericMethaneCalculator.calculate_cow_methane(
+    mitigated_em_result, unmitigated_em_result = EntericMethaneCalculator.calculate_cow_methane(
         is_lactating=is_lactating,
         body_weight=650.0,
         milk_fat=3.5,
@@ -156,7 +157,8 @@ def test_calculate_cow_methane(
     else:
         mock_mitigation.assert_not_called()
 
-    assert result == expected_methane
+    assert mitigated_em_result == expected_mitigated_methane
+    assert unmitigated_em_result == expected_unmitigated_methane
 
 
 @pytest.mark.parametrize(

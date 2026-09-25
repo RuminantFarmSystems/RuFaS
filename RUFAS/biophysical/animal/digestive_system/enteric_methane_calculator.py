@@ -87,7 +87,7 @@ class EntericMethaneCalculator:
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
         methane_models: dict[str, Any],
-    ) -> float:
+    ) -> tuple[float, float]:
         """
         Calculates the daily enteric emissions for cows.
 
@@ -118,8 +118,9 @@ class EntericMethaneCalculator:
 
         Returns
         -------
-        float
-            The daily enteric emissions for cows (g/day).
+        tuple[float, float]
+            - The daily mitigated enteric emissions for cows (g/day).
+            - The daily unmitigated enteric emissions for cows (g/day).
 
         """
         dry_matter_intake = nutrient_amounts.dry_matter
@@ -137,6 +138,7 @@ class EntericMethaneCalculator:
                 nutrient_amounts,
                 methane_models,
             )
+            unmitigated_methane = methane_emission
             if methane_mitigation_method:
                 methane_yield = 0.0
                 methane_yield_reduction = 0.0
@@ -160,8 +162,9 @@ class EntericMethaneCalculator:
             methane_emission = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
                 methane_models, metabolizable_energy_intake, nutrient_amounts
             )
+            unmitigated_methane = methane_emission
 
-        return methane_emission
+        return methane_emission, unmitigated_methane
 
     @staticmethod
     def _calculate_lactating_cow_enteric_methane(

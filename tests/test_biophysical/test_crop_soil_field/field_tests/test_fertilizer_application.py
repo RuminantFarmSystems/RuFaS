@@ -10,20 +10,30 @@ from RUFAS.biophysical.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
-    "depth,bottom_depths,expected",
+    "depth,top_depths,bottom_depths,expected",
     [
-        (15.0, [20.0, 70.0, 200.0], [1.0]),
-        (0.0, [20.0, 70.0, 200.0], [1.0]),
-        (40.0, [20.0, 70.0, 200.0], [0.5, 0.5]),
-        (65.0, [20.0, 70.0, 200.0], [0.30769231, 0.69230769]),
-        (70.0, [20.0, 70.0, 200.0], [0.28571429, 0.71428571]),
-        (120.0, [20.0, 70.0, 200.0], [0.16666667, 0.58333333, 0.25]),
+        (15.0, [0.0, 20.0, 70.0], [20.0, 70.0, 200.0], [1.0]),
+        (0.0, [0.0, 20.0, 70.0], [20.0, 70.0, 200.0], [1.0]),
+        (40.0, [0.0, 20.0, 70.0], [20.0, 70.0, 200.0], [0.5, 0.5]),
+        (65.0, [0.0, 20.0, 70.0], [20.0, 70.0, 200.0], [0.30769231, 0.69230769]),
+        (70.0, [0.0, 20.0, 70.0], [20.0, 70.0, 200.0], [0.28571429, 0.71428571]),
+        (120.0, [0.0, 20.0, 70.0], [20.0, 70.0, 200.0], [0.16666667, 0.41666667, 0.41666667]),
     ],
 )
-def test_generate_depth_factors(depth: float, bottom_depths: list[float], expected: list[float]) -> None:
+def test_generate_depth_factors(
+    depth: float,
+    top_depths: list[float],
+    bottom_depths: list[float],
+    expected: list[float],
+) -> None:
     """Tests that the depth factors are correctly calculated for subsurface nutrient applications."""
-    actual = FertilizerApplication.generate_depth_factors(depth, bottom_depths)
-    assert pytest.approx(actual) == expected
+    actual = FertilizerApplication.generate_depth_factors(
+        depth,
+        top_depths,
+        bottom_depths,
+    )
+
+    assert actual == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(
@@ -34,7 +44,10 @@ def test_generate_depth_factors(depth: float, bottom_depths: list[float], expect
     ],
 )
 def test_apply_subsurface_fertilizer(
-    nutrient_amounts: float, depth: float, subsurface_frac: float, expected: list[float]
+    nutrient_amounts: float,
+    depth: float,
+    subsurface_frac: float,
+    expected: list[float],
 ) -> None:
     """Tests that subsurface nutrients from fertilizer are applied correctly."""
     field_size = 1.3
@@ -44,10 +57,12 @@ def test_apply_subsurface_fertilizer(
         LayerData(top_depth=70.0, bottom_depth=200.0, field_size=field_size),
         LayerData(top_depth=200.0, bottom_depth=400.0, field_size=field_size),
     ]
+
     for layer in soil_layers:
         layer.labile_inorganic_phosphorus_content = 0.0
         layer.nitrate_content = 0.0
         layer.ammonium_content = 0.0
+
     soil = Soil(soil_data=SoilData(soil_layers=soil_layers, field_size=field_size))
     fert_app = FertilizerApplication(soil=soil)
 
@@ -64,11 +79,19 @@ def test_apply_subsurface_fertilizer(
             subsurface_frac,
         )
 
-        patched_depth_factor_generator.assert_called_once_with(depth, [20.0, 70.0, 200.0, 400.0])
+        patched_depth_factor_generator.assert_called_once_with(
+            depth,
+            [0.0, 20.0, 70.0, 200.0],
+            [20.0, 70.0, 200.0, 400.0],
+        )
+
         for index, expected_result in enumerate(expected):
-            assert fert_app.soil.data.soil_layers[index].labile_inorganic_phosphorus_content == expected_result
-            assert fert_app.soil.data.soil_layers[index].nitrate_content == expected_result
-            assert fert_app.soil.data.soil_layers[index].ammonium_content == expected_result
+            assert (
+                fert_app.soil.data.soil_layers[index].labile_inorganic_phosphorus_content
+                == pytest.approx(expected_result)
+            )
+            assert fert_app.soil.data.soil_layers[index].nitrate_content == pytest.approx(expected_result)
+            assert fert_app.soil.data.soil_layers[index].ammonium_content == pytest.approx(expected_result)
 
 
 @pytest.mark.parametrize(

@@ -609,6 +609,7 @@ def test_initialize_heiferII_or_heiferIII(
     mock_reproduction_init = mocker.patch(
         "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None
     )
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
 
     expected_days_in_pregnancy = args.get("days_in_pregnancy", 0)
     expected_p_calf = args.get("phosphorus_for_gestation_required_for_calf", 0)
@@ -830,6 +831,7 @@ def test_initialize_cow(args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
         "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
     )
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     mocker.patch("RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve.get_wood_parameters")
 
     expected_days_in_milk = args.get("days_in_milk", 0)
@@ -882,6 +884,7 @@ def mock_heiferI() -> Animal:
 @pytest.fixture
 def mock_heiferII(mocker: MockerFixture) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     args = HeiferIIValuesTypedDict(
         id=1,
         breed="HO",
@@ -903,6 +906,7 @@ def mock_heiferII(mocker: MockerFixture) -> Animal:
 @pytest.fixture
 def mock_heiferIII(mocker: MockerFixture) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     args = HeiferIIIValuesTypedDict(
         id=1,
         breed="HO",
@@ -924,6 +928,7 @@ def mock_heiferIII(mocker: MockerFixture) -> Animal:
 @pytest.fixture
 def mock_lactating_cow(mocker: MockerFixture) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     args = CowValuesTypedDict(
         id=1,
         breed="HO",
@@ -950,6 +955,7 @@ def mock_lactating_cow(mocker: MockerFixture) -> Animal:
 @pytest.fixture
 def mock_dry_cow(mocker: MockerFixture) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch.object(Reproduction, "repro_state_manager", new=MagicMock(), create=True)
     args = CowValuesTypedDict(
         id=1,
         breed="HO",
@@ -1147,6 +1153,30 @@ def test_future_death_date_setter(
     else:
         with pytest.raises(TypeError):
             animal.future_death_date = 2000
+
+
+@pytest.mark.parametrize(
+    "animal_fixture_name, expected_methane",
+    [
+        ("mock_calf", 9.0),
+        ("mock_heiferI", 9.0),
+        ("mock_heiferII", 9.0),
+        ("mock_heiferIII", 9.0),
+        ("mock_lactating_cow", 8.0),
+    ],
+)
+def test_enteric_methane_uses_correct_digestive_system_value(
+    request: pytest.FixtureRequest,
+    animal_fixture_name: str,
+    expected_methane: float,
+) -> None:
+    """enteric_methane returns unmitigated methane for cows and mitigated methane otherwise."""
+    animal: Animal = request.getfixturevalue(animal_fixture_name)
+
+    animal.digestive_system.enteric_methane_for_energy = 8.0
+    animal.digestive_system.enteric_methane_emission = 9.0
+
+    assert animal.enteric_methane == pytest.approx(expected_methane)
 
 
 @pytest.mark.parametrize(

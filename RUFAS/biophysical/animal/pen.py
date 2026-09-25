@@ -515,7 +515,7 @@ class Pen:
                 feeds_used=available_feeds,
                 ration_formulation=self.ration,
                 body_weight=animal.body_weight,
-                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                enteric_methane=animal.enteric_methane,
                 urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrition_supply = nutrient_supply
@@ -915,7 +915,7 @@ class Pen:
                 feeds_used=feeds_used,
                 ration_formulation=ration_formulation,
                 body_weight=animal.body_weight,
-                enteric_methane=animal.digestive_system.enteric_methane_emission,
+                enteric_methane=animal.enteric_methane,
                 urinary_nitrogen=animal.digestive_system.manure_excretion.urine_nitrogen,
             )
             animal.nutrients.set_dry_matter_intake(animal.nutrition_supply.dry_matter)
@@ -1086,13 +1086,11 @@ class Pen:
         nutrient_standard = list(self.animals_in_pen.values())[0].nutrient_standard
 
         if nutrient_standard is NutrientStandard.NASEM:
-            enteric_methane_list = []
-            urine_nitrogen_list = []
-            for animal in self.animals_in_pen.values():
-                enteric_methane_list.append(animal.digestive_system.enteric_methane_emission)
-                urine_nitrogen_list.append(animal.digestive_system.manure_excretion.urine_nitrogen)
-            pen_average_enteric_methane = sum(enteric_methane_list) / len(enteric_methane_list)
-            pen_average_urine_nitrogen = sum(urine_nitrogen_list) / len(urine_nitrogen_list)
+            animals = list(self.animals_in_pen.values())
+            pen_average_enteric_methane = sum(a.enteric_methane for a in animals) / len(animals)
+            pen_average_urine_nitrogen = (
+                sum(a.digestive_system.manure_excretion.urine_nitrogen for a in animals) / len(animals)
+            )
         else:
             pen_average_enteric_methane = None
             pen_average_urine_nitrogen = None

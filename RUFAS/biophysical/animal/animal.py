@@ -50,6 +50,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     CowPreSynchSubProtocol,
     CowTAISubProtocol,
     CowReSynchSubProtocol,
+    ReproStateEnum,
 )
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -1093,6 +1094,15 @@ class Animal:
             parity=self.calves,
         )
 
+    @property
+    def enteric_methane(self) -> float:
+        """Returns unmitigated enteric methane for cows and mitigated enteric methane for non-cows."""
+        return (
+            self.digestive_system.enteric_methane_for_energy
+            if self.animal_type.is_cow
+            else self.digestive_system.enteric_methane_emission
+        )
+
     def _assign_sex_to_newborn_calf(self) -> None:
         """
         Assign a sex to a newborn calf based on the semen type and male calf rate.
@@ -1208,6 +1218,11 @@ class Animal:
         elif heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
             heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("heifer_reproduction_sub_protocol"))
 
+        if self.is_pregnant:
+            self.reproduction.repro_state_manager.enter(ReproStateEnum.PREGNANT)
+        else:
+            self.reproduction.repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
+
         return heifer_reproduction_program, heifer_reproduction_sub_program
 
     def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict) -> None:
@@ -1275,6 +1290,11 @@ class Animal:
         if self.calves > 0:
             wood_parameters = LactationCurve.get_wood_parameters(self.calves)
             self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
+
+        if self.is_pregnant:
+            self.reproduction.repro_state_manager.enter(ReproStateEnum.PREGNANT)
+        else:
+            self.reproduction.repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
 
     def reduce_milk_production(self) -> bool:
         """
