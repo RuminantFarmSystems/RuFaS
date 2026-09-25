@@ -126,4 +126,5 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3285](https://github.com/RuminantFarmSystems/RuFaS/pull/3285) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds MCF factor lookup table option for short-term storage duration `BeddedPack`.
 - [3273](https://github.com/RuminantFarmSystems/RuFaS/pull/3273) - [minor change] [E2E Testing] [NoInputChange] [NoOutputChange] Validates the end-to-end testing configuration before the simulation runs for both the comparison and the expected results update tasks.
 - [3275](https://github.com/RuminantFarmSystems/RuFaS/pull/3260) - [minor change] [E2E Testing] [NoInputChange] [NoOutputChange] Removes `deepdiff` check from the process to update e2e expected results.
+- [3290](https://github.com/RuminantFarmSystems/RuFaS/pull/3290) - [minor change] [E2E Testing] [InputChange] [OutputChange] Adds accepted-range support to end-to-end testing.
 - [3206](https://github.com/RuminantFarmSystems/RuFaS/pull/3206) - [minor change] [Animal] [NoInputChange] [OutputChange] Fixes the off-by-one error where cow milking history skipped DIM = 1 on calving day.

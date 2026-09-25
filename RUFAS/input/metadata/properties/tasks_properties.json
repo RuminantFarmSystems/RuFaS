@@ -62,6 +62,11 @@
           "default": null,
           "nullable": true
         },
+        "use_accepted_ranges": {
+          "type": "bool",
+          "description": "Whether end-to-end testing grades the variables listed in the accepted ranges file against their range instead of the expected results.",
+          "default": true
+        },
         "output_prefix": {
           "type": "string",
           "description": "Will be used to generate a name for each of the output files for this task.",
