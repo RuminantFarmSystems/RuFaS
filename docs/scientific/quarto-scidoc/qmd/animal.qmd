@@ -1532,7 +1532,7 @@ $$
 :::{#eq-an-sup-2-1}
 [[**AN.SUP.2.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{DMI\_to\_maint} = 1, if \text{TotalTDN} < 0.035 \times \text{BW}^{0.75}, \frac{\text{TotalTDN}}{0.035 \times \text{SBW}^{0.75}}
+\text{DMI\_to\_maint} = 1, if  \text{TotalTDN} < 0.035 \times \text{BW}^{0.75}, \frac{\text{TotalTDN}}{0.035 \times \text{SBW}^{0.75}}
 $$
 :::
 
@@ -1568,9 +1568,9 @@ $$
 $$
 \text{MEacti} =
 \begin{cases}
-(1.01 \times \text{DEacti}) + (0.0046 \times 0.0046 \times \text{EEi}) - 3,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
-(1.01 \times \text{DEacti}) - 0.45,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
-(1.01 \times \text{DEacti}),& \text{if feed type is fat}
+(1.01 \times \text{DEact}_{i}) + (0.0046 \times 0.0046 \times \text{EE}_{i}) - 3,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
+(1.01 \times \text{DEact}_{i}) - 0.45,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
+(1.01 \times \text{DEact}_{i}),& \text{if feed type is fat}
 \end{cases}
 $$
 :::
@@ -1584,8 +1584,8 @@ $$
 $$
 \text{NEmacti} =
 \begin{cases}
-(1.37 \times \text{MEacti}) - (0.138 \times \text{MEacti}^2) + (0.0105 \times \text{MEacti}^3) - 1.12 ,& \text{if feed type is not fat} \\[8pt]
-(0.8 \times \text{MEacti}) ,& \text{if feed type is fat} 
+(1.37 \times \text{MEact}_{i}) - (0.138 \times \text{MEact}_{i}^2) + (0.0105 \times \text{MEact}_{i}^3) - 1.12 ,& \text{if feed type is not fat} \\[8pt]
+(0.8 \times \text{MEact}_{i}) ,& \text{if feed type is fat} 
 \end{cases}
 $$
 :::
@@ -1597,9 +1597,9 @@ $$
 $$
 \text{NElacti}=
 \begin{cases}
-(0.703 \times \text{MEacti}) - 0.019 + (0.097 \times \text{MEacti}) + (0.1997 \times \text{EEi}) - 3 ,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
-(0.703 \times \text{MEacti}) - 0.19 ,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
-(0.8 \times \text{0DEacti}) ,& \text{if feed type is fat}
+(0.703 \times \text{MEact}_{i}) - 0.019 + (0.097 \times \text{MEact}_{i}) + (0.1997 \times \text{EE}_{i}) - 3 ,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
+(0.703 \times \text{MEact}_{i}) - 0.19 ,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
+(0.8 \times \text{DEact}_{i}) ,& \text{if feed type is fat}
 \end{cases}
 $$
 :::
@@ -1612,8 +1612,8 @@ $$
 \text{NEgacti}
 =
 \begin{cases}
-(1.42 \times \text{MEacti}) - (0.174 \times \text{MEacti}^2) + (0.0122 \times \text{MEacti}^3) - 1.65 ,& \text{if feed type is not fat} \\[8pt]
-(0.55 \times \text{MEacti}) ,& \text{if feed type is fat} 
+(1.42 \times \text{MEact}_{i}) - (0.174 \times \text{MEact}_{i}^2) + (0.0122 \times \text{MEact}_{i}^3) - 1.65 ,& \text{if feed type is not fat} \\[8pt]
+(0.55 \times \text{MEact}_{i}) ,& \text{if feed type is fat} 
 \end{cases}
 $$
 :::
@@ -1831,7 +1831,7 @@ $$
 
 ##### Mineral Supply
 
-We will use calcium as an example, but phosphorus calculations will be similar.
+We use calcium as an example, but phosphorus calculations are analagous.
 
 :::{#eq-an-sup-15}
 [[**AN.SUP.15**]]{.aside .content-visible when-format="html"}    
@@ -1844,7 +1844,7 @@ $$
 
 ##### Introduction
 
-Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight during formulation. The ration formulation process includes information not only from the Animal Module’s inputs (@tbl-an-auto-ration-an-input), but the primary Feed input file (@tbl-an-auto-ration-feed-input-purch and @tbl-an-auto-ration-feed-input-perc), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
+Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight of the pen on the day of the formulation. The ration formulation process includes information not only from the Animal Module’s inputs (@tbl-an-auto-ration-an-input), but the primary Feed input file (@tbl-an-auto-ration-feed-input-purch and @tbl-an-auto-ration-feed-input-perc), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
 
 ##### Required User Inputs
 
@@ -1969,7 +1969,6 @@ The ration formulation will proceed as described in the Automated Methodology ab
 
 * Record failed constraints and formulation attempt to OutputManager.
 * Milk production will be reduced.
-  * IF average milk production for the pen drops below the values defined in [Milk Production and Reduction](#sec-an-milk-prod-red), then the simulation halts with an error.
   * IF if the `milk_reduction_maximum` is exceeded, then the simulation proceeds by using the user-defined ration percentages exactly.
 * Recalculation of the nutritional requirements for all animals in the pen.
 * Ration formulation reattempt (repeat).

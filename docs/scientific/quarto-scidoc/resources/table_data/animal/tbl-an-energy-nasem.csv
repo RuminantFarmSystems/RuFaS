@@ -1,23 +1,23 @@
-﻿Variable,Description,Units
-NElact , Actual net energy supply of the diet, Mcal
-ME , Actual metabolizable energy supply of the diet, Mcal
-DE_{i} , Digestible energy content of feed i , Mcal/kg
-DE_{Diet} , Digestible energy content of the diet , Mcal
-PropFeed_{i} , Proportion of diet DM that is feed i , proportion
-NDF_{i} , Neutral Detergent Fiber content of feed i , % 
-dNDF_{i} , Neutral Detergent Fiber digestibility of feed i , proportion
-"dNDF_{base,i} ", The baseline Neutral Detergent Fiber digestibility of feed i , proportion
-Lignin_{i} , Lignin content of feed i , % 
-Starch_{i} , Starch content of feed i , % 
-dStarch_{i} , Starch digestibility of feed i , proportion
-Starch_{Diet} , Starch content of the diet , % 
-FA_{i} , Fatty Acid content of feed i , % 
-dFA_{i} , Fatty Acid digestibility of feed i , proportion
-RDP_{i} , Rumen Degradable Protein content of feed i , % 
-RDP_{CPi} , Percent of Crude Protein that is Rumen Degradable i , % 
-RUP_{i} , Rumen Undegradable Protein content of feed i , %
-RUP_{CPi} , Percent of Crude Protein that is Rumen Undegradable i , % 
-dRUP_{i} , Rumen Undegradable Protein digestibility of feed i , proportion
-NPN_{suppi} , Supplemental Non-Protein Nitrogen content , %
-ROM_{i} , Residual Organic Matter content of feed i , % 
-dROM_{i} , Residual Organic Matter digestibility of feed i , proportion
+Variable,Description,Units
+NElact, Actual net energy supply of the diet, Mcal
+MEact, Actual metabolizable energy supply of the diet, Mcal
+$\text{DE}_{\text{i}}$, Digestible energy content of feed i , Mcal/kg
+$\text{DE}_{\text{Diet}}$, Digestible energy content of the diet , Mcal
+$\text{PropFeed}_{\text{i}}$, Proportion of diet DM that is feed i , proportion
+$\text{NDF}_{\text{i}}$, Neutral Detergent Fiber content of feed i , % 
+$\text{dNDF}_{\text{i}}$, Neutral Detergent Fiber digestibility of feed i , proportion
+"$\text{dNDF}_{\text{base,i}}$", The baseline Neutral Detergent Fiber digestibility of feed i , proportion
+$\text{Lignin}_{\text{i}}$, Lignin content of feed i , % 
+$\text{Starch}_{\text{i}}$, Starch content of feed i , % 
+$\text{dStarch}_{\text{i}}$, Starch digestibility of feed i , proportion
+$\text{Starch}_{\text{Diet}}$, Starch content of the diet , % 
+$\text{FA}_{\text{i}}$, Fatty Acid content of feed i , % 
+$\text{dFA}_{\text{i}}$, Fatty Acid digestibility of feed i , proportion
+$\text{RDP}_{\text{i}}$, Rumen Degradable Protein content of feed i , % 
+$\text{RDP}_{\text{CPi}}$, Percent of Crude Protein that is Rumen Degradable i , % 
+$\text{RUP}_{\text{i}}$, Rumen Undegradable Protein content of feed i , %
+"$\text{RUP}_{\text{CP,i}}$", Percent of Crude Protein that is Rumen Undegradable i , % 
+$\text{dRUP}_{\text{i}}$, Rumen Undegradable Protein digestibility of feed i , proportion
+"$\text{NPN}_{\text{supp,i}}$", Supplemental Non-Protein Nitrogen content , %
+$\text{ROM}_{\text{i}}$, Residual Organic Matter content of feed i , % 
+$\text{dROM}_{\text{i}}$, Residual Organic Matter digestibility of feed i , proportion
