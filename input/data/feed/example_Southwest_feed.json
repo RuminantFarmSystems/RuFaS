@@ -81,6 +81,8 @@
   "rations": [
     {
       "animal_combination": "calf",
+      "intake_option": "set_DMI",
+      "intake_value": 3,
       "feeds": [
         {
           "feed_type": 202,
@@ -94,6 +96,8 @@
     },
     {
       "animal_combination": "growing",
+      "intake_option": "predict_DMI",
+      "intake_value": null,
       "feeds": [
         {
           "feed_type": 44,
@@ -123,6 +127,8 @@
     },
     {
       "animal_combination": "close_up",
+      "intake_option": "predict_DMI",
+      "intake_value": null,
       "feeds": [
         {
           "feed_type": 44,
@@ -156,6 +162,8 @@
     },
     {
       "animal_combination": "lac_cow",
+      "intake_option": "predict_DMI",
+      "intake_value": null,
       "feeds": [
         {
           "feed_type": 44,

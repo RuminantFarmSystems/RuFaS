@@ -5,6 +5,7 @@ import numpy.typing as npt
 from typing import Callable, Any, Sequence, Optional
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator, FeedInRation
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
+from RUFAS.biophysical.animal.ration.ration_manager import RationManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
@@ -38,6 +39,9 @@ class RationConfig:
         Average enteric methane in the pen.
     pen_average_urine_nitrogen : float, optional
         Average urine nitrogen in the pen.
+    animal_combination : AnimalCombination, optional
+        The animal combination the ration is formulated for, used to resolve the effective dry
+        matter intake constraint values.
 
     Attributes
     ----------
@@ -51,6 +55,15 @@ class RationConfig:
         Dry matter intake requirement at start of ration formulation.
     initial_protein_requirement : float
         Metabolizable protein requirement at start of ration formulation.
+    animal_combination : AnimalCombination | None
+        The animal combination the ration is formulated for.
+    dmi_constraint_fraction : float
+        The +/- fraction of the dry matter requirement allowed in the DMI constraint methods. 0.0
+        when the animal combination uses a DMI input option.
+    dmi_requirement_boost : float
+        The fraction of the dry matter intake requirement used as the basis for the inclusion rate
+        bounds in the user defined ration formulation method. 1.0 when the animal combination uses
+        a DMI input option.
     feeds_used : list[Feed]
         List of Feeds used in ration formulation.
     price_list : list[float]
@@ -78,6 +91,7 @@ class RationConfig:
         pen_average_body_weight: float = 0,
         pen_average_enteric_methane: float | None = None,
         pen_average_urine_nitrogen: float | None = None,
+        animal_combination: AnimalCombination | None = None,
     ) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
@@ -92,6 +106,9 @@ class RationConfig:
         self.pen_average_urine_nitrogen = pen_average_urine_nitrogen
         self.initial_dry_matter_requirement: float = initial_dry_matter_requirement
         self.initial_protein_requirement: float = initial_protein_requirement
+        self.animal_combination = animal_combination
+        self.dmi_constraint_fraction: float = RationManager.effective_dmi_constraint_fraction(animal_combination)
+        self.dmi_requirement_boost: float = RationManager.effective_dmi_requirement_boost(animal_combination)
 
         self.feeds_used = pen_available_feeds
 
@@ -751,10 +768,7 @@ class RationOptimizer:
         """
         return float(
             (sum(decision_vector))
-            - (
-                ration_configuration.animal_requirements.dry_matter
-                * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
-            )
+            - (ration_configuration.animal_requirements.dry_matter * (1 - ration_configuration.dmi_constraint_fraction))
         )
 
     @staticmethod
@@ -778,10 +792,7 @@ class RationOptimizer:
         """
         return float(
             -(sum(decision_vector))
-            + (
-                ration_configuration.initial_dry_matter_requirement
-                * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
-            )
+            + (ration_configuration.initial_dry_matter_requirement * (1 + ration_configuration.dmi_constraint_fraction))
         )
 
     @staticmethod
@@ -874,6 +885,7 @@ class RationOptimizer:
             pen_average_body_weight,
             pen_average_enteric_methane,
             pen_average_urine_nitrogen,
+            animal_combination,
         )
         sorted_previous_ration = dict(sorted(previous_ration.items())) if previous_ration else None
         initial_decision_vector = np.array(
@@ -940,11 +952,11 @@ class RationOptimizer:
         user_defined_ration_tolerance: float,
     ) -> list[tuple[float, float]]:
         """
-        Builds the initial decision vector (`x0`) for the optimizer for a user defined ration.
+        Builds the optimizer bounds for each feed ingredient of a user defined ration.
 
         Parameters
         ----------
-        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+        ration_config : RationConfig
             Collection of animal requirements and feed supply information for ration formulation.
         user_defined_ration_dictionary : dict[RUFAS_ID, float]
             Dictionary of feeds and their percentage of dry matter intake prediction for a ration.
@@ -954,7 +966,15 @@ class RationOptimizer:
         Returns
         -------
         list[tuple[float, float]]
-            List of upper and lower bounds for each feed ingredient.
+            List of lower and upper bounds for each feed ingredient.
+
+        Notes
+        -----
+        Each feed's target range is clipped to the feed's allowed inclusion range (its lower limit
+        and limit per animal per day), so the bounds are always ordered. When a target range lies
+        entirely outside the allowed range the feed is pinned at the nearest limit and a warning
+        identifies the feed and the target dry matter intake, since the ration cannot reach the
+        target without exceeding that feed's limit.
         """
         feed_bound_list = list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
         user_defined_boundlist = []
@@ -965,20 +985,44 @@ class RationOptimizer:
                 user_defined_ration_dictionary[key]
                 / 100
                 * (1 - udr_tolerance)
-                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_REQUIREMENT_BOOST)
+                * (ration_config.initial_dry_matter_requirement * ration_config.dmi_requirement_boost)
             )
             target_upper = (
                 user_defined_ration_dictionary[key]
                 / 100
                 * (1 + udr_tolerance)
-                * (ration_config.initial_dry_matter_requirement * AnimalModuleConstants.DMI_REQUIREMENT_BOOST)
+                * (ration_config.initial_dry_matter_requirement * ration_config.dmi_requirement_boost)
             )
             targetbounds = (max(0.0, target_lower), target_upper)
             user_defined_boundlist.append(targetbounds)
 
-        user_defined_boundlist_trimmed = [
-            (max(t1[0], t2[0]), min(t1[1], t2[1])) for t1, t2 in zip(feed_bound_list, user_defined_boundlist)
-        ]
+        user_defined_boundlist_trimmed: list[tuple[float, float]] = []
+        infeasible_feeds: list[str] = []
+        for key, (feed_min, feed_max), (target_lower, target_upper) in zip(
+            ration_key_list, feed_bound_list, user_defined_boundlist
+        ):
+            if max(feed_min, target_lower) > min(feed_max, target_upper):
+                infeasible_feeds.append(
+                    f"feed {key}: target {target_lower:.2f}-{target_upper:.2f} kg vs limits {feed_min}-{feed_max} kg"
+                )
+            user_defined_boundlist_trimmed.append(
+                (min(max(target_lower, feed_min), feed_max), min(max(target_upper, feed_min), feed_max))
+            )
+
+        if infeasible_feeds:
+            animal_combination = ration_config.animal_combination
+            OutputManager().add_warning(
+                "user_defined_ration_exceeds_feed_limits",
+                f"The {animal_combination.value if animal_combination else 'unknown'} ration cannot reach its target "
+                f"dry matter intake of {ration_config.initial_dry_matter_requirement:.2f} kg/animal/day within the "
+                "feed inclusion limits, so the affected feeds are pinned at their limits: "
+                f"{'; '.join(infeasible_feeds)}.",
+                {
+                    "class": RationOptimizer.__name__,
+                    "function": RationOptimizer._build_bounds_user_defined_ration.__name__,
+                    "units": MeasurementUnits.KILOGRAMS,
+                },
+            )
         return user_defined_boundlist_trimmed
 
     def _select_constraints(self, animal_combination: AnimalCombination) -> Sequence[dict[str, Any]]:
