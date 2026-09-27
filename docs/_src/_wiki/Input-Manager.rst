@@ -95,7 +95,7 @@ Notes:
   the command to run the model: ``python main.py -ov`` For more details
   on this and other gnu arguments that can be used, try
   ``python main.py -h`` for help or read through the details in the
-  forthcoming gnu args section of the RuFaS wiki.
+  forthcoming gnu args section of the RuFaS documentation.
 
 Getting Data from Input Manager's Data Pool
 -------------------------------------------
@@ -166,7 +166,7 @@ For InputManager, the metadata:
 RuFaS relies on metadata for handling inputs to be able to successfully
 run simulations.
 
-The majority of the rest of this Wiki page will be dedicated to
+The majority of the rest of this page will be dedicated to
 explaining the InputManager's metadata.
 
 The Metadata File(s)
