@@ -483,10 +483,7 @@ class TaskManager:
                             "Single Run Random Seed Error",
                             "SIMULATION_SINGLE_RUN task type selected but multiple random seeds specified.  "
                             "Check task input specifications and confirm task type and random seeds selected.",
-                            info_map={
-                                "class": TaskManager.__name__,
-                                "function": self._parse_input_tasks.__name__
-                            }
+                            info_map={"class": TaskManager.__name__, "function": self._parse_input_tasks.__name__},
                         )
                         raise ValueError(
                             "SIMULATION_SINGLE_RUN task type selected but multiple random seeds specified.  "
@@ -622,9 +619,7 @@ class TaskManager:
         random_seed = multi_run_args["random_seeds"][0]
 
         if multi_run_args["sampler"] == "fractional_factorial":
-            sampled_values = fractional_factorial_sampler.sample(
-                parsed_SA_input_variables, seed=random_seed
-            )
+            sampled_values = fractional_factorial_sampler.sample(parsed_SA_input_variables, seed=random_seed)
         elif multi_run_args["sampler"] == "sobol":
             sampled_values = sobol_sampler.sample(
                 parsed_SA_input_variables,
