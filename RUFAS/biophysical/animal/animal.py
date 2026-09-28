@@ -10,7 +10,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus, CowParity
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -1781,9 +1781,6 @@ class Animal:
                 self.milk_production.set_wood_parameters(
                     wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
                 )
-                self.future_death_date = self.determine_future_death_date()
-                self._future_death_reason = animal_constants.DEATH_CULL
-                self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
         self.events += reproduction_outputs.events
 
@@ -2437,110 +2434,90 @@ class Animal:
             parity=self.calves,
         )
 
-    def determine_future_death_date(self) -> int:
+    def assess_removal_risk(
+        self,
+        percent_fresh: float,
+        annual_death_risk_by_parity: dict[CowParity, float],
+        annual_acute_sale_risk_by_parity: dict[CowParity, float],
+        time: RufasTime,
+    ) -> None:
         """
-        Determine the future death date of the animal based on its parity.
+        Roll a cow's daily mortality and acute-sale risk and schedule any resulting removal.
+
+        Parameters
+        ----------
+        percent_fresh : float
+            Fraction of the herd currently fresh, used to scale the daily death and
+            acute-sale selection probabilities.
+        annual_death_risk_by_parity : dict[CowParity, float]
+            Annual death risk for each parity group, keyed by :class:`CowParity`, (unitless).
+        annual_acute_sale_risk_by_parity : dict[CowParity, float]
+            Annual acute-sale risk for each parity group, keyed by :class:`CowParity`, (unitless).
+        time : RufasTime
+            Current simulation time, used to record the day of death or sale.
 
         Returns
         -------
-        int
-            Calculated future death date in simulation days.
-
-        Notes
-        -------
-        [AN.ANM.1]
-
+        None
         """
-        if self.calves >= 4:
-            death_rate = AnimalConfig.parity_death_probability[3]
-        else:
-            death_rate = AnimalConfig.parity_death_probability[self.calves - 1]
-        death_rand = random()
-        if death_rand <= death_rate:
-            death_probability_upper_limit = death_probability_lower_limit = 0.0
-            death_time_upper_limit = death_time_lower_limit = 0.0
-            death_date_random = random()
-            for i in range(len(AnimalConfig.death_day_probability) - 1):
-                if (
-                    AnimalConfig.death_day_probability[i]
-                    <= death_date_random
-                    < AnimalConfig.death_day_probability[i + 1]
-                ):
-                    death_probability_lower_limit = AnimalConfig.death_day_probability[i]
-                    death_probability_upper_limit = AnimalConfig.death_day_probability[i + 1]
-                    death_time_lower_limit = AnimalConfig.cull_day_count[i]
-                    death_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
-            n = (death_time_upper_limit - death_time_lower_limit) / (
-                death_probability_upper_limit - death_probability_lower_limit
-            )
-            return round(
-                death_time_lower_limit + n * (death_date_random - death_probability_lower_limit) + self.days_born
-            )
-        return sys.maxsize
+        if self.future_cull_date == sys.maxsize:
+            if self.is_selected_for_removal(annual_acute_sale_risk_by_parity[self.parity_index], percent_fresh):
+                self.future_cull_date = self.days_born
+                self.cull_reason = animal_constants.ACUTE_SALE_CULL
+                self.sold_at_day = time.simulation_day
+                return
+        if self.future_death_date == sys.maxsize:
+            if self.is_selected_for_removal(annual_death_risk_by_parity[self.parity_index], percent_fresh):
+                self.future_death_date = self.days_born
+                self.cull_reason = self._future_death_reason = animal_constants.DEATH_CULL
+                self.dead_at_day = time.simulation_day
 
-    def determine_future_cull_date(self) -> tuple[int, str]:
+    @property
+    def parity_index(self) -> CowParity:
         """
-        Determine the future cull date and reason for the animal based on parity-specific probabilities.
+        The parity group of the animal.
 
         Returns
         -------
-        tuple[int, str]
-            - Future cull date in simulation days.
-            - Reason for culling.
-
-        Notes
-        -------
-        [AN.ANM.2]
-
+        CowParity
+            ``CowParity.ONE`` or ``CowParity.TWO`` for cows in their 1st or 2nd lactation,
+            ``CowParity.THREE_PLUS`` for cows in any later lactation, and ``CowParity.NONE`` for
+            animals that are not cows.
         """
-        cull_reason = ""
-        future_cull_date = sys.maxsize
-        if self.calves >= 4:
-            inv_cull_rate = AnimalConfig.parity_cull_probability[3]
-        else:
-            inv_cull_rate = AnimalConfig.parity_cull_probability[self.calves - 1]
-        cull_rand = random()
-        if cull_rand <= inv_cull_rate:
-            cull_reason_rand = random()
-            cull_prob = 0.0
-            if cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.feet_leg_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.feet_leg_cull_day_probability
-                cull_reason = animal_constants.LAMENESS_CULL
-
-            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.injury_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.injury_cull_day_probability
-                cull_reason = animal_constants.INJURY_CULL
-
-            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.mastitis_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.mastitis_cull_day_probability
-                cull_reason = animal_constants.MASTITIS_CULL
-
-            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.disease_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.disease_cull_day_probability
-                cull_reason = animal_constants.DISEASE_CULL
-
-            elif cull_reason_rand <= (cull_prob + AnimalConfig.udder_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.udder_cull_day_probability
-                cull_reason = animal_constants.UDDER_CULL
-
+        if self.animal_type.is_cow:
+            if self.calves == 1:
+                return CowParity.ONE
+            elif self.calves == 2:
+                return CowParity.TWO
             else:
-                cull_reason_cull_prob = AnimalConfig.unknown_cull_day_probability
-                cull_reason = animal_constants.UNKNOWN_CULL
+                return CowParity.THREE_PLUS
+        return CowParity.NONE
 
-            cull_time_rand = random()
-            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0.0
-            for i in range(len(cull_reason_cull_prob) - 1):
-                if cull_reason_cull_prob[i] <= cull_time_rand < cull_reason_cull_prob[i + 1]:
-                    cull_reason_lower_limit = cull_reason_cull_prob[i]
-                    cull_reason_upper_limit = cull_reason_cull_prob[i + 1]
-                    cull_time_lower_limit = AnimalConfig.cull_day_count[i]
-                    cull_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
-            x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
-            future_cull_date = round(
-                cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + self.days_born
-            )
+    def is_selected_for_removal(self, annual_risk: float, percent_fresh: float) -> bool:
+        """
+        Roll the cow's daily removal (death or acute-sale) risk.
 
-        return future_cull_date, cull_reason
+        Parameters
+        ----------
+        annual_risk : float
+            Annual removal risk for the cow's parity group, (unitless).
+        percent_fresh : float
+            Fraction of the herd currently fresh, used to scale the daily risk so that fresh
+            cows carry a higher risk than the rest of the herd.
+
+        Returns
+        -------
+        bool
+            ``True`` if the cow is selected for removal, ``False`` otherwise.
+        """
+        average_daily_risk = annual_risk / 365
+        percent_other = 1 - percent_fresh
+
+        daily_risk_other = average_daily_risk / (2.55 * percent_fresh + percent_other)
+        daily_risk_fresh = 2.55 * daily_risk_other
+
+        daily_risk = daily_risk_fresh if self.days_in_milk < 50 else daily_risk_other
+        return random() <= daily_risk
 
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """
