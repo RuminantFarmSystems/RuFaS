@@ -1663,7 +1663,7 @@ def test_expand_sensitivity_analysis_args(
             "output_prefix": expected_output_prefixes[i],
             "log_verbosity": "errors",
             "sampler": multi_run_args["sampler"],
-            "random_seeds": [42],
+            "random_seed": multi_run_args["random_seeds"][0],
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
             "skip_values": 0,

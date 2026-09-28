@@ -58,7 +58,7 @@
       "metadata_file_path": "input/metadata/example_manure_only_metadata.json",
       "output_prefix": "manure_only",
       "log_verbosity": "errors",
-      "random_seed": 42,
+      "random_seeds": [42],
       "cross_validation_file_paths": [
         "input/metadata/cross_validation/weather_cross_validation.json"
       ]

@@ -426,6 +426,11 @@ class TaskManager:
         """
         Parses input tasks into single and multiple run tasks.
 
+        Raises
+        ------
+        ValueError
+            - If ``SIMULATION_SINGLE_RUN`` task type and multiple random seeds specified in task inputs.
+
         Returns
         -------
         tuple[list[dict[str, Any]], list[dict[str, Any]]]
@@ -467,11 +472,26 @@ class TaskManager:
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
             input_task["input_data_csv_import_path"] = input_data_csv_import_path
             input_task["task_manager_metadata_properties"] = task_manager_metadata_properties
+            input_task["random_seeds"] = input_task.get("random_seeds", [0])
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
                 random_seeds = input_task.pop("random_seeds", None)
                 if random_seeds is not None:
+                    if input_task["task_type"] == TaskType.SIMULATION_SINGLE_RUN and len(random_seeds) != 1:
+                        self.output_manager.add_error(
+                            "Single Run Random Seed Error",
+                            "SIMULATION_SINGLE_RUN task type selected but multiple random seeds specified.  "
+                            "Check task input specifications and confirm task type and random seeds selected.",
+                            info_map={
+                                "class": TaskManager.__name__,
+                                "function": self._parse_input_tasks.__name__
+                            }
+                        )
+                        raise ValueError(
+                            "SIMULATION_SINGLE_RUN task type selected but multiple random seeds specified.  "
+                            "Check task input specifications and confirm task type and random seeds selected."
+                        )
                     input_task["random_seed"] = random_seeds[0]
                 parsed_single_run_args.append(input_task)
         return parsed_single_run_args, parsed_multi_run_args
@@ -526,7 +546,7 @@ class TaskManager:
         for i in range(multi_run_args["multi_run_counts"]):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
-            new_args["random_seed"] = [random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)]
+            new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
             new_args.pop("random_seeds", None)
             new_args["output_prefix"] = f"{new_args['output_prefix']} run {i + 1}"
             single_run_args.append(new_args)
@@ -567,8 +587,9 @@ class TaskManager:
           ``"morris"`` samplers.
         - ``skip_values`` : int — number of initial Sobol sequence values to skip;
           required for ``"sobol"`` sampler.
-        - ``random_seeds`` : list[int] — Random seeds available to the task. The first seed is used to initialize
-            the sensitivity analysis sampler..
+        - ``random_seeds`` : list[int] — random seeds available to the task. The first
+            seed is used to initialize the sensitivity analysis sampler and is assigned
+            to each expanded simulation run.
         - ``SA_load_balancing_start`` : float — fractional start of the sample
           range to process (0.0–1.0).
         - ``SA_load_balancing_stop`` : float — fractional end of the sample range
@@ -598,21 +619,22 @@ class TaskManager:
 
         data_type_str_to_class_map = {"float": float, "int": int}
         data_types = [data_type_str_to_class_map[input_variable["data_type"]] for input_variable in SA_input_variables]
+        random_seed = multi_run_args["random_seeds"][0]
 
         if multi_run_args["sampler"] == "fractional_factorial":
             sampled_values = fractional_factorial_sampler.sample(
-                parsed_SA_input_variables, seed=multi_run_args["random_seeds"][0]
+                parsed_SA_input_variables, seed=random_seed
             )
         elif multi_run_args["sampler"] == "sobol":
             sampled_values = sobol_sampler.sample(
                 parsed_SA_input_variables,
                 multi_run_args["sampler_n"],
                 skip_values=multi_run_args["skip_values"],
-                seed=multi_run_args["random_seeds"][0],
+                seed=random_seed,
             )
         elif multi_run_args["sampler"] == "morris":
             sampled_values = morris_sampler.sample(
-                parsed_SA_input_variables, multi_run_args["sampler_n"], seed=multi_run_args["random_seeds"][0]
+                parsed_SA_input_variables, multi_run_args["sampler_n"], seed=random_seed
             )
         else:
             self.output_manager.add_log(
@@ -636,6 +658,8 @@ class TaskManager:
         for sample_number in range(start_sample, stop_sample):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
+            new_args["random_seed"] = random_seed
+            new_args.pop("random_seeds", None)
             run_number = f"{sample_number + 1}".zfill(digits)
             new_args["output_prefix"] = f"{new_args['output_prefix']} run {run_number}"
             new_args["input_patch"] = {
@@ -1153,7 +1177,7 @@ class TaskManager:
         if not is_data_valid:
             output_manager.add_error(
                 "No task run",
-                f"Data not valid for {comparison_args['output_prefix']}, task not run",
+                f"Data not valid for {e2e_group}, task not run",
                 info_map={
                     "class": TaskManager.__name__,
                     "function": TaskManager._process_end_to_end_testing_group.__name__,

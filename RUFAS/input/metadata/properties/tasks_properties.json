@@ -178,6 +178,7 @@
         "random_seeds": {
           "type": "array",
           "description": "The random seeds used for single or multi simulation runs.",
+          "nullable": true,
           "properties": {
             "type": "number",
             "description": "The random seed, set it to 0 to auto-generate it",
