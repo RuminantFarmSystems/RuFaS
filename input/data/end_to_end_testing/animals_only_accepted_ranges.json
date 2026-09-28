@@ -1,0 +1,4 @@
+{
+    "description": "Accepted ranges, keyed by the exact variable names of this input set's e2e_json_*_filter.json expected results. Each range needs numerical 'min' and 'max' bounds; a listed variable passes when all its values fall within them instead of matching the expected results. Extra keys, e.g. a reference, are echoed in the results.",
+    "accepted_ranges": {}
+}
