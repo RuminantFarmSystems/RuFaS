@@ -203,6 +203,7 @@ class OutputManager(object):
             self.chunkification: bool = False
             self.saved_pool_chunks_num: int = 0
             self.saved_pool_chunks_path: Path | None = None
+            self._discarded_pool_chunks: set[Path] = set()
 
             self.available_memory: int = 0
             self.average_add_variable_call_addition: int = 118
@@ -258,6 +259,7 @@ class OutputManager(object):
             "function": self.setup_pool_overflow_control.__name__,
         }
         self.chunkification = True
+        self._discarded_pool_chunks.clear()
 
         self.available_memory = psutil.virtual_memory().available
         available_memory_gb = self.available_memory / GeneralConstants.BYTES_PER_GB
@@ -1625,7 +1627,9 @@ class OutputManager(object):
         the ``saved_pool_chunks_path``. Then sort the files according to their file name to preserve the order.
         """
         list_of_dumped_files: list[Path] = [
-            file for file in self.saved_pool_chunks_path.iterdir() if file.is_file() and file.name.endswith(".json")
+            file
+            for file in self.saved_pool_chunks_path.iterdir()
+            if file.is_file() and file.name.endswith(".json") and file not in self._discarded_pool_chunks
         ]
         list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
         return list_of_dumped_files
@@ -2293,9 +2297,22 @@ class OutputManager(object):
 
         return flattened
 
+    def clear_variables_pool(self) -> None:
+        """Discard variables and exclude existing saved chunks from final output, preserving other pools."""
+        if self.chunkification and self.saved_pool_chunks_path is not None:
+            self._discarded_pool_chunks.update(self._sort_saved_chunk_files())
+        self._set_variables_pool({})
+        self.add_log(
+            "Variables pool cleared",
+            f"Cleared the variables pool at the start of simulation day {self.time.simulation_day}; "
+            "previously saved variable chunks are excluded from final output.",
+            {"class": self.__class__.__name__, "function": self.clear_variables_pool.__name__},
+        )
+
     def flush_pools(self) -> None:
         """Sets each pool to an empty dictionary."""
         self._set_variables_pool({})
+        self._discarded_pool_chunks.clear()
         self.warnings_pool = {}
         self.errors_pool = {}
         self.logs_pool = {}
