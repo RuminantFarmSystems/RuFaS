@@ -18,12 +18,17 @@ class MilkProductionInputs:
         The number of days since the animal was born, (simulation days).
     days_in_pregnancy : int
         The number of days the animal has been pregnant, (simulation days).
+    just_calved : bool
+        Whether the cow calves during the current daily routine. Because the milking update runs
+        before the reproduction update that sets ``days_in_milk = 1``, this flag lets the milking
+        update recognize the first day of a new lactation while ``days_in_milk`` is still 0.
 
     """
 
     days_in_milk: int
     days_born: int
     days_in_pregnancy: int
+    just_calved: bool = False
 
     @property
     def is_milking(self) -> bool:
