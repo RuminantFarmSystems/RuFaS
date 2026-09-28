@@ -151,6 +151,8 @@ class SimulationEngine:
         A dictionary mapping the simulation type to the appropriate daily simulation function.
     time : RufasTime
         The RufasTime object that contains methods for accessing and manipulating the simulation time.
+    warmup_days : int
+        Number of initial simulation days to run before clearing output. Zero disables warmup.
     weather : Weather
         The weather object that contains the weather data.
     emissions_estimator : EmissionsEstimator
@@ -193,6 +195,7 @@ class SimulationEngine:
         self.om = OutputManager()
         self.im = InputManager()
         self.time = RufasTime()
+        self.warmup_days: int = self.im.get_data("config.warmup_days")
         self.simulation_type = simulation_type
         self.simulate_animals = self.simulation_type.simulate_animals
         self.simulate_fields = self.simulation_type.simulate_fields
@@ -380,11 +383,8 @@ class SimulationEngine:
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
     def _run_simulation_main_loop(self) -> None:
-        """
-        The main loop for simulation.
-
-        """
-        for simulation_year in range(self.time.simulation_length_years):
+        """Run the simulation one calendar year at a time."""
+        for _ in range(self.time.simulation_length_years):
             self._annual_simulation()
 
     def _execute_full_farm_daily_simulation(self) -> None:
@@ -738,10 +738,21 @@ class SimulationEngine:
         self.annual_reset()
 
     def _annual_simulation(self) -> None:
-        """
-        Executes the annual simulation routines.
-        """
-        for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
+        """Run this year's warmup and evaluation days, then execute annual routines."""
+        year_start_simulation_day = self.time.simulation_day
+        days_in_year = self.time.year_end_day - self.time.year_start_day + 1
+        warmup_days_in_year = min(max(self.warmup_days - year_start_simulation_day, 0), days_in_year)
+
+        for _ in range(warmup_days_in_year):
+            self._simulation_type_to_daily_simulation_function[self.simulation_type]()
+
+        if (
+            self.warmup_days > 0
+            and year_start_simulation_day <= self.warmup_days < year_start_simulation_day + days_in_year
+        ):
+            self.om.clear_variables_pool()
+
+        for _ in range(warmup_days_in_year, days_in_year):
             self._simulation_type_to_daily_simulation_function[self.simulation_type]()
 
         self._run_post_annual_routines()
