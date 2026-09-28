@@ -1325,3 +1325,33 @@ def test_gather_available_feeds_by_id_groups_and_sorts() -> None:
     assert set(purchased_by_id.keys()) == {1, 2}
     assert purchased_by_id[1] == [p1, p1b]
     assert purchased_by_id[2] == [p2]
+
+
+def test_stock_initial_storage_contents(mocker: MockerFixture, feed_manager: FeedManager, time: RufasTime) -> None:
+    """Tests that initial contents are stocked into the named storages, with a warning for unknown names."""
+    storage = feed_manager.active_storages["example_pile"]
+    mocked_stock = mocker.patch.object(storage, "stock_initial_contents")
+    mock_add_warning = mocker.patch.object(feed_manager._om, "add_warning")
+    initial_contents = {"dry_matter_mass": 1000.0, "dry_matter_percentage": 35.0}
+
+    feed_manager.stock_initial_storage_contents(
+        {"example_pile": initial_contents, "not_a_storage": initial_contents}, time
+    )
+
+    mocked_stock.assert_called_once_with(initial_contents, time.current_date.date(), time.simulation_day)
+    mock_add_warning.assert_called_once()
+    assert "not_a_storage" in mock_add_warning.call_args.args[1]
+
+
+def test_stock_initial_storage_contents_without_input_is_a_no_op(
+    mocker: MockerFixture, feed_manager: FeedManager, time: RufasTime
+) -> None:
+    """Tests that stocking with no initial contents input leaves every storage untouched."""
+    mocked_stocks = [
+        mocker.patch.object(storage, "stock_initial_contents") for storage in feed_manager.active_storages.values()
+    ]
+
+    feed_manager.stock_initial_storage_contents({}, time)
+
+    for mocked_stock in mocked_stocks:
+        mocked_stock.assert_not_called()

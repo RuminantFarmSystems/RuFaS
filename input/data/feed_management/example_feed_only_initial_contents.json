@@ -1,0 +1,60 @@
+{
+ "initial_contents": [
+  {
+   "storage_name": "corn_silage_storage_1",
+   "dry_matter_mass": 200000.0,
+   "dry_matter_percentage": 35.0,
+   "dry_matter_digestibility": 40.0,
+   "crude_protein_percent": 7.707,
+   "non_protein_nitrogen": 4.55,
+   "starch": 31.0,
+   "adf": 24.0,
+   "ndf": 40.931,
+   "lignin": 3.054,
+   "sugar": 1.5,
+   "ash": 3.843
+  },
+  {
+   "storage_name": "alfalfa_silage_storage_1",
+   "dry_matter_mass": 105000.0,
+   "dry_matter_percentage": 35.0,
+   "dry_matter_digestibility": 40.0,
+   "crude_protein_percent": 20.471,
+   "non_protein_nitrogen": 10.098,
+   "starch": 1.973,
+   "adf": 33.683,
+   "ndf": 43.195,
+   "lignin": 7.419,
+   "sugar": 6.274,
+   "ash": 10.597
+  },
+  {
+   "storage_name": "corn_grain_storage_2",
+   "dry_matter_mass": 110000.0,
+   "dry_matter_percentage": 86.0907,
+   "dry_matter_digestibility": 40.0,
+   "crude_protein_percent": 8.514,
+   "non_protein_nitrogen": 1.0,
+   "starch": 72.0,
+   "adf": 3.5,
+   "ndf": 9.761,
+   "lignin": 1.37,
+   "sugar": 2.0,
+   "ash": 1.504
+  },
+  {
+   "storage_name": "alfalfa_hay_storage_2",
+   "dry_matter_mass": 30000.0,
+   "dry_matter_percentage": 88.136,
+   "dry_matter_digestibility": 40.0,
+   "crude_protein_percent": 20.745,
+   "non_protein_nitrogen": 10.2,
+   "starch": 2.0,
+   "adf": 33.0,
+   "ndf": 41.109,
+   "lignin": 6.643,
+   "sugar": 6.3,
+   "ash": 10.762
+  }
+ ]
+}
