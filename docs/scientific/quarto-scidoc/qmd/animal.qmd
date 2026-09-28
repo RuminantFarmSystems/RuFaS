@@ -2398,7 +2398,7 @@ synchronization treatments, breeding efficiency, and pregnancy outcomes. The key
 #| tbl-cap: User inputs in `management_decisions` that determine the reproductive breeding program of animal groups and impact reproductive efficiency. In the case of heifer groups, this includes age at first calving.
 import_table(
   "../resources/table_data/animal/tbl-an-repro-inputs-mgmt.csv",
-  colalign = ["left", "left", "left", "center", "center", "center"]
+  colalign = ["left", "center", "left", "center", "center", "center"]
 )
 
 ```
@@ -2433,19 +2433,34 @@ Anytime an insemination is performed after an OvSynch program, the conception ra
 
 #### Expected Outputs
 
-Overall reporting for reproductive measures can be summarized and split into scheduled events and updates on an individual basis for heifers and cows. These include: 
+Overall reporting for reproductive measures can be summarized and split into scheduled events and updates on an individual basis for heifers and cows. Please note that this is not an exhaustive list, but do include: 
 
-* Events for Estrus (detection and scheduling)
-* Hormone Administration
-* Artificial Insemination (AI) (scheduling and status)
-* Pregnancy Checks and Status
-* Days Carry Calf
-* Abortion Events
-* Updates to Lactation
-* Updates to Estrous
-* Updates to Pregnancy
-* Updates to Reproductive Status or Culling Decisions
-* Updates to Protocols
+* *Herd-Level*
+  * Heifers (`heiferII`)
+    * `num_heiferII_in_ed_period`
+    * `ai_num_h`
+    * `preg_check_num_h`
+    * `GnRH_injection_num_h`
+    * `PGF_injection_num_h`
+    * `heiferII_total_num_ai_performed`
+    * `heiferII_total_num_successful_conceptions`
+    * `heiferII_overall_conception_rate`
+  * Cows (`cow`)
+    * `open_cow_num`
+    * `preg_cow_num`
+    * `vwp_cow_num`
+    * `num_cow_in_ed_period`
+    * `ai_num`
+    * `preg_check_num`
+    * `GnRH_injection_num`
+    * `PGF_injection_num`
+    * `cow_total_num_ai_performed`
+    * `cow_total_num_successful_conceptions`
+    * `cow_overall_conception_rate`
+    * `avg_breeding_to_preg_time`
+    * `avg_calving_interval`
+    
+* *Individual Animal-Level* is reported in the `AnimalModuleReporter.` via `_record_animal_events`
 
 #### Methodology
 
