@@ -2110,7 +2110,7 @@ assigned a birthweight according to a user-informed random distribution. All mal
 of their life. Female calves remain on the farm determined by an event-based Monte Carlo method informed by the user-defined percent of 
 female calves that are kept. 
 
-### RuFaS Bodyweight and Growth
+### Bodyweight and Growth
 
 #### Introduction
 
@@ -2385,53 +2385,44 @@ reproductive events.
 The simulation generates and tracks detailed reproductive performance metrics at the animal level. These outputs provide insights into estrus detection, 
 synchronization treatments, breeding efficiency, and pregnancy outcomes. The key recorded variables include:
 
-* Estrus Detection (ED) Metrics: Number of days an animal participates in the ED program (`ED_days`) and the total estrous events detected (`estrus_count`)
-* Hormonal Treatments: Counts of synchronization protocol injections, including GnRH (`GnRH_injections`), PGF (`PGF_injections`), and CIDR (`CIDR_injections`)
-* Breeding Interventions: Number of semen straws used (`semen_number`) and total AI procedures performed (`AI_times`)
-* Reproductive Efficiency: Time from first breeding attempt to pregnancy confirmation (`breeding_to_pregnancy_time`) and the interval from calving to confirmed pregnancy (`calving_to_pregnancy_time`)
-* Pregnancy Monitoring: Total number of pregnancy checks performed (`pregnancy_diagnoses`)
+* **ED Metrics:** Number of days an animal participates in the ED program (`ED_days`) and the total estrous events detected (`estrus_count`)
+* **Hormonal Treatments:** Counts of synchronization protocol injections, including GnRH (`GnRH_injections`), PGF (`PGF_injections`), and CIDR (`CIDR_injections`)
+* **Breeding Interventions:** Number of semen straws used (`semen_number`) and total AI procedures performed (`AI_times`)
+* **Reproductive Efficiency:** Time from first breeding attempt to pregnancy confirmation (`breeding_to_pregnancy_time`) and the interval from calving to confirmed pregnancy (`calving_to_pregnancy_time`)
+* **Pregnancy Monitoring:** Total number of pregnancy checks performed (`pregnancy_diagnoses`)
 
 #### Required User Inputs
 
 ```{python}
-#| label: tbl-an-repro_inputs-heifer-mgmt
-#| tbl-cap: User inputs in `management_decisions` that determine the heifer reproductive breeding program and impact reproductive efficiency and age at first calving.
+#| label: tbl-an-repro_inputs-mgmt
+#| tbl-cap: User inputs in `management_decisions` that determine the reproductive breeding program of animal groups and impact reproductive efficiency. In the case of heifer groups, this includes age at first calving.
 import_table(
-  "../resources/table_data/animal/tbl-an-repro-inputs-heifer-mgmt.csv",
-  colalign = ["left", "left", "center", "center", "center"]
+  "../resources/table_data/animal/tbl-an-repro-inputs-mgmt.csv",
+  colalign = ["left", "left", "left", "center", "center", "center"]
 )
 
 ```
 ```{python}
 #| label: tbl-an-repro_inputs-heifer-farm
-#| tbl-cap: User inputs in `farm_level_heifers` that determine the heifer reproductive breeding program and impact reproductive efficiency and age at first calving.
+#| tbl-cap: User inputs in `farm_level_heifers` (`farm_level.repro.heifers`) that determine the [heifer]{.underline} reproductive breeding program and impact reproductive efficiency and age at first calving.
 import_table(
   "../resources/table_data/animal/tbl-an-repro-inputs-heifer-farm.csv",
   colalign = ["left", "left", "center", "center", "center"]
 )
 ```
-
-```{python}
-#| label: tbl-an-repro_inputs-cow-mgmt
-#| tbl-cap: User inputs that determine reproductive efficiency of cows and influence culling, calving interval, and calf output.
-import_table(
-  "../resources/table_data/animal/tbl-an-repro-inputs-cow-mgmt.csv",
-  colalign = ["left", "left", "center", "center", "center"]
-)
-```
 ```{python}
 #| label: tbl-an-repro_inputs-cow-farm
-#| tbl-cap: User inputs that determine reproductive efficiency of cows and influence culling, calving interval, and calf output.
+#| tbl-cap: User inputs in `farm_level_cows` (`farm_level.repro.cows`) that determine the [cow]{.underline} reproductive breeding program and impact reproductive efficiency, calving interval, and reproductive culling.
 import_table(
   "../resources/table_data/animal/tbl-an-repro-inputs-cow-farm.csv",
   colalign = ["left", "left", "center", "center", "center"]
 )
 ```
 ```{python}
-#| label: tbl-an-repro_inputs-cow-cow
-#| tbl-cap: User inputs that determine reproductive efficiency of cows and influence culling, calving interval, and calf output.
+#| label: tbl-an-repro-inputs-adjust
+#| tbl-cap: The following inputs can be used to determine if there is a decrease in the conception rate with parity and rebreeding attempts (`farm_level` section).
 import_table(
-  "../resources/table_data/animal/tbl-an-repro-inputs-cow-cow.csv",
+  "../resources/table_data/animal/tbl-an-repro-inputs-adjust.csv",
   colalign = ["left", "left", "center", "center", "center"]
 )
 ```
@@ -2439,15 +2430,6 @@ import_table(
 ::: {.callout-note}
 Anytime an insemination is performed after an OvSynch program, the conception rate will be changed to the `ovsynch_program_conception_rate`.
 :::
-
-```{python}
-#| label: tbl-an-repro_inputs-concept-dec
-#| tbl-cap: Inputs that can be used to determine if there is a decrease in the conception rate with parity and rebreeding attempts (`farm_level` section).
-import_table(
-  "../resources/table_data/animal/tbl-an-repro-inputs-concept-dec.csv",
-  colalign = ["left", "left", "center", "center", "center", "center"]
-)
-```
 
 #### Expected Outputs
 
@@ -2526,14 +2508,14 @@ AI is scheduled according to the estrus detection protocol. If no estrus is dete
 For rebreedings, cows can be assigned to any of the three rebreeding strategies `resynch_program`: TAIbeforePD, TAIafterPD, or PGFatPD (`open_cow`).
 :::
 
-* **TAIbeforePD:** The TAIbeforePD rebreeding strategy initiates a timed AI synchronization protocol before the first pregnancy diagnosis (PD). 
+* `TAIbeforePD`: The TAIbeforePD rebreeding strategy initiates a timed AI synchronization protocol before the first pregnancy diagnosis (PD). 
 Cows that are due for pregnancy diagnosis but have not been confirmed pregnant yet start one of the predefined synchronization protocols 
 (OvSynch-48, OvSynch-56, CoSynch-72, or 5-day CoSynch) six days before PD. This approach ensures that if a cow is found open (not pregnant) on PD day, 
 she is already progressing through a synchronization protocol, reducing the waiting period before the next AI attempt.
-* **TAIafterPD:** The TAIafterPD rebreeding strategy schedules synchronization for cows that are diagnosed as open on the PD day. If a cow is 
+* `TAIafterPD`: The TAIafterPD rebreeding strategy schedules synchronization for cows that are diagnosed as open on the PD day. If a cow is 
 not pregnant, she is immediately enrolled in one of the available timed AI protocols (OvSynch-48, OvSynch-56, CoSynch-72, or 5-day CoSynch). 
 This ensures timely rebreeding but does not initiate synchronization in advance of PD.
-* **PGFatPD:** The PGFatPD rebreeding strategy uses prostaglandin (PGF) administration following PD for open cows to induce estrus. 
+* `PGFatPD`: The PGFatPD rebreeding strategy uses prostaglandin (PGF) administration following PD for open cows to induce estrus. 
 After PGF treatment (day 0), cows are monitored for natural estrus. If estrus is detected, AI is performed accordingly. If no estrus is detected 
 within seven days, the cow is enrolled in a timed AI protocol (OvSynch-48, OvSynch-56, CoSynch-72, or 5-day CoSynch) to ensure insemination. 
 This program balances estrus detection with timed AI, allowing for natural breeding opportunities before initiating synchronization.
@@ -2541,7 +2523,7 @@ This program balances estrus detection with timed AI, allowing for natural breed
 ##### Pregnancy Diagnosis (PD) and Pregnancy Loss
 
 For both heifers and lactating cows (`heifer_pregnancy_update`, `cow_pregnancy_update`), pregnancy diagnoses are scheduled at three intervals 
-after AI (`preg\_check\_day\_1`, `preg_check_day_2`, `preg_check_day_3`). The default settings simulate the first at 32 d after insemination, 
+after AI (`preg_check_day_1`, `preg_check_day_2`, `preg_check_day_3`). The default settings simulate the first at 32 d after insemination, 
 which, if confirmed positive for pregnancy, is followed at 60 d and then at 200 d [@wiltbank2016]; however, the number and day of 
 pregnancy checks can be adjusted by the model user according to farm practices. Between AI and three pregnancy checks, pregnancy losses are 
 simulated to occur according to random draws from a U (0,1) compared with thresholds according to the expected pregnancy losses in each of those 
@@ -2567,7 +2549,7 @@ This section describes how RuFaS determines the amount of milk and milk componen
     
 Milk yield is largely determined by lactation curve parameters. Wood’s curve is the only lactation model implemented in RuFaS currently, 
 but there is flexibility to potentially include other models as well. At the beginning of the simulation, the herd is assigned distributions 
-for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the [Lactation Curve](#sec-an-lac-curve) section. At the beginning of each new lactation, 
+for the Wood’s curve parameters l, m, and n for each parity of cows (see more information in the [Lactation Curve](#sec-an-lac-curve) section). At the beginning of each new lactation, 
 each cow is assigned a set of parameters for that lactation based on the herd’s distributions for her current parity. 
     
 When the cow starts lactating, she produces milk from the calving day until dry or culled according to the assigned lactation curve model. 
@@ -2577,7 +2559,7 @@ Milk components (protein, fat, and lactose) are calculated based on milk product
     
 Currently, the only source of milk reduction is if there is no possible ration using the feeds available that would support the baseline level of 
 milk production. Ration formulation is attempted with reduced milk production levels until reaching an acceptable ration (that meets the nutrient 
-requirements for the pen’s average cow) or reaching a threshold (floor) milk production defined by some combination of user inputs and pre-defined constants.   
+requirements for the pen’s average cow) or reaching a threshold milk production defined by some combination of user inputs and pre-defined constants.   
 
 #### Required User Inputs
 
@@ -2701,7 +2683,9 @@ $$
 * t = DIM
 
 ::: {.callout-note}
-Adjusted milk production = maximum of (calculated milk production + milk production variance - milk production reduction) or 0.
+Adjusted milk production = maximum of: 
+
+calculated milk production + milk production variance - milk production reduction OR 0.
 :::
 
 * `MilkProduction.calculate_daily_milk_production()`
@@ -2764,7 +2748,7 @@ reduction values are used.
 **User Inputs and Constants**
 
 * `Milk_reduction_maximum`: Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements 
-* Tolerance: Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
+* **Tolerance:** Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
 has no effect due to no implementation of automatic ration optimizer. 
 * `Milk_reduction_kg` is set to 0.25 kg: Milk reduction amount for each failed ration attempt, kg. 
 * `Minimum_avg_pen_milk` is set to 15 kg: Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal
@@ -2810,7 +2794,7 @@ For more details on milk changes and reductions, go to the Milk Production and R
 :::
 
 ::: {#sec-an-lac-curve}
-### Lactation Curve: Parameters and Definitions
+### Lactation Curve
 :::
 
 #### Introduction
