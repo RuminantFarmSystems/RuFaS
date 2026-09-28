@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingSce
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, CowParity
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
@@ -107,13 +107,13 @@ class HerdManager:
     buying_threshold : int | float
         Herd size threshold below which replacement animals may be purchased.
     cull_eligibility_minimum_days_in_milk : int | float
-        Minimum days in milk a cow must have reached to be eligible for an oversupply cull,
+        Minimum days in milk a cow must have reached to be eligible for a low production cull,
         (simulation days). Protects fresh cows from being sold.
     cull_eligibility_maximum_days_carried_calf : int | float
         Maximum days carrying a calf (days in pregnancy) a cow may have to remain eligible for an
-        oversupply cull, (simulation days). Protects late-pregnant cows from being sold.
+        low production cull, (simulation days). Protects late-pregnant cows from being sold.
     cull_ranking_criteria : str
-        Attribute used to rank eligible cows when selecting which to sell for an oversupply cull.
+        Attribute used to rank eligible cows when selecting which to sell for a low production cull.
         One of ``"milk"`` (daily milk production) or ``"305_day_milk"`` (305-day milk yield); the
         lowest-ranked eligible cows are sold first.
     housing : dict[str, Any]
@@ -569,13 +569,59 @@ class HerdManager:
             animal.update_genetic_history(simulation_day=time.simulation_day)
         return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
 
+    def _calculate_annual_risk_by_parity(
+        self,
+        herd_annual_risk: float,
+        parity_distribution: dict[CowParity, float],
+        parity_group_fractions: dict[CowParity, float],
+    ) -> dict[CowParity, float]:
+        """
+        Converts a whole-herd annual risk into an annual risk for each parity group.
+
+        Parameters
+        ----------
+        herd_annual_risk : float
+            Annual risk of the event for the whole cow herd, (unitless).
+        parity_distribution : dict[CowParity, float]
+            Fractions of all events that come from each parity group, keyed by :class:`CowParity`,
+            (unitless).
+        parity_group_fractions : dict[CowParity, float]
+            Fractions of the cow herd currently in each parity group, keyed by :class:`CowParity`,
+            (unitless).
+
+        Returns
+        -------
+        dict[CowParity, float]
+            Annual risk of the event for a cow in each of the ``ONE``, ``TWO``, and ``THREE_PLUS``
+            parity groups, (unitless). A parity group with no cows is assigned a risk of 0.
+
+        Notes
+        -----
+        The expected number of events coming from parity group ``p`` is
+        ``herd_annual_risk * parity_distribution[p] * N``, spread over the
+        ``parity_group_fractions[p] * N`` cows in that group, so the per-cow risk for the group is
+        ``herd_annual_risk * parity_distribution[p] / parity_group_fractions[p]``.
+        """
+        annual_risk_by_parity: dict[CowParity, float] = {
+            CowParity.ONE: 0.0,
+            CowParity.TWO: 0.0,
+            CowParity.THREE_PLUS: 0.0,
+        }
+        for parity in annual_risk_by_parity.keys():
+            if parity_group_fractions[parity] > 0:
+                annual_risk_by_parity[parity] = (
+                    herd_annual_risk * parity_distribution[parity] / parity_group_fractions[parity]
+                )
+        return annual_risk_by_parity
+
     def _assess_removal_risk(self, animals: list[Animal], time: RufasTime) -> tuple[list[Animal], list[Animal]]:
         """
         Assess daily removal risk for each cow and collect those removed.
 
-        Computes the fresh fraction across all cows in the herd, then rolls death and
-        acute-sale risk for every cow in ``animals`` via
-        :meth:`Animal.assess_removal_risk`. Non-cow animals are skipped.
+        Computes the fresh fraction and the 1st, 2nd, and 3rd+ parity group fractions across all
+        cows in the herd, converts the whole-herd annual death and acute-sale risks into annual
+        risks for each parity group, then rolls death and acute-sale risk for every cow in
+        ``animals`` via :meth:`Animal.assess_removal_risk`. Non-cow animals are skipped.
 
         Parameters
         ----------
@@ -594,15 +640,36 @@ class HerdManager:
         dead_cows: list[Animal] = []
 
         all_cows = [animal for animal in self.all_animals if animal.animal_type.is_cow]
+        num_cows = len(all_cows)
         fresh_cows: list[Animal] = [cow for cow in all_cows if cow.days_in_milk < 50]
-        percent_fresh_cows = len(fresh_cows) / len(all_cows) if len(all_cows) > 0 else 0
+        percent_fresh_cows = len(fresh_cows) / num_cows if num_cows > 0 else 0
+
+        parity_group_counts = {CowParity.ONE: 0, CowParity.TWO: 0, CowParity.THREE_PLUS: 0}
+        for cow in all_cows:
+            parity_group_counts[cow.parity_index] += 1
+        parity_group_fractions: dict[CowParity, float] = {
+            parity: count / num_cows if num_cows > 0 else 0.0 for parity, count in parity_group_counts.items()
+        }
+
+        annual_death_risk_by_parity = self._calculate_annual_risk_by_parity(
+            AnimalConfig.annual_death_probability, AnimalConfig.parity_death_distribution, parity_group_fractions
+        )
+        annual_acute_sale_risk_by_parity = self._calculate_annual_risk_by_parity(
+            animal_constants.ACUTE_SALE_FRACTION * AnimalConfig.annual_sale_probability,
+            AnimalConfig.parity_sale_distribution,
+            parity_group_fractions,
+        )
+
         for animal in animals:
             if animal.animal_type.is_cow:
-                animal.assess_removal_risk(percent_fresh_cows, time)
+                animal.assess_removal_risk(
+                    percent_fresh_cows, annual_death_risk_by_parity, annual_acute_sale_risk_by_parity, time
+                )
                 if animal.sold:
                     sold_cows.append(animal)
                 if animal.dead:
                     dead_cows.append(animal)
+                    self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
         return (sold_cows, dead_cows)
 
     def _update_genetic_values_at_lactation_start(self, animal: Animal, time: RufasTime) -> None:
@@ -1020,7 +1087,8 @@ class HerdManager:
         return newborn_calf
 
     def _cull_ranking_value(self, cow: Animal) -> float:
-        """Returns the value used to rank ``cow`` for an oversupply cull, based on the user-defined
+        """
+        Returns the value used to rank ``cow`` for a low production cull, based on the user-defined
         ``cull_ranking_criteria``.
 
         Parameters
@@ -1051,7 +1119,7 @@ class HerdManager:
 
     def _get_cow_removal_index(self, removed_animal: list[Animal]) -> int | None:
         """
-        Finds the index of the lowest-ranked cow that is eligible for an oversupply cull.
+        Finds the index of the lowest-ranked cow that is eligible for a low production cull.
 
         Eligibility is governed by the ``cull_eligibility_minimum_days_in_milk`` and
         ``cull_eligibility_maximum_days_carried_calf`` user inputs (protecting fresh and
@@ -2260,8 +2328,10 @@ class HerdManager:
                 [cow for cow in sold_and_died_cows if cow.cull_reason == cull_reason]
             )
 
-        oversupply_cows_num = sum(cow.cull_reason == animal_constants.OVERSUPPLY_CULL for cow in sold_and_died_cows)
-        self.herd_statistics.sold_cow_oversupply_num += oversupply_cows_num
+        low_production_cows_num = sum(
+            cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL for cow in sold_and_died_cows
+        )
+        self.herd_statistics.sold_cow_low_production_num += low_production_cows_num
 
         sold_cows: list[Animal] = [cow for cow in sold_and_died_cows if cow.cull_reason != animal_constants.DEATH_CULL]
         self.herd_statistics.sold_cows_info += [

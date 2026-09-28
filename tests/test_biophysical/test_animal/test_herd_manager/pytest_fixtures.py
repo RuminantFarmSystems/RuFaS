@@ -6,6 +6,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_enums import CowParity
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
@@ -141,8 +142,10 @@ def animal_json() -> dict[str, Any]:
                     "std_estrus_cycle_after_pgf": 2,
                 },
                 "culling": {
-                    "parity_death_prob": [0.039, 0.056, 0.085, 0.117],
-                    "parity_acute_sale_prob": [0.169, 0.233, 0.301, 0.408],
+                    "annual_death_prob": 0.05,
+                    "parity_death_dist": [0.2, 0.3, 0.5],
+                    "annual_sale_prob": 0.32,
+                    "parity_sale_dist": [0.2, 0.3, 0.5],
                 },
                 "life_cycle": {"still_birth_rate": 0.065},
             },
@@ -564,6 +567,10 @@ def mock_animal(
     animal.sold = sold
     animal.stillborn = stillborn
     animal.calves = calves
+    if animal_type.is_cow:
+        animal.parity_index = {1: CowParity.ONE, 2: CowParity.TWO}.get(calves, CowParity.THREE_PLUS)
+    else:
+        animal.parity_index = CowParity.NONE
     animal.calving_interval = calving_interval
     animal.sold_at_day = sold_at_day
     animal.stillborn_day = stillborn_day

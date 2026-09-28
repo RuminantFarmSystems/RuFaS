@@ -5,6 +5,7 @@ import pytest
 import pytest_mock
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.data_types.animal_enums import CowParity
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     HeiferTAISubProtocol,
@@ -130,8 +131,10 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
                 "std_estrus_cycle_after_pgf": 2,
             },
             "culling": {
-                "parity_death_prob": [0.039, 0.056, 0.085, 0.117],
-                "parity_acute_sale_prob": [0.169, 0.233, 0.301, 0.408],
+                "annual_death_prob": 0.05,
+                "parity_death_dist": [0.2, 0.3, 0.5],
+                "annual_sale_prob": 0.32,
+                "parity_sale_dist": [0.2, 0.3, 0.5],
             },
             "life_cycle": {"still_birth_rate": 0.065},
         },
@@ -199,6 +202,19 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
     assert AnimalConfig.cow_tai_method == CowTAISubProtocol("OvSynch 56")
     assert AnimalConfig.cow_ovsynch_method == CowTAISubProtocol("OvSynch 56")
     assert AnimalConfig.cow_resynch_method == CowReSynchSubProtocol("TAIafterPD")
+
+    assert AnimalConfig.annual_death_probability == 0.05
+    assert AnimalConfig.parity_death_distribution == {
+        CowParity.ONE: 0.2,
+        CowParity.TWO: 0.3,
+        CowParity.THREE_PLUS: 0.5,
+    }
+    assert AnimalConfig.annual_sale_probability == 0.32
+    assert AnimalConfig.parity_sale_distribution == {
+        CowParity.ONE: 0.2,
+        CowParity.TWO: 0.3,
+        CowParity.THREE_PLUS: 0.5,
+    }
 
     mock_om.add_warning.assert_not_called()
 
@@ -385,8 +401,10 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                 "std_estrus_cycle_after_pgf": 2,
             },
             "culling": {
-                "parity_death_prob": [0.039, 0.056, 0.085, 0.117],
-                "parity_acute_sale_prob": [0.169, 0.233, 0.301, 0.408],
+                "annual_death_prob": 0.05,
+                "parity_death_dist": [0.2, 0.3, 0.5],
+                "annual_sale_prob": 0.32,
+                "parity_sale_dist": [0.2, 0.3, 0.5],
             },
             "life_cycle": {"still_birth_rate": 0.065},
         },

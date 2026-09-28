@@ -596,8 +596,8 @@ class AnimalModuleReporter:
             "is_daily_variable": True,
         }
         om.add_variable(
-            "sold_cow_oversupply_num",
-            herd_statistics.sold_cow_oversupply_num,
+            "sold_cow_low_production_num",
+            herd_statistics.sold_cow_low_production_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
@@ -841,7 +841,7 @@ class AnimalModuleReporter:
         )
         cull_reason_stats_units = {
             animal_constants.DEATH_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.OVERSUPPLY_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.LOW_PRODUCTION_CULL: MeasurementUnits.UNITLESS,
             animal_constants.ACUTE_SALE_CULL: MeasurementUnits.UNITLESS,
         }
         om.add_variable(

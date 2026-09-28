@@ -112,8 +112,10 @@
 				"std_estrus_cycle_after_pgf": 2
 			},
 			"culling": {
-				"parity_death_prob": [0.039,0.056,0.085,0.117],
-				"parity_acute_sale_prob": [0.169, 0.233, 0.301, 0.408]
+				"annual_death_prob": 0.05,
+				"parity_death_dist": [0.2, 0.3, 0.5],
+				"annual_sale_prob": 0.32,
+				"parity_sale_dist": [0.2, 0.3, 0.5]
 			},
 			"life_cycle": {
 				"still_birth_rate": 0.065

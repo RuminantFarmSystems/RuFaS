@@ -1054,6 +1054,64 @@
       ]
     },
     {
+      "description": "Sum of parity death distribution fractions must equal 1.0",
+      "aliases": {
+        "variables": {
+          "parity_death_dist": "animal.animal_config.from_literature.culling.parity_death_dist"
+        },
+        "constants": {
+          "one": 1.0
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "mode": "aggregate",
+              "operands": ["parity_death_dist"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["one"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "Sum of parity sale distribution fractions must equal 1.0",
+      "aliases": {
+        "variables": {
+          "parity_sale_dist": "animal.animal_config.from_literature.culling.parity_sale_dist"
+        },
+        "constants": {
+          "one": 1.0
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "mode": "aggregate",
+              "operands": ["parity_sale_dist"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["one"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
       "description": "The maximum days carried calf cannot be more than gestation length",
       "aliases": {
         "variables": {

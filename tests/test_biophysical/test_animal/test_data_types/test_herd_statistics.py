@@ -41,7 +41,7 @@ def test_reset_daily_stats(herd_statistics: HerdStatistics) -> None:
     # --- event counts ---
     herd_statistics.stillborn_calf_num = 1
     herd_statistics.sold_calf_num = 2
-    herd_statistics.sold_cow_oversupply_num = 3
+    herd_statistics.sold_cow_low_production_num = 3
     herd_statistics.bought_heifer_num = 4
     herd_statistics.sold_heiferII_num = 5
     herd_statistics.cow_herd_exit_num = 6
@@ -131,7 +131,7 @@ def test_reset_daily_stats(herd_statistics: HerdStatistics) -> None:
     # --- event counts ---
     assert herd_statistics.stillborn_calf_num == 0
     assert herd_statistics.sold_calf_num == 0
-    assert herd_statistics.sold_cow_oversupply_num == 0
+    assert herd_statistics.sold_cow_low_production_num == 0
     assert herd_statistics.bought_heifer_num == 0
     assert herd_statistics.sold_heiferII_num == 0
     assert herd_statistics.cow_herd_exit_num == 0

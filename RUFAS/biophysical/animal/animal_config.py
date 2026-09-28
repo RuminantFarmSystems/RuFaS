@@ -1,5 +1,6 @@
 from typing import Any
 
+from RUFAS.biophysical.animal.data_types.animal_enums import CowParity
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     CowReproductionProtocol,
@@ -145,11 +146,14 @@ class AnimalConfig:
         Third pregnancy check day post-breeding, (simulation day).
     third_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the third pregnancy check, (unitless).
-    parity_death_probability : list[float]
-        Annual, parity-indexed probability that a cow dies during a given year, (unitless).
-    parity_acute_sale_probability : list[float]
-        Annual, parity-indexed probability that a cow is sold for an acute / involuntary
-        reason during a given year, (unitless).
+    annual_death_probability : float
+        Annual probability that a cow in the whole cow herd dies during a given year, (unitless).
+    parity_death_distribution : dict[CowParity, float]
+        Fractions of all cow deaths that come from the 1st, 2nd, and 3rd+ parity groups, (unitless).
+    annual_sale_probability : float
+        Annual probability that a cow in the whole cow herd is sold during a given year, (unitless).
+    parity_sale_distribution : dict[CowParity, float]
+        Fractions of all cow sales that come from the 1st, 2nd, and 3rd+ parity groups, (unitless).
     methane_mitigation_method : str
         The mitigation method applied for methane reduction, e.g., "None", (unitless).
     methane_mitigation_additive_amount : float
@@ -240,8 +244,18 @@ class AnimalConfig:
     third_pregnancy_check_day: int = 200
     third_pregnancy_check_loss_rate: float = 0.017
 
-    parity_death_probability: list[float] = [0.039, 0.056, 0.085, 0.117]
-    parity_acute_sale_probability: list[float] = [0.169, 0.233, 0.301, 0.408]
+    annual_death_probability: float = 0.05
+    parity_death_distribution: dict[CowParity, float] = {
+        CowParity.ONE: 0.2,
+        CowParity.TWO: 0.3,
+        CowParity.THREE_PLUS: 0.5,
+    }
+    annual_sale_probability: float = 0.32
+    parity_sale_distribution: dict[CowParity, float] = {
+        CowParity.ONE: 0.2,
+        CowParity.TWO: 0.3,
+        CowParity.THREE_PLUS: 0.5,
+    }
 
     methane_model: dict[str, Any] = {
         "calves": "Pattanaik",
@@ -382,8 +396,15 @@ class AnimalConfig:
         cls.third_pregnancy_check_day = animal_config_data["from_literature"]["repro"]["preg_check_day_3"]
         cls.third_pregnancy_check_loss_rate = animal_config_data["from_literature"]["repro"]["preg_loss_rate_3"]
 
-        cls.parity_death_probability = animal_config_data["from_literature"]["culling"]["parity_death_prob"]
-        cls.parity_acute_sale_probability = animal_config_data["from_literature"]["culling"]["parity_acute_sale_prob"]
+        culling_data = animal_config_data["from_literature"]["culling"]
+        cls.annual_death_probability = culling_data["annual_death_prob"]
+        cls.parity_death_distribution[CowParity.ONE] = culling_data["parity_death_dist"][0]
+        cls.parity_death_distribution[CowParity.TWO] = culling_data["parity_death_dist"][1]
+        cls.parity_death_distribution[CowParity.THREE_PLUS] = culling_data["parity_death_dist"][2]
+        cls.annual_sale_probability = culling_data["annual_sale_prob"]
+        cls.parity_sale_distribution[CowParity.ONE] = culling_data["parity_sale_dist"][0]
+        cls.parity_sale_distribution[CowParity.TWO] = culling_data["parity_sale_dist"][1]
+        cls.parity_sale_distribution[CowParity.THREE_PLUS] = culling_data["parity_sale_dist"][2]
 
         cls.methane_model = animal_data["methane_model"]
         methane_mitigation_data = animal_data["methane_mitigation"]

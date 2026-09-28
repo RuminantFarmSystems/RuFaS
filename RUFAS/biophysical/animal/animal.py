@@ -10,7 +10,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus, CowParity
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -2419,7 +2419,13 @@ class Animal:
             parity=self.calves,
         )
 
-    def assess_removal_risk(self, percent_fresh: float, time: RufasTime) -> None:
+    def assess_removal_risk(
+        self,
+        percent_fresh: float,
+        annual_death_risk_by_parity: dict[CowParity, float],
+        annual_acute_sale_risk_by_parity: dict[CowParity, float],
+        time: RufasTime,
+    ) -> None:
         """
         Roll a cow's daily mortality and acute-sale risk and schedule any resulting removal.
 
@@ -2428,6 +2434,10 @@ class Animal:
         percent_fresh : float
             Fraction of the herd currently fresh, used to scale the daily death and
             acute-sale selection probabilities.
+        annual_death_risk_by_parity : dict[CowParity, float]
+            Annual death risk for each parity group, keyed by :class:`CowParity`, (unitless).
+        annual_acute_sale_risk_by_parity : dict[CowParity, float]
+            Annual acute-sale risk for each parity group, keyed by :class:`CowParity`, (unitless).
         time : RufasTime
             Current simulation time, used to record the day of death or sale.
 
@@ -2436,56 +2446,63 @@ class Animal:
         None
         """
         if self.future_cull_date == sys.maxsize:
-            if self.is_selected_for_acute_sale(percent_fresh):
+            if self.is_selected_for_removal(annual_acute_sale_risk_by_parity[self.parity_index], percent_fresh):
                 self.future_cull_date = self.days_born
                 self.cull_reason = animal_constants.ACUTE_SALE_CULL
                 self.sold_at_day = time.simulation_day
                 return
         if self.future_death_date == sys.maxsize:
-            if self.is_selected_for_death(percent_fresh):
+            if self.is_selected_for_removal(annual_death_risk_by_parity[self.parity_index], percent_fresh):
                 self.future_death_date = self.days_born
                 self.cull_reason = self._future_death_reason = animal_constants.DEATH_CULL
                 self.dead_at_day = time.simulation_day
 
-    def _parity_index(self) -> int:
-        """Return the 0-based index into a by-parity array, capping parity 4+ at the last entry."""
-        return 3 if self.calves >= 4 else self.calves - 1
-
-    def is_selected_for_death(self, percent_fresh: float) -> bool:
+    @property
+    def parity_index(self) -> CowParity:
         """
-        Roll the cow's daily mortality risk.
+        The parity group of the animal.
+
+        Returns
+        -------
+        CowParity
+            ``CowParity.ONE`` or ``CowParity.TWO`` for cows in their 1st or 2nd lactation,
+            ``CowParity.THREE_PLUS`` for cows in any later lactation, and ``CowParity.NONE`` for
+            animals that are not cows.
+        """
+        if self.animal_type.is_cow:
+            if self.calves == 1:
+                return CowParity.ONE
+            elif self.calves == 2:
+                return CowParity.TWO
+            else:
+                return CowParity.THREE_PLUS
+        return CowParity.NONE
+
+    def is_selected_for_removal(self, annual_risk: float, percent_fresh: float) -> bool:
+        """
+        Roll the cow's daily removal (death or acute-sale) risk.
+
+        Parameters
+        ----------
+        annual_risk : float
+            Annual removal risk for the cow's parity group, (unitless).
+        percent_fresh : float
+            Fraction of the herd currently fresh, used to scale the daily risk so that fresh
+            cows carry a higher risk than the rest of the herd.
 
         Returns
         -------
         bool
-            ``True`` if the cow is selected to die, ``False`` otherwise.
+            ``True`` if the cow is selected for removal, ``False`` otherwise.
         """
-        average_daily_death_rate = AnimalConfig.parity_death_probability[self._parity_index()] / 365
+        average_daily_risk = annual_risk / 365
         percent_other = 1 - percent_fresh
 
-        daily_death_risk_other = average_daily_death_rate / (2.55 * percent_fresh + percent_other)
-        daily_death_risk_fresh = 2.55 * daily_death_risk_other
+        daily_risk_other = average_daily_risk / (2.55 * percent_fresh + percent_other)
+        daily_risk_fresh = 2.55 * daily_risk_other
 
-        daily_death_risk = daily_death_risk_fresh if self.days_in_milk < 50 else daily_death_risk_other
-        return random() <= daily_death_risk
-
-    def is_selected_for_acute_sale(self, percent_fresh: float) -> bool:
-        """
-        Roll the cow's daily acute-sale (forced / involuntary) risk.
-
-        Returns
-        -------
-        bool
-            ``True`` if the cow is selected for an acute sale, ``False`` otherwise.
-        """
-        average_daily_removal_rate = AnimalConfig.parity_acute_sale_probability[self._parity_index()] / 365
-        percent_other = 1 - percent_fresh
-
-        daily_removal_risk_other = average_daily_removal_rate / (2.55 * percent_fresh + percent_other)
-        daily_removal_risk_fresh = 2.55 * daily_removal_risk_other
-
-        daily_removal_risk = daily_removal_risk_fresh if self.days_in_milk < 50 else daily_removal_risk_other
-        return random() <= daily_removal_risk
+        daily_risk = daily_risk_fresh if self.days_in_milk < 50 else daily_risk_other
+        return random() <= daily_risk
 
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """

@@ -801,7 +801,7 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
     hs = HerdStatistics()
 
     # Set distinct non-zero values so each assertion catches a wrong-field mapping.
-    hs.sold_cow_oversupply_num = 1
+    hs.sold_cow_low_production_num = 1
     hs.bought_heifer_num = 2
     hs.sold_heiferII_num = 3
     hs.cow_herd_exit_num = 4
@@ -859,7 +859,7 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
 
     # --- event counts ---
-    assert reported["sold_cow_oversupply_num"] == 1
+    assert reported["sold_cow_low_production_num"] == 1
     assert reported["bought_heifer_num"] == 2
     assert reported["sold_heiferII_num"] == 3
     assert reported["cow_herd_exit_num"] == 4

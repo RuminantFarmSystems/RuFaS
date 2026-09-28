@@ -175,13 +175,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 0,
-                animal_constants.OVERSUPPLY_CULL: 0,
+                animal_constants.LOW_PRODUCTION_CULL: 0,
                 animal_constants.ACUTE_SALE_CULL: 0,
             },
             0,
             {
                 animal_constants.DEATH_CULL: 0.0,
-                animal_constants.OVERSUPPLY_CULL: 0.0,
+                animal_constants.LOW_PRODUCTION_CULL: 0.0,
                 animal_constants.ACUTE_SALE_CULL: 0.0,
             },
         ),
@@ -189,13 +189,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 5,
-                animal_constants.OVERSUPPLY_CULL: 0,
+                animal_constants.LOW_PRODUCTION_CULL: 0,
                 animal_constants.ACUTE_SALE_CULL: 0,
             },
             5,
             {
                 animal_constants.DEATH_CULL: 100.0,
-                animal_constants.OVERSUPPLY_CULL: 0.0,
+                animal_constants.LOW_PRODUCTION_CULL: 0.0,
                 animal_constants.ACUTE_SALE_CULL: 0.0,
             },
         ),
@@ -204,13 +204,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 5,
-                animal_constants.OVERSUPPLY_CULL: 5,
+                animal_constants.LOW_PRODUCTION_CULL: 5,
                 animal_constants.ACUTE_SALE_CULL: 0,
             },
             10,
             {
                 animal_constants.DEATH_CULL: 50.0,
-                animal_constants.OVERSUPPLY_CULL: 50.0,
+                animal_constants.LOW_PRODUCTION_CULL: 50.0,
                 animal_constants.ACUTE_SALE_CULL: 0.0,
             },
         ),
@@ -219,13 +219,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 3,
-                animal_constants.OVERSUPPLY_CULL: 2,
+                animal_constants.LOW_PRODUCTION_CULL: 2,
                 animal_constants.ACUTE_SALE_CULL: 0,
             },
             10,
             {
                 animal_constants.DEATH_CULL: 30.0,
-                animal_constants.OVERSUPPLY_CULL: 20.0,
+                animal_constants.LOW_PRODUCTION_CULL: 20.0,
                 animal_constants.ACUTE_SALE_CULL: 0.0,
             },
         ),
@@ -235,13 +235,13 @@ def test_calculate_cow_percentages(herd_manager: HerdManager, mock_herd: dict[st
         (
             {
                 animal_constants.DEATH_CULL: 2,
-                animal_constants.OVERSUPPLY_CULL: 0,
+                animal_constants.LOW_PRODUCTION_CULL: 0,
                 animal_constants.ACUTE_SALE_CULL: 8,
             },
             10,
             {
                 animal_constants.DEATH_CULL: 20.0,
-                animal_constants.OVERSUPPLY_CULL: 0.0,
+                animal_constants.LOW_PRODUCTION_CULL: 0.0,
                 animal_constants.ACUTE_SALE_CULL: 80.0,
             },
         ),
@@ -489,7 +489,7 @@ def test_update_sold_and_died_cow_statistics(
 ) -> None:
     """Unit test for _update_sold_and_died_cow_statistics()"""
     cull_reasons = [
-        animal_constants.OVERSUPPLY_CULL,
+        animal_constants.LOW_PRODUCTION_CULL,
         animal_constants.ACUTE_SALE_CULL,
     ]
 
@@ -556,15 +556,15 @@ def test_update_sold_and_died_cow_statistics(
 
     current_cull_reason_stats = {
         animal_constants.DEATH_CULL: randint(0, num_total_sold_and_died_cows),
-        animal_constants.OVERSUPPLY_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.LOW_PRODUCTION_CULL: randint(0, num_total_sold_and_died_cows),
         animal_constants.ACUTE_SALE_CULL: randint(0, num_total_sold_and_died_cows),
     }
     herd_manager.herd_statistics.cull_reason_stats = current_cull_reason_stats
     expected_cull_reason_stats = {
         animal_constants.DEATH_CULL: current_cull_reason_stats[animal_constants.DEATH_CULL]
         + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DEATH_CULL]),
-        animal_constants.OVERSUPPLY_CULL: current_cull_reason_stats[animal_constants.OVERSUPPLY_CULL]
-        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.OVERSUPPLY_CULL]),
+        animal_constants.LOW_PRODUCTION_CULL: current_cull_reason_stats[animal_constants.LOW_PRODUCTION_CULL]
+        + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL]),
         animal_constants.ACUTE_SALE_CULL: current_cull_reason_stats[animal_constants.ACUTE_SALE_CULL]
         + len([cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.ACUTE_SALE_CULL]),
     }
