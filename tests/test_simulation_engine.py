@@ -112,6 +112,7 @@ def test_get_simulation_type_invalid() -> None:
 def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     mocker.patch("RUFAS.simulation_engine.RufasTime")
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._setup_simulation_modules")
+    mocker.patch.object(InputManager, "get_data", return_value=0)
     mock_simulation_type = SimulationType("full_farm")
 
     simulation_engine = SimulationEngine(mock_simulation_type)
@@ -123,6 +124,50 @@ def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     simulation_engine.emissions_estimator = MagicMock(auto_spec=EmissionsEstimator)
 
     return simulation_engine
+
+
+@pytest.mark.parametrize("warmup_days", [0, 2])
+def test_warmup_days_input(warmup_days: int, mocker: MockerFixture) -> None:
+    mocker.patch.object(InputManager, "get_data", return_value=warmup_days)
+    mocker.patch("RUFAS.simulation_engine.RufasTime", return_value=MagicMock(simulation_length_days=3))
+    mocker.patch.object(SimulationEngine, "_setup_simulation_modules")
+
+    engine = SimulationEngine(SimulationType.FIELD_ONLY)
+
+    assert engine.warmup_days == warmup_days
+
+
+@pytest.mark.parametrize("simulation_type", list(SimulationType))
+@pytest.mark.parametrize("warmup_days", [0, 1, 2, 366, 367, 368])
+def test_warmup_and_evaluation_across_year_boundaries(
+    simulation_type: SimulationType, warmup_days: int, mocker: MockerFixture
+) -> None:
+    mocker.patch.object(InputManager, "get_data", return_value=warmup_days)
+    time = RufasTime(datetime(2023, 12, 31), datetime(2025, 1, 2))
+    mocker.patch("RUFAS.simulation_engine.RufasTime", return_value=time)
+    mocker.patch.object(SimulationEngine, "_setup_simulation_modules")
+    engine = SimulationEngine(simulation_type)
+    annual_dates = []
+    mocker.patch.object(engine, "_run_post_annual_routines", side_effect=lambda: annual_dates.append(time.current_date))
+    retained_days = [-1]
+    all_days = []
+    clear = mocker.patch.object(engine.om, "clear_variables_pool", side_effect=retained_days.clear)
+
+    def simulate_day() -> None:
+        retained_days.append(time.simulation_day)
+        all_days.append(time.simulation_day)
+        time.advance()
+
+    engine._simulation_type_to_daily_simulation_function[simulation_type] = simulate_day
+    engine._run_simulation_main_loop()
+
+    assert all_days == list(range(time.simulation_length_days))
+    assert retained_days == (
+        [-1] + all_days if warmup_days == 0 else list(range(warmup_days, time.simulation_length_days))
+    )
+    assert clear.call_count == (0 if warmup_days == 0 else 1)
+    assert annual_dates == [datetime(2024, 1, 1), datetime(2025, 1, 1), datetime(2025, 1, 3)]
+    assert time.current_date == datetime(2025, 1, 3)
 
 
 def test_simulation_engine_init(mocker: MockerFixture) -> None:
@@ -1418,7 +1463,7 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     "year_start_day, year_end_day, expected_day_count",
     [
-        (0, 0, 1),
+        (1, 1, 1),
         (2, 3, 2),
         (362, 365, 4),
     ],
@@ -1431,13 +1476,14 @@ def test_annual_simulation(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _annual_simulation in simulation_engine.py
+    Annual routines run once after all the days in a full or partial year.
     """
     # Arrange
     mock_daily_simulation = mocker.MagicMock(name="daily_simulation")
     mock_run_post_annual_routines = mocker.patch.object(simulation_engine, "_run_post_annual_routines")
 
     simulation_engine.time = (mock_time := MagicMock(autospec=RufasTime))
+    mock_time.simulation_day = 0
     mock_time.year_start_day = year_start_day
     mock_time.year_end_day = year_end_day
 
@@ -1450,7 +1496,6 @@ def test_annual_simulation(
     simulation_engine._annual_simulation()
 
     # Assert
-    assert mock_daily_simulation.call_count == expected_day_count
     assert mock_daily_simulation.call_args_list == [call()] * expected_day_count
     mock_run_post_annual_routines.assert_called_once_with()
 
@@ -1529,14 +1574,17 @@ def test_run_simulation_main_loop(
     # Arrange
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     mock_time.simulation_length_years = expected_iterations
+    simulation_engine.warmup_days = 0
 
     mock_annual_simulation = mocker.patch.object(simulation_engine, "_annual_simulation")
+    mock_clear_pool = mocker.patch.object(simulation_engine.om, "clear_variables_pool")
 
     # Act
     simulation_engine._run_simulation_main_loop()
 
     # Assert
     assert mock_annual_simulation.call_count == expected_iterations
+    mock_clear_pool.assert_not_called()
 
 
 def test_gather_field_data_with_fields(mocker: MockerFixture) -> None:
