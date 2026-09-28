@@ -1704,6 +1704,7 @@ def test_expand_sensitivity_analysis_args(
             "output_prefix": "Task 4",
             "log_verbosity": "errors",
             "sampler": "invalid_sampler",
+            "random_seeds": [42],
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
             "SA_input_variables": [
@@ -1732,6 +1733,7 @@ def test_expand_sensitivity_analysis_args(
             "output_prefix": "Task 5",
             "log_verbosity": "warning",
             "sampler": "random_sampler",
+            "random_seeds": [42],
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
             "SA_input_variables": [
