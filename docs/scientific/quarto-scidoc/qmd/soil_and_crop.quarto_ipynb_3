@@ -8,7 +8,7 @@
         "# Soil and Crop Module\n",
         "<!-- reuse code to import functions from \"../scripts/\": -->"
       ],
-      "id": "90c89525"
+      "id": "f014df6d"
     },
     {
       "cell_type": "code",
@@ -18,7 +18,7 @@
         "sys.path.append(\"../scripts\")\n",
         "from markdown_tables import import_table, display_md_tbl, read_tbl"
       ],
-      "id": "5ffc83e5",
+      "id": "6110a7cc",
       "execution_count": null,
       "outputs": []
     },
@@ -85,7 +85,7 @@
         "\n",
         "### Required User Inputs"
       ],
-      "id": "f970f0cc"
+      "id": "80b6bb29"
     },
     {
       "cell_type": "code",
@@ -569,7 +569,7 @@
         "\n",
         "### Required User Inputs"
       ],
-      "id": "f7b1e450"
+      "id": "a2d204a2"
     },
     {
       "cell_type": "code",
@@ -4460,7 +4460,7 @@
         "\n",
         "## References"
       ],
-      "id": "1bec5e32"
+      "id": "7d1d87a5"
     }
   ],
   "metadata": {

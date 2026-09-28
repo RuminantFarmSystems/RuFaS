@@ -8,7 +8,7 @@
         "# Manure Module\n",
         "<!-- reuse code to import functions from \"../scripts/\": -->"
       ],
-      "id": "9adb9fd4"
+      "id": "d30885a5"
     },
     {
       "cell_type": "code",
@@ -18,7 +18,7 @@
         "sys.path.append(\"../scripts\")\n",
         "from markdown_tables import import_table, display_md_tbl, read_tbl"
       ],
-      "id": "5529b3ab",
+      "id": "566bcc59",
       "execution_count": null,
       "outputs": []
     },
@@ -36,7 +36,7 @@
         "\n",
         "Processors in the Manure Module fall into four basic classes, with multiple types available within each class. The processor classes are intended to represent the common, primary steps in manure management. They include manure handling (which refers to the daily activities of cleaning and removing manure from facilities or managing it in place), storage, and manure treatment, such as anaerobic digestion or mechanical solid liquid separation. "
       ],
-      "id": "95b3595a"
+      "id": "53d9da0b"
     },
     {
       "cell_type": "code",
@@ -130,7 +130,7 @@
         "\n",
         "**Classes**"
       ],
-      "id": "a71646cd"
+      "id": "2b364079"
     },
     {
       "cell_type": "code",
@@ -153,7 +153,7 @@
       "source": [
         "#### Required User Inputs"
       ],
-      "id": "7bc92de5"
+      "id": "c3afad5d"
     },
     {
       "cell_type": "code",
@@ -314,7 +314,7 @@
         "* `num_stalls` = the number of stalls in the pen assigned to the handler\n",
         "* `surface_area` (m^2/animal) = surface area per stall, provided in @tbl-mn-hdl-surface-area."
       ],
-      "id": "912b34ab"
+      "id": "c8a8fe5f"
     },
     {
       "cell_type": "code",
@@ -502,7 +502,7 @@
         "\n",
         "Equations in the table below are in the format of \"Output/exiting value\" = \"Entering processor value\" +/- XYZ. \"Entering\" refers to the manure entering the processor (i.e., being loaded into the digester) and output variables reflect the manure leaving the processor (i.e., digestate leaving the digester). The Calculation column describes how the variable is updated in the processor."
       ],
-      "id": "1e4def04"
+      "id": "3907dbe3"
     },
     {
       "cell_type": "code",
@@ -547,7 +547,7 @@
         "\n",
         "**Classes**"
       ],
-      "id": "7ef0deaf"
+      "id": "e025adff"
     },
     {
       "cell_type": "code",
@@ -570,7 +570,7 @@
       "source": [
         "### Required User Inputs"
       ],
-      "id": "f4363023"
+      "id": "14c2778c"
     },
     {
       "cell_type": "code",
@@ -643,7 +643,7 @@
         "\n",
         "Nutrients that are separated according to this pattern are presented in the table below. The default separation efficiencies, as well as minimum and maximum allowable separation efficiencies, for the rotary screen and screw press separators are also provided [@Hegg1981; @Mukhtar1999; @Varma2021]. Note that separate removal efficiencies for manure degradable and non-degradable VS or bedding non-degradable VS are not specifiable at this time; all VS fractions are assumed to be removed at the rate of total VS removal. "
       ],
-      "id": "1ec06521"
+      "id": "af77a564"
     },
     {
       "cell_type": "code",
@@ -749,7 +749,7 @@
         "\n",
         "Equations in the table below are in the format of “Output/exiting value” = “Entering processor value” +/- XYZ. “Entering” refers to the manure entering the processor (i.e., being loaded into the digester) and output variables reflect the manure leaving the processor (i.e., digestate leaving the digester). The Calculation column describes how the variable is updated in the processor."
       ],
-      "id": "3c15b8c7"
+      "id": "ccc9a7b4"
     },
     {
       "cell_type": "code",
@@ -798,7 +798,7 @@
         "\n",
         "**Classes**"
       ],
-      "id": "c2b54bce"
+      "id": "e48d873c"
     },
     {
       "cell_type": "code",
@@ -821,7 +821,7 @@
       "source": [
         "### Required User Inputs"
       ],
-      "id": "f4404f7f"
+      "id": "5930f26b"
     },
     {
       "cell_type": "code",
@@ -1077,7 +1077,7 @@
         "\n",
         "Equations in the table below are in the format of “Output/exiting value” = “Entering processor value” +/- XYZ. “Entering” refers to the manure entering the processor (i.e., being loaded into the digester) and output variables reflect the manure leaving the processor (i.e., digestate leaving the digester). The Calculation column describes how the variable is updated in the processor."
       ],
-      "id": "78c90f85"
+      "id": "2133ef74"
     },
     {
       "cell_type": "code",
@@ -1110,7 +1110,7 @@
         "\n",
         "There are two options for slurry storage in RuFaS, slurry storage outdoor and slurry storage underfloor, which function almost identically. The key differences between the two methods are presented in @tbl-mn-ss-options. Because the two methods are highly similar, both are covered in this document."
       ],
-      "id": "78cbb6dd"
+      "id": "d842f62e"
     },
     {
       "cell_type": "code",
@@ -1137,7 +1137,7 @@
         "\n",
         "Note that both slurry storage methods inherit some behavior from the base class, Storage. Because the two methods are highly similar, the content below is representative of both types of slurry storage, with specific differences between the two noted explicitly (@tbl-mn-ss-options)."
       ],
-      "id": "40b9473e"
+      "id": "754f535f"
     },
     {
       "cell_type": "code",
@@ -1160,7 +1160,7 @@
       "source": [
         "### Required User Inputs"
       ],
-      "id": "3a1ef660"
+      "id": "8ed9986c"
     },
     {
       "cell_type": "code",
@@ -1469,7 +1469,7 @@
         "\n",
         "Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. "
       ],
-      "id": "6955dc0f"
+      "id": "5565346b"
     },
     {
       "cell_type": "code",
@@ -1508,7 +1508,7 @@
         "\n",
         "**Classes**"
       ],
-      "id": "3555bc62"
+      "id": "983dd7a9"
     },
     {
       "cell_type": "code",
@@ -1531,7 +1531,7 @@
       "source": [
         "### Required User Inputs"
       ],
-      "id": "63e74d28"
+      "id": "2e621cb2"
     },
     {
       "cell_type": "code",
@@ -1871,7 +1871,7 @@
         "\n",
         "Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. "
       ],
-      "id": "ce5646d6"
+      "id": "086680e9"
     },
     {
       "cell_type": "code",
@@ -1914,7 +1914,7 @@
         "\n",
         "**Classes**"
       ],
-      "id": "dfa6a724"
+      "id": "fee6b01f"
     },
     {
       "cell_type": "code",
@@ -1937,7 +1937,7 @@
       "source": [
         "### Required User Inputs"
       ],
-      "id": "ed2ab9d0"
+      "id": "a7cf70d6"
     },
     {
       "cell_type": "code",
@@ -1997,7 +1997,7 @@
         "The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded\n",
         ":::"
       ],
-      "id": "6fa784c0"
+      "id": "d999a92f"
     },
     {
       "cell_type": "code",
@@ -2275,7 +2275,7 @@
         "\n",
         "Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. "
       ],
-      "id": "b99b10a6"
+      "id": "c1d243e4"
     },
     {
       "cell_type": "code",
@@ -2317,7 +2317,7 @@
         "\n",
         "**Classes**"
       ],
-      "id": "f25e6385"
+      "id": "bd7e8907"
     },
     {
       "cell_type": "code",
@@ -2340,7 +2340,7 @@
       "source": [
         "### Required User Inputs"
       ],
-      "id": "205fdba9"
+      "id": "4b641e97"
     },
     {
       "cell_type": "code",
@@ -2650,7 +2650,7 @@
         "\n",
         "Equations in the table below (See [Table](#tbl-mn-ol-calc), calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. "
       ],
-      "id": "8b470cca"
+      "id": "68eac738"
     },
     {
       "cell_type": "code",
@@ -2701,7 +2701,7 @@
         "\n",
         "**Classes**"
       ],
-      "id": "50512d46"
+      "id": "58d1a583"
     },
     {
       "cell_type": "code",
@@ -2724,7 +2724,7 @@
       "source": [
         "### Required User Inputs"
       ],
-      "id": "8d41965e"
+      "id": "b431a004"
     },
     {
       "cell_type": "code",
@@ -2783,7 +2783,7 @@
         "The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded.\n",
         "::: "
       ],
-      "id": "c8e0d055"
+      "id": "05cbd65d"
     },
     {
       "cell_type": "code",
@@ -2958,7 +2958,7 @@
         "\n",
         "Manure nitrogen being added to and accumulating in the compost results in NH<sub>3</sub> emissions. Here we utilize daily manure N addition to compost and an emission factor based on composting method @Hanson2024 to estimate total kg of NH<sub>3</sub>-N loss."
       ],
-      "id": "b5bab9f6"
+      "id": "4e59a078"
     },
     {
       "cell_type": "code",
@@ -2993,7 +2993,7 @@
         "\n",
         "In addition to NH<sub>3</sub>-N emissions, nitrogen added to and accumulating in the compost also results in  N$_2$O emissions. Similar to NH<sub>3</sub>, here we utilize daily manure N addition to compost and an emission factor based on composting method @Hanson2024 to estimate total kg of  N$_2$O-N loss."
       ],
-      "id": "107a583d"
+      "id": "603f6a3a"
     },
     {
       "cell_type": "code",
@@ -3028,7 +3028,7 @@
         "\n",
         "Nitrogen in compost may also be lost to leaching. Leaching of compost N may occur when fecal and urinary N are converted to nitrate in the soil beneath the compost, if the compost is not contained in a vessel. Nitrate can then be carried away via water movement through the subsoil. Similar to NH<sub>3</sub> and N<sub>2</sub>O, we use daily manure N addition to compost and an emission factor based on composting method @Hanson2024 to estimate total kg of leaching N loss."
       ],
-      "id": "1be8a2a9"
+      "id": "cf2a1c48"
     },
     {
       "cell_type": "code",
@@ -3096,7 +3096,7 @@
         "\n",
         "Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. "
       ],
-      "id": "21a31548"
+      "id": "51310469"
     },
     {
       "cell_type": "code",
@@ -3140,7 +3140,7 @@
         "\n",
         "**Classes**"
       ],
-      "id": "84b6c889"
+      "id": "abc738fa"
     },
     {
       "cell_type": "code",
@@ -3163,7 +3163,7 @@
       "source": [
         "### Required User Inputs"
       ],
-      "id": "c4735ddb"
+      "id": "47dfdaa5"
     },
     {
       "cell_type": "code",
@@ -3209,7 +3209,7 @@
         "\n",
         "## Key constants"
       ],
-      "id": "186d19ea"
+      "id": "3db0b338"
     },
     {
       "cell_type": "code",
@@ -3232,7 +3232,7 @@
       "source": [
         "## References"
       ],
-      "id": "77e66492"
+      "id": "9432fafa"
     }
   ],
   "metadata": {

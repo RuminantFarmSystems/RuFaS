@@ -7,7 +7,7 @@
         "# Highlighted Updates\n",
         "<!-- reuse code to import functions from \"../scripts/\": -->"
       ],
-      "id": "b2373bf2"
+      "id": "087867b2"
     },
     {
       "cell_type": "code",
@@ -17,7 +17,7 @@
         "sys.path.append(\"../scripts\")\n",
         "from markdown_tables import import_table, display_md_tbl, read_tbl"
       ],
-      "id": "ab6e516e",
+      "id": "3734eec7",
       "execution_count": null,
       "outputs": []
     },
@@ -98,7 +98,7 @@
         "### Output Updates\n",
         "Expectations\n"
       ],
-      "id": "c59e2f5f"
+      "id": "1f4cf678"
     }
   ],
   "metadata": {

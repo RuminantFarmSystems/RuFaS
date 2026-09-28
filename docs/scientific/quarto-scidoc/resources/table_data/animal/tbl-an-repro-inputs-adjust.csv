@@ -1,4 +1,4 @@
 ﻿Variable,Definition (units),Default Value,Min,Max
-conception_rate_decrease,Conception Rate Decrease (percent) -- The percent decrease in conception rate of each breeding after the first breeding,0.026,0,0.1
-decrease_conception_rate_in_rebreeding,Decrease Conception Rate in Rebreeding -- whether or not to decrease the conception rate in rebreeding (default is false),FALSE,--,--
-decrease_conception_rate_by_parity,Decrease Conception Rate by Parity -- whether or not to decrease the conception rate by parity (default is false),FALSE,--,--
+conception_rate_decrease,The proportionate decrease in conception rate of each breeding after the first breeding (%),0.026,0,0.1
+decrease_conception_rate_in_rebreeding,Whether or not to decrease the conception rate in rebreeding,FALSE,--,--
+decrease_conception_rate_by_parity,Whether or not to decrease the conception rate by parity,FALSE,--,--

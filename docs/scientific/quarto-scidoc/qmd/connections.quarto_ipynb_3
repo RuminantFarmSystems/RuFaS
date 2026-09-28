@@ -8,7 +8,7 @@
         "\n",
         "<!-- reuse code to import functions from \"../scripts/\": -->"
       ],
-      "id": "8354ef60"
+      "id": "20255b31"
     },
     {
       "cell_type": "code",
@@ -18,7 +18,7 @@
         "sys.path.append(\"../scripts\")\n",
         "from markdown_tables import import_table, display_md_tbl, read_tbl"
       ],
-      "id": "e74314b4",
+      "id": "f53a7af8",
       "execution_count": null,
       "outputs": []
     },
@@ -46,7 +46,7 @@
         "\n",
         "#### Classes"
       ],
-      "id": "13cf5fed"
+      "id": "3e210402"
     },
     {
       "cell_type": "code",
@@ -70,7 +70,7 @@
       "source": [
         "#### Required User Inputs"
       ],
-      "id": "cd7a0e95"
+      "id": "ac8bc2b1"
     },
     {
       "cell_type": "code",
@@ -259,7 +259,7 @@
         "\n",
         "Recommended `minutes_away_for_milking` values for lactating cows are based on cow time budgets from published literature and are not official model defaults. The purpose of these time budgets at the time of writing is strictly related to estimating manure deposition in specific locations and is not related to larger Animal module activities. The use of time budgets for this purpose relies on the assumption that cows excrete urine and feces at a constant rate throughout the day and across various locations."
       ],
-      "id": "27c8ac08"
+      "id": "aaef4580"
     },
     {
       "cell_type": "code",
@@ -291,7 +291,7 @@
         "\n",
         "The following streams and proportions are based on literature data and are not official model defaults. They are provided for user informational purposes; they may be used as a starting point to adjust proportions specific to a farm, or can be used for theoretical modeling scenarios."
       ],
-      "id": "40a3908c"
+      "id": "2f7646c9"
     },
     {
       "cell_type": "code",
@@ -401,7 +401,7 @@
         "\n",
         "#### Update ManureStream values to reflect bedding"
       ],
-      "id": "0e743255"
+      "id": "bd5c12d9"
     },
     {
       "cell_type": "code",
@@ -521,7 +521,7 @@
         "\n",
         "## References"
       ],
-      "id": "75a82171"
+      "id": "706499ce"
     }
   ],
   "metadata": {

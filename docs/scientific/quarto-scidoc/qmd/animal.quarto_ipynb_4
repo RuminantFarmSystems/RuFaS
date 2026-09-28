@@ -8,7 +8,7 @@
         "# Animal Module\n",
         "<!-- reuse code to import functions from \"../scripts/\": -->"
       ],
-      "id": "dbed54c1"
+      "id": "f9b43a25"
     },
     {
       "cell_type": "code",
@@ -18,7 +18,7 @@
         "sys.path.append(\"../scripts\")\n",
         "from markdown_tables import import_table, display_md_tbl, read_tbl"
       ],
-      "id": "b60ced8c",
+      "id": "890abe43",
       "execution_count": null,
       "outputs": []
     },
@@ -83,7 +83,7 @@
         "\n",
         "For the rest of the simulation, animals enter the herd through birth as newborn calves or purchased replacements (`heiferIII`’s). \n"
       ],
-      "id": "09eb7968"
+      "id": "04821ec4"
     },
     {
       "cell_type": "code",
@@ -107,7 +107,7 @@
       "source": [
         "#### Required User Inputs"
       ],
-      "id": "c1d6f502"
+      "id": "918edbcd"
     },
     {
       "cell_type": "code",
@@ -185,7 +185,7 @@
         "\n",
         "#### Required User Inputs"
       ],
-      "id": "aad032aa"
+      "id": "f07631a8"
     },
     {
       "cell_type": "code",
@@ -222,7 +222,7 @@
         "\n",
         "To translate from the `AnimalTypes` needed to track an animal’s life stages and the combinations of animals that are allowed to be grouped into a single pen, a new variable called `AnimalCombination` is created that combines some `AnimalTypes` to facilitate sorting into pens. The `AnimalCombination` class is defined in `enums.py` and includes the following mapping from `AnimalTypes` to `AnimalCombinations`:"
       ],
-      "id": "2ef38eac"
+      "id": "87bba2ad"
     },
     {
       "cell_type": "code",
@@ -687,7 +687,7 @@
         "$$\n",
         ":::"
       ],
-      "id": "3d7fe82d"
+      "id": "183714a4"
     },
     {
       "cell_type": "code",
@@ -849,7 +849,7 @@
         "$$\n",
         ":::"
       ],
-      "id": "337388ae"
+      "id": "3a6f652d"
     },
     {
       "cell_type": "code",
@@ -923,7 +923,7 @@
         "$$\n",
         ":::"
       ],
-      "id": "35f1ed0c"
+      "id": "69611703"
     },
     {
       "cell_type": "code",
@@ -1322,7 +1322,7 @@
         "$$\n",
         ":::"
       ],
-      "id": "37eade19"
+      "id": "deba4731"
     },
     {
       "cell_type": "code",
@@ -1463,7 +1463,7 @@
         "$$\n",
         ":::"
       ],
-      "id": "8a9324ca"
+      "id": "649e640c"
     },
     {
       "cell_type": "code",
@@ -1516,7 +1516,7 @@
         "$$\n",
         ":::"
       ],
-      "id": "8f4d35d2"
+      "id": "c0278118"
     },
     {
       "cell_type": "code",
@@ -1545,7 +1545,7 @@
         "* This section will focus on calculating the requirements for the essential amino acids. The EAA and NEAA are listed in the next table.\n",
         "* Find the equations in RuFaS in `amino_acid.py`"
       ],
-      "id": "864c2c2c"
+      "id": "9017e7bd"
     },
     {
       "cell_type": "code",
@@ -1636,7 +1636,7 @@
         "If there are any questions regarding calculations regarding calculations of maintenance AA requirements for Lactating Cows and/or Total AA requirement of Lactating or Late Gestation Cows and Heifers, please refer to Tables 6-2 and 6-4 in @nrc_2021.\n",
         ":::"
       ],
-      "id": "fd8f83fe"
+      "id": "ce8bb035"
     },
     {
       "cell_type": "code",
@@ -1669,7 +1669,7 @@
         "lactation and pregnancy, and NEg provides energy for growth. Feed actual energy contents are corrected from standard values provided by @nrc_2001. \n",
         "Minerals do not provide any energy."
       ],
-      "id": "4016066b"
+      "id": "3dc6314d"
     },
     {
       "cell_type": "code",
@@ -1808,7 +1808,7 @@
         "    \n",
         "Parameter definitions and units are provided in @tbl-an-energy-nasem. "
       ],
-      "id": "e1c6f4cf"
+      "id": "a7693cb2"
     },
     {
       "cell_type": "code",
@@ -2030,7 +2030,7 @@
         "\n",
         "##### Required User Inputs"
       ],
-      "id": "b86daee0"
+      "id": "4221f30b"
     },
     {
       "cell_type": "code",
@@ -2136,7 +2136,7 @@
         "\n",
         "The generalized equation for sequential quadratic programming is as follows and gi(x) is constraint i, which must be twice continuously differentiable with respect to all xj in x (@Li_2022)."
       ],
-      "id": "043d4620"
+      "id": "7f97c3a2"
     },
     {
       "cell_type": "code",
@@ -2166,7 +2166,7 @@
         "\n",
         "##### Required User Inputs"
       ],
-      "id": "3945d96c"
+      "id": "1a5be485"
     },
     {
       "cell_type": "code",
@@ -2373,7 +2373,7 @@
         "\n",
         "#### Required User Inputs"
       ],
-      "id": "bfb9c55c"
+      "id": "f8d87b0f"
     },
     {
       "cell_type": "code",
@@ -2590,7 +2590,7 @@
         "\n",
         "Where P1 and P2 are parameters with distinct values for primiparous and multiparous cows:"
       ],
-      "id": "aac0b069"
+      "id": "c067ae76"
     },
     {
       "cell_type": "code",
@@ -2657,20 +2657,20 @@
         "\n",
         "#### Required User Inputs"
       ],
-      "id": "167ce3c8"
+      "id": "8d1737ee"
     },
     {
       "cell_type": "code",
       "metadata": {},
       "source": [
-        "#| label: tbl-an-repro_inputs-heifer-mgmt\n",
-        "#| tbl-cap: User inputs in `management_decisions` that determine the [heifer]{.underline} reproductive breeding program and impact reproductive efficiency and age at first calving.\n",
+        "#| label: tbl-an-repro_inputs-mgmt\n",
+        "#| tbl-cap: User inputs in `management_decisions` that determine the reproductive breeding program of animal groups and impact reproductive efficiency. In the case of heifer groups, this includes age at first calving.\n",
         "import_table(\n",
-        "  \"../resources/table_data/animal/tbl-an-repro-inputs-heifer-mgmt.csv\",\n",
-        "  colalign = [\"left\", \"left\", \"center\", \"center\", \"center\"]\n",
+        "  \"../resources/table_data/animal/tbl-an-repro-inputs-mgmt.csv\",\n",
+        "  colalign = [\"left\", \"left\", \"left\", \"center\", \"center\", \"center\"]\n",
         ")"
       ],
-      "id": "tbl-an-repro_inputs-heifer-mgmt",
+      "id": "tbl-an-repro_inputs-mgmt",
       "execution_count": null,
       "outputs": []
     },
@@ -2679,7 +2679,7 @@
       "metadata": {},
       "source": [
         "#| label: tbl-an-repro_inputs-heifer-farm\n",
-        "#| tbl-cap: User inputs in `farm_level_heifers` that determine the [heifer]{.underline} reproductive breeding program and impact reproductive efficiency and age at first calving.\n",
+        "#| tbl-cap: User inputs in `farm_level_heifers` (`farm_level.repro.heifers`) that determine the [heifer]{.underline} reproductive breeding program and impact reproductive efficiency and age at first calving.\n",
         "import_table(\n",
         "  \"../resources/table_data/animal/tbl-an-repro-inputs-heifer-farm.csv\",\n",
         "  colalign = [\"left\", \"left\", \"center\", \"center\", \"center\"]\n",
@@ -2693,23 +2693,8 @@
       "cell_type": "code",
       "metadata": {},
       "source": [
-        "#| label: tbl-an-repro_inputs-cow-mgmt\n",
-        "#| tbl-cap: User inputs in `management_decisions` that determine reproductive efficiency of [cows]{.underline} and influence culling, calving interval, and calf output.\n",
-        "import_table(\n",
-        "  \"../resources/table_data/animal/tbl-an-repro-inputs-cow-mgmt.csv\",\n",
-        "  colalign = [\"left\", \"left\", \"center\", \"center\", \"center\"]\n",
-        ")"
-      ],
-      "id": "tbl-an-repro_inputs-cow-mgmt",
-      "execution_count": null,
-      "outputs": []
-    },
-    {
-      "cell_type": "code",
-      "metadata": {},
-      "source": [
         "#| label: tbl-an-repro_inputs-cow-farm\n",
-        "#| tbl-cap: User inputs that determine reproductive efficiency of cows and influence culling, calving interval, and calf output.\n",
+        "#| tbl-cap: User inputs in `farm_level_cows` (`farm_level.repro.cows`) that determine the [cow]{.underline} reproductive breeding program and impact reproductive efficiency, calving interval, and reproductive culling.\n",
         "import_table(\n",
         "  \"../resources/table_data/animal/tbl-an-repro-inputs-cow-farm.csv\",\n",
         "  colalign = [\"left\", \"left\", \"center\", \"center\", \"center\"]\n",
@@ -2723,14 +2708,14 @@
       "cell_type": "code",
       "metadata": {},
       "source": [
-        "#| label: tbl-an-repro_inputs-cow-cow\n",
-        "#| tbl-cap: User inputs that determine reproductive efficiency of cows and influence culling, calving interval, and calf output.\n",
+        "#| label: tbl-an-repro-inputs-adjust\n",
+        "#| tbl-cap: The following inputs can be used to determine if there is a decrease in the conception rate with parity and rebreeding attempts (`farm_level` section).\n",
         "import_table(\n",
-        "  \"../resources/table_data/animal/tbl-an-repro-inputs-cow-cow.csv\",\n",
+        "  \"../resources/table_data/animal/tbl-an-repro-inputs-adjust.csv\",\n",
         "  colalign = [\"left\", \"left\", \"center\", \"center\", \"center\"]\n",
         ")"
       ],
-      "id": "tbl-an-repro_inputs-cow-cow",
+      "id": "tbl-an-repro-inputs-adjust",
       "execution_count": null,
       "outputs": []
     },
@@ -2740,29 +2725,8 @@
       "source": [
         "::: {.callout-note}\n",
         "Anytime an insemination is performed after an OvSynch program, the conception rate will be changed to the `ovsynch_program_conception_rate`.\n",
-        ":::"
-      ],
-      "id": "1f7b7d89"
-    },
-    {
-      "cell_type": "code",
-      "metadata": {},
-      "source": [
-        "#| label: tbl-an-repro_inputs-concept-dec\n",
-        "#| tbl-cap: Inputs that can be used to determine if there is a decrease in the conception rate with parity and rebreeding attempts (`farm_level` section).\n",
-        "import_table(\n",
-        "  \"../resources/table_data/animal/tbl-an-repro-inputs-concept-dec.csv\",\n",
-        "  colalign = [\"left\", \"left\", \"center\", \"center\", \"center\", \"center\"]\n",
-        ")"
-      ],
-      "id": "tbl-an-repro_inputs-concept-dec",
-      "execution_count": null,
-      "outputs": []
-    },
-    {
-      "cell_type": "markdown",
-      "metadata": {},
-      "source": [
+        ":::\n",
+        "\n",
         "#### Expected Outputs\n",
         "\n",
         "Overall reporting for reproductive measures can be summarized and split into scheduled events and updates on an individual basis for heifers and cows. These include: \n",
@@ -2864,7 +2828,7 @@
         "\n",
         "##### Reproductive Functions"
       ],
-      "id": "75cb488e"
+      "id": "e8062b60"
     },
     {
       "cell_type": "code",
@@ -2907,7 +2871,7 @@
         "\n",
         "#### Required User Inputs"
       ],
-      "id": "cd443a66"
+      "id": "ef2df25d"
     },
     {
       "cell_type": "code",
@@ -3188,7 +3152,7 @@
         "* Adjustment Factors\n",
         "* Farm Specific 305 d Milk Production"
       ],
-      "id": "d1d982eb"
+      "id": "c2889157"
     },
     {
       "cell_type": "code",
@@ -3241,7 +3205,7 @@
       "source": [
         "#### Expected Outputs"
       ],
-      "id": "e8cb2fa9"
+      "id": "d0137029"
     },
     {
       "cell_type": "code",
@@ -3424,7 +3388,7 @@
         "\n",
         "#### Required User Inputs"
       ],
-      "id": "bc88b175"
+      "id": "29b7d8c3"
     },
     {
       "cell_type": "code",
@@ -3479,7 +3443,7 @@
         "\n",
         "The values for the CDF determining probability of death by day of lactation are located in the animal input json file (`death_day_prob`)."
       ],
-      "id": "eaf2c267"
+      "id": "4b06a785"
     },
     {
       "cell_type": "code",
@@ -3548,7 +3512,7 @@
         "\n",
         "**Parameters and Equations**"
       ],
-      "id": "964af530"
+      "id": "0de7b271"
     },
     {
       "cell_type": "code",
@@ -3675,7 +3639,7 @@
         "The Manure Excretion Calculator module computes manure excretion metrics for various animal categories. Inputs are \n",
         "drawn from pen ration files and animal module constants. They are organized into the following groups:"
       ],
-      "id": "9d7779cd"
+      "id": "bf24ad65"
     },
     {
       "cell_type": "code",
@@ -3731,7 +3695,7 @@
         "The outputs from the Manure Excretion Calculator are organized into two main categories: manure excretion values and \n",
         "manure nutrient composition. These outputs are consistently generated across animal categories."
       ],
-      "id": "8ca98342"
+      "id": "8e550211"
     },
     {
       "cell_type": "code",
@@ -4280,7 +4244,7 @@
         "\n",
         "### Required User Inputs"
       ],
-      "id": "4b5a97ae"
+      "id": "9b469292"
     },
     {
       "cell_type": "code",
@@ -4335,7 +4299,7 @@
         "\n",
         "This module predicts the daily enteric methane emissions for individual animals:"
       ],
-      "id": "c8cdf976"
+      "id": "d8c5b35f"
     },
     {
       "cell_type": "code",
@@ -4517,7 +4481,7 @@
         "The Methane Mitigation Calculator module evaluates the reduction in enteric methane yield based on dietary \n",
         "composition and the use of specific feed additives. The inputs are organized into the following groups:"
       ],
-      "id": "1d46a7f8"
+      "id": "219f8de1"
     },
     {
       "cell_type": "code",
@@ -4618,7 +4582,7 @@
         "\n",
         "## References"
       ],
-      "id": "e5ae991c"
+      "id": "2dedd798"
     }
   ],
   "metadata": {

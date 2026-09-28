@@ -8,7 +8,7 @@
         "# Economics Module\n",
         "<!-- reuse code to import functions from \"../scripts/\": -->"
       ],
-      "id": "3bf89db3"
+      "id": "f1d579a6"
     },
     {
       "cell_type": "code",
@@ -18,7 +18,7 @@
         "sys.path.append(\"../scripts\")\n",
         "from markdown_tables import import_table, display_md_tbl, read_tbl"
       ],
-      "id": "91dc78bd",
+      "id": "b7707b89",
       "execution_count": null,
       "outputs": []
     },
@@ -31,7 +31,7 @@
         "\n",
         "## References"
       ],
-      "id": "0531f510"
+      "id": "257b7b49"
     }
   ],
   "metadata": {

@@ -6,7 +6,7 @@
       "source": [
         "<!-- reuse code to import functions from \"../scripts/\": -->"
       ],
-      "id": "f647b3bb"
+      "id": "ec93881d"
     },
     {
       "cell_type": "code",
@@ -16,7 +16,7 @@
         "sys.path.append(\"../scripts\")\n",
         "from markdown_tables import import_table, display_md_tbl, read_tbl"
       ],
-      "id": "1dcd3593",
+      "id": "45d72c3c",
       "execution_count": null,
       "outputs": []
     },
@@ -142,7 +142,7 @@
         "\n",
         "If you are having trouble running this, be sure to check the sys.path.append location and the actual .csv file location.\n"
       ],
-      "id": "1014ded4"
+      "id": "f8e9e9d9"
     },
     {
       "cell_type": "code",
@@ -180,7 +180,7 @@
         "\n",
         "## Section Sign Up"
       ],
-      "id": "26f63b4a"
+      "id": "d777e227"
     },
     {
       "cell_type": "code",
@@ -339,7 +339,7 @@
         "```\n",
         ":::"
       ],
-      "id": "fd06a87d"
+      "id": "dcdb74dc"
     },
     {
       "cell_type": "code",
