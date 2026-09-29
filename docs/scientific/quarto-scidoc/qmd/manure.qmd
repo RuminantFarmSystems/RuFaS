@@ -55,7 +55,7 @@ The assignment of manure generated in the Animal Module (which also reflects the
 **Manure Storage Assumptions**
 
 * Received manure nutrients entering a storage are added to accumulated mass/nutrient quantities prior to calculating gas emissions each day.
-* When the end of the storage’s user defined storage time is reached, the accumulated manure in storage is removed completely and entirely, and is passed to the next processor in the chain (e.g., a subsequent storage, field application, etc.).
+* When the end of the storage’s user defined storage time is reached, the accumulated manure in storage is removed completely and entirely, and is passed to the next processor in the chain (e.g., a subsequent storage, field application, etc.) unless otherwise stated in the specific processor's documentation section.
 * Emptying intervals (in days) are defined by the user in equal lengths at this time, e.g., manure storage can be emptied every 3 months (e.g. in April, July, October, January) but cannot be emptied in April, then 2 months later in June, and then 3 months later in September. However, timing of storage emptying (e.g. April and October emptying vs. May and November emptying) can be set according to the general simulation dates to simulate more realistic manure removal behavior.
 
 
@@ -85,7 +85,7 @@ The specific manure handler options in the RuFaS model are:
 
 Manure handlers in RuFaS have two primary functions: calculate and add cleaning water if used, and calculat indoor housing emissions of CH<sub>4</sub>, CO<sub>2</sub>, and NH<sub>3</sub> if applicable.
 
-The following are important assumptions made in the manure handler submodules, as well as context on how manure handlers are used in the larger manure management chain:
+The following are important assumptions made in the manure handler processors, as well as context on how manure handlers are used in the larger manure management chain:
 
 1. All manure excreted and all bedding applied each day (if applicable) is assumed to be recovered by the manure handler.
 
@@ -108,7 +108,7 @@ import_table(
 
 ```{python}
 #| label: tbl-mn-hdl-inputs
-#| tbl-cap: "Required inputs for the Manure Handler (`refreshed_manure_management.json`)."
+#| tbl-cap: "Required inputs for manure handlers."
 import_table(
   "../resources/table_data/manure/tbl-mn-hdl-inputs.csv",
   colalign = ["left", "center", "left"]
@@ -119,26 +119,26 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$ and manure methane potential, m$^3$/kgVS):
 
-* water
-* ammoniacal_nitrogen
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `water`
+* `ammoniacal_nitrogen`
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 Manure handlers also make use of information contained in the `PenManureData` subclass. This includes the following information specific to the pen from which the manure was generated:
 
 * `num_animals`: number of animals in the pen
 * `animal_combination`: type of animals in the pen (calves, growing post-weaning heifers through closeup period, closeup (cows and heifers within user-defined closeup period), or lactating cows)
-* Manure deposition surface area (m$^2$): surface area soiled with manure. See section below on determining soiled surface area
+* `exposed_manure_surface_area` (m$^2$): surface area soiled with manure. See section below on determining soiled surface area
 * `pen_type`: the type of pen the manure was generated in (freestall, tiestall, open lot, or bedded pack barn)
 * `daily_urine` (kg): mass of urine in the manure
 * `urine_nitrogen` (kg): mass of urine N in the manure
@@ -426,7 +426,7 @@ $$
 Below is a summary of updates to `ManureStream` variables.
 
 ::: {.callout-note}
-The formulas below may be a summarization of multiple steps detailed above, and are intended to provide an overview of what mass losses/gains are reflected in the value of each variable.
+Some formulas below are a summarization of multiple steps detailed above, and are intended to provide an overview of what mass losses/gains are reflected in the value of each variable.
 :::
 
 Equations in the table below are in the format of "Output/exiting value" = "Entering processor value" +/- XYZ. "Entering" refers to the manure entering the processor (i.e., being loaded into the digester) and output variables reflect the manure leaving the processor (i.e., digestate leaving the digester). The Calculation column describes how the variable is updated in the processor.
@@ -488,27 +488,27 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$, and manure methane potential, m$^3$ / kgVS):
 
-* water 
+* `water` 
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen` 
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
 
 Two sets of `ManureStream` variables:
 
-* Separated solids (`SeparatedSolids`) 
-* Liquid fraction (`SeparatedLiquid`)
+* Separated solids (`SeparatedSolids`) representing the separated manure solids
+* Liquid fraction (`SeparatedLiquid`) representing the separated liquid
 
 ### Methodology
 
