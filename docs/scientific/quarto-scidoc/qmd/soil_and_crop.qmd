@@ -5,60 +5,103 @@
 
 ## Introduction 
 
-The Soil and Crop Module simulates the daily changes in soil composition and crop growth based on nutrient availability, weather and soil types. The underlying biophysical processes are drawn from existing models of soil and plant biogeochemistry including the SWAT model, Daycent, and SurPhos. The management routines execute the daily biogeochemical processes and direct simulation of the user-provided management practices including application of manure or synthetic fertilizer, tillage, planting and harvesting. As part of the whole farm biophysical simulation in RuFaS, the Soil and Crop Module receives manure from the Manure Module and sends harvested crop biomass to the Feed Storage Module.
+The Soil and Crop Module simulates the daily changes in soil composition and crop growth based on nutrient availability,
+ weather and soil types. The underlying biophysical processes are drawn from existing models of soil and plant
+ biogeochemistry including the SWAT model, Daycent, and SurPhos. The management routines execute the daily
+ biogeochemical processes and direct simulation of the user-provided management practices including application of
+ manure or synthetic fertilizer, tillage, planting and harvesting. As part of the whole farm biophysical simulation in
+ RuFaS, the Soil and Crop Module receives manure from the Manure Module and sends harvested crop biomass to the Feed
+ Storage Module.
 
 ## Field Management 
-
 ### Introduction 
 
-The Field Manager (`FieldManager`) is analogous to the agronomist or field manager on a real dairy farm. It coordinates and manages all the different routines and processes that are executed in Soil and Crop Module across any number of fields. To start with, the field manager interprets and integrates all of the user’s inputs about field management, crops, and soils to create a set of fields that each have their specified field and soil properties as well as schedules for each of the key management operations (manure application, fertilizer application, tillage, planting, and harvesting). 
+The Field Manager (`FieldManager`) is analogous to the agronomist or field manager on a real dairy farm. It coordinates
+and manages all the different routines and processes that are executed in Soil and Crop Module across any number of
+fields. To start with, the field manager interprets and integrates all the user’s inputs about field management,
+crops, and soils to create a set of fields that each have their specified field and soil properties as well as
+schedules for each of the key management operations (manure application, fertilizer application, tillage, planting,
+and harvesting).
 
-Once the fields and their schedules are set up, the `FieldManager` works through daily updates for each field. These daily updates include:
+Once the fields and their schedules are set up, the `FieldManager` works through daily updates for each field. These
+daily updates include:
 
 * Gathering the weather conditions for that day.
-* Checking if there is a manure application needed so that it can coordinate with Manure Module to provide the manure for the application.
+* Checking if there is a manure application needed so that it can coordinate with Manure Module to provide the manure
+for the application.
 * Calling each field’s daily update methods.
 * Recording the harvested crops and sending them to the Feed Storage Module.
 
-The `FieldManager` is also responsible for calling functions to record and reset any annual data records or processes for each field. Thus, the `FieldManager` is responsible for receiving and generating information from the user and other parts of the model and coordinating the simulation within the Soil and Crop Module.
+The `FieldManager` is also responsible for calling functions to record and reset any annual data records or processes
+for each field. Thus, the `FieldManager` is responsible for receiving and generating information from the user and
+other parts of the model and coordinating the simulation within the Soil and Crop Module.
 
 **Setting up Field Management**
 
-RuFaS can simulate as many fields as the user wishes to specify and requires a unique input file for each field. However, individual fields can share soil, crop, and management schedule inputs so that the user can simulate multiple fields with, for example, the same soil configuration but different crop and management schedules or different crops with the same manure application schedules without having to replicate the inputs for fields with shared characteristics.
+RuFaS can simulate as many fields as the user wishes to specify and requires a unique input file for each field.
+However, individual fields can share soil, crop, and management schedule inputs so that the user can simulate multiple
+fields with, for example, the same soil configuration but different crop and management schedules or different crops
+with the same manure application schedules without having to replicate the inputs for fields with shared
+characteristics.
 
 **Field Management Initialization**
 
-The `FieldManager` class, implemented in `field_manager.py`, has a series of functions to help package the user-provided configuration data and management schedule information required to initialize each field. These functions all start with the prefix `set_up` and are called by the wrapper function `set_up_field()`. There is only one instance of the `FieldManager` class as it is used to set up and coordinate processes across all the fields. The following functions within the `FieldManager``class gather information and call other functions to help initialize key data classes required for initialization of each field:
+The `FieldManager` class, implemented in `field_manager.py`, has a series of functions to help package the
+user-provided configuration data and management schedule information required to initialize each field. These functions
+all start with the prefix `set_up` and are called by the wrapper function `set_up_field()`. There is only one instance
+of the `FieldManager` class as it is used to set up and coordinate processes across all the fields. The following
+functions within the `FieldManager``class gather information and call other functions to help initialize key data
+classes required for initialization of each field:
 
-* `setup_field_data`: This function sets up the field data parameters and returns an instance of the `FieldData` class populated with the values from the `field_configuration_data`.
-* `setup_soil_data`: This function sets up a Soil instance that itself contains a `SoilData` instance configured to the user-provided specifications.
-* `setup_soil_layer_data`: This function sets up a soil LayerData instance configured with provided data that is added to the `SoilData` instance.
+* `setup_field_data`: This function sets up the field data parameters and returns an instance of the `FieldData` class
+populated with the values from the `field_configuration_data`.
+* `setup_soil_data`: This function sets up a Soil instance that itself contains a `SoilData` instance configured to the
+user-provided specifications.
+* `setup_soil_layer_data`: This function sets up a soil LayerData instance configured with provided data that is added
+to the `SoilData` instance.
 
-See the Individual Field Management section below for more information about the `FieldData` Class and the Soil submodule documentation for information related to the soil data classes.
+See the Individual Field Management section below for more information about the `FieldData` Class and the Soil
+submodule documentation for information related to the soil data classes.
 
-The next group of `set_up` functions in `FieldManager` help initialize the management schedules for each field. These functions call initialization routines for a schedule class that is used to generate an instance of a schedule with all the information that is specific to each type of management practice for each field. These schedule classes translate the user input into detailed schedules that can be read and interpreted by the `FieldManager` and instances of RuFaS Fields on a daily basis to determine the operations that need to be simulated each day. The schedule set up functions are:
+The next group of `set_up` functions in `FieldManager` help initialize the management schedules for each field. These
+functions call initialization routines for a schedule class that is used to generate an instance of a schedule with all 
+the information that is specific to each type of management practice for each field. These schedule classes translate 
+the user input into detailed schedules that can be read and interpreted by the `FieldManager` and instances of RuFaS 
+Fields on a daily basis to determine the operations that need to be simulated each day. The schedule set up functions 
+are:
 
-* `set_up_fertilizer_events`: This function generates fertilizer application event schedules based on the user-provided fertilizer schedule and returns a fertilizer schedule as well as a dictionary with the available fertilizer mixes.
-* `set_up_manure_events`: This function generates manure application event schedules based on the user-provided manure application schedules and returns a list of the planned manure applications.
-* `set_up_tillage_events`: This function generates tillage event schedules based on the user-provided tillage schedules and returns a list of the planned tillage events.
-* `set_up_crop_events`: This function generates all planting and harvest events based on the user-provided crop rotation schedule and returns a list of planting events and a list of the harvesting events that correspond to the planting events. 
-* `set_up_crop_schedules`: This function is called by `set_up_crop_events()` and returns a single list of all the cropping schedules.
+* `set_up_fertilizer_events`: This function generates fertilizer application event schedules based on the user-provided
+fertilizer schedule and returns a fertilizer schedule as well as a dictionary with the available fertilizer mixes.
+* `set_up_manure_events`: This function generates manure application event schedules based on the user-provided manure
+application schedules and returns a list of the planned manure applications.
+* `set_up_tillage_events`: This function generates tillage event schedules based on the user-provided tillage schedules
+and returns a list of the planned tillage events.
+* `set_up_crop_events`: This function generates all planting and harvest events based on the user-provided crop rotation
+schedule and returns a list of planting events and a list of the harvesting events that correspond to the planting 
+events.
+* `set_up_crop_schedules`: This function is called by `set_up_crop_events()` and returns a single list of all the
+cropping schedules.
 
-Outputs for each field can be identified by the character string used to define the field input blob in the metadata file. 
+Outputs for each field can be identified by the character string used to define the field input blob in the metadata
+file.
 
 For example, in the below excerpt from a metadata input file:
 
 ![Example of the metadata input file](../resources/images/soc_metadata.png){#fig-soc-metadata-input-eg}
 
-There are 2 different fields named `field_example_1` and `field_example_2` so the outputs generated by the first field would take the form:
-`Class.function.variable.field` = `field_example_1`
+There are 2 different fields named `field_example_1` and `field_example_2` so the outputs generated by the first field
+would take the form: `Class.function.variable.field` = `field_example_1`
 
-Where the pre-fix Class.function.variable is determined by the class, function that produced the variable, and the variable being reported. As a specific illustration, the output variable for the daily surface residue from `field_example_1` would be: 
-`FieldDataReporter.send_field_daily_variables.current_residue.field` = `field_example_1`
+Where the pre-fix Class.function.variable is determined by the class, function that produced the variable, and the
+variable being reported. As a specific illustration, the output variable for the daily surface residue from
+`field_example_1` would be: `FieldDataReporter.send_field_daily_variables.current_residue.field` = `field_example_1`
 
 **Field Setup and Initialization**
 
-When directed by the `FieldManager`, the Field class initializes a new Field object with the user-provided information that is packaged and shared by the `FieldManager`. These inputs include things like the field location, size, irrigation practices, pointers to the input files with management schedules, and options for turning crop growth stressors on and off. 
+When directed by the `FieldManager`, the Field class initializes a new Field object with the user-provided information
+that is packaged and shared by the `FieldManager`. These inputs include things like the field location, size,
+irrigation practices, pointers to the input files with management schedules, and options for turning crop growth
+stressors on and off.
 
 ### Required User Inputs
 
@@ -109,13 +152,27 @@ import_table(
 
 ### Expected Outputs
 
+<!-- TODO -->
 
 
 ### Methodology
 
-The first step to initializing an instance of a field is to initialize an instance of the `FieldData` class for each field which is called by the `setup_field_data()` function in `FieldManager`. Each instance of the `FieldData` class contains key information about the field from the user-provided configuration data that remains fixed throughout the simulation as well as other field attributes that are updated dynamically throughout the simulation such as the amount of crop residue that is on the surface of the field (`current_residue`), the amount of water being applied to a field in an irrigation interval (`watering_amount_in_mm`) and the number of days since the start of the current watering interval (`days_into_watering_interval`). 
+The first step to initializing an instance of a field is to initialize an instance of the `FieldData` class for each
+field which is called by the `setup_field_data()` function in `FieldManager`. Each instance of the `FieldData` class
+contains key information about the field from the user-provided configuration data that remains fixed throughout the
+simulation as well as other field attributes that are updated dynamically throughout the simulation such as the amount
+of crop residue that is on the surface of the field (`current_residue`), the amount of water being applied to a field
+in an irrigation interval (`watering_amount_in_mm`) and the number of days since the start of the current watering
+interval (`days_into_watering_interval`).
 
-Once the `FieldData` is initialized, the instances of the `SoilData` and `SoilLayerData` classes for that field are initialized. Following initialization of the soils for each field, the management schedules are generated. The user has some flexibility in how they provide information about the schedule for management operations so that they can either provide a list that provides information and dates for each operation individually, or if the same operation is repeated at an annual timestep or greater, they can provide information about the pattern with which that operation is repeated via the `pattern_repeat` and `pattern_skip` inputs. For example, if a user wanted to simulate an operation such as planting corn or fertilizer application that happened every year for 5 years on May 4th starting in 2021, they could specify this schedule with either of the two following combinations of inputs in a management schedule input file:
+Once the `FieldData` is initialized, the instances of the `SoilData` and `SoilLayerData` classes for that field are
+initialized. Following initialization of the soils for each field, the management schedules are generated. The user
+has some flexibility in how they provide information about the schedule for management operations so that they can
+either provide a list that provides information and dates for each operation individually, or if the same operation
+is repeated at an annual timestep or greater, they can provide information about the pattern with which that operation
+is repeated via the `pattern_repeat` and `pattern_skip` inputs. For example, if a user wanted to simulate an operation
+such as planting corn or fertilizer application that happened every year for 5 years on May 4th starting in 2021, they
+could specify this schedule with either of the two following combinations of inputs in a management schedule input file:
 
 **Option 1:**
 
@@ -131,7 +188,8 @@ Once the `FieldData` is initialized, the instances of the `SoilData` and `SoilLa
 * `pattern_repeat`: 5, 
 * `pattern_skip`: 0
 
-Similarly, if a user wanted to simulate something like cover crop planting or a manure application that happened every 4 years on September 5th starting in 1985, they could provide either of the following two inputs for that operation:
+Similarly, if a user wanted to simulate something like cover crop planting or a manure application that happened every
+4 years on September 5th starting in 1985, they could provide either of the following two inputs for that operation:
 
 **Option 1:**
 
@@ -147,22 +205,43 @@ Similarly, if a user wanted to simulate something like cover crop planting or a 
 * `pattern_repeat`: 6, 
 * `pattern_skip`: 4
 
-To translate the user-provided information about field schedules into standard data formats, RuFaS generates management schedules via operation specific schedule classes. These schedule classes (`CropSchedule`, `FertilizerSchedule`, `ManureSchedule`, and `TillageSchedule`) are built as child classes from a generic parent class (`Schedule`) that contains functions to expand the user-provided information about the timing of management operations into a list with a Julian day and year for each management operation alongside any operation specific configuration data. 
+To translate the user-provided information about field schedules into standard data formats, RuFaS generates management
+schedules via operation specific schedule classes. These schedule classes (`CropSchedule`, `FertilizerSchedule`,
+`ManureSchedule`, and `TillageSchedule`) are built as child classes from a generic parent class (`Schedule`) that
+contains functions to expand the user-provided information about the timing of management operations into a list with
+a Julian day and year for each management operation alongside any operation specific configuration data.
 
-**Crop specific** management data includes specification of both the planting and harvesting schedule, and whether the harvest operation is a harvest only operation (meaning that the crop continues to grow after harvest) or if it is an event that kills the plant, with or without harvesting the crop. 
+**Crop specific** management data includes specification of both the planting and harvesting schedule, and whether the
+harvest operation is a harvest only operation (meaning that the crop continues to grow after harvest) or if it is an
+event that kills the plant, with or without harvesting the crop.
 
-**Tillage specific** management information includes the depth of the tillage operation, the amount of surface soil that is mixed into lower parts of the soil profile (`incorporation_fractions`), and the amount of mixing that occurs between soil layers (`mixing_fractions`). 
+**Tillage specific** management information includes the depth of the tillage operation, the amount of surface soil
+that is mixed into lower parts of the soil profile (`incorporation_fractions`), and the amount of mixing that occurs
+between soil layers (`mixing_fractions`).
 
-**Fertilizer application specific** management information includes the proportions of N, P, and K in the fertilizer mixes being used, the proportion of N that is in the form of ammonium (`ammonium_fraction`), the total masses of N, P, and K applied at each application, the application depth, and the fraction of manure that remains on the surface (`surface_remainder_fraction`). 
+**Fertilizer application specific** management information includes the proportions of N, P, and K in the fertilizer
+mixes being used, the proportion of N that is in the form of ammonium (`ammonium_fraction`), the total masses of N, P,
+and K applied at each application, the application depth, and the fraction of manure that remains on the surface
+(`surface_remainder_fraction`).
 
 
-**Manure application specific** management information includes the total masses of N, P, and K applied at each manure application, the application depth, and the fraction of fertilizer that remains on the surface (`surface_remainder_fraction`), and an indication of how the model should handle cases where there is not enough manure in storage to meet the manure application request (`supplement_manure Nutrient_Deficiencies`). 
+**Manure application specific** management information includes the total masses of N, P, and K applied at each manure
+application, the application depth, and the fraction of fertilizer that remains on the surface
+(`surface_remainder_fraction`), and an indication of how the model should handle cases where there is not enough
+manure in storage to meet the manure application request (`supplement_manure Nutrient_Deficiencies`).
 
-After the user information about the management schedules are translated into complete lists where each list entry is the schedule information for each operation for the entire simulation, these multi-year schedules are then translated into lists where each entry is an individual event for each operation so that the field manager can iterate over this list. The lists of events are then combined with the field and soil data to initialize an instance of a field.
+After the user information about the management schedules are translated into complete lists where each list entry is
+the schedule information for each operation for the entire simulation, these multi-year schedules are then translated
+into lists where each entry is an individual event for each operation so that the field manager can iterate over this
+list. The lists of events are then combined with the field and soil data to initialize an instance of a field.
 
 #### Daily Field Management
 
-Each day the main simulation engine calls on the `FieldManager` routine to run its `daily_update_routine()` function which returns a list of harvested crops that can be passed to the Feed Storage Module. The `FieldManager` `daily_update_routine()` function collects the current weather conditions and manure for application to the field where appropriate and calls the Field class `manage_field()` routine which is the primary method in the Field class that steps through all the functions that execute the field management operations. The order of operations called is:
+Each day the main simulation engine calls on the `FieldManager` routine to run its `daily_update_routine()` function
+which returns a list of harvested crops that can be passed to the Feed Storage Module. The `FieldManager`
+`daily_update_routine()` function collects the current weather conditions and manure for application to the field
+where appropriate and calls the Field class `manage_field()` routine which is the primary method in the Field class
+that steps through all the functions that execute the field management operations. The order of operations called is:
 
 * Fertilizer Application
 * Manure Application
@@ -174,11 +253,14 @@ Each day the main simulation engine calls on the `FieldManager` routine to run i
     * Harvest crops
     * Update crop and crop residue coverage
 
-Once these daily processes have been executed for each field, the `FieldManager` `daily_update_routine()` function sends all the outputs to the `OutputManager` via the `output_gatherer.send_daily_variables()` function. 
+Once these daily processes have been executed for each field, the `FieldManager` `daily_update_routine()` function
+sends all the outputs to the `OutputManager` via the `output_gatherer.send_daily_variables()` function.
 
 #### Fertilizer Application
 
-The first step in execution of a fertilizer application is to calculate the total mass of fertilizer required to meet the minimum N, P, and K application masses requested for each fertilizer given the specified nutrient composition of the fertilizer mix using the following two methods:
+The first step in execution of a fertilizer application is to calculate the total mass of fertilizer required to meet
+the minimum N, P, and K application masses requested for each fertilizer given the specified nutrient composition of
+the fertilizer mix using the following two methods:
 
 ::: {#eq-sc-fld-1}
 [[**SC.FLD.1**]]{.aside .content-visible when-format="html"}
@@ -227,13 +309,20 @@ $$
 * `applied_phosphorus` (kg) = mass of phosphorus applied.
 * `applied_potassium` (kg) = mass of potassium applied.
 
-Once the total fertilizer mass and nutrients associated with a fertilizer application are determined, the fertilizer nitrogen and phosphorus masses are added to the appropriate soil nutrient pools via the `apply_fertilizer()` function in the `FertilizerApplication` class in the `fertilizer_application.py` file. 
+Once the total fertilizer mass and nutrients associated with a fertilizer application are determined, the fertilizer
+nitrogen and phosphorus masses are added to the appropriate soil nutrient pools via the `apply_fertilizer()` function
+in the `FertilizerApplication` class in the `fertilizer_application.py` file.
 
 ::: {.callout-note}
-Note that RuFaS does not currently track soil potassium cycling so the application of potassium with fertilizer is recorded solely as a means of tracking resource use. In the future, we hope to add a soil potassium cycling routine at which point potassium will be added to soil nutrient pools via the `apply_fertilizer()` method in a similar manner as nitrogen and phosphorus.
+Note that RuFaS does not currently track soil potassium cycling so the application of potassium with fertilizer is
+recorded solely as a means of tracking resource use. In the future, we hope to add a soil potassium cycling routine at
+which point potassium will be added to soil nutrient pools via the `apply_fertilizer()` method in a similar manner as
+nitrogen and phosphorus.
 :::
 
-Nitrogen and phosphorus are first added to the surface soil layer followed by distribution to the sub-surface layers according to the depth of application. Because soil nutrient pools are tracked in units of kg/ha, the total mass of each nutrient applied to the field is first divided by the field size.
+Nitrogen and phosphorus are first added to the surface soil layer followed by distribution to the sub-surface layers
+according to the depth of application. Because soil nutrient pools are tracked in units of kg/ha, the total mass of
+each nutrient applied to the field is first divided by the field size.
 
 The amount of each nutrient applied to the surface is determined as:
 
@@ -247,10 +336,12 @@ $$
 *Where*:
 
 * `surface_applied_nutrient` (kg/ha) = mass per ha of each nutrient applied to the surface soil layer.
-* `surface_remainder_fraction` (proportion) = user-provided input defining the fraction of the fertilizer that remains on the soil surface.
+* `surface_remainder_fraction` (proportion) = user-provided input defining the fraction of the fertilizer that remains
+on the soil surface.
 * `field_size` (ha) = size of the field.
 
-The proportion of the subsurface fertilizer that is applied to each layer is calculated from the relationship between the bottom depth of each soil and the application depth. So, for each layer a “depth factor” is calculated as:
+The proportion of the subsurface fertilizer that is applied to each layer is calculated from the relationship between
+the bottom depth of each soil and the application depth. So, for each layer a “depth factor” is calculated as:
 
 if layer_depth < application_depth:
 
@@ -274,7 +365,8 @@ $$
 
 * `depth_factor` (proportion) = fraction of subsurface fertilizer added to each soil layer.
 * `layer_depth` (mm) = bottom depth of each sub-surface soil layer.
-* `depth_factor_sum` (proportion) = sum of the depth factors for all layers above the deepest layer receiving fertilizer.
+* `depth_factor_sum` (proportion) = sum of the depth factors for all layers above the deepest layer receiving
+fertilizer.
 
 Thus, the amount of fertilizer added to each nutrient pool in a sub-surface soil layer is: 
 
@@ -290,9 +382,15 @@ $$
 $$
 ::: 
 
-The soil nutrient pools that receive nitrogen are the soil nitrate and ammonium pools. The proportion of fertilizer nitrogen distributed to each of these pools is determined by the user provided `ammonium_fraction`.
+The soil nutrient pools that receive nitrogen are the soil nitrate and ammonium pools. The proportion of fertilizer
+nitrogen distributed to each of these pools is determined by the user provided `ammonium_fraction`.
 
-Fertilizer phosphorus is intended to be added to the labile inorganic phosphorus pools to be available for plant uptake. However, phosphorus applied to the surface is not immediately available in this pool and until the first precipitation or irrigation event the phosphorus is gradually sorbed by the soil. Thus, at the time of application, 75% of surface applied fertilizer P is added to the available phosphorus pool for gradual sorption and 25% of the surface applied P is added to the recalcitrant pool which is solubilized during rainfall and either added to the labile phosphorus pool or lost through runoff and leaching.
+Fertilizer phosphorus is intended to be added to the labile inorganic phosphorus pools to be available for plant
+uptake. However, phosphorus applied to the surface is not immediately available in this pool and until the first
+precipitation or irrigation event the phosphorus is gradually sorbed by the soil. Thus, at the time of application,
+75% of surface applied fertilizer P is added to the available phosphorus pool for gradual sorption and 25% of the
+surface applied P is added to the recalcitrant pool which is solubilized during rainfall and either added to the labile
+phosphorus pool or lost through runoff and leaching.
 
 ::: {#eq-sc-fld-7}
 [[**SC.FLD.7**]]{.aside .content-visible when-format="html"}
@@ -306,9 +404,15 @@ $$
 
 #### Manure Application
 
-When the results of the manure nutrient request are passed into the `FieldManager` and then to the Field class daily update routine, the `manage_field()` function can then execute the manure application with the manure nutrients and amount provided by the `ManureModule` via the `SimulationEngine`. If there are any unmet nutrients from the initial, intended application, if the user indicated that these unmet nutrients can be met with synthetic fertilizers, these are supplied by an additional fertilizer application that is initiated by the `handle_unmet_nutrients()` function. 
+When the results of the manure nutrient request are passed into the `FieldManager` and then to the Field class daily
+update routine, the `manage_field()` function can then execute the manure application with the manure nutrients and
+amount provided by the `ManureModule` via the `SimulationEngine`. If there are any unmet nutrients from the initial,
+intended application, if the user indicated that these unmet nutrients can be met with synthetic fertilizers, these
+are supplied by an additional fertilizer application that is initiated by the `handle_unmet_nutrients()` function.
 
-Once the amount of manure to be applied is known, the `apply_and_record_manure_application()` function first adds the water associated with the manure application. The amount of water in the manure application is determined by the total mass of manure applied and the dry matter fraction of the manure:
+Once the amount of manure to be applied is known, the `apply_and_record_manure_application()` function first adds the
+water associated with the manure application. The amount of water in the manure application is determined by the total
+mass of manure applied and the dry matter fraction of the manure:
 
 ::: {#eq-sc-fld-8}
 [[**SC.FLD.8**]]{.aside .content-visible when-format="html"}
@@ -323,11 +427,17 @@ $$
 
 The amount of water in liters is then converted to the amount in mm by a helper function `convert_liters_to_millimeters()`. 
 
-After the water is applied, the phosphorus and nitrogen from manure are applied via the `apply_machine_manure()` function in the `ManureApplication` class which is implemented in `manure_application.py`. The manure application process is broken out into the surface application which follows methods described by the SurPhos model and the subsurface application [@vadas2007]. 
+After the water is applied, the phosphorus and nitrogen from manure are applied via the `apply_machine_manure()`
+function in the `ManureApplication` class which is implemented in `manure_application.py`. The manure application
+process is broken out into the surface application which follows methods described by the SurPhos model and the
+subsurface application [@vadas2007].
 
 **Surface Manure Application**
 
-During manure application, the amount of manure applied to the surface is assumed to stay on the surface unless it is a liquid manure with a dry matter content less than 15% in which case infiltration is assumed and the manure nutrients are assumed to be added to the sub-surface layer. Following the methods from the SurPhos model, first the manure solids remaining on the soil surface are calculated [@vadas2007]:
+During manure application, the amount of manure applied to the surface is assumed to stay on the surface unless it is
+a liquid manure with a dry matter content less than 15% in which case infiltration is assumed and the manure nutrients
+are assumed to be added to the sub-surface layer. Following the methods from the SurPhos model, first the manure solids
+remaining on the soil surface are calculated [@vadas2007]:
 
 ::: {#eq-sc-fld-9}
 [[**SC.FLD.9**]]{.aside .content-visible when-format="html"}
@@ -338,15 +448,19 @@ $$
             
 *Where*:
 
-* `surface_dry_matter_mass` (kg) = amount of manure solids or dry matter that is applied to the soil surface at that application.
+* `surface_dry_matter_mass` (kg) = amount of manure solids or dry matter that is applied to the soil surface at that
+application.
 * `manure_dry_matter_mass` (kg) = amount of manure solids or dry matter that is applied at that application.
-* `surface_remainder_fraction` (kg) = user-provided value for the amount of the manure applied that remains on the surface.
+* `surface_remainder_fraction` (kg) = user-provided value for the amount of the manure applied that remains on the
+surface.
 
 **Surface Phosphorus Application**
 
-Phosphorus is then distributed to 4 pools (water extractable inorganic phosphorus, water extractable organic phosphorus, stable inorganic phosphorus, stable organic phosphorus) according to the following methods:
+Phosphorus is then distributed to 4 pools (water extractable inorganic phosphorus, water extractable organic
+phosphorus, stable inorganic phosphorus, stable organic phosphorus) according to the following methods:
 
-First the fractions of each type of phosphorus are calculated assuming that 55% of manure phosphorus is water extractable and 75% of the non-water extractable or stable phosphorus is inorganic: 
+First the fractions of each type of phosphorus are calculated assuming that 55% of manure phosphorus is water
+extractable and 75% of the non-water extractable or stable phosphorus is inorganic:
 
 ::: {#eq-sc-fld-10}
 [[**SC.FLD.10**]]{.aside .content-visible when-format="html"}
@@ -362,7 +476,9 @@ $$
 $$
 :::  
 
-Then these fractions are multiplied by the total phosphorus applied as well as the product of the infiltration indicator and the surface remainder fraction to obtain the mass of each phosphorus type applied to add the surface or subsurface soil phosphorus layers:
+Then these fractions are multiplied by the total phosphorus applied as well as the product of the infiltration
+indicator and the surface remainder fraction to obtain the mass of each phosphorus type applied to add the surface
+or subsurface soil phosphorus layers:
 
 ::: {#eq-sc-fld-11 style="font-size:85%"}
 [[**SC.FLD.11**]]{.aside .content-visible when-format="html"}
@@ -388,16 +504,20 @@ $$
 
 *Where*:
 
-* `mass_to_add_to_labile_phos` (kg) = phosphorus that will be added to the surface labile phosphorus pool during that application.
-* `mass_to_add_to_active_phos` (kg) = phosphorus that will be added to the surface active phosphorus pool during that application.
+* `mass_to_add_to_labile_phos` (kg) = phosphorus that will be added to the surface labile phosphorus pool during that
+application.
+* `mass_to_add_to_active_phos` (kg) = phosphorus that will be added to the surface active phosphorus pool during that
+application.
 * `total_phosphorus_mass` (kg) = total phosphorus applied during that application.
 * `soil_infiltration` = 0.4 if the manure applied is less than 15% dry matter, and 0 otherwise.
 
-The SurPhos manure pool attributes for the manure dry matter mass, moisture factor and field coverage are then updated according to the new field coverage and surface dry matter mass for that application [@vadas2007].
+The SurPhos manure pool attributes for the manure dry matter mass, moisture factor and field coverage are then updated
+according to the new field coverage and surface dry matter mass for that application [@vadas2007].
 
 **Surface Nitrogen Application**
 
-The composition of manure nitrogen is provided by the manure module as the fractions that are in inorganic nitrogen, ammonium nitrogen, and organic nitrogen. These fractions are then distributed to the soil nitrate, ammonium, fresh organic nitrogen, and stable organic nitrogen pools according to the following:
+The composition of manure nitrogen is provided by the manure module as the fractions that are in inorganic nitrogen,
+ammonium nitrogen, and organic nitrogen. These fractions are then distributed to the soil nitrate, ammonium, fresh organic nitrogen, and stable organic nitrogen pools according to the following:
 
 ::: {#eq-sc-fld-13}
 [[**SC.FLD.13**]]{.aside .content-visible when-format="html"}
@@ -421,14 +541,21 @@ $$
 * `mass_fresh_organic_nitrogen_added` (kg N/ha) = mass of fresh organic nitrogen applied to relevant soil layer.
 * `mass_stable_organic_nitrogen_added` (kg N/ha) = mass of stable organic nitrogen applied to relevant soil layer.
 * `manure_dry_matter_mass` (kg) = mass of manure dry matter added to the soil layer.
-* `ammonium_fraction` (proportion) = fraction of inorganic nitrogen that is in the form of ammoniacal nitrogen and is provided by the Manure Module.
-* `fresh_fraction_of_organic_nitrogen` (proportion) = fraction of organic nitrogen that is more quickly mineralized and is set to a constant of 0.9286.
+* `ammonium_fraction` (proportion) = fraction of inorganic nitrogen that is in the form of ammoniacal nitrogen and is
+provided by the Manure Module.
+* `fresh_fraction_of_organic_nitrogen` (proportion) = fraction of organic nitrogen that is more quickly mineralized and
+is set to a constant of 0.9286.
 
-The manure mass that is applied to the surface layer is set to the 100% of the `surface_dry_matter_mass` calculated in [SC.FLD.9](#eq-sc-fld-9) if the manure dry matter content is greater than 15%. For liquid manure when the dry matter content is less than 15%, infiltration is assumed and the surface application is set to 60% of the `surface_dry_matter_mass` from [SC.FLD.9](#eq-sc-fld-9) and 40% of the `surface_dry_matter_mass` is assigned to be added to the first sub-surface layer.
+The manure mass that is applied to the surface layer is set to the 100% of the `surface_dry_matter_mass` calculated in
+[SC.FLD.9](#eq-sc-fld-9) if the manure dry matter content is greater than 15%. For liquid manure when the dry matter
+content is less than 15%, infiltration is assumed and the surface application is set to 60% of the
+`surface_dry_matter_mass` from [SC.FLD.9](#eq-sc-fld-9) and 40% of the `surface_dry_matter_mass` is assigned to be
+added to the first sub-surface layer.
 
 **Subsurface Manure Application**
 
-For manure applications where a fraction or all of the manure is applied below the soil surface (i.e. injection) the sub-surface manure application method is followed for the proportion of the application applied below the soil surface. 
+For manure applications where a fraction or all of the manure is applied below the soil surface (i.e. injection) the
+sub-surface manure application method is followed for the proportion of the application applied below the soil surface.
 
 The sub-surface fraction of manure application is calculated as:
 
@@ -441,13 +568,19 @@ $$
 
 to capture all the manure applied that is not accounted for in the surface application methods. 
 
-This value, along with the manure nitrogen and phosphorus compositions and the total masses of manure applied in each application is passed into the `apply_subsurface_manure()` function. 
+This value, along with the manure nitrogen and phosphorus compositions and the total masses of manure applied in each
+application is passed into the `apply_subsurface_manure()` function.
 
-Calculation of the manure phosphorus masses to be added to different soil phosphorus pools occurs according to the equations described in [SC.FLD.9](#eq-sc-fld-9), [SC.FLD.10](#eq-sc-fld-10), and [SC.FLD.11](#eq-sc-fld-11). 
+Calculation of the manure phosphorus masses to be added to different soil phosphorus pools occurs according to the
+equations described in [SC.FLD.9](#eq-sc-fld-9), [SC.FLD.10](#eq-sc-fld-10), and [SC.FLD.11](#eq-sc-fld-11).
 
-Similarly, calculation of the manure N mass to be added to the subsurface layers follows the methods described in [SC.FLD.13](#eq-sc-fld-13). 
+Similarly, calculation of the manure N mass to be added to the subsurface layers follows the methods described in
+[SC.FLD.13](#eq-sc-fld-13).
 
-The method for distributing the `total_phosphorus_mass` and `manure_mass_applied` to the subsurface layers multiplies the manure application masses by the `subsurface_fraction` calculated in [SC.FLD.9](#eq-sc-fld-9) and `depth_factors` calculated using the method described in [SC.FLD.5](#eq-sc-fld-5) and [SC.FLD.6](#eq-sc-fld-6) as in the generic equation below:
+The method for distributing the `total_phosphorus_mass` and `manure_mass_applied` to the subsurface layers multiplies
+the manure application masses by the `subsurface_fraction` calculated in [SC.FLD.9](#eq-sc-fld-9) and `depth_factors`
+calculated using the method described in [SC.FLD.5](#eq-sc-fld-5) and [SC.FLD.6](#eq-sc-fld-6) as in the generic
+equation below:
 
 ::: {#eq-sc-fld-15}
 [[**SC.FLD.15**]]{.aside .content-visible when-format="html"}
@@ -461,7 +594,9 @@ $$
 
 **Tillage Application**
 
-The tillage method mixes nutrient masses from the soil layers to the layers below them and ensures that the nutrients do not get mixed below the bottom of the soil profile.  The `till_soil()` function aggregates all the soil nutrient pools needed to be mixed through tillage including: 
+The tillage method mixes nutrient masses from the soil layers to the layers below them and ensures that the nutrients
+do not get mixed below the bottom of the soil profile.  The `till_soil()` function aggregates all the soil nutrient
+pools needed to be mixed through tillage including:
 
 * `labile_inorganic_phosphorus_content`
 * `active_inorganic_phosphorus_content`
@@ -477,11 +612,14 @@ The tillage method mixes nutrient masses from the soil layers to the layers belo
 * `slow_carbon_amount`
 * `passive_carbon_amount`
 
-It then iterates through these soil nutrient pools and soil layers to redistribute nutrients between the soil pools according to the user provided tillage depth and mixing fraction.
+It then iterates through these soil nutrient pools and soil layers to redistribute nutrients between the soil pools
+according to the user provided tillage depth and mixing fraction.
 
 #### Initiate Daily Biophysical Processes
 
-An important step in the `Field classes manage_field()` routine is to initiate the updates to the biophysical processes that are managed by the Soil and Crop classes. This is achieved by the `execute_daily_processes()` method and initiates the following processes:
+An important step in the `Field classes manage_field()` routine is to initiate the updates to the biophysical
+processes that are managed by the Soil and Crop classes. This is achieved by the `execute_daily_processes()` method
+and initiates the following processes:
 
 * Snow accumulation and melting
 * Crop residue and canopy cover update
@@ -491,22 +629,34 @@ An important step in the `Field classes manage_field()` routine is to initiate t
 
 #### Crop Management
 
-In managing the crop cycle, the daily updates called by the Field class first check if the crop is meant to go into a dormant stage. 
+In managing the crop cycle, the daily updates called by the Field class first check if the crop is meant to go into a
+dormant stage.
 
-After initiating any dormancy where appropriate, the Field class then checks to see if any crops are scheduled to be planted that day. If so, it calls on the Crop class to initialize Crop and ensures that the `max_root_depth` attribute of that crop does not allow its roots to go below the bottom of the soil profile.
+After initiating any dormancy where appropriate, the Field class then checks to see if any crops are scheduled to be
+planted that day. If so, it calls on the Crop class to initialize Crop and ensures that the `max_root_depth` attribute
+of that crop does not allow its roots to go below the bottom of the soil profile.
 
-The last management practice the Field class checks is the harvesting event schedule. If a harvest event is scheduled for that day, it initiates the harvest method in the Crop class and updates its list of crops to remove the harvested and killed crops from its list of crops. 
+The last management practice the Field class checks is the harvesting event schedule. If a harvest event is scheduled
+for that day, it initiates the harvest method in the Crop class and updates its list of crops to remove the harvested
+and killed crops from its list of crops.
 
 
 ## Soil Management 
-
 ### Introduction 
 
-The soil submodule spatially and dynamically models agronomic and biogeochemical processes taking place on the surface of and within the soil profile. It tracks plant roots/residue, hydrological movement, and dissolved/undissolved carbon, nitrogen, and phosphorus cycling. Carbon and nitrogen nutrient cycling and hydrology are based on the SWAT+ model and phosphorus nutrient cycling on the SurPhos model [@vadas2007]. 
+The soil submodule spatially and dynamically models agronomic and biogeochemical processes taking place on the
+surface of and within the soil profile. It tracks plant roots/residue, hydrological movement, and dissolved/undissolved
+carbon, nitrogen, and phosphorus cycling. Carbon and nitrogen nutrient cycling and hydrology are based on the SWAT+
+model and phosphorus nutrient cycling on the SurPhos model [@vadas2007].
 
 **Soil Initialization**
 
-RuFaS can simulate soils of any combination of textures in as many layers delineated by depth as the user wishes to specify. A single soil type and profile can represent all fields in a simulation or can be specific to individual fields. Each specified soil is stored by RuFaS as a `SoilData` object consisting of a list of `LayerData` objects that in turn represent a set of variables specific to each layer of soil. At the start of the simulation the user's soil specifications generate the soil layers for each field and pools of water, carbon, nitrogen, and phosphorus are initialized in each layer.
+RuFaS can simulate soils of any combination of textures in as many layers delineated by depth as the user wishes to
+specify. A single soil type and profile can represent all fields in a simulation or can be specific to individual
+fields. Each specified soil is stored by RuFaS as a `SoilData` object consisting of a list of `LayerData` objects
+that in turn represent a set of variables specific to each layer of soil. At the start of the simulation the user's
+soil specifications generate the soil layers for each field and pools of water, carbon, nitrogen, and phosphorus are
+initialized in each layer.
 
 ### Required User Inputs
 
@@ -521,7 +671,7 @@ import_table(
 
 ### Expected Outputs
 
-
+<!-- TODO -->
 
 ### Methodology
 
@@ -529,7 +679,9 @@ Soil temperature and water content/flow are the main drivers of soil biogeochemi
 
 #### Soil Temperature
 
-Soil temperature fluctuates diurnally and seasonally and is estimated daily as a function of the previous day’s soil temperature, average annual air temperature, the current day’s soil surface temperature and depth in the soil profile for each soil layer by using the following equations from SWAT 2009 documentation.
+Soil temperature fluctuates diurnally and seasonally and is estimated daily as a function of the previous day’s soil
+temperature, average annual air temperature, the current day’s soil surface temperature and depth in the soil profile
+for each soil layer by using the following equations from SWAT 2009 documentation.
 
 ::: {#eq-sc-tmp-1}
 [[**SC.TMP.1**]]{.aside .content-visible when-format="html"}
@@ -541,7 +693,8 @@ $$
 *Where*:
         
 * T<sub>soil(z,dn)</sub> = soil temperature ℃ at depth z (mm) and day of the air d<sub>n</sub>
-* `L` = lag coefficient( ranging from 0.0 to 1.0, default: 0.8) that controls the influence of the previous day’s temperature on the current day’s temperature  
+* `L` = lag coefficient( ranging from 0.0 to 1.0, default: 0.8) that controls the influence of the previous day’s
+temperature on the current day’s temperature
 * T<sub>soil(z,dn-1)</sub> = soil temperature ℃ at depth z (mm) on previous day
 * `df` = depth factor that quantifies the influence of depth below surface on soil temperature
 * T<sub>aair</sub> = average annual air temperature ℃
@@ -568,7 +721,10 @@ $$
 * `dd` = damping depth (mm)
 * `z` = depth at the center of the soil layer (mm)
 
-Damping depth is a function of soil water and max damping depth. dd<sub>max</sub> is the maximum damping depth (mm) to which the temperature wave penetrates and the amplitude decreases to 1/e or 0.37 of its initial value in the soil layers. This is largely dependent on soil thermal conductivity and thermal diffusivity, and is calculated using following equations:
+Damping depth is a function of soil water and max damping depth. dd<sub>max</sub> is the maximum damping depth (mm)
+to which the temperature wave penetrates and the amplitude decreases to 1/e or 0.37 of its initial value in the soil
+layers. This is largely dependent on soil thermal conductivity and thermal diffusivity, and is calculated using
+following equations:
 
 ::: {#eq-sc-tmp-4}
 [[**SC.TMP.4**]]{.aside .content-visible when-format="html"}
@@ -602,7 +758,8 @@ $$
 * `SW` = total soil water in the profile (mm)
 * `Ztot` = total soil profile depth (mm)
         
-Soil surface temperature is a function of the previous day’s temperature, the amount of ground cover, and the temperature of a bare soil surface. The temperature of a bare soil is calculated as: 
+Soil surface temperature is a function of the previous day’s temperature, the amount of ground cover, and the
+temperature of a bare soil surface. The temperature of a bare soil is calculated as:
 
 ::: {#eq-sc-tmp-7}
 [[**SC.TMP.7**]]{.aside .content-visible when-format="html"}
@@ -631,7 +788,8 @@ $$
         
 Albedo should be determined by soil type and is set by user input. 
 		
-The impact of plant and snow cover is quantified as a weighting factor, bcv, given by the maximum of the following two equations:
+The impact of plant and snow cover is quantified as a weighting factor, bcv, given by the maximum of the following two
+equations:
 
 ::: {#eq-sc-tmp-9}
 [[**SC.TMP.9**]]{.aside .content-visible when-format="html"}
@@ -663,16 +821,25 @@ $$
 
 * `Tsurf` = surface temperature (℃)
 
-Surface temperature is dependent on the previous day’s soil temperature and is calculated before soil temperature on any given day. On the first day of a simulation the default soil temperature is used for T<sub>soil,d-1</sub>.
+Surface temperature is dependent on the previous day’s soil temperature and is calculated before soil temperature on
+any given day. On the first day of a simulation the default soil temperature is used for T<sub>soil,d-1</sub>.
 
 
 #### Soil Hydrology
 
-The soil hydrological processes calculated in RuFaS are limited to infiltration, the downward movement of water through the soil profile, and evapotranspiration, the movement of water from the soil profile into the atmosphere.
+The soil hydrological processes calculated in RuFaS are limited to infiltration, the downward movement of water
+through the soil profile, and evapotranspiration, the movement of water from the soil profile into the atmosphere.
 
 **Infiltration** `infiltration.py`
 
-The Infiltration class is implemented in `infiltration.py` and calculates both infiltration and runoff. Infiltration is the movement of soil water into and through the soil profile and surface runoff results when application of water to the ground surface exceeds the infiltration rate. Infiltration is calculated as the difference between the amount of water applied to the surface and the amount of surface water run off. Surface water is thus calculated first and then used to calculate soil water infiltration. Soil texture (percentage of sand, silt, and clay), bulk density, presence of pores, pore diameter, and continuity affect the soil infiltration rate. Slow soil infiltration rate results in ponding in the level areas, surface runoff, and erosion in sloping areas. High infiltration rates can lead to nutrient leaching. Surface runoff is estimated using the NRCS curve number method.
+The Infiltration class is implemented in `infiltration.py` and calculates both infiltration and runoff. Infiltration
+is the movement of soil water into and through the soil profile and surface runoff results when application of water
+to the ground surface exceeds the infiltration rate. Infiltration is calculated as the difference between the amount
+of water applied to the surface and the amount of surface water run off. Surface water is thus calculated first and
+then used to calculate soil water infiltration. Soil texture (percentage of sand, silt, and clay), bulk density,
+presence of pores, pore diameter, and continuity affect the soil infiltration rate. Slow soil infiltration rate
+results in ponding in the level areas, surface runoff, and erosion in sloping areas. High infiltration rates can lead
+to nutrient leaching. Surface runoff is estimated using the NRCS curve number method.
 
 Runoff has a minimum of 0 and is calculated as:
 
@@ -692,7 +859,8 @@ $$
 * `R` = daily rainfall (mm H<sub>2</sub>O) 
 * `S` = retention parameter (mm H<sub>2</sub>O)
         
-S is determined using an empirical value CN (curve number, unitless, user-defined). Three values of CN are used to determine S.
+S is determined using an empirical value CN (curve number, unitless, user-defined). Three values of CN are used to
+determine S.
 
 ::: {#eq-sc-inf-2}
 [[**SC.INF.2**]]{.aside .content-visible when-format="html"}
@@ -788,11 +956,17 @@ $$
 
 **Evapotranspiration**
 
-Evapotranspiration (ET) is one of the most important hydrological processes of soil water balance in the soil and crop module. It is the sum of all processes by which water moves from the land surface to the atmosphere via soil evaporation, plant canopy transpiration, and sublimation. RuFaS adapts the Hargreaves method to estimate ET which only requires temperature as an input [@hargreaves1985].
+Evapotranspiration (ET) is one of the most important hydrological processes of soil water balance in the soil and crop
+module. It is the sum of all processes by which water moves from the land surface to the atmosphere via soil
+evaporation, plant canopy transpiration, and sublimation. RuFaS adapts the Hargreaves method to estimate ET which
+only requires temperature as an input [@hargreaves1985].
 
-Potential evapotranspiration (PET) is the maximum amount of water that could be removed due to surface evaporation and plant canopy transpiration with no limitation on water availability, while evapotranspiration (ET) is the actual amount of water lost due to evaporation and transpiration. 
+Potential evapotranspiration (PET) is the maximum amount of water that could be removed due to surface evaporation
+and plant canopy transpiration with no limitation on water availability, while evapotranspiration (ET) is the actual
+amount of water lost due to evaporation and transpiration.
 
-*Potential Evapotranspiration* (implemented in `field.py`) is the larger of 0.001 or function of the radiation, daily temperature range, and heat of vaporization:
+*Potential Evapotranspiration* (implemented in `field.py`) is the larger of 0.001 or function of the radiation, daily
+temperature range, and heat of vaporization:
 
 ::: {#eq-sc-evp-1}
 [[**SC.EVP.1**]]{.aside .content-visible when-format="html"}
@@ -819,7 +993,9 @@ $$
 $$
 :::
             
-*Maximum crop transpiration* (implemented in `water_dynamics.py`) is the proportion of potential evapotranspiration that is transpired through the plant canopy. Leaf Area Index (LAI) lower than 3.0 and available water in the rooting zone limit transpiration.
+*Maximum crop transpiration* (implemented in `water_dynamics.py`) is the proportion of potential evapotranspiration
+that is transpired through the plant canopy. Leaf Area Index (LAI) lower than 3.0 and available water in the rooting
+zone limit transpiration.
 
 ::: {#eq-sc-evp-3}
 [[**SC.EVP.3**]]{.aside .content-visible when-format="html"}
@@ -837,7 +1013,8 @@ $$
 * Trans<sub>max</sub> =	maximum transpiration on a given day (mm H<sub>2</sub>O)
 * LAI<sub>act</sub>	= LAI (Leaf Area Index) actual (calculated in Crop Growth)
         
-*Sublimation and soil evaporation* (implemented in `field.py`) refer to the phase changes of solid and liquid water to gas which transfer water from land to atmosphere.
+*Sublimation and soil evaporation* (implemented in `field.py`) refer to the phase changes of solid and liquid water to
+gas which transfer water from land to atmosphere.
 
 ::: {#eq-sc-evp-4}
 [[**SC.EVP.4**]]{.aside .content-visible when-format="html"}
@@ -871,7 +1048,8 @@ $$
 $$
 :::    
             
-*Partition evaporation within soil profile* (implemented in `evaporation.py`) vertically subsets the maximum evaporation to calculate evaporation demand within each layer of the soil profile
+*Partition evaporation within soil profile* (implemented in `evaporation.py`) vertically subsets the maximum
+evaporation to calculate evaporation demand within each layer of the soil profile
 
 ::: {#eq-sc-evp-7}
 [[**SC.EVP.7**]]{.aside .content-visible when-format="html"}
@@ -885,7 +1063,8 @@ $$
 * evap<sub>z</sub> = evaporation demand at depth z (mm H<sub>2</sub>O)
 * `z` = depth below soil surface (mm)
         
-The evaporation demand for a given soil layer is the difference between evaporation demands at the top and bottom of the layer. 
+The evaporation demand for a given soil layer is the difference between evaporation demands at the top and bottom of
+the layer.
 
 ::: {#eq-sc-evp-8}
 [[**SC.EVP.8**]]{.aside .content-visible when-format="html"}
@@ -894,7 +1073,8 @@ $$
 $$
 :::
             
-When the water content of a soil layer is below field capacity, the evaporative demand for the layer is reduced according to the following equation:
+When the water content of a soil layer is below field capacity, the evaporative demand for the layer is reduced
+according to the following equation:
 
 ::: {#eq-sc-evp-9}
 [[**SC.EVP.9**]]{.aside .content-visible when-format="html"}
@@ -923,7 +1103,8 @@ The total actual amount of water lost in evapotranspiration (ETact) is equal to 
 
 **Percolation** `percolation.py`
 
-Percolation is the process of water movement downward through the soil profile. When the soil water content in a layer is less than or equal to field capacity no percolation occurs. Percolation is not calculated for frozen layers.  
+Percolation is the process of water movement downward through the soil profile. When the soil water content in a layer
+is less than or equal to field capacity no percolation occurs. Percolation is not calculated for frozen layers.
 
 ::: {#eq-sc-per-1}
 [[**SC.PER.1**]]{.aside .content-visible when-format="html"}
@@ -962,7 +1143,10 @@ $$
         
 **Soil Erosion** `soil_erosion.py`
 
-Soil erosion is a geological process whereby surface soil is removed by water/wind and  anthropogenically. In RuFaS, erosion is modeled from individual crop fields using the Modified Universal Soil Loss Equations (MUSLE, SWAT 2009 documentation). The MUSLE input variables include rainfall (rainfall amount and intensity), soil erodibility factor, soil cover/management, best management practices, and the topographic factor.
+Soil erosion is a geological process whereby surface soil is removed by water/wind and  anthropogenically. In RuFaS,
+erosion is modeled from individual crop fields using the Modified Universal Soil Loss Equations (MUSLE, SWAT 2009
+documentation). The MUSLE input variables include rainfall (rainfall amount and intensity), soil erodibility factor,
+soil cover/management, best management practices, and the topographic factor.
 
 *Base Equation, Rainfall Intensity, and Peak Runoff*
 
@@ -1134,7 +1318,8 @@ $$
 * `Cover` = amount of residue and growing biomass covering the soil surface (kg/ha)
 * 0.05 = the estimated minimum value for C	
         
-LS is a topographic factor and is the expected ratio of soil loss per unit area from a field slope to that from a 22.1-m length of uniform 9 percent slope under identical conditions. LS is estimated as:
+LS is a topographic factor and is the expected ratio of soil loss per unit area from a field slope to that from a
+22.1-m length of uniform 9 percent slope under identical conditions. LS is estimated as:
 
 ::: {#eq-sc-ero-15}
 [[**SC.ERO.15**]]{.aside .content-visible when-format="html"}
@@ -1160,7 +1345,8 @@ $$
             
 The P factor is a user defined support practice factor that reduces erosion. 
 
-If there is snow on the ground, this will heavily affect sediment yield. sed is adjusted for snowfall on the range day > 350, or day < 60 as:
+If there is snow on the ground, this will heavily affect sediment yield. sed is adjusted for snowfall on the range
+day > 350, or day < 60 as:
 
 ::: {#eq-sc-ero-17}
 [[**SC.ERO.17**]]{.aside .content-visible when-format="html"}
@@ -1185,8 +1371,7 @@ $$
 *Where*:
             
 * `rock` = percent of rock in the first soil layer
-        
-    
+
 #### Soil Nitrogen Cycling
 
 RuFaS tracks soil N as five pools based on nitrogen form and lability. 
@@ -1198,13 +1383,15 @@ Nitrogen enters the cycle as synthetic fertilizer, manure, and crop residue.
 
 * Synthetic fertilizers are partitioned into nitrate and ammonium. 
      * NO$_3^-$ can be taken up by plants, percolate, runoff, or denitrify to NO, N$_2$O, and N$_2$ gas.
-     * NH$_4^+$ can be converted into NO$_3^-$ via nitrification, taken up by plants, volatilized, percolated, or lost via runoff. 
+     * NH$_4^+$ can be converted into NO$_3^-$ via nitrification, taken up by plants, volatilized, percolated, or lost
+     via runoff.
 * Manure organic N is partitioned into active and stable organic N pools by 92.86% and 7.14% respectively. 
     * Active and stable organic N can interconvert. 
     * N in the active pool can also get percolated to the second layer. 
     * Active N is converted into NH$_4^+$ after mineralization.  
     * Manure dry matter mass goes into ammonium and nitrate pools using certain equations.
-* Residue biomass also gets converted into fresh and active organic N pools via mineralization. If residue is in top 2 cm it goes into the fresh organic N pool while if residue is below 2 cm it goes into the active organic N pool. 
+* Residue biomass also gets converted into fresh and active organic N pools via mineralization. If residue is in top 2
+cm it goes into the fresh organic N pool while if residue is below 2 cm it goes into the active organic N pool.
     * 80% of fresh organic N is converted into nitrate and 20% into active pool via decomposition. 
 
 **Intialize soil N Pools** `layer_data.py`
@@ -1218,7 +1405,8 @@ $$
 
 *Where*:
             
-* `initial_soil_nitrate_concentration` is the initial concentration of nitrate in the soil (mg kg$^{-1}$ or ppm) at depth
+* `initial_soil_nitrate_concentration` is the initial concentration of nitrate in the soil (mg kg$^{-1}$ or ppm) at
+depth
 * `depth_of_layer_center` is the depth of the middle of the soil layer from the soil surface (mm)
 
 The ammonium pool for soil N is initially set by the user in the soil input file.
@@ -1251,12 +1439,16 @@ $$
 
 *Where*:
             
-* activeN, `initial_active_organic_nitrogen_concentration`, is the concentration of N in the active organic pool (mg kg$^{-1}$)
+* activeN, `initial_active_organic_nitrogen_concentration`, is the concentration of N in the active organic pool
+(mg kg$^{-1}$)
 * `humic_organic_nitrogen_concentration` is the concentration of humic organic N in the layer (mg kg$^{-1}$)
-* FractN, `fraction_of_humic_nitrogen_in_active_pool`, is the fraction of humic N in the active pool; General Constant - 0.02
-* stableN, `initial_active_organic_nitrogen_concentration`, is the concentration of N in the stable organic pool (mg kg$^{-1}$)
+* FractN, `fraction_of_humic_nitrogen_in_active_pool`, is the fraction of humic N in the active pool;
+General Constant - 0.02
+* stableN, `initial_active_organic_nitrogen_concentration`, is the concentration of N in the stable organic pool
+(mg kg$^{-1}$)
         
-Fresh N is initialized in the top soil layer only (user defined, usually 0-20 mm), and is 0.15% of the initial amount of residue on the soil surface.
+Fresh N is initialized in the top soil layer only (user defined, usually 0-20 mm), and is 0.15% of the initial amount
+of residue on the soil surface.
 
 ::: {#eq-sc-son-4}
 [[**SC.SON.4**]]{.aside .content-visible when-format="html"}
@@ -1270,7 +1462,8 @@ $$
 * `fresh_organic_nitrogen_content` is the fresh organic pool in the top soil layer (kg N ha$^{-1}$)
 * `residue` is material in the residue pool for the top soil layer (kg ha$^{-1}$)	           
 
-While pool sizes are initialized as concentration (mg kg$^{-1}$), all calculations are done in units of mass (kg ha$^{-1}$). The conversion is:
+While pool sizes are initialized as concentration (mg kg$^{-1}$), all calculations are done in units of mass
+(kg ha$^{-1}$). The conversion is:
 
 ::: {#eq-sc-son-5}
 [[**SC.SON.5**]]{.aside .content-visible when-format="html"}
@@ -1292,11 +1485,15 @@ $$
 * `depth` is the thickness of a given layer (mm)
 * `field size` is the field area (ha)
         
-All pools have a lower limit of 0. If a transfer of N from one pool to another is greater than the N in the pool of origin, the destination pool receives only the amount that depletes the pool of origin. The rest of the N cycle is in the `nitrogen_cycling` folder and run by `nitrogen_cycling.py`, which is called from the soil routine.
+All pools have a lower limit of 0. If a transfer of N from one pool to another is greater than the N in the pool of
+origin, the destination pool receives only the amount that depletes the pool of origin. The rest of the N cycle is in
+the `nitrogen_cycling` folder and run by `nitrogen_cycling.py`, which is called from the soil routine.
 
 **Nitrification and Volatilization** `nitrification_volatilization.py`
 
-Nitrification is the conversion of  NH$_4^+$ to NO$_3^-$ via microbial oxidation of NH$_4^+$ under suitable soil temperature and moisture conditions. Nitrification occurs only at soil temperatures greater than 5℃ and is modeled as a function of soil temperature and water factors, `temp_factor` and `water_factor`.
+Nitrification is the conversion of  NH$_4^+$ to NO$_3^-$ via microbial oxidation of NH$_4^+$ under suitable soil
+temperature and moisture conditions. Nitrification occurs only at soil temperatures greater than 5℃ and is modeled as
+a function of soil temperature and water factors, `temp_factor` and `water_factor`.
 
 ::: {#eq-sc-nnv-1}
 [[**SC.NNV.1**]]{.aside .content-visible when-format="html"}
@@ -1323,7 +1520,9 @@ $$
 * `field_capacity` is the field capacity water content (mm)
 * `wilting_point` is the wilting point water content (mm)
 
-The volatilization of aqueous soil ammonium to ammonia gas (NH<sub>3</sub>) occurs even when nitrification does not.NH<sub>3</sub> volatilization is influenced by temperature, moisture, fertilizer application, pH, and depth [@mu-extsoil].
+The volatilization of aqueous soil ammonium to ammonia gas (NH<sub>3</sub>) occurs even when nitrification does
+not.NH<sub>3</sub> volatilization is influenced by temperature, moisture, fertilizer application, pH, and depth
+[@mu-extsoil].
 
 The volatilization depth factor (`DepthFac`) is unitless and calculated as:
 
@@ -1338,9 +1537,12 @@ $$
             
 * `depth_of_layer_center` is the depth from the surface of the soil to the middle of the layer (mm)
         
-The impact of environmental factors on nitrification andNH<sub>3</sub> volatilization are estimated by nitrification and volatilization regulator equations. Nitrification and volatilization only occur if the soil temperature is greater than 5℃.
+The impact of environmental factors on nitrification andNH<sub>3</sub> volatilization are estimated by nitrification
+and volatilization regulator equations. Nitrification and volatilization only occur if the soil temperature is greater
+than 5℃.
 
-A nitrification regulator (`nitrification_regulator`) and a volatilization regulator (`volatilization_regulator`) are calculated as:
+A nitrification regulator (`nitrification_regulator`) and a volatilization regulator (`volatilization_regulator`) are
+calculated as:
 
 ::: {#eq-sc-nnv-3}
 [[**SC.NNV.3**]]{.aside .content-visible when-format="html"}
@@ -1384,7 +1586,8 @@ $$
 :::              
 
             
-The amount of N removed from the NH,<sub>4</sub> pool via nitrification and converted to NO<sub>3</sub> is (kg N ha$^{-1}$) calculated as:
+The amount of N removed from the NH,<sub>4</sub> pool via nitrification and converted to NO<sub>3</sub> is
+(kg N ha$^{-1}$) calculated as:
 
 ::: {#eq-sc-nnv-7 style="font-size:90%"}
 [[**SC.NNV.7**]]{.aside .content-visible when-format="html"}
@@ -1401,9 +1604,15 @@ $$
 
 **Nitrogen Loss in Leaching and Runoff** `leaching_runoff_erosion.py`
 
-N can be transported with the movement of water through and out of the soil profile through leaching, runoff, and erosion. Leaching is the process by which N ions move down the soil profile with percolating soil water [@wangli2019]. Leaching affects inorganic and active organic pools. If percolation is 0, then percolated N is also 0. NO<sub>3</sub>, NO<sub>4</sub> and active N lost to percolation in each layer is removed from the layer of origin and added to the layer below. The water and N percolated from the bottom layer is lost from the soil profile to the vadose layer. Runoff and erosion N is removed exclusively from the surface soil layer. Lateral flow is not taken into account.
+N can be transported with the movement of water through and out of the soil profile through leaching, runoff, and
+erosion. Leaching is the process by which N ions move down the soil profile with percolating soil water [@wangli2019].
+Leaching affects inorganic and active organic pools. If percolation is 0, then percolated N is also 0. NO<sub>3</sub>,
+NO<sub>4</sub> and active N lost to percolation in each layer is removed from the layer of origin and added to the
+layer below. The water and N percolated from the bottom layer is lost from the soil profile to the vadose layer.
+Runoff and erosion N is removed exclusively from the surface soil layer. Lateral flow is not taken into account.
 
-The concentration of NO<sub>3</sub> and NO<sub>4</sub> (kg N mm$^{-1}$ H<sub>2</sub>O) in the mobile water fraction for a given layer (NConc<sub>1</sub>) is: 
+The concentration of NO<sub>3</sub> and NO<sub>4</sub> (kg N mm$^{-1}$ H<sub>2</sub>O) in the mobile water
+fraction for a given layer (NConc<sub>1</sub>) is:
 
 ::: {#eq-sc-nnv-8}
 [[**SC.NNV.8**]]{.aside .content-visible when-format="html"}
@@ -1419,7 +1628,8 @@ $$
 * $\theta$ is the fraction of porosity from which anions are excluded
 * `SAT` is the saturated water content of the soil layer (mm H<sub>2</sub>O).
         
-The amount of mobile water in the layer (mm H<sub>2</sub>O) is the amount of water lost by surface runoff and percolation given as:   
+The amount of mobile water in the layer (mm H<sub>2</sub>O) is the amount of water lost by surface runoff and
+percolation given as:
 
 * for top layer:
 
@@ -1442,7 +1652,8 @@ $$
 *Where*:
             
 * `runoff_water_amount` is the surface runoff generated on a given day (mm H<sub>2</sub>O)
-* `percolated_water_amount` is the amount of water percolating to the underlying soil layer on a given day (mm H<sub>2</sub>O). 
+* `percolated_water_amount` is the amount of water percolating to the underlying soil layer on a given day
+(mm H<sub>2</sub>O).
         
 The amount/mass (kg N ha$^{-1}$) of NO<sub>3</sub> and NO<sub>4</sub> lost in surface runoff  is: 
 
@@ -1460,8 +1671,10 @@ $$
 
 *Where*:
             
-* `xxx_conc_in_mobile_h20` is the concentration of nitrate or ammonium in the surface layer mobile water (kg N mm$^{-1}$ H<sub>2</sub>O)
-* `xxx_runoff_coefficient` is the nitrate or ammonium percolation coefficient (General Constants; ammonium = 0.2, nitrate = 0.2)
+* `xxx_conc_in_mobile_h20` is the concentration of nitrate or ammonium in the surface layer mobile water
+(kg N mm$^{-1}$ H<sub>2</sub>O)
+* `xxx_runoff_coefficient` is the nitrate or ammonium percolation coefficient (General Constants; ammonium = 0.2,
+nitrate = 0.2)
 * `runoff_water_amount` is the surface runoff generated on a given day (mm H<sub>2</sub>O) 
         
 **Nitrogen Erosion** `leaching_runoff_erosion.py`
@@ -1493,7 +1706,8 @@ $$
             
 * `daily_soil_lost` is the daily soil loss per hectare (metric tons soil ha$^{-1}$)
 * `nitrogen_erosion_concentration` is the concentration of organic N in the top soil layer (g N metric ton$^{-1}$ soil)
-* `enrichment_ratio` is the ratio of concentration of organic N transported with the sediment to that found in the soil surface layer. 
+* `enrichment_ratio` is the ratio of concentration of organic N transported with the sediment to that found in the
+soil surface layer.
         
 ::: {#eq-sc-lch-4}
 [[**SC.LCH.4**]]{.aside .content-visible when-format="html"}
@@ -1514,15 +1728,20 @@ $$
 
 *Where*:
             
-* `xxx_conc_in_mobile_h20` is the concentration of nitrate or ammonium in the surface layer mobile water (kg N mm$^{-1}$ H<sub>2</sub>O) as determined in equation [SC.NNV.8](#eq-sc-nnv-8)
+* `xxx_conc_in_mobile_h20` is the concentration of nitrate or ammonium in the surface layer mobile water
+(kg N mm$^{-1}$ H<sub>2</sub>O) as determined in equation [SC.NNV.8](#eq-sc-nnv-8)
 * `percolated_water` is the water percolated from the layer (mm)
 
 
 **Denitrification** `denitrification.py`
 
-Denitrification is the bacterial conversion of NO<sub>3</sub> to denitrified nitrates (N$_2$, NO<sub>2</sub>, NO, N$_2$O) under anaerobic conditions. The denitrification submodule calculates total denitrified nitrates and partitions these emissions further into N$_2$O and N$_2$. Denitrification is a function of soil water content, temperature, and induced by the presence of NO<sub>3</sub> and carbon (C). 
+Denitrification is the bacterial conversion of NO<sub>3</sub> to denitrified nitrates (N$_2$, NO<sub>2</sub>, NO,
+N$_2$O) under anaerobic conditions. The denitrification submodule calculates total denitrified nitrates and partitions
+these emissions further into N$_2$O and N$_2$. Denitrification is a function of soil water content, temperature, and
+induced by the presence of NO<sub>3</sub> and carbon (C).
 
-The amount of nitrate that is lost to denitrification (`DenitrN`) (kg N ha$^{-1}$) is calculated for each soil layer by the function `calculate_denitrification_amount` according to the following equation:
+The amount of nitrate that is lost to denitrification (`DenitrN`) (kg N ha$^{-1}$) is calculated for each soil layer
+by the function `calculate_denitrification_amount` according to the following equation:
 
 If `nutrient_cycling_soil_water_factor<sub>layer[i]</sub>` > `soil_water_threshold`:
 
@@ -1545,13 +1764,18 @@ $$
 *Where*:
             
 * nitrate_content<sub>layer[i]</sub> is the amount of nitrate in layer i (kg N h$^{-1}$)
-* `denitrification_rate_coefficienct` is the user defined denitrification rate coefficient which can have values between 0-3 with a default value of 1.4
+* `denitrification_rate_coefficienct` is the user defined denitrification rate coefficient which can have values
+between 0-3 with a default value of 1.4
 * temp_factor<sub>layer[i]</sub> is the nutrient cycling temperature factor for each layer
-* organic_carbon_percent<sub>layer[i]</sub> is the amount of organic carbon in the layer (%) calculated as organic_carbon_fraction<sub>layer[i]</sub> x 100
+* organic_carbon_percent<sub>layer[i]</sub> is the amount of organic carbon in the layer (%) calculated as
+organic_carbon_fraction<sub>layer[i]</sub> x 100
 * nutrient_cycling_soil_water_factor<sub>layer[i]</sub> is the nutrient cycling water factor for the layer i
-* `soil_water_threshold` is the nutrient_cycling_water_factor threshold value for the soil profile and is a user input with a default of 1.0. According to @wen2024 the value for the soil_water_threshold is typically set to 1.0 so denitrification is allowed to occur when water content is above field capacity.
+* `soil_water_threshold` is the nutrient_cycling_water_factor threshold value for the soil profile and is a user input
+with a default of 1.0. According to @wen2024 the value for the soil_water_threshold is typically set to 1.0 so
+denitrification is allowed to occur when water content is above field capacity.
 
-The `denitrified_nitrates<sub>layer[i]</sub>` is removed from the layer’s NO<sub>3</sub> pool and partitioned into N$_2$O and N$_2$ which are then lost to the atmosphere. 
+The `denitrified_nitrates<sub>layer[i]</sub>` is removed from the layer’s NO<sub>3</sub> pool and partitioned into
+N$_2$O and N$_2$ which are then lost to the atmosphere.
 
 Partitioning factor is used to partition denitrified nitrates into N$_2$O and N$_2$:
 
@@ -1625,9 +1849,17 @@ $$
         
 **Mineralization and Decomposition/Immobilization** `mineralization_decomp.py`
 
-Mineralization is the microbial conversion of organic N to simple, soluble forms of organic N (including amino acids) and ultimately to the inorganic N that can be taken up by a plant. Decomposition is the breakdown of fresh organic residue into simpler organic components. Immobilization is the uptake or assimilation of N by microbes making them unavailable (temporarily) to plants. Soil stoichiometry (C:N) determines whether organic N will be mineralized (resulting in more plant available N) or inorganic N will be immobilized (resulting in less plant available N).
+Mineralization is the microbial conversion of organic N to simple, soluble forms of organic N (including amino acids)
+and ultimately to the inorganic N that can be taken up by a plant. Decomposition is the breakdown of fresh organic
+residue into simpler organic components. Immobilization is the uptake or assimilation of N by microbes making them
+unavailable (temporarily) to plants. Soil stoichiometry (C:N) determines whether organic N will be mineralized
+(resulting in more plant available N) or inorganic N will be immobilized (resulting in less plant available N).
 
-The N mineralization equations represent net mineralization which incorporate immobilization into the equations. Fresh and active N pools are subject to decomposition and mineralization respectively. Mineralization and decomposition are allowed to occur only if soil temperature is greater than 0℃. Soil temperature and water are the two factors used in the mineralization and decomposition equations to account for the impacts of temperature and moisture on these processes. 
+The N mineralization equations represent net mineralization which incorporate immobilization into the equations.
+Fresh and active N pools are subject to decomposition and mineralization respectively. Mineralization and
+decomposition are allowed to occur only if soil temperature is greater than 0℃. Soil temperature and water are the
+two factors used in the mineralization and decomposition equations to account for the impacts of temperature and
+moisture on these processes.
 
 N mineralized from the active N pool (`Nminact`) (kg N ha$^{-1}$) is calculated as:
 
@@ -1645,7 +1877,10 @@ $$
 * `water_factor` is the nutrient cycling water factor for the layer
 * `activeN` is the amount of N in the active organic pool (kg N ha$^{-1}$)
                      
-N mineralized from the active pool is transferred from the active pool to the NH<sub>4</sub> pool. Decomposition and mineralization are a function of a daily decay rate constant that is calculated with the C:N and C:P ratios of the residue, and temperature and soil water factors. The C:N and C:P ratios of the residues in the soil layer are currently fixed at:
+N mineralized from the active pool is transferred from the active pool to the NH<sub>4</sub> pool. Decomposition and
+mineralization are a function of a daily decay rate constant that is calculated with the C:N and C:P ratios of the
+residue, and temperature and soil water factors. The C:N and C:P ratios of the residues in the soil layer are currently
+fixed at:
 
 ::: {#eq-sc-nmn-2}
 [[**SC.NMN.2**]]{.aside .content-visible when-format="html"}
@@ -1654,7 +1889,8 @@ $$
 $$
 ::: 
 
-The decay rate constant, the same as that used to calculate residue in crop defines the fraction of residue that is decomposed as: 
+The decay rate constant, the same as that used to calculate residue in crop defines the fraction of residue that is
+decomposed as:
 
 ::: {#eq-sc-nmn-3}
 [[**SC.NMN.3**]]{.aside .content-visible when-format="html"}
@@ -1666,7 +1902,8 @@ $$
 *Where*:
             
 * `residue_comp_factor` is the nutrient cycling residue composition factor
-* `min_coeff` is the rate coefficient for mineralization of the residue fresh organic nutrients (user-defined, default - 0.05)
+* `min_coeff` is the rate coefficient for mineralization of the residue fresh organic nutrients (user-defined,
+default - 0.05)
 * `temp_factor` is temperature’s effect on nutrient cycling for the layer
 * `water_factor` is water’s effect on nutrient cycling for the layer
         
@@ -1684,13 +1921,19 @@ $$
 * `decay_rate_constant` is the residue decay rate constant
 * `freshN` is the N in the fresh organic pool in the layer (kg N ha$^{-1}$).
         
-20% of the N decomposed from the `residue_freshN_mineralization` is then transferred to the active organic N pool, and 80% is transferred to the NO<sub>3</sub> pool. In the top layer, 0.15% of residue is decomposed into fresh organic N pools.
+20% of the N decomposed from the `residue_freshN_mineralization` is then transferred to the active organic N pool, and
+80% is transferred to the NO<sub>3</sub> pool. In the top layer, 0.15% of residue is decomposed into fresh organic N
+pools.
 
 **Humus Mineralization** `humus_mineralization.py`
 
-In general, the term humus describes the transformed products formed from a wide variety of organic substrates without any intent to assign chemical composition or structure @hayes2020vindication. Humus mineralization allows N to move between the active and stable organic pools. N mineralized from the humus active organic pool is added to the NO<sub>3</sub> pool in the layer. 
+In general, the term humus describes the transformed products formed from a wide variety of organic substrates without
+any intent to assign chemical composition or structure @hayes2020vindication. Humus mineralization allows N to move
+between the active and stable organic pools. N mineralized from the humus active organic pool is added to the
+NO<sub>3</sub> pool in the layer.
 
-The amount of N transferred between the active and stable organic pools (`Ntrans`) (kg N h$^{-1}$) maintains an equilibrium, and is calculated as:
+The amount of N transferred between the active and stable organic pools (`Ntrans`) (kg N h$^{-1}$) maintains an
+equilibrium, and is calculated as:
 
 ::: {#eq-sc-nmn-5}
 [[**SC.NMN.5**]]{.aside .content-visible when-format="html"}
@@ -1709,16 +1952,25 @@ $$
 * fracN is the `fraction_of_humic_nitrogen_in_the_active_ pool` (0.02)
 * `stable_organic_nitrogen` is the amount of N in the stable organic pool (kg N ha$^{-1}$)  
         
-When `Ntrans` is positive, N moves from the active to stable organic pool. When `Ntrans` is negative, N moves from stable to active organic pool.
-
+When `Ntrans` is positive, N moves from the active to stable organic pool. When `Ntrans` is negative, N moves from
+stable to active organic pool.
 
 #### Soil Phosphorus Cycling
 
-Soil phosphorus cycling is based on the SurPhos model theoretical documentation, which identifies eight soil phosphorus pools; two organic and six inorganic  [@vadas2007]. Organic pools are divided into stable and water extractable and inorganic pools are divided into stable, water extractable, active, labile, recalcitrant, and available. RuFaS handles phosphorus cycling via the `PhosphorusCycling` class, which contains and manages the simulated aspects of phosphorus in a soil profile. These aspects are divided into fertilizer (implemented in `fertilizer.py`), manure (implemented in `manure.py`), mineralization (implemented in `phosphorus_mineralization.py`), and soluble phosphorus (implemented in `soluble_phosphorus.py`). The `cycle_phosphorus` method calls each of the daily routines that manage surface and subsurface phosphorus.
+Soil phosphorus cycling is based on the SurPhos model theoretical documentation, which identifies eight soil phosphorus
+pools; two organic and six inorganic  [@vadas2007]. Organic pools are divided into stable and water extractable and
+inorganic pools are divided into stable, water extractable, active, labile, recalcitrant, and available. RuFaS handles
+phosphorus cycling via the `PhosphorusCycling` class, which contains and manages the simulated aspects of phosphorus in
+a soil profile. These aspects are divided into fertilizer (implemented in `fertilizer.py`), manure (implemented in
+`manure.py`), mineralization (implemented in `phosphorus_mineralization.py`), and soluble phosphorus (implemented in
+`soluble_phosphorus.py`). The `cycle_phosphorus` method calls each of the daily routines that manage surface and
+subsurface phosphorus.
 
 **Phosphorus Initialization** `layer_data.py`
 
-The P sorption parameter (PSP) is initialized before the simulation begins. The PSP represents how much of any inorganic P added to soil remains labile P upon reaching relative equilibrium. A PSP of 0.5 means 50% of added P remains labile P and 50% becomes active P. 
+The P sorption parameter (PSP) is initialized before the simulation begins. The PSP represents how much of any
+inorganic P added to soil remains labile P upon reaching relative equilibrium. A PSP of 0.5 means 50% of added P
+remains labile P and 50% becomes active P.
 
 PSP is initialized as:	
 
@@ -1741,7 +1993,8 @@ $$
 * `PSP` is the P sorption parameter (unitless)
 * `clay` is the adjusted_clay_content 
 * `clay fraction` is the fraction of the layer composed of clay
-* `orgC` is the percentage of the layer composed of organic carbon, assumed to be 58% of user-defined organic matter content (%)
+* `orgC` is the percentage of the layer composed of organic carbon, assumed to be 58% of user-defined organic matter
+content (%)
 * labileP (`labile_inorganic_phosphorus`) is the concentration of labile inorganic phosphorus (mg kg$^{-1}$) 
         
 ::: {#eq-sc-pho-3}
@@ -1758,7 +2011,10 @@ After initialization soil P pools are converted from mg phosphorus kg$^{-1}$ soi
 
 **Soluble Phosphorus** `soluble_phosphorus.py`
 
-The `SolublePhosphorus` class calculates the P transferred via hydrological processes in the soil based on equations from the APLE and SurPhos models [@vadas2007]. The     `daily_update_routine` alters phosphorus levels in the `SoilData` object by tracking phosphorus in runoff (if any) from the first soil layer and phosphorus percolated downward through the soil profile.
+The `SolublePhosphorus` class calculates the P transferred via hydrological processes in the soil based on equations
+from the APLE and SurPhos models [@vadas2007]. The     `daily_update_routine` alters phosphorus levels in the
+`SoilData` object by tracking phosphorus in runoff (if any) from the first soil layer and phosphorus percolated
+downward through the soil profile.
 
 **Soluble Phosphorus Runoff**
         
@@ -1771,7 +2027,8 @@ $$
     
 *Where*:
             
-* `adjusted DRPrunoff` is the dissolved reactive phosphorus in runoff from the soil (kg ha$^{-1}$) surface expressed as the lesser of labileP or calculated dissolved P
+* `adjusted DRPrunoff` is the dissolved reactive phosphorus in runoff from the soil (kg ha$^{-1}$) surface expressed as
+the lesser of labileP or calculated dissolved P
 * `extraction coefficient` is 0.005
 * `runoff` is the amount of water lost from the surface layer (L ha$^{-1}$)
 * `top_soil_layerP` is:
@@ -1830,9 +2087,11 @@ $$
             
 * DRP<sub>leachate</sub> is the dissolved reactive phosphorus leached from the soil layer (mg L$^{-1}$)
         
-The maximum leachate concentration specified in APLE is 20 (mg L$^{-1}$), and is applied here as the min term. Leached P is added to the soil layer immediately below the layer for which it is calculated.
+The maximum leachate concentration specified in APLE is 20 (mg L$^{-1}$), and is applied here as the min term. Leached
+P is added to the soil layer immediately below the layer for which it is calculated.
 
-The predicted value in (mg L$^{-1}$) is then converted to kg h$^{-1}$ and the actual dissolved reactive phosphorus is expressed as the minimum of the layer labile P or the calculated DRP<sub>leachate</sub> to prevent negative values.
+The predicted value in (mg L$^{-1}$) is then converted to kg h$^{-1}$ and the actual dissolved reactive phosphorus is
+expressed as the minimum of the layer labile P or the calculated DRP<sub>leachate</sub> to prevent negative values.
         
 ::: {#eq-sc-psl-6}
 [[**SC.PSL.6**]]{.aside .content-visible when-format="html"}
@@ -1854,7 +2113,9 @@ Simulates the leaching and runoff of phosphorus from fertilizer applied to the s
 
 **Available Fertilizer P pool**
 
-During rainfall events, the fraction of fertilizer P lost is greatest during the first rain event and reduced for each consecutive rainfall event. When synthetic fertilizer P is applied, 75% of it goes into an available pool, and 25% goes into a recalcitrant pool. The equation below determines the fraction of P remaining in the available P pool (unitless). 
+During rainfall events, the fraction of fertilizer P lost is greatest during the first rain event and reduced for each
+consecutive rainfall event. When synthetic fertilizer P is applied, 75% of it goes into an available pool, and 25% goes
+into a recalcitrant pool. The equation below determines the fraction of P remaining in the available P pool (unitless).
         
 ::: {#eq-sc-psl-7}
 [[**SC.PSL.7**]]{.aside .content-visible when-format="html"}
@@ -1873,14 +2134,18 @@ $$
     * “GRASSED”: 0.8
             
 ::: {.callout-note}
-Note: the multiplicative and additive constants differ between the SurPhos documentation and here, the ones listed here should be preferred [@vadas2007].
+Note: the multiplicative and additive constants differ between the SurPhos documentation and here, the ones listed here
+should be preferred [@vadas2007].
 :::        
         
-fert<sub>CNT</sub> is then iterated to account for the logarithmic curve of fertilizer sorption without rain. The availability of P for runoff or leaching decreases as it sits on the soil surface.
+fert<sub>CNT</sub> is then iterated to account for the logarithmic curve of fertilizer sorption without rain. The
+availability of P for runoff or leaching decreases as it sits on the soil surface.
 
 **Runoff and Leaching**
      
-At the first rainfall event, available P is split between runoff and leachate. Subsequent rain events target the recalcitrant pool, with 40% of released P leached, and all subsequent events leaching 7.5% of available P. The partitioning of P between runoff and leachate is a function of the amount of rainfall.
+At the first rainfall event, available P is split between runoff and leachate. Subsequent rain events target the
+recalcitrant pool, with 40% of released P leached, and all subsequent events leaching 7.5% of available P. The
+partitioning of P between runoff and leachate is a function of the amount of rainfall.
 
 ::: {#eq-sc-psl-8}
 [[**SC.PSL.8**]]{.aside .content-visible when-format="html"}
@@ -1920,7 +2185,9 @@ $$
             
 * fert<sub>sorp</sub> is the fertilizer sorption
         
-For the first layer, labileP is converted to kg to add adsorbed fertilizer P. labileP is then converted back to kg ha$^{-1}$. The concentration of fertilizer dissolved P in runoff (mg L$^{-1}$) (fertP<sub>dissolved in runoff</sub>) is computed:
+For the first layer, labileP is converted to kg to add adsorbed fertilizer P. labileP is then converted back to
+kg ha$^{-1}$. The concentration of fertilizer dissolved P in runoff (mg L$^{-1}$) (fertP<sub>dissolved in runoff</sub>)
+is computed:
         
 ::: {#eq-sc-psl-12}
 [[**SC.PSL.12**]]{.aside .content-visible when-format="html"}
@@ -1939,11 +2206,14 @@ $$
 *Where*:
             
 * `fertP` is the amount of fertilizer P in the pool that is going to be leached from (mg)
-* fraction of P released is the fraction of P solubilized during the current rain event. 1 for first, 0.4 for second, and 0.075 (unitless).
-* PD<sub>fact</sub> is the P distribution factor is the value that determines P distribution between runoff and infiltration (unitless)
+* fraction of P released is the fraction of P solubilized during the current rain event. 1 for first, 0.4 for second,
+and 0.075 (unitless).
+* PD<sub>fact</sub> is the P distribution factor is the value that determines P distribution between runoff and
+infiltration (unitless)
 * total rainfall is rainfall on the day (L)
         
-Leached fertilizer P is added to soil labileP for each layer to yield the updated labileP as a function of depth [@vadas2007]:
+Leached fertilizer P is added to soil labileP for each layer to yield the updated labileP as a function of depth
+[@vadas2007]:
         
 ::: {#eq-sc-psl-14}
 [[**SC.PSL.14**]]{.aside .content-visible when-format="html"}
@@ -1961,7 +2231,10 @@ Fertilizer P lost to runoff and leaching are added to their cumulative sums.
 
 **Manure Phosphorus**
 
-Manure is an important source of bioavailable P for crop uptake, runoff, and leaching losses. Organic and inorganic P contributions from manure applications are tracked and modeled, including decomposition of manure solids, labile P release and P sorption. Largely changes to manure P are by three main processes: leaching, decomposition, and assimilation.  
+Manure is an important source of bioavailable P for crop uptake, runoff, and leaching losses. Organic and inorganic
+P contributions from manure applications are tracked and modeled, including decomposition of manure solids, labile P
+release and P sorption. Largely changes to manure P are by three main processes: leaching, decomposition, and
+assimilation.
 
 **Manure Phosphorus Leaching** `manure_pool.py`
 
@@ -2061,7 +2334,8 @@ $$
     
 *Where*:
             
-* `DF` is the Depth Factor for a given layer of soil, a terminating geometric sequence modeling the decreasing fraction of manure P to be leached from one layer to the next
+* `DF` is the Depth Factor for a given layer of soil, a terminating geometric sequence modeling the decreasing fraction
+of manure P to be leached from one layer to the next
 * `center depth` is the depth of the center of a given soil layer (mm)
 * `damping depth` is the damping depth of the soil factor (mm)
         
@@ -2166,7 +2440,8 @@ $$
     
 *Where*:
             
-* P{pools} represents each of the tracked P pools: stable inorganic P (SIP), stable organic P (SOP), water-extractable organic P (WOP)
+* P{pools} represents each of the tracked P pools: stable inorganic P (SIP), stable organic P (SOP), water-extractable
+organic P (WOP)
         
 Manure mass and total cover also have assimilation factors calculated as: 
             
@@ -2246,12 +2521,14 @@ $$
     
 *Where*:
             
-* `depth_factor` is a terminating geometric sequence modeling the decreasing fraction of decomposed P to be leached from one layer to the next
+* `depth_factor` is a terminating geometric sequence modeling the decreasing fraction of decomposed P to be leached
+from one layer to the next
 
 
 **Manure Runoff** `manure_pool.py`
 
-Manure and soil P in the first layer are susceptible to runoff and the manure dissolved reactive phosphorus is 0.5\% of the top layer P concentration:
+Manure and soil P in the first layer are susceptible to runoff and the manure dissolved reactive phosphorus is 0.5\% of
+the top layer P concentration:
 
 ::: {#eq-sc-psl-55}
 [[**SC.PSL.55**]]{.aside .content-visible when-format="html"}
@@ -2265,7 +2542,8 @@ $$
 * MDRP{runoff} is the manure dissolved reactive P transported in runoff (mg/L)
 * `manureP` is the amount of manure phosphorus
         
-The total inorganic phosphorus in runoff is calculated as the sum of manure inorganic, dissolved reactive, and fertilizer P:
+The total inorganic phosphorus in runoff is calculated as the sum of manure inorganic, dissolved reactive, and
+fertilizer P:
 
 ::: {#eq-sc-psl-56}
 [[**SC.PSL.56**]]{.aside .content-visible when-format="html"}
@@ -2283,9 +2561,13 @@ $$
         
 **Phosphorus Mineralization** `phosphorus_mineralization.py`
 
-Phosphorus mineralization is the transfer of P from organic to inorganic pools and between labile and active inorganic pools.
+Phosphorus mineralization is the transfer of P from organic to inorganic pools and between labile and active
+inorganic pools.
 
-The amount of P that mineralizes into water-extractable inorganic P on the current day from the given pool is a function of the sorption dynamics of the type of P being mineralized, soil temperature, and soil moisture. The maximum P sorption parameter (PSP) is calculated for each layer then adjusted to be between 0.05 and 0.7 and limited based on the average value of PSP.
+The amount of P that mineralizes into water-extractable inorganic P on the current day from the given pool is a
+function of the sorption dynamics of the type of P being mineralized, soil temperature, and soil moisture. The maximum
+P sorption parameter (PSP) is calculated for each layer then adjusted to be between 0.05 and 0.7 and limited based on
+the average value of PSP.
             
 ::: {#eq-sc-pmn-1}
 [[**SC.PMN.1**]]{.aside .content-visible when-format="html"}
@@ -2302,7 +2584,9 @@ $$
         
 The following variables are used to define the empirical sorption and desorption curves.
 
-The current balance of P between labile and active inorganic pools is calculated as pbal. A negative value returned indicates that there is more active phosphorus than there should be, a positive value indicates that there is more labile phosphorus than there should be, and a return value of zero indicates that the two pools are balanced
+The current balance of P between labile and active inorganic pools is calculated as pbal. A negative value returned
+indicates that there is more active phosphorus than there should be, a positive value indicates that there is more
+labile phosphorus than there should be, and a return value of zero indicates that the two pools are balanced
             
 ::: {#eq-sc-pmn-2}
 [[**SC.PMN.2**]]{.aside .content-visible when-format="html"}
@@ -2334,7 +2618,8 @@ $$
 $$
 :::
 
-The amount of P that should be removed from the active inorganic P pool to put it in equilibrium with the labile inorganic P pool (kg ha$^{-1}$) is given as `labilepflow` 
+The amount of P that should be removed from the active inorganic P pool to put it in equilibrium with the labile
+inorganic P pool (kg ha$^{-1}$) is given as `labilepflow`
 
 ::: {#eq-sc-pmn-5}
 [[**SC.PMN.5**]]{.aside .content-visible when-format="html"}
@@ -2346,9 +2631,11 @@ $$
 *Where*:
             
 * PD{fac} is the P desorption factor
-* day{count} is the number of days that the active inorganic P pool has been greater than it would be when in equilibrium with the labile inorganic P pool. 
+* day{count} is the number of days that the active inorganic P pool has been greater than it would be when in
+equilibrium with the labile inorganic P pool.
 * labile{pflow} is the amount of P moved from the active to labile inorganic P pool to maintain equilibrium (kg/ha).
-* `base` is a value used to determine how much P is transferred from the active P pool to the labile inorganic P pool (unitless). 
+* `base` is a value used to determine how much P is transferred from the active P pool to the labile inorganic P pool
+(unitless).
 * PSP{act}	is the actual P sorption parameter of the layer adjusted from the maximum (unitless)
         
 P sorption factor (`PDfac`) calculates how much P should be sorped in the given soil layer:
@@ -2363,10 +2650,12 @@ $$
 *Where*:
             
 * PS{fac} is the P sorption factor
-* scalar is the scalar used to calculate sorption factor. The scalar is used in determining how much phosphorus is removed from the labile inorganic phosphorus pool and transferred to the active inorganic phosphorus pool (unitless).
+* scalar is the scalar used to calculate sorption factor. The scalar is used in determining how much phosphorus is
+removed from the labile inorganic phosphorus pool and transferred to the active inorganic phosphorus pool (unitless).
 * exponent is a value used as an exponential term when determining the phosphorus sorption rate (unitless).
         
-The amount of phosphorus that should be removed from the labile inorganic phosphorus pool to put it in equilibrium with the active inorganic phosphorus pool (kg / ha) (`activepflow`) is given as:
+The amount of phosphorus that should be removed from the labile inorganic phosphorus pool to put it in equilibrium with
+the active inorganic phosphorus pool (kg / ha) (`activepflow`) is given as:
             
 ::: {#eq-sc-pmn-7}
 [[**SC.PMN.7**]]{.aside .content-visible when-format="html"}
@@ -2397,7 +2686,10 @@ $$
 
 #### Soil Carbon Cycling
 
-The `CarbonCycling` class (implemented in `carbon_cycle.py`) manages carbon cycling processes within the `SoilData` object. Carbon cycling processes include decomposition of organic matter, processing of crop residue, and partitioning of carbon between soil pools and the atmosphere and are based on the DAYCENT model. There are five carbon pools in the soil:
+The `CarbonCycling` class (implemented in `carbon_cycle.py`) manages carbon cycling processes within the `SoilData`
+object. Carbon cycling processes include decomposition of organic matter, processing of crop residue, and partitioning
+of carbon between soil pools and the atmosphere and are based on the DAYCENT model. There are five carbon pools in the
+soil:
 
 * Plant Structural - Slowly decomposing plant mass with higher lignin content
 * Plant Metabolic - Rapidly decomposing plant mass with low lignin content
@@ -2405,7 +2697,9 @@ The `CarbonCycling` class (implemented in `carbon_cycle.py`) manages carbon cycl
 * Slow - Soil organic matter that turns over every 20-40 years
 * Passive - Stable, recalcitrant soil organic matter with a turn over time between 200 and 1500 years
     
-Decomposition occurs within the soil C pools resulting in the transfer of C between pools. In addition, crop residues, above and below ground, decompose into the soil C pools. Each decomposition event generates some CO<sub>2</sub> that enters the atmosphere.
+Decomposition occurs within the soil C pools resulting in the transfer of C between pools. In addition, crop residues,
+above and below ground, decompose into the soil C pools. Each decomposition event generates some CO<sub>2</sub> that
+enters the atmosphere.
 
 
 **Soil Carbon Partitioning** `carbon_cycle.py`
@@ -2455,7 +2749,9 @@ $$
         
 **Decomposition** `decomposition.py`
 
-Carbon decomposition is the process of complex carbon molecules breaking down into simpler molecules and leaving behind more recalcitrant C species, represented here as a transfer of C between C pools. Decomposition is a function of temperature and moisture. The following factors are parameterized and calculated with the assumption of coarse soil:
+Carbon decomposition is the process of complex carbon molecules breaking down into simpler molecules and leaving behind
+more recalcitrant C species, represented here as a transfer of C between C pools. Decomposition is a function of
+temperature and moisture. The following factors are parameterized and calculated with the assumption of coarse soil:
             
 ::: {#eq-sc-car-4}
 [[**SC.CAR.4**]]{.aside .content-visible when-format="html"}
@@ -2501,7 +2797,8 @@ $$
 
 *Where*:
             
-* C{active decomp rate} = rate at which active C is decomposed into slow C, passive C and CO<sub>2</sub> (%) (kg year$^{-1}$)
+* C{active decomp rate} = rate at which active C is decomposed into slow C, passive C and CO<sub>2</sub> (%)
+(kg year$^{-1}$)
 * K5 = maximum rate of C decomposition (0.14, [@parton1987analysis]) 
 * `silt:clay_%` = ratio of percent silt to clay content in the soil
         
@@ -2628,11 +2925,13 @@ $$
         
 **Residue Partitioning** `residue_partitioning.py`
 
-Crop residues are partitioned into above and below ground biomass representing stalks and roots left after harvest, respectively. Additionally, some above ground residue is incorporated into the soil profile in the case of tillage.
+Crop residues are partitioned into above and below ground biomass representing stalks and roots left after harvest,
+respectively. Additionally, some above ground residue is incorporated into the soil profile in the case of tillage.
 
 **Above Ground: Lignin, Metabolic C, Structural C**
 
-Above ground residue is further partitioned into metabolic and structural components based on the lignin composition of the residue.
+Above ground residue is further partitioned into metabolic and structural components based on the lignin composition of
+the residue.
         
 ::: {#eq-sc-car-16}
 [[**SC.CAR.16**]]{.aside .content-visible when-format="html"}        
@@ -2659,10 +2958,12 @@ $$
 
 *Where*:
             
-* AG{L:N} = above ground plant lignin to nitrogen (N) ratio when nitrogen in plant residue at harvest is greater than 0 (unitless)
+* AG{L:N} = above ground plant lignin to nitrogen (N) ratio when nitrogen in plant residue at harvest is greater than
+0 (unitless)
 * fr{N} = fraction of N in plant residue at harvest (unitless)
         
-The ratio of lignin to N in residue determines the percentage of above ground residue in the metabolic pool, with a maximum of 85%.
+The ratio of lignin to N in residue determines the percentage of above ground residue in the metabolic pool, with a
+maximum of 85%.
         
 ::: {#eq-sc-car-18}
 [[**SC.CAR.18**]]{.aside .content-visible when-format="html"}        
@@ -2675,7 +2976,8 @@ $$
             
 * AG{met frac} = above ground residue that is metabolic (unitless)
         
-The component of residue dry matter at harvest consisting of above ground metabolic carbon (C) is added to the above ground metabolic C pool.
+The component of residue dry matter at harvest consisting of above ground metabolic carbon (C) is added to the above
+ground metabolic C pool.
                 
 ::: {#eq-sc-car-19}
 [[**SC.CAR.19**]]{.aside .content-visible when-format="html"}        
@@ -2690,7 +2992,9 @@ $$
 * AG{met frac} = fraction of above ground residue that is metabolic (unitless)
 * AG{DM res} = dry matter residue at harvest (kg ha$^{-1}$)
         
-Above ground metabolic C follows two paths into the soil. It is either incorporated below ground pool via tillage or decomposed into the active C. The calculated values are subtracted from the above ground metabolic pool and added to the relevant pool.
+Above ground metabolic C follows two paths into the soil. It is either incorporated below ground pool via tillage or
+decomposed into the active C. The calculated values are subtracted from the above ground metabolic pool and added to
+the relevant pool.
                 
 ::: {#eq-sc-car-20}
 [[**SC.CAR.20**]]{.aside .content-visible when-format="html"}
@@ -2718,7 +3022,8 @@ $$
 * AG{met}:BG{met} = above ground metabolic C decomposed to below ground metabolic C (kg ha$^{-1}$)
 * tillagefrac = fraction metabolic C incorporated into soil during tillage (unitless)
         
-Any dry matter residue at harvest that is not added to the above ground metabolic C pool is added to the above ground structural C pool:
+Any dry matter residue at harvest that is not added to the above ground metabolic C pool is added to the above ground
+structural C pool:
 
 ::: {#eq-sc-car-22}
 [[**SC.CAR.22**]]{.aside .content-visible when-format="html"}
@@ -2731,7 +3036,9 @@ $$
 
 * AG{struct} = above ground structural C (kg ha$^{-1}$)
         
-Similarly to above ground metabolic C, above ground structural C is incorporated into the belowground structural C pool via tillage or decomposed, in this case, equally into active and slow C pools. The calculated values are subtracted from the above ground structural pool and added to the relevant pool.
+Similarly to above ground metabolic C, above ground structural C is incorporated into the belowground structural C pool
+via tillage or decomposed, in this case, equally into active and slow C pools. The calculated values are subtracted
+from the above ground structural pool and added to the relevant pool.
         
 ::: {#eq-sc-car-23}
 [[**SC.CAR.23**]]{.aside .content-visible when-format="html"}
@@ -2773,7 +3080,9 @@ $$
         
 **Below Ground: Lignin, Metabolic C, Structural C**
 
-As above ground, the residue below ground is partitioned into metabolic and structural C pools based on the lignin content of the residue. In the case of tillage, some residue is incorporated from the above ground pool. In the case of tillage, below ground residue will be a combination of below ground and incorporated biomass.
+As above ground, the residue below ground is partitioned into metabolic and structural C pools based on the lignin
+content of the residue. In the case of tillage, some residue is incorporated from the above ground pool. In the case
+of tillage, below ground residue will be a combination of below ground and incorporated biomass.
         
 ::: {#eq-sc-car-26}
 [[**SC.CAR.26**]]{.aside .content-visible when-format="html"}
@@ -2795,7 +3104,8 @@ $$
 * BG{DM res} = below ground residue mass (kg ha$^{-1}$)
 * BG{bio} = below ground biomass (kg ha$^{-1}$)
         
-The below ground ratio of lignin to N will then be a weighted sum of the lignin to N ratio in the below ground and the incorporated biomass.
+The below ground ratio of lignin to N will then be a weighted sum of the lignin to N ratio in the below ground and
+the incorporated biomass.
         
 ::: {#eq-sc-car-28}
 [[**SC.CAR.28**]]{.aside .content-visible when-format="html"}
@@ -2808,7 +3118,8 @@ $$
             
 * BG{L:N} = below ground lignin to N ratio
         
-The component of below ground residue that is metabolic is determined by the below ground lignin to N ratio, with a maximum composition of 85%.
+The component of below ground residue that is metabolic is determined by the below ground lignin to N ratio, with a
+maximum composition of 85%.
         
 ::: {#eq-sc-car-29}
 [[**SC.CAR.29**]]{.aside .content-visible when-format="html"}
@@ -2821,7 +3132,8 @@ $$
             
 * BG{met frac} = below ground residue that is metabolic (fraction)
 
-Incorporated metabolic C and the component of below ground biomass consisting of metabolic C are added to the below ground metabolic C pool.
+Incorporated metabolic C and the component of below ground biomass consisting of metabolic C are added to the below
+ground metabolic C pool.
         
 ::: {#eq-sc-car-30}
 [[**SC.CAR.30**]]{.aside .content-visible when-format="html"}        
@@ -2834,7 +3146,8 @@ $$
             
 * BG{met}=below ground metabolic C (kg ha$^{-1}$)
         
-Below ground metabolic C decomposes and the calculated mass is removed from below ground metabolic C and added to below ground active C.
+Below ground metabolic C decomposes and the calculated mass is removed from below ground metabolic C and added to below
+ground active C.
         
 ::: {#eq-sc-car-31}
 [[**SC.CAR.31**]]{.aside .content-visible when-format="html"}        
@@ -2846,9 +3159,11 @@ $$
 *Where*:
             
 * `BG<sub>met</sub>_to_C$_{active}$` = below ground metabolic C decomposed into active C (kg ha$^{-1}$)
-* BG{met active decomp} =	rate at which below ground metabolic C decomposes into	active C (set at 0.35, @parton1987analysis)
+* BG{met active decomp} =	rate at which below ground metabolic C decomposes into	active C (set at 0.35,
+@parton1987analysis)
         
-Incorporated structural and the component of below ground biomass consisting of structural C are added to the below ground structural C pool.
+Incorporated structural and the component of below ground biomass consisting of structural C are added to the below
+ground structural C pool.
         
 ::: {#eq-sc-car-32}
 [[**SC.CAR.32**]]{.aside .content-visible when-format="html"}        
@@ -2857,7 +3172,8 @@ $$
 $$
 :::  
     
-Decomposition then reduces below ground structural C  by the sum of the calculated values and equal amounts of mass are added to the below ground active and slow C pools.
+Decomposition then reduces below ground structural C  by the sum of the calculated values and equal amounts of mass
+are added to the below ground active and slow C pools.
         
 ::: {#eq-sc-car-33}
 [[**SC.CAR.33**]]{.aside .content-visible when-format="html"}        
@@ -2873,12 +3189,16 @@ $$
             
 * BG{struct}\_to\_C{active} = below ground structural C decomposed into active C (kg ha$^{-1}$)
 * BG{struct}\_to\_C{slow} = below ground structural C decomposed into slow C (kg ha$^{-1}$)
-* BG{struct decomp} = rate at which below ground structural C decomposes into slow or active C (set at 0.094, @parton1987analysis)
+* BG{struct decomp} = rate at which below ground structural C decomposes into slow or active C (set at 0.094,
+@parton1987analysis)
 * BG{struct} = below ground structural C (kg ha$^{-1}$)
         
 **Pool and Gas Partitioning** `pool_gas_partition.py`
 
-Following the residue biomass transfers detailed above, C pools are then updated to account for the imperfect transfer of decomposition between the metabolic and structural C pools to the active and slow C pools. The amount of C lost to the atmosphere as CO2 during decomposition processes are detailed below. Calculated CO<sub>2</sub> losses are subtracted from their source pool and added to the relevant atmospheric pool.
+Following the residue biomass transfers detailed above, C pools are then updated to account for the imperfect transfer
+of decomposition between the metabolic and structural C pools to the active and slow C pools. The amount of C lost to
+the atmosphere as CO2 during decomposition processes are detailed below. Calculated CO<sub>2</sub> losses are
+subtracted from their source pool and added to the relevant atmospheric pool.
         
 ::: {#eq-sc-car-34}
 [[**SC.CAR.34**]]{.aside .content-visible when-format="html"}        
@@ -2892,9 +3212,12 @@ $$
             
 *Where*:
             
-* frac_CO2{met\_to\_active} = rate of C dioxide loss during transformation of metabolic to active C (0.55, @parton1987analysis)
-* AG{met}\_to\_C{active loss} = above ground metabolic C being lost as carbon dioxide during decomposition into active C (kg ha$^{-1}$)
-* AG{met}\_to\_C{active act} = above ground metabolic C decomposed to active carbon after accounting for C dioxide loss (kg ha$^{-1}$)
+* frac_CO2{met\_to\_active} = rate of C dioxide loss during transformation of metabolic to active C (0.55,
+@parton1987analysis)
+* AG{met}\_to\_C{active loss} = above ground metabolic C being lost as carbon dioxide during decomposition into
+active C (kg ha$^{-1}$)
+* AG{met}\_to\_C{active act} = above ground metabolic C decomposed to active carbon after accounting for C dioxide
+loss (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-35}
 [[**SC.CAR.35**]]{.aside .content-visible when-format="html"}        
@@ -2908,9 +3231,12 @@ $$
            
 *Where*:
             
-* frac\_CO2{struct active} = rate of CO<sub>2</sub> loss during transformation of structural to	active C (0.45, @parton1987analysis)
-* AG{struct}\_to\_C{active act} = above ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss C (kg ha$^{-1}$)
-* AG{struct}\_to\_C{active loss} = above ground structural C being lost as CO2 during decomposition into active C (kg ha$^{-1}$)
+* frac\_CO2{struct active} = rate of CO<sub>2</sub> loss during transformation of structural to	active C (0.45,
+@parton1987analysis)
+* AG{struct}\_to\_C{active act} = above ground structural C decomposed to active C after accounting for CO<sub>2</sub>
+loss C (kg ha$^{-1}$)
+* AG{struct}\_to\_C{active loss} = above ground structural C being lost as CO2 during decomposition into active C
+(kg ha$^{-1}$)
         
 ::: {#eq-sc-car-36}
 [[**SC.CAR.36**]]{.aside .content-visible when-format="html"}        
@@ -2924,8 +3250,10 @@ $$
            
 *Where*:
             
-* AG{struct}\_to\_C{slow loss} = decomposing above ground structural C being lost as CO<sub>2</sub> during decomposition into slow C (kg ha$^{-1}$)
-* AG{struct}\_to\_C{slow act}  = above ground structural C decomposed to slow C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
+* AG{struct}\_to\_C{slow loss} = decomposing above ground structural C being lost as CO<sub>2</sub> during
+decomposition into slow C (kg ha$^{-1}$)
+* AG{struct}\_to\_C{slow act}  = above ground structural C decomposed to slow C after accounting for CO<sub>2</sub>
+loss (kg ha$^{-1}$)
 * frac\_CO2{struct\_to\_slow} = rate of CO2 loss during transformation of structural to slow C (0.3,  Partonet al. 1987)
         
 ::: {#eq-sc-car-37}
@@ -2940,8 +3268,10 @@ $$
             
 *Where*:
             
-* G{met}\_to\_C{active loss} = below ground metabolic C being lost as CO<sub>2</sub> during decomposition into active C (kg ha$^{-1}$)
-* BG{met}\_to\_C{active act} = below ground metabolic C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
+* G{met}\_to\_C{active loss} = below ground metabolic C being lost as CO<sub>2</sub> during decomposition into active
+C (kg ha$^{-1}$)
+* BG{met}\_to\_C{active act} = below ground metabolic C decomposed to active C after accounting for CO<sub>2</sub> loss
+(kg ha$^{-1}$)
         
 ::: {#eq-sc-car-38}
 [[**SC.CAR.38**]]{.aside .content-visible when-format="html"}        
@@ -2955,8 +3285,10 @@ $$
           
 *Where*:
             
-* BG{struct}\_to\_C{active loss} = below ground structural C being lost as CO<sub>2</sub> during  decomposition into active C (kg ha$^{-1}$)
-* BG{struct}\_to\_C{active act} = below ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
+* BG{struct}\_to\_C{active loss} = below ground structural C being lost as CO<sub>2</sub> during  decomposition into
+active C (kg ha$^{-1}$)
+* BG{struct}\_to\_C{active act} = below ground structural C decomposed to active C after accounting for CO<sub>2</sub>
+loss (kg ha$^{-1}$)
         
 ::: {#eq-sc-car-38}
 [[**SC.CAR.38**]]{.aside .content-visible when-format="html"}        
@@ -2970,8 +3302,10 @@ $$
 
 *Where*:
             
-* BG{struct}\_to\_C{slow loss} = below ground structural C being lost as CO<sub>2</sub> during  decomposition into active C (kg ha$^{-1}$)
-* BG{struct}\_to\_C{slow act} = below ground structural C decomposed to active C after accounting for CO<sub>2</sub> loss (kg ha$^{-1}$)
+* BG{struct}\_to\_C{slow loss} = below ground structural C being lost as CO<sub>2</sub> during  decomposition into
+active C (kg ha$^{-1}$)
+* BG{struct}\_to\_C{slow act} = below ground structural C decomposed to active C after accounting for CO<sub>2</sub>
+loss (kg ha$^{-1}$)
         
 Decomposition losses, mass transfers between pools, and totals are updated following pooling and gas partitioning:
           
@@ -3096,35 +3430,57 @@ $$
 
 
 ## Crop Management 
-
 ### Introduction
 
-Crop growth and development in RuFaS is based on the SWAT model and is driven by biomass accumulation based on the available heat units adsorbed by the plant/plant parts, and available nutrient and water uptake from the soil by the crop roots. Absorbed heat units and leaf area index drive potential biomass accumulation and the availability of soil nutrients and water modulate the potential crop growth via stress functions. 
+Crop growth and development in RuFaS is based on the SWAT model and is driven by biomass accumulation based on the
+available heat units adsorbed by the plant/plant parts, and available nutrient and water uptake from the soil by the
+crop roots. Absorbed heat units and leaf area index drive potential biomass accumulation and the availability of soil
+nutrients and water modulate the potential crop growth via stress functions.
 
 We simulate three organic N pools (fresh, active, and stable) and two inorganic pools (NO$_3^-$ and NH$_4^+$).
 
 **Daily Biophysical Processes**
 
-The daily crop processes are called by the `Field` class and are executed in two methods. First the water cycling is executed by the `Field` class `cycle_water()` method in which the crop’s water cycle is called last. Then the daily crop updates are called for each crop using the `Crop` class’s `perform_daily_crop_update()` method.
+The daily crop processes are called by the `Field` class and are executed in two methods. First the water cycling is
+executed by the `Field` class `cycle_water()` method in which the crop’s water cycle is called last. Then the daily
+crop updates are called for each crop using the `Crop` class’s `perform_daily_crop_update()` method.
 
 **Harvest**
 
-At the end of the `Field` class’s `manage_field()` routine, it checks for both user scheduled and optimal harvest events and initiates the `Crop` routine’s harvest if it is a harvest day.
+At the end of the `Field` class’s `manage_field()` routine, it checks for both user scheduled and optimal harvest
+events and initiates the `Crop` routine’s harvest if it is a harvest day.
 
 ### Required User Inputs
 
-When the Field class plants a new crop, it calls the `create_crop()` method of the `Crop` class to initialize a new crop with the appropriate crop configuration inputs. The crop configurations and the default input values for each of the default crop options are provided in the table below. The key inputs to ensure that the crop that is grown will be harvested, stored by the Feed Module, and fed to animals by the Animal Module as intended are:
+When the Field class plants a new crop, it calls the `create_crop()` method of the `Crop` class to initialize a new
+crop with the appropriate crop configuration inputs. The crop configurations and the default input values for each of
+the default crop options are provided in the table below. The key inputs to ensure that the crop that is grown will be
+harvested, stored by the Feed Module, and fed to animals by the Animal Module as intended are:
 
 * Crop category
 * Crop type
 * RuFaS feed IDs associated with this feed
 * Storage type
 
-All other inputs drive the biological processes and ultimately determine the rate and extent of biomass accumulation in response to weather and nutrient availability.
+All other inputs drive the biological processes and ultimately determine the rate and extent of biomass accumulation
+in response to weather and nutrient availability.
 
-Initial NO<sub>3</sub> levels (mg kg$^{-1}$) in the soil are set by user input. If user input is null, initial nitrate concentrations are generated as: 
+Initial NO<sub>3</sub> levels (mg kg$^{-1}$) in the soil are set by user input. If user input is null, initial nitrate
+concentrations are generated as:
 
 ### Expected Outputs
+
+<!-- TODO -->
+
+** Crop yield **
+
+```{python}
+#| label: tbl-sc-crop-yld-outputs
+#| tbl-cap: Expected crop yield outputs
+import_table(
+    "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-crop-yld-outputs.csv",
+)
+```
 
 
 
@@ -3132,15 +3488,22 @@ Initial NO<sub>3</sub> levels (mg kg$^{-1}$) in the soil are set by user input. 
 
 #### Crop Water Cycle Daily Updates
 
-The water cycle within a crop is executed by methods in the `WaterUptake` class and the `WaterDynamics` and are mostly called by the `Crop` class method `cycle_water_for_crop()`. First, water is taken up from the soil into the crop by `water_uptake.uptake()` method and then water is distributed through the crop water cycle by the `water_dynamics.cycle_water()` method. 
+The water cycle within a crop is executed by methods in the `WaterUptake` class and the `WaterDynamics` and are mostly
+called by the `Crop` class method `cycle_water_for_crop()`. First, water is taken up from the soil into the crop by
+`water_uptake.uptake()` method and then water is distributed through the crop water cycle by the
+`water_dynamics.cycle_water()` method.
 
-However, The maximum potential water evaporation and transpiration from the crop are called directly from the `Field` class’s `cycle_water()` method because these values are needed to calculate the field water balance and soil evaporation. 
+However, The maximum potential water evaporation and transpiration from the crop are called directly from the `Field`
+class’s `cycle_water()` method because these values are needed to calculate the field water balance and soil
+evaporation.
 
 **Crop Evaporation**
 
-The maximum potential crop canopy evaporation and transpiration are calculated as a function of the total potential evapotranspiration for the field on that day (see the Soil documentation). 
+The maximum potential crop canopy evaporation and transpiration are calculated as a function of the total potential
+evapotranspiration for the field on that day (see the Soil documentation).
 
-After the total potential evapotranspiration (mm H<sub>2</sub>O) is calculated in the `Field` class, evaporation from the crop canopy is estimated as: 
+After the total potential evapotranspiration (mm H<sub>2</sub>O) is calculated in the `Field` class, evaporation from
+the crop canopy is estimated as:
 
 ::: {#eq-sc-crp-1}
 [[**SC.CRP.1**]]{.aside .content-visible when-format="html"}        
@@ -3151,7 +3514,9 @@ $$
 
 **Crop Canopy Water**
 
-The amount of water in the crop’s canopy is calculated by the `Crop` class’s `handle_water_in_canopy()` method. Each crop has a crop-specific maximum water capacity (mm) when the crop is fully matured and this value informs the current day’s maximum water storage capacity (mm) based on the ratio of the current leaf area index (LAI) and the maximum LAI:  
+The amount of water in the crop’s canopy is calculated by the `Crop` class’s `handle_water_in_canopy()` method. Each
+crop has a crop-specific maximum water capacity (mm) when the crop is fully matured and this value informs the current
+day’s maximum water storage capacity (mm) based on the ratio of the current leaf area index (LAI) and the maximum LAI:
 
 ::: {#eq-sc-crp-2}
 [[**SC.CRP.2**]]{.aside .content-visible when-format="html"}        
@@ -3160,7 +3525,8 @@ $$
 $$
 :::
 
-The potential excess storage capacity is calculated using the maximum water storage capacity and the actual amount of water in the canopy on that day:
+The potential excess storage capacity is calculated using the maximum water storage capacity and the actual amount of
+water in the canopy on that day:
 
 ::: {#eq-sc-crp-3}
 [[**SC.CRP.3**]]{.aside .content-visible when-format="html"}        
@@ -3187,7 +3553,8 @@ $$
 $$
 :::
 
-Finally, the remaining precipitation is passed by the `Field` class to the `Soil` as the precipitation that reaches the soil: 
+Finally, the remaining precipitation is passed by the `Field` class to the `Soil` as the precipitation that reaches the
+soil:
     
 ::: {#eq-sc-crp-6 style="font-size:90%"}
 [[**SC.CRP.6**]]{.aside .content-visible when-format="html"}        
@@ -3198,7 +3565,9 @@ $$
 
 **Crop Potential Transpiration**
 
-The `Field` class's `cycle_water` method then subtracts the amount of water evaporated from the crop to calculate the remaining evapotranspiration demand (mm H<sub>2</sub>O) and that value is passed to the `Crop` class’s method to calculate the maximum crop transpiration (mm H<sub>2</sub>O):
+The `Field` class's `cycle_water` method then subtracts the amount of water evaporated from the crop to calculate the
+remaining evapotranspiration demand (mm H<sub>2</sub>O) and that value is passed to the `Crop` class’s method to
+calculate the maximum crop transpiration (mm H<sub>2</sub>O):
     
 ::: {#eq-sc-crp-6}
 [[**SC.CRP.6**]]{.aside .content-visible when-format="html"}        
@@ -3229,7 +3598,8 @@ $$
 * `depth` = depth from the soil surface (mm)
 * `root_depth` = depth of root development in the soil (mm) 
 
-The potential maximum water uptake from any soil layer, then, can be calculated by taking the difference in uptake between the top and bottom of the soil layer
+The potential maximum water uptake from any soil layer, then, can be calculated by taking the difference in uptake
+between the top and bottom of the soil layer
     
 ::: {#eq-sc-crp-8}
 [[**SC.CRP.8**]]{.aside .content-visible when-format="html"}        
@@ -3243,7 +3613,8 @@ $$
 * max_water_uptake_{bottom_depth} = potential water uptake for the lower boundary of the soil layer (mm H<sub>2</sub>O) 
 * max_water_uptake_{top_depth} = potential water uptake for the upper boundary of the soil layer (mm H<sub>2</sub>O)
 
-Potential water uptakes from each layer are then calculated sequentially from the soil surface to the maximum depth by layer to allow for compensation for unmet demand set by the maximum water uptake by the available water in lower layers. 
+Potential water uptakes from each layer are then calculated sequentially from the soil surface to the maximum depth by
+layer to allow for compensation for unmet demand set by the maximum water uptake by the available water in lower layers.
 
 The unmet demands for water are calculated as sum of the unmet demands for that layer and all layers above it:
     
@@ -3254,7 +3625,8 @@ $$
 $$
 :::
 
-The unmet demands are then used to calculate the potential water uptakes for each layer from the maximum water uptake and the unmet demands from each layer for every layer below the surface:
+The unmet demands are then used to calculate the potential water uptakes for each layer from the maximum water uptake
+and the unmet demands from each layer for every layer below the surface:
     
 ::: {#eq-sc-crp-10}
 [[**SC.CRP.10**]]{.aside .content-visible when-format="html"}        
@@ -3269,11 +3641,16 @@ $$
 *Where*: 
 
 * potential_water_uptake_{layer} = adjusted potential water uptake for layer (mm H<sub>2</sub>O)
-* `uptake_compensation_factor` = plant uptake compensation factor which is a user-defined input for each crop that ranges between 0.01 and 1.00 
+* `uptake_compensation_factor` = plant uptake compensation factor which is a user-defined input for each crop that
+ranges between 0.01 and 1.00
 
-When the `uptake_compensation_factor` approaches 1.00 the model allows more of the water uptake demand to be met by lower layers in the soil; when it approaches 0.00, the model allows less variation from the original depth distribution to take place. 
+When the `uptake_compensation_factor` approaches 1.00 the model allows more of the water uptake demand to be met by
+lower layers in the soil; when it approaches 0.00, the model allows less variation from the original depth distribution
+to take place.
 
-As the water content of the soil decreases, the soil holds remaining water more tightly, resulting in a decrease in the efficiency of plant water uptake. Thus, the potential water uptakes are adjusted one more time if the initial soil water content is below a threshold:
+As the water content of the soil decreases, the soil holds remaining water more tightly, resulting in a decrease in the
+efficiency of plant water uptake. Thus, the potential water uptakes are adjusted one more time if the initial soil
+water content is below a threshold:
     
 ::: {#eq-sc-crp-11}
 [[**SC.CRP.11**]]{.aside .content-visible when-format="html"}        
@@ -3288,12 +3665,14 @@ $$
 
 *Where*:
 
-* available_water_capcity_{layer} = point at which plant available water in the soil layer begins to limit efficiency of plant uptake
+* available_water_capcity_{layer} = point at which plant available water in the soil layer begins to limit efficiency
+of plant uptake
 * soil_water_{layer} = soil water in a given layer (mm H<sub>2</sub>O)
 
 **Actural Water Uptake**
 
-The actual water uptake for each layer are then calculated as the minimum of the adjusted potential water uptakes and the difference between the available soil water in that layer and the wilting point soil water. 
+The actual water uptake for each layer are then calculated as the minimum of the adjusted potential water uptakes and
+the difference between the available soil water in that layer and the wilting point soil water.
     
 ::: {#eq-sc-crp-12}
 [[**SC.CRP.12**]]{.aside .content-visible when-format="html"}        
@@ -3310,7 +3689,8 @@ $$
 * `actual_water_uptake_layer` = actual water for the layer (mm H<sub>2</sub>O)
 * wilting_point_{layer} = water content of the layer at wilting point (mm H<sub>2</sub>O) 
 
-The total plant uptake for the entire profile for the day (mm H<sub>2</sub>O) is calculated as the sum of these values for each layer in the profile
+The total plant uptake for the entire profile for the day (mm H<sub>2</sub>O) is calculated as the sum of these values
+for each layer in the profile
     
 ::: {#eq-sc-crp-13}
 [[**SC.CRP.13**]]{.aside .content-visible when-format="html"}        
@@ -3321,9 +3701,11 @@ $$
 
 *Where*: 
 
-* actual_water_uptake_later_i = actual water for layer (mm H<sub>2</sub>O) and n is the number of layers in the soil profile
+* actual_water_uptake_later_i = actual water for layer (mm H<sub>2</sub>O) and n is the number of layers in the soil
+profile
 
-The total plant water uptake is passed to `WaterDynamics` `cycle_water()` method as the actual amount of transpiration on the day (mm H<sub>2</sub>O).
+The total plant water uptake is passed to `WaterDynamics` `cycle_water()` method as the actual amount of transpiration
+on the day (mm H<sub>2</sub>O).
     
 ::: {#eq-sc-crp-14}
 [[**SC.CRP.14**]]{.aside .content-visible when-format="html"}        
@@ -3335,7 +3717,10 @@ $$
 
 #### Crop Growth and Nutrient Cycle Daily Updates
 
-The second set of daily process updates is called by the `execute_daily_processes()` method in the `Field` class which in turn calls `perform_daily_crop_update()` in the `Crop` class. Similar to other daily update functions, this method steps through a number of functions to initiate simulation of the biophysical processes that drive crop growth and development. These processes are:
+The second set of daily process updates is called by the `execute_daily_processes()` method in the `Field` class which
+in turn calls `perform_daily_crop_update()` in the `Crop` class. Similar to other daily update functions, this method
+steps through a number of functions to initiate simulation of the biophysical processes that drive crop growth and
+development. These processes are:
 
 * Check if the crop is mature or is dormant
 * Absorb solar radiation in the form of heat units and determine the max potential growth for that day
@@ -3348,7 +3733,10 @@ The second set of daily process updates is called by the `execute_daily_processe
 
 **Maturity**
 
-A crop’s advance towards maturity is tracked through the accumulation of heat units which are a theoretical unit developed to estimate the amount of solar radiation absorbed by the plant. Each crop has a crop specific value for the potential heat units (PHU) required to reach maturity. The accumulated fraction of potential heat units (FrPHU) on a given day is calculated as:
+A crop’s advance towards maturity is tracked through the accumulation of heat units which are a theoretical unit
+developed to estimate the amount of solar radiation absorbed by the plant. Each crop has a crop specific value for the
+potential heat units (PHU) required to reach maturity. The accumulated fraction of potential heat units (FrPHU) on a
+given day is calculated as:
     
 ::: {#eq-sc-crp-15}
 [[**SC.CRP.15**]]{.aside .content-visible when-format="html"}        
@@ -3366,7 +3754,9 @@ HU_{sum} is calculated from day 1 (planting day) to the day until the plant reac
 
 **Dormancy**
 
-Perennial crops like alfalfa enter a period of dormancy in which the plants do not grow as the day length nears the shortest or minimum day length for the year. The beginning and end of dormancy are defined by a day length threshold (hrs) which can be calculated as:
+Perennial crops like alfalfa enter a period of dormancy in which the plants do not grow as the day length nears the
+shortest or minimum day length for the year. The beginning and end of dormancy are defined by a day length threshold
+(hrs) which can be calculated as:
     
 ::: {#eq-sc-crp-16}
 [[**SC.CRP.16**]]{.aside .content-visible when-format="html"}        
@@ -3380,7 +3770,8 @@ $$
 * `daylength_min` = minimum day length for the location during the year (hrs)
 * `dormancy_threshold` = dormancy threshold (hrs). 
 
-Plants enter dormancy when the day length falls below the threshold and exit dormancy when day length exceeds the threshold again in the next year. The dormancy threshold varies with latitude and is calculated as: 
+Plants enter dormancy when the day length falls below the threshold and exit dormancy when day length exceeds the
+threshold again in the next year. The dormancy threshold varies with latitude and is calculated as:
     
 ::: {#eq-sc-crp-17}
 [[**SC.CRP.17**]]{.aside .content-visible when-format="html"}        
@@ -3398,7 +3789,8 @@ $$
 
 * `latitude` = a positive value regardless of cardinality (degrees).
 
-The total daylight hours (daylength, hrs) for each day is calculated by the `Weather` class each day and passed to the `FieldManager`: 
+The total daylight hours (daylength, hrs) for each day is calculated by the `Weather` class each day and passed to the
+`FieldManager`:
     
 ::: {#eq-sc-crp-18}
 [[**SC.CRP.18**]]{.aside .content-visible when-format="html"}        
@@ -3409,7 +3801,8 @@ $$
 
 *Where*: 
 
-* `solar declination in radians` = earth’s latitude at which incoming solar rays are normal to the earth’s surface and the angular velocity of the earth’s rotation is a constant equal to 0.2618 rad \(h^{-1}\) or \(15^\circ\ h^{-1}\).
+* `solar declination in radians` = earth’s latitude at which incoming solar rays are normal to the earth’s surface and
+the angular velocity of the earth’s rotation is a constant equal to 0.2618 rad \(h^{-1}\) or \(15^\circ\ h^{-1}\).
     
 ::: {#eq-sc-crp-19}
 [[**SC.CRP.19**]]{.aside .content-visible when-format="html"}        
@@ -3423,8 +3816,11 @@ $$
 * `year length` = number of days in a given year
 * `day` = Julian day
 
-At the beginning of the dormant period for perennials (like alfalfa), 10\% of the biomass is converted to residue and the LAI for the species is set to the minimum value allowed for the species (default 0.75). For cool season annuals like winter cereal grain species (rye, triticale, wheat, etc), their biomass is not converted to residue.
-When the day length first drops below the dormancy threshold, the dormancy routine is run once on the first day of the dormancy period.
+At the beginning of the dormant period for perennials (like alfalfa), 10\% of the biomass is converted to residue and
+the LAI for the species is set to the minimum value allowed for the species (default 0.75). For cool season annuals
+like winter cereal grain species (rye, triticale, wheat, etc), their biomass is not converted to residue.
+When the day length first drops below the dormancy threshold, the dormancy routine is run once on the first day of
+the dormancy period.
 
 If it is a perennial crop, the model checks whether the perennial should be cut:
     
@@ -3440,11 +3836,14 @@ $$
 * fr{PHU} = fraction of potential heat units
 * fr{PHU,harvest,min} = minimum fraction of potential heat units acquired to warrant  harvest (user input)
       
-The parameters that drive growth (fr{PHU}, HU{sum}, fr{LAI,max}) are reset to 0 and crop biomass, nitrogen, and phosphorus are reduced by 10% of their value at the time of harvest. Biomass lost when entering dormancy is added to residue.
+The parameters that drive growth (fr{PHU}, HU{sum}, fr{LAI,max}) are reset to 0 and crop biomass, nitrogen, and
+phosphorus are reduced by 10% of their value at the time of harvest. Biomass lost when entering dormancy is added to
+residue.
 
 **Accumulation of Heat Units**
 
-The available heat units on a given day are calculated by the `determine_new_heat_units()` method in the `HeatUnits` class:
+The available heat units on a given day are calculated by the `determine_new_heat_units()` method in the `HeatUnits`
+class:
     
 ::: {#eq-sc-crp-21}
 [[**SC.CRP.21**]]{.aside .content-visible when-format="html"}        
@@ -3461,7 +3860,8 @@ $$
 * T_{HU} = either the mean daily temperature ℃ or the temperature used to define the maximum heat units for the day
 * T_{min} = base or minimum temperature required for the plant growth ℃
 
-By default, T_{HU} is  set to the mean daily ambient temperature. If the attribute `use_heat_unit_temperature` is set to True, then THU is defined by the equation below:
+By default, T_{HU} is  set to the mean daily ambient temperature. If the attribute `use_heat_unit_temperature` is set
+to True, then THU is defined by the equation below:
     
 ::: {#eq-sc-crp-22}
 [[**SC.CRP.22**]]{.aside .content-visible when-format="html"}        
@@ -3502,18 +3902,25 @@ $$
 * T_{crop,max} and T_{crop,min}	= crop-specific maximum and minimum temperatures required to sustain growth (℃)
 * T_{ambient,max} and T_{ambient,min} = maximum and minimum ambient temperatures that day (℃)
 
-The effect of using the alternative method on heat unit accumulation varies depending on the relationship between the air temperature range and the crop's growth temperature range:
+The effect of using the alternative method on heat unit accumulation varies depending on the relationship between the
+air temperature range and the crop's growth temperature range:
 
-* If both min and max air temperatures are higher than the crop's min and max growth temperatures, accumulation is greater than the main method.
-* If both min and max air temperatures are lower than the crop's min and max temperatures, accumulation is greater than the main method.
-* If the air temperature range is entirely within the crop's temperature range, accumulation equals the middle of the crop temperature window.
-* If the crop's temperature range is entirely within the air temperature range, accumulation equals the middle of the air temperature range.
+* If both min and max air temperatures are higher than the crop's min and max growth temperatures, accumulation is
+greater than the main method.
+* If both min and max air temperatures are lower than the crop's min and max temperatures, accumulation is greater
+than the main method.
+* If the air temperature range is entirely within the crop's temperature range, accumulation equals the middle of the
+crop temperature window.
+* If the crop's temperature range is entirely within the air temperature range, accumulation equals the middle of the
+air temperature range.
 
-Once the heat units for that day have been calculated, they are added to the previously accumulated heat units by the `add_heat_units()` method. 
+Once the heat units for that day have been calculated, they are added to the previously accumulated heat units by the
+`add_heat_units()` method.
 
 **Root Development**
 
-The depth of the roots on a given day is estimated based on the fraction of accumulated heat units fr_{PHU} and the maximum rooting depth. First a root specific fraction is calculated:
+The depth of the roots on a given day is estimated based on the fraction of accumulated heat units fr_{PHU} and the
+maximum rooting depth. First a root specific fraction is calculated:
     
 ::: {#eq-sc-crp-25}
 [[**SC.CRP.25**]]{.aside .content-visible when-format="html"}        
@@ -3537,7 +3944,8 @@ $$
 $$
 :::          
 
-If the crop type is perennial, and it is not the establishment/planting year then the rooting depth of the given plant (`root_depth`, mm) is defined as the depth of root development in the soil on a given day and calculated as:
+If the crop type is perennial, and it is not the establishment/planting year then the rooting depth of the given plant
+(`root_depth`, mm) is defined as the depth of root development in the soil on a given day and calculated as:
     
 ::: {#eq-sc-crp-27}
 [[**SC.CRP.27**]]{.aside .content-visible when-format="html"}        
@@ -3556,15 +3964,23 @@ $$
 
 **Nitrogen Uptake**
 
-Each crop’s nitrogen uptake routines are managed by the `uptake()` method in the `NitrogenUptake` class. This function executes all nitrogen incorporation routines. It calculates the amount of nitrogen the plant desires based on its current growth stage and the available nitrogen in the soil. Then, it extracts nitrogen from the accessible soil profile. If there's any unmet nitrogen demand, the plant may attempt to fix atmospheric nitrogen. The nitrogen from both extraction and fixation is then added to the plant's biomass, contributing to its growth.
+Each crop’s nitrogen uptake routines are managed by the `uptake()` method in the `NitrogenUptake` class. This function
+executes all nitrogen incorporation routines. It calculates the amount of nitrogen the plant desires based on its
+current growth stage and the available nitrogen in the soil. Then, it extracts nitrogen from the accessible soil
+profile. If there's any unmet nitrogen demand, the plant may attempt to fix atmospheric nitrogen. The nitrogen from
+both extraction and fixation is then added to the plant's biomass, contributing to its growth.
 
 **Potential Nitrogen Uptake**
 
-A crop’s demand for nitrogen (and phosphorus), also known as the potential nitrogen uptake, at different stages of development is driven by the optimal composition or fraction of that nutrient in the plant’s biomass at that stage of development, the total biomass, and the amount of that nutrient in the plant on the previous day. 
+A crop’s demand for nitrogen (and phosphorus), also known as the potential nitrogen uptake, at different stages of
+development is driven by the optimal composition or fraction of that nutrient in the plant’s biomass at that stage of
+development, the total biomass, and the amount of that nutrient in the plant on the previous day.
 
-The optimal composition of a crop for both nitrogen and phosphorus is predicted based on a curve between the crop-specific, user-provided compositions at emergence (fr<sub>N,1</sub>) and maturity (fr<sub>N,3</sub>). 
+The optimal composition of a crop for both nitrogen and phosphorus is predicted based on a curve between the
+crop-specific, user-provided compositions at emergence (fr<sub>N,1</sub>) and maturity (fr<sub>N,3</sub>).
 
-Following this logic, the function for determining the optimal fraction of N in the plant biomass on a given day (fr<sub>n</sub>) is:
+Following this logic, the function for determining the optimal fraction of N in the plant biomass on a given day
+(fr<sub>n</sub>) is:
     
 ::: {#eq-sc-crp-28}
 [[**SC.CRP.28**]]{.aside .content-visible when-format="html"}        
@@ -3577,10 +3993,13 @@ $$
 
 * fr_{N,1} = fraction of N in the plant biomass at emergence
 * fr_{N,3} = fraction of N in the plant biomass at maturity
-* fr_{PHU} = fraction of potential heat units accumulated for the plant on a given day in the growing season (described in [SC.CRP.15](#eq-sc-crp-15))
+* fr_{PHU} = fraction of potential heat units accumulated for the plant on a given day in the growing season
+(described in [SC.CRP.15](#eq-sc-crp-15))
 * n_1 and n_2 = shape coefficients. 
 
-The shape coefficients are calculated by solving the below equations using the composition of the plant at two known points in crop development: half maturity (fr<sub>PHU,50%</sub>) and maturity (fr<sub>PHU,100%</sub>). The second shape coefficient is needed to calculate the first shape coefficient and is calculated as:
+The shape coefficients are calculated by solving the below equations using the composition of the plant at two known
+points in crop development: half maturity (fr<sub>PHU,50%</sub>) and maturity (fr<sub>PHU,100%</sub>). The second shape
+coefficient is needed to calculate the first shape coefficient and is calculated as:
 
 ::: {#eq-sc-crp-29}
 [[**SC.CRP.29**]]{.aside .content-visible when-format="html"}        
@@ -3611,9 +4030,12 @@ $$
 * fr_{PHU,50%} = fraction of potential heat units accumulated for the plant at 50% maturity
 * fr_{PHU,100%} = fraction of potential heat units accumulated for the plant at 100% maturity
 
-We follow the SWAT model assumption that the difference between the nutrient fraction near maturity and the nutrient fraction at maturity in the crop is equal to 0.00001 and the near mature nutrient fraction is calculated from the mature nutrient fraction according to this assumption.
+We follow the SWAT model assumption that the difference between the nutrient fraction near maturity and the nutrient
+fraction at maturity in the crop is equal to 0.00001 and the near mature nutrient fraction is calculated from the
+mature nutrient fraction according to this assumption.
 
-Using the optimal fraction of N in the crop biomass calculated in [SC.CRP.28](#eq-sc-crp-28) the optimal mass of N stored in the plant biomass on a given day (kg N ha$^{-1}$) is given as:
+Using the optimal fraction of N in the crop biomass calculated in [SC.CRP.28](#eq-sc-crp-28) the optimal mass of N
+stored in the plant biomass on a given day (kg N ha$^{-1}$) is given as:
     
 ::: {#eq-sc-crp-31}
 [[**SC.CRP.31**]]{.aside .content-visible when-format="html"}        
@@ -3638,14 +4060,21 @@ $$
 
 *Where*:
 
-* `optimal_nitrogen_mass_previous` = actual mass of N stored in the plant material at the end of the previous day (kg N ha$^{-1}$)
-* `biomass_growth_max` = potential increase in total plant biomass on a given day (kg N ha$^{-1}$), and is constrained by the condition that `nitrogen_uptake` $\geq$ 0
+* `optimal_nitrogen_mass_previous` = actual mass of N stored in the plant material at the end of the previous day
+(kg N ha$^{-1}$)
+* `biomass_growth_max` = potential increase in total plant biomass on a given day (kg N ha$^{-1}$), and is constrained
+by the condition that `nitrogen_uptake` $\geq$ 0
 
 **Actual Nitrogen Uptake**
 
-Once the potential nitrogen uptake has been calculated, the request for nutrients from the crops is distributed through the soil layers, starting from the top down. First the soil layers accessible to the roots based on the depth of the roots on that day is determined by the method `find_deepest_accessible_soil_layer()` which updates each crop’s `accessible_soil_layers` attribute, an integer that indicates the number of soil layers from the surface down to which the crop roots have access. 
+Once the potential nitrogen uptake has been calculated, the request for nutrients from the crops is distributed through
+the soil layers, starting from the top down. First the soil layers accessible to the roots based on the depth of the
+roots on that day is determined by the method `find_deepest_accessible_soil_layer()` which updates each crop’s
+`accessible_soil_layers` attribute, an integer that indicates the number of soil layers from the surface down to which
+the crop roots have access.
 
-The number of accessible soil layers is then used to calculate the bottom depths of each layer and the amount of nitrates in each layer that are accessible to the plant by the methods `access_layers` in the `NonWaterUptake` class.
+The number of accessible soil layers is then used to calculate the bottom depths of each layer and the amount of
+nitrates in each layer that are accessible to the plant by the methods `access_layers` in the `NonWaterUptake` class.
 
 The potential N uptake from the surface to any given depth z (N_{up,z}; kg N ha$^{-1}$) is calculated as:
     
@@ -3664,9 +4093,14 @@ $$
 * `depth` = depth from soil surface (mm)
 * `root_depth` = depth of root development in the soil on a given day (mm)
 
-The $\beta_\text{n}$ parameter does not significantly affect N uptake by plants, but it has a significant impact on the maximum amount of NO<sub>3</sub> removed from the upper 10 cm via surface runoff. Higher $\beta_\text{n}$ values allow plants to extract a greater percentage of N{3}up from the upper soil layers, which results in less NO<sub>3</sub> loss to runoff. We set this parameter to a default value of 10.
+The $\beta_\text{n}$ parameter does not significantly affect N uptake by plants, but it has a significant impact on
+the maximum amount of NO<sub>3</sub> removed from the upper 10 cm via surface runoff. Higher $\beta_\text{n}$ values
+allow plants to extract a greater percentage of N{3}up from the upper soil layers, which results in less NO<sub>3</sub>
+loss to runoff. We set this parameter to a default value of 10.
 
-Potential N uptake for each layer is then calculated as the difference in the potential uptake to the bottom depth of the layer and the potential uptake to the top depth of each layer. For the surface layer, where the top depth or upper boundary of the soil layer is at 0 mm depth:
+Potential N uptake for each layer is then calculated as the difference in the potential uptake to the bottom depth of
+the layer and the potential uptake to the top depth of each layer. For the surface layer, where the top depth or upper
+boundary of the soil layer is at 0 mm depth:
     
 ::: {#eq-sc-crp-34}
 [[**SC.CRP.34**]]{.aside .content-visible when-format="html"}        
@@ -3679,7 +4113,8 @@ $$
 
 * nitrogen_uptake_{layer} = potential N uptake from the surface soil layer (kg N ha$^{-1}$)
 
-For every other layer, the potential N uptake is calculated for the upper and lower boundaries of the layer and \(N_{up,ly}\) is taken as the difference between the two:
+For every other layer, the potential N uptake is calculated for the upper and lower boundaries of the layer and
+\(N_{up,ly}\) is taken as the difference between the two:
     
 ::: {#eq-sc-crp-35}
 [[**SC.CRP.35**]]{.aside .content-visible when-format="html"}        
@@ -3690,10 +4125,13 @@ $$
 
 *Where*: 
 
-* potential_nitrogen_uptake{depth,bottom} = potential N uptake from the soil surface to the lower boundary of the soil layer (kg N ha$^{-1}$)
-* nitrogen_uptake{depth,upper} = potential N uptake from the soil surface to the upper boundary of the soil layer (kg N ha$^{-1}$)
+* potential_nitrogen_uptake{depth,bottom} = potential N uptake from the soil surface to the lower boundary of the soil
+layer (kg N ha$^{-1}$)
+* nitrogen_uptake{depth,upper} = potential N uptake from the soil surface to the upper boundary of the soil layer
+(kg N ha$^{-1}$)
 
-The actual N uptake from a given soil layer (kg N ha$^{-1}$) is calculated as the minimum of potential N uptake plus demand, and available NO<sub>3</sub> in the layer and given as:
+The actual N uptake from a given soil layer (kg N ha$^{-1}$) is calculated as the minimum of potential N uptake plus
+demand, and available NO<sub>3</sub> in the layer and given as:
     
 ::: {#eq-sc-crp-36}
 [[**SC.CRP.33**]]{.aside .content-visible when-format="html"}        
@@ -3704,7 +4142,8 @@ $$
     
 *Where*:
 
-* `unmet_nitrogen_demand` = potential N uptake from the overlying soil layers (kg N ha$^{-1}$) that was not met by the nutrients in those layers. 
+* `unmet_nitrogen_demand` = potential N uptake from the overlying soil layers (kg N ha$^{-1}$) that was not met by the
+nutrients in those layers.
     * For the first soil layer where there are no overlying layers, `unmet_nitrogen_demand` is 0. 
 * nitrogen_uptake{layer} = potential N uptake for the soil layer (kg N ha$^{-1}$)
 * `soil_nitrate` is the nitrate content of the soil layer (kg N ha$^{-1}$)
@@ -3752,9 +4191,13 @@ $$
 
 **Nitrogen Fixation**
 
-The N fixation module amends the routine and equations described in the SWAT 2009 documentation by limiting calculations of f{NO3}, f{SW}, N{demand}, and N{fix} to the portion of the soil profile that is accessible to root biomass. This module also only applies to those crops that have been designated/defined as capable of forming symbiotic N fixation associations (e.g. legumes).
+The N fixation module amends the routine and equations described in the SWAT 2009 documentation by limiting
+calculations of f{NO3}, f{SW}, N{demand}, and N{fix} to the portion of the soil profile that is accessible to root
+biomass. This module also only applies to those crops that have been designated/defined as capable of forming symbiotic
+N fixation associations (e.g. legumes).
 
-After the amount of N available in the soil to meet the crop’s nitrogen demands has been determined, the amount of N added to the plant biomass by fixation ( kg N ha$^{-1}$)  is calculated using the unmet demands from the soil:
+After the amount of N available in the soil to meet the crop’s nitrogen demands has been determined, the amount of N
+added to the plant biomass by fixation ( kg N ha$^{-1}$)  is calculated using the unmet demands from the soil:
    
 ::: {#eq-sc-crp-40}
 [[**SC.CRP.40**]]{.aside .content-visible when-format="html"}        
@@ -3765,12 +4208,14 @@ $$
 
 *Where*: 
 
-* `unmet_demand` = plant N demand not met by uptake from the soil (kg N ha$^{-1}$) and is also the maximum amount of N that can be fixed by the plant on a given day
+* `unmet_demand` = plant N demand not met by uptake from the soil (kg N ha$^{-1}$) and is also the maximum amount of N
+that can be fixed by the plant on a given day
 * `stage_factor` = growth stage factor (0.0-1.0) 
 * `water_factor` = soil water factor (0.0-1.0)
 * `nitrate_factor` = soil nitrate factor (0.0-1.0)
 
-The growth stage factor is dependent on the fraction of accumulated potential heat units (PHU) for the plant on a given day in the growing season and can be expressed as: 
+The growth stage factor is dependent on the fraction of accumulated potential heat units (PHU) for the plant on a given
+day in the growing season and can be expressed as:
    
 ::: {#eq-sc-crp-41}
 [[**SC.CRP.41**]]{.aside .content-visible when-format="html"}        
@@ -3790,7 +4235,8 @@ $$
 
 * `stage_factor` = growth and decline of N fixing bacteria in the plant roots during the growing season
 
-The soil nitrate factor is dependent on the sum of nitrate available in the soil layers accessible to root biomass (kg NO<sub>3</sub>-N ha$^{-1}$) and calculated as:
+The soil nitrate factor is dependent on the sum of nitrate available in the soil layers accessible to root biomass
+(kg NO<sub>3</sub>-N ha$^{-1}$) and calculated as:
    
 ::: {#eq-sc-crp-42}
 [[**SC.CRP.42**]]{.aside .content-visible when-format="html"}        
@@ -3829,10 +4275,13 @@ $$
 
 *Where*:
 
-* `root_accessible_soil_water` = soil water content in the soil profile accessible to plant root biomass (mm H<sub>2</sub>O)
-* `root_accessible_field_capacity` = soil water content accessible to root biomass at field capacity (mm H<sub>2</sub>O)
+* `root_accessible_soil_water` = soil water content in the soil profile accessible to plant root biomass
+(mm H<sub>2</sub>O)
+* `root_accessible_field_capacity` = soil water content accessible to root biomass at field capacity
+(mm H<sub>2</sub>O)
 
-`root_accessible_soil_water` and 0.85 x `root_accessible_field_capacity_t` are calculated as the sum of total soil water and soil water field capacity in each layer for the soil layers accessible to the root biomass.
+`root_accessible_soil_water` and 0.85 x `root_accessible_field_capacity_t` are calculated as the sum of total soil
+water and soil water field capacity in each layer for the soil layers accessible to the root biomass.
 
 **Store Nitrogen in Plant**
 
@@ -3854,18 +4303,28 @@ $$
 
 #### Phosphorus Uptake
 
-The methods for estimating crop phosphorus uptake and addition to the plant’s stored phosphorus are analogous to the methods for crop nitrogen uptake and both the `PhosphorusUptake` class and the `NitrogenUptake` class use the same generic methods that are inherited from the `NonWaterUptake` class to implement these calculations. The pool of phosphorus available for uptake by the crop is labile inorganic phosphorus.
+The methods for estimating crop phosphorus uptake and addition to the plant’s stored phosphorus are analogous to the
+methods for crop nitrogen uptake and both the `PhosphorusUptake` class and the `NitrogenUptake` class use the same
+generic methods that are inherited from the `NonWaterUptake` class to implement these calculations. The pool of
+phosphorus available for uptake by the crop is labile inorganic phosphorus.
 
 To summarize:
 
-* First the potential phosphorus uptake is estimated based on the demand from the crop given its current biomass, stage of development, and estimated phosphorus composition at that stage of development. These methods are described in [SC.CRP.28](#eq-sc-crp-28) - [SC.CRP.32](#eq-sc-crp-32) substituting phosphorus for nitrogen. 
-* Then the actual phosphorus uptake is calculated based on the number of soil layers that the roots have access to and the amount of labile inorganic phosphorus in each soil layer. These methods are described in [SC.CRP.33](#eq-sc-crp-33) - [SC.CRP.44](#eq-sc-crp-44) again, substituting phosphorus for nitrogen. 
-* Finally the phosphorus taken up by the roots are added to the amount of phosphorus stored in the plant as described in [SC.CRP.45](#eq-sc-crp-45) with the exception that there is never any fixed phosphorus.
+* First the potential phosphorus uptake is estimated based on the demand from the crop given its current biomass,
+stage of development, and estimated phosphorus composition at that stage of development. These methods are described
+in [SC.CRP.28](#eq-sc-crp-28) - [SC.CRP.32](#eq-sc-crp-32) substituting phosphorus for nitrogen.
+* Then the actual phosphorus uptake is calculated based on the number of soil layers that the roots have access to and
+the amount of labile inorganic phosphorus in each soil layer. These methods are described in
+[SC.CRP.33](#eq-sc-crp-33) - [SC.CRP.44](#eq-sc-crp-44) again, substituting phosphorus for nitrogen.
+* Finally the phosphorus taken up by the roots are added to the amount of phosphorus stored in the plant as described
+in [SC.CRP.45](#eq-sc-crp-45) with the exception that there is never any fixed phosphorus.
 
 
 #### Growth Constraints
 
-The `GrowthConstraints` class includes all of the methods that estimate the potential limitations on plant growth that a crop faces due to environmental conditions. Specifically, these methods calculate a stress factor for each of the following:
+The `GrowthConstraints` class includes all of the methods that estimate the potential limitations on plant growth that
+a crop faces due to environmental conditions. Specifically, these methods calculate a stress factor for each of the
+following:
 
 * Insufficient or excess water
 * Inadequate nitrogen 
@@ -3873,7 +4332,9 @@ The `GrowthConstraints` class includes all of the methods that estimate the pote
 * Extreme temperature
 
 
-The stress factors have values between [0,1] and represent the proportional reduction in total potential biomass that is accumulated that day as a result of that environmental stressor. After calculating the stress factor for each condition separately, the largest stressor is used to define the growth factor for that day:
+The stress factors have values between [0,1] and represent the proportional reduction in total potential biomass that
+is accumulated that day as a result of that environmental stressor. After calculating the stress factor for each
+condition separately, the largest stressor is used to define the growth factor for that day:
    
 ::: {#eq-sc-crp-46}
 [[**SC.CRP.46**]]{.aside .content-visible when-format="html"}        
@@ -3882,7 +4343,11 @@ $$
 $$
 ::: 
 
-If the user wishes to run a simulation in which crop growth ignores these environmental stressors, they can do so through the user inputs `simulate_water_stress`, `simulate_temp_stress`, `simulate_nitrogen_stress`, and `simulate_phosphorus_stress` in each field. The default values for these are set to true, indicating that crop growth should take environmental stressors into account but setting any of these input values to false will “turn off” that stressor and return a value of 0 for the associated stress factor.
+If the user wishes to run a simulation in which crop growth ignores these environmental stressors, they can do so
+through the user inputs `simulate_water_stress`, `simulate_temp_stress`, `simulate_nitrogen_stress`, and
+`simulate_phosphorus_stress` in each field. The default values for these are set to true, indicating that crop growth
+should take environmental stressors into account but setting any of these input values to false will “turn off” that
+stressor and return a value of 0 for the associated stress factor.
 
 **Water Stress**
 
@@ -3904,7 +4369,10 @@ $$
 
 **Temperature Stress**
 
-Temperature stress is experienced by the crops when the mean air temperature on a given day diverges from the optimal temperature for the plant growth.  If the average temperature is less than or equal to the minimum temperature required for crop growth, also called the base temperature, then the temperature stress for that day will be 1 and the crop will not accumulate any biomass.
+Temperature stress is experienced by the crops when the mean air temperature on a given day diverges from the optimal
+temperature for the plant growth.  If the average temperature is less than or equal to the minimum temperature
+required for crop growth, also called the base temperature, then the temperature stress for that day will be 1 and the
+crop will not accumulate any biomass.
    
 ::: {#eq-sc-crp-48}
 [[**SC.CRP.48**]]{.aside .content-visible when-format="html"}        
@@ -3918,7 +4386,8 @@ $$
 * \bar{T}_{ave} = mean air temperature (℃) 
 * T_{base} = plant-specific minimum temperature for growth (℃)
 
-If the base temperature is less than the average temperature and the average temperature is less than or equal to the optimal temperature, then temperature stress is calculated as:
+If the base temperature is less than the average temperature and the average temperature is less than or equal to the
+optimal temperature, then temperature stress is calculated as:
    
 ::: {#eq-sc-crp-49}
 [[**SC.CRP.49**]]{.aside .content-visible when-format="html"}        
@@ -3931,7 +4400,8 @@ $$
 
 * T_{opt} = plant-specific optimal temperature for growth (℃)
 
-If the optimal temperature is less than the average temperature and the average temperature is less than or equal to two times the optimal temperature minus the base temperature, then temperature stress for a given day is calculated as:
+If the optimal temperature is less than the average temperature and the average temperature is less than or equal to
+two times the optimal temperature minus the base temperature, then temperature stress for a given day is calculated as:
    
 ::: {#eq-sc-crp-50}
 [[**SC.CRP.50**]]{.aside .content-visible when-format="html"}        
@@ -3940,7 +4410,8 @@ $$
 $$
 ::: 
             
-If the average temperature is greater than two times the optimal temperature minus the base temperature, then temperature stress is set to 1 and results in no biomass accumulation, 
+If the average temperature is greater than two times the optimal temperature minus the base temperature, then
+temperature stress is set to 1 and results in no biomass accumulation,
    
 ::: {#eq-sc-crp-51}
 [[**SC.CRP.51**]]{.aside .content-visible when-format="html"}        
@@ -3952,7 +4423,10 @@ $$
 
 **Nitrogen and Phosphorus Stress**
 
-Nitrogen and phosphorus stress are calculated using the same functions based on a non-linear relationship between the current nitrogen content of the plant and the optimal content of the plant on that day. Nitrogen stress, however, is not calculated only for legumes. Both nitrogen and phosphorus stress are 0.0 at optimal nutrient content and 1.0 when the nutrient content of the plant is 50% or less of the optimal value. 
+Nitrogen and phosphorus stress are calculated using the same functions based on a non-linear relationship between the
+current nitrogen content of the plant and the optimal content of the plant on that day. Nitrogen stress, however, is
+not calculated only for legumes. Both nitrogen and phosphorus stress are 0.0 at optimal nutrient content and 1.0 when
+the nutrient content of the plant is 50% or less of the optimal value.
 
 First a scaling factor is calculate that relates the current plant nutrient content to the optimal nutrient content:
    
@@ -3978,14 +4452,20 @@ $$
 
 *Where*: 
 
-* `stored_nutrient_content` = actual mass of nitrogen or phosphorus stored in plant material on the current day (kg N or P ha$^{-1}$)
-* `optimal_nutrient_content` = optimal mass of nitrogen or phosphorus stored in plant material for the current growth stage (kg N or P ha$^{-1}$)
+* `stored_nutrient_content` = actual mass of nitrogen or phosphorus stored in plant material on the current day
+(kg N or P ha$^{-1}$)
+* `optimal_nutrient_content` = optimal mass of nitrogen or phosphorus stored in plant material for the current growth
+stage (kg N or P ha$^{-1}$)
 
 **Grow Canopy**
 
-The amount of canopy cover is expressed as the leaf area index (LAI). LAI is defined as the area of green leaf per unit area of land. Each crop species has a maximum LAI and once that maximum is reached, the LAI will remain constant until leaf senescence begins to exceed leaf growth. 
+The amount of canopy cover is expressed as the leaf area index (LAI). LAI is defined as the area of green leaf per unit
+area of land. Each crop species has a maximum LAI and once that maximum is reached, the LAI will remain constant until
+leaf senescence begins to exceed leaf growth.
 	
-LAI is calculated using equations that relate the current fraction of accumulated heat units and crop-specific heat unit fractions associated with different stages of development. The methods for calculating the LAI are found in the `LeafAreaIndex` class.
+LAI is calculated using equations that relate the current fraction of accumulated heat units and crop-specific heat
+unit fractions associated with different stages of development. The methods for calculating the LAI are found in the
+`LeafAreaIndex` class.
 
 First, two unitless shape coefficients, `shape_1` and `shape_2`, are calculated by the method `determine_lai_shapes()`:
    
@@ -4006,8 +4486,10 @@ $$
 *Where*: 
 
 * fr_{PHU,1}, fr_{PHU,2}, fr_{LAI,1}, and fr_{LAI,2} = crop-specific curve points 
-    * fr_{PHU,1} and fr_{PHU,2} = fractions of total potential heat units of the growing season corresponding to the 1st point and 2nd point on the optimal leaf area development curve
-    * fr_{LAI,1} and fr_{LAI,2} = fractions of the maximum plant LAI corresponding to the 1st and 2nd point on the optimal leaf area development curve
+    * fr_{PHU,1} and fr_{PHU,2} = fractions of total potential heat units of the growing season corresponding to the
+    1st point and 2nd point on the optimal leaf area development curve
+    * fr_{LAI,1} and fr_{LAI,2} = fractions of the maximum plant LAI corresponding to the 1st and 2nd point on the
+    optimal leaf area development curve
  
 Next, the optimal LAI fraction for a given day is calculated by the method `determine_optimal_leaf_area_fraction()` as:
    
@@ -4020,9 +4502,11 @@ $$
 
 *Where*: 
 
-* fr_{LAI,opt} = fraction of the plant’s maximum potential LAI corresponding to a given fraction of potential heat units (PHU) the plant has accumulated on that day
+* fr_{LAI,opt} = fraction of the plant’s maximum potential LAI corresponding to a given fraction of potential heat
+units (PHU) the plant has accumulated on that day
 
-The optimal LAI fraction (fr_{LAI,opt}) is then used by the method `determine_canopy_height()` to set the canopy height for that day according to the following equation:
+The optimal LAI fraction (fr_{LAI,opt}) is then used by the method `determine_canopy_height()` to set the canopy
+height for that day according to the following equation:
    
 ::: {#eq-sc-crp-57}
 [[**SC.CRP.57**]]{.aside .content-visible when-format="html"}        
@@ -4031,7 +4515,8 @@ $$
 $$
 :::
             
-The optimal increase in LAI for annuals and perennials that are not in senescence is calculated by the method `determine_max_leaf_area_change()` using the following equation:
+The optimal increase in LAI for annuals and perennials that are not in senescence is calculated by the method
+`determine_max_leaf_area_change()` using the following equation:
    
 ::: {#eq-sc-crp-58}
 [[**SC.CRP.58**]]{.aside .content-visible when-format="html"}        
@@ -4046,7 +4531,8 @@ $$
 *Where*: 
 
 * LAImax = crop-specific maximum LAI
-* fr_{LAI,max,d} and fr_{LAI,max,d-1} = fraction of the plant’s maximum LAI accumulated on the given day d and the previous day respectively
+* fr_{LAI,max,d} and fr_{LAI,max,d-1} = fraction of the plant’s maximum LAI accumulated on the given day d and the
+previous day respectively
 * LAI_{act,d-1}LAIact,d-1 = actual LAI on the previous day
 
 The actual LAI added is then calculated as: 
@@ -4060,7 +4546,8 @@ $$
             
 *Where*: 
 
-* `actual_leaf_area_index_change` is the change in the LAI the given day and `growth_factor` is the plant’s growth factor (0.0 - 1.0) calculated in [SC.CRP.46](#ew-sc-crp-46)
+* `actual_leaf_area_index_change` is the change in the LAI the given day and `growth_factor` is the plant’s growth
+factor (0.0 - 1.0) calculated in [SC.CRP.46](#ew-sc-crp-46)
 
 The total LAI for the plant that day is then updated according to the following:
         
@@ -4086,9 +4573,12 @@ $$
 
 **Biomass Accumulation**
 
-Plant biomass is produced when intercepted solar radiation is converted into plant biomass via photosynthesis assuming a plant species-specific radiation use efficiency. The methods that estimate the conversion of solar radiation into plant biomass are collected in the `BiomassAllocation` class.
+Plant biomass is produced when intercepted solar radiation is converted into plant biomass via photosynthesis
+assuming a plant species-specific radiation use efficiency. The methods that estimate the conversion of solar
+radiation into plant biomass are collected in the `BiomassAllocation` class.
 
-The amount of photosynthetically active radiation (MJ m$^{-2}$) that is intercepted by the leaf area is calculated by the method `intercept_radiation` using the following function:
+The amount of photosynthetically active radiation (MJ m$^{-2}$) that is intercepted by the leaf area is calculated
+by the method `intercept_radiation` using the following function:
 
 ::: {#eq-sc-crp-61}
 [[**SC.CRP.61**]]{.aside .content-visible when-format="html"}        
@@ -4134,7 +4624,9 @@ $$
 
 **Biomass Allocation**
 
-Once the total biomass growth for a given day has been calculated, the total accumulated biomass can be partitioned into above and below ground biomass depending on the development stage of the crop. The aboveground biomass (kg hha$^{-1}$) is calculated as:
+Once the total biomass growth for a given day has been calculated, the total accumulated biomass can be partitioned
+into above and below ground biomass depending on the development stage of the crop. The aboveground biomass
+(kg hha$^{-1}$) is calculated as:
    
 ::: {#eq-sc-crp-64}
 [[**SC.CRP.64**]]{.aside .content-visible when-format="html"}        
@@ -4158,7 +4650,8 @@ $$
 
 #### Crop Harvest
 
-When the Field class initiates a harvest event via the `manage_harvest()` function of the `Crop` class, the `CropManagement` class method for harvesting is called which:
+When the Field class initiates a harvest event via the `manage_harvest()` function of the `Crop` class, the
+`CropManagement` class method for harvesting is called which:
 
 * Determines the harvest index for that crop which accounts for the type of feed and storage of that crop
 * Cuts and collects the crop’s harvested biomass according to the harvest index and harvest efficiency
@@ -4168,7 +4661,10 @@ When the Field class initiates a harvest event via the `manage_harvest()` functi
 
 **Harvest Index**
 
-If a custom harvest index is provided by the user (harvest index override), that value is used. Otherwise, the harvest index is calculated based on the crop's accumulated heat fraction and the crop-specific optimal harvest index. The method also adjusts the harvest index based on the crop's water deficiency. Harvest index is defined as the fraction of the above ground dry biomass of plant that is removed as dry yield. 
+If a custom harvest index is provided by the user (harvest index override), that value is used. Otherwise, the harvest
+index is calculated based on the crop's accumulated heat fraction and the crop-specific optimal harvest index. The
+method also adjusts the harvest index based on the crop's water deficiency. Harvest index is defined as the fraction
+of the above ground dry biomass of plant that is removed as dry yield.
 
 The potential harvest index (HI_{max}) for the plant for a given day is calculated as:
    
@@ -4199,10 +4695,12 @@ $$
 *Where*: 
 
 * `potential_harvest_index` = potential harvest index
-* `minimum_harvest_index` = harvest index for the plant in drought conditions and represents the minimum harvest index allowed for the plant
+* `minimum_harvest_index` = harvest index for the plant in drought conditions and represents the minimum harvest
+index allowed for the plant
 * `water_deficiency` = water deficiency factor. 
 
-As the water deficiency factor increases, the actual harvest index will decrease. The water deficiency factor is calculated in the `WaterDynamics` class during the `cycle_water()` method:
+As the water deficiency factor increases, the actual harvest index will decrease. The water deficiency factor is
+calculated in the `WaterDynamics` class during the `cycle_water()` method:
    
 ::: {#eq-sc-crp-68}
 [[**SC.CRP.68**]]{.aside .content-visible when-format="html"}        
@@ -4214,15 +4712,22 @@ $$
 *Where*: 
 
 * `p` = day of planting
-* `m` = day of harvest if the plant is harvested before it reaches maturity or the last day of the growing season if the plant is harvested after it reaches maturity
+* `m` = day of harvest if the plant is harvested before it reaches maturity or the last day of the growing season if
+the plant is harvested after it reaches maturity
 * `actual_evaoptranspiration` = actual evapotranspiration on a given day (mm H<sub>2</sub>O)
 * `potential_evapotranspiration` = potential evapotranspiration on a given day (mm H<sub>2</sub>O)
 
 **Crop Cutting**
 
-After the harvest index has been set, the `manage_harvest` method calls the `cup_crop()` method that determines how much biomass is cut from the growing crop. The proportion of a crop that is cut is determined by the harvest index. A harvest index < 1 indicates that a proportion of aboveground biomass equal to the harvest index will be removed from the aboveground biomass of the plant. A harvest index > 1 will remove below ground biomass as well.
+After the harvest index has been set, the `manage_harvest` method calls the `cup_crop()` method that determines how
+much biomass is cut from the growing crop. The proportion of a crop that is cut is determined by the harvest index. A
+harvest index < 1 indicates that a proportion of aboveground biomass equal to the harvest index will be removed from
+the aboveground biomass of the plant. A harvest index > 1 will remove below ground biomass as well.
 
-The cut biomass is removed from the plant's total biomass and the amount collected as yield is determined by the collected fraction. The remaining portion is left in the field as the crop residue created during harvest. Cut operations without a harvest, as in the case of cover cropping systems, are conducted by setting `collected_fraction` = 0 (the default).
+The cut biomass is removed from the plant's total biomass and the amount collected as yield is determined by the
+collected fraction. The remaining portion is left in the field as the crop residue created during harvest. Cut
+operations without a harvest, as in the case of cover cropping systems, are conducted by setting
+`collected_fraction` = 0 (the default).
 
 If the harvest index is less than one, the cut biomass (kg ha$^{-1}$) is calculated as:
    
@@ -4233,7 +4738,9 @@ $$
 $$
 :::
 
-The actual harvested yield (kg DM ha$^{-1}$) and cut crop residue (kg DM ha$^{-1}$) left on the field are then calculated using the harvest efficiency which is defined as the fraction of cut biomass removed by the harvesting equipment. 
+The actual harvested yield (kg DM ha$^{-1}$) and cut crop residue (kg DM ha$^{-1}$) left on the field are then
+calculated using the harvest efficiency which is defined as the fraction of cut biomass removed by the harvesting
+equipment.
    
 ::: {#eq-sc-crp-70}
 [[**SC.CRP.70**]]{.aside .content-visible when-format="html"}        
@@ -4246,7 +4753,9 @@ $$
 $$
 :::           
 
-After the total biomass and yields have been updated, the above and belowground biomass in the plant material that remains in the field are updated along with the plant’s root fraction via the `recalculate_biomass_distribution()` method. 
+After the total biomass and yields have been updated, the above and belowground biomass in the plant material that
+remains in the field are updated along with the plant’s root fraction via the `recalculate_biomass_distribution()`
+method.
 
 If no roots are harvested:
           
@@ -4271,9 +4780,12 @@ $$
 $$
 ::: 
 
-In addition to total biomass, the nutrient content for both the collected and uncollected portions are updated. If the simulation is using the internally-derived harvest index for cutting, then nutrients are determined with the crop-specific yield nutrient fractions. Otherwise, (harvest index override), the optimal nutrient values are used.
+In addition to total biomass, the nutrient content for both the collected and uncollected portions are updated. If the
+simulation is using the internally-derived harvest index for cutting, then nutrients are determined with the
+crop-specific yield nutrient fractions. Otherwise, (harvest index override), the optimal nutrient values are used.
 
-The amount of nitrogen and phosphorus removed with the collected biomass, or the nitrogen and phosphorus yields (kg N or P ha$^{-1}$) are calculated as:
+The amount of nitrogen and phosphorus removed with the collected biomass, or the nitrogen and phosphorus yields
+(kg N or P ha$^{-1}$) are calculated as:
    
 ::: {#eq-sc-crp-72}
 [[**SC.CRP.72**]]{.aside .content-visible when-format="html"}        
@@ -4290,7 +4802,8 @@ $$
 * `nitrogen_fraction` = fraction of nitrogen in the harvested biomass
 * `phosphorus_fraction` = fraction of phosphorus in the harvested biomass
 
-The `cut_crop()` method updates the crops leaf area index and accumulated heat units. This is especially important for perennial crops that will continue growing either the following day or after the end of their dormancy. 
+The `cut_crop()` method updates the crops leaf area index and accumulated heat units. This is especially important
+for perennial crops that will continue growing either the following day or after the end of their dormancy.
 
 The plant’s leaf area index and accumulated heat units are set back by the fraction of biomass removed in yield.
    
@@ -4315,11 +4828,15 @@ $$
 $$
 ::: 
 
-Reducing the number of accumulated heat units shifts the plant’s development to an earlier period in which growth is usually occurring at a faster rate.
+Reducing the number of accumulated heat units shifts the plant’s development to an earlier period in which growth is
+usually occurring at a faster rate.
 
 **Crop Kill**
 
-If the plant is killed at harvest, the plant biomass that was not removed by harvest and the nutrients in that biomass are added to the residue pools (kg DM, N or P ha$^{-1}$). So after the `cut_crop()` methods calculates the yield and the residue produced by the harvest practice, the `kill()` method, updates the status of the crop plant to indicate that it is no longer living and adds the remaining plant biomass and nutrients to the yield residue pools.
+If the plant is killed at harvest, the plant biomass that was not removed by harvest and the nutrients in that biomass
+are added to the residue pools (kg DM, N or P ha$^{-1}$). So after the `cut_crop()` methods calculates the yield and
+the residue produced by the harvest practice, the `kill()` method, updates the status of the crop plant to indicate
+that it is no longer living and adds the remaining plant biomass and nutrients to the yield residue pools.
    
 ::: {#eq-sc-crp-76}
 [[**SC.CRP.76**]]{.aside .content-visible when-format="html"}        
@@ -4334,9 +4851,12 @@ $$
             
 **Record Harvest and Transfer Residue**
 
-The last steps in the `CropManagement` method for managing the crop harvest is to record the harvested crop information in a data structure that can be passed to the `OutputManager` and the Feed Storage Module and then to add the crop residue to the soil residue pools. The latter is accomplished by the `transfer_residue` method. 
+The last steps in the `CropManagement` method for managing the crop harvest is to record the harvested crop information
+in a data structure that can be passed to the `OutputManager` and the Feed Storage Module and then to add the crop
+residue to the soil residue pools. The latter is accomplished by the `transfer_residue` method.
 
-If the crop is not killed and there is only surface residue and the soil pools in the surface layer are updated as follows:
+If the crop is not killed and there is only surface residue and the soil pools in the surface layer are updated as
+follows:
    
 ::: {#eq-sc-crp-77 style="font-size:90%"}
 [[**SC.CRP.77**]]{.aside .content-visible when-format="html"}        
@@ -4349,7 +4869,8 @@ $$
 $$
 :::           
 
-If the crop is killed and there is both surface and belowground crop residue to add to the soil pools, the residue is distributed between the soil layers by the `distribute_residue_nutrients()` method. 
+If the crop is killed and there is both surface and belowground crop residue to add to the soil pools, the residue is
+distributed between the soil layers by the `distribute_residue_nutrients()` method.
 
 First, the fraction of the residue that remains on the surface is calculated as:
 
@@ -4357,20 +4878,31 @@ $$
 \text{surface\_residue\_fraction} = \frac{\text{yield\_residue} - \text{root\_biomass}}{\text{yield\_residue}}
 $$   
 
-The surface residue, nitrogen residue, and phosphorus residues are then calculated by multiplying the total residue masses by the surface residue fractions and that mass is added to the soil pools as described above in [SC.CRP.77](#eq-sc-crp-77). 
+The surface residue, nitrogen residue, and phosphorus residues are then calculated by multiplying the total residue
+masses by the surface residue fractions and that mass is added to the soil pools as described above in [SC.CRP.77](#eq-sc-crp-77).
 
-Then the residue masses added to the subsurface soil layers calculated as the masses multiplied by (1-`surface_residue_fraction`). The subsurface residue masses are distributed to different soil layers by calculating the distribution of root biomass between the soil layers following a method described by @fan2016root. The work by @fan2016root propose a logistic dose response curve for the cumulative distribution of the root biomass up to a specific depth in the soil profile. We adapt the methods they proposed to estimate the proportion of biomass in each soil layer, rather than the cumulative proportion at a given soil depth.
+Then the residue masses added to the subsurface soil layers calculated as the masses multiplied by
+(1-`surface_residue_fraction`). The subsurface residue masses are distributed to different soil layers by calculating
+the distribution of root biomass between the soil layers following a method described by @fan2016root. The work by
+@fan2016root propose a logistic dose response curve for the cumulative distribution of the root biomass up to a
+specific depth in the soil profile. We adapt the methods they proposed to estimate the proportion of biomass in each
+soil layer, rather than the cumulative proportion at a given soil depth.
 
 Heuristically, the method is executed as follows:
 
 Starting with the top layer:
 
-* Estimate the proportion of the root biomass distributed to the depth that is equal to the bottom of the soil layer using Equation 2 in @fan2016root reproduced in [SC.CRP.78](#eq-sc-crp-78) below.
-* Multiply the proportion of the root biomass distributed up to the depth of the current soil layer from step 1 by remaining yield residue masses (total mass, nitrogen mass, and phosphorus mass). 
-* Subtract the sum of the yield residue mass for all layers above the current layer from the total yield residue mass from the surface to the bottom of the soil layer to get the root biomass in that latter alone. (note, for the first sub-surface layer, this sum will be zero).
+* Estimate the proportion of the root biomass distributed to the depth that is equal to the bottom of the soil layer
+using Equation 2 in @fan2016root reproduced in [SC.CRP.78](#eq-sc-crp-78) below.
+* Multiply the proportion of the root biomass distributed up to the depth of the current soil layer from step 1 by
+remaining yield residue masses (total mass, nitrogen mass, and phosphorus mass).
+* Subtract the sum of the yield residue mass for all layers above the current layer from the total yield residue mass
+from the surface to the bottom of the soil layer to get the root biomass in that latter alone. (note, for the first
+sub-surface layer, this sum will be zero).
 * Repeat for each layer going down. 
 
-The equation from @fan2016root that determines the fraction of the root biomass up to a given depth is described below and broken up into 3 parts for clarity:
+The equation from @fan2016root that determines the fraction of the root biomass up to a given depth is described below
+and broken up into 3 parts for clarity:
 
 ::: {#eq-sc-crp-78}
 [[**SC.CRP.78**]]{.aside .content-visible when-format="html"}       
@@ -4384,7 +4916,8 @@ $$
 $$
 :::  
 
-This method relies on two crop-specific, empirically fitted parameters estimated by @fan2016root: `root_dist_param_da` and `root_dist_param_c`. The default values for these parameters are those reported in the original manuscript but they are available for adjustment as user inputs. 
-
+This method relies on two crop-specific, empirically fitted parameters estimated by @fan2016root: `root_dist_param_da`
+and `root_dist_param_c`. The default values for these parameters are those reported in the original manuscript but they
+are available for adjustment as user inputs.
 
 ## References
