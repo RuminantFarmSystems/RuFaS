@@ -1,3 +1,8 @@
+---
+# Globally set all the tables to take up the full "page" layout.
+tbl-column: page
+---
+
 ![Soil and Crop module icon](../resources/images/soc_icon.png){width=25%}
 # Soil and Crop Module
 <!-- reuse code to import functions from "../scripts/": -->
@@ -665,13 +670,26 @@ initialized in each layer.
 #| tbl-cap: Required user inputs for the Soil section.
 import_table(
   "../resources/table_data/soil_and_crop/tbl-sc-soil-inputs.csv",
-  colalign = ["left", "left", "center", "center", "center"]
+  colalign = ["left", "left", "center", "center", "center"],
 )
 ```
 
 ### Expected Outputs
 
 <!-- TODO -->
+
+<!-- Soil data -->
+```{python}
+#| label: tbl-sc-soil-outputs
+#| tbl-cap: "Expected soil outputs"
+
+import_table(
+  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-soil-outputs.csv",
+  colalign = ["left", "left", "left"],
+  maxcolwidths = [None, None, 5],
+  tablefmt = "simple"
+)
+```
 
 ### Methodology
 
@@ -3472,17 +3490,31 @@ concentrations are generated as:
 
 <!-- TODO -->
 
-** Crop yield **
-
+<!-- Crop yields -->
 ```{python}
 #| label: tbl-sc-crop-yld-outputs
-#| tbl-cap: Expected crop yield outputs
+#| tbl-cap: "Expected crop yield outputs. The name of the field is indicated by the stand-in [FIELD_NAME]."
+
 import_table(
     "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-crop-yld-outputs.csv",
+    # headersalign = ["left", "center", "left"], # NOT WORKING
+    colalign = ["left", "left", "center"],
+    maxcolwidths = [None, None, 8],
+    tablefmt = "simple"
 )
 ```
 
+<!-- Crop growth -->
+```{python}
+#| label: tbl-sc-crop-growth-outputs
+#| tbl-cap: "Expected crop (daily) growth outputs. Here, [X] is substituted for \"field=[FIELD_NAME],crop=[CROP_NAME],planted=[PLANT_DAY],[PLANT_YEAR]\" where [FIELD_NAME] is the name of the field, [CROP_NAME] is the name of the crop in that field, [PLANT_DAY] and [PLANT_YEAR] indicate the date the crop was planted."
 
+import_table(
+  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-crop-growth-outputs.csv",
+  colalign = ["left", "left", "center"],
+  maxcolwidths = [None, None, 10],
+)
+```
 
 ### Methodology
 
