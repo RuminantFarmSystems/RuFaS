@@ -115,7 +115,7 @@
     "field_1": {
       "title": "Field specification",
       "description": "Field characteristics and references to field management specifications.",
-      "path": "input/data/field/example_field_bare_soil.json",
+      "path": "input/data/field/example_small_field_corn_alf_silage.json",
       "type": "json",
       "properties": "field_properties"
     },
@@ -126,7 +126,7 @@
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "crop_schedule_1": {
+    "Corn-Alf-Silage": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
       "path": "input/data/crop/no_crop.json",
