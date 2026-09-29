@@ -11,12 +11,11 @@ book:
   chapters:
     - index.qmd
     - qmd/versionupdates.qmd
-    - qmd/example_structures.qmd
     - qmd/animal.qmd
     - qmd/manure.qmd
     - qmd/soil_and_crop.qmd
     - qmd/feed_storage.qmd
-    - qmd/economics.qmd
+    - qmd/emissions.qmd
     - qmd/connections.qmd
     - abbrevs.qmd
 
