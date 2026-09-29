@@ -20,7 +20,7 @@
     },
 	"milking_cow_fraction": 0.8356,
     "annual_milk_yield": null,
-    "simulate_genetics": true
+    "simulate_genetics": false
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
