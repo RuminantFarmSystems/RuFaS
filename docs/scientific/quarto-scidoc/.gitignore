@@ -29,3 +29,4 @@ _book/
 *.quarto_ipynb*
 .ipynb_checkpoints/
 **/*.quarto_ipynb
+.~*#

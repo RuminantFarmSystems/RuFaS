@@ -107,7 +107,6 @@ When directed by the `FieldManager`, the Field class initializes a new Field obj
 that is packaged and shared by the `FieldManager`. These inputs include things like the field location, size,
 irrigation practices, pointers to the input files with management schedules, and options for turning crop growth
 stressors on and off.
-
 ### Required User Inputs
 
 ```{python}
@@ -154,7 +153,6 @@ import_table(
   colalign = ["left", "left", "center", "center", "center"]
 )
 ```
-
 ### Expected Outputs
 
 <!-- TODO -->
@@ -645,7 +643,6 @@ The last management practice the Field class checks is the harvesting event sche
 for that day, it initiates the harvest method in the Crop class and updates its list of crops to remove the harvested
 and killed crops from its list of crops.
 
-
 ## Soil Management 
 ### Introduction 
 
@@ -662,7 +659,6 @@ fields. Each specified soil is stored by RuFaS as a `SoilData` object consisting
 that in turn represent a set of variables specific to each layer of soil. At the start of the simulation the user's
 soil specifications generate the soil layers for each field and pools of water, carbon, nitrogen, and phosphorus are
 initialized in each layer.
-
 ### Required User Inputs
 
 ```{python}
@@ -673,7 +669,6 @@ import_table(
   colalign = ["left", "left", "center", "center", "center"],
 )
 ```
-
 ### Expected Outputs
 
 <!-- TODO -->
@@ -686,7 +681,7 @@ import_table(
 import_table(
   "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-soil-outputs.csv",
   colalign = ["left", "left", "left"],
-  maxcolwidths = [None, None, 5],
+  maxcolwidths = [None, None, 12],
   tablefmt = "simple"
 )
 ```
@@ -3467,7 +3462,6 @@ crop updates are called for each crop using the `Crop` class’s `perform_daily_
 
 At the end of the `Field` class’s `manage_field()` routine, it checks for both user scheduled and optimal harvest
 events and initiates the `Crop` routine’s harvest if it is a harvest day.
-
 ### Required User Inputs
 
 When the Field class plants a new crop, it calls the `create_crop()` method of the `Crop` class to initialize a new
@@ -3485,7 +3479,6 @@ in response to weather and nutrient availability.
 
 Initial NO<sub>3</sub> levels (mg kg$^{-1}$) in the soil are set by user input. If user input is null, initial nitrate
 concentrations are generated as:
-
 ### Expected Outputs
 
 <!-- TODO -->
