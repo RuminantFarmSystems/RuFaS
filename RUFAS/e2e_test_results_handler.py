@@ -4,11 +4,12 @@ from collections import namedtuple
 from collections.abc import Iterable
 from pathlib import Path
 import shutil
-from typing import Any, TypeGuard
+from typing import Any
 
 import pandas as pd
 from deepdiff import DeepDiff
 
+from RUFAS.data_validator import DataValidator
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -974,26 +975,9 @@ class E2ETestResultsHandler:
             return False
         lower_bound = accepted_range.get(ACCEPTED_RANGE_MIN_KEY)
         upper_bound = accepted_range.get(ACCEPTED_RANGE_MAX_KEY)
-        if E2ETestResultsHandler._is_number(lower_bound) and E2ETestResultsHandler._is_number(upper_bound):
+        if DataValidator.is_number(lower_bound) and DataValidator.is_number(upper_bound):
             return lower_bound <= upper_bound
         return False
-
-    @staticmethod
-    def _is_number(value: Any) -> TypeGuard[int | float]:
-        """
-        Checks whether a value is a number.
-
-        Parameters
-        ----------
-        value : Any
-            The value to check.
-
-        Returns
-        -------
-        bool
-            ``True`` for integers and floats, ``False`` for booleans and every other type.
-        """
-        return isinstance(value, (int, float)) and not isinstance(value, bool)
 
     @staticmethod
     def _evaluate_accepted_ranges(
@@ -1072,7 +1056,7 @@ class E2ETestResultsHandler:
             The numbers found, in traversal order. Lists and dictionary values are searched recursively; booleans,
             strings, and ``None`` are not numbers and are skipped.
         """
-        if E2ETestResultsHandler._is_number(value):
+        if DataValidator.is_number(value):
             return [value]
         nested_values: Iterable[Any]
         if isinstance(value, dict):
