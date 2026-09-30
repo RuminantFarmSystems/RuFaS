@@ -249,7 +249,7 @@ class TaskManager:
                     }
                 )
 
-            self._run_end_to_end_testing_comparisons(
+            comparisons_succeeded = self._run_end_to_end_testing_comparisons(
                 comparison_args=comparison_args,
                 produce_graphics=produce_graphics,
                 metadata_depth_limit=metadata_depth_limit,
@@ -276,9 +276,10 @@ class TaskManager:
                 if any(f"{run['output_prefix']} ({run['task_id']})" in failed_tasks for run in e2e_runs)
             ]
 
-            self.output_manager.summarize_e2e_test_results(
-                json_output_directory, output_prefixes, e2e_random_seeds, failed_e2e_groups
-            )
+            if comparisons_succeeded:
+                self.output_manager.summarize_e2e_test_results(
+                    json_output_directory, output_prefixes, e2e_random_seeds, failed_e2e_groups
+                )
 
         TaskManager.handle_post_processing(
             args={
@@ -1038,7 +1039,7 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
-    ) -> None:
+    ) -> bool:
         """
         Runs all E2E result averaging and comparison tasks, in parallel if a process pool is available.
 
@@ -1057,6 +1058,11 @@ class TaskManager:
             Directory containing the E2E simulation outputs and where comparison outputs will be written.
         verbosity : LogVerbosity or None
             Log verbosity level for each E2E comparison.
+
+        Returns
+        -------
+        bool
+            Whether the E2E results comparisons were successfully completed.
 
         Notes
         -----
@@ -1098,6 +1104,9 @@ class TaskManager:
                     "function": (self._run_end_to_end_testing_comparisons.__name__),
                 },
             )
+            return False
+
+        return True
 
     @staticmethod
     def _process_end_to_end_testing_group(
