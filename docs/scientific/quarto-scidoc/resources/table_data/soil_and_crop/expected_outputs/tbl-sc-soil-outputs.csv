@@ -3,84 +3,71 @@ annual_eroded_active_organic_nitrogen_total.field=[FIELD_NAME],cumulative total 
 annual_eroded_fresh_organic_nitrogen_total.field=[FIELD_NAME],cumulative total of fresh organic N removed from the top soil,kg
 annual_eroded_sediment_total.field=[FIELD_NAME],cumulative total of sediment removed from the topsoil in the year,tons
 annual_eroded_stable_organic_nitrogen_total.field=[FIELD_NAME],cumulative total of stable organic N removed from the top soil,kg
-annual_grazing_decomposed_manure.field=[FIELD_NAME],amount of annual manure decomposed/mineralized from grazing,kg
-annual_machine_decomposed_manure.field=[FIELD_NAME],amount of annual manure decomposed/mineralized from machine processing,kg
+annual_[grazing|machine]_decomposed_manure.field=[FIELD_NAME],amount of annual manure decomposed/mineralized from grazing or machine,kg
 annual_nitrates_content_change.field=[FIELD_NAME],cumulative change in nitrates from the initial value,kg/ha
-annual_runoff_ammonium_total.field=[FIELD_NAME],,
-annual_runoff_fertilizer_phosphorus.field=[FIELD_NAME],,
-annual_runoff_grazing_manure_inorganic_phosphorus.field=[FIELD_NAME],,
-annual_runoff_grazing_manure_organic_phosphorus.field=[FIELD_NAME],,
-annual_runoff_machine_manure_inorganic_phosphorus.field=[FIELD_NAME],,
-annual_runoff_machine_manure_organic_phosphorus.field=[FIELD_NAME],,
-annual_runoff_nitrates_total.field=[FIELD_NAME],,
-annual_soil_evaporation_total.field=[FIELD_NAME],,
-annual_soil_phosphorus_runoff.field=[FIELD_NAME],,
-annual_surface_runoff_total.field=[FIELD_NAME],,
-annual_water_content_change.field=[FIELD_NAME],,
-accumulated_runoff.field=[FIELD_NAME],,
-ammonium_runoff.field=[FIELD_NAME],,
-available_phosphorus_pool.field=[FIELD_NAME],,
-cover_type.field=[FIELD_NAME],,
-current_day_snow_temperature.field=[FIELD_NAME],,
-days_since_application.field=[FIELD_NAME],,
-eroded_active_organic_nitrogen.field=[FIELD_NAME],,
-eroded_fresh_organic_nitrogen.field=[FIELD_NAME],,
-eroded_sediment.field=[FIELD_NAME],,
-eroded_stable_organic_nitrogen.field=[FIELD_NAME],,
-full_available_phosphorus_pool.field=[FIELD_NAME],,
-grazing_inorganic_phosphorus_runoff.field=[FIELD_NAME],,
-grazing_manure_applied_mass.field=[FIELD_NAME],,
-grazing_manure_dry_mass.field=[FIELD_NAME],,
-grazing_manure_field_coverage.field=[FIELD_NAME],,
-grazing_manure_moisture_factor.field=[FIELD_NAME],,
-grazing_organic_phosphorus_runoff.field=[FIELD_NAME],,
-grazing_stable_inorganic_phosphorus.field=[FIELD_NAME],,
-grazing_stable_organic_phosphorus.field=[FIELD_NAME],,
-grazing_water_extractable_inorganic_phosphorus.field=[FIELD_NAME],,
-grazing_water_extractable_organic_phosphorus.field=[FIELD_NAME],,
-infiltrated_water.field=[FIELD_NAME],,
-machine_inorganic_phosphorus_runoff.field=[FIELD_NAME],,
-machine_manure_applied_mass.field=[FIELD_NAME],,
-machine_manure_dry_mass.field=[FIELD_NAME],,
-machine_manure_field_coverage.field=[FIELD_NAME],,
-machine_manure_moisture_factor.field=[FIELD_NAME],,
-machine_organic_phosphorus_runoff.field=[FIELD_NAME],,
-machine_stable_inorganic_phosphorus.field=[FIELD_NAME],,
-machine_stable_organic_phosphorus.field=[FIELD_NAME],,
-machine_water_extractable_inorganic_phosphorus.field=[FIELD_NAME],,
-machine_water_extractable_organic_phosphorus.field=[FIELD_NAME],,
-nitrate_runoff.field=[FIELD_NAME],,
-profile_active_organic_nitrogen_total.field=[FIELD_NAME],,
-profile_ammonium_total.field=[FIELD_NAME],,
-profile_carbon_emissions.[FEED_ID]field=[FIELD_NAME],,
-profile_carbon_total.field=[FIELD_NAME],,
-profile_fresh_organic_nitrogen_total.field=[FIELD_NAME],,
-profile_nitrates_total.field=[FIELD_NAME],,
-profile_stable_organic_nitrogen_total.field=[FIELD_NAME],,
-rain_events_after_fertilizer_application.field=[FIELD_NAME],,
-recalcitrant_phosphorus_pool.field=[FIELD_NAME],,
-runoff_fertilizer_phosphorus.field=[FIELD_NAME],,
-snow_content.field=[FIELD_NAME],,
-snow_melt.field=[FIELD_NAME],,
-soil_phosphorus_runoff.field=[FIELD_NAME],,
-water_evaporated.field=[FIELD_NAME],,
-water_sublimated.field=[FIELD_NAME],,
-"annual_ammonia_emissions_total.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"annual_carbon_CO2_lost.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"annual_decomposition_carbon_CO2_lost.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"annual_nitrous_oxide_emissions_total.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_decomposition_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_to_passive_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_to_slow_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_to_slow_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"ammonia_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"ammonium_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"dinitrogen_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"evaporated_water_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
+annual_runoff_ammonium_total.field=[FIELD_NAME],cumulative total of ammonium removed from the topsoil by runoff,kg
+annual_runoff_fertilizer_phosphorus.field=[FIELD_NAME],Amount of solubilized phosphorus that has been leached off the field by runoff,kg
+annual_runoff_[grazing|machine]_manure_inorganic_phosphorus.field=[FIELD_NAME],Cumulative total of inorganic phosphorus from machine- or grazer-applied manure that was carried off the field by runoff,kg
+annual_runoff_[grazing|machine]_manure_organic_phosphorus.field=[FIELD_NAME],Cumulative total of inorganic phosphorus from machine- or grazer-applied manure that was carried off the field by runoff,kg
+annual_runoff_nitrates_total.field=[FIELD_NAME],Cumulative total of nitrates that were removed from the top soil layer by runoff,kg
+annual_soil_evaporation_total.field=[FIELD_NAME],Cumulative total of water evaporated from the soil this year,mm
+annual_soil_phosphorus_runoff.field=[FIELD_NAME],Cumulative total of phosphorus that was from the top layer of the soil profile by runoff,kg/ha
+annual_surface_runoff_total.field=[FIELD_NAME],Cumulative total of the volume of surface runoff that occurred in a year,mm/ha
+annual_water_content_change.field=[FIELD_NAME],Change in total soil water content in millimeters since start of simulation,mm
+accumulated_runoff.field=[FIELD_NAME],Amount of rainfall discharged as runoff on the current day,mm
+ammonium_runoff.field=[FIELD_NAME],Amount of ammonium removed from the soil surface by runoff,kg/ha
+available_phosphorus_pool.field=[FIELD_NAME],Amount of phosphorus available for soil adsorption and leaching via runoff before the first rainfall event after application,kg
+cover_type.field=[FIELD_NAME],"The cover type of the soil surface, which can be bare, residue covered, or grassed",
+current_day_snow_temperature.field=[FIELD_NAME],Snow pack temperature of the current day,degrees C
+days_since_application.field=[FIELD_NAME],Number of days since phosphorus was applied to the field via fertilizer,days
+eroded_active_organic_nitrogen.field=[FIELD_NAME],Amount of active organic nitrogen removed from the soil surface by eroded sediment,kg/ha
+eroded_fresh_organic_nitrogen.field=[FIELD_NAME],Amount of fresh organic nitrogen removed from the soil surface by eroded sediment,kg/ha
+eroded_sediment.field=[FIELD_NAME],Cumulative amount of sediment that has been eroded off of the field in a day,tons
+eroded_stable_organic_nitrogen.field=[FIELD_NAME],Amount of stable organic nitrogen removed from the soil surface by eroded sediment,kg/ha
+full_available_phosphorus_pool.field=[FIELD_NAME],Starting value of the available phosphorus pool,kg
+[grazing|machine]_inorganic_phosphorus_runoff.field=[FIELD_NAME],Amount of inorganic phosphorus from grazer-applied manure dissolved in and removed by runoff ,kg
+[grazing|machine]_manure_applied_mass.field=[FIELD_NAME],dry weight equivalent of the most recent application of manure applied by grazers or machine,kg
+[grazing|machine]_manure_dry_mass.field=[FIELD_NAME],dry weight equivalent of manure mass on the field that was applied by grazers or machine,kg
+[grazing|machine]_manure_field_coverage.field=[FIELD_NAME],Fraction of the field that is covered by machine- or grazer-applied manure,
+[grazing|machine]_manure_moisture_factor.field=[FIELD_NAME],Fraction representing the current moisture level of the machine- or grazer-applied manure on the field,
+[grazing|machine]_organic_phosphorus_runoff.field=[FIELD_NAME],Amount of organic phosphorus from machine- or grazer-applied manure dissolved in and removed by runoff,kg
+[grazing|machine]_stable_inorganic_phosphorus.field=[FIELD_NAME],Amount of stable inorganic phosphorus on the field that was applied by machine or grazers,kg
+[grazing|machine]_stable_organic_phosphorus.field=[FIELD_NAME],Amount of stable organic phosphorus on the field that was applied by machine or grazers,kg
+[grazing|machine]_water_extractable_inorganic_phosphorus.field=[FIELD_NAME],Amount of water extractable inorganic phosphorus on the field that was applied by machine or grazers,kg
+[grazing|machine]_water_extractable_organic_phosphorus.field=[FIELD_NAME],Amount of water extractable organic phosphorus on the field that was applied by machine or grazers,kg
+infiltrated_water.field=[FIELD_NAME],Amount of water that infiltrated the soil profile on the day,mm
+nitrate_runoff.field=[FIELD_NAME],Amount of nitrate removed from the soil surface by runoff,kg/ha
+profile_active_organic_nitrogen_total.field=[FIELD_NAME],The total amount of active organic nitrogen in the soil,kg/ha
+profile_ammonium_total.field=[FIELD_NAME],Total amount of CO2 emitted from carbon decomposition in the soil profile,kg/ha
+profile_carbon_emissions.[FEED_ID]field=[FIELD_NAME],total carbon present in the soil profile,kg/ha
+profile_carbon_total.field=[FIELD_NAME],The total amount of carbon in the soil,kg/ha
+profile_fresh_organic_nitrogen_total.field=[FIELD_NAME],The total amount of fresh organic nitrogen in the soil,kg/ha
+profile_nitrates_total.field=[FIELD_NAME],The total amount of nitrates in the soil,kg/ha
+profile_stable_organic_nitrogen_total.field=[FIELD_NAME],The total amount of stable organic nitrogen in the soil,kg/ha
+rain_events_after_fertilizer_application.field=[FIELD_NAME],Number of rain events that have occurred since phosphorus was applied to the field via fertilizer,
+recalcitrant_phosphorus_pool.field=[FIELD_NAME],Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event,kg
+runoff_fertilizer_phosphorus.field=[FIELD_NAME],Amount of solubilized phosphorus that has been leached off the field by runoff,kg
+snow_content.field=[FIELD_NAME],Water content of the snow pack,mm
+snow_melt.field=[FIELD_NAME],Water content of the snow that melted on the current day,mm
+soil_phosphorus_runoff.field=[FIELD_NAME],Amount of phosphorus removed from the surface soil layer by runoff,kg/ha
+water_evaporated.field=[FIELD_NAME],Amount of water evaporated from the soil profile on the current day,mm
+water_sublimated.field=[FIELD_NAME],Amount of water sublimated from the soil profile on the current day,mm
+"annual_ammonia_emissions_total.field=[FIELD_NAME],layer=[SOIL_LAYER]",Cumulative total of ammonium volatilized in this year,kg/ha
+"annual_carbon_CO2_lost.field=[FIELD_NAME],layer=[SOIL_LAYER]",Total amount of carbon lost as CO2,kg/ha
+"annual_decomposition_carbon_CO2_lost.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of total carbon lost as CO2 during decomposition,kg/ha
+"annual_nitrous_oxide_emissions_total.field=[FIELD_NAME],layer=[SOIL_LAYER]",Cumulative total amount of nitrates that have denitrified in a year,kg/ha
+"active_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon stored in the layer,kg/ha
+"active_carbon_decomposition_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon decomposed into slow or passive carbon and CO2,kg/ha
+"active_carbon_to_passive_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon decomposed into passive carbon,kg/ha
+"active_carbon_to_slow_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon decomposed into slow carbon,kg/ha
+"active_carbon_to_slow_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon lost as CO2 during decomposition into slow carbon,kg/ha
+"active_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active inorganic phosphorus content of this soil layer,kg/ha
+"active_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",The number of days that the active inorganic phosphorus pool has been greater than it would be when in equilibrium with the labile inorganic phosphorus pool.,
+"active_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active organic nitrogen content of this soil layer,kg/ha
+"ammonia_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of ammonium that volatilized out of the soil layer on the current day,kg/ha
+"ammonium_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Ammonium (NH4+) content of this soil layer,kg/ha
+"dinitrogen_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of dinitrogen emitted from this soil layer on the current day,kg/ha
+"evaporated_water_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of water that evaporated out of the layer on the current day,mm
 "fresh_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
 "fresh_organic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
 "labile_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
