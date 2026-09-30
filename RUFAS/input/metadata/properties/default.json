@@ -13,6 +13,12 @@
       "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
       "default": "2009:100"
     },
+    "warmup_days": {
+      "type": "number",
+      "description": "Number of initial simulation days to run as warmup before clearing output variables. Must be an integer leaving at least one evaluation day between start_date and end_date. Zero disables warmup. Simulation dates, day numbering, and manager state are unchanged.",
+      "minimum": 0,
+      "default": 0
+    },
     "simulation_type": {
       "type": "string",
       "description": "The type of daily simulation to run. Will determine daily simulation function in SimulationEngine.",
