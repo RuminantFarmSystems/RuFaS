@@ -1,12 +1,89 @@
+from enum import Enum
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Any
 
+
 LOGGER_NAME = "RUFAS"
 
 LOG_FORMAT = "[%(asctime)s][%(levelname)s][%(rufas_name)s] %(message)s"
 DATE_FORMAT = "%d-%b-%Y_%a_%H-%M-%S"
+
+
+
+
+class LogVerbosity(Enum):
+    """
+    The different types of logs printed by ``OutputManager``. Set by the ``verbose`` gnu arg in main.py.
+
+    Attributes
+    ----------
+    NONE : str
+        Selecting ``NONE`` will tell ``OutputManager`` not to print out anything during a simulation.
+    CREDITS : str
+        Selecting ``CREDITS`` will tell ``OutputManager`` to only print out the credits.
+    ERRORS : str
+        Selecting ``ERRORS`` will tell ``OutputManager`` to print out all credits and errors added during a simulation.
+    WARNINGS : str
+        Selecting ``WARNINGS`` will tell ``OutputManager`` to print out the credits as well as warnings and errors added
+        during a simulation.
+    LOGS : str
+        Selecting ``LOGS`` will tell ``OutputManager`` to print out the credits as well as logs, warnings, and errors
+        added during a simulation.
+
+    Notes
+    -----
+    ``CREDITS`` is the default setting.
+    """
+
+    NONE = "none"
+    CREDITS = "credits"
+    ERRORS = "errors"
+    WARNINGS = "warnings"
+    LOGS = "logs"
+
+    def __le__(self, other: "LogVerbosity") -> bool:
+        order = {
+            LogVerbosity.NONE: 0,
+            LogVerbosity.CREDITS: 1,
+            LogVerbosity.ERRORS: 2,
+            LogVerbosity.WARNINGS: 3,
+            LogVerbosity.LOGS: 4,
+        }
+
+        if other == LogVerbosity.NONE and self != LogVerbosity.NONE:
+            return False
+
+        return order[self] <= order[other]
+
+    def __str__(self) -> str:
+        if self.value == "none":
+            return "NONE"
+        return self.value[:-1].upper()
+
+
+LOG_LEVELS: dict[LogVerbosity, int] = {
+    LogVerbosity.LOGS: logging.INFO,
+    LogVerbosity.WARNINGS: logging.WARNING,
+    LogVerbosity.ERRORS: logging.ERROR,
+}
+
+
+
+
+
+def get_log_level(verbosity: LogVerbosity) -> int:
+    log_levels = {
+        LogVerbosity.NONE: logging.CRITICAL + 1,
+        LogVerbosity.CREDITS: logging.CRITICAL + 1,
+        LogVerbosity.ERRORS: logging.ERROR,
+        LogVerbosity.WARNINGS: logging.WARNING,
+        LogVerbosity.LOGS: logging.INFO,
+    }
+
+    return log_levels[verbosity]
+
 
 
 def configure_logging(
