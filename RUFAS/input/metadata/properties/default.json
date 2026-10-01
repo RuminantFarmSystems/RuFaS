@@ -7036,18 +7036,18 @@
       }
     }
   },
-  "initial_feed_storage_contents_properties": {
+  "initial_feed_storage_inventory_properties": {
     "data_collection_app_compatible": false,
-    "initial_contents": {
+    "initial_inventory": {
       "type": "array",
-      "description": "The contents that feed storages hold when the simulation starts. Storages that are not named start empty. Stated directly because a simulation without the crop and soil module has no harvests to derive contents from.",
+      "description": "The inventory that feed storages hold when the simulation starts. Storages that are not named start empty. Stated directly because a simulation without the crop and soil module has no harvests to derive inventory from.",
       "minimum_length": 0,
       "properties": {
         "type": "object",
         "description": "The dry matter mass and composition of the crop one storage holds when the simulation starts.",
         "storage_name": {
           "type": "string",
-          "description": "Name of the feed storage instance that holds these contents. Must match a name from the feed storage configurations."
+          "description": "Name of the feed storage instance that holds this inventory. Must match a name from the feed storage configurations."
         },
         "dry_matter_mass": {
           "type": "number",

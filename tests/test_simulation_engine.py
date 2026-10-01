@@ -440,8 +440,8 @@ def test_execute_feed_only_daily_simulation(
     # Arrange
     parent = MagicMock()
     parent.attach_mock(
-        mocker.patch.object(simulation_engine, "_execute_feed_storage_upkeep"),
-        "execute_feed_storage_upkeep",
+        mocker.patch.object(simulation_engine, "_execute_feed_storage_operations"),
+        "execute_feed_storage_operations",
     )
     parent.attach_mock(
         mocker.patch.object(simulation_engine, "_report_daily_records"),
@@ -464,7 +464,7 @@ def test_execute_feed_only_daily_simulation(
 
     # Assert
     assert parent.mock_calls == [
-        call.execute_feed_storage_upkeep(),
+        call.execute_feed_storage_operations(),
         call.report_daily_records(),
         call.advance_time(),
     ]
@@ -478,13 +478,13 @@ def test_execute_feed_only_daily_simulation(
 
 
 @pytest.mark.parametrize("is_time_to_process_degradations", [True, False])
-def test_execute_feed_storage_upkeep(
+def test_execute_feed_storage_operations(
     simulation_engine: SimulationEngine,
     mocker: MockerFixture,
     is_time_to_process_degradations: bool,
 ) -> None:
     """
-    Unit test for function _execute_feed_storage_upkeep in file RUFAS/simulation_engine.py
+    Unit test for function _execute_feed_storage_operations in file RUFAS/simulation_engine.py
     """
     # Arrange
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
@@ -500,7 +500,7 @@ def test_execute_feed_storage_upkeep(
     )
 
     # Act
-    simulation_engine._execute_feed_storage_upkeep()
+    simulation_engine._execute_feed_storage_operations()
 
     # Assert
     simulation_engine.feed_manager.report_feed_storage_levels.assert_called_once_with(42, "daily_storage_levels")
@@ -517,32 +517,32 @@ def test_execute_feed_storage_upkeep(
         simulation_engine.feed_manager.process_degradations.assert_not_called()
 
 
-def test_gather_initial_feed_storage_contents(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
+def test_gather_initial_feed_storage_inventory(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """
-    Unit test for function _gather_initial_feed_storage_contents in file RUFAS/simulation_engine.py
+    Unit test for function _gather_initial_feed_storage_inventory in file RUFAS/simulation_engine.py
     """
     # Arrange
-    first_contents = {
-        "initial_contents": [
+    first_inventory = {
+        "initial_inventory": [
             {"storage_name": "corn_silage_storage_1", "dry_matter_mass": 200000.0, "dry_matter_percentage": 35.0},
             {"storage_name": "corn_silage_storage_1", "dry_matter_mass": 1.0, "dry_matter_percentage": 1.0},
         ]
     }
-    second_contents = {
-        "initial_contents": [
+    second_inventory = {
+        "initial_inventory": [
             {"storage_name": "alfalfa_hay_storage_2", "dry_matter_mass": 30000.0, "dry_matter_percentage": 88.0},
         ]
     }
     simulation_engine.im = MagicMock(auto_spec=InputManager)
-    simulation_engine.im.get_data_keys_by_properties.return_value = ["initial_contents_1", "initial_contents_2"]
-    simulation_engine.im.get_data.side_effect = [first_contents, second_contents]
+    simulation_engine.im.get_data_keys_by_properties.return_value = ["initial_inventory_1", "initial_inventory_2"]
+    simulation_engine.im.get_data.side_effect = [first_inventory, second_inventory]
     mock_add_warning = mocker.patch.object(simulation_engine.om, "add_warning")
 
     # Act
-    initial_contents_by_storage_name = simulation_engine._gather_initial_feed_storage_contents()
+    initial_inventory_by_storage_name = simulation_engine._gather_initial_feed_storage_inventory()
 
     # Assert
-    assert initial_contents_by_storage_name == {
+    assert initial_inventory_by_storage_name == {
         "corn_silage_storage_1": {"dry_matter_mass": 200000.0, "dry_matter_percentage": 35.0},
         "alfalfa_hay_storage_2": {"dry_matter_mass": 30000.0, "dry_matter_percentage": 88.0},
     }
@@ -551,15 +551,15 @@ def test_gather_initial_feed_storage_contents(simulation_engine: SimulationEngin
 
 
 @pytest.mark.parametrize("simulate_fields, expected_warning_count", [(False, 1), (True, 0)])
-def test_gather_initial_feed_storage_contents_no_input_files(
+def test_gather_initial_feed_storage_inventory_no_input_files(
     simulation_engine: SimulationEngine,
     mocker: MockerFixture,
     simulate_fields: bool,
     expected_warning_count: int,
 ) -> None:
     """
-    Unit test for function _gather_initial_feed_storage_contents in file RUFAS/simulation_engine.py when no initial
-    contents input files are provided.
+    Unit test for function _gather_initial_feed_storage_inventory in file RUFAS/simulation_engine.py when no initial
+    inventory input files are provided.
     """
     # Arrange
     simulation_engine.simulate_fields = simulate_fields
@@ -568,10 +568,10 @@ def test_gather_initial_feed_storage_contents_no_input_files(
     mock_add_warning = mocker.patch.object(simulation_engine.om, "add_warning")
 
     # Act
-    initial_contents_by_storage_name = simulation_engine._gather_initial_feed_storage_contents()
+    initial_inventory_by_storage_name = simulation_engine._gather_initial_feed_storage_inventory()
 
     # Assert
-    assert initial_contents_by_storage_name == {}
+    assert initial_inventory_by_storage_name == {}
     assert mock_add_warning.call_count == expected_warning_count
 
 

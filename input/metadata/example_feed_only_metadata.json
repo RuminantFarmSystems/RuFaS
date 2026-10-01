@@ -203,12 +203,12 @@
       "type": "json",
       "properties": "feed_storage_instances"
     },
-    "initial_feed_storage_contents": {
-      "title": "Initial feed storage contents",
-      "description": "The contents that feed storages hold when the simulation starts, in place of harvests from simulated fields.",
-      "path": "input/data/feed_management/example_feed_only_initial_contents.json",
+    "initial_feed_storage_inventory": {
+      "title": "Initial feed storage inventory",
+      "description": "The inventory that feed storages hold when the simulation starts, in place of harvests from simulated fields.",
+      "path": "input/data/feed_management/example_feed_only_initial_inventory.json",
       "type": "json",
-      "properties": "initial_feed_storage_contents_properties"
+      "properties": "initial_feed_storage_inventory_properties"
     }
   },
   "runtime_metadata": {

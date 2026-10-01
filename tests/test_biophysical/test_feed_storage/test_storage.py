@@ -653,8 +653,8 @@ def test_calculate_degradation_values(storage: Storage, mocker: MockerFixture) -
 
 
 @pytest.fixture
-def sample_initial_contents() -> dict[str, float]:
-    """Initial contents block as it appears in a storage configuration."""
+def sample_initial_inventory() -> dict[str, float]:
+    """Initial inventory block as it appears in the initial feed storage inventory input."""
     return {
         "dry_matter_mass": 200000.0,
         "dry_matter_percentage": 35.0,
@@ -670,11 +670,11 @@ def sample_initial_contents() -> dict[str, float]:
     }
 
 
-def test_stock_initial_contents(storage: Storage, sample_initial_contents: dict[str, float]) -> None:
-    """Tests that stocked initial contents become a stored crop with the stated mass and composition."""
+def test_stock_initial_inventory(storage: Storage, sample_initial_inventory: dict[str, float]) -> None:
+    """Tests that stocked initial inventory becomes a stored crop with the stated mass and composition."""
     start_date = date(2013, 1, 1)
 
-    storage.stock_initial_contents(sample_initial_contents, start_date, simulation_day=0)
+    storage.stock_initial_inventory(sample_initial_inventory, start_date, simulation_day=0)
 
     assert len(storage.stored) == 1
     crop = storage.stored[0]
@@ -682,14 +682,14 @@ def test_stock_initial_contents(storage: Storage, sample_initial_contents: dict[
     assert crop.field_name == "Test Field"
     assert crop.harvest_time == start_date
     assert crop.storage_time == start_date
-    assert crop.dry_matter_mass == sample_initial_contents["dry_matter_mass"]
-    assert crop.dry_matter_percentage == sample_initial_contents["dry_matter_percentage"]
-    assert crop.dry_matter_digestibility == sample_initial_contents["dry_matter_digestibility"]
-    assert crop.ash == sample_initial_contents["ash"]
+    assert crop.dry_matter_mass == sample_initial_inventory["dry_matter_mass"]
+    assert crop.dry_matter_percentage == sample_initial_inventory["dry_matter_percentage"]
+    assert crop.dry_matter_digestibility == sample_initial_inventory["dry_matter_digestibility"]
+    assert crop.ash == sample_initial_inventory["ash"]
 
 
-def test_stock_initial_contents_applies_arrival_losses(sample_initial_contents: dict[str, float]) -> None:
-    """Tests that initial contents of a grain crop receive the same arrival loss as a harvested grain crop."""
+def test_stock_initial_inventory_applies_arrival_losses(sample_initial_inventory: dict[str, float]) -> None:
+    """Tests that initial inventory of a grain crop receives the same arrival loss as a harvested grain crop."""
     storage = Storage(
         storage_config={
             "name": "Test Grain Storage",
@@ -701,7 +701,7 @@ def test_stock_initial_contents_applies_arrival_losses(sample_initial_contents: 
         }
     )
 
-    storage.stock_initial_contents(sample_initial_contents, date(2013, 1, 1), simulation_day=0)
+    storage.stock_initial_inventory(sample_initial_inventory, date(2013, 1, 1), simulation_day=0)
 
-    expected_dry_matter_mass = sample_initial_contents["dry_matter_mass"] * (1 - 0.01)
+    expected_dry_matter_mass = sample_initial_inventory["dry_matter_mass"] * (1 - 0.01)
     assert storage.stored[0].dry_matter_mass == pytest.approx(expected_dry_matter_mass)

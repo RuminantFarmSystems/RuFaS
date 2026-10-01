@@ -178,35 +178,35 @@ class Storage:
             crop.remove_dry_matter_mass(dry_matter_to_remove)
             self._record_stored_crops(simulation_day + initial_degradation_day_offset)
 
-    def stock_initial_contents(
-        self, initial_contents: dict[str, float], storage_time: date, simulation_day: int
+    def stock_initial_inventory(
+        self, initial_inventory: dict[str, float], storage_time: date, simulation_day: int
     ) -> None:
         """
-        Stocks this storage with the specified initial contents.
+        Stocks this storage with the specified initial inventory.
 
         Parameters
         ----------
-        initial_contents : dict[str, float]
+        initial_inventory : dict[str, float]
             The dry matter mass and composition of the crop this storage holds when the simulation starts, keyed by
             the ``HarvestedCrop`` field names.
         storage_time : date
-            The date the initial contents are considered to have been stored. This should be the start date of the
+            The date the initial inventory is considered to have been stored. This should be the start date of the
             simulation.
         simulation_day : int
             The current simulation day, used for record keeping.
 
         Notes
         -----
-        Initial contents let a storage begin the simulation already holding a crop, which is how the feed module is
+        Initial inventory lets a storage begin the simulation already holding a crop, which is how the feed module is
         given something to manage when there is no crop and soil module to harvest anything. The mass and composition
-        of the contents are stated in the initial feed storage contents input because there is nothing to derive them
+        of the inventory are stated in the initial feed storage inventory input because there is nothing to derive them
         from without harvests.
 
-        The contents are received through ``receive_crop``, so capacity checks and arrival losses apply to them the
+        The inventory is received through ``receive_crop``, so capacity checks and arrival losses apply to it the
         same way they would to a harvested crop arriving on the start date.
 
         """
-        composition: dict[str, Any] = dict(initial_contents)
+        composition: dict[str, Any] = dict(initial_inventory)
         crop = HarvestedCrop(
             config_name=self.crop_name,
             field_name=self.field_names[0] if self.field_names else self.storage_name,

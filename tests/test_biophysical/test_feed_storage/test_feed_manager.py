@@ -1327,31 +1327,31 @@ def test_gather_available_feeds_by_id_groups_and_sorts() -> None:
     assert purchased_by_id[2] == [p2]
 
 
-def test_stock_initial_storage_contents(mocker: MockerFixture, feed_manager: FeedManager, time: RufasTime) -> None:
-    """Tests that initial contents are stocked into the named storages, with a warning for unknown names."""
+def test_stock_initial_storage_inventory(mocker: MockerFixture, feed_manager: FeedManager, time: RufasTime) -> None:
+    """Tests that initial inventory is stocked into the named storages, with a warning for unknown names."""
     storage = feed_manager.active_storages["example_pile"]
-    mocked_stock = mocker.patch.object(storage, "stock_initial_contents")
+    mocked_stock = mocker.patch.object(storage, "stock_initial_inventory")
     mock_add_warning = mocker.patch.object(feed_manager._om, "add_warning")
-    initial_contents = {"dry_matter_mass": 1000.0, "dry_matter_percentage": 35.0}
+    initial_inventory = {"dry_matter_mass": 1000.0, "dry_matter_percentage": 35.0}
 
-    feed_manager.stock_initial_storage_contents(
-        {"example_pile": initial_contents, "not_a_storage": initial_contents}, time
+    feed_manager.stock_initial_storage_inventory(
+        {"example_pile": initial_inventory, "not_a_storage": initial_inventory}, time
     )
 
-    mocked_stock.assert_called_once_with(initial_contents, time.current_date.date(), time.simulation_day)
+    mocked_stock.assert_called_once_with(initial_inventory, time.current_date.date(), time.simulation_day)
     mock_add_warning.assert_called_once()
     assert "not_a_storage" in mock_add_warning.call_args.args[1]
 
 
-def test_stock_initial_storage_contents_without_input_is_a_no_op(
+def test_stock_initial_storage_inventory_without_input_is_a_no_op(
     mocker: MockerFixture, feed_manager: FeedManager, time: RufasTime
 ) -> None:
-    """Tests that stocking with no initial contents input leaves every storage untouched."""
+    """Tests that stocking with no initial inventory input leaves every storage untouched."""
     mocked_stocks = [
-        mocker.patch.object(storage, "stock_initial_contents") for storage in feed_manager.active_storages.values()
+        mocker.patch.object(storage, "stock_initial_inventory") for storage in feed_manager.active_storages.values()
     ]
 
-    feed_manager.stock_initial_storage_contents({}, time)
+    feed_manager.stock_initial_storage_inventory({}, time)
 
     for mocked_stock in mocked_stocks:
         mocked_stock.assert_not_called()

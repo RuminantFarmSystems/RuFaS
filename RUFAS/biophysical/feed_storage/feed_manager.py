@@ -300,15 +300,15 @@ class FeedManager:
                 next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
         return next_harvest_dates_rufas_ids
 
-    def stock_initial_storage_contents(
-        self, initial_contents_by_storage_name: dict[str, dict[str, float]], time: RufasTime
+    def stock_initial_storage_inventory(
+        self, initial_inventory_by_storage_name: dict[str, dict[str, float]], time: RufasTime
     ) -> None:
         """
-        Stocks storages with the initial contents specified for them, if any.
+        Stocks storages with the initial inventory specified for them, if any.
 
         Parameters
         ----------
-        initial_contents_by_storage_name : dict[str, dict[str, float]]
+        initial_inventory_by_storage_name : dict[str, dict[str, float]]
             The dry matter mass and composition each storage holds when the simulation starts, keyed by storage
             instance name. Storages that are not named start empty.
         time : RufasTime
@@ -318,20 +318,20 @@ class FeedManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.stock_initial_storage_contents.__name__,
+            "function": self.stock_initial_storage_inventory.__name__,
         }
         storage_time = time.current_date.date()
-        for storage_name, initial_contents in initial_contents_by_storage_name.items():
+        for storage_name, initial_inventory in initial_inventory_by_storage_name.items():
             if storage_name not in self.active_storages:
                 self._om.add_warning(
-                    "Unknown storage in initial feed storage contents",
-                    f"Storage '{storage_name}' has initial contents specified, but no active storage with that name "
-                    "exists. These contents will not be stocked.",
+                    "Unknown storage in initial feed storage inventory",
+                    f"Storage '{storage_name}' has initial inventory specified, but no active storage with that name "
+                    "exists. This inventory will not be stocked.",
                     info_map,
                 )
                 continue
-            self.active_storages[storage_name].stock_initial_contents(
-                initial_contents, storage_time, time.simulation_day
+            self.active_storages[storage_name].stock_initial_inventory(
+                initial_inventory, storage_time, time.simulation_day
             )
 
     def receive_crop(
