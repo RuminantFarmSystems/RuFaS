@@ -818,7 +818,8 @@ class E2ETestResultsHandler:
         Returns
         -------
         bool
-            ``True`` if the change is both numerical and significant, ``False`` otherwise.
+            ``True`` if the values differ beyond the numerical tolerance or contain a non-numerical or structural
+            difference; ``False`` otherwise.
 
         Notes
         -----
@@ -831,6 +832,9 @@ class E2ETestResultsHandler:
 
         old_value = changes["old_value"]
         new_value = changes["new_value"]
+
+        if old_value == new_value:
+            return False
 
         if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
             reference = abs(old_value) if abs(old_value) > 0 else 1
