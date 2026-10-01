@@ -801,7 +801,7 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
     hs = HerdStatistics()
 
     # Set distinct non-zero values so each assertion catches a wrong-field mapping.
-    hs.sold_cow_oversupply_num = 1
+    hs.sold_cow_low_production_num = 1
     hs.bought_heifer_num = 2
     hs.sold_heiferII_num = 3
     hs.cow_herd_exit_num = 4
@@ -859,7 +859,7 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
 
     # --- event counts ---
-    assert reported["sold_cow_oversupply_num"] == 1
+    assert reported["sold_cow_low_production_num"] == 1
     assert reported["bought_heifer_num"] == 2
     assert reported["sold_heiferII_num"] == 3
     assert reported["cow_herd_exit_num"] == 4
@@ -1106,7 +1106,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             animal_type="LacCow",
             sold_at_day=123,
             body_weight=456.78,
-            cull_reason=animal_constants.UDDER_CULL,
+            cull_reason=animal_constants.ACUTE_SALE_CULL,
             days_in_milk=18,
             parity=2,
             genetic_history="",
@@ -1126,7 +1126,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             animal_type="DryCow",
             sold_at_day=123,
             body_weight=456.78,
-            cull_reason=animal_constants.LAMENESS_CULL,
+            cull_reason=animal_constants.ACUTE_SALE_CULL,
             days_in_milk=0,
             parity=3,
             genetic_history="",

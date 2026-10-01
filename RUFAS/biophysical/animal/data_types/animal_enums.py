@@ -23,3 +23,12 @@ class AnimalStatus(Enum):
     DEAD = "dead"
     SOLD = "sold"
     STILLBORN = "stillborn"
+
+
+class CowParity(Enum):
+    """Enum indicating the parity group of the animal, used to look up parity-group-specific removal risks."""
+
+    NONE = "none"
+    ONE = "1"
+    TWO = "2"
+    THREE_PLUS = "3+"
