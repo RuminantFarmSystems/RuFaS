@@ -231,6 +231,7 @@ def test_estimate_emissions(
     mock_im_get_data = mocker.patch.object(
         em.im, "get_data", return_value={"start_date": "2000:1", "end_date": "2000:100"}
     )
+    mock_build_field_details = mocker.patch.object(em, "_build_field_details")
     mock_parse_farmgrown_feeds_emission_data = mocker.patch.object(em, "_parse_farmgrown_feeds_emission_data")
     mock_parse_manure_and_fertilizer_application_data = mocker.patch.object(
         em, "_parse_manure_and_fertilizer_application_data"
@@ -252,7 +253,8 @@ def test_estimate_emissions(
     em.estimate_farmgrown_feed_emissions()
 
     mock_im_get_data.assert_called_once_with("config")
-    mock_parse_farmgrown_feeds_emission_data.assert_called_once()
+    mock_build_field_details.assert_called_once()
+    mock_parse_farmgrown_feeds_emission_data.assert_called_once_with(mock_build_field_details.return_value)
     mock_parse_manure_and_fertilizer_application_data.assert_called_once()
     mock_parse_crop_to_feed_id_mapping.assert_called_once()
     mock_parse_harvest_data.assert_called_once()
@@ -425,12 +427,40 @@ def test_parse_farmgrown_feeds_emission_data(
     em: EmissionsEstimator,
     mocker: MockerFixture,
 ) -> None:
+    """The per-hectare emissions summed across the soil layers of each field are scaled by the field size."""
+    field_details = {"field_1": {"field_size": 100.0}, "field_2": {"field_size": 50.0}}
     mock_om_filter_variables_pool = mocker.patch.object(
         em.om, "filter_variables_pool", side_effect=[raw_nitrous_oxide_emissions_data, raw_ammonia_emissions_data]
     )
-    actual_data = em._parse_farmgrown_feeds_emission_data()
-    assert actual_data == parsed_emissions_data
+    actual_data = em._parse_farmgrown_feeds_emission_data(field_details)
+    expected_data = {
+        emission_type: {
+            field_name: {
+                simulation_day: emission * field_details[field_name]["field_size"]
+                for simulation_day, emission in daily_emissions.items()
+            }
+            for field_name, daily_emissions in emissions_by_field.items()
+        }
+        for emission_type, emissions_by_field in parsed_emissions_data.items()
+    }
+    assert actual_data == expected_data
     assert mock_om_filter_variables_pool.call_count == 2
+
+
+def test_parse_farmgrown_feeds_emission_data_skips_fields_without_size(
+    raw_nitrous_oxide_emissions_data: dict[str, dict[str, list[Any]]],
+    raw_ammonia_emissions_data: dict[str, dict[str, list[Any]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    """A field without a harvest record has no known field size and is left out of the emission data."""
+    mocker.patch.object(
+        em.om, "filter_variables_pool", side_effect=[raw_nitrous_oxide_emissions_data, raw_ammonia_emissions_data]
+    )
+    actual_data = em._parse_farmgrown_feeds_emission_data({"field_1": {"field_size": 100.0}})
+    assert set(actual_data.keys()) == {"nitrous_oxide_emissions", "ammonia_emissions"}
+    assert set(actual_data["nitrous_oxide_emissions"].keys()) == {"field_1"}
+    assert set(actual_data["ammonia_emissions"].keys()) == {"field_1"}
 
 
 def test_parse_manure_and_fertilizer_application_data(
@@ -488,6 +518,51 @@ def test_parse_harvest_data(
     mock_om_filter_variables_pool.assert_called_once()
 
 
+def test_build_field_details(
+    raw_harvest_data: dict[str, dict[str, list[Any]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    """The size of every field with a harvest record is collected from the harvest data."""
+    mock_om_filter_variables_pool = mocker.patch.object(em.om, "filter_variables_pool", return_value=raw_harvest_data)
+    actual_data = em._build_field_details()
+    assert actual_data == {"field_1": {"field_size": 100.0}, "field_2": {"field_size": 100.0}}
+    mock_om_filter_variables_pool.assert_called_once()
+
+
+def test_build_field_details_no_data(em: EmissionsEstimator, mocker: MockerFixture) -> None:
+    """Without harvest data there are no field details."""
+    mock_om_filter_variables_pool = mocker.patch.object(em.om, "filter_variables_pool", return_value={})
+    assert em._build_field_details() == {}
+    mock_om_filter_variables_pool.assert_called_once()
+
+
+def test_group_harvest_details_by_date(
+    expected_harvest_yield_data: dict[str, dict[int, dict[str, int | str | float]]],
+    em: EmissionsEstimator,
+) -> None:
+    """Regroups harvest details keyed by field name into details keyed by harvest date, collecting harvests
+    from every field sharing a date into a single list."""
+    actual_data = em._group_harvest_details_by_date(expected_harvest_yield_data)
+
+    expected_data: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for field_name, harvest_dates in expected_harvest_yield_data.items():
+        for harvest_date, details in harvest_dates.items():
+            expected_data[harvest_date].append({"field_name": field_name, "details": details})
+    assert actual_data == expected_data
+
+    assert [entry["field_name"] for entry in actual_data[262]] == ["field_1"]
+    assert [entry["field_name"] for entry in actual_data[297]] == ["field_2"]
+    assert [entry["field_name"] for entry in actual_data[514]] == ["field_1", "field_2"]
+    assert actual_data[514][0]["details"] == expected_harvest_yield_data["field_1"][514]
+    assert actual_data[514][1]["details"] == expected_harvest_yield_data["field_2"][514]
+
+
+def test_group_harvest_details_by_date_empty(em: EmissionsEstimator) -> None:
+    """An empty harvest mapping regroups to an empty result."""
+    assert em._group_harvest_details_by_date({}) == {}
+
+
 def test_parse_farmgrown_feed_deductions_data(
     raw_farmgrown_feed_deductions_data: dict[str, dict[str, list[Any]]],
     expected_farmgrown_feed_deductions_data: dict[RUFAS_ID, dict[int, float]],
@@ -537,6 +612,182 @@ def test_calculate_daily_farmgrown_feed_emissions_and_resources(
             assert emissions_and_resources[day] == pytest.approx(
                 expected_daily_farmgrown_feed_emissions_and_resources[feed_id][day], rel=1e-3
             )
+
+
+def test_calculate_daily_farmgrown_feed_emissions_and_resources_same_feed_in_multiple_fields(
+    em: EmissionsEstimator,
+) -> None:
+    """
+    The same feed harvested in two fields at different times accumulates chronologically across the fields: the
+    earlier harvest (field_2, day 10) only carries its own field's emissions and yield, and the later harvest
+    (field_1, day 20) adds its field's emissions and yield to the running totals of the feed.
+    """
+    emission_data: dict[str, dict[str, dict[int, float]]] = {
+        "nitrous_oxide_emissions": {"field_1": {5: 1.0}, "field_2": {3: 3.0}},
+        "ammonia_emissions": {"field_1": {}, "field_2": {}},
+    }
+    resource_data: dict[str, dict[str, dict[int, dict[str, float]]]] = {
+        "fertilizer_applications": {},
+        "manure_applications": {},
+    }
+    harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]] = {
+        "field_1": {
+            20: {"field_name": "field_1", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_kill"},
+        },
+        "field_2": {
+            10: {"field_name": "field_2", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_kill"},
+        },
+    }
+    all_simulation_days = list(range(0, 31))
+
+    actual_data = em._calculate_daily_farmgrown_feed_emissions_and_resources(
+        emission_data,
+        resource_data,
+        harvest_yield_by_field,
+        all_simulation_days,
+    )
+
+    assert set(actual_data.keys()) == {7}
+    assert set(actual_data[7].keys()) == set(all_simulation_days)
+    for simulation_day in range(0, 10):
+        assert actual_data[7][simulation_day]["nitrous_oxide_emissions"] == 0.0
+    # Days 10-19: only field_2's 3.0 kg over its 100 kg harvest.
+    for simulation_day in range(10, 20):
+        assert pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == 0.03
+    # Days 20-30: (3.0 + 1.0) kg over (100 + 100) kg once field_1 is harvested as well.
+    for simulation_day in range(20, 31):
+        assert pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == 0.02
+
+
+def test_calculate_daily_farmgrown_feed_emissions_and_resources_duplicate_harvest_dates(
+    em: EmissionsEstimator,
+) -> None:
+    """
+    Two fields harvest the same feed on the same day (day 10): the daily values must combine both fields' yields
+    and emissions, and the allocation window must extend to the next distinct harvest date (day 20), not the
+    duplicate date itself.
+    """
+    emission_data: dict[str, dict[str, dict[int, float]]] = {
+        "nitrous_oxide_emissions": {"field_1": {5: 1.0, 15: 2.0}, "field_2": {5: 3.0}},
+        "ammonia_emissions": {"field_1": {}, "field_2": {}},
+    }
+    resource_data: dict[str, dict[str, dict[int, dict[str, float]]]] = {
+        "fertilizer_applications": {"field_1": {}, "field_2": {}},
+        "manure_applications": {"field_1": {}, "field_2": {}},
+    }
+    harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]] = {
+        "field_1": {
+            10: {"field_name": "field_1", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_only"},
+            20: {"field_name": "field_1", "feed_id": 7, "dry_yield": 200.0, "harvest_type": "harvest_only"},
+        },
+        "field_2": {
+            10: {"field_name": "field_2", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_only"},
+        },
+    }
+    all_simulation_days = list(range(0, 26))
+
+    actual_data = em._calculate_daily_farmgrown_feed_emissions_and_resources(
+        emission_data,
+        resource_data,
+        harvest_yield_by_field,
+        all_simulation_days,
+    )
+
+    assert set(actual_data.keys()) == {7}
+    assert set(actual_data[7].keys()) == set(all_simulation_days)
+    for simulation_day in range(0, 10):
+        assert actual_data[7][simulation_day]["nitrous_oxide_emissions"] == 0.0
+    # Days 10-19: (1.0 + 3.0) kg over (100 + 100) kg harvested across both fields.
+    for simulation_day in range(10, 20):
+        assert pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == 0.02
+    # Days 20-25: (4.0 + 2.0) kg over (200 + 200) kg after the second field_1 harvest.
+    for simulation_day in range(20, 26):
+        assert pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == 0.015
+
+
+def test_calculate_daily_farmgrown_feed_emissions_and_resources_different_feeds_on_same_date(
+    em: EmissionsEstimator,
+) -> None:
+    """Different feeds harvested in different fields on the same day are allocated independently."""
+    emission_data: dict[str, dict[str, dict[int, float]]] = {
+        "nitrous_oxide_emissions": {"field_1": {5: 1.0}, "field_2": {5: 2.0}},
+        "ammonia_emissions": {"field_1": {}, "field_2": {}},
+    }
+    resource_data: dict[str, dict[str, dict[int, dict[str, float]]]] = {
+        "fertilizer_applications": {},
+        "manure_applications": {},
+    }
+    harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]] = {
+        "field_1": {
+            10: {"field_name": "field_1", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_kill"},
+        },
+        "field_2": {
+            10: {"field_name": "field_2", "feed_id": 8, "dry_yield": 50.0, "harvest_type": "harvest_kill"},
+        },
+    }
+    all_simulation_days = list(range(0, 16))
+
+    actual_data = em._calculate_daily_farmgrown_feed_emissions_and_resources(
+        emission_data,
+        resource_data,
+        harvest_yield_by_field,
+        all_simulation_days,
+    )
+
+    assert set(actual_data.keys()) == {7, 8}
+    for simulation_day in range(0, 10):
+        assert actual_data[7][simulation_day]["nitrous_oxide_emissions"] == 0.0
+        assert actual_data[8][simulation_day]["nitrous_oxide_emissions"] == 0.0
+    for simulation_day in range(10, 16):
+        # Feed 7: field_1's 1.0 kg over 100 kg; feed 8: field_2's 2.0 kg over 50 kg.
+        assert pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == 0.01
+        assert pytest.approx(actual_data[8][simulation_day]["nitrous_oxide_emissions"]) == 0.04
+
+
+@pytest.mark.parametrize(
+    "no_feed_harvest_type, expected_nitrous_oxide_emissions",
+    [
+        # A kill-only harvest does not advance the field's last harvest date, so the
+        # emission window for the day-10 harvest spans (-1, 10] and includes day 3.
+        ("kill_only", 0.03),
+        # Any other no-feed harvest advances the window, so only day 8 is included.
+        ("harvest_kill", 0.02),
+    ],
+)
+def test_calculate_daily_farmgrown_feed_emissions_and_resources_no_feed_harvests(
+    em: EmissionsEstimator,
+    no_feed_harvest_type: str,
+    expected_nitrous_oxide_emissions: float,
+) -> None:
+    """A harvest that produces no farmgrown feed only closes the field's accumulation window if it is not kill-only."""
+    emission_data: dict[str, dict[str, dict[int, float]]] = {
+        "nitrous_oxide_emissions": {"field_1": {3: 1.0, 8: 2.0}},
+        "ammonia_emissions": {"field_1": {}},
+    }
+    resource_data: dict[str, dict[str, dict[int, dict[str, float]]]] = {
+        "fertilizer_applications": {"field_1": {}},
+        "manure_applications": {"field_1": {}},
+    }
+    harvest_yield_by_field: dict[str, dict[int, dict[str, Any]]] = {
+        "field_1": {
+            5: {"field_name": "field_1", "feed_id": None, "dry_yield": 0.0, "harvest_type": no_feed_harvest_type},
+            10: {"field_name": "field_1", "feed_id": 7, "dry_yield": 100.0, "harvest_type": "harvest_only"},
+        },
+    }
+    all_simulation_days = list(range(0, 16))
+
+    actual_data = em._calculate_daily_farmgrown_feed_emissions_and_resources(
+        emission_data,
+        resource_data,
+        harvest_yield_by_field,
+        all_simulation_days,
+    )
+
+    assert set(actual_data.keys()) == {7}
+    for simulation_day in range(10, 16):
+        assert (
+            pytest.approx(actual_data[7][simulation_day]["nitrous_oxide_emissions"]) == expected_nitrous_oxide_emissions
+        )
 
 
 def test_get_daily_emission_and_resource_values_for_field(em: EmissionsEstimator) -> None:
@@ -629,70 +880,3 @@ def test_calculate_and_report_lca_and_luc_emissions(
         expected_farmgrown_feed_deductions_data,
     )
     assert mock_add_variable_bulk.call_count == 2 * 2
-
-
-def test_gather_farmgrown_feed_inventory_data_success(
-    em: EmissionsEstimator,
-    mocker: MockerFixture,
-) -> None:
-    fake_filtered = {
-        "stored_feed_12_dm.daily_storage_levels": {
-            "values": [
-                {"simulation_day": 0, "amount": 1.25},
-                {"simulation_day": 1, "amount": 2.5},
-                {"simulation_day": 10, "amount": 0.0},
-            ]
-        },
-        "stored_feed_7_dm.daily_storage_levels": {
-            "values": [{"simulation_day": 5, "amount": 9.0}, {"simulation_day": 6, "amount": 8.0}]
-        },
-    }
-
-    filter_spy = mocker.patch.object(em.om, "filter_variables_pool", return_value=fake_filtered)
-    add_error_spy = mocker.patch.object(em.om, "add_error")
-
-    all_days = list(range(0, 15))
-    result = em._gather_farmgrown_feed_inventory_data(all_simulation_days=all_days)
-
-    filter_spy.assert_called_once()
-    add_error_spy.assert_not_called()
-
-    expected = {
-        12: {day: 0.0 for day in all_days},
-        7: {day: 0.0 for day in all_days},
-    }
-    expected[12].update({0: 1.25, 1: 2.5, 10: 0.0})
-    expected[7].update({5: 9.0, 6: 8.0})
-
-    assert result == expected
-
-
-def test_gather_farmgrown_feed_inventory_data_raises_and_logs_on_bad_key(
-    em: EmissionsEstimator,
-    mocker: MockerFixture,
-) -> None:
-    """
-    Tests that a non-matching variable name logs an error via om.add_error
-    and then raises ValueError with helpful text.
-    """
-    bad_key = "stored_feed_X_dm.daily_storage_levels"
-    fake_filtered = {bad_key: {"values": [(0, 1.0)]}}
-
-    mocker.patch.object(em.om, "filter_variables_pool", return_value=fake_filtered)
-    add_error_spy = mocker.patch.object(em.om, "add_error")
-
-    with pytest.raises(ValueError) as excinfo:
-        em._gather_farmgrown_feed_inventory_data(all_simulation_days=list(range(0, 15)))
-
-    msg = str(excinfo.value)
-    assert bad_key in msg
-    assert "Needed to parse farmgrown feed inventory data." in msg
-    assert "Check emissions.py filters." in msg
-
-    add_error_spy.assert_called_once()
-    title, message, info_map = add_error_spy.call_args.args
-
-    assert title == "Farmgrown Feed Data Parsing Error"
-    assert message == f"No feed_id match found for {bad_key}."
-    assert info_map["class"] == em.__class__.__name__
-    assert info_map["function"] == "_gather_farmgrown_feed_inventory_data"
