@@ -316,7 +316,7 @@ class ReportGenerator:
             The name of the report to be graphed.
         """
 
-        # TODO use the overhauled GraphGenerator once its functions are set up (#3190)
+        # TODO use the overhauled GraphGenerator, which logs directly, once its functions are set up (#3190)
         graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"], time=self.time)
         graph_details = {
             **filter_content["graph_details"],
@@ -326,31 +326,9 @@ class ReportGenerator:
         }
         graphics_dir = graph_details.pop("graphics_dir", None)
         produce_graphics = graph_details.get("produce_graphics", True)
-        graph_event_log = graph_generator.generate_graph(
+        graph_generator.generate_graph(
             graph_data, graph_details, individual_report_name, graphics_dir, produce_graphics
         )
-        self._log_graph_generator_events(graph_event_log)
-
-    def _log_graph_generator_events(self, graph_event_log: list[dict[str, str | dict[str, str]]]) -> None:
-        """
-        Logs the logs, warnings, and errors returned by ``GraphGenerator``.
-
-        Parameters
-        ----------
-        graph_event_log : list[dict[str, str | dict[str, str]]]
-            The logs, warnings, and errors returned by ``GraphGenerator.generate_graph()``.
-        """
-        # TODO remove once the overhauled GraphGenerator logs directly (#3190)
-        levels = {"error": logging.ERROR, "log": logging.INFO, "warning": logging.WARNING}
-        for event in graph_event_log:
-            for event_type, level in levels.items():
-                if event_type in event:
-                    self._logger.log(
-                        level,
-                        event["message"],
-                        extra={"rufas_name": event[event_type], "rufas_info_map": event["info_map"]},
-                    )
-                    break
 
     def _ensure_unique_report_name_with_timestamp(self, report_name: str | None) -> str:
         """

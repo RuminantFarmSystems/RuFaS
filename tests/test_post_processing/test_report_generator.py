@@ -585,10 +585,7 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
         "produce_graphics": False,
     }
     filter_content = {"name": "example_report", "filters": ["filter1", "filter2"], "graph_details": dict(graph_details)}
-    graph_event_log = [{"log": "log name", "message": "Graph generated", "info_map": {"class": "GraphGenerator"}}]
     mock_graph_generator = mocker.patch("RUFAS.post_processing.report_generator.GraphGenerator")
-    mock_graph_generator.return_value.generate_graph.return_value = graph_event_log
-    mock_log_graph_generator_events = mocker.patch.object(report_generator, "_log_graph_generator_events")
 
     report_generator._prepare_report_data_to_be_graphed(graph_data, filter_content, "test_report")
 
@@ -607,7 +604,6 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
         "dir",
         False,
     )
-    mock_log_graph_generator_events.assert_called_once_with(graph_event_log)
     assert filter_content["graph_details"] == graph_details
 
 
@@ -658,41 +654,6 @@ def test_prepare_report_data_to_be_graphed_missing_details(
         report_generator._prepare_report_data_to_be_graphed({}, filter_content, "test_report")
 
     mock_graph_generator.return_value.generate_graph.assert_not_called()
-
-
-def test_log_graph_generator_events(report_generator: ReportGenerator, mocker: MockerFixture) -> None:
-    """Unit test for the _log_graph_generator_events method of ReportGenerator."""
-    info_map = {"class": "GraphGenerator", "function": "generate_graph"}
-    graph_event_log: list[dict[str, str | dict[str, str]]] = [
-        {"log": "log name", "message": "log message", "info_map": info_map},
-        {"warning": "warning name", "message": "warning message", "info_map": info_map},
-        {"error": "error name", "message": "error message", "info_map": info_map},
-        {"status": "success", "message": "not logged", "info_map": info_map},
-        {"warning": "warning name", "error": "both", "message": "error and warning message", "info_map": info_map},
-    ]
-    mock_logger_log = mocker.patch.object(report_generator._logger, "log")
-
-    report_generator._log_graph_generator_events(graph_event_log)
-
-    assert mock_logger_log.call_args_list == [
-        mocker.call(logging.INFO, "log message", extra={"rufas_name": "log name", "rufas_info_map": info_map}),
-        mocker.call(
-            logging.WARNING, "warning message", extra={"rufas_name": "warning name", "rufas_info_map": info_map}
-        ),
-        mocker.call(logging.ERROR, "error message", extra={"rufas_name": "error name", "rufas_info_map": info_map}),
-        mocker.call(
-            logging.ERROR, "error and warning message", extra={"rufas_name": "both", "rufas_info_map": info_map}
-        ),
-    ]
-
-
-def test_log_graph_generator_events_without_events(report_generator: ReportGenerator, mocker: MockerFixture) -> None:
-    """Unit test for the _log_graph_generator_events method of ReportGenerator when there are no events."""
-    mock_logger_log = mocker.patch.object(report_generator._logger, "log")
-
-    report_generator._log_graph_generator_events([])
-
-    mock_logger_log.assert_not_called()
 
 
 @pytest.mark.parametrize(
