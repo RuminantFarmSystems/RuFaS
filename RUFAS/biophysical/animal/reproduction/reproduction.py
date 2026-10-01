@@ -355,15 +355,6 @@ class Reproduction:
 
         """
         if reproduction_data_stream.is_pregnant and reproduction_data_stream.days_in_pregnancy == self.gestation_length:
-            if time.simulation_day == 0:
-                self.embryo_sex = (
-                    Sex.MALE if random.random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE
-                )
-                reproduction_data_stream.events.add_event(
-                    reproduction_data_stream.days_born,
-                    time.simulation_day,
-                    f"Assigning sex {self.embryo_sex} on day 0.",
-                )
             reproduction_data_stream = self.cow_give_birth(reproduction_data_stream, time)
 
         if not self.do_not_breed:
@@ -565,7 +556,7 @@ class Reproduction:
         if self.embryo_sex is None:
             self.embryo_sex = Sex.FEMALE
         reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
-            breed=reproduction_data_stream.breed.name,
+            breed=Breed.BOD.name if self.semen_type == SemenType.BEEF else reproduction_data_stream.breed.name,
             bred_from_semen=self.semen_type,
             sex=self.embryo_sex,
             animal_type=AnimalType.CALF.value,
@@ -1203,7 +1194,7 @@ class Reproduction:
                     reproduction_data_stream, simulation_day
                 )
                 reproduction_data_stream = self._increment_successful_cow_conceptions(reproduction_data_stream)
-            self.embryo_sex = self._determine_embryo_sex(simulation_day)
+            self.embryo_sex = self.determine_embryo_sex()
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
@@ -1226,7 +1217,7 @@ class Reproduction:
 
         return reproduction_data_stream
 
-    def _determine_embryo_sex(self, simulation_day: int) -> Sex:
+    def determine_embryo_sex(self) -> Sex:
 
         if self.semen_type == SemenType.CONVENTIONAL_DAIRY:
             male_calf_rate = animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE

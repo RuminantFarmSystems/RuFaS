@@ -2508,7 +2508,7 @@ def test_perform_ai(
     mock_compare_randomized_rate = mocker.patch(
         "RUFAS.util.Utility.compare_randomized_rate_less_than", return_value=expected_conception_success
     )
-    mock_determine_embryo_sex = mocker.patch.object(reproduction, "_determine_embryo_sex", return_value=Sex.FEMALE)
+    mock_determine_embryo_sex = mocker.patch.object(reproduction, "determine_embryo_sex", return_value=Sex.FEMALE)
     mock_increment_heifer_ai_counts = mocker.patch.object(
         reproduction, "_increment_heifer_ai_counts", return_value=mock_outputs
     )
@@ -2581,7 +2581,7 @@ def test_perform_ai(
 
     # On success the embryo sex is determined and retained; on failure both are cleared.
     if expected_conception_success:
-        mock_determine_embryo_sex.assert_called_once_with(mock_time.simulation_day)
+        mock_determine_embryo_sex.assert_called_once_with()
         assert reproduction.embryo_sex == Sex.FEMALE
         mock_add_event.assert_any_call(
             mock_outputs.days_born,
@@ -2695,7 +2695,7 @@ def test_determine_embryo_sex(
     # random_value < male_calf_rate -> MALE, otherwise FEMALE.
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.random.random", return_value=random_value)
 
-    assert reproduction._determine_embryo_sex(simulation_day=100) == expected_sex
+    assert reproduction.determine_embryo_sex() == expected_sex
 
 
 def test_determine_embryo_sex_raises_when_semen_type_unset() -> None:
@@ -2704,7 +2704,7 @@ def test_determine_embryo_sex_raises_when_semen_type_unset() -> None:
     reproduction.semen_type = None
 
     with pytest.raises(ValueError, match="Unexpected Semen Type."):
-        reproduction._determine_embryo_sex(simulation_day=100)
+        reproduction.determine_embryo_sex()
 
 
 @pytest.mark.parametrize(

@@ -127,35 +127,40 @@ def test_set_animal_grouping_scenario(
     assert HerdManager.ANIMAL_GROUPING_SCENARIO == new_grouping_scenario
 
 
-@pytest.mark.parametrize(
-    "random_value, expected_sex_name",
-    [
-        (0.1, "MALE"),  # random < CONVENTIONAL_DAIRY_MALE_CALF_RATE (0.5) -> male
-        (0.9, "FEMALE"),  # random >= CONVENTIONAL_DAIRY_MALE_CALF_RATE -> female
-    ],
-)
-def test_assign_embryo_sex_for_pregnant_animals_entering_the_herd(
-    random_value: float, expected_sex_name: str, mocker: MockerFixture
+def test_initialize_pregnancy_for_pregnant_animals_entering_the_herd(
+    herd_manager: HerdManager, mocker: MockerFixture
 ) -> None:
     """
     Pregnant animals imported into the herd (initial herd load or replacement purchases) have no
-    recorded conception event, so their embryo sex is assigned at conventional-dairy odds on import.
+    recorded conception event, so on import they enter the pregnant state and are assigned a
+    user-defined semen type plus an embryo sex drawn via their own reproduction model. Open animals
+    are left untouched.
     """
     from RUFAS.biophysical.animal.data_types.animal_enums import Sex
+    from RUFAS.biophysical.animal.data_types.semen_type import SemenType
+    from RUFAS.biophysical.animal.data_types.repro_protocol_enums import ReproStateEnum
 
-    mocker.patch("RUFAS.biophysical.animal.herd_manager.random", return_value=random_value)
+    mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager")
 
-    animal_one = MagicMock()
-    animal_one.days_born = 400
-    animal_two = MagicMock()
-    animal_two.days_born = 512
-    animals = [animal_one, animal_two]
+    time = MagicMock()
+    time.simulation_day = 42
 
-    HerdManager._assign_embryo_sex_for_pregnant_animals_entering_the_herd(MagicMock(), animals)
+    pregnant_animal = MagicMock()
+    pregnant_animal.is_pregnant = True
+    pregnant_animal.days_born = 400
+    pregnant_animal.reproduction.determine_embryo_sex.return_value = Sex.MALE
 
-    expected_sex = Sex[expected_sex_name]
-    for animal in animals:
-        assert animal.reproduction.embryo_sex == expected_sex
-        animal.events.add_event.assert_called_once_with(
-            animal.days_born, 0, f"Assigning embryo_sex {expected_sex} upon import."
-        )
+    open_animal = MagicMock()
+    open_animal.is_pregnant = False
+
+    animals = [pregnant_animal, open_animal]
+
+    herd_manager._initialize_pregnancy_for_pregnant_animals_entering_the_herd(animals, time)
+
+    pregnant_animal.reproduction.repro_state_manager.enter.assert_called_once_with(ReproStateEnum.PREGNANT)
+    assert pregnant_animal.reproduction.semen_type == SemenType.USER_DEFINED
+    assert pregnant_animal.reproduction.embryo_sex == Sex.MALE
+    pregnant_animal.events.add_event.assert_called_once()
+
+    open_animal.reproduction.repro_state_manager.enter.assert_not_called()
+    open_animal.events.add_event.assert_not_called()

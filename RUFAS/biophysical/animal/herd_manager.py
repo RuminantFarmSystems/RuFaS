@@ -1,7 +1,6 @@
 from collections import defaultdict
 from datetime import date, timedelta
 import math
-from random import random
 from typing import Any
 
 from RUFAS.biophysical.animal import animal_constants
@@ -11,7 +10,7 @@ from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Sex
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
@@ -25,7 +24,9 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import ReproStateEnum
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -263,7 +264,7 @@ class HerdManager:
             herd_population.replacement,
         )
         pregnant_animals = [animal for animal in (self.heiferIIs + self.heiferIIIs + self.cows) if animal.is_pregnant]
-        self._assign_embryo_sex_for_pregnant_animals_entering_the_herd(pregnant_animals)
+        self._initialize_pregnancy_for_pregnant_animals_entering_the_herd(pregnant_animals, time)
 
         self.allocate_animals_to_pens(time.simulation_day)
         self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -691,7 +692,7 @@ class HerdManager:
             newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
             if newly_added_animals:
                 pregnant_newly_added_animals = [animal for animal in newly_added_animals if animal.is_pregnant]
-                self._assign_embryo_sex_for_pregnant_animals_entering_the_herd(pregnant_newly_added_animals)
+                self._initialize_pregnancy_for_pregnant_animals_entering_the_herd(pregnant_newly_added_animals, time)
 
         self._update_herd_structure(
             graduated_animals=graduated_animals,
@@ -2457,7 +2458,11 @@ class HerdManager:
                         k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
                     }
 
-    def _assign_embryo_sex_for_pregnant_animals_entering_the_herd(self, animals: list[Animal]) -> None:
+    def _initialize_pregnancy_for_pregnant_animals_entering_the_herd(
+            self,
+            animals: list[Animal],
+            time: RufasTime
+    ) -> None:
         """
         Assign a random embryo sex to pregnant animals imported into the herd.
 
@@ -2468,12 +2473,26 @@ class HerdManager:
             been determined.
         """
         for animal in animals:
-            animal.reproduction.embryo_sex = (
-                Sex.MALE if random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE
-            )
-            animal.events.add_event(
-                animal.days_born, 0, f"Assigning embryo_sex {animal.reproduction.embryo_sex} upon import."
-            )
+            if animal.is_pregnant:
+                animal.reproduction.repro_state_manager.enter(ReproStateEnum.PREGNANT)
+                animal.reproduction.semen_type = SemenType.USER_DEFINED
+                animal.reproduction.embryo_sex = animal.reproduction.determine_embryo_sex()
+                log_message = (
+                    f"Assigned semen type {SemenType.USER_DEFINED.name} and sex {animal.reproduction.embryo_sex} "
+                    f"for pregnant {animal.animal_type.name} entering the herd on day {time.simulation_day} "
+                    f"based on a user-defined male calf rate of {AnimalConfig.user_defined_male_calf_rate}.")
+                om = OutputManager()
+                om.add_log(
+                    "Imported Pregnant Cow Assignment",
+                    log_message,
+                    {
+                        "class": self.__class__.__name__,
+                        "function": self._initialize_pregnancy_for_pregnant_animals_entering_the_herd.__name__
+                    },
+                )
+                animal.events.add_event(
+                    animal.days_born, 0, log_message
+                )
 
     def update_herd_305_day_milk_yields(self) -> None:
         """Refresh each cow's 305-day milk yield estimate (used by reporting and culling)."""
