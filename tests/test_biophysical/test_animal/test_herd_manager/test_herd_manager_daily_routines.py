@@ -6,6 +6,7 @@ from unittest.mock import call, MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
@@ -473,6 +474,7 @@ def test_apply_daily_herd_structure_updates(
     graduated_animals = mock_herd["heiferIs"]
     newborn_calves = mock_herd["calves"]
     removed_animals = [mock_animal(AnimalType.LAC_COW, sold=True)]
+    already_removed_animals = list(removed_animals)
     sold_low_production_cows = [mock_animal(AnimalType.LAC_COW, sold=True)]
     replacement_heifers = [mock_animal(AnimalType.HEIFER_III)]
     mock_available_feeds: list[Feed] = [MagicMock(auto_spec=Feed)]
@@ -505,15 +507,15 @@ def test_apply_daily_herd_structure_updates(
         mock_check_if_cows_need_to_be_sold.assert_called_once_with(
             simulation_day=simulation_day, removed_animal=removed_animals
         )
-        mock_update_sold_and_died_cow_statistics.assert_called_once_with(removed_animals)
+        mock_update_sold_and_died_cow_statistics.assert_called_once_with(sold_low_production_cows)
         mock_check_if_replacement_heifers_needed.assert_called_once_with(time=mock_time)
-        expected_removed_animals = removed_animals
+        expected_removed_animals = already_removed_animals + sold_low_production_cows
         expected_newly_added_animals = replacement_heifers
     else:
         mock_check_if_cows_need_to_be_sold.assert_not_called()
         mock_update_sold_and_died_cow_statistics.assert_not_called()
         mock_check_if_replacement_heifers_needed.assert_not_called()
-        expected_removed_animals = removed_animals
+        expected_removed_animals = already_removed_animals
         expected_newly_added_animals = []
 
     mock_update_herd_structure.assert_called_once_with(
@@ -881,6 +883,7 @@ def test_check_if_cows_need_to_be_sold_comprehensive(herd_manager: HerdManager, 
 
     assert len(removed_cows) == 6
     assert len(herd_manager.cows) == 10
+    assert all(cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL for cow in removed_cows)
 
     assert removed_cows[0] == cow_dnb_low_milk
     assert removed_cows[1] == cow_normal_low_milk

@@ -780,10 +780,11 @@ class HerdManager:
         newly_added_animals: list[Animal] = []
         adjust_herd_size: bool = time.simulation_day > 0 and time.simulation_day % self.adjustment_period == 0
         if adjust_herd_size:
-            removed_animals += self._check_if_cows_need_to_be_sold(
+            herd_resize_sold_cows = self._check_if_cows_need_to_be_sold(
                 simulation_day=time.simulation_day, removed_animal=removed_animals
             )
-            self._update_sold_and_died_cow_statistics(removed_animals)
+            self._update_sold_and_died_cow_statistics(herd_resize_sold_cows)
+            removed_animals += herd_resize_sold_cows
             newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
 
         self._update_herd_structure(
@@ -1169,7 +1170,7 @@ class HerdManager:
 
             removed_cow = self.cows.pop(remove_index)
             removed_cow.sold_at_day = simulation_day
-            removed_cow.cull_reason = "culled for herd resize"
+            removed_cow.cull_reason = animal_constants.LOW_PRODUCTION_CULL
             animals_removed.append(removed_cow)
 
         return animals_removed
