@@ -754,7 +754,7 @@ def test_report_manure_streams(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_manure_streams(manure_streams, 10)
 
-    assert mock_om_add_variable.call_count == 16 * len(manure_streams)
+    assert mock_om_add_variable.call_count == 17 * len(manure_streams)
 
 
 def test_report_manure_excretions(mocker: MockerFixture) -> None:
@@ -785,7 +785,7 @@ def test_report_manure_excretions(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_manure_excretions(manure_excretions_by_pen, 10)
 
-    assert mock_om_add_variable.call_count == 12 * len(manure_excretions_by_pen)
+    assert mock_om_add_variable.call_count == 13 * len(manure_excretions_by_pen)
 
 
 def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
