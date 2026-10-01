@@ -11,8 +11,6 @@ LOG_FORMAT = "[%(asctime)s][%(levelname)s][%(rufas_name)s] %(message)s"
 DATE_FORMAT = "%d-%b-%Y_%a_%H-%M-%S"
 
 
-
-
 class LogVerbosity(Enum):
     """
     The different types of logs printed by ``OutputManager``. Set by the ``verbose`` gnu arg in main.py.
@@ -70,9 +68,6 @@ LOG_LEVELS: dict[LogVerbosity, int] = {
 }
 
 
-
-
-
 def get_log_level(verbosity: LogVerbosity) -> int:
     log_levels = {
         LogVerbosity.NONE: logging.CRITICAL + 1,
@@ -83,7 +78,6 @@ def get_log_level(verbosity: LogVerbosity) -> int:
     }
 
     return log_levels[verbosity]
-
 
 
 def configure_logging(
