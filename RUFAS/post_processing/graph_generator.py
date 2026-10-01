@@ -15,7 +15,6 @@ from matplotlib.figure import Figure
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
-
 logger = logging.getLogger(__name__)
 
 """
@@ -194,9 +193,7 @@ class GraphGenerator:
         try:
             updated_pool = filtered_pool
             if graph_details.get("display_units", True) or graph_details.get("is_aggregated_report_data", False):
-                updated_pool = self._add_var_units(
-                    filtered_pool, graph_details.get("title", "Untitled graph")
-                )
+                updated_pool = self._add_var_units(filtered_pool, graph_details.get("title", "Untitled graph"))
                 graph_details["variables"] = list(updated_pool.keys())
             prepared_data: dict[str, list[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
             sanitized_data: dict[str, list[int | float]] = {}
@@ -440,18 +437,11 @@ class GraphGenerator:
             values = value["values"]
 
             if isinstance(values, list):
-                bad_items = [
-                    (index, item)
-                    for index, item in enumerate(values)
-                    if not isinstance(item, (int, float))
-                ]
+                bad_items = [(index, item) for index, item in enumerate(values) if not isinstance(item, (int, float))]
 
                 if bad_items:
                     bad_types = {type(item) for _, item in bad_items}
-                    bad_locations = [
-                        f"index {index}: {repr(item)}"
-                        for index, item in bad_items
-                    ]
+                    bad_locations = [f"index {index}: {repr(item)}" for index, item in bad_items]
 
                     logger.warning(
                         "Bad data found in %s data set: %s key contains non-numerical "
