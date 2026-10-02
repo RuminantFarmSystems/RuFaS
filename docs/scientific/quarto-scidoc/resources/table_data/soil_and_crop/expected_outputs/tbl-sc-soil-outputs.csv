@@ -40,34 +40,34 @@ nitrate_runoff.field=[FIELD_NAME],Amount of nitrate removed from the soil surfac
 profile_active_organic_nitrogen_total.field=[FIELD_NAME],The total amount of active organic nitrogen in the soil,kg/ha
 profile_ammonium_total.field=[FIELD_NAME],Total amount of CO2 emitted from carbon decomposition in the soil profile,kg/ha
 profile_carbon_emissions.[FEED_ID]field=[FIELD_NAME],total carbon present in the soil profile,kg/ha
-profile_carbon_total.field=[FIELD_NAME],The total amount of fresh organic nitrogen in the soil,kg/ha
-profile_fresh_organic_nitrogen_total.field=[FIELD_NAME],,
-profile_nitrates_total.field=[FIELD_NAME],,
-profile_stable_organic_nitrogen_total.field=[FIELD_NAME],,
-rain_events_after_fertilizer_application.field=[FIELD_NAME],,
-recalcitrant_phosphorus_pool.field=[FIELD_NAME],,
-runoff_fertilizer_phosphorus.field=[FIELD_NAME],,
-snow_content.field=[FIELD_NAME],,
-snow_melt.field=[FIELD_NAME],,
-soil_phosphorus_runoff.field=[FIELD_NAME],,
-water_evaporated.field=[FIELD_NAME],,
-water_sublimated.field=[FIELD_NAME],,
-"annual_ammonia_emissions_total.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"annual_carbon_CO2_lost.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"annual_decomposition_carbon_CO2_lost.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"annual_nitrous_oxide_emissions_total.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_decomposition_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_to_passive_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_to_slow_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_carbon_to_slow_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"active_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"ammonia_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"ammonium_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"dinitrogen_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"evaporated_water_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
+profile_carbon_total.field=[FIELD_NAME],The total amount of carbon in the soil,kg/ha
+profile_fresh_organic_nitrogen_total.field=[FIELD_NAME],The total amount of fresh organic nitrogen in the soil,kg/ha
+profile_nitrates_total.field=[FIELD_NAME],The total amount of nitrates in the soil,kg/ha
+profile_stable_organic_nitrogen_total.field=[FIELD_NAME],The total amount of stable organic nitrogen in the soil,kg/ha
+rain_events_after_fertilizer_application.field=[FIELD_NAME],Number of rain events that have occurred since phosphorus was applied to the field via fertilizer,
+recalcitrant_phosphorus_pool.field=[FIELD_NAME],Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event,kg
+runoff_fertilizer_phosphorus.field=[FIELD_NAME],Amount of solubilized phosphorus that has been leached off the field by runoff,kg
+snow_content.field=[FIELD_NAME],Water content of the snow pack,mm
+snow_melt.field=[FIELD_NAME],Water content of the snow that melted on the current day,mm
+soil_phosphorus_runoff.field=[FIELD_NAME],Amount of phosphorus removed from the surface soil layer by runoff,kg/ha
+water_evaporated.field=[FIELD_NAME],Amount of water evaporated from the soil profile on the current day,mm
+water_sublimated.field=[FIELD_NAME],Amount of water sublimated from the soil profile on the current day,mm
+"annual_ammonia_emissions_total.field=[FIELD_NAME],layer=[SOIL_LAYER]",Cumulative total of ammonium volatilized in this year,kg/ha
+"annual_carbon_CO2_lost.field=[FIELD_NAME],layer=[SOIL_LAYER]",Total amount of carbon lost as CO2,kg/ha
+"annual_decomposition_carbon_CO2_lost.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of total carbon lost as CO2 during decomposition,kg/ha
+"annual_nitrous_oxide_emissions_total.field=[FIELD_NAME],layer=[SOIL_LAYER]",Cumulative total amount of nitrates that have denitrified in a year,kg/ha
+"active_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon stored in the layer,kg/ha
+"active_carbon_decomposition_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon decomposed into slow or passive carbon and CO2,kg/ha
+"active_carbon_to_passive_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon decomposed into passive carbon,kg/ha
+"active_carbon_to_slow_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon decomposed into slow carbon,kg/ha
+"active_carbon_to_slow_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon lost as CO2 during decomposition into slow carbon,kg/ha
+"active_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active inorganic phosphorus content of this soil layer,kg/ha
+"active_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",The number of days that the active inorganic phosphorus pool has been greater than it would be when in equilibrium with the labile inorganic phosphorus pool.,
+"active_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active organic nitrogen content of this soil layer,kg/ha
+"ammonia_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of ammonium that volatilized out of the soil layer on the current day,kg/ha
+"ammonium_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Ammonium (NH4+) content of this soil layer,kg/ha
+"dinitrogen_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of dinitrogen emitted from this soil layer on the current day,kg/ha
+"evaporated_water_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of water that evaporated out of the layer on the current day,mm
 "fresh_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
 "fresh_organic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
 "labile_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
