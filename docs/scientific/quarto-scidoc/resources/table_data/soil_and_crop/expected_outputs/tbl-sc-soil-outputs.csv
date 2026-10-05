@@ -68,51 +68,51 @@ water_sublimated.field=[FIELD_NAME],Amount of water sublimated from the soil pro
 "ammonium_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Ammonium (NH4+) content of this soil layer,kg/ha
 "dinitrogen_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of dinitrogen emitted from this soil layer on the current day,kg/ha
 "evaporated_water_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of water that evaporated out of the layer on the current day,mm
-"fresh_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"fresh_organic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"labile_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"labile_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"mean_phosphorus_sorption_parameter.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"metabolic_litter_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"nitrate_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"nitrous_oxide_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"passive_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"passive_carbon_co2_lost_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"passive_carbon_decomposition_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"passive_to_active_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"percolated_active_organic_nitrogen.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"percolated_ammonium.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"percolated_nitrates.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"percolated_phosphorus.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"percolated_water.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_active_decompose_carbon.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_metabolic_active_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_metabolic_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_metabolic_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_structural_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_structural_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_structural_slow_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_structural_slow_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"plant_structural_slow_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"slow_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"slow_carbon_co2_lost_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"slow_carbon_decomposition_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"slow_to_active_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_active_decompose_carbon.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_metabolic_active_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_metabolic_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_metabolic_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_overall_carbon_fraction.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_structural_active_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_structural_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_structural_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_structural_slow_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_structural_slow_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"soil_structural_slow_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"stable_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"stable_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"structural_litter_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"temperature.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"total_soil_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"water_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
-"water_factor.field=[FIELD_NAME],layer=[SOIL_LAYER]",,
+"fresh_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Fresh organic nitrogen content of this soil layer,kg/ha
+"fresh_organic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Fresh organic phosphorus content of this soil layer,kg/ha
+"labile_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Labile inorganic phosphorus content of this soil layer,kg/ha
+"labile_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",The number of days that the labile inorganic phosphorus pool has been greater than it would be when in equilibrium with the labile inorganic phosphorus pool,
+"mean_phosphorus_sorption_parameter.field=[FIELD_NAME],layer=[SOIL_LAYER]",Parameter that determines the equilibria of the different inorganic phosphorus pools and has been adjusted so it is not sensitive to large immediate changes in the soil chemistry ,
+"metabolic_litter_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant metabolic carbon amount in this layer,kg/ha
+"nitrate_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Nitrate (NO3) content of this soil layer,kg/ha
+"nitrous_oxide_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of nitrous oxide emitted from this soil layer on the current day,kg/ha
+"passive_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Passive carbon stored in the soil layer,kg/ha
+"passive_carbon_co2_lost_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Passive carbon lost as CO2 during decomposition,kg/ha
+"passive_carbon_decomposition_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Passive carbon decomposed into active or passive carbon and CO2,kg/ha
+"passive_to_active_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Passive carbon decomposed into active carbon,kg/ha
+"percolated_active_organic_nitrogen.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of active organic nitrogen removed from the soil layer by water percolating out,kg/ha
+"percolated_ammonium.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of ammonium removed from the soil layer by water percolating out,kg/ha
+"percolated_nitrates.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of nitrates removed from the soil layer by water percolating out,kg/ha
+"percolated_phosphorus.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of phosphorus removed from the soil layer by water percolating out,kg/ha
+"percolated_water.field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of water removed from the soil layer by water percolating out,mm
+"plant_active_decompose_carbon.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant carbon decomposed into the active carbon pool,kg/ha
+"plant_metabolic_active_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon,kg/ha
+"plant_metabolic_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss,kg/ha
+"plant_metabolic_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant metabolic carbon decomposed into active carbon,kg/ha
+"plant_structural_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant structural carbon decomposed to active carbon after accounting for carbon dioxide loss ,kg/ha
+"plant_structural_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant structural carbon decomposed into active carbon,kg/ha
+"plant_structural_slow_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon,kg/ha
+"plant_structural_slow_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant structural carbon decomposed to slow carbon after accounting for carbon dioxide loss ,kg/ha
+"plant_structural_slow_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant structural carbon decomposed into slow carbon,kg/ha
+"slow_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Slow carbon stored in the soil,kg/ha
+"slow_carbon_co2_lost_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Slow carbon lost as CO2 during decomposition,kg/ha
+"slow_carbon_decomposition_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Slow carbon decomposed into active or passive carbon and CO2,kg/ha
+"slow_to_active_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Slow carbon decomposed into active carbon,kg/ha
+"soil_active_decompose_carbon.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil carbon decomposed into the active carbon pool,kg/ha
+"soil_metabolic_active_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon,kg/ha
+"soil_metabolic_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss,kg/ha
+"soil_metabolic_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil metabolic carbon decomposed into active carbon,kg/ha
+"soil_overall_carbon_fraction.field=[FIELD_NAME],layer=[SOIL_LAYER]",The total fraction of carbon in the soil,
+"soil_structural_active_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon being lost as carbon dioxide during decomposition into active carbon,kg/ha
+"soil_structural_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss,kg/ha
+"soil_structural_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon decomposed into active carbon,kg/ha
+"soil_structural_slow_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon being lost as carbon dioxide during decomposition into slow carbon,kg/ha
+"soil_structural_slow_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss,kg/ha
+"soil_structural_slow_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon decomposed into slow carbon after accounting for carbon dioxide loss,kg/ha
+"stable_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Stable inorganic phosphorus content of this soil layer,kg/ha
+"stable_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Stable organic nitrogen content of this soil layer,kg/ha
+"structural_litter_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",mount of plant structural carbon,kg/ha
+"temperature.field=[FIELD_NAME],layer=[SOIL_LAYER]",Current temperature of this soil layer,degrees C
+"total_soil_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",The total amount of soil carbon,kg/ha
+"water_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Water present in the layer,mm
+"water_factor.field=[FIELD_NAME],layer=[SOIL_LAYER]",Relative water saturation percent,
