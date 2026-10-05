@@ -2410,11 +2410,11 @@ The quantity of volatile solids utilized in determination of CH<sub>4</sub> incl
 
 ```{python}
 #| label: tbl-mn-cp-met-conv
-#| tbl-cap: "Required inputs for the composting section (`refreshed_manure_management.json`)"
+#| tbl-cap: Methane conversion factor values for compost pens, based on composting method and average annual air temperature.
 
 import_table(
   "../resources/table_data/manure/tbl-mn-CP-met-conv.csv",
-  colalign = ["left", "center", "center"]
+  colalign = ["left", "center", "center", "center"]
 )
 ```
 
