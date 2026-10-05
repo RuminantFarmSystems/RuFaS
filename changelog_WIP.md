@@ -131,4 +131,5 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3275](https://github.com/RuminantFarmSystems/RuFaS/pull/3260) - [minor change] [E2E Testing] [NoInputChange] [NoOutputChange] Removes `deepdiff` check from the process to update e2e expected results.
 - [3290](https://github.com/RuminantFarmSystems/RuFaS/pull/3290) - [minor change] [E2E Testing] [InputChange] [OutputChange] Adds accepted-range support to end-to-end testing.
 - [3206](https://github.com/RuminantFarmSystems/RuFaS/pull/3206) - [minor change] [Animal] [NoInputChange] [OutputChange] Fixes the off-by-one error where cow milking history skipped DIM = 1 on calving day.
+- [3306](https://github.com/RuminantFarmSystems/RuFaS/pull/3306) - [minor change] [Crop and Soil] [NoInputChange] [NoOutputChange] Enables the Crop and Soil module to simulate a field with no crop, manure, or fertilizer schedule and adds a bare-soil example scenario.
 - [3310](https://github.com/RuminantFarmSystems/RuFaS/pull/3310) - [minor change] [E2E Testing] [NoInputChange] [OutputChange] Updates expected e2e results.

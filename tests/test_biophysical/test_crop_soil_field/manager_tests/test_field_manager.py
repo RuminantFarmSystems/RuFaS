@@ -818,6 +818,18 @@ def test_setup_manure_schedule(
     mock_get_data.assert_called_once_with("test_manure_schedule", required=False)
 
 
+def test_setup_manure_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Tests that no manure events or daily spread settings are created when the manure schedule blob is excluded
+    from the input pool."""
+    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=None)
+
+    actual_manure_events, actual_daily_spread_settings = FieldManager._setup_manure_events("test_manure_schedule")
+
+    assert actual_manure_events == []
+    assert actual_daily_spread_settings is None
+    mock_get_data.assert_called_once_with("test_manure_schedule", required=False)
+
+
 @pytest.mark.parametrize(
     "tillage_schedule_data,expected_tillage_schedule",
     [
@@ -1389,17 +1401,20 @@ def test_crop_schedule_setup(
     for index in range(len(expected)):
         assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
         assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
-    mock_get_data.assert_called_once_with("test_crop_schedule.crop_schedules")
+    mock_get_data.assert_called_once_with("test_crop_schedule.crop_schedules", required=False)
 
 
 def test_setup_crop_schedule_schedule_no_data(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
-    """Test when no crop schedule input data available."""
-    mocker.patch.object(mock_input_manager, "get_data", return_value=None)
+    """Tests that no crop schedules are created when the crop schedule blob is excluded from the input pool."""
+    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=None)
     crop_configs = ["alfalfa", "corn", "oats"]
     mock_add_error = mocker.patch.object(OutputManager, "add_error")
-    with pytest.raises(ValueError):
-        FieldManager._setup_crop_schedules("test_crop_schedule", crop_configs)
-    mock_add_error.assert_called_once()
+
+    actual = FieldManager._setup_crop_schedules("test_crop_schedule", crop_configs)
+
+    assert actual == []
+    mock_add_error.assert_not_called()
+    mock_get_data.assert_called_once_with("test_crop_schedule.crop_schedules", required=False)
 
 
 def test_crop_schedule_setup_error(mocker: MockerFixture, mock_input_manager: InputManager) -> None:
