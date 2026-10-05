@@ -23,6 +23,7 @@ from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
+NON_FILTER_FILE_SUFFIXES = ("must_change_variables.json", "accepted_ranges.json")
 
 
 class LogVerbosity(Enum):
@@ -1360,6 +1361,8 @@ class OutputManager(object):
             filter_files = []
             all_files = os.listdir(dir_path)
             for filename in all_files:
+                if filename.endswith(NON_FILTER_FILE_SUFFIXES):
+                    continue
                 if filename.endswith(".txt") or filename.endswith(".json"):
                     for supported_prefix in self._filter_prefixes.values():
                         if filename.startswith(supported_prefix):
@@ -2528,7 +2531,9 @@ class OutputManager(object):
                 f"{warnings_count} warning(s), and {logs_count} log(s).\n"
             )
 
-    def summarize_e2e_test_results(self, json_output_directory: Path, output_prefixes: list[str]) -> None:
+    def summarize_e2e_test_results(
+        self, json_output_directory: Path, output_prefixes: list[str], failed_output_prefixes: list[str] | None = None
+    ) -> None:
         """
         Summarizes the end-to-end test results by gathering the results from all the e2e tests and prepares them to be
         printed out to the console.
@@ -2540,11 +2545,15 @@ class OutputManager(object):
             The directory where the JSON output files are located.
         output_prefixes : list[str]
             A list of output prefixes to look for in the filenames.
+        failed_output_prefixes : list[str] | None, default None
+            The output prefixes of the tasks that failed. They are summarized as not run, and any results files found
+            for them are ignored because they were left by an earlier run.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.summarize_e2e_test_results.__name__,
         }
+        failed_output_prefixes = failed_output_prefixes or []
         self.add_log(
             "Attempting to open e2e test results directory",
             "Opening e2e test results directory to read results files",
@@ -2552,7 +2561,11 @@ class OutputManager(object):
         )
         module_headers: list[str] = ["Animal", "CropAndSoil", "Manure"]
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
-            prefix: {header: "n/a" for header in module_headers} for prefix in output_prefixes
+            prefix: {
+                header: "not run (task failed)" if prefix in failed_output_prefixes else "n/a"
+                for header in module_headers
+            }
+            for prefix in output_prefixes
         }
         all_results_files = os.listdir(json_output_directory)
         for filename in all_results_files:
@@ -2571,6 +2584,8 @@ class OutputManager(object):
                 self.add_error(
                     "Invalid e2e output prefix", f"No matching output_prefix found in filename: {filename}", info_map
                 )
+                continue
+            if matched_prefix in failed_output_prefixes:
                 continue
 
             for key, value in data.items():

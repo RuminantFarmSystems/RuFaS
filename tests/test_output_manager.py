@@ -2695,6 +2695,23 @@ def test_list_filter_files_in_dir(
         mock_output_manager._list_filter_files_in_dir(Path("nonexistent_directory"))
 
 
+def test_list_filter_files_in_dir_skips_e2e_configuration_files(
+    mock_output_manager: OutputManager,
+    tmpdir: py.path.local,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that a scenario's must-change and accepted ranges files are skipped without a warning."""
+    mock_add_warning = mocker.patch.object(mock_output_manager, "add_warning")
+    tmpdir.join("json_file1.json").write("File 1 content")
+    tmpdir.join("freestall_must_change_variables.json").write("{}")
+    tmpdir.join("freestall_accepted_ranges.json").write("{}")
+
+    filter_files = mock_output_manager._list_filter_files_in_dir(Path(tmpdir))
+
+    assert filter_files == ["json_file1.json"]
+    mock_add_warning.assert_not_called()
+
+
 @pytest.fixture
 def mock_simple_variables_pool() -> dict[str, OutputManager.pool_element_type]:
     """Simple variables pool to be used for testing the Output Manager."""
@@ -4053,6 +4070,28 @@ def test_summarize_e2e_test_results_good_path(
     mock_print.assert_called_once()
     (summary_arg,) = mock_print.call_args.args
     assert summary_arg == {"E2E_Animal": {"Animal": True, "CropAndSoil": False, "Manure": "n/a"}}
+
+
+def test_summarize_e2e_test_results_failed_task(
+    tmp_path: Path, mock_output_manager: OutputManager, mocker: MockerFixture
+) -> None:
+    """Unit test for the summarize_e2e_test_results() method in OutputManager class with a failed task."""
+    mock_print = mocker.patch.object(mock_output_manager, "_print_e2e_results_summary")
+    mocker.patch.object(mock_output_manager, "add_log")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+    results_of_an_earlier_run = {"Animal.something": {"values": [True]}}
+    (tmp_path / "E2E_Failed_comparison.json").write_text(json.dumps(results_of_an_earlier_run))
+    (tmp_path / "E2E_Animal_comparison.json").write_text(json.dumps(results_of_an_earlier_run))
+
+    mock_output_manager.summarize_e2e_test_results(tmp_path, ["E2E_Failed", "E2E_Animal"], ["E2E_Failed"])
+
+    mock_add_error.assert_not_called()
+    (summary_arg,) = mock_print.call_args.args
+    not_run = "not run (task failed)"
+    assert summary_arg == {
+        "E2E_Failed": {"Animal": not_run, "CropAndSoil": not_run, "Manure": not_run},
+        "E2E_Animal": {"Animal": True, "CropAndSoil": "n/a", "Manure": "n/a"},
+    }
 
 
 def test_summarize_e2e_test_results_invalid_prefix_logs_error(
