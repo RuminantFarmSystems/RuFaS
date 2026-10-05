@@ -250,7 +250,6 @@ mixes being used, the proportion of N that is in the form of ammonium (`ammonium
 and K applied at each application, the application depth, and the fraction of manure that remains on the surface
 (`surface_remainder_fraction`).
 
-
 **Manure application specific** management information includes the total masses of N, P, and K applied at each manure
 application, the application depth, and the fraction of fertilizer that remains on the surface
 (`surface_remainder_fraction`), and an indication of how the model should handle cases where there is not enough
@@ -859,7 +858,6 @@ $$
 
 Surface temperature is dependent on the previous day’s soil temperature and is calculated before soil temperature on
 any given day. On the first day of a simulation the default soil temperature is used for T<sub>soil,d-1</sub>.
-
 
 #### Soil Hydrology
 
@@ -1768,7 +1766,6 @@ $$
 (kg N mm$^{-1}$ H<sub>2</sub>O) as determined in equation [SC.NNV.8](#eq-sc-nnv-8)
 * `percolated_water` is the water percolated from the layer (mm)
 
-
 **Denitrification** `denitrification.py`
 
 Denitrification is the bacterial conversion of NO<sub>3</sub> to denitrified nitrates (N$_2$, NO<sub>2</sub>, NO,
@@ -2377,7 +2374,6 @@ of manure P to be leached from one layer to the next
         
 Manure and leachate P are then added to their respective annual sums
 
-
 **Manure Decomposition** `manure_pool.py`
 
 ::: {#eq-sc-psl-39}
@@ -2484,7 +2480,7 @@ Manure mass and total cover also have assimilation factors calculated as:
 ::: {#eq-sc-psl-48}
 [[**SC.PSL.48**]]{.aside .content-visible when-format="html"}
 $$
-\text{manure}_\text{ASIM} = min(\text{manure}_\text{mass}, max(0.0, \text{ASIM} \times \text{TFA} \times \text{manure}_\text{cov}))
+\text{manure}_\text{ASIM} = min(\text{manure}_\text{mass}, max(0.0, \text{ASIM} \times \text{TFA} \times \text{ma#nure}_\text{cov}))
 $$
 :::         
     
@@ -2559,7 +2555,6 @@ $$
             
 * `depth_factor` is a terminating geometric sequence modeling the decreasing fraction of decomposed P to be leached
 from one layer to the next
-
 
 **Manure Runoff** `manure_pool.py`
 
@@ -2736,7 +2731,6 @@ soil:
 Decomposition occurs within the soil C pools resulting in the transfer of C between pools. In addition, crop residues,
 above and below ground, decompose into the soil C pools. Each decomposition event generates some CO<sub>2</sub> that
 enters the atmosphere.
-
 
 **Soil Carbon Partitioning** `carbon_cycle.py`
 
@@ -3453,7 +3447,6 @@ $$
 *Where*:
             
 * C{CO<sub>2</sub> loss} = total C lost as CO<sub>2</sub> (kg ha$^{-1}$)
-
 
 ## Crop Management 
 ### Introduction
@@ -4338,7 +4331,6 @@ $$
 * N_{actualup} = actual N uptake for the entire soil profile (kg N ha$^{-1}$)
 * N_{fix} = amount of N added to the plant biomass by fixation (kg N ha$^{-1}$) for perennial crops
 
-
 #### Phosphorus Uptake
 
 The methods for estimating crop phosphorus uptake and addition to the plant’s stored phosphorus are analogous to the
@@ -4357,7 +4349,6 @@ the amount of labile inorganic phosphorus in each soil layer. These methods are 
 * Finally the phosphorus taken up by the roots are added to the amount of phosphorus stored in the plant as described
 in [SC.CRP.46](#eq-sc-crp-46) with the exception that there is never any fixed phosphorus.
 
-
 #### Growth Constraints
 
 The `GrowthConstraints` class includes all of the methods that estimate the potential limitations on plant growth that
@@ -4368,7 +4359,6 @@ following:
 * Inadequate nitrogen 
 * Inadequate phosphorus
 * Extreme temperature
-
 
 The stress factors have values between [0,1] and represent the proportional reduction in total potential biomass that
 is accumulated that day as a result of that environmental stressor. After calculating the stress factor for each
@@ -4608,7 +4598,6 @@ $$
 * fr_{PHU,sen} = crop-specific fraction of PHU at which senescence becomes the dominant growth process
 * fr_{PHU} = fraction of PHU accumulated for the plant on a given day in the growing season
 
-
 **Biomass Accumulation**
 
 Plant biomass is produced when intercepted solar radiation is converted into plant biomass via photosynthesis
@@ -4658,7 +4647,6 @@ $$
 *Where*:
 
 * `growth_factor` = plant growth factor (0.0 - 1.0) calculated in [SC.CRP.47](eq-sc-crp-47)
-
 
 **Biomass Allocation**
 
