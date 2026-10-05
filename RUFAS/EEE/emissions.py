@@ -311,6 +311,8 @@ class EmissionsEstimator:
             emission_data, resource_data, harvest_yield_data, all_simulation_days
         )
 
+        self._report_daily_farmgrown_feed_emissions_and_resource_intensity(daily_farmgrown_feed_emissions_and_resources)
+
         daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id = (
             self._calculate_daily_farmgrown_feed_fed_emissions_and_resources(
                 daily_farmgrown_feed_emissions_and_resources, feed_deductions_data, all_simulation_days
@@ -924,18 +926,65 @@ class EmissionsEstimator:
             The daily emissions and resources attributable to the farmgrown feed fed to animals, keyed by feed ID,
             simulation day, and emission or resource name.
         """
+        self._report_daily_emission_and_resource_values_by_feed_id(
+            daily_farmgrown_feed_fed_emissions_and_resources,
+            self._report_daily_farmgrown_feed_fed_emissions_and_resources.__name__,
+            MeasurementUnits.KILOGRAMS,
+        )
+
+    def _report_daily_farmgrown_feed_emissions_and_resource_intensity(
+        self,
+        daily_farmgrown_feed_emissions_and_resource_intensity: dict[RUFAS_ID, dict[int, dict[str, float]]],
+    ) -> None:
+        """
+        Reports the daily emissions and resource intensity of the farmgrown feeds.
+
+        Each tracked emission and resource is reported per kilogram of harvested dry matter as a daily output
+        variable named ``"<prefix>_<feed_id>"``, where the prefixes are defined in
+        ``FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES``.
+
+        Parameters
+        ----------
+        daily_farmgrown_feed_emissions_and_resource_intensity : dict[RUFAS_ID, dict[int, dict[str, float]]]
+            The daily emissions and resources per kilogram of harvested dry matter of each farmgrown feed, keyed by
+            feed ID, simulation day, and emission or resource name.
+        """
+        self._report_daily_emission_and_resource_values_by_feed_id(
+            daily_farmgrown_feed_emissions_and_resource_intensity,
+            self._report_daily_farmgrown_feed_emissions_and_resource_intensity.__name__,
+            MeasurementUnits.KILOGRAMS_PER_KILOGRAM_DRY_MATTER,
+        )
+
+    def _report_daily_emission_and_resource_values_by_feed_id(
+        self,
+        daily_emission_and_resource_values_by_feed_id: dict[RUFAS_ID, dict[int, dict[str, float]]],
+        reporting_function_name: str,
+        units: MeasurementUnits,
+    ) -> None:
+        """
+        Reports every tracked emission and resource of each farmgrown feed as a daily output variable.
+
+        Parameters
+        ----------
+        daily_emission_and_resource_values_by_feed_id : dict[RUFAS_ID, dict[int, dict[str, float]]]
+            The daily values to report, keyed by feed ID, simulation day, and emission or resource name.
+        reporting_function_name : str
+            The name of the function the values are reported for, which becomes part of the output variable names.
+        units : MeasurementUnits
+            The units of the reported values.
+        """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._report_daily_farmgrown_feed_fed_emissions_and_resources.__name__,
+            "function": reporting_function_name,
         }
-        for feed_id, daily_data_for_feed_id in daily_farmgrown_feed_fed_emissions_and_resources.items():
+        for feed_id, daily_data_for_feed_id in daily_emission_and_resource_values_by_feed_id.items():
             for emission_or_resource, output_name_prefix in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.items():
                 emission_or_resource_outputs = [
                     (
                         {f"{output_name_prefix}_{feed_id}": data_for_day[emission_or_resource]},
                         {
                             **info_map,
-                            "units": MeasurementUnits.KILOGRAMS,
+                            "units": units,
                             "simulation_day": simulation_day,
                             "is_daily_variable": True,
                         },

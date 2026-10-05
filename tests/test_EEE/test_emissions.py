@@ -242,6 +242,9 @@ def test_estimate_emissions(
     mock_calculate_daily_farmgrown_feed_emissions_and_resources = mocker.patch.object(
         em, "_calculate_daily_farmgrown_feed_emissions_and_resources"
     )
+    mock_report_daily_farmgrown_feed_emissions_and_resource_intensity = mocker.patch.object(
+        em, "_report_daily_farmgrown_feed_emissions_and_resource_intensity"
+    )
     mock_calculate_daily_farmgrown_feed_fed_emissions_and_resources = mocker.patch.object(
         em, "_calculate_daily_farmgrown_feed_fed_emissions_and_resources", return_value={}
     )
@@ -260,6 +263,9 @@ def test_estimate_emissions(
     mock_parse_harvest_data.assert_called_once()
     mock_parse_farmgrown_feed_deductions_data.assert_called_once()
     mock_calculate_daily_farmgrown_feed_emissions_and_resources.assert_called_once()
+    mock_report_daily_farmgrown_feed_emissions_and_resource_intensity.assert_called_once_with(
+        mock_calculate_daily_farmgrown_feed_emissions_and_resources.return_value
+    )
     mock_calculate_daily_farmgrown_feed_fed_emissions_and_resources.assert_called_once()
     mock_report_daily_farmgrown_feed_fed_emissions_and_resources.assert_called_once()
     mock_calculate_and_report_lca_and_luc_emissions.assert_called_once()
@@ -866,6 +872,71 @@ def test_report_daily_farmgrown_feed_fed_emissions_and_resources(
         expected_daily_farmgrown_feed_fed_emissions_and_resources_by_feed_id
     )
     assert mock_add_variable_bulk.call_count == 2 * 6
+
+
+def test_report_daily_farmgrown_feed_emissions_and_resource_intensity(
+    expected_daily_farmgrown_feed_emissions_and_resources: dict[RUFAS_ID, dict[int, dict[str, float]]],
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    mock_add_variable_bulk = mocker.patch.object(em.om, "add_variable_bulk")
+    em._report_daily_farmgrown_feed_emissions_and_resource_intensity(
+        expected_daily_farmgrown_feed_emissions_and_resources
+    )
+    assert mock_add_variable_bulk.call_count == 4 * 6
+
+
+@pytest.mark.parametrize(
+    "reporting_function_name, expected_units",
+    [
+        ("_report_daily_farmgrown_feed_fed_emissions_and_resources", MeasurementUnits.KILOGRAMS),
+        (
+            "_report_daily_farmgrown_feed_emissions_and_resource_intensity",
+            MeasurementUnits.KILOGRAMS_PER_KILOGRAM_DRY_MATTER,
+        ),
+    ],
+)
+def test_report_daily_farmgrown_feed_output_names_and_units(
+    reporting_function_name: str,
+    expected_units: MeasurementUnits,
+    em: EmissionsEstimator,
+    mocker: MockerFixture,
+) -> None:
+    """Each report adds one daily variable per emission or resource of a feed, named after the reporting function
+    and carrying the units of that report."""
+    daily_data: dict[RUFAS_ID, dict[int, dict[str, float]]] = {
+        7: {
+            0: {emission_or_resource: 0.0 for emission_or_resource in FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES},
+            1: {
+                emission_or_resource: float(index + 1)
+                for index, emission_or_resource in enumerate(FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES)
+            },
+        }
+    }
+    mock_add_variable_bulk = mocker.patch.object(em.om, "add_variable_bulk")
+
+    getattr(em, reporting_function_name)(daily_data)
+
+    assert mock_add_variable_bulk.call_count == len(FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES)
+    for index, (call, output_name_prefix) in enumerate(
+        zip(mock_add_variable_bulk.call_args_list, FARMGROWN_FEED_FED_OUTPUT_NAME_PREFIXES.values())
+    ):
+        outputs = call.args[0]
+        assert call.kwargs == {"first_info_map_only": False}
+        assert [variable for variable, _ in outputs] == [
+            {f"{output_name_prefix}_7": 0.0},
+            {f"{output_name_prefix}_7": float(index + 1)},
+        ]
+        assert [info_map for _, info_map in outputs] == [
+            {
+                "class": "EmissionsEstimator",
+                "function": reporting_function_name,
+                "units": expected_units,
+                "simulation_day": simulation_day,
+                "is_daily_variable": True,
+            }
+            for simulation_day in (0, 1)
+        ]
 
 
 def test_calculate_and_report_lca_and_luc_emissions(
