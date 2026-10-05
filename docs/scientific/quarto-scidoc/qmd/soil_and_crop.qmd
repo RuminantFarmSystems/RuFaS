@@ -3607,8 +3607,8 @@ The `Field` class's `cycle_water` method then subtracts the amount of water evap
 remaining evapotranspiration demand (mm H<sub>2</sub>O) and that value is passed to the `Crop` class’s method to
 calculate the maximum crop transpiration (mm H<sub>2</sub>O):
     
-::: {#eq-sc-crp-6}
-[[**SC.CRP.6**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-7}
+[[**SC.CRP.7**]]{.aside .content-visible when-format="html"}        
 $$
 \text{max\_transpiration} = 
 \begin{cases}
@@ -3622,8 +3622,8 @@ $$
 
 The potential water uptake from the soil surface to any specified depth in the root zone can be calculated as:
     
-::: {#eq-sc-crp-7}
-[[**SC.CRP.7**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-8}
+[[**SC.CRP.8**]]{.aside .content-visible when-format="html"}        
 $$
 \text{max\_water\_uptake}_\text{depth} = \frac{\text{max\_transpiration}}{1 - e^{-\text{water\_dist\_param}}} \times (1 - e^{1 -\text{water\_dist\_param} \times \frac{\text{depth}}{\text{root\_depth}}})
 $$
@@ -3639,8 +3639,8 @@ $$
 The potential maximum water uptake from any soil layer, then, can be calculated by taking the difference in uptake
 between the top and bottom of the soil layer
     
-::: {#eq-sc-crp-8}
-[[**SC.CRP.8**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-9}
+[[**SC.CRP.9**]]{.aside .content-visible when-format="html"}        
 $$
 \text{max\_water\_uptake}_\text{layer} = \text{max\_water\_uptake}_\text{bottom\_depth} - \text{max\_water\_uptake}_\text{top\_depth}
 $$
@@ -3656,8 +3656,8 @@ layer to allow for compensation for unmet demand set by the maximum water uptake
 
 The unmet demands for water are calculated as sum of the unmet demands for that layer and all layers above it:
     
-::: {#eq-sc-crp-9}
-[[**SC.CRP.9**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-10}
+[[**SC.CRP.10**]]{.aside .content-visible when-format="html"}        
 $$
 \text{unmet\_demand}_\text{layer\_i} = \sum_{x=1}^i \text{max\_water\_uptakex} - \text{soil\_water}
 $$
@@ -3666,8 +3666,8 @@ $$
 The unmet demands are then used to calculate the potential water uptakes for each layer from the maximum water uptake
 and the unmet demands from each layer for every layer below the surface:
     
-::: {#eq-sc-crp-10}
-[[**SC.CRP.10**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-11}
+[[**SC.CRP.11**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 \text{potential\_water\_updake}_\text{layer} &= \text{max\_water\_uptake}_\text{layer} + \text{unmet\_demand}_\text{layer} \\[8pt]
@@ -3690,8 +3690,8 @@ As the water content of the soil decreases, the soil holds remaining water more 
 efficiency of plant water uptake. Thus, the potential water uptakes are adjusted one more time if the initial soil
 water content is below a threshold:
     
-::: {#eq-sc-crp-11}
-[[**SC.CRP.11**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-12}
+[[**SC.CRP.12**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 & \text{if soil\_water}_\text{layer} < 0.25 \times \text{available\_water\_capacity}_\text{layer} : \\[8pt]
@@ -3712,8 +3712,8 @@ of plant uptake
 The actual water uptake for each layer are then calculated as the minimum of the adjusted potential water uptakes and
 the difference between the available soil water in that layer and the wilting point soil water.
     
-::: {#eq-sc-crp-12}
-[[**SC.CRP.12**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-13}
+[[**SC.CRP.13**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 \text{actual\_water\_uptake\_layer} &= min(\text{adjusted\_potential\_water\_uptake}_\text{layer}, \\[8pt]
@@ -3730,8 +3730,8 @@ $$
 The total plant uptake for the entire profile for the day (mm H<sub>2</sub>O) is calculated as the sum of these values
 for each layer in the profile
     
-::: {#eq-sc-crp-13}
-[[**SC.CRP.13**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-14}
+[[**SC.CRP.14**]]{.aside .content-visible when-format="html"}        
 $$
 \text{total\_water\_uptake} = \sum_{x=1}^n \text{actual\_water\_uptake\_later}_\text{i}
 $$
@@ -3745,8 +3745,8 @@ profile
 The total plant water uptake is passed to `WaterDynamics` `cycle_water()` method as the actual amount of transpiration
 on the day (mm H<sub>2</sub>O).
     
-::: {#eq-sc-crp-14}
-[[**SC.CRP.14**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-15}
+[[**SC.CRP.15**]]{.aside .content-visible when-format="html"}        
 $$
 \text{actual\_transpiration} = \text{total\_water\_uptake}
 $$
@@ -3776,8 +3776,8 @@ developed to estimate the amount of solar radiation absorbed by the plant. Each 
 potential heat units (PHU) required to reach maturity. The accumulated fraction of potential heat units (FrPHU) on a
 given day is calculated as:
     
-::: {#eq-sc-crp-15}
-[[**SC.CRP.15**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-16}
+[[**SC.CRP.16**]]{.aside .content-visible when-format="html"}        
 $$
 \text{fr}_\text{PHU} = \frac{\text{HU}_\text{sum}}{\text{PHU}}
 $$
@@ -3796,8 +3796,8 @@ Perennial crops like alfalfa enter a period of dormancy in which the plants do n
 shortest or minimum day length for the year. The beginning and end of dormancy are defined by a day length threshold
 (hrs) which can be calculated as:
     
-::: {#eq-sc-crp-16}
-[[**SC.CRP.16**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-17}
+[[**SC.CRP.17**]]{.aside .content-visible when-format="html"}        
 $$
 \text{daylength\_threshold} = \text{daylength\_min} + \text{dormancy\_threshold}
 $$
@@ -3811,8 +3811,8 @@ $$
 Plants enter dormancy when the day length falls below the threshold and exit dormancy when day length exceeds the
 threshold again in the next year. The dormancy threshold varies with latitude and is calculated as:
     
-::: {#eq-sc-crp-17}
-[[**SC.CRP.17**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-18}
+[[**SC.CRP.18**]]{.aside .content-visible when-format="html"}        
 $$
 \text{t}_\text{dorm} =
 \begin{cases}
@@ -3830,8 +3830,8 @@ $$
 The total daylight hours (daylength, hrs) for each day is calculated by the `Weather` class each day and passed to the
 `FieldManager`:
     
-::: {#eq-sc-crp-18}
-[[**SC.CRP.18**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-19}
+[[**SC.CRP.19**]]{.aside .content-visible when-format="html"}        
 $$
 \text{daylength} = \frac{2 cos^{-1}(-tan(\text{solar\_declination\_radians})tan(\text{latitude}))}{\text{earth\_angular\_velocity}}
 $$
@@ -3842,8 +3842,8 @@ $$
 * `solar declination in radians` = earth’s latitude at which incoming solar rays are normal to the earth’s surface and
 the angular velocity of the earth’s rotation is a constant equal to 0.2618 rad \(h^{-1}\) or \(15^\circ\ h^{-1}\).
     
-::: {#eq-sc-crp-19}
-[[**SC.CRP.19**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-20}
+[[**SC.CRP.20**]]{.aside .content-visible when-format="html"}        
 $$
 \text{solar\_declination\_radians} = sin^{-1}(0.4 \times sin(\frac{2\pi}{\text{year length}}(\text{day} - 82)))
 $$
@@ -3862,8 +3862,8 @@ the dormancy period.
 
 If it is a perennial crop, the model checks whether the perennial should be cut:
     
-::: {#eq-sc-crp-20}
-[[**SC.CRP.20**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-21}
+[[**SC.CRP.21**]]{.aside .content-visible when-format="html"}        
 $$
 \text{if} (\text{fr}_\text{PHU}) \geq \text{fr}_\text{PHU,harvest,min} : \text{yield}
 $$
@@ -3883,8 +3883,8 @@ residue.
 The available heat units on a given day are calculated by the `determine_new_heat_units()` method in the `HeatUnits`
 class:
     
-::: {#eq-sc-crp-21}
-[[**SC.CRP.21**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-22}
+[[**SC.CRP.22**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 & \text{HU} = \text{T}_\text{HU} - \text{T}_\text{min} ; \qquad \text{when T}_\text{HU} > \text{T}_\text{base,min} \\[8pt]
@@ -3901,8 +3901,8 @@ $$
 By default, T_{HU} is  set to the mean daily ambient temperature. If the attribute `use_heat_unit_temperature` is set
 to True, then THU is defined by the equation below:
     
-::: {#eq-sc-crp-22}
-[[**SC.CRP.22**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-23}
+[[**SC.CRP.23**]]{.aside .content-visible when-format="html"}        
 $$
 \text{T}_\text{HU} = \frac{\text{T}_\text{HU,max} + \text{T}_\text{HU,min}}{2}
 $$
@@ -3913,8 +3913,8 @@ $$
 * T_{HU,max} = maximum heat unit temperature on a given day ℃
 * T_{HU,min} = minimum heat unit temperature on a given day ℃
     
-::: {#eq-sc-crp-23}
-[[**SC.CRP.23**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-24}
+[[**SC.CRP.24**]]{.aside .content-visible when-format="html"}        
 $$
 \text{T}_\text{HU,min} =
 \begin{cases}
@@ -3924,8 +3924,8 @@ $$
 $$
 :::
 
-::: {#eq-sc-crp-24}
-[[**SC.CRP.24**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-25}
+[[**SC.CRP.25**]]{.aside .content-visible when-format="html"}        
 $$
 \text{T}_\text{HU,max} =
 \begin{cases}
@@ -3960,8 +3960,8 @@ Once the heat units for that day have been calculated, they are added to the pre
 The depth of the roots on a given day is estimated based on the fraction of accumulated heat units fr_{PHU} and the
 maximum rooting depth. First a root specific fraction is calculated:
     
-::: {#eq-sc-crp-25}
-[[**SC.CRP.25**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-26}
+[[**SC.CRP.26**]]{.aside .content-visible when-format="html"}        
 $$
 \text{T}_\text{root\_fraction} =
 \begin{cases}
@@ -3975,8 +3975,8 @@ $$
 
 * root_depth_{max} = maximum depth of root development in the soil (mm)
     
-::: {#eq-sc-crp-26}
-[[**SC.CRP.26**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-27}
+[[**SC.CRP.27**]]{.aside .content-visible when-format="html"}        
 $$
 \text{root\_depth} = \text{root\_depth\_max} 
 $$
@@ -3985,8 +3985,8 @@ $$
 If the crop type is perennial, and it is not the establishment/planting year then the rooting depth of the given plant
 (`root_depth`, mm) is defined as the depth of root development in the soil on a given day and calculated as:
     
-::: {#eq-sc-crp-27}
-[[**SC.CRP.27**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-28}
+[[**SC.CRP.28**]]{.aside .content-visible when-format="html"}        
 $$
 \text{root\_depth} =
 \begin{cases}
@@ -4020,8 +4020,8 @@ crop-specific, user-provided compositions at emergence (fr<sub>N,1</sub>) and ma
 Following this logic, the function for determining the optimal fraction of N in the plant biomass on a given day
 (fr<sub>n</sub>) is:
     
-::: {#eq-sc-crp-28}
-[[**SC.CRP.28**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-29}
+[[**SC.CRP.29**]]{.aside .content-visible when-format="html"}        
 $$
 \text{fr}_\text{n} = (\text{fr}_\text{N,1} - \text{fr}_\text{N,3}) \times (1 - \frac{\text{fr}_\text{PHU}}{\text{fr}_\text{PHU} + e^{\text{n}_1 + \text{n}_2 \times \text{fr}_\text{PHU}}}) + \text{fr}_\text{N,3} 
 $$
@@ -4032,15 +4032,15 @@ $$
 * fr_{N,1} = fraction of N in the plant biomass at emergence
 * fr_{N,3} = fraction of N in the plant biomass at maturity
 * fr_{PHU} = fraction of potential heat units accumulated for the plant on a given day in the growing season
-(described in [SC.CRP.15](#eq-sc-crp-15))
+(described in [SC.CRP.16](#eq-sc-crp-16))
 * n_1 and n_2 = shape coefficients. 
 
 The shape coefficients are calculated by solving the below equations using the composition of the plant at two known
 points in crop development: half maturity (fr<sub>PHU,50%</sub>) and maturity (fr<sub>PHU,100%</sub>). The second shape
 coefficient is needed to calculate the first shape coefficient and is calculated as:
 
-::: {#eq-sc-crp-29}
-[[**SC.CRP.29**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-30}
+[[**SC.CRP.30**]]{.aside .content-visible when-format="html"}        
 $$
 \text{n}_\text{2} = \frac{ln \left(\frac{\text{fr}_\text{PHU,50\%}}{1 - \left(\frac{\text{fr}_\text{N,2} - \text{fr}_\text{N,3}}{\text{fr}_\text{N,1} - \text{fr}_\text{N,3}} \times \text{fr}_\text{PHU,50\%} \right)} \right) 
 - ln \left(\frac{\text{fr}_\text{PHU,100\%}}{1 - \left(\frac{\text{fr}_\text{N,3} - \text{fr}_\text{N,3}}{\text{fr}_\text{N,1} - \text{fr}_\text{N,3}} \times \text{fr}_\text{PHU,100\%} \right)}  \right)}
@@ -4050,8 +4050,8 @@ $$
 
 The first shape coefficient is then calculated as:
 
-::: {#eq-sc-crp-30}
-[[**SC.CRP.30**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-31}
+[[**SC.CRP.31**]]{.aside .content-visible when-format="html"}        
 $$
 \text{n}_\text{2} = ln \left(\frac{\text{fr}_\text{PHU,50\%}}{1 - \left(\frac{\text{fr}_\text{N,2} - \text{fr}_\text{N,3}}{\text{fr}_\text{N,1} - \text{fr}_\text{N,3}} \times \text{fr}_\text{PHU,50\%} \right)} - \text{fr}_\text{PHU,50\%} \right) + \text{n}_2 \times \text{fr}_\text{PHU,50\%}
 $$
@@ -4072,11 +4072,11 @@ We follow the SWAT model assumption that the difference between the nutrient fra
 fraction at maturity in the crop is equal to 0.00001 and the near mature nutrient fraction is calculated from the
 mature nutrient fraction according to this assumption.
 
-Using the optimal fraction of N in the crop biomass calculated in [SC.CRP.28](#eq-sc-crp-28) the optimal mass of N
+Using the optimal fraction of N in the crop biomass calculated in [SC.CRP.29](#eq-sc-crp-29) the optimal mass of N
 stored in the plant biomass on a given day (kg N ha$^{-1}$) is given as:
     
-::: {#eq-sc-crp-31}
-[[**SC.CRP.31**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-32}
+[[**SC.CRP.32**]]{.aside .content-visible when-format="html"}        
 $$
 \text{optimal\_nitrogen\_mass} = \text{optimal\_nitrogen\_fraction} \times \text{plant\_biomass}
 $$
@@ -4089,8 +4089,8 @@ $$
 
 Plant N demand (potential N uptake) on a given day (kg N ha$^{-1}$) is then calculated as:
     
-::: {#eq-sc-crp-32}
-[[**SC.CRP.32**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-33}
+[[**SC.CRP.33**]]{.aside .content-visible when-format="html"}        
 $$
 \text{optimal\_nitrogen\_mass\_previous} = \text{optimal\_nitrogen\_fraction} \times \text{biomass\_growth\_max}
 $$
@@ -4116,8 +4116,8 @@ nitrates in each layer that are accessible to the plant by the methods `access_l
 
 The potential N uptake from the surface to any given depth z (N_{up,z}; kg N ha$^{-1}$) is calculated as:
     
-::: {#eq-sc-crp-33}
-[[**SC.CRP.33**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-34}
+[[**SC.CRP.34**]]{.aside .content-visible when-format="html"}        
 $$
 \text{nitrogen\_uptake}_\text{depth} = \frac{\text{nitrogen\_uptake}}{1 - e^{-\beta_\text{n}}} \times 1 - e^{(-\beta_\text{n} \times \frac{\text{depth}}{\text{root\_depth}})}
 $$
@@ -4140,8 +4140,8 @@ Potential N uptake for each layer is then calculated as the difference in the po
 the layer and the potential uptake to the top depth of each layer. For the surface layer, where the top depth or upper
 boundary of the soil layer is at 0 mm depth:
     
-::: {#eq-sc-crp-34}
-[[**SC.CRP.34**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-35}
+[[**SC.CRP.35**]]{.aside .content-visible when-format="html"}        
 $$
 \text{nitrogen\_uptake}_\text{layer} = \text{nitrogen\_uptake}_\text{depth}
 $$
@@ -4154,8 +4154,8 @@ $$
 For every other layer, the potential N uptake is calculated for the upper and lower boundaries of the layer and
 \(N_{up,ly}\) is taken as the difference between the two:
     
-::: {#eq-sc-crp-35}
-[[**SC.CRP.35**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-36}
+[[**SC.CRP.36**]]{.aside .content-visible when-format="html"}        
 $$
 \text{potential\_nitrogen\_uptake}_\text{layer} = \text{nitrogen\_uptake}_\text{depth,bottom} - \text{nitrogen\_uptake}_\text{depth,upper}
 $$
@@ -4171,8 +4171,8 @@ layer (kg N ha$^{-1}$)
 The actual N uptake from a given soil layer (kg N ha$^{-1}$) is calculated as the minimum of potential N uptake plus
 demand, and available NO<sub>3</sub> in the layer and given as:
     
-::: {#eq-sc-crp-36}
-[[**SC.CRP.33**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-37}
+[[**SC.CRP.37**]]{.aside .content-visible when-format="html"}        
 $$
 \text{actual\_nitrogen\_uptake}_\text{layer} = min(\text{nitrogen\_uptake}_\text{layer} + \text{unmet\_nitrogen\_demand}, \text{ soil\_nitrate}_\text{layer})
 $$
@@ -4188,8 +4188,8 @@ nutrients in those layers.
 
 For every other soil layer the unmet nitrogen demand is calculated as:
    
-::: {#eq-sc-crp-37}
-[[**SC.CRP.37**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-38}
+[[**SC.CRP.38**]]{.aside .content-visible when-format="html"}        
 $$
 \text{unmet\_nitrogen\_demand} = max(\text{sum\_potential\_nitrogen\_uptake}_\text{above} - \text{sum\_soil\_nitrate}_\text{above}, 0)
 $$
@@ -4201,8 +4201,8 @@ $$
 * NO$_3${over} = sum of nitrate content of each soil layer overlying the given layer (kg N ha$^{-1}$)
    
 
-::: {#eq-sc-crp-38}
-[[**SC.CRP.38**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-39}
+[[**SC.CRP.39**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 & \text{sum\_potential\_nitrogen\_uptake}_\text{above} = \sum_{\text{layer} - 1}^{\text{surface}} \text{potential\_nitrogen\_uptake}_\text{layer} \\[8pt]
@@ -4220,8 +4220,8 @@ $$
 
 actual_nitrogen_uptake{total} for the entire profile on a given day is the sum of N{actualup} for each layer.
    
-::: {#eq-sc-crp-39}
-[[**SC.CRP.39**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-40}
+[[**SC.CRP.40**]]{.aside .content-visible when-format="html"}        
 $$
 \text{actual\_nitrogen\_uptake}_\text{total} = \sum_{\text{z}}^{\text{s}} \text{actual\_nitrogen\_uptake}_\text{layer}
 $$
@@ -4237,8 +4237,8 @@ N fixation associations (e.g. legumes).
 After the amount of N available in the soil to meet the crop’s nitrogen demands has been determined, the amount of N
 added to the plant biomass by fixation ( kg N ha$^{-1}$)  is calculated using the unmet demands from the soil:
    
-::: {#eq-sc-crp-40}
-[[**SC.CRP.40**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-41}
+[[**SC.CRP.41**]]{.aside .content-visible when-format="html"}        
 $$
 \text{nitrogen\_fixation} = \text{unmet\_demand} \times \text{stage\_factor} \times min(\text{water\_factor}, \text{nitrate\_factor}, 1)
 $$
@@ -4255,8 +4255,8 @@ that can be fixed by the plant on a given day
 The growth stage factor is dependent on the fraction of accumulated potential heat units (PHU) for the plant on a given
 day in the growing season and can be expressed as:
    
-::: {#eq-sc-crp-41}
-[[**SC.CRP.41**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-42}
+[[**SC.CRP.42**]]{.aside .content-visible when-format="html"}        
 $$
 \text{stage\_factor} = 
 \begin{cases}
@@ -4276,8 +4276,8 @@ $$
 The soil nitrate factor is dependent on the sum of nitrate available in the soil layers accessible to root biomass
 (kg NO<sub>3</sub>-N ha$^{-1}$) and calculated as:
    
-::: {#eq-sc-crp-42}
-[[**SC.CRP.42**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-43}
+[[**SC.CRP.43**]]{.aside .content-visible when-format="html"}        
 $$
 \text{accessible\_nitrates} = \sum_{\text{i}=0}^{\text{root\_layer}} \text{soil\_nitrates}_\text{layer,i}
 $$
@@ -4290,8 +4290,8 @@ $$
 
 The soil nitrate factor is then determined along the continuum:
    
-::: {#eq-sc-crp-43}
-[[**SC.CRP.43**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-44}
+[[**SC.CRP.44**]]{.aside .content-visible when-format="html"}        
 $$
 \text{nitrate\_factor} = 
 \begin{cases}
@@ -4304,8 +4304,8 @@ $$
 
 The soil water factor controls N fixation as the soil dries out and is calculated in the SoilData class: 
    
-::: {#eq-sc-crp-44}
-[[**SC.CRP.44**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-45}
+[[**SC.CRP.45**]]{.aside .content-visible when-format="html"}        
 $$
 \text{water\_factor} = \frac{\text{root\_accessible\_soil\_water}}{0.85 \times \text{root\_accessible\_field\_capacity}}
 $$
@@ -4325,8 +4325,8 @@ water and soil water field capacity in each layer for the soil layers accessible
 
 The actual nitrogen stored in plant biomass on a given day (kg N ha$^{-1}$) is calculated as:
    
-::: {#eq-sc-crp-45}
-[[**SC.CRP.45**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-46}
+[[**SC.CRP.46**]]{.aside .content-visible when-format="html"}        
 $$
 \text{crop\_nitrogen} = \text{previous\_crop\_nitrogen} + \text{N}_\text{actualup} + \text{N}_\text{fix}
 $$
@@ -4350,12 +4350,12 @@ To summarize:
 
 * First the potential phosphorus uptake is estimated based on the demand from the crop given its current biomass,
 stage of development, and estimated phosphorus composition at that stage of development. These methods are described
-in [SC.CRP.28](#eq-sc-crp-28) - [SC.CRP.32](#eq-sc-crp-32) substituting phosphorus for nitrogen.
+in [SC.CRP.29](#eq-sc-crp-29) - [SC.CRP.33](#eq-sc-crp-33) substituting phosphorus for nitrogen.
 * Then the actual phosphorus uptake is calculated based on the number of soil layers that the roots have access to and
 the amount of labile inorganic phosphorus in each soil layer. These methods are described in
-[SC.CRP.33](#eq-sc-crp-33) - [SC.CRP.44](#eq-sc-crp-44) again, substituting phosphorus for nitrogen.
+[SC.CRP.34](#eq-sc-crp-34) - [SC.CRP.45](#eq-sc-crp-45) again, substituting phosphorus for nitrogen.
 * Finally the phosphorus taken up by the roots are added to the amount of phosphorus stored in the plant as described
-in [SC.CRP.45](#eq-sc-crp-45) with the exception that there is never any fixed phosphorus.
+in [SC.CRP.46](#eq-sc-crp-46) with the exception that there is never any fixed phosphorus.
 
 
 #### Growth Constraints
@@ -4374,8 +4374,8 @@ The stress factors have values between [0,1] and represent the proportional redu
 is accumulated that day as a result of that environmental stressor. After calculating the stress factor for each
 condition separately, the largest stressor is used to define the growth factor for that day:
    
-::: {#eq-sc-crp-46}
-[[**SC.CRP.46**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-47}
+[[**SC.CRP.47**]]{.aside .content-visible when-format="html"}        
 $$
 \text{growth\_factor} = 1 - max(\text{water\_stress}, \text{ temp\_stress}, \text{ nitrogen\_stress}, \text{ phosphorus\_stress})
 $$
@@ -4393,8 +4393,8 @@ Water stress is the stress caused by the soil water conditions on a given day.
 
 The water stress for a given day is calculated as:
    
-::: {#eq-sc-crp-47}
-[[**SC.CRP.47**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-48}
+[[**SC.CRP.48**]]{.aside .content-visible when-format="html"}        
 $$
 \text{water\_stress} = 1 - \frac{\text{w}_\text{actualup}}{\text{E}_\text{t}}
 $$
@@ -4412,8 +4412,8 @@ temperature for the plant growth.  If the average temperature is less than or eq
 required for crop growth, also called the base temperature, then the temperature stress for that day will be 1 and the
 crop will not accumulate any biomass.
    
-::: {#eq-sc-crp-48}
-[[**SC.CRP.48**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-49}
+[[**SC.CRP.49**]]{.aside .content-visible when-format="html"}        
 $$
 \text{temp\_stress} = 1; \qquad \text{if } \bar{\text{T}}_\text{ave} \leq \text{T}_\text{base}
 $$
@@ -4427,8 +4427,8 @@ $$
 If the base temperature is less than the average temperature and the average temperature is less than or equal to the
 optimal temperature, then temperature stress is calculated as:
    
-::: {#eq-sc-crp-49}
-[[**SC.CRP.49**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-50}
+[[**SC.CRP.50**]]{.aside .content-visible when-format="html"}        
 $$
 \text{temp\_stress} = 1 - e^{\left(\frac{-0.1054(\text{T}_\text{opt} - \bar{\text{T}}_\text{ave})^2}{(\bar{\text{T}}_\text{ave} - \text{T}_\text{base})^2}\right)}; \quad \text{if } \text{T}_\text{base} < \bar{\text{T}}_\text{ave} \leq \text{T}_\text{opt}
 $$
@@ -4441,8 +4441,8 @@ $$
 If the optimal temperature is less than the average temperature and the average temperature is less than or equal to
 two times the optimal temperature minus the base temperature, then temperature stress for a given day is calculated as:
    
-::: {#eq-sc-crp-50}
-[[**SC.CRP.50**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-51}
+[[**SC.CRP.51**]]{.aside .content-visible when-format="html"}        
 $$
 \text{temp\_stress} = 1 - e^{\left(\frac{-0.1054(\text{T}_\text{opt} - \bar{\text{T}}_\text{ave})^2}{(2 \times \text{T}_\text{opt} - \bar{\text{T}}_\text{ave} - \text{T}_\text{base})^2}\right)}; \quad \text{if } \text{T}_\text{opt} < \bar{\text{T}}_\text{ave} \leq 2 \times \text{T}_\text{opt} - \text{T}_\text{base}
 $$
@@ -4451,8 +4451,8 @@ $$
 If the average temperature is greater than two times the optimal temperature minus the base temperature, then
 temperature stress is set to 1 and results in no biomass accumulation,
    
-::: {#eq-sc-crp-51}
-[[**SC.CRP.51**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-52}
+[[**SC.CRP.52**]]{.aside .content-visible when-format="html"}        
 $$
 \text{temp\_stress} = 1; \qquad \text{if } \bar{\text{T}}_\text{ave} > 2 \times \text{T}_\text{opt} - \text{T}_\text{base}
 $$
@@ -4468,8 +4468,8 @@ the nutrient content of the plant is 50% or less of the optimal value.
 
 First a scaling factor is calculate that relates the current plant nutrient content to the optimal nutrient content:
    
-::: {#eq-sc-crp-52}
-[[**SC.CRP.52**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-53}
+[[**SC.CRP.53**]]{.aside .content-visible when-format="html"}        
 $$
 \text{scaling\_factor} = 200\left(\frac{\text{stored\_nutrient\_content}}{\text{optimal\_nutrient\_content}} - 0.5 \right); \qquad \text{if optimal\_nutrient\_content} \neq 0
 $$
@@ -4477,8 +4477,8 @@ $$
 
 The nutrient stress for a given day is then calculated as:
    
-::: {#eq-sc-crp-53}
-[[**SC.CRP.53**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-54}
+[[**SC.CRP.54**]]{.aside .content-visible when-format="html"}        
 $$
 \text{nutrient stress} = 
 \begin{cases}
@@ -4507,15 +4507,15 @@ unit fractions associated with different stages of development. The methods for 
 
 First, two unitless shape coefficients, `shape_1` and `shape_2`, are calculated by the method `determine_lai_shapes()`:
    
-::: {#eq-sc-crp-54}
-[[**SC.CRP.54**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-55}
+[[**SC.CRP.55**]]{.aside .content-visible when-format="html"}        
 $$
 \text{shape\_1} = ln\left(\frac{\text{fr}_\text{PHU,1}}{\text{fr}_\text{LAI,1}} - \text{fr}_\text{PHU,1} \right) + \text{shape\_2} \times \text{fr}_\text{PHU,1}
 $$
 ::: 
     
-::: {#eq-sc-crp-55}
-[[**SC.CRP.55**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-56}
+[[**SC.CRP.56**]]{.aside .content-visible when-format="html"}        
 $$
 \text{shape\_2} = \frac{ln\left(\frac{\text{fr}_\text{PHU,1}}{\text{fr}_\text{LAI,1}} - \text{fr}_\text{PHU,1} \right) - ln\left(\frac{\text{fr}_\text{PHU,2}}{\text{fr}_\text{LAI,2}} - \text{fr}_\text{PHU,2} \right)}{\text{fr}_\text{PHU,2} - \text{fr}_\text{PHU,1}}
 $$
@@ -4531,8 +4531,8 @@ $$
  
 Next, the optimal LAI fraction for a given day is calculated by the method `determine_optimal_leaf_area_fraction()` as:
    
-::: {#eq-sc-crp-56}
-[[**SC.CRP.56**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-57}
+[[**SC.CRP.57**]]{.aside .content-visible when-format="html"}        
 $$
 \text{fr}_\text{LAI,opt} = \frac{\text{fr}_\text{PHU}}{\text{fr}_\text{PHU} + e^{(\text{shape\_1} - \text{shape\_2} \times \text{fr}_\text{PHU})} }
 $$
@@ -4546,8 +4546,8 @@ units (PHU) the plant has accumulated on that day
 The optimal LAI fraction (fr_{LAI,opt}) is then used by the method `determine_canopy_height()` to set the canopy
 height for that day according to the following equation:
    
-::: {#eq-sc-crp-57}
-[[**SC.CRP.57**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-58}
+[[**SC.CRP.58**]]{.aside .content-visible when-format="html"}        
 $$
 \text{canopy\_height} = min(\text{canopy\_height}_\text{max}, \text{ canopy\_height}_\text{max} \times \sqrt{\text{fr}_\text{LAI,opt}})
 $$
@@ -4556,8 +4556,8 @@ $$
 The optimal increase in LAI for annuals and perennials that are not in senescence is calculated by the method
 `determine_max_leaf_area_change()` using the following equation:
    
-::: {#eq-sc-crp-58}
-[[**SC.CRP.58**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-59}
+[[**SC.CRP.59**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 \text{optimal\_leaf\_area\_index\_change} &= (\text{fr}_\text{LAI,opt,d} - \text{fr}_\text{LAI,opt,d-1}) \times \text{LAI}_\text{max} \\[8pt]
@@ -4575,8 +4575,8 @@ previous day respectively
 
 The actual LAI added is then calculated as: 
    
-::: {#eq-sc-crp-59}
-[[**SC.CRP.59**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-60}
+[[**SC.CRP.60**]]{.aside .content-visible when-format="html"}        
 $$
 \text{actual\_leaf\_area\_index\_change} = \text{optimal\_leaf\_area\_index\_change} \times \sqrt{\text{growth\_factor}})
 $$
@@ -4585,7 +4585,7 @@ $$
 *Where*: 
 
 * `actual_leaf_area_index_change` is the change in the LAI the given day and `growth_factor` is the plant’s growth
-factor (0.0 - 1.0) calculated in [SC.CRP.46](#ew-sc-crp-46)
+factor (0.0 - 1.0) calculated in [SC.CRP.47](#eq-sc-crp-47)
 
 The total LAI for the plant that day is then updated according to the following:
         
@@ -4595,8 +4595,8 @@ $$
     
 If the plant is in a stage of senescence, the LAI for annuals is calculated as:
    
-::: {#eq-sc-crp-60}
-[[**SC.CRP.60**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-61}
+[[**SC.CRP.61**]]{.aside .content-visible when-format="html"}        
 $$
 \text{leaf\_area\_index} = \text{LAI}_\text{max} \times \frac{1 - \text{fr}_\text{PHU}}{1 - \text{fr}_\text{PHU,sen}}
 $$
@@ -4618,8 +4618,8 @@ radiation into plant biomass are collected in the `BiomassAllocation` class.
 The amount of photosynthetically active radiation (MJ m$^{-2}$) that is intercepted by the leaf area is calculated
 by the method `intercept_radiation` using the following function:
 
-::: {#eq-sc-crp-61}
-[[**SC.CRP.61**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-62}
+[[**SC.CRP.62**]]{.aside .content-visible when-format="html"}        
 $$
 \text{intercepted\_radiation} = 0.5 \times \text{radiation} \times (1 - e^{(-\text{extinction\_coef} \times \text{LAI}_\text{act})})
 $$
@@ -4633,8 +4633,8 @@ $$
  
 Using this value, the maximum potential biomass increase for that day is calculated as:
    
-::: {#eq-sc-crp-62}
-[[**SC.CRP.62**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-63}
+[[**SC.CRP.63**]]{.aside .content-visible when-format="html"}        
 $$
 \text{biomass\_growth\_max} = \text{light\_use\_efficiency} \times \text{intercepted\_radiation}
 $$
@@ -4648,8 +4648,8 @@ $$
 
 The actual increase in biomass (kg/ha) on a given day is calculated as:
    
-::: {#eq-sc-crp-63}
-[[**SC.CRP.63**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-64}
+[[**SC.CRP.64**]]{.aside .content-visible when-format="html"}        
 $$
 \text{biomass\_growth} = \text{biomass\_growth\_max} \times \text{growth\_factor}
 $$
@@ -4657,7 +4657,7 @@ $$
 
 *Where*:
 
-* `growth_factor` = plant growth factor (0.0 - 1.0) calculated in [SC.CRP.46](eq-sc-crp-46)
+* `growth_factor` = plant growth factor (0.0 - 1.0) calculated in [SC.CRP.47](eq-sc-crp-47)
 
 
 **Biomass Allocation**
@@ -4666,8 +4666,8 @@ Once the total biomass growth for a given day has been calculated, the total acc
 into above and below ground biomass depending on the development stage of the crop. The aboveground biomass
 (kg hha$^{-1}$) is calculated as:
    
-::: {#eq-sc-crp-64}
-[[**SC.CRP.64**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-65}
+[[**SC.CRP.65**]]{.aside .content-visible when-format="html"}        
 $$
 \text{aboveground\_biomass\_growth} = (1 - \text{root\_fraction}) \times \text{biomass\_growth}
 $$
@@ -4675,11 +4675,11 @@ $$
 
 *Where*: 
 
-* `root_fraction` = fraction of total biomass in the roots calculated in [SC.CRP.25](#eq-crp-25)
+* `root_fraction` = fraction of total biomass in the roots calculated in [SC.CRP.26](#eq-crp-26)
 * `biomass_growth` = actual plant biomass added that day (kg hha$^{-1}$)
    
-::: {#eq-sc-crp-65}
-[[**SC.CRP.65**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-66}
+[[**SC.CRP.66**]]{.aside .content-visible when-format="html"}        
 $$
 \text{belowground\_biomass\_growth} = \text{root\_fraction} \times \text{biomass\_growth}
 $$
@@ -4706,8 +4706,8 @@ of the above ground dry biomass of plant that is removed as dry yield.
 
 The potential harvest index (HI_{max}) for the plant for a given day is calculated as:
    
-::: {#eq-sc-crp-66}
-[[**SC.CRP.66**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-67}
+[[**SC.CRP.67**]]{.aside .content-visible when-format="html"}        
 $$
 \text{potential\_harvest\_index} = \text{optimal\_harvest\_index} \times \frac{100 \times \text{fr}_\text{PHU}}{100 \times \text{fr}_\text{PHU} + e^{(11.1 - 10 \times \text{fr}_\text{PHU})}}
 $$
@@ -4720,8 +4720,8 @@ $$
 
 The actual harvest index is then adjusted for water deficiency: 
    
-::: {#eq-sc-crp-67}
-[[**SC.CRP.67**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-68}
+[[**SC.CRP.68**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 \text{actual\_harvest\_index} &= (\text{potential\_harvest\_index} - \text{minimum\_harvest\_index} \\[8pt]
@@ -4740,8 +4740,8 @@ index allowed for the plant
 As the water deficiency factor increases, the actual harvest index will decrease. The water deficiency factor is
 calculated in the `WaterDynamics` class during the `cycle_water()` method:
    
-::: {#eq-sc-crp-68}
-[[**SC.CRP.68**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-69}
+[[**SC.CRP.69**]]{.aside .content-visible when-format="html"}        
 $$
 \text{water\_deficiency} = \frac{\sum_\text{p}^\text{m} \text{actual\_evapotranspiration}}{\sum_\text{p}^\text{m} \text{potential\_evapotranspiration}}
 $$
@@ -4769,8 +4769,8 @@ operations without a harvest, as in the case of cover cropping systems, are cond
 
 If the harvest index is less than one, the cut biomass (kg ha$^{-1}$) is calculated as:
    
-::: {#eq-sc-crp-69}
-[[**SC.CRP.69**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-70}
+[[**SC.CRP.70**]]{.aside .content-visible when-format="html"}        
 $$
 \text{cut\_biomass} = text{aboveground\_biomass} \times \text{actual\_harvest\_index}
 $$
@@ -4780,8 +4780,8 @@ The actual harvested yield (kg DM ha$^{-1}$) and cut crop residue (kg DM ha$^{-1
 calculated using the harvest efficiency which is defined as the fraction of cut biomass removed by the harvesting
 equipment.
    
-::: {#eq-sc-crp-70}
-[[**SC.CRP.70**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-71}
+[[**SC.CRP.71**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 & \text{dry\_yield\_collected} = \text{cut\_biomass} \times \text{harvest\_efficiency} \\[8pt]
@@ -4806,8 +4806,8 @@ $$
 
 If roots are harvested:
    
-::: {#eq-sc-crp-71}
-[[**SC.CRP.71**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-72}
+[[**SC.CRP.72**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 & \text{root\_biomass\_removed} = \text{cut\_biomass} - \text{aboveground\_biomass}_\text{previous} \\[8pt]
@@ -4825,8 +4825,8 @@ crop-specific yield nutrient fractions. Otherwise, (harvest index override), the
 The amount of nitrogen and phosphorus removed with the collected biomass, or the nitrogen and phosphorus yields
 (kg N or P ha$^{-1}$) are calculated as:
    
-::: {#eq-sc-crp-72}
-[[**SC.CRP.72**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-73}
+[[**SC.CRP.73**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 & \text{nitrogen\_yield} = \text{nitrogen\_fraction} \times \text{dry\_yield\_collected} \\[8pt]
@@ -4845,22 +4845,22 @@ for perennial crops that will continue growing either the following day or after
 
 The plant’s leaf area index and accumulated heat units are set back by the fraction of biomass removed in yield.
    
-::: {#eq-sc-crp-73}
-[[**SC.CRP.73**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-74}
+[[**SC.CRP.74**]]{.aside .content-visible when-format="html"}        
 $$
 \text{fraction\_cut} = \frac{\text{cut\_biomass}}{\text{aboveground\_biomass}}
 $$
 ::: 
 
-::: {#eq-sc-crp-74}
-[[**SC.CRP.74**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-75}
+[[**SC.CRP.75**]]{.aside .content-visible when-format="html"}        
 $$
 \text{leaf\_area\_index}_\text{update} = \text{leaf\_area\_index}_\text{previous} \times (1 - \text{fraction\_cut})
 $$
 :::             
 
-::: {#eq-sc-crp-75}
-[[**SC.CRP.75**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-76}
+[[**SC.CRP.76**]]{.aside .content-visible when-format="html"}        
 $$
 \text{accumulated\_heat\_unit}_\text{update} = \text{accumulated\_heat\_unit}_\text{previous} \times (1 - \text{fraction\_cut})
 $$
@@ -4876,8 +4876,8 @@ are added to the residue pools (kg DM, N or P ha$^{-1}$). So after the `cut_crop
 the residue produced by the harvest practice, the `kill()` method, updates the status of the crop plant to indicate
 that it is no longer living and adds the remaining plant biomass and nutrients to the yield residue pools.
    
-::: {#eq-sc-crp-76}
-[[**SC.CRP.76**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-77}
+[[**SC.CRP.77**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 & \text{yield\_residue}_\text{update} = \text{yield\_residue}_\text{previous} + \text{biomass} \\[8pt]
@@ -4896,8 +4896,8 @@ residue to the soil residue pools. The latter is accomplished by the `transfer_r
 If the crop is not killed and there is only surface residue and the soil pools in the surface layer are updated as
 follows:
    
-::: {#eq-sc-crp-77 style="font-size:90%"}
-[[**SC.CRP.77**]]{.aside .content-visible when-format="html"}        
+::: {#eq-sc-crp-78 style="font-size:90%"}
+[[**SC.CRP.78**]]{.aside .content-visible when-format="html"}        
 $$
 \begin{aligned}
 & \text{soil\_plant\_residue} = \text{yield\_residue} \\[8pt]
@@ -4917,7 +4917,7 @@ $$
 $$   
 
 The surface residue, nitrogen residue, and phosphorus residues are then calculated by multiplying the total residue
-masses by the surface residue fractions and that mass is added to the soil pools as described above in [SC.CRP.77](#eq-sc-crp-77).
+masses by the surface residue fractions and that mass is added to the soil pools as described above in [SC.CRP.78](#eq-sc-crp-78).
 
 Then the residue masses added to the subsurface soil layers calculated as the masses multiplied by
 (1-`surface_residue_fraction`). The subsurface residue masses are distributed to different soil layers by calculating
@@ -4931,7 +4931,7 @@ Heuristically, the method is executed as follows:
 Starting with the top layer:
 
 * Estimate the proportion of the root biomass distributed to the depth that is equal to the bottom of the soil layer
-using Equation 2 in @fan2016root reproduced in [SC.CRP.78](#eq-sc-crp-78) below.
+using Equation 2 in @fan2016root reproduced in [SC.CRP.79](#eq-sc-crp-79) below.
 * Multiply the proportion of the root biomass distributed up to the depth of the current soil layer from step 1 by
 remaining yield residue masses (total mass, nitrogen mass, and phosphorus mass).
 * Subtract the sum of the yield residue mass for all layers above the current layer from the total yield residue mass
@@ -4942,8 +4942,8 @@ sub-surface layer, this sum will be zero).
 The equation from @fan2016root that determines the fraction of the root biomass up to a given depth is described below
 and broken up into 3 parts for clarity:
 
-::: {#eq-sc-crp-78}
-[[**SC.CRP.78**]]{.aside .content-visible when-format="html"}       
+::: {#eq-sc-crp-79}
+[[**SC.CRP.79**]]{.aside .content-visible when-format="html"}       
 $$
 \begin{aligned}
 & \text{root\_biomass\_layer\_fraction} = \text{first\_term} + (\text{second\_term} \times \text{third\_term}) \\[8pt]
