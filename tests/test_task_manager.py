@@ -570,9 +570,11 @@ def test_handle_end_to_end_testing(
         "convert_variable_table_path": "compare_path",
         "output_prefix": "dummy_prefix",
         "filters_directory": Path("filters"),
+        "use_accepted_ranges": True,
     }
     validate_configuration = mocker.patch(
-        "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.validate_comparison_configuration", return_value={"A.x"}
+        "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.validate_comparison_configuration",
+        return_value=({"A.x"}, {"A.y": {"min": 0, "max": 1}}),
     )
     compare_outputs = mocker.patch(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results"
@@ -586,7 +588,10 @@ def test_handle_end_to_end_testing(
     task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     validate_configuration.assert_called_once_with(
-        args["output_prefix"], args["convert_variable_table_path"], args["filters_directory"]
+        args["output_prefix"],
+        args["convert_variable_table_path"],
+        args["filters_directory"],
+        args["use_accepted_ranges"],
     )
     assert [name for name, _, _ in call_order.mock_calls] == ["validate_configuration", "sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
@@ -598,7 +603,11 @@ def test_handle_end_to_end_testing(
         should_flush_im_pool=True,
     )
     compare_outputs.assert_called_once_with(
-        args["json_output_directory"], args["convert_variable_table_path"], args["output_prefix"], {"A.x"}
+        args["json_output_directory"],
+        args["convert_variable_table_path"],
+        args["output_prefix"],
+        {"A.x"},
+        {"A.y": {"min": 0, "max": 1}},
     )
     assert add_log.call_count == 2
     assert post_processing.call_count == 1
@@ -622,6 +631,7 @@ def test_handle_end_to_end_testing_invalid_configuration(
         "convert_variable_table_path": None,
         "output_prefix": "dummy_prefix",
         "filters_directory": Path("filters"),
+        "use_accepted_ranges": True,
     }
 
     with pytest.raises(ValueError, match="invalid configuration"):
