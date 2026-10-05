@@ -112,26 +112,29 @@ def test_determine_total_soil_carbon_amount(
 
 
 @pytest.mark.parametrize(
-    "plant_metabolic_active_carbon_loss, plant_structural_active_carbon_loss, " "plant_structural_slow_carbon_loss",
+    "residue_metabolic_active_carbon_loss, residue_structural_active_carbon_loss, "
+    "residue_structural_slow_carbon_loss",
     [
         (1, 2, 3),  # lower value
         (0.5, 0.3, 0.16),  # arbitrary values
         (40, 55, 79),  # higher value
     ],
 )
-def test_determine_total_plant_carbon_CO2_loss(
-    plant_metabolic_active_carbon_loss: float,
-    plant_structural_active_carbon_loss: float,
-    plant_structural_slow_carbon_loss: float,
+def test_determine_total_residue_carbon_CO2_loss(
+    residue_metabolic_active_carbon_loss: float,
+    residue_structural_active_carbon_loss: float,
+    residue_structural_slow_carbon_loss: float,
 ) -> None:
-    """Checks that the total amount of plant carbon lost as CO2 was calculated correctly"""
+    """Checks that the total amount of residue carbon lost as CO2 was calculated correctly"""
     expected = (
-        plant_metabolic_active_carbon_loss + plant_structural_active_carbon_loss + plant_structural_slow_carbon_loss
+        residue_metabolic_active_carbon_loss
+        + residue_structural_active_carbon_loss
+        + residue_structural_slow_carbon_loss
     )
-    assert expected == CarbonCycling._determine_total_plant_carbon_CO2_loss(
-        plant_metabolic_active_carbon_loss,
-        plant_structural_active_carbon_loss,
-        plant_structural_slow_carbon_loss,
+    assert expected == CarbonCycling._determine_total_residue_carbon_CO2_loss(
+        residue_metabolic_active_carbon_loss,
+        residue_structural_active_carbon_loss,
+        residue_structural_slow_carbon_loss,
     )
 
 
@@ -180,7 +183,7 @@ def test_determine_total_decomposition_carbon_CO2_lost(
 
 
 @pytest.mark.parametrize(
-    "total_plant_carbon_CO2_loss, total_soil_carbon_CO2_loss, " "total_decomposition_carbon_CO2_lost",
+    "total_residue_carbon_CO2_loss, total_soil_carbon_CO2_loss, " "total_decomposition_carbon_CO2_lost",
     [
         (1, 2, 3),  # lower value
         (0.5, 0.3, 0.16),  # arbitrary values
@@ -188,14 +191,14 @@ def test_determine_total_decomposition_carbon_CO2_lost(
     ],
 )
 def test_determine_total_carbon_CO2_lost(
-    total_plant_carbon_CO2_loss: float,
+    total_residue_carbon_CO2_loss: float,
     total_soil_carbon_CO2_loss: float,
     total_decomposition_carbon_CO2_lost: float,
 ) -> None:
     """Checks that the total amount of carbon lost as CO2 was calculated correctly"""
-    expected = total_decomposition_carbon_CO2_lost + total_plant_carbon_CO2_loss + total_soil_carbon_CO2_loss
+    expected = total_decomposition_carbon_CO2_lost + total_residue_carbon_CO2_loss + total_soil_carbon_CO2_loss
     assert expected == CarbonCycling._determine_total_carbon_CO2_lost(
-        total_plant_carbon_CO2_loss,
+        total_residue_carbon_CO2_loss,
         total_soil_carbon_CO2_loss,
         total_decomposition_carbon_CO2_lost,
     )
@@ -301,7 +304,7 @@ def test_soil_carbon_aggregation(layers) -> None:
     CarbonCycling._determine_soil_passive_carbon_fraction = MagicMock(return_value=5)
     CarbonCycling._determine_soil_overall_carbon_fraction = MagicMock(return_value=6)
     CarbonCycling._determine_total_soil_carbon_amount = MagicMock(return_value=7)
-    CarbonCycling._determine_total_plant_carbon_CO2_loss = MagicMock(return_value=8)
+    CarbonCycling._determine_total_residue_carbon_CO2_loss = MagicMock(return_value=8)
     CarbonCycling._determine_total_soil_carbon_CO2_loss = MagicMock(return_value=9)
     CarbonCycling._determine_total_decomposition_carbon_CO2_lost = MagicMock(return_value=10)
     CarbonCycling._determine_total_carbon_CO2_lost = MagicMock(return_value=11)
@@ -315,7 +318,7 @@ def test_soil_carbon_aggregation(layers) -> None:
     assert CarbonCycling._determine_soil_passive_carbon_fraction.call_count == len(layers)
     assert CarbonCycling._determine_soil_overall_carbon_fraction.call_count == len(layers)
     assert CarbonCycling._determine_total_soil_carbon_amount.call_count == len(layers)
-    assert CarbonCycling._determine_total_plant_carbon_CO2_loss.call_count == len(layers)
+    assert CarbonCycling._determine_total_residue_carbon_CO2_loss.call_count == len(layers)
     assert CarbonCycling._determine_total_soil_carbon_CO2_loss.call_count == len(layers)
     assert CarbonCycling._determine_total_decomposition_carbon_CO2_lost.call_count == len(layers)
     assert CarbonCycling._determine_total_carbon_CO2_lost.call_count == len(layers)
