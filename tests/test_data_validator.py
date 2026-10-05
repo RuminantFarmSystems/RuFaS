@@ -985,6 +985,25 @@ def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expe
 
 
 @pytest.mark.parametrize(
+    "value, expected",
+    [
+        (7, True),
+        (0, True),
+        (-2.5, True),
+        (True, False),
+        (False, False),
+        (None, False),
+        ("7", False),
+        ([7], False),
+        ({"value": 7}, False),
+    ],
+)
+def test_is_number(value: Any, expected: bool) -> None:
+    """Tests that DataValidator.is_number accepts integers and floats, and rejects booleans and other types."""
+    assert DataValidator.is_number(value) is expected
+
+
+@pytest.mark.parametrize(
     "variable_path, variable_properties, input_data, eager_termination, properties_blob_key,"
     "expected_result, patch_extract_return, patch_validate_return",
     [
