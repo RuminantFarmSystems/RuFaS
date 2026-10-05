@@ -53,6 +53,50 @@ class PreprocessingContext:
             return set(metadata.keys())
         return set()
 
+    def can_validate_input_keys(self) -> bool:
+        """Report whether input-key availability can be checked at all.
+
+        Returns
+        -------
+        bool
+            ``True`` when either the cached file-metadata keys are populated or
+            the InputManager exposes a pool-membership check, ``False`` when
+            neither source is available and callers should fall back to their
+            optimistic default.
+        """
+        if self.available_input_keys:
+            return True
+        return callable(getattr(self.im, "check_property_exists_in_pool", None))
+
+    def input_key_available(self, key: str) -> bool:
+        """Report whether ``key`` resolves to loaded input data.
+
+        The cached file-metadata keys are checked first, then the InputManager
+        pool. Commodity price series are loaded as runtime metadata and live in
+        the pool only, so they are absent from
+        :attr:`available_input_keys` and must be confirmed against the pool.
+
+        Parameters
+        ----------
+        key : str
+            InputManager data key to look up.
+
+        Returns
+        -------
+        bool
+            ``True`` when the key is found in the file-metadata keys or the
+            InputManager pool, ``False`` otherwise.
+        """
+        if key in self.available_input_keys:
+            return True
+        check = getattr(self.im, "check_property_exists_in_pool", None)
+        if not callable(check):
+            return False
+        try:
+            return bool(check(key))
+        except Exception:
+            return False
+
     def normalize_economics_key(self, path: str) -> str:
         """Map mapping file paths to InputManager data keys."""
 

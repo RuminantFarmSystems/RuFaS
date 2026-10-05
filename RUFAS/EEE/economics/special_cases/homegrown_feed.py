@@ -14,7 +14,6 @@ and the generic pipeline produces the usual fallback entry.
 
 from __future__ import annotations
 
-import json
 import re
 from typing import TYPE_CHECKING, Any
 
@@ -64,21 +63,28 @@ class HomegrownFeedHandler(SpecialCaseHandler):
         points to the closest available proxy commodity, as agreed with the
         economics SMEs. Returns ``None`` when neither a direct match nor a valid
         alias resolves to an available InputManager key.
+
+        Availability is checked with
+        :meth:`~RUFAS.EEE.economics.preprocessing_context.PreprocessingContext.input_key_available`,
+        which also consults the InputManager pool. Commodity price series are
+        loaded as runtime metadata and so are absent from the file-metadata keys
+        in ``available_input_keys``; checking the pool is what lets real price
+        series resolve instead of collapsing to the generic price fallback.
         """
         direct_key = f"commodity_prices_{crop_name}_dollar_per_kilogram"
 
-        # Without metadata we cannot validate keys; preserve the direct key so
-        # downstream lookups behave as before.
-        if not self.context.available_input_keys:
+        # Without any way to verify keys we cannot validate; preserve the direct
+        # key so downstream lookups behave as before.
+        if not self.context.can_validate_input_keys():
             return direct_key
 
-        if direct_key in self.context.available_input_keys:
+        if self.context.input_key_available(direct_key):
             return direct_key
 
         alias = HOMEGROWN_FEED_PRICE_ALIASES.get(crop_name)
         if alias is not None:
             alias_key = f"commodity_prices_{alias}_dollar_per_kilogram"
-            if alias_key in self.context.available_input_keys:
+            if self.context.input_key_available(alias_key):
                 return alias_key
 
         return None
@@ -126,9 +132,9 @@ class HomegrownFeedHandler(SpecialCaseHandler):
         return feed_id_map
 
     def _compute_line_items_by_wildcard(
-            self,
-            item: EconomicItem,
-            wildcard_values: list[tuple],
+        self,
+        item: EconomicItem,
+        wildcard_values: list[tuple],
     ) -> dict[str, float]:
         """Compute per-wildcard-match line items using the feed config price map.
 

@@ -561,10 +561,7 @@ def test_resolve_price_file_key_uses_alias(monkeypatch: pytest.MonkeyPatch) -> N
     # cereal_rye_silage has no dedicated series; it should alias to barley_silage.
     preprocessor.context.available_input_keys = {"commodity_prices_barley_silage_dollar_per_kilogram"}
 
-    assert (
-        handler._resolve_price_file_key("cereal_rye_silage")
-        == "commodity_prices_barley_silage_dollar_per_kilogram"
-    )
+    assert handler._resolve_price_file_key("cereal_rye_silage") == "commodity_prices_barley_silage_dollar_per_kilogram"
 
 
 def test_resolve_price_file_key_returns_none_when_unmapped(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -581,9 +578,28 @@ def test_resolve_price_file_key_without_metadata_returns_direct(monkeypatch: pyt
     preprocessor.context.available_input_keys = set()
 
     assert (
-        handler._resolve_price_file_key("cereal_rye_silage")
-        == "commodity_prices_cereal_rye_silage_dollar_per_kilogram"
+        handler._resolve_price_file_key("cereal_rye_silage") == "commodity_prices_cereal_rye_silage_dollar_per_kilogram"
     )
+
+
+def test_resolve_price_file_key_checks_pool_when_absent_from_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Commodity series loaded as runtime metadata resolve via the pool.
+
+    They are absent from the file-metadata keys in ``available_input_keys``, so
+    without the pool check the resolver would collapse to ``None`` and prices
+    would fall back to the generic $1/$2 defaults.
+    """
+    preprocessor, dummy_im, _ = _make_preprocessor(monkeypatch)
+    handler = _homegrown_handler(preprocessor)
+    # Metadata keys never contain commodity price series at runtime.
+    preprocessor.context.available_input_keys = {"config", "animal"}
+    pool_keys = {"commodity_prices_corn_silage_dollar_per_kilogram"}
+    dummy_im.check_property_exists_in_pool = lambda key: key in pool_keys
+
+    assert handler._resolve_price_file_key("corn_silage") == "commodity_prices_corn_silage_dollar_per_kilogram"
+    assert handler._resolve_price_file_key("absent_feed") is None
 
 
 def test_homegrown_feed_price_aliases_resolve_to_available_series(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -591,8 +607,7 @@ def test_homegrown_feed_price_aliases_resolve_to_available_series(monkeypatch: p
     preprocessor, _, _ = _make_preprocessor(monkeypatch)
     handler = _homegrown_handler(preprocessor)
     available_targets = {
-        f"commodity_prices_{target}_dollar_per_kilogram"
-        for target in HOMEGROWN_FEED_PRICE_ALIASES.values()
+        f"commodity_prices_{target}_dollar_per_kilogram" for target in HOMEGROWN_FEED_PRICE_ALIASES.values()
     }
     preprocessor.context.available_input_keys = available_targets
 
