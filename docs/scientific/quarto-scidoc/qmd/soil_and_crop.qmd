@@ -3437,17 +3437,7 @@ $$
 * C = soil carbon (kg ha$^{-1}$)
 * C{mg} = soil carbon (mg ha$^{-1}$)
 * C{g} = soil carbon (g ha$^{-1}$)
-        
-::: {#eq-sc-car-47}
-[[**SC.CAR.47**]]{.aside .content-visible when-format="html"}        
-$$
-\begin{aligned}
-& \text{AG}_\text{CO2 loss} = \text{AG}_\text{met}:\text{C}_\text{active loss} + \text{AG}_\text{struct}:\text{C}_\text{active loss} + \text{AG}_\text{struct}:\text{C}_\text{slow loss} \\[8pt]
-& \text{BG}_\text{CO2 loss} = \text{BG}_\text{met}:\text{C}_\text{active loss} + \text{BG}_\text{struct}:\text{C}_\text{active loss} + \text{BG}_\text{struct}:\text{C}_\text{slow loss}
-\end{aligned}
-$$
-:::        
-
+         
 *Where*:
             
 * AG{CO<sub>2</sub> loss} = above ground C lost as CO<sub>2</sub> (kg ha$^{-1}$)
