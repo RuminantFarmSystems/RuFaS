@@ -1,0 +1,5 @@
+Variable,Description,Units
+tillage_record.field=[FIELD_NAME].tillage_depth,the lowest depth the tilling implement reaches,mm
+tillage_record.field=[FIELD_NAME].incorporation_fraction,fraction of soil surface pool incorporated into the soil profile,
+tillage_record.field=[FIELD_NAME].mixing_fraction,Fraction of pool in each layer mixed and redistributed back into the soil profile,
+tillage_record.field=[FIELD_NAME].implement,The tillage implement used to execute this application.,

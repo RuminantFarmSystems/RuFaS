@@ -157,6 +157,29 @@ import_table(
 
 <!-- TODO -->
 
+```{python}
+#| label: tbl-sc-field-tillage-outputs
+#| tbl-cap: Tillage-associated outputs. Here, [FIELD_NAME] indicates the name of the field.
+import_table(
+  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-field-tillage-outputs.csv",
+)
+```
+
+```{python}
+#| label: tbl-sc-field-amendments-outputs
+#| tbl-cap: Soil amendment-associated outputs. Here, [FIELD_NAME] indicates the name of the field.
+import_table(
+  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-field-amendments-outputs.csv",
+)
+```
+
+```{python}
+#| label: tbl-sc-field-general-outputs
+#| tbl-cap: Other miscellaneous field management-associated outputs. Here, [FIELD_NAME] indicates the name of the field.
+import_table(
+  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-field-general-outputs.csv",
+)
+```
 
 ### Methodology
 
