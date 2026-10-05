@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import re
 from enum import Enum
-from typing import Any, Callable, Sequence, cast
+from typing import Any, Callable, Sequence, TypeGuard, cast
 
 from RUFAS.util import Aggregator
 
@@ -2108,6 +2108,23 @@ class DataValidator:
 
         return data
 
+    @staticmethod
+    def is_number(value: Any) -> TypeGuard[int | float]:
+        """
+        Checks whether a value is a number.
+
+        Parameters
+        ----------
+        value : Any
+            The value to check.
+
+        Returns
+        -------
+        bool
+            ``True`` for integers and floats, ``False`` for booleans and every other type.
+        """
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+
 
 class CrossValidator:
     """
@@ -2181,7 +2198,9 @@ class CrossValidator:
         is_cross_validation_successful = True
         validation_rules = cross_validation_block.get("rules", [])
         for rule in validation_rules:
-            is_cross_validation_successful = self._evaluate_condition(rule, eager_termination)
+            is_cross_validation_successful = self._evaluate_condition(rule, eager_termination) and (
+                is_cross_validation_successful
+            )
             if not is_cross_validation_successful and eager_termination:
                 break
         return is_cross_validation_successful
@@ -3143,7 +3162,7 @@ class CrossValidator:
             "integer": lambda v: isinstance(v, int) and not isinstance(v, bool),
             "float": lambda v: isinstance(v, float),
             "boolean": lambda v: isinstance(v, bool),
-            "number": lambda v: (isinstance(v, (int, float)) and not isinstance(v, bool)),
+            "number": DataValidator.is_number,
         }
         checker = checkers.get(data_type)
         if checker is None:

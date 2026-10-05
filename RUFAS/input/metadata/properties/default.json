@@ -17,7 +17,7 @@
       "type": "string",
       "description": "The type of daily simulation to run. Will determine daily simulation function in SimulationEngine.",
       "default": "full_farm",
-      "pattern": "^(full_farm|field_and_feed|field_only|animals_only|manure_only)$"
+      "pattern": "^(full_farm|field_and_feed|field_only|animals_only|manure_only|feed_only)$"
     },
     "nutrient_standard": {
       "type": "string",
@@ -4421,6 +4421,19 @@
           "type": "string",
           "description": "Animal combination for this ration."
         },
+        "intake_option": {
+          "type": "string",
+          "description": "Dry matter intake control mode used for this animal combination's ration. predict_DMI utilizes NASEM (2021) or NRC (2001) DMI prediction equations, set_DMI fixes intake at intake_value (kg/animal/day), and set_DMI_per_X multiplies intake_value by the pen's average milk yield (lac_cow) or average daily gain (growing).",
+          "pattern": "^(predict_DMI|set_DMI|set_DMI_per_X)$",
+          "default": "predict_DMI"
+        },
+        "intake_value": {
+          "type": "number",
+          "description": "Dry matter intake value used for the ration of this animal combination. Units are kg/animal/day for set_DMI, and kg dry matter intake per kg milk yield (lac_cow) or per kg average daily gain (growing) for set_DMI_per_X. Ignored when intake_option is predict_DMI.",
+          "minimum": 0,
+          "nullable": true,
+          "default": null
+        },
         "feeds": {
           "type": "array",
           "description": "Feeds available to the specified animal group.",
@@ -5703,7 +5716,7 @@
         "composting_type": {
           "type": "string",
           "description": "Composting method, applicable only to the composting storage type.",
-          "pattern": "^(intensive windrow|passive windrow|static pile)$",
+          "pattern": "^(intensive windrow|passive windrow|static pile|in vessel)$",
           "nullable": true
         },
         "is_mixed": {
@@ -6368,6 +6381,11 @@
             "type": "string",
             "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
             "default": ""
+          },
+          "accepted_ranges_path": {
+            "type": "string",
+            "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6396,6 +6414,11 @@
           "must_change_variables_path": {
             "type": "string",
             "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
+          },
+          "accepted_ranges_path": {
+            "type": "string",
+            "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
             "default": ""
           }
         }
@@ -6426,6 +6449,11 @@
             "type": "string",
             "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
             "default": ""
+          },
+          "accepted_ranges_path": {
+            "type": "string",
+            "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
+            "default": ""
           }
         }
       },
@@ -6454,6 +6482,11 @@
           "must_change_variables_path": {
             "type": "string",
             "description": "Path to the file listing the variables that are expected to differ from the recorded expected results for this input set. Each listed variable must differ from its expected value beyond the domain tolerance for the end-to-end test to pass.",
+            "default": ""
+          },
+          "accepted_ranges_path": {
+            "type": "string",
+            "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
             "default": ""
           }
         }
@@ -7039,6 +7072,87 @@
           "type": "number",
           "description": "Achievable emission of methane from the manure in the stream (m^3 methane / kg volatile solids). The 2024 USDA method for entity scale inventory suggests 0.24 for manure from lactating, dry, and close up animals and 0.17 for manure from calves and heifers.",
           "minimum": 0.0
+        }
+      }
+    }
+  },
+  "initial_feed_storage_inventory_properties": {
+    "data_collection_app_compatible": false,
+    "initial_inventory": {
+      "type": "array",
+      "description": "The inventory that feed storages hold when the simulation starts. Storages that are not named start empty. Stated directly because a simulation without the crop and soil module has no harvests to derive inventory from.",
+      "minimum_length": 0,
+      "properties": {
+        "type": "object",
+        "description": "The dry matter mass and composition of the crop one storage holds when the simulation starts.",
+        "storage_name": {
+          "type": "string",
+          "description": "Name of the feed storage instance that holds this inventory. Must match a name from the feed storage configurations."
+        },
+        "dry_matter_mass": {
+          "type": "number",
+          "description": "Mass of dry matter initially held in the storage (kg).",
+          "minimum": 0.0
+        },
+        "dry_matter_percentage": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is not water.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "dry_matter_digestibility": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is digestible.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "crude_protein_percent": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is dietary crude protein.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "non_protein_nitrogen": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is non-protein nitrogen.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "starch": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is starch.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "adf": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is acid detergent fiber.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "ndf": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is neutral detergent fiber.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "lignin": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is lignin.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "sugar": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is labile carbohydrate.",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "ash": {
+          "type": "number",
+          "description": "Percent of the initially held mass that is ash.",
+          "minimum": 0.0,
+          "maximum": 100.0
         }
       }
     }
