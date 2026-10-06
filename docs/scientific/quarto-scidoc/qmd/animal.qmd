@@ -61,7 +61,6 @@ Every simulation begins with a herd consisting of calves, heifers, and dry and l
 
 For the rest of the simulation, animals enter the herd through birth as newborn calves or purchased replacements (`heiferIII`’s). 
 
-
 ```{python}
 #| label: tbl-an-sim-outline
 #| tbl-cap: Overview of the distinct phases by which animals are created and introduced to the herd.
@@ -99,7 +98,6 @@ Output variables:
 parity and lactation status, average age of animals within each class, distribution of age of animals within each 
 class, average body weight of animals within each class, average cow days in milk, days in preg, parity, and calving 
 interval. 
-
 
 #### Methodology
 
@@ -179,7 +177,6 @@ four AnimalCombinations: `CALF`, `GROWING`, `CLOSE_UP`, and `LAC_COW`.
 
 * *Option 2:* In some cases, and especially in very small farms, a user might wish to represent a scenario where all growing animals, pregnant heifers, and non-lactating cows are housed together. In this case, there is an option to have a pen that houses both `GROWING` and `CLOSE_UP` animals such that the there is at least one pen with each of the three  AnimalCombination  inputs: `CALF`, `GROWING_AND_CLOSE_UP`, and `LAC_COW`. 
 
-
 **Pen Sizing**
 
 Due to oscillations in the exact number of animals in each animal type, it is strongly recommended that the stocking density is at least 120\% of the expected number of animals in each pen. 
@@ -196,7 +193,6 @@ Pens are initiated from the Pen class by the `HerdManager` at the beginning of t
 `_add_new_animals`: This function is called by `Pen.update_animals` which is in turn called by `HerdManager._add_animal_to_pen_and_id_map`. Thus, when `HerdManager` initiates addition of animals to each pen, this function executes the addition of those animals. 
 
 `set_animal_nutritional_requirements`
-
 :::
 
 ### Ration Formulation
@@ -224,7 +220,6 @@ ingredient listed, but the % dry matter intake in the user defined ration percen
 kg/DM. RuFaS will then use all the ingredients available (based on costs and inventory available if the feed is homegrown) to create a ration that 
 meets the nutritional requirements of the animal class and is cost-optimized. 
 
-
 ::: {.callout-note}
 For the time being, only one set of feeds and ration formula can be provided for each animal class. 
 :::
@@ -242,9 +237,7 @@ Calculations are included for the following requirement categories:
 
 Where appropriate, requirement calculations are differentiated by animal age and reproductive status.
 
-
 #### Nutrient Requirements of Dairy Cattle: NRC
-
 
 ##### Energy Requirements
 For details about the variables included in each calculation, please refer to @tbl-an-energy-nrc for a full list.
@@ -260,7 +253,6 @@ $$
 \text{CBW} = \text{MW} \times 0.06275
 $$
 :::
-
 
 :::{#eq-an-nrc-2}
 [[**AN.NRC.2**]]{.aside .content-visible when-format="html"}
@@ -286,7 +278,6 @@ $$
 \text{CBW} = \text{MW} \times 0.06275
 $$
 :::
-
 
 :::{}
 [See [AN.NRC.2](#eq-an-nrc-2)]{.aside .content-visible when-format="html"}
@@ -644,7 +635,6 @@ $$
 \end{cases}
 $$
 :::
-
 
 *Phosphorus Equations*
 
@@ -1893,7 +1883,6 @@ In cases of ration formulation failure, a summary of the constraints that failed
 * Class and function: `RationOptimizer.handle_failed_constraints`
 * Output variable: `failed_constraint_summary_for_pen_pen_id`
 
-
 ##### Methodology
 
 Ration formulation is carried out at the pen level on a user-defined formulation interval (@tbl-an-auto-ration-an-input). The mean requirements for a given pen are 
@@ -1929,7 +1918,6 @@ import_table(
   colalign = ["left", "left", "center", "center", "center"]
 )
 ```
-
 
 #### User-Defined Ration Formulation
 
@@ -1971,7 +1959,6 @@ The ration formulation will proceed as described in the Automated Methodology ab
 * Record failed constraints and formulation attempt to OutputManager.
 * Recording of which constraints were unable to be met.
 * The simulation proceeds by using the user-defined ration percentages exactly.
-
 
 ### Herd Size Management  
 
@@ -2028,7 +2015,6 @@ If the heifer does not have a successful conception or pregnancy and age (days b
 * `Animal._evaluate_heiferII_for_culling()`
    * Called by `Animal.daily_routines()` → `Animal.animal_life_stage_update()`
    * This method determines whether a heifer should be culled based on its pregnancy status and age, returning *True* if the heifer is not pregnant and has surpassed the specified culling age.
-
 
 #### Calf Sales
 
@@ -2278,7 +2264,6 @@ The gestation length for cows is estimated with the same methods that are used f
 is set either as the average herd calving interval or the animal’s own calving interval which is calculated as the age 
 at her second calving minus her age at first calving as part of the `daily_reproduction_update` in `animal.py`.
 
-
 ##### Conceptus Growth
 
 Conceptus growth is estimated the same way for both heifers and cows using a non-linear model for animals that are 
@@ -2366,9 +2351,6 @@ $$
 \text{bodyweight\_tissue\_change} = \frac{\text{tissue changed}}{\text{gestation length} - \text{DIPdry}}
 $$
 :::
-
-
-
 
 ### Animal Reproduction
 
@@ -3134,7 +3116,6 @@ Probability of disease sales associated with each lactation (1, 2, 3, 4+) is spe
    * `Probability` - Conditional probability that a sold animal is removed due to each group of issues. This probability is used to determine the reason for sale after it has been decided that the animal will be sold during the current lactation. The sum of probabilities for the six culling reasons equals 1. See @tbl-an-cull-reason below for default values used to construct the empirical CDF.
   * `Cull_day_prob`: Values to construct the CDF to determine future sale day, given that disease-related sale is going to occur. Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days”; default values in @tbl-an-cull-cdf) 
 
-
 **Parameters and Equations**
 
 ```{python}
@@ -3295,7 +3276,6 @@ import_table(
   colalign = ["left", "left", "center"]
 )
 ```
-
 
 ### Methodology
 
@@ -3988,7 +3968,6 @@ $$
 \text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentration} \times \text{dry\_matter\_intake}}{0.05565} 
 $$
 :::
-
 
 ## Methane Mitigation
 
