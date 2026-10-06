@@ -3405,7 +3405,7 @@ def test_calculate_nutrition_requirements_nasem(mock_lactating_cow: Animal, mock
     animal.calves = 2
     animal.calving_interval = 365
     animal.body_condition_score_5 = 3.0
-    animal.growth = type("DummyGrowth", (), {"daily_growth": 1.0})()
+    animal.growth = type("DummyGrowth", (), {"daily_growth": 1.0, "daily_tissue_change": -0.5})()
     MilkProduction.set_milk_quality(fat_percent=3.5, true_protein_percent=3.0, lactose_percent=4.5)
     milk_prod = MilkProduction()
     milk_prod._daily_milk_produced = 30.0

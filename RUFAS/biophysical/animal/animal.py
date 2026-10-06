@@ -2685,6 +2685,7 @@ class Animal:
                 body_condition_score_5=self.body_condition_score_5,
                 days_in_milk=days_in_milk,
                 average_daily_gain_heifer=self.growth.daily_growth,
+                tissue_weight_gain=self.growth.daily_tissue_change,
                 animal_type=self.animal_type,
                 parity=self.calves,
                 calving_interval=self.calving_interval,

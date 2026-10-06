@@ -132,3 +132,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3290](https://github.com/RuminantFarmSystems/RuFaS/pull/3290) - [minor change] [E2E Testing] [InputChange] [OutputChange] Adds accepted-range support to end-to-end testing.
 - [3206](https://github.com/RuminantFarmSystems/RuFaS/pull/3206) - [minor change] [Animal] [NoInputChange] [OutputChange] Fixes the off-by-one error where cow milking history skipped DIM = 1 on calving day.
 - [3310](https://github.com/RuminantFarmSystems/RuFaS/pull/3310) - [minor change] [E2E Testing] [NoInputChange] [OutputChange] Updates expected e2e results.
+- [3316](https://github.com/RuminantFarmSystems/RuFaS/pull/3316) - [minor change] [Animal] [NoInputChange] [OutputChange] Corrects the NASEM growth energy equation and adds the body reserve tissue term to the NASEM protein requirement.
