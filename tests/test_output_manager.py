@@ -2695,6 +2695,23 @@ def test_list_filter_files_in_dir(
         mock_output_manager._list_filter_files_in_dir(Path("nonexistent_directory"))
 
 
+def test_list_filter_files_in_dir_skips_e2e_configuration_files(
+    mock_output_manager: OutputManager,
+    tmpdir: py.path.local,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that a scenario's must-change and accepted ranges files are skipped without a warning."""
+    mock_add_warning = mocker.patch.object(mock_output_manager, "add_warning")
+    tmpdir.join("json_file1.json").write("File 1 content")
+    tmpdir.join("freestall_must_change_variables.json").write("{}")
+    tmpdir.join("freestall_accepted_ranges.json").write("{}")
+
+    filter_files = mock_output_manager._list_filter_files_in_dir(Path(tmpdir))
+
+    assert filter_files == ["json_file1.json"]
+    mock_add_warning.assert_not_called()
+
+
 @pytest.fixture
 def mock_simple_variables_pool() -> dict[str, OutputManager.pool_element_type]:
     """Simple variables pool to be used for testing the Output Manager."""

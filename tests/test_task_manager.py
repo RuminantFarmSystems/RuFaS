@@ -692,6 +692,7 @@ def test_run_end_to_end_testing_simulation(
         "convert_variable_table_path": "compare_path",
         "output_prefix": "dummy_prefix",
         "filters_directory": Path("filters"),
+        "use_accepted_ranges": True,
     }
     mock_input_manager = mocker.MagicMock()
     add_log = mocker.patch.object(mock_output_manager, "add_log")

@@ -23,6 +23,7 @@ from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
+NON_FILTER_FILE_SUFFIXES = ("must_change_variables.json", "accepted_ranges.json")
 
 
 class LogVerbosity(Enum):
@@ -1360,6 +1361,8 @@ class OutputManager(object):
             filter_files = []
             all_files = os.listdir(dir_path)
             for filename in all_files:
+                if filename.endswith(NON_FILTER_FILE_SUFFIXES):
+                    continue
                 if filename.endswith(".txt") or filename.endswith(".json"):
                     for supported_prefix in self._filter_prefixes.values():
                         if filename.startswith(supported_prefix):
