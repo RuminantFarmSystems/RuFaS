@@ -240,20 +240,18 @@ Calculations are included for the following requirement categories:
 
 Where appropriate, requirement calculations are differentiated by animal age and reproductive status.
 
-
 #### Nutrient Requirements of Dairy Cattle: NRC
-
 
 ##### Energy Requirements
 For details about the variables included in each calculation, please refer to @tbl-an-energy-nrc for a full list.
 
 **Maintenance** <br>
-The maintenance requirement is calculated based on metabolic body weight ($\text{BW}^{0.75}$).
+The maintenance requirement is calculated based on metabolic body weight (BW$^{0.75}$).
 
-* **Lactating and Dry Cows**
+* Lactating and Dry Cows
 
-First the conceptus weight ($\text{CW}$) is estimated as a function of the expected calf
-birth weight ($\text{CBW}$) which is estimated as fraction of the cow's mature bodyweight ($\text{MW}$): 
+First the conceptus weight (CW) is estimated as a function of the expected calf
+birth weight (CBW) which is estimated as fraction of the cow's mature bodyweight (MW): 
 
 :::{#eq-an-nrc-1}
 [[**AN.NRC.1**]]{.aside .content-visible when-format="html"}
@@ -261,9 +259,6 @@ $$
 \text{CBW} = \text{MW} \times 0.06275
 $$
 :::
-
-
-
 
 :::{#eq-an-nrc-2}
 [[**AN.NRC.2**]]{.aside .content-visible when-format="html"}
@@ -275,7 +270,6 @@ $$
 $$
 :::
 
-
 Then maintenance energy requirements are estimated as a function of the metabolic bodyweight without the conceptus weight. 
 
 :::{#eq-an-nrc-3}
@@ -285,11 +279,11 @@ $$
 $$
 :::
 
-* **Heifers** 
+* Heifers 
 
-The maintenance requirement is calculated based on metabolic body weight $(\text{BW}^{0.75})$, body condition score, and the previous month's temperatures.
+The maintenance requirement is calculated based on metabolic body weight (BW$^{0.75}$), body condition score, and the previous month's temperatures.
 
-First the body condition score must be translated to a 9 point scale $(\text{BSC9})$. The conceptus weight $(\text{CW})$ is calculated the same as for lactating and dry cows.
+First the body condition score must be translated to a 9 point scale (BSC9). The conceptus weight (CW) is calculated the same as for lactating and dry cows.
 
 :::{#eq-an-nrc-6}
 [[**AN.NRC.6**]]{.aside .content-visible when-format="html"}
@@ -301,14 +295,17 @@ $$
 :::{#eq-an-nrc-7}
 [[**AN.NRC.7**]]{.aside .content-visible when-format="html"}
 $$
-\text{NEmaint} = (\text{BW} - \text{CW})^{0.75}\times (0.086\times (0.8 + (\text{BCS9} - 1)\times 0.05) + 0.0007 \times (20 - \text{PrevTemp})) 
+\begin{aligned}
+\text{NEmaint} =& (\text{BW} - \text{CW})^{0.75}\times (0.086\times (0.8 + (\text{BCS9} - 1)\times 0.05) \\[8pt]
+& \qquad+ 0.0007 \times (20 - \text{PrevTemp})) 
+\end{aligned}
 $$
 :::
 
 **Activity** <br>
 Activity requirement is proportional to body weight and daily walking distance in kilometers. A grazing system and hilly topography will cost additional energy. 
 
-* **Lactating and Dry Cows**
+* Lactating and Dry Cows
 
 :::{#eq-an-nrc-8}
 [[**AN.NRC.8**]]{.aside .content-visible when-format="html"}
@@ -318,10 +315,7 @@ $$
 $$
 \text{NEa1} = 0.0,  \qquad \text{if Housing } \neq \text{Grazing}
 $$
-
 :::
-
-
 
 :::{#eq-an-nrc-9}
 [[**AN.NRC.9**]]{.aside .content-visible when-format="html"}
@@ -329,7 +323,6 @@ $$
 \text{NEa2} = 0.006 \times \text{BW}, \qquad \text{if Topography = Hilly}
 $$
 :::
-
 
 :::{#eq-an-nrc-10}
 [[**AN.NRC.10**]]{.aside .content-visible when-format="html"}
@@ -348,10 +341,6 @@ $$
 $$
 :::
 
-
-
-
-
 $$
 \text{NEa2} = (0.00045 \times \text{Distance} \times \text{BW}) + \text{NEa1}
 $$
@@ -359,11 +348,10 @@ $$
 
 **Growth** <br>
 
-* **Lactating and Dry Cows**
-Cows will continue to grow toward their mature body weight until the end of their second lactation. Their growth rate is estimated as a linear increase to reach the expected proportion of their mature bodyweight $\text{MW}$ at the beginning of their next parity. 
+* Lactating and Dry Cows
+Cows will continue to grow toward their mature body weight until the end of their second lactation. Their growth rate is estimated as a linear increase to reach the expected proportion of their mature bodyweight (MW) at the beginning of their next parity. 
 
-
-First the shrunk bodweight $(\text{SBW})$, the mature shrunk bodyweight $(\text{MSBW})$ and the equivalent shrunk bodyweight are calculated $(\text{EQSBW})$ to remove the effect of gut fill on bodyweight, the conceptus, and relate the animal's weight to the reference animal of 478 kg. 
+First the shrunk bodweight (SBW), the mature shrunk bodyweight (MSBW) and the equivalent shrunk bodyweight are calculated (EQSBW) to remove the effect of gut fill on bodyweight, the conceptus, and relate the animal's weight to the reference animal of 478 kg. 
 
 :::{#eq-an-nrc-13}
 [[**AN.NRC.13**]]{.aside .content-visible when-format="html"}
@@ -386,7 +374,7 @@ $$
 $$
 :::
 
-Next the average daily gain $(\text{ADG})$, is calculated as the difference between the target fraction of $(\text{MSBW})$ at the start of the current parity and the start of the next parity divided by the calving interval ($(\text{CI})$). Specifically, cows are expected to be 82%, 92% and 100% of their $(\text{MSBW})$ at the start of their 1st, 2nd, and 3rd parities. 
+Next the average daily gain (ADG), is calculated as the difference between the target fraction of (MSBW) at the start of the current parity and the start of the next parity divided by the calving interval ((CI)). Specifically, cows are expected to be 82%, 92% and 100% of their (MSBW) at the start of their 1st, 2nd, and 3rd parities. 
 
 :::{#eq-an-nrc-17}
 [[**AN.NRC.17**]]{.aside .content-visible when-format="html"}
@@ -400,7 +388,7 @@ $$
 $$
 :::
 
-Finally, the expected $(\text{ADG})$ and $(\text{EQSBW})$ are adjusted for the weight associated with internal organs to get the equivalent empty bodyweight gain $(\text{EQEBG})$ and the equivalent empty body weight $(\text{EQEBW})$ which is then used to estimate the net energy for gain.
+Finally, the expected (ADG) and (EQSBW) are adjusted for the weight associated with internal organs to get the equivalent empty bodyweight gain (EQEBG) and the equivalent empty body weight (EQEBW) which is then used to estimate the net energy for gain.
 
 :::{#eq-an-nrc-18}
 [[**AN.NRC.18**]]{.aside .content-visible when-format="html"}
@@ -423,9 +411,9 @@ $$
 $$
 :::
 
-* **Heifers**
+* Heifers
 
-Heifer growth is estimated according to a similar principal as lactating cow growth. Growth targets for heifers are set based on their expected weights at the start of breeding (55% of $\text{MSBW}$) and age at first calving (82% of $(\text{BSC9})$ which is equivalent to the start of parity 1). 
+Heifer growth is estimated according to a similar principal as lactating cow growth. Growth targets for heifers are set based on their expected weights at the start of breeding (55% of MSBW) and age at first calving (82% of BSC9 which is equivalent to the start of parity 1). 
 
 :::{#eq-an-nrc-21}
 [[**AN.NRC.21**]]{.aside .content-visible when-format="html"}
@@ -461,7 +449,7 @@ $$
 
 **Pregnancy** <br>
 
-The energy requirements for pregnancy are based on the days in pregnancy $(\text{DOP})$ and calf birth weight $(\text{CBW})$ and only applies when the $\text{DOP}$ advanced beyond 190 days. 
+The energy requirements for pregnancy are based on the days in pregnancy (DOP) and calf birth weight (CBW) and only applies when the (DOP) advanced beyond 190 days. 
 
 :::{#eq-an-nrc-25}
 [[**AN.NRC.25**]]{.aside .content-visible when-format="html"}
@@ -480,7 +468,7 @@ $$
 **Lactation** <br>
 
 Energy requirements for lactation are based on the total fat, true protein and
-lactose produced. First the energy required per kg of milk $(\text{Milk}_{\text{Energy}})$ is estimated based on the milk fat, protein, and lactose composition. 
+lactose produced. First the energy required per kg of milk (Milk<sub>Energy</sub>) is estimated based on the milk fat, protein, and lactose composition. 
 
 :::{#eq-an-nrc-27}
 [[**AN.NRC.27**]]{.aside .content-visible when-format="html"}
@@ -489,7 +477,7 @@ $$
 $$
 :::
 
-Then the total net energy for lactation is estimated by multiplying the $\text{Milk}_{\text{Energy}}$ by the total milk produced $(\text{MilkYeild, kg})$. 
+Then the total net energy for lactation is estimated by multiplying the Milk<sub>Energy</sub> by the total milk produced (MilkYeild, kg). 
 
 :::{#eq-an-nrc-28}
 [[**AN.NRC.28**]]{.aside .content-visible when-format="html"}
@@ -501,7 +489,7 @@ $$
 ##### Protein Requirements
 
 **Total Protein** <br>
-Reporting of protein requirements is divided into four components: maintenance $(\text{MPm})$, growth $(\text{MPg})$, pregnancy $(\text{MPpreg})$, and lactation $(\text{MPlact})$ (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
+Reporting of protein requirements is divided into four components: maintenance (MPm), growth (MPg), pregnancy (MPpreg), and lactation (MPlact) (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
 
 :::{#eq-an-nrc-36}
 [[**AN.NRC.36**]]{.aside .content-visible when-format="html"}
@@ -514,7 +502,7 @@ $$
 
 * Lactating and Dry Cows
 
-Maintenance protein requirements are estimated as a function of animal bodyweight excluding conceptus weight if pregnant, dry matter intake, and the amount of  rumen bacterial protein supply $(\text{MPbact})$. 
+Maintenance protein requirements are estimated as a function of animal bodyweight excluding conceptus weight if pregnant, dry matter intake, and the amount of  rumen bacterial protein supply (MPbact). 
 
 :::{#eq-an-nrc-29}
 [[**AN.NRC.29**]]{.aside .content-visible when-format="html"}
@@ -603,7 +591,7 @@ $$
 
 **Pregnancy** <br>
 
-Similar to energy, protein requirements for pregnancy are estimated as a function of the days in pregnancy $(\text{DOP})$ and the calf birthweight $(\text{CBW})$. 
+Similar to energy, protein requirements for pregnancy are estimated as a function of the days in pregnancy (DOP) and the calf birthweight (CBW).
 
 :::{#eq-an-nrc-37}
 [[**AN.NRC.37**]]{.aside .content-visible when-format="html"}
@@ -622,7 +610,6 @@ $$
 \text{MPlact} = \text{MilkYield} \times \frac{\text{TP}_{\text{Milk}}}{100} \times \frac{1000}{0.67}
 $$
 :::
-
 
 ```{python}
 #| label: tbl-an-prot-req-var
@@ -652,7 +639,6 @@ $$
 \end{cases}
 $$
 :::
-
 
 *Phosphorus Equations*
 
@@ -793,7 +779,7 @@ $$
 
 **Lactating Cows** <br>
 
-For lactating cows, the estimated DMI $(\text{DIMest})$ is calculated as a function of the fat corrected milk $(\text{FCM})$, bodyweight $(\text{BW})$, and week of lactation $(\text{WOL})$. 
+For lactating cows, the estimated DMI (DIMest) is calculated as a function of the fat corrected milk (FCM), bodyweight (BW), and week of lactation (WOL). 
 
 :::{#eq-an-nrc-51}
 [[**AN.NRC.51**]]{.aside .content-visible when-format="html"}
@@ -811,7 +797,7 @@ $$
 
 **Dry Cows** <br>
 
-For dry cows, $\text{DIMest}$ is a function of day of pregnancy $(\text{DOP})$ and $\text{BW}$.
+For dry cows, DIMest is a function of day of pregnancy (DOP) and BW.
 
 :::{#eq-an-nrc-53}
 [[**AN.NRC.53**]]{.aside .content-visible when-format="html"}
@@ -822,7 +808,7 @@ $$
 
 **Heifers** <br>
 
-* If a heifer is *LESS* than 365 days old her $\text{DIMest}$ is calculated as a function of her metabolic bodyweight $(\text{BW}^{0.75})$ with an adjustment for the energy concentration of the diet:
+* If a heifer is *LESS* than 365 days old her DIMest is calculated as a function of her metabolic bodyweight (BW$^{0.75}$) with an adjustment for the energy concentration of the diet:
 
 :::{#eq-an-nrc-54}
 [[**AN.NRC.54**]]{.aside .content-visible when-format="html"}
@@ -831,7 +817,7 @@ $$
 $$
 :::
 
-* If the heifer is *MORE* than 365 days old, a separate intercept is used and adjustment is also made for the pregnacy status if she is greater than 210 $\text{DOP}$:
+* If the heifer is *MORE* than 365 days old, a separate intercept is used and adjustment is also made for the pregnacy status if she is greater than 210 DOP:
 
 :::{#eq-an-nrc-55}
 [[**AN.NRC.55**]]{.aside .content-visible when-format="html"}
@@ -858,7 +844,7 @@ The maintenance requirement is calculated based on metabolic body weight (MBW, b
 
 * Lactating and Dry Cows
 
-For Lactating cows, the body weight is adjusted both for the weight of the gravid uterine tissues $(\text{GrUterW})$ and the uterine tissues $(\text{UterW})$ for normal activity in confinement conditions; otherwise include adjustments for activity requirements under grazing conditions. 
+For Lactating cows, the body weight is adjusted both for the weight of the gravid uterine tissues (GrUterW) and the uterine tissues (UterW) for normal activity in confinement conditions; otherwise include adjustments for activity requirements under grazing conditions. 
 
 :::{#eq-an-nsm-1}
 [[**AN.NSM.1**]]{.aside .content-visible when-format="html"}
@@ -881,7 +867,6 @@ $$
 $$
 :::
 
-
 :::{#eq-an-nsm-4}
 [[**AN.NSM.4**]]{.aside .content-visible when-format="html"}
 $$
@@ -903,8 +888,7 @@ $$
 **Activity** <br>
 Activity energy requirements are the sum of energy required for grazing activity, walking to the parlor, and for gaining elevation. 
 
-If the DMI from pasture $(\text{DMI}_{Pasture})$ is greater that 0.5% of the total DMI $(\text{DMI}_{Total})$, then the energy requirements for grazing activities are a function of $\text{BW}$ and the amount of supplemental feed that is provided $(\text{DMI}_{Supp})$.
-
+If the DMI from pasture (DMI<sub>Pasture</sub>) is greater that 0.5% of the total DMI (DMI<sub>Total</sub>), then the energy requirements for grazing activities are a function of BW and the amount of supplemental feed that is provided (DMI<sub>Supp</sub>).
 
 *Otherwise*
 
@@ -913,7 +897,7 @@ If the DMI from pasture $(\text{DMI}_{Pasture})$ is greater that 0.5% of the tot
 $$
 \text{NEa1} =
 \begin{cases}
-0.0075 \times \text{BW}^{0.75} \times \frac{(600 - 12 \times \text{DMI}_{Supp})}{600},& \text{if } \frac{\text{DMI}_{Pasture}}{\text{DMI}_{Total}} \geq 0.005 \\[8pt]
+0.0075 \times \text{BW}^{0.75} \times \frac{(600 - 12 \times \text{DMI}_{\text{Supp}})}{600},& \text{if } \frac{\text{DMI}_{\text{Pasture}}}{\text{DMI}_{\text{Total}}} \geq 0.005 \\[8pt]
 0 & \text{otherwise}
 \end{cases}
 $$
@@ -928,7 +912,7 @@ $$
 $$
 :::
 
-The energy required for an animal to gain elevation is calculated as a function of $\text{BW}$ and the gain in elevation:
+The energy required for an animal to gain elevation is calculated as a function of BW and the gain in elevation:
 
 :::{#eq-an-nsm-9}
 [[**AN.NSM.9**]]{.aside .content-visible when-format="html"}
@@ -947,8 +931,7 @@ $$
 **Growth** <br>
 In @nrc_2021, body frame gain (fat + protein) corresponds to the true growth and it is part of the calculation which is further partitioned into body reserves or condition gain (or loss), and pregnancy-associated gain (considered a pregnancy requirement).
 
-First the empty bodyweight grain $(\text{EBG})$ is estimated from the $\text{ADG}$ which is calculated as described in [AN.NRC.17](#eq-an-nrc-17) and [AN.NRC.21](#eq-an-nrc-21). 
-
+First the empty bodyweight grain (EBG) is estimated from the $\text{ADG}$ which is calculated as described in [AN.NRC.17](#eq-an-nrc-17) and [AN.NRC.21](#eq-an-nrc-21). 
 
 :::{#eq-an-nsm-12}
 [[**AN.NSM.12**]]{.aside .content-visible when-format="html"}
@@ -957,7 +940,7 @@ $$
 $$
 :::
 
-Then amount of fat $(\text{FatADG})$ and lean tissue $(\text{ProtADG})$ daily gain is estimated from the $(\text{EBG})$.
+Then amount of fat (FatADG) and lean tissue (ProtADG) daily gain is estimated from the EBG.
 
 :::{#eq-an-nsm-13}
 [[**AN.NSM.13**]]{.aside .content-visible when-format="html"}
@@ -973,7 +956,7 @@ $$
 $$
 :::
 
-Finally the amount of energy associated with the energy in the $(\text{FatADG})$ and $(\text{ProtADG})$ as retained energy $(\text{REFADG})$ and the amount of metabolizable $(\text{MEFrameADG})$ and net $(\text{NElFrameADG})$ energy needed for frame grown is estimated.
+Finally the amount of energy associated with the energy in the FatADG and (ProtADG) as retained energy (REFADG) and the amount of metabolizable (MEFrameADG) and net (NElFrameADG) energy needed for frame grown is estimated.
 
 :::{#eq-an-nsm-15}
 [[**AN.NSM.15**]]{.aside .content-visible when-format="html"}
@@ -997,7 +980,7 @@ $$
 :::
 
 **Pregnancy** <br>
-The daily rate of gravid uterine tissue deposition ($\text{GrUterWGain}$, kg/d) is estimated from the current gravid uterine weight $(\text{GrUterW})$ estimated in equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.3](#eq-an-nsm-3) as defined above. Then the energy required to support this weight gain is estimated. 
+The daily rate of gravid uterine tissue deposition (GrUterWGain, kg/d) is estimated from the current gravid uterine weight (GrUterW) estimated in equations [AN.NSM.2](#eq-an-nsm-2) and [AN.NSM.3](#eq-an-nsm-3) as defined above. Then the energy required to support this weight gain is estimated. 
 
 * During Gestation
 
@@ -1020,8 +1003,6 @@ $$
 \end{cases}
 $$
 :::
-
-
 
 :::{#eq-an-nsm-20}
 [[**AN.NSM.20**]]{.aside .content-visible when-format="html"}
@@ -1121,7 +1102,7 @@ $$
 
 Two distinct growth processes are represented: frame growth and BW changes related to the deposition (and mobilization) of body reserves.
 
-The following are the protein requirements for growth associated with increased frame size, where $\text{FrameWG}$ is the sum of $\text{FatADG}$ and $\text{ProtADG}$ as described in [AN.NSM.13](#eq-an-nsm-13) and [AN.NSM.14](#eq-an-nsm-14):
+The following are the protein requirements for growth associated with increased frame size, where FrameWG is the sum of FatADG and ProtADG as described in [AN.NSM.13](#eq-an-nsm-13) and [AN.NSM.14](#eq-an-nsm-14):
 
 :::{#eq-an-nsm-30}
 [[**AN.NSM.30**]]{.aside .content-visible when-format="html"}
@@ -1130,7 +1111,7 @@ $$
 $$
 :::
 
-If the change in BW is not frame growth but rather a change in body reserves during lactation, then the following equation is used because the protein content is assumed to be 8.0 percent protein where the $\text{TissueWG}$ is drawn from equations described in [AN.BWT.18](#eq-an-bwt-18), [AN.BWT.19](#eq-an-bwt-19), and [AN.BWT.20](#eq-an-bwt-20).
+If the change in BW is not frame growth but rather a change in body reserves during lactation, then the following equation is used because the protein content is assumed to be 8.0 percent protein where the TissueWG is drawn from equations described in [AN.BWT.18](#eq-an-bwt-18), [AN.BWT.19](#eq-an-bwt-19), and [AN.BWT.20](#eq-an-bwt-20).
 
 :::{#eq-an-nsm-31}
 [[**AN.NSM.31**]]{.aside .content-visible when-format="html"}
@@ -1462,11 +1443,11 @@ $$
 
 **Total Requirements**
 
-Here are the equations for calculating the total $\text{AA}_{\text{i}}$ requirements for lactating cows, late-gestation cows, and heifers. 
+Here are the equations for calculating the total AA<sub>i</sub> requirements for lactating cows, late-gestation cows, and heifers. 
 
 The variables needed to calculate these equations come from the outputs generated in the AA requirements equations for scurf, endogenous urine, metabolic fecal protein, growth, gestation, and milk production (see formulas above). 
 
-The $\text{TargetEfficiencyAA}_{i}$ variable, refers to the target efficiency required to convert the EAA to build proteins and support body gain. It is a fixed value, and it can be found in Table 6-4 (page 88) of @nrc_2021.
+The TargetEfficiencyAA<sub>i</sub> variable, refers to the target efficiency required to convert the EAA to build proteins and support body gain. It is a fixed value, and it can be found in Table 6-4 (page 88) of @nrc_2021.
   
 * Lactating Cows
 
@@ -1538,7 +1519,7 @@ $$
 
 Otherwise:
 
-:::{#eq-an-sup-3-1}
+:::{#eq-an-sup-3-1 style="font-size:90%"}
 [[**AN.SUP.3.1**]]{.aside .content-visible when-format="html"}
 $$
 \text{Discount} = 1, \quad if \quad \text{TDNconc} < 60 \frac{\text{TDNconc} - (0.18 \times \text{TDNconc} - 10.3) \times (\text{DMI}_{\text{to,maint}} - 1)}{\text{TDNconc}}
@@ -1563,7 +1544,7 @@ $$
 
 **Metabolizable Energy (ME)**
 
-:::{#eq-an-sup-5-1}
+:::{#eq-an-sup-5-1 style="font-size:85%"}
 [[**AN.SUP.5.1**]]{.aside .content-visible when-format="html"}
 $$
 \text{MEacti} =
@@ -1579,7 +1560,7 @@ $$
 
 * Maintenance
 
-:::{#eq-an-sup-7-1}
+:::{#eq-an-sup-7-1 style="font-size:90%"}
 [[**AN.SUP.7.1**]]{.aside .content-visible when-format="html"}
 $$
 \text{NEmacti} =
@@ -1592,7 +1573,7 @@ $$
 
 * Lactation
 
-:::{#eq-an-sup-6-1}
+:::{#eq-an-sup-6-1 style="font-size:80%"}
 [[**AN.SUP.6.1**]]{.aside .content-visible when-format="html"}
 $$
 \text{NElacti}=
@@ -1606,7 +1587,7 @@ $$
 
 * Activity
 
-:::{#eq-an-sup-8-1}
+:::{#eq-an-sup-8-1 style="font-size:90%"}
 [[**AN.SUP.8.1**]]{.aside .content-visible when-format="html"}
 $$
 \text{NEgacti}
@@ -1647,7 +1628,7 @@ import_table(
 )
 ```
 
-The nutrient compositions of each feed ($\text{NDF}_\text{i}$, $\text{Starch}_\text{i}$, $\text{EE}_\text{i}$, $\text{RUP}_\text{i}$) are provided in the feed library. 
+The nutrient compositions of each feed (NDF<sub>i</sub>, Starch<sub>i</sub>, EE<sub>i</sub>, RUP<sub>i</sub>) are provided in the feed library. 
 The digestibilities of each feed are estimated to account for the effects of intake and diet composition:
 
 **Digestible Energy (DE) of a Feed**
@@ -1660,7 +1641,7 @@ $$
 \text{dNDF}_\text{i} = (\text{dNDF}_\text{base,i} - (0.0059 \times \text{Starch}_\text{Diet}) - 0.26)  - 1.1 \times (\frac{\text{DMI}}{\text{BodyWeight}} - 0.035)
 $$
 
-And the $\text{dNDF}_\text{base,i}$ is calculated based on the lignin and NDF content of the feed.
+And the dNDF<sub>base,i</sub> is calculated based on the lignin and NDF content of the feed.
 
 :::{#eq-an-sup-2-2}
 [[**AN.SUP.2.2**]]{.aside .content-visible when-format="html"}    
@@ -1680,11 +1661,11 @@ $$
 $$
 :::  
 
-And the base starch digestibility, $\text{dStarch}_\text{base,i}$, is considered to be an innate property of the feed and is provided in the feed library.
+And the base starch digestibility, dStarch<sub>base,i</sub>, is considered to be an innate property of the feed and is provided in the feed library.
 
 * Fatty Acid Digestibility (dFA)
 
-Fatty acids are assumed to have a digestibility of 0.73 $(\text{dFA}_\text{i} = 0.73)$ unless a digesibility specific to the fat supplement is provided by the manufacturer.
+Fatty acids are assumed to have a digestibility of 0.73 (dFA<sub>i</sub> = 0.73) unless a digestibility specific to the fat supplement is provided by the manufacturer.
 
 * Protein Digestibility (RUP and dRUP)
 
@@ -1711,7 +1692,7 @@ $$
 $$
 ::: 
 
-The digestibility of ROM is assumed to be 0.96 $(\text{dROM}_\text{i} = 0.96)$ and $\text{NPN}_\text{supp,i}$ is the supplemented non-protein nitrogen fraction as a proportion of the total CP content. 
+The digestibility of ROM is assumed to be 0.96 (dROM<sub>i</sub> = 0.96) and NPN<sub>supp,i</sub> is the supplemented non-protein nitrogen fraction as a proportion of the total CP content. 
 
 **Digestible Energy of the Diet**
 
@@ -1777,7 +1758,7 @@ $$
 
 **Microbial Protein Supply**
 
-:::{#eq-an-sup-9}
+:::{#eq-an-sup-9 style="font-size:90%"}
 [[**AN.SUP.9**]]{.aside .content-visible when-format="html"}
 $$
 \text{Kpi} =
@@ -2372,9 +2353,6 @@ $$
 \text{bodyweight\_tissue\_change} = \frac{\text{dry\_tissue\_change\_numerator}}{\text{gestation length} - \text{DIPdry}}
 $$
 :::
-
-
-
 
 ### Animal Reproduction
 
@@ -3939,7 +3917,6 @@ emissions. The CNCPS and IFSM models use the Mitscherlich 3 equation.
 
 ::: {#eq-an-met-7 style="font-size:80%;"}
 [[**AN.MET.7**]]{.aside .content-visible when-format="html"}
-
 $$
 \begin{aligned}
   \text{methane\_emission} = \frac{ 45.98 \times \
@@ -3955,7 +3932,6 @@ $$
 
 :::{}
 [See [AN.MET.5](#eq-an-met-5)]{.aside .content-visible when-format="html"}
-
 $$
 \text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565}
 $$
@@ -3968,7 +3944,6 @@ This is previously described in the [lactating cow section](#sec-an-mills-model)
 
 :::{style="font-size:80%;"}
 [See [AN.EXC.7](#eq-an-exc-7)]{.aside .content-visible when-format="html"}
-
 $$
 \begin{aligned}
   \text{methane\_emission} = \frac{ 45.98 \times \
@@ -3983,7 +3958,6 @@ This is previously described in the [lactating cow section](#sec-an-ipcc-model) 
 
 :::{}
 [See [AN.EXC.5](#eq-an-exc-5)]{.aside .content-visible when-format="html"}
-
 $$
 \text{methane\_emission} = \frac{0.065 \times \text{gross\_energy\_concentrationdry\_matter\_intake}}{0.05565} 
 $$

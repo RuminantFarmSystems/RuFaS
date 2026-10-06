@@ -1,37 +1,37 @@
 Variable,Description,Units
-$\text{NetAAscurf}_{i}$ , Net demand for $\text{AA}_{i}$ in scurf excretion ,grams per day (g/d)
+NetAAscurf$_{\text{i}}$ , Net demand for AA$_{\text{i}}$ in scurf excretion ,grams per day (g/d)
 NPscurf , Net total protein requirement for scurf ,g/d
-$\text{AACorrScurf}_{i}$ ," For each amino acid, a fixed value for the proportion of the scurf in each AA. ", --
-$\text{NetAAEndUrine}_{i}$ , Net $\text{AA}_{i}$ requirement for endogenous urinary excretion,g/d
+AACorrScurf$_{\text{i}}$ ," For each amino acid, a fixed value for the proportion of the scurf in each AA. ", --
+NetAAEndUrine$_{\text{i}}$ , Net AA$_{\text{i}}$ requirement for endogenous urinary excretion,g/d
 BW , Body weight , kg
-$\text{AACorrWholeEmptyBody}_{i}$ ," For each amino acid, a fixed value for each AA within the tissues of the animal's whole empty body ",g/100g
-$\text{NetAAMFP}_{i}$ , Net $\text{AA}_{i}$ requirement for metabolic fecal protein ,g/d
+AACorrWholeEmptyBody$_{\text{i}}$ ," For each amino acid, a fixed value for each AA within the tissues of the animal's whole empty body ",g/100g
+NetAAMFP$_{\text{i}}$ , Net AA$_{\text{i}}$ requirement for metabolic fecal protein ,g/d
 NPMFP , Net protein requirement for metabolic fecal protein ,g/d; small assumes 73% of TP in MFP.
-$\text{AACorrMFP}_{i}$ ," Amino acids corrected for MFP. For each amino acid, a fixed value for each AA is excreted as metabolic fecal protein ",g/100g TP
-$\text{NetAAGrowth}_{i}$ , Net $\text{AA}_{i}$ requirement for body frame weight gain ,g/d
+AACorrMFP$_{\text{i}}$ ," Amino acids corrected for MFP. For each amino acid, a fixed value for each AA is excreted as metabolic fecal protein ",g/100g TP
+NetAAGrowth$_{\text{i}}$ , Net AA$_{\text{i}}$ requirement for body frame weight gain ,g/d
 NPGrowth , Net protein requirement for body frame weight gain ,g/d
-$\text{AACorrWholeEmptyBody}_{i}$ ," For each amino acid, a fixed value for each AA within the tissues of the animal's whole empty body ",g/100g TP
-$\text{NetAAGest}_{i}$ , Amino acids composition of protein accretion associated with gestation ,g/d
+AACorrWholeEmptyBody$_{\text{i}}$ ," For each amino acid, a fixed value for each AA within the tissues of the animal's whole empty body ",g/100g TP
+NetAAGest$_{\text{i}}$ , Amino acids composition of protein accretion associated with gestation ,g/d
 NPGest , Net protein requirement for gestation ,g/d
-$\text{AACorrWholeEmptyBody}_{i}$," For each amino acid, a fixed value for each AA within the tissues of the animal's whole empty body ",g/100g TP
-$\text{NetAAMilk}_{i}$ , Net amino acids yield in milk ,g/d
+AACorrWholeEmptyBody$_{\text{i}}$," For each amino acid, a fixed value for each AA within the tissues of the animal's whole empty body ",g/100g TP
+NetAAMilk$_{\text{i}}$ , Net amino acids yield in milk ,g/d
 NPMilk , Net protein in milk. This refers to milk TP yield ,g/d
-$\text{AAcalcMilk}_{i}$, Estimated AA composition of the true protein (TP) fraction involved in the estimation of AA Supply and recommendations. Fixed values for each individual amino acid in milk , --
-$\text{TotalAArequirements}_{i}$ , Total AA requirement,g/d
-$\text{NetAAscurf}_{i}$ , Net demand for $\text{AA}_{i}$ in scurf excretion ,g/d
-$\text{NetAAMFP}_{i}$ ,  Net $\text{AA}_{i}$ requirement for metabolic fecal protein ,g/d
-$\text{NetAAGrowth}_{i}$ ,  Net $\text{AA}_{i}$ requirement for body frame weight gain ,g/d
-$\text{NetAAMilk}_{i}$ ,  Net amino acids yield in milk ,g/d
-$\text{NetAAGest}_{i}$ ,  Amino acids composition of protein accretion associated with pregnancy ,g/d
-$\text{NetAAEndUrine}_{i}$ ,  Net $\text{AA}_{i}$ requirement for endogenous urinary excretion ,g/d
+AAcalcMilk$_{\text{i}}$, Estimated AA composition of the true protein (TP) fraction involved in the estimation of AA Supply and recommendations. Fixed values for each individual amino acid in milk , --
+TotalAArequirements$_{\text{i}}$ , Total AA requirement,g/d
+NetAAscurf$_{\text{i}}$ , Net demand for AA$_{\text{i}}$ in scurf excretion ,g/d
+NetAAMFP$_{\text{i}}$ ,  Net AA$_{\text{i}}$ requirement for metabolic fecal protein ,g/d
+NetAAGrowth$_{\text{i}}$ ,  Net AA$_{\text{i}}$ requirement for body frame weight gain ,g/d
+NetAAMilk$_{\text{i}}$ ,  Net amino acids yield in milk ,g/d
+NetAAGest$_{\text{i}}$ ,  Amino acids composition of protein accretion associated with pregnancy ,g/d
+NetAAEndUrine$_{\text{i}}$ ,  Net AA$_{\text{i}}$ requirement for endogenous urinary excretion ,g/d
 TargetEfficiencyGest ,  Proposed target efficiency of using MP for gestation. ,Value = 0.33
-$\text{TargetEfficiencyAA}_{i}$, Proposed target efficiencies of essential amino acids (EAA) to export proteins and body gain ,g/100g TP
-$\text{TotalAArequirements}_{i}$ , Total AA requirement ,g/d
-$\text{NetAAscurf}_{i}$ , Net demand for $\text{AA}_{i}$ in scurf excretion ,g/d
-$\text{NetAAMFP}_{i}$ , Net $\text{AA}_{i}$ requirement for metabolic fecal protein ,g/d
-$\text{NetAAGrowth}_{i}$ , Net $\text{AA}_{i}$ requirement for body frame weight gain ,g/d
-$\text{NetAAGest}_{i}$ , Amino acids composition of protein accretion associated with pregnancy ,g/d
-$\text{NetAAEndUrine}_{i}$ , Net $\text{AA}_{i}$ requirement for endogenous urinary excretion ,g/d
+TargetEfficiencyAA$_{\text{i}}$, Proposed target efficiencies of essential amino acids (EAA) to export proteins and body gain ,g/100g TP
+TotalAArequirements$_{\text{i}}$ , Total AA requirement ,g/d
+NetAAscurf$_{\text{i}}$ , Net demand for AA$_{\text{i}}$ in scurf excretion ,g/d
+NetAAMFP$_{\text{i}}$ , Net AA$_{\text{i}}$ requirement for metabolic fecal protein ,g/d
+NetAAGrowth$_{\text{i}}$ , Net AA$_{\text{i}}$ requirement for body frame weight gain ,g/d
+NetAAGest$_{\text{i}}$ , Amino acids composition of protein accretion associated with pregnancy ,g/d
+NetAAEndUrine$_{\text{i}}$ , Net AA$_{\text{i}}$ requirement for endogenous urinary excretion ,g/d
 TargetEfficiencyGest , Proposed target efficiency of using MP for gestation. ,Value = 0.33
 TargetEfficiencyGrowth , Proposed target efficiency of using MP for growth. ,Value = 0.40
-$\text{TargetEfficiencyAA}_{i}$, Proposed target efficiencies of essential amino acids (EAA) to export proteins and body gain , --
+TargetEfficiencyAA$_{\text{i}}$, Proposed target efficiencies of essential amino acids (EAA) to export proteins and body gain , --
