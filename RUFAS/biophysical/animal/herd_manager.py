@@ -10,7 +10,7 @@ from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Sex
 from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
@@ -2317,11 +2317,19 @@ class HerdManager:
 
         Notes
         -----
-        It increments the count of sold calves and appends detailed information about each sold newborn
-        calf to the corresponding statistics.
+        It increments the count of sold calves, increments the counts of sold calves by category (dairy male,
+        dairy female, and beef), and appends detailed information about each sold newborn calf to the
+        corresponding statistics. Calves bred from beef semen are counted as beef regardless of sex.
 
         """
         self.herd_statistics.sold_calf_num += len(sold_newborn_calves)
+        for calf in sold_newborn_calves:
+            if calf.bred_from_semen == SemenType.BEEF:
+                self.herd_statistics.beef_sold_calf_num += 1
+            elif calf.sex == Sex.MALE:
+                self.herd_statistics.dairy_male_sold_calf_num += 1
+            else:
+                self.herd_statistics.dairy_female_sold_calf_num += 1
         self.herd_statistics.sold_calves_info += [
             SoldAnimalTypedDict(
                 id=calf.id,

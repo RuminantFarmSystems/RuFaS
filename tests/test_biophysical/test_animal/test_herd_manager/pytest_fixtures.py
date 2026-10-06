@@ -6,11 +6,13 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_enums import Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -573,6 +575,8 @@ def mock_animal(
     dead_at_day: int | None = None,
     stillborn_day: int | None = None,
     cull_reason: str = "",
+    sex: Sex = Sex.FEMALE,
+    bred_from_semen: SemenType | None = None,
 ) -> Animal:
     animal = MagicMock(auto_spec=Animal)
     animal.id = id
@@ -595,6 +599,8 @@ def mock_animal(
     animal.stillborn_day = stillborn_day
     animal.dead_at_day = dead_at_day
     animal.cull_reason = cull_reason
+    animal.sex = sex
+    animal.bred_from_semen = bred_from_semen
 
     animal.events = AnimalEvents()
     animal.events.add_event(most_recent_new_birth_age, 0, animal_constants.NEW_BIRTH)

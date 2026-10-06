@@ -1,4 +1,4 @@
-from random import randint, uniform
+from random import choice, randint, uniform
 from unittest.mock import MagicMock
 
 import pytest
@@ -9,7 +9,9 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_enums import Sex
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.output_manager import OutputManager
@@ -753,9 +755,18 @@ def test_update_sold_newborn_calf_statistics(
             sold_at_day=randint(0, 200),
             body_weight=uniform(0.0, 350),
             days_born=randint(0, 200),
+            sex=choice([Sex.MALE, Sex.FEMALE]),
+            bred_from_semen=choice(list(SemenType)),
         )
         for i in range(num_sold_calves)
     ]
+    expected_beef_sold_calf_num = sum(calf.bred_from_semen == SemenType.BEEF for calf in sold_calves)
+    expected_dairy_male_sold_calf_num = sum(
+        calf.bred_from_semen != SemenType.BEEF and calf.sex == Sex.MALE for calf in sold_calves
+    )
+    expected_dairy_female_sold_calf_num = sum(
+        calf.bred_from_semen != SemenType.BEEF and calf.sex == Sex.FEMALE for calf in sold_calves
+    )
 
     current_sold_calf_num = randint(0, 500)
     current_sold_calves_info = [mock_sold_animal_typed_dict for _ in range(current_sold_calf_num)]
@@ -781,6 +792,9 @@ def test_update_sold_newborn_calf_statistics(
     herd_manager._update_sold_newborn_calf_statistics(sold_calves)
 
     assert herd_manager.herd_statistics.sold_calf_num == expected_sold_calf_num
+    assert herd_manager.herd_statistics.beef_sold_calf_num == expected_beef_sold_calf_num
+    assert herd_manager.herd_statistics.dairy_male_sold_calf_num == expected_dairy_male_sold_calf_num
+    assert herd_manager.herd_statistics.dairy_female_sold_calf_num == expected_dairy_female_sold_calf_num
     assert herd_manager.herd_statistics.sold_calves_info == expected_sold_calves_info
 
 
