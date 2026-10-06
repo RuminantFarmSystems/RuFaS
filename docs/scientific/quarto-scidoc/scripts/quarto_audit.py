@@ -13,7 +13,7 @@ from openpyxl.utils import get_column_letter
 # Configuration
 # ------------------------------------------------------------
 # Script-relative root so the script works no matter where it is run from.
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_FILE = "quarto_reference_audit.xlsx"
 OUTPUT_SHEET_LIMIT = 31
 

@@ -1,4 +1,5 @@
 ![Animal module icon](../resources/images/ani_icon.png){width=25%}
+
 # Animal Module
 <!-- reuse code to import functions from "../scripts/": -->
 {{< include ../scripts/_import-from-scripts.qmd >}}
@@ -1929,6 +1930,7 @@ import_table(
 )
 ```
 
+
 #### User-Defined Ration Formulation
 
 ##### Introduction
@@ -3294,6 +3296,7 @@ import_table(
 )
 ```
 
+
 ### Methodology
 
 #### Calf Manure Excretion (`calculate_calf_manure`)
@@ -3728,6 +3731,7 @@ $$
 :::
 
 Inorganic phosphorus fraction:
+
 ::: {#eq-an-exc-31}
 [[**AN.EXC.31**]]{.aside .content-visible when-format="html"}
 $$
@@ -3985,11 +3989,10 @@ $$
 $$
 :::
 
-### Methane Mitigation
 
+## Methane Mitigation
 
-
-#### Introduction
+### Introduction
 
 The Methane Mitigation Calculator module evaluates the reduction in enteric methane yield due to the inclusion of 
 specific feed additives in animal diets. This module calculates methane mitigation effects on a per-animal basis by 
@@ -4003,7 +4006,7 @@ Future updates will include additional strategies such as essential oils and sea
 calculated as a percentage reduction in methane yield (methane production / DMI). Then this module integrates with 
 the Enteric Methane Calculator to adjust the initially predicted enteric methane. 
 
-#### Required User Inputs
+### Required User Inputs
 
 The Methane Mitigation Calculator module evaluates the reduction in enteric methane yield based on dietary 
 composition and the use of specific feed additives. The inputs are organized into the following groups:
@@ -4025,7 +4028,7 @@ import_table(
   colalign = ["left", "left", "center"]
 )
 ```
-#### Expected Outputs
+### Expected Outputs
 
 This module predicts the daily enteric methane emissions for individual animals. Outputs are described in @tbl-an-output-methane.
 
