@@ -741,7 +741,7 @@ class SimulationEngine:
         """Run this year's warmup and evaluation days, then execute annual routines."""
         year_start_simulation_day = self.time.simulation_day
         days_in_year = self.time.year_end_day - self.time.year_start_day + 1
-        warmup_days_in_year = min(max(self.warmup_days - year_start_simulation_day, 0), days_in_year)
+        warmup_days_in_year = int(min(max(self.warmup_days - year_start_simulation_day, 0), days_in_year))
 
         for _ in range(warmup_days_in_year):
             self._simulation_type_to_daily_simulation_function[self.simulation_type]()
