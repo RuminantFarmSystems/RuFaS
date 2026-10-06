@@ -22,6 +22,7 @@ This **changelog** file keeps a record of updates included in existing version r
 ## Changelog Entries
 
 ### Current version
+- [3317](https://github.com/RuminantFarmSystems/RuFaS/pull/3317) - [minor change] [pyproject.toml] [NoInputChange] [NoOutputChange] Aligns dependency requirements between pyproject.toml files on dev and main/test. 
 
 ### v1.0.6
 - [3247](https://github.com/RuminantFarmSystems/RuFaS/pull/3247) - [minor change] [EEE] [NoInputChange] [NoOutputChange] Fix for edge case error introduced in 3202, a div0 error already fixed on dev, and labels pregnant cows during initialization using Repro Enum.
