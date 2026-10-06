@@ -32,7 +32,8 @@ format:
     theme: cosmo
     crossref:
       eq-prefix: ""
-    css: resources/templates/styles.css
+    css: 
+      - resources/templates/styles.css
   # pdf:
   #   pdf-engine: xelatex
   #   documentclass: scrbook
