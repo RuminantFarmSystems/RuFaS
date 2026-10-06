@@ -1198,7 +1198,7 @@ class TaskManager:
             )
 
             output_manager.is_first_post_processing = False
-            
+
             must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
                 group_args["output_prefix"],
                 group_args["convert_variable_table_path"],
