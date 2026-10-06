@@ -60,13 +60,6 @@ class LogVerbosity(Enum):
         return self.value[:-1].upper()
 
 
-LOG_LEVELS: dict[LogVerbosity, int] = {
-    LogVerbosity.LOGS: logging.INFO,
-    LogVerbosity.WARNINGS: logging.WARNING,
-    LogVerbosity.ERRORS: logging.ERROR,
-}
-
-
 def get_log_level(verbosity: LogVerbosity) -> int:
     log_levels = {
         LogVerbosity.NONE: logging.CRITICAL + 1,
