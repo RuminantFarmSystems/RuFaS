@@ -4,6 +4,27 @@ Output Manager
 Overview
 --------
 
+Set ``"warmup_days": 365`` in the simulation config JSON to run the first 365
+days as warmup. The remaining days form the evaluation phase. The value must be
+a non-negative integer leaving at least one evaluation day within the configured
+start and end dates. Omit the setting or use ``0`` to run without warmup; in that
+case initialization output is preserved and the pool is not cleared.
+
+The annual simulation loop is preserved. Within each year, warmup and evaluation
+run in separate daily loops with the same managers and clock. The warmup boundary
+is checked once per year, outside the daily loops.
+Between the loops, Output Manager clears the variable pool, resets its cached
+size, excludes existing saved variable chunks from final output, and logs the
+event. Saved chunks remain on disk for inspection. Logs, warnings, and errors
+are preserved. Annual routines still run at calendar-year boundaries and at the
+end of the simulation, not at an arbitrary midyear warmup boundary.
+
+This setting does not prepend years, reset simulation day numbering, or reset
+cumulative statistics maintained by the modules. End-of-simulation reports may
+therefore include warmup history from those modules. It is an output retention
+boundary, not an economics accounting reset or a complete steady-state warmup
+implementation.
+
 As its name suggests, it is in charge of managing the output. Output
 Manager collects variables, warnings, logs, and errors during the
 simulation (and other processes) and, as accurately as possible,
