@@ -56,6 +56,8 @@ mjx-container[jax="CHTML"][display="true"] mjx-tag {
    TABLE STYLING
 ========================================= */
 
+/* Consider https://github.com/quarto-dev/quarto-cli/issues/6945#issuecomment-1734250751 to remove striping instead /*
+
 /* Remove alternating row striping */
 table tbody tr:nth-child(odd),
 table tbody tr:nth-child(even) {
@@ -85,7 +87,6 @@ table td {
   border-bottom: 1px solid #ddd;
 }
 
-
 /* Force Quarto/Bootstrap striped tables to white */
 .table-striped > tbody > tr:nth-of-type(odd) > *,
 .table-striped > tbody > tr:nth-of-type(even) > *,
@@ -104,35 +105,4 @@ table tbody tr,
 table tbody tr > * {
   background-color: white !important;
   box-shadow: none !important;
-}
-
-/* =========================================
-   TABLE ALIGNMENT
-========================================= */
-
-/* Center all table headers */
-table th {
-  text-align: center !important;
-  vertical-align: middle !important;
-}
-
-/* Left-align text-heavy columns */
-table td:nth-child(1),
-table td:nth-child(2) {
-  text-align: left;
-  vertical-align: top;
-}
-
-/* Center numeric columns */
-table td:nth-child(3),
-table td:nth-child(4),
-table td:nth-child(5) {
-  text-align: center;
-  vertical-align: top;
-}
-
-/* Optional: control definition column width */
-table th:nth-child(2),
-table td:nth-child(2) {
-  width: 45%;
 }
