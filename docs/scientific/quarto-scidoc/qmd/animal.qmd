@@ -2464,16 +2464,18 @@ Overall reporting for reproductive measures can be summarized and split into sch
 
 #### Methodology
 
+In the next few sections, we will describe the RuFaS model's methodology for simulating reproductive events and outcomes for both heifers and cows. The model tracks key reproductive metrics at both the herd and individual animal levels, allowing for detailed analysis of reproductive performance. Here you may refer to the symbol key for the subsequent schematics outlined in this reproduction section.
+
+![Methodology used for heifer breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_key.png){#fig-ani-repro-key}
+
 ##### Heifer Breeding
 
 The `heiferII_reproduction_update` represents the breeding-eligible heifer stage, beginning when the animal enters a reproductive management program 
 and ending when she reaches a user-defined day in pregnancy that marks the start of the pre-fresh period (`prefresh_day`). The breeding process follows 
-the assigned reproductive management program and is simulated as described below (@fig-ani-repro-method-2). Each program includes a user-defined conception 
+the assigned reproductive management program and is simulated as described below (@fig-ani-repro-heifers). Each program includes a user-defined conception 
 rate (`conception_rate`), determining the probability of pregnancy initiation at the time of insemination. 
 
-![Methodology used for heifer breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_heifers.png){#fig-ani-repro-heifers}
-
-![Methodology used for heifer breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_method_2.png){#fig-ani-repro-method-2}
+![Methodology used for heifer breeding and rebreeding in the RuFaS Animal Module. The icon key is available at the beginning of this section (@fig-ani-repro-key)](../resources/images/ani_repro_heifers.png){#fig-ani-repro-heifers} 
 
 Pregnancy diagnosis and reconfirmation occur after each insemination `heifer_pregnancy_update`. If a heifer remains nonpregnant beyond a user-defined age 
 threshold (`heifer_repro_cull_time`, e.g., 500 days), she is culled due to reproductive failure. At a user-defined day in pregnancy (`prefresh_day`, 
@@ -2500,12 +2502,10 @@ breeding attempts.
 ##### Cow Breeding
 
 The breeding process for cows begins after calving and the voluntary waiting period (VWP), following one of three reproductive management strategies 
-available for cows which are similar to those described in the heifer section and are pictured in @fig-ani-repro-method. The program assigned to a cow 
+available for cows which are similar to those described in the heifer section and are pictured in @fig-ani-repro-cow-presynch. The program assigned to a cow 
 determines the timing of insemination and the probability of pregnancy initiation.
 
-![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_cow_presynch.png){#fig-ani-repro-cow-presynch}
-
-![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_method.png){#fig-ani-repro-method}
+![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module. The icon key is available at the beginning of this section (@fig-ani-repro-key)](../resources/images/ani_repro_cow_presynch.png){#fig-ani-repro-cow-presynch}
 
 * **ED (`execute_cow_ed_protocol`):** In the ED strategy, spontaneous estrous cycles are simulated. The first estrous cycle after calving is 
 determined on the calving date using a random draw from a normal distribution with user-specified mean and standard deviation [@kalantari2015using]. 
@@ -2523,7 +2523,7 @@ random draw from a uniform distribution U(0,1), compared against the conception 
 before TAI begins. If estrus is detected after VWP (`voluntary_waiting_period`) and before the initiation of the TAI (`ovsynch_program_start_day`), 
 AI is scheduled according to the estrus detection protocol. If no estrus is detected, the cow follows the TAI protocol for insemination.
 
-![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_cow_breeding_protocol.png){#fig-ani-repro-cow-breeding-protocol}
+![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module. The icon key is available at the beginning of this section (@fig-ani-repro-key)](../resources/images/ani_repro_cow_breeding_protocol.png){#fig-ani-repro-cow-breeding-protocol}
 
 ::: {.callout-note}
 For rebreedings, cows can be assigned to any of the three rebreeding strategies `resynch_program`: TAIbeforePD, TAIafterPD, or PGFatPD (`open_cow`).
@@ -2541,7 +2541,7 @@ After PGF treatment (day 0), cows are monitored for natural estrus. If estrus is
 within seven days, the cow is enrolled in a timed AI protocol (OvSynch-48, OvSynch-56, CoSynch-72, or 5-day CoSynch) to ensure insemination. 
 This program balances estrus detection with timed AI, allowing for natural breeding opportunities before initiating synchronization.
 
-![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module.](../resources/images/ani_repro_cow_rebreed.png){#fig-ani-repro-cow-rebreed}
+![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module. The icon key is available at the beginning of this section (@fig-ani-repro-key)](../resources/images/ani_repro_cow_rebreed.png){#fig-ani-repro-cow-rebreed}
 
 ##### Pregnancy Diagnosis (PD) and Pregnancy Loss
 
