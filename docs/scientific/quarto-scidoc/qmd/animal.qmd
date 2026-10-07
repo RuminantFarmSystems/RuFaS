@@ -2591,7 +2591,7 @@ requirements for the pen’s average cow) or reaching a threshold milk productio
 #| tbl-cap: Inputs used to estimate customized herd-level lactation curve parameters.
 import_table(
   "../resources/table_data/animal/tbl-an-milk-inputs.csv",
-  colalign = ["left", "left", "left", "center", "center", "center" ]
+  colalign = ["left", "left", "left", "center", "center" ]
 )
 ```
 
@@ -2600,7 +2600,7 @@ import_table(
 #| tbl-cap: Inputs used to determine milk fat and protein percentages for each lactating cow.
 import_table(
   "../resources/table_data/animal/tbl-an-milk-fat-pro.csv",
-  colalign = ["left", "left", "left", "center", "center", "center" ]
+  colalign = ["left", "left", "left", "center", "center"]
 )
 ```
 
@@ -2609,7 +2609,7 @@ import_table(
 #| tbl-cap: Inputs used to constrain how much an average cow's daily milk production will be reduced due to an inadequate ration.
 import_table(
   "../resources/table_data/animal/tbl-an-milk-red.csv",
-  colalign = ["left", "left", "left", "center", "center", "center" ]
+  colalign = ["left", "left", "left", "center", "center"]
 )
 ```
 
@@ -2848,7 +2848,7 @@ There are three categories on inputs that should be considered in this section:
 #| tbl-cap: Wood's Lactation Curve base parameters, provide baseline values and variability.
 import_table(
   "../resources/table_data/animal/tbl-an-lac-woods.csv",
-  colalign = ["left", "left", "center", "center"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -2857,7 +2857,7 @@ import_table(
 #| tbl-cap: Adjustment factors based on geographical, temporal, and parity considerations.
 import_table(
   "../resources/table_data/animal/tbl-an-lac-adjust.csv",
-  colalign = ["left", "left", "center", "center"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
@@ -2866,7 +2866,7 @@ import_table(
 #| tbl-cap: Farm specific 305-day milk production, used to tailor the lactation curve to the farm's production targets and herd composition.
 import_table(
   "../resources/table_data/animal/tbl-an-lac-milk-prod.csv",
-  colalign = ["left", "left", "center", "center"]
+  colalign = ["left", "left", "center"]
 )
 ```
 
