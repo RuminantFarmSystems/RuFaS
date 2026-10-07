@@ -1,6 +1,6 @@
-﻿Variable ,Application, Definition (+/-units), Default ,Min,Max
-breeding_start_day_h,Heifers,Age when RuFaS initiates estrus protocol (days; first cycle to occur ~21 days later),380,0,
-heifer_repro_method,Heifers,Select one: `TAI` - Timed Artificial Insemination; `ED` - Estrus Detection; `ED-TAI` - Combination of ED and TAI,TAI,--,--
-heifer_repro_cull_time,Heifers,Age when a heifer would be culled for failure to become pregnant (days),500,0,--
-cow_repro_method,Cows,Select one: `TAI` - Timed Artificial Insemination; `ED` - Estrus Detection; `ED-TAI` - Combination of ED and TAI,TAI,--,--
-do_not_breed_time,Cows,The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant (days),185,0,
+﻿Variable ,Application, Definition (+/-units), Default ,Min,Max,Values
+breeding_start_day_h,Heifers,Age when RuFaS initiates estrus protocol (days; first cycle to occur ~21 days later),380,0,--,--
+heifer_repro_method,Heifers,Select one: `TAI` - Timed Artificial Insemination; `ED` - Estrus Detection; `ED-TAI` - Combination of ED and TAI,ED,--,--,"TAI, ED, SynchED"
+heifer_repro_cull_time,Heifers,Age when a heifer would be culled for failure to become pregnant (days),500,0,--,--
+cow_repro_method,Cows,Select one: `TAI` - Timed Artificial Insemination; `ED` - Estrus Detection; `ED-TAI` - Combination of ED and TAI,ED-TAI,--,--,"TAI, ED, ED-TAI"
+do_not_breed_time,Cows,The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant (days),185,0,--,--

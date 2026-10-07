@@ -1,5 +1,5 @@
-﻿Variable , Definition , Default , Min ,Max
-estrus_detection_rate,The proportion of *total heifers* in estrus that are detected in the ED (Estrus Detection) protocol (%),0.6,0,1
-estrus_conception_rate,The proportion of *inseminated heifers* that become pregnant in the ED protocol (%),0.9,0,1
-repro_sub_protocol,"The hormone delivery program to be used for heifers using the Synch-ED or TAI methods. If Synch-ED, then `2p` or `CP`; If TAI, then `5dCG2P`or `5dCGP`. If ED , this value should set it to `N/A`",--,5dCG2P,"5dCG2P, 5dCGP, 2P, CP, or N/A"
-conception_rate,The conception rate for the reproductive subprotocol,0.6,0,1
+﻿Variable , Definition , Default , Min ,Max,Values
+estrus_detection_rate,The proportion of *total heifers* in estrus that are detected in the ED (Estrus Detection) protocol (%),0.9,0,1,--
+estrus_conception_rate,The proportion of *inseminated heifers* that become pregnant in the ED protocol (%),0.6,0,1,--
+repro_sub_protocol,"The hormone delivery program to be used for heifers using the Synch-ED or TAI methods. If Synch-ED, then `2p` or `CP`; If TAI, then `5dCG2P`or `5dCGP`. If ED , this value should set it to `N/A`",5dCG2P,--,--,"5dCG2P, 5dCGP, 2P, CP, N/A"
+conception_rate,The conception rate for the reproductive subprotocol,0.6,0,1,--

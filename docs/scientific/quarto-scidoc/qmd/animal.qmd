@@ -2398,7 +2398,7 @@ synchronization treatments, breeding efficiency, and pregnancy outcomes. The key
 #| tbl-cap: User inputs in `management_decisions` that determine the reproductive breeding program of animal groups and impact reproductive efficiency. In the case of heifer groups, this includes age at first calving.
 import_table(
   "../resources/table_data/animal/tbl-an-repro-inputs-mgmt.csv",
-  colalign = ["left", "center", "left", "center", "center", "center"]
+  colalign = ["left", "center", "left", "center", "center", "center", "left"]
 )
 
 ```
@@ -2407,7 +2407,7 @@ import_table(
 #| tbl-cap: User inputs in `farm_level_heifers` (`farm_level.repro.heifers`) that determine the [heifer]{.underline} reproductive breeding program and impact reproductive efficiency and age at first calving.
 import_table(
   "../resources/table_data/animal/tbl-an-repro-inputs-heifer-farm.csv",
-  colalign = ["left", "left", "center", "center", "center"]
+  colalign = ["left", "left", "center", "center", "center", "left"]
 )
 ```
 ```{python}
@@ -2415,7 +2415,7 @@ import_table(
 #| tbl-cap: User inputs in `farm_level_cows` (`farm_level.repro.cows`) that determine the [cow]{.underline} reproductive breeding program and impact reproductive efficiency, calving interval, and reproductive culling.
 import_table(
   "../resources/table_data/animal/tbl-an-repro-inputs-cow-farm.csv",
-  colalign = ["left", "left", "center", "center", "center"]
+  colalign = ["left", "left", "center", "center", "center", "left"]
 )
 ```
 ```{python}
@@ -2423,7 +2423,7 @@ import_table(
 #| tbl-cap: The following inputs can be used to determine if there is a decrease in the conception rate with parity and rebreeding attempts (`farm_level` section).
 import_table(
   "../resources/table_data/animal/tbl-an-repro-inputs-adjust.csv",
-  colalign = ["left", "left", "center", "center", "center"]
+  colalign = ["left", "left", "center", "center", "center", "left"]
 )
 ```
 
