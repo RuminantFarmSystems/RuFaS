@@ -2,6 +2,7 @@
   "cross_validation": [
     {
       "description": "weather high, low, and average temperature arrays must have equal lengths",
+      "failure_message": "weather.high, weather.low and weather.avg must have the same number of daily values.",
       "aliases": {
         "variables": {
           "weather_high": "weather.high",
@@ -56,6 +57,7 @@
     },
     {
       "description": "weather daily high temperatures must be greater than or equal to daily averages",
+      "failure_message": "On every day, weather.high must be greater than or equal to weather.avg.",
       "aliases": {
         "variables": {
           "weather_high": "weather.high",
@@ -88,6 +90,7 @@
     },
     {
       "description": "weather daily average temperatures must be greater than or equal to daily lows",
+      "failure_message": "On every day, weather.avg must be greater than or equal to weather.low.",
       "aliases": {
         "variables": {
           "weather_avg": "weather.avg",

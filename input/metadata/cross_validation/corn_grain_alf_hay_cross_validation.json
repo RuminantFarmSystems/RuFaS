@@ -2,6 +2,7 @@
   "cross_validation": [
     {
       "description": "CornGrain-AlfHay schedule 0 has equal planting year/day lengths",
+      "failure_message": "CornGrain-AlfHay.crop_schedules.0.planting_years and CornGrain-AlfHay.crop_schedules.0.planting_days must have the same number of entries (one planting day per planting year).",
       "aliases": {
         "variables": {
           "planting_years": "CornGrain-AlfHay.crop_schedules.0.planting_years",
@@ -34,6 +35,7 @@
     },
     {
       "description": "CornGrain-AlfHay schedule 0 has equal harvest year/day lengths",
+      "failure_message": "CornGrain-AlfHay.crop_schedules.0.harvest_years and CornGrain-AlfHay.crop_schedules.0.harvest_days must have the same number of entries (one harvest day per harvest year).",
       "aliases": {
         "variables": {
           "harvest_years": "CornGrain-AlfHay.crop_schedules.0.harvest_years",
@@ -66,6 +68,7 @@
     },
     {
       "description": "CornGrain-AlfHay schedule 1 has equal planting year/day lengths",
+      "failure_message": "CornGrain-AlfHay.crop_schedules.1.planting_years and CornGrain-AlfHay.crop_schedules.1.planting_days must have the same number of entries (one planting day per planting year).",
       "aliases": {
         "variables": {
           "planting_years": "CornGrain-AlfHay.crop_schedules.1.planting_years",
@@ -98,6 +101,7 @@
     },
     {
       "description": "CornGrain-AlfHay schedule 1 has equal harvest year/day lengths",
+      "failure_message": "CornGrain-AlfHay.crop_schedules.1.harvest_years and CornGrain-AlfHay.crop_schedules.1.harvest_days must have the same number of entries (one harvest day per harvest year).",
       "aliases": {
         "variables": {
           "harvest_years": "CornGrain-AlfHay.crop_schedules.1.harvest_years",
@@ -130,6 +134,7 @@
     },
     {
       "description": "CornGrain-AlfHay schedule 2 has equal planting year/day lengths",
+      "failure_message": "CornGrain-AlfHay.crop_schedules.2.planting_years and CornGrain-AlfHay.crop_schedules.2.planting_days must have the same number of entries (one planting day per planting year).",
       "aliases": {
         "variables": {
           "planting_years": "CornGrain-AlfHay.crop_schedules.2.planting_years",
@@ -162,6 +167,7 @@
     },
     {
       "description": "CornGrain-AlfHay schedule 2 has equal harvest year/day lengths",
+      "failure_message": "CornGrain-AlfHay.crop_schedules.2.harvest_years and CornGrain-AlfHay.crop_schedules.2.harvest_days must have the same number of entries (one harvest day per harvest year).",
       "aliases": {
         "variables": {
           "harvest_years": "CornGrain-AlfHay.crop_schedules.2.harvest_years",
@@ -194,6 +200,7 @@
     },
     {
       "description": "CornGrain-AlfHay schedule 3 has equal planting year/day lengths",
+      "failure_message": "CornGrain-AlfHay.crop_schedules.3.planting_years and CornGrain-AlfHay.crop_schedules.3.planting_days must have the same number of entries (one planting day per planting year).",
       "aliases": {
         "variables": {
           "planting_years": "CornGrain-AlfHay.crop_schedules.3.planting_years",
@@ -226,6 +233,7 @@
     },
     {
       "description": "CornGrain-AlfHay schedule 3 has equal harvest year/day lengths",
+      "failure_message": "CornGrain-AlfHay.crop_schedules.3.harvest_years and CornGrain-AlfHay.crop_schedules.3.harvest_days must have the same number of entries (one harvest day per harvest year).",
       "aliases": {
         "variables": {
           "harvest_years": "CornGrain-AlfHay.crop_schedules.3.harvest_years",
