@@ -166,6 +166,10 @@ class ManureStream:
         Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it (unitless).
+    lignin : float, default 0.0
+        Mass of lignin in the manure stream, from excreted manure and bedding (kg). Lignin is assumed to be
+        conserved through manure processing: emission and decomposition losses do not reduce it, and separators
+        split it between their solid and liquid outputs following the total solids separation efficiency.
 
     Class Attributes
     ----------------
@@ -187,6 +191,7 @@ class ManureStream:
     volume: float
     methane_production_potential: float
     pen_manure_data: PenManureData | None
+    lignin: float = 0.0
 
     MANURE_STREAM_UNITS = {
         "water": MeasurementUnits.KILOGRAMS,
@@ -204,6 +209,7 @@ class ManureStream:
         "total_volatile_solids": MeasurementUnits.KILOGRAMS,
         "methane_production_potential": MeasurementUnits.CUBIC_METERS_PER_KILOGRAM,
         "pen_manure_data": None,
+        "lignin": MeasurementUnits.KILOGRAMS,
     }
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
@@ -247,6 +253,7 @@ class ManureStream:
             ),
             bedding_non_degradable_volatile_solids=self.bedding_non_degradable_volatile_solids
             + other.bedding_non_degradable_volatile_solids,
+            lignin=self.lignin + other.lignin,
         )
 
     @property
@@ -269,6 +276,7 @@ class ManureStream:
                 self.total_solids,
                 self.volume,
                 self.bedding_non_degradable_volatile_solids,
+                self.lignin,
             ]
         )
 
@@ -307,6 +315,7 @@ class ManureStream:
             methane_production_potential=0.0,
             pen_manure_data=None,
             bedding_non_degradable_volatile_solids=0.0,
+            lignin=0.0,
         )
 
     def split_stream(
@@ -379,6 +388,7 @@ class ManureStream:
             methane_production_potential=self.methane_production_potential,
             pen_manure_data=split_pen_manure_data,
             bedding_non_degradable_volatile_solids=self.bedding_non_degradable_volatile_solids * split_ratio,
+            lignin=self.lignin * split_ratio,
         )
 
 
