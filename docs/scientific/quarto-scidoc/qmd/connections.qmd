@@ -41,7 +41,7 @@ import_table(
 #| tbl-cap: User inputs for the Stream Formation section.
 import_table(
     "../resources/table_data/connections/mn-inputs-stream.csv",
-    colalign=["left", "center", "left"],
+    colalign=["left", "left", "center", "center", "center", "center"],
     read_opts = {"encoding": "cp1252"}
 )
 ```
