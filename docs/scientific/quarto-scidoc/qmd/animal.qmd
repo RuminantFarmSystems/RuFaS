@@ -36,12 +36,9 @@ and Cow).
 *  Heifer II animals that successfully conceive become Heifer III's when the number of days left in their pregnancy 
 is equal to the user-defined input for prefresh days (default 21).
 *  When a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm.
-*  Cows cycle through lactating and non-lactating phases until they are removed from the herd due to low milk production or a user-provided probability for sale or death within each parity (lactation).
+*  Cows cycle through lactating and non-lactating phases until they are removed from the herd through mortality, disease-related sale, or herd-size management (i.e., lowest producing cows are replaced by incoming heifers).
 
-When a Heifer III or Cow reaches full gestation length, they start lactating and a new calf object is created. The calf 
-is assigned a birthweight according to a user-informed random distribution. All male calves are recorded and removed 
-from the farm on day 1 of their life. Female calves either remain on the farm or are sold on day 1, determined by an 
-event-based Monte Carlo method informed by the user-defined percent of female calves that are kept. 
+When a Heifer III or Cow reaches full gestation length, a new calf object is created. The calf is assigned a birthweight according to a user-informed random distribution. All live male calves are recorded and removed from the farm on the day of birth. Female calves either remain on the farm or are sold according to the user-selected calf retention method. Users may retain female calves using either a probability-based retention rate or a target annual number of calves to retain. Youngstock that remain in the herd are also subject to user-defined calf and heifer mortality probabilities as they progress through the calf and heifer life stages.
 
 ## Herd-level Processes and Management
 
@@ -215,7 +212,7 @@ changing the compositions of the existing feeds or by adding new feeds.
 
 Regardless of whether or not a user chooses to provide their own ration or have RuFaS build and feed a ration optimized for least-cost, 
 RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients and ingredients that 
-are in both the NASEM and NRC libraries can be used. Users interested in feeding a ration that they define, need to provide a list of ingredients 
+are in both the NASEM and NRC libraries. Users interested in feeding a ration that they define, need to provide a list of ingredients 
 and their relative % dry matter intake for each animal class (pre-weaned calves, growing heifers, close-up animals, and lactating cows). 
 
 If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, it is imperative that proper costs are inputted for each 
@@ -1975,9 +1972,13 @@ The ration formulation will proceed as described in the Automated Methodology ab
 
 #### Introduction
 
-If the number of close-up heifers is more than the herd needs, heifers in the Heifer III group are sold. If the number of close-up 
-is less than the herd needs, a replacement is bought from the market. This is evaluated daily by comparing the number of (cows + Heifer III) 
-to the herd num specified by the user. Details of this method are described in the [Culling](#sec-an-cull) section of Animal-level processes and management. 
+RuFaS maintains the user-defined cow herd size by periodically comparing the number of cows in the herd with user-defined buying and selling thresholds. At each user-defined herd-size evaluation interval, RuFaS determines whether additional replacement animals should be purchased to enter the herd or whether cows should leave the herd because the cow population exceeds the desired upper threshold.
+
+If cow numbers fall below the user-defined buying threshold, replacement Heifer IIIs ("springers") are purchased from the replacement market. If cow numbers exceed the user-defined selling threshold, eligible cows are ranked according to the selected culling criterion and the lowest-ranking cows are sold until the herd reaches the appropriate herd-size threshold.
+
+Heifer IIIs are not sold as a mechanism for controlling excess herd size. Instead, the availability of replacement heifers entering the cow herd regulates the removal of lower-ranking cows through oversupply culling.
+
+ More details of this method are described in the [Culling](#sec-an-cull) section of Animal-level processes and management. 
 
 #### Herd Size Management: Heifer III Sales
 
@@ -1987,31 +1988,110 @@ a replacement is bought from the market. This is evaluated daily by comparing th
 **User Inputs and Constants**
 
 * `herd_num`: the target number of cows (dry + lactating) to maintain
-* `SELLING_THRESHOLD` = 1.03 – hard-coded value (animal constant) used to determine threshold above `herd_num` at which heiferIII’s should be sold. 
-* `BUYING_THRESHOLD` = 1.01 – hard-coded value used to determine threshold below `herd_num` at which heiferIII’s should be bought
+* `herd_size_sell_threshold`: threshold relative to the target herd size above which eligible cows may be sold for herd oversupply.
+* `herd_size_buy_threshold`: threshold relative to the target herd size below which replacement Heifer IIIs may be purchased.
+* `herd_size_adjustment_interval`: Number of simulation days between evaluations of the cow population for herd-size adjustment.
+
+#### Oversupply Culling (Low Production culls)
+At each herd-size check, `HerdManager` evaluates the current number of cows relative to the user-defined buying and selling thresholds.
+Oversupply culling in RuFaS is used to reduce the cow population when cow numbers exceed the user-defined selling threshold, in the same way that springing heifers replace low-producing cows in real herds.
+
+Not all cows are eligible for removal. Eligibility is determined using the user-defined days-in-milk and pregnancy thresholds. By default, a cow must have at least 60 days in milk and must have carried her current calf for no more than 180 days to be considered for an oversupply cull. These limits protect fresh cows and cows in later pregnancy, respectively.
+
+Eligible cows are ranked according to `cull_ranking_criteria`:
+
+`‘milk’` = rank cows according to current daily milk production.
+`‘305_day_milk’` =  rank cows according to 305-day milk yield.
+
+The lowest-ranking eligible cow is removed first. Additional eligible cows are removed, as necessary, until the herd-size condition has been addressed.
+
+Oversupply culling replaces the previous production-related culling mechanism in which cows marked Do Not Breed were sold after milk production fell below `cull_milk_production`. The `cull_milk_production` input is no longer used for cow removal. A Do Not Breed designation can therefore terminate reproductive management without independently triggering a low-production cull.
+
+**User Inputs and Constants**
+
+* `cull_eligibility_minimum_days_in_milk`:  minimum days in milk required for a cow to be eligible for an oversupply cull. Default = 60 days.
+* `cull_eligibility_maximum_days_carried_calf`:  maximum days carried calf for a cow to remain eligible for an oversupply cull. Cows later in pregnancy than this threshold are protected from oversupply culling. Default = 180 days.
+* `cull_ranking_criteria`: Production measure used to rank eligible cows for oversupply culling. Available options are `milk` and `305_day_milk`; the default is `milk`.
+* Buying and selling thresholds refer to the when the cow population reaches to point that Heifer IIIs may be purchased or when cows must be sold respectively. Herd size adjustment interval  establishes the frequency that this population is evaluated.
 
 **Parameters and Equations**
 
-* `HerdManager._check_if_heifers_need_to_be_sold()` Evaluates if the current number of Heifer III and cows exceeds a specified threshold 
-(defined as 3% of the herd statistics’ target herd size). If the threshold is surpassed, Heifer IIIs are removed from the herd until herd size 
-falls within acceptable range. 
+* `HerdManager._check_if_cows_need_to_be_sold()` evaluates whether the current cow population exceeds the user-defined selling threshold and coordinates the removal of cows when herd size exceeds that threshold via `cull_ranking_criteria`.
   * Called by `HerdManager.daily_routines()`
-  * Returns a list of animals removed 
-  * Logic - While the number of (Heifer IIIs + cows) is greater than `herd_num` x `selling_threshold`: 
-      * The last heifer III is removed and is added to `animals_removed`
-      * Information about that heifer III is added to `sold_heiferIIIs_info`
-      * The number of heifer III’s is decremented by 1
-      * The number of `sold_heiferIII_oversupply_num` is incremented by 1
-  * This cycle iterates until the number of (Heifer IIIs + cows) is equal to `herd_num` x `selling_threshold`
+  * Returns a list of cows removed
+  * Logic 
+	* Compare the current number of cows with herd_num × herd_size_sell_threshold.
+      * If the cow population exceeds the selling threshold, identify cows to remove. 
+      * Rank eligible cows according to `cull_ranking_criteria`.
+      * Removes cows until the herd-size selling condition has been addressed.
+      *  Record removed animals and update cow oversupply sale statistics.
 
-* `HerdManager._check_if_replacement_heifers_needed()` Determines whether additional Heifer IIIs need to be added to the herd based on the 
-current herd size, purchase thresholds, and the availability of heifers in the replacement market.
+* `HerdManager._get_cow_removal_index()` identifies the lowest-ranking cow that is eligible for an oversupply cull.
+      * Cow eligibility is determined using `cull_eligibility_minimum_days_in_milk` and `cull_eligibility_maximum_days_carried_calf`.
+      * Eligible cows are ranked according to the user-defined `cull_ranking_criteria`.
+      * Returns the index of the eligible cow selected for removal.
+
+#### Replacement Purchases 
+
+If the cow population is below the buying threshold, replacement Heifer IIIs are purchased from the replacement market. Purchased Heifer IIIs enter the herd as springers and subsequently enter the cow population at first calving.
+
+If the cow population is within the user-defined herd-size limits, no herd-size adjustment is made.
+
+If the cow population exceeds the selling threshold, RuFaS initiates oversupply culling of low producing cows as described above.
+
+**Parameters and Equations**
+
+* `HerdManager._check_if_replacement_heifers_needed()` Determines whether additional Heifer IIIs need to be added to the herd based on the
+current cow population, purchase thresholds, and the availability of heifers in the replacement market.
   * Called by `HerdManager.daily_routines()`
-  * Returns a list of animals purchased 
-  * While the number of (Heifer IIIs + cows + bought\_heifer\_num) is less than `herd_num` x `buying_threshold`: 
-    * The first animal in the `replacement_market` enters the herd, assigned a phosphorus requirement and net merit value, and added to the `animals_added` list 
-    * The number of `bought_heifer_num` is incremented by 1 
-  * This cycle iterates until the number of (Heifer IIIs + cows + `bought_heifer_num`) is equal to `herd_num` x `buying_threshold` 
+  * Returns a list of Heifer IIIs purchased
+  * Logic 
+	* Compare the current number of cows with `herd_num` × `herd_size_buy_threshold`.
+      * If the cow population is below the buying threshold, purchase replacement Heifer IIIs from the replacement_market  
+      * Purchased animals are added to the herd and recorded as purchased replacements.
+      * Continue purchasing replacement Heifer IIIs as needed until the herd-size buying condition is satisfied or the replacement market is exhausted.
+
+#### Cow Removals
+
+Cows can leave the RuFaS herd through several removal pathways. Cow mortality and acute sales are stochastic removal processes based on parity and stage of lactation, whereas oversupply culling is a management-driven process used to regulate herd size.
+For mortality and acute sales, RuFaS assigns annual removal probabilities according to cow parity. These annual probabilities are converted to daily risks and adjusted according to whether a cow is fresh (DIM < 50) or not fresh (DIM ≥ 50). Fresh cows are assigned 2.55 times the daily mortality and acute-sale risk of non-fresh cows. The risks are weighted according to the proportion of fresh and non-fresh cows in the herd so that the average daily risk remains consistent with the parity-specific annual probability.
+Mortality and acute-sale risks are evaluated daily. Acute-sale risk is evaluated before mortality risk. If a cow is selected for acute sale, she is removed from further mortality assessment on that day.
+
+**Acute Sales**
+
+An acute sale represents an involuntary sale of a cow, rather than mortality or a management-driven oversupply cull.
+As with mortality, acute-sale risk is determined using a parity-specific annual probability. The annual probability is converted to an average daily risk and redistributed between fresh and non-fresh cows. Fresh cows have 2.55 times the daily acute-sale risk of non-fresh cows.
+Acute-sale and mortality probabilities are separate. A cow can therefore have different annual probabilities for the two removal pathways even though the same parity and fresh-cow adjustment framework is used for both.
+Acute-sale risk is evaluated before mortality risk during the daily removal assessment. If a cow is selected for acute sale, she is marked as sold and is not subsequently evaluated for mortality on that day.
+
+**Cow Death and Mortality**
+
+Cow mortality represents removal of a cow from the herd because of death.
+Each cow is assigned an annual mortality probability according to her parity. Parities 1, 2, and 3 use their corresponding probability, while cows in parity 4 or greater use the parity-4+ probability.
+The annual mortality probability is converted to an average daily mortality risk. RuFaS then adjusts this risk according to stage of lactation. Cows with fewer than 50 DIM are classified as fresh and receive 2.55 times the daily mortality risk assigned to non-fresh cows.
+The proportion of fresh cows is calculated from the current cow population. Therefore, the fresh-cow adjustment redistributes the parity-specific mortality risk between fresh and non-fresh cows rather than simply multiplying the annual mortality probability by 2.55.
+Each eligible cow receives a daily stochastic mortality assessment. A cow selected for mortality is recorded as a death and removed from the herd.
+
+::: {.callout-note}
+Oversupply culling is handled separately through herd-size management. It is not based on the parity-specific mortality or acute-sale probabilities and does not use the fresh/non-fresh risk adjustment.
+:::
+
+**User Inputs and Constants**
+
+
+
+
+
+
+**Parameters and Equations**
+The average daily mortality risk for a cow's parity is calculated as: 
+* `HerdManager._assess_removal_risk()` determines the proportion of the cow herd that is currently fresh and initiates the individual removal-risk assessment.
+* Fresh cows are identified as cows with DIM < 50.
+* `percent_fresh_cows` is calculated from the entire current cow population.
+* Each cow is passed the current fresh-cow proportion for individual removal-risk assessment.
+* `Animal.assess_removal_risk()` evaluates the cow's daily acute-sale and mortality risks.
+* The mortality-risk calculation uses the cow's parity to select the appropriate `parity_death_probability`, applies the fresh/non-fresh adjustment, and stochastically determines whether the cow dies.
+
 
 #### Reproductive Culls: Heifer II Sales
 
@@ -2019,7 +2099,7 @@ If the heifer does not have a successful conception or pregnancy and age (days b
 
 **User Inputs and Constants**
 
-* `Heifer_repro_cull_time` Days old when a heifer would be culled for failure to become pregnant (Default: 500 d)
+* `Heifer_repro_cull_time` age (days) when a heifer would be culled for failure to become pregnant (Default: 500 days)
 
 **Parameters and Equations**
 
@@ -2030,22 +2110,76 @@ If the heifer does not have a successful conception or pregnancy and age (days b
 
 #### Calf Sales
 
-All live male calves are sold immediately after birth. Female calves are sold/kept according to a roll of the dice evaluated against the 
-user-defined rate of keeping female calves.
+All live male calves are sold immediately after birth. Live female calves may either be retained as replacement youngstock or sold. RuFaS provides two alternative methods for determining female-calf retention: a rate-based method and a count-based method.
 
 **User Inputs and Constants**
 
-* `Keep_female_calf_rate` The percentage of female calves kept and raised on-farm (Default: 1)
+* `calf_retention_method` method used to determine female-calf retention. Options are `rate` and `count`. Default = `rate`.
+* `keep_female_calf_rate` The percentage of female calves kept and raised on-farm (Default: 1)
+* `keep_female_calf_num_annual` target number of live female calves to retain per year when `calf_retention_method` = `count`.
 
 **Parameters and Equations**
 
-* `Animal._initialize_newborn_calf()` to `self.sold`
-   * Called by `HerdManager._create_newborn_calf()` in `_perform_daily_routines_for_animals()`
-      * Creates a newborn calf instance 
-      * Contains logic that determines whether a calf should be sold, returning *True* if the calf is a male or if a random draw generates a number higher than the `keep_female_calf_rate`
-      * If assigned to be sold, `sold_at_day` = `simulation_day` 
+* `CalfRetentionPolicy` determines whether newborn calves are retained or sold according to the user-selected `calf_retention_method`.
+  * For `rate`, live female calves are retained according to `keep_female_calf_rate`.
+  * For `count`, live female calves consume available retention tags generated from `keep_female_calf_num_annual`.
+  * Male and stillborn calves do not consume retention tags.
+* `HerdManager._create_newborn_calf()`
+  * Creates the newborn calf during the active herd simulation.
+  * Applies `CalfRetentionPolicy` to determine whether a live female calf is retained or sold.
 
-#### Calf Losses (Death)
+
+** Rate vs. Count Based Retention **
+When `calf_retention_method` = `rate` (default), each live female calf is evaluated using an event-based Monte Carlo process. A random draw is compared with `keep_female_calf_rate` to determine whether the calf is retained or sold.
+
+This is the default calf-retention method and maintains the behavior of simulations that used `keep_female_calf_rate` before the count-based option was introduced.
+
+When `calf_retention_method` = `count`, `keep_female_calf_num_annual` specifies a target number of live female calves to retain during each simulation year. RuFaS distributes opportunities to retain calves across the simulation year using an evenly spaced schedule of retention "tags." When a retention tag becomes available, the next live female calf born consumes that tag and is retained. Female calves born when no retention tag is available are sold.
+
+Male calves and stillborn calves do not consume retention tags.
+
+The annual retention target is prorated for partial simulation years. If more than 20% of the retention tags remain unfulfilled at the end of the simulation year because too few live female calves were born, RuFaS records an ERROR and halts the simulation.
+
+The retention decision is managed by `CalfRetentionPolicy`. During the active herd simulation, `HerdManager` applies the policy when newborn calves are created. During herd initialization, female-calf retention continues to use the rate-based method because the count-based annual scheduling process does not apply to the initialization spin-up.
+
+#### Youngstock Mortality
+RuFaS represents mortality among live-born calves and post-weaning heifers separately from stillbirth and reproductive culling.
+
+
+** User Inputs and Constants **
+* `calf_mortality_rate` cumulative probability that a live-born calf dies between birth and weaning (Default: 0.0).
+* `heifer_mortality_rate` cumulative probability that a post-weaning heifer dies before entering the Heifer III stage (Default: 0.0).
+
+**Parameters and Equations**
+
+* `Animal._setup_calf_mortality()`
+  * Determines whether a live-born calf is assigned a pre-weaning mortality event.
+  * If mortality is assigned, samples the death day between day 1 and the day before weaning.
+* `Animal._setup_heifer_mortality()`
+  * Determines whether a post-weaning heifer is assigned a mortality event.
+  * Two-thirds of assigned mortality events occur during the Heifer I stage and one-third during the Heifer II stage.
+  * Heifer III animals are excluded from this mortality process.
+
+** Heifer Mortality **
+`heifer_mortality_rate` specifies the cumulative probability that a post-weaning heifer dies before entering the Heifer III stage. If a heifer is assigned a mortality event, the potential deaths are divided between the Heifer I and Heifer II stages:
+
+* Two-thirds of assigned heifer mortality events occur during the Heifer I period between weaning and the beginning of breeding.
+* One-third occur during the Heifer II period after breeding begins and before entry into the prefresh Heifer III stage.
+
+Heifer III animals are intentionally excluded from the youngstock mortality process. Animals removed through this process are assigned the cull reason: `died from post-wean mortality`
+
+The sampled future death day is stored using the same future-death mechanism used elsewhere in the Animal Module. For animals already partway through a mortality window when loaded into the initial herd, a sampled mortality date is retained only when that date occurs after the animal's current age.
+
+**Calf Losses (Death)**
+
+This process applies only to live-born calves and is therefore distinct from stillbirth. Calf losses in RuFaS include two distinct processes: stillbirth and mortality following a live birth. Stillbirth is evaluated when the newborn calf is initialized and removed from the day of birth if the random draw is less than the `still_birth_rate`. 
+
+For each eligible calf, RuFaS first determines whether mortality will occur using an event-based random draw. If mortality is assigned, the future death day is sampled from the period between day 1 and the day before weaning.
+
+Live-born calves retained on the farm may subsequently die before weaning according to `calf_mortality_rate`, as described in the introduction to Youngstock Mortality section above.
+
+Animals removed through this process are assigned the cull reason:
+`died from pre-wean mortality`
 
 **User Inputs and Constants**
 
@@ -2105,10 +2239,10 @@ the herd are described in detail in the Herd Exits section.
 
 **Parturition and New Calves** 
 
-When a Heifer III or Cow animal reaches the end of their pregnancy and starts lactating, a new calf animal object is created and 
-assigned a birthweight according to a user-informed random distribution. All male calves are recorded and removed from the farm on day 1 
-of their life. Female calves remain on the farm determined by an event-based Monte Carlo method informed by the user-defined percent of 
-female calves that are kept. 
+When a Heifer III or Cow animal reaches the end of their pregnancy and starts lactating, a new calf animal object is created and
+assigned a birthweight according to a user-informed random distribution. All male calves are recorded and removed from the farm on day 1
+of their life. Female calves are retained or sold according to the user-selected calf retention method. Retention may be determined using an event-based Monte Carlo process informed by `keep_female_calf_rate`, or by a user-defined annual target number of female calves to retain.
+
 
 ### Bodyweight and Growth
 
