@@ -3364,7 +3364,7 @@ def test_evaluate_condition_equal_length_branch(mocker: MockerFixture, eager_ter
     )
 
     assert result is True
-    mock_equal_length.assert_called_once_with([1, 2], [3, 4], eager_termination)
+    mock_equal_length.assert_called_once_with([1, 2], [3, 4], eager_termination, comparison="{} is_equal_length {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3407,7 +3407,7 @@ def test_evaluate_condition_equal_path(mocker: MockerFixture, eager_termination:
     valid = cv._evaluate_condition({"relationship": "equal", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_eq.assert_called_once_with("A", "B", eager_termination)
+    mock_eq.assert_called_once_with("A", "B", eager_termination, comparison="{} equal {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3423,7 +3423,7 @@ def test_evaluate_condition_greater_or_equal_path(mocker: MockerFixture, eager_t
     )
 
     assert valid
-    mock_ge.assert_called_once_with(5, 2, eager_termination)
+    mock_ge.assert_called_once_with(5, 2, eager_termination, comparison="{} greater_or_equal_to {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3453,7 +3453,7 @@ def test_evaluate_condition_not_equal_inverts_equality(mocker: MockerFixture, ea
     valid = cv._evaluate_condition({"relationship": "not_equal", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_eq.assert_called_once_with("foo", "bar", eager_termination)
+    mock_eq.assert_called_once_with("foo", "bar", eager_termination, comparison="{} not_equal {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3467,7 +3467,7 @@ def test_evaluate_condition_is_of_type_passes_eager(mocker: MockerFixture, eager
     valid = cv._evaluate_condition({"relationship": "is_of_type", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_is_type.assert_called_once_with("text", "string", eager_termination)
+    mock_is_type.assert_called_once_with("text", "string", eager_termination, comparison="{} is_of_type {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -4311,3 +4311,170 @@ def test_evaluate_condition_clause_array_returns_false_on_unsatisfied_clause(
 
     assert result is False
     assert any("Unsatisfied condition clause" in str(log) for log in cv._event_logs)
+
+
+def test_flush_event_logs_returns_and_clears_logs() -> None:
+    """flush_event_logs returns accumulated logs and leaves the pool empty."""
+    cv = CrossValidator()
+    cv._log_cross_validation_error("err", "msg", "func")
+
+    flushed = cv.flush_event_logs()
+
+    assert len(flushed) == 1
+    assert flushed[0]["error"] == "err"
+    assert cv._event_logs == []
+
+
+@pytest.mark.parametrize(
+    "alias_addresses,alias,expected",
+    [
+        (
+            {"p1": "animal.herd_information.parity_fractions.1"},
+            "p1",
+            "'p1' (animal.herd_information.parity_fractions.1)",
+        ),
+        ({}, "one", "'one'"),
+        ({"p1": "a.b"}, 3, "'3'"),
+    ],
+)
+def test_describe_alias(alias_addresses: dict[str, str], alias: Any, expected: str) -> None:
+    """_describe_alias includes the data address only for variable aliases."""
+    cv = CrossValidator()
+    cv._alias_addresses = alias_addresses
+
+    assert cv._describe_alias(alias) == expected
+
+
+@pytest.mark.parametrize(
+    "expression_block,expected",
+    [
+        ({"aggregation": {"operation": "no_op", "operands": ["a"]}}, "'a' (x.a)"),
+        ({"aggregation": {"operands": ["a"]}}, "'a' (x.a)"),
+        ({"aggregation": {"operation": "sum", "operands": ["a", "c"]}}, "sum('a' (x.a), 'c')"),
+        (
+            {
+                "for_each": {
+                    "in": "pens",
+                    "field": "stalls",
+                    "value_to_compare": "a",
+                    "relationship": "greater",
+                    "mode": "enforce",
+                }
+            },
+            "[for each entry in 'pens' (x.pens) (enforce): field 'stalls' greater 'a' (x.a)]",
+        ),
+        (
+            {
+                "for_each": {
+                    "in": "pens",
+                    "field": "age",
+                    "field_to_compare": "min_age",
+                    "relationship": "equal",
+                    "mode": "filter",
+                }
+            },
+            "[for each entry in 'pens' (x.pens) (filter): field 'age' equal field 'min_age']",
+        ),
+        ({}, "{}"),
+        ("not a block", "not a block"),
+    ],
+)
+def test_describe_expression(expression_block: Any, expected: str) -> None:
+    """_describe_expression names the aliases and data addresses used by an expression."""
+    cv = CrossValidator()
+    cv._alias_addresses = {"a": "x.a", "pens": "x.pens"}
+
+    assert cv._describe_expression(expression_block) == expected
+
+
+def test_describe_condition_clause() -> None:
+    """_describe_condition_clause joins the left-hand, relationship and right-hand descriptions."""
+    cv = CrossValidator()
+    cv._alias_addresses = {"dry": "animal.days_in_preg_when_dry", "gest": "animal.avg_gestation_len"}
+    clause = {
+        "left_hand": {"aggregation": {"operation": "no_op", "operands": ["gest"]}},
+        "right_hand": {"aggregation": {"operation": "no_op", "operands": ["dry"]}},
+        "relationship": "greater",
+    }
+
+    assert (
+        cv._describe_condition_clause(clause)
+        == "'gest' (animal.avg_gestation_len) greater 'dry' (animal.days_in_preg_when_dry)"
+    )
+
+
+def test_cross_validate_data_does_not_log_rule_failure_for_apply_when() -> None:
+    """An unsatisfied apply_when clause skips the block without logging a rule failure error."""
+    cv = CrossValidator()
+    block = {
+        "description": "guarded",
+        "aliases": {"variables": {"kind": "animal.kind"}, "constants": {"calf": "CALF"}},
+        "apply_when": [
+            {
+                "left_hand": {"aggregation": {"operation": "no_op", "operands": ["kind"]}},
+                "right_hand": {"aggregation": {"operation": "no_op", "operands": ["calf"]}},
+                "relationship": "equal",
+            }
+        ],
+        "rules": [],
+    }
+
+    result = cv.cross_validate_data({"kind": "COW", "calf": "CALF"}, block, eager_termination=True)
+
+    assert result is True
+    assert not any("error" in log for log in cv._event_logs)
+    assert any("'kind' (animal.kind) equal 'calf'" in str(log["message"]) for log in cv._event_logs)
+
+
+def test_evaluate_pairwise_condition_message_includes_comparison() -> None:
+    """Pairwise length mismatch errors include the lengths and the comparison description."""
+    cv = CrossValidator()
+
+    cv._evaluate_pairwise_condition([1, 2, 3], [1, 2], lambda a, b: a == b, False, comparison="'a' (x.a) equal 'b'")
+
+    message = str(cv._event_logs[0]["message"])
+    assert "got lengths 3 and 2." in message
+    assert message.endswith("Comparison: 'a' (x.a) equal 'b'.")
+
+
+def test_evaluate_equal_data_length_message_includes_comparison() -> None:
+    """Invalid length validation errors include the comparison description."""
+    cv = CrossValidator()
+
+    cv._evaluate_equal_data_length(1, [1], False, comparison="'a' is_equal_length 'b'")
+
+    assert str(cv._event_logs[0]["message"]).endswith("Comparison: 'a' is_equal_length 'b'.")
+
+
+@pytest.mark.parametrize("data_type", [[123], ["weird"]])
+def test_evaluate_is_type_message_includes_comparison(data_type: list[Any]) -> None:
+    """Type validation errors include the comparison description."""
+    cv = CrossValidator()
+
+    cv._evaluate_is_type(["x"], data_type, False, comparison="'a' is_of_type 'b'")
+
+    assert str(cv._event_logs[0]["message"]).endswith("Comparison: 'a' is_of_type 'b'.")
+
+
+def test_evaluate_for_each_block_passes_comparison_to_relationship(mocker: MockerFixture) -> None:
+    """for_each comparisons pass a description of the iterated field to the relationship function."""
+    cv = CrossValidator()
+    cv._alias_pool = {"pens": [{"stalls": 3}], "min": 1}
+    cv._alias_addresses = {"pens": "animal.pen_information"}
+    mock_greater = mocker.patch.object(cv, "_evaluate_greater_condition", return_value=True)
+    iter_block = {
+        "in": "pens",
+        "field": "stalls",
+        "value_to_compare": "min",
+        "relationship": "greater",
+        "mode": "enforce",
+    }
+
+    cv._evaluate_for_each_block(iter_block, False, "equal")
+
+    mock_greater.assert_called_once_with(
+        [3],
+        [1],
+        False,
+        comparison="for each entry in 'pens' (animal.pen_information) (enforce): field 'stalls' greater 'min'",
+    )

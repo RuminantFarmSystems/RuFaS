@@ -453,14 +453,14 @@ def test_start_data_processing(
 
 
 @pytest.mark.parametrize(
-    "cv_scenario, eager_termination, expected_return, expected_cv_calls, expected_fail_blocks",
+    "cv_scenario, eager_termination, expected_return, expected_cv_calls, expected_fail_messages",
     [
         ("none", True, True, 0, []),
         ("none", False, True, 0, []),
         ("all_pass", True, True, 2, []),
         ("all_pass", False, True, 2, []),
         ("first_fail_eager_true", True, False, 1, ["cv1"]),
-        ("two_fail_eager_false", False, False, 3, ["cv1", "cv2"]),
+        ("two_fail_eager_false", False, False, 3, ["cv1", "cv2 failed: fix the cv2 inputs."]),
         ("multiple_pass", True, True, 3, []),
     ],
     ids=[
@@ -480,7 +480,7 @@ def test_cross_validate_data(
     eager_termination: bool,
     expected_return: bool,
     expected_cv_calls: int,
-    expected_fail_blocks: list[str],
+    expected_fail_messages: list[str],
 ) -> None:
     """Unit test for function _cross_validate_data in file input_manager.py"""
     add_error = mocker.patch.object(mock_input_manager.om, "add_error")
@@ -518,7 +518,12 @@ def test_cross_validate_data(
             {
                 "cross_validation": [
                     {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
-                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {
+                        "description": "cv2",
+                        "failure_message": "cv2 failed: fix the cv2 inputs.",
+                        "aliases": {"x": 2},
+                        "rules": [{"r": 2}],
+                    },
                     {"description": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
                 ]
             }
@@ -563,16 +568,69 @@ def test_cross_validate_data(
         assert eager is eager_termination
         assert isinstance(target_and_save_result, dict)
 
-    if expected_fail_blocks:
-        add_error.assert_called_once()
-        err, msg, info = add_error.call_args.args
-        assert err == "Cross Validation Failure"
-        for name in expected_fail_blocks:
-            assert name in msg
-        assert info.get("class") == mock_input_manager.__class__.__name__
-        assert info.get("function") == mock_input_manager._cross_validate_data.__name__
+    expected_info_map = {
+        "class": mock_input_manager.__class__.__name__,
+        "function": mock_input_manager._cross_validate_data.__name__,
+    }
+    assert add_error.call_args_list == [
+        call("Cross Validation Failure", message, expected_info_map) for message in expected_fail_messages
+    ]
+
+
+@pytest.mark.parametrize("raises", [False, True])
+def test_cross_validate_data_routes_cross_validator_logs(
+    mock_input_manager: InputManager, mocker: MockerFixture, raises: bool
+) -> None:
+    """Cross validator logs are routed to OM before the block failure error, and even when validation raises."""
+    manager = mocker.Mock()
+    mocker.patch.object(mock_input_manager.om, "route_logs", manager.route_logs)
+    mocker.patch.object(mock_input_manager.om, "add_error", manager.add_error)
+    mocker.patch.object(mock_input_manager, "_extract_target_and_save_block", return_value={})
+    mocker.patch.object(
+        mock_input_manager,
+        "_load_cross_validation",
+        return_value=[{"cross_validation": [{"description": "cv1", "failure_message": "Fix cv1.", "rules": []}]}],
+    )
+    cv_logs = [{"error": "Invalid data length validation", "message": "msg", "info_map": {}}]
+    mocker.patch.object(mock_input_manager.cross_validator, "flush_event_logs", side_effect=[cv_logs, []])
+    mocker.patch.object(
+        mock_input_manager.cross_validator,
+        "cross_validate_data",
+        side_effect=ValueError("boom") if raises else [False],
+    )
+    info_map = {
+        "class": mock_input_manager.__class__.__name__,
+        "function": mock_input_manager._cross_validate_data.__name__,
+    }
+
+    if raises:
+        with pytest.raises(ValueError, match="boom"):
+            mock_input_manager._cross_validate_data(["dummy_path"], eager_termination=True)
+        assert manager.mock_calls == [call.route_logs(cv_logs)]
     else:
-        add_error.assert_not_called()
+        assert mock_input_manager._cross_validate_data(["dummy_path"], eager_termination=False) is False
+        assert manager.mock_calls == [
+            call.route_logs(cv_logs),
+            call.add_error("Cross Validation Failure", "Fix cv1.", info_map),
+            call.route_logs([]),
+        ]
+
+
+@pytest.mark.parametrize(
+    "block,expected",
+    [
+        ({"description": "desc", "failure_message": "Readable message."}, "Readable message."),
+        ({"description": "desc", "failure_message": ""}, "desc"),
+        ({"description": "desc", "failure_message": 42}, "desc"),
+        ({"description": "desc"}, "desc"),
+        ({}, "unnamed block"),
+    ],
+)
+def test_get_cross_validation_failure_message(
+    mock_input_manager: InputManager, block: dict[str, Any], expected: str
+) -> None:
+    """The failure message falls back to the description when no valid failure_message is provided."""
+    assert mock_input_manager._get_cross_validation_failure_message(block) == expected
 
 
 def test_start_data_processing_invalid_metadata_raises(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
