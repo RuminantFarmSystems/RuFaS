@@ -2,6 +2,7 @@
   "cross_validation": [
     {
       "description": "Hay storage initial_storage_dry_matter must not exceed target_dry_matter",
+      "failure_message": "In every entry of feed_storage_configurations.hay_storage, initial_storage_dry_matter must not be greater than target_dry_matter.",
       "aliases": {
         "variables": {
           "hay_storages": "feed_storage_configurations.hay_storage"
