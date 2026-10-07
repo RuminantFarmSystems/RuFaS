@@ -2,6 +2,7 @@
   "cross_validation": [
     {
       "description": "The set_DMI_per_X intake option is only available for growing and lac_cow rations",
+      "failure_message": "The 'set_DMI_per_X' intake_option in feed.rations can only be used by the 'growing' and 'lac_cow' rations. Choose a different intake_option for the other rations.",
       "aliases": {
         "variables": {
           "rations": "feed.rations"
@@ -36,6 +37,7 @@
     },
     {
       "description": "Rations using the set_DMI intake option must provide an intake_value greater than 0",
+      "failure_message": "Every ration in feed.rations with intake_option 'set_DMI' must have an intake_value greater than 0.",
       "aliases": {
         "variables": {
           "rations": "feed.rations"
@@ -127,6 +129,7 @@
     },
     {
       "description": "Rations using the set_DMI_per_X intake option must provide an intake_value greater than 0 and less than 100",
+      "failure_message": "Every ration in feed.rations with intake_option 'set_DMI_per_X' must have an intake_value greater than 0 and less than 100.",
       "aliases": {
         "variables": {
           "rations": "feed.rations"
