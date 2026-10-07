@@ -482,8 +482,9 @@ class TaskManager:
                     if input_task["task_type"] == TaskType.SIMULATION_SINGLE_RUN and len(random_seeds) != 1:
                         self.output_manager.add_error(
                             "Single Run Random Seed Error",
-                            "SIMULATION_SINGLE_RUN task type selected but multiple random seeds specified.  "
-                            "Check task input specifications and confirm task type and random seeds selected.",
+                            "SIMULATION_SINGLE_RUN task type requires exactly one random seed, but the specified "
+                            f"random seeds list contains {len(random_seeds)} seeds. Check task input specifications "
+                            "and confirm the task type and random seeds selected.",
                             info_map={"class": TaskManager.__name__, "function": self._parse_input_tasks.__name__},
                         )
                         raise ValueError(
