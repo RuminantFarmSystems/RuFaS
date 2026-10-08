@@ -3,6 +3,7 @@ import re
 from typing import Any
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.post_processing.rufas_logger import get_logger, log
 from RUFAS.units import MeasurementUnits
 
 
@@ -24,8 +25,7 @@ class UnitHandler:
     def __init__(self, metadata_prefix: str = "") -> None:
         """Initializes the UnitHandler."""
         self.metadata_prefix: str = metadata_prefix
-        # TODO use the RuFaS logger helpers once the new logging system is merged (#3192)
-        self._logger: logging.Logger = logging.getLogger(f"RUFAS.{self.__class__.__name__}")
+        self._logger: logging.Logger = get_logger(self.__class__.__name__)
 
     def _log(self, level: int, name: str, message: str, function_name: str) -> None:
         """
@@ -47,7 +47,7 @@ class UnitHandler:
             "function": function_name,
             "metadata_prefix": self.metadata_prefix,
         }
-        self._logger.log(level, message, extra={"rufas_name": name, "rufas_info_map": info_map})
+        log(self._logger, level, name, message, info_map)
 
     @staticmethod
     def add_var_units(report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
@@ -151,6 +151,7 @@ class UnitHandler:
         ------
         ValueError
             If there is no report data to extract units from.
+
         """
         if len(report_data) == 0:
             raise ValueError("Report Generator error: No report data available to aggregate units from.")
