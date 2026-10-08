@@ -1200,11 +1200,13 @@ class TaskManager:
 
             output_manager.is_first_post_processing = False
 
-            must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
-                group_args["output_prefix"],
-                group_args["convert_variable_table_path"],
-                group_args["filters_directory"],
-                group_args["use_accepted_ranges"],
+            must_change_variables, accepted_ranges, variable_tolerances = (
+                E2ETestResultsHandler.validate_comparison_configuration(
+                    group_args["output_prefix"],
+                    group_args["convert_variable_table_path"],
+                    group_args["filters_directory"],
+                    group_args["use_accepted_ranges"],
+                )
             )
 
             E2ETestResultsHandler.compare_actual_and_expected_test_results(
@@ -1213,6 +1215,7 @@ class TaskManager:
                 output_prefix=e2e_group,
                 must_change_variables=must_change_variables,
                 accepted_ranges=accepted_ranges,
+                variable_tolerances=variable_tolerances,
             )
 
             TaskManager.handle_post_processing(

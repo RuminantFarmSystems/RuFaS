@@ -18,6 +18,10 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
+TOLERANCE_TYPE_PERCENT = "percent"
+TOLERANCE_TYPE_ABSOLUTE = "absolute"
+TOLERANCE_TYPE_SIGNIFICANT_DIGITS = "significant_digits"
+TOLERANCE_TYPES = (TOLERANCE_TYPE_PERCENT, TOLERANCE_TYPE_ABSOLUTE, TOLERANCE_TYPE_SIGNIFICANT_DIGITS)
 ResultPathType = namedtuple(
     "ResultPathType",
     [
@@ -27,15 +31,25 @@ ResultPathType = namedtuple(
         "tolerance",
         "must_change_variables_path",
         "accepted_ranges_path",
+        "tolerance_type",
+        "variable_tolerances_path",
     ],
-    defaults=["", ""],
+    defaults=["", "", TOLERANCE_TYPE_PERCENT, ""],
 )
 ORDERED_EXPECTED_RESULTS_FILE_KEYS = ["name", "filters", "expected_results_last_updated", "expected_results"]
 MUST_CHANGE_VARIABLES_KEY = "must_change_variables"
 ACCEPTED_RANGES_KEY = "accepted_ranges"
 ACCEPTED_RANGE_MIN_KEY = "min"
 ACCEPTED_RANGE_MAX_KEY = "max"
-TOP_LEVEL_DIFF_PATH_PATTERN = re.compile(r"^root\['([^']+)'\]")
+VARIABLE_TOLERANCES_KEY = "variable_tolerances"
+TOLERANCE_KEY = "tolerance"
+TOLERANCE_TYPE_KEY = "tolerance_type"
+TOLERANCE_REQUIREMENTS = (
+    f"'{TOLERANCE_TYPE_KEY}' must be one of {list(TOLERANCE_TYPES)}, a '{TOLERANCE_TYPE_PERCENT}' or "
+    f"'{TOLERANCE_TYPE_ABSOLUTE}' '{TOLERANCE_KEY}' must be a number of at least 0, and a "
+    f"'{TOLERANCE_TYPE_SIGNIFICANT_DIGITS}' '{TOLERANCE_KEY}' must be a whole number of at least 1"
+)
+TOP_LEVEL_DIFF_PATH_PATTERN = re.compile(r"""^root\[(?:'([^']+)'|"([^"]+)")\]""")
 
 
 class E2ETestResultsHandler:
@@ -48,6 +62,7 @@ class E2ETestResultsHandler:
         output_prefix: str,
         must_change_variables: set[str],
         accepted_ranges: dict[str, dict[str, Any]],
+        variable_tolerances: dict[str, dict[str, Any]],
     ) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
@@ -66,9 +81,17 @@ class E2ETestResultsHandler:
         accepted_ranges : dict[str, dict[str, Any]]
             The accepted ranges of the input set's variables, keyed by variable name, as returned by
             ``validate_comparison_configuration``. Empty when accepted ranges are not used.
+        variable_tolerances : dict[str, dict[str, Any]]
+            The tolerance overrides of the input set's variables, keyed by variable name, as returned by
+            ``validate_comparison_configuration``.
 
         Notes
         -----
+        Each domain's values are compared with the domain's ``tolerance``, interpreted according to its
+        ``tolerance_type`` (see ``_exceeds_tolerance``). A variable listed in the input set's variable tolerances
+        file is compared with its own tolerance and tolerance type instead, for the regular comparison and for the
+        must-change check alike.
+
         Variables flagged in the input set's must-change variables file are held to the opposite assertion of the
         regular comparison: each flagged variable must differ from its recorded expected value beyond the domain
         tolerance, and its differences are not reported as regular failures. The comparison results additionally
@@ -114,6 +137,9 @@ class E2ETestResultsHandler:
             domain_accepted_ranges = {
                 name: accepted_ranges[name] for name in sorted(accepted_ranges) if name in expected_results
             }
+            domain_variable_tolerances = {
+                name: variable_tolerances[name] for name in sorted(variable_tolerances) if name in expected_results
+            }
             excluded_variables = must_change_variables | set(accepted_ranges)
             comparison_expected_not_excluded = {
                 k: v for k, v in expected_results.items() if k not in excluded_variables
@@ -128,9 +154,16 @@ class E2ETestResultsHandler:
                 significant_digits=3,
             )
 
-            filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(diff, path_set.tolerance)
+            filtered_diff = E2ETestResultsHandler.filter_insignificant_changes(
+                diff, path_set.tolerance, path_set.tolerance_type, domain_variable_tolerances
+            )
             must_change_satisfied, must_change_violations = E2ETestResultsHandler._evaluate_must_change_variables(
-                expected_results, actual_results, domain_must_change_variables, path_set.tolerance
+                expected_results,
+                actual_results,
+                domain_must_change_variables,
+                path_set.tolerance,
+                path_set.tolerance_type,
+                domain_variable_tolerances,
             )
             accepted_range_satisfied, accepted_range_violations = E2ETestResultsHandler._evaluate_accepted_ranges(
                 actual_results, domain_accepted_ranges
@@ -152,7 +185,7 @@ class E2ETestResultsHandler:
         convert_variable_table_path: str | None,
         filters_directory: Path,
         use_accepted_ranges: bool,
-    ) -> tuple[set[str], dict[str, dict[str, Any]]]:
+    ) -> tuple[set[str], dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
         """
         Validates the comparison configuration of an end-to-end testing input set before the simulation runs.
 
@@ -172,34 +205,36 @@ class E2ETestResultsHandler:
 
         Returns
         -------
-        tuple[set[str], dict[str, dict[str, Any]]]
-            The names of the variables flagged as must change, and the accepted ranges keyed by variable name (empty
-            when ``use_accepted_ranges`` is ``False``), for ``compare_actual_and_expected_test_results``.
+        tuple[set[str], dict[str, dict[str, Any]], dict[str, dict[str, Any]]]
+            The names of the variables flagged as must change, the accepted ranges keyed by variable name (empty
+            when ``use_accepted_ranges`` is ``False``), and the tolerance overrides keyed by variable name, for
+            ``compare_actual_and_expected_test_results``.
 
         Raises
         ------
         ValueError
             If the configuration is not valid. The message lists every problem found: must-change variables files,
-            accepted ranges files, expected results files, or a conversion table that cannot be loaded, result path
-            sets that cannot be resolved once the simulation has run (see ``_validate_result_path_set``), and
-            must-change variables or variables with an accepted range that are not found in the expected results of
+            accepted ranges files, variable tolerances files, expected results files, or a conversion table that
+            cannot be loaded, result path sets that cannot be resolved once the simulation has run or whose domain
+            tolerance is not valid (see ``_validate_result_path_set``), and must-change variables, variables with an
+            accepted range, or variables with a tolerance override that are not found in the expected results of
             any domain.
 
         Notes
         -----
         Runs the checks of ``compare_actual_and_expected_test_results`` that do not depend on the actual results:
-        the input set's must-change variables files, accepted ranges files, expected results files, and conversion
-        table must load, every result path set must resolve to actual results the run will write, and every
-        must-change variable and every variable with an accepted range must be a key of at least one domain's
+        the input set's must-change variables files, accepted ranges files, variable tolerances files, expected
+        results files, and conversion table must load, every result path set must resolve to actual results the run
+        will write and carry a valid domain tolerance, and every must-change variable, every variable with an
+        accepted range, and every variable with a tolerance override must be a key of at least one domain's
         expected results. Running these checks before the simulation makes a configuration mistake, such as a
         mistyped path or variable name, fail the task in seconds instead of after the full simulation. The
         comparison does not repeat them, so it relies on this validation having passed.
 
         Every check runs before the error is raised, so one run reports all the problems of the input set. The
-        must-change and ranged variable names are only checked when every expected results file could be loaded,
-        because a name may belong to a file that could not be read.
+        must-change, ranged, and overridden variable names are only checked when every expected results file could
+        be loaded, because a name may belong to a file that could not be read.
         """
-        om = OutputManager()
         info_map: dict[str, Any] = {
             "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler.validate_comparison_configuration.__name__,
@@ -221,9 +256,11 @@ class E2ETestResultsHandler:
         accepted_ranges: dict[str, dict[str, Any]] = (
             E2ETestResultsHandler._collect_accepted_ranges(test_result_path_sets, errors) if use_accepted_ranges else {}
         )
+        variable_tolerances = E2ETestResultsHandler._collect_variable_tolerances(test_result_path_sets, errors)
 
         matched_must_change_variables: set[str] = set()
         matched_ranged_variables: set[str] = set()
+        matched_overridden_variables: set[str] = set()
         all_expected_results_loaded = True
         for path_set in test_result_path_sets:
             file_content = E2ETestResultsHandler._validate_result_path_set(
@@ -235,26 +272,33 @@ class E2ETestResultsHandler:
             expected_results = file_content["expected_results"]
             matched_must_change_variables.update(name for name in must_change_variables if name in expected_results)
             matched_ranged_variables.update(name for name in accepted_ranges if name in expected_results)
+            matched_overridden_variables.update(name for name in variable_tolerances if name in expected_results)
 
-        unknown_must_change_variables = must_change_variables - matched_must_change_variables
-        if unknown_must_change_variables and all_expected_results_loaded:
-            message = (
-                "Must-change variables not found in the expected results of any domain: "
-                f"{sorted(unknown_must_change_variables)}"
+        if all_expected_results_loaded:
+            E2ETestResultsHandler._record_unknown_variables(
+                errors,
+                "End-to-end testing must-change configuration error",
+                "Must-change variables",
+                must_change_variables - matched_must_change_variables,
+                info_map,
             )
-            om.add_error("End-to-end testing must-change configuration error", message, info_map)
-            E2ETestResultsHandler._record_configuration_error(errors, message)
-        unknown_ranged_variables = set(accepted_ranges) - matched_ranged_variables
-        if unknown_ranged_variables and all_expected_results_loaded:
-            message = (
-                "Variables with an accepted range not found in the expected results of any domain: "
-                f"{sorted(unknown_ranged_variables)}"
+            E2ETestResultsHandler._record_unknown_variables(
+                errors,
+                "End-to-end testing accepted-range configuration error",
+                "Variables with an accepted range",
+                set(accepted_ranges) - matched_ranged_variables,
+                info_map,
             )
-            om.add_error("End-to-end testing accepted-range configuration error", message, info_map)
-            E2ETestResultsHandler._record_configuration_error(errors, message)
+            E2ETestResultsHandler._record_unknown_variables(
+                errors,
+                "End-to-end testing tolerance configuration error",
+                "Variables with a tolerance override",
+                set(variable_tolerances) - matched_overridden_variables,
+                info_map,
+            )
         if errors:
             E2ETestResultsHandler._raise_configuration_errors(errors)
-        return must_change_variables, accepted_ranges
+        return must_change_variables, accepted_ranges, variable_tolerances
 
     @staticmethod
     def validate_update_configuration(output_prefix: str, filters_directory: Path) -> None:
@@ -1020,8 +1064,8 @@ class E2ETestResultsHandler:
         -------
         list[ResultPathType]
             List of result path sets, each containing the domain, expected results path,
-            actual results path, tolerance, and the optional must-change variables and accepted ranges
-            file paths for one test domain.
+            actual results path, tolerance, and the optional must-change variables, accepted ranges, and variable
+            tolerances file paths and tolerance type for one test domain.
         """
         im = InputManager()
         result_paths: list[dict[str, str]] = im.get_data(
@@ -1037,6 +1081,8 @@ class E2ETestResultsHandler:
                     path_set["tolerance"],
                     path_set.get("must_change_variables_path", ""),
                     path_set.get("accepted_ranges_path", ""),
+                    path_set.get("tolerance_type", TOLERANCE_TYPE_PERCENT),
+                    path_set.get("variable_tolerances_path", ""),
                 )
             )
         return test_result_paths
@@ -1181,6 +1227,32 @@ class E2ETestResultsHandler:
         )
 
     @staticmethod
+    def _record_unknown_variables(
+        errors: list[str], error_title: str, description: str, unknown_names: set[str], info_map: dict[str, Any]
+    ) -> None:
+        """
+        Records the variable names of a comparison feature that are not found in the expected results of any domain.
+
+        Parameters
+        ----------
+        errors : list[str]
+            The list that the problem is appended to, so that the caller can report every problem together.
+        error_title : str
+            The title of the error logged through the ``OutputManager``.
+        description : str
+            How the variables are referred to in the message, e.g. ``"Must-change variables"``.
+        unknown_names : set[str]
+            The variable names that are not found. Nothing is recorded when the set is empty.
+        info_map : dict[str, Any]
+            Information about the source of the logged error.
+        """
+        if not unknown_names:
+            return
+        message = f"{description} not found in the expected results of any domain: {sorted(unknown_names)}"
+        OutputManager().add_error(error_title, message, info_map)
+        E2ETestResultsHandler._record_configuration_error(errors, message)
+
+    @staticmethod
     def _validate_result_path_set(
         path_set: ResultPathType,
         output_prefix: str,
@@ -1218,7 +1290,8 @@ class E2ETestResultsHandler:
         ``{output_prefix}_saved_variables_{filter name}_{timestamp}.json``, which ``actual_results_path`` has to match
         as a prefix for the results to be found afterwards. When the filter name is unknown because the expected
         results file could not be loaded, ``actual_results_path`` is only checked against the part of the file name
-        that does not depend on it, ``{output_prefix}_saved_variables_``.
+        that does not depend on it, ``{output_prefix}_saved_variables_``. The domain's ``tolerance`` also has to be
+        valid for its ``tolerance_type`` (see ``_is_valid_tolerance``).
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -1264,6 +1337,13 @@ class E2ETestResultsHandler:
             )
             om.add_error(error_title, message, info_map)
             E2ETestResultsHandler._record_configuration_error(errors, message)
+        if not E2ETestResultsHandler._is_valid_tolerance(path_set.tolerance, path_set.tolerance_type):
+            message = (
+                f"tolerance '{path_set.tolerance}' with tolerance_type '{path_set.tolerance_type}' for "
+                f"{path_set.domain} is not valid: {TOLERANCE_REQUIREMENTS}."
+            )
+            om.add_error(error_title, message, info_map)
+            E2ETestResultsHandler._record_configuration_error(errors, message)
         return file_content
 
     @staticmethod
@@ -1272,6 +1352,8 @@ class E2ETestResultsHandler:
         actual_results: dict[str, Any],
         must_change_variable_names: list[str],
         tolerance: float,
+        tolerance_type: str = TOLERANCE_TYPE_PERCENT,
+        variable_tolerances: dict[str, dict[str, Any]] | None = None,
     ) -> tuple[list[str], dict[str, str]]:
         """
         Checks that each variable flagged as must change actually differs from its recorded expected value.
@@ -1285,7 +1367,14 @@ class E2ETestResultsHandler:
         must_change_variable_names : list[str]
             The must-change variable names present in ``expected_results``.
         tolerance : float
-            The threshold (expressed as a percent) below which a difference is considered no change.
+            The domain threshold below which a difference is considered no change, interpreted according to
+            ``tolerance_type``.
+        tolerance_type : str, optional
+            How ``tolerance`` is interpreted, one of ``TOLERANCE_TYPES`` (see ``_exceeds_tolerance``). Defaults to
+            ``percent``.
+        variable_tolerances : dict[str, dict[str, Any]] | None, optional
+            Tolerance overrides keyed by variable name, applied to the flagged variables they list instead of the
+            domain tolerance (see ``filter_nested``). ``None`` (the default) applies the domain tolerance to all.
 
         Returns
         -------
@@ -1309,7 +1398,9 @@ class E2ETestResultsHandler:
                 verbose_level=2,
                 significant_digits=3,
             )
-            filtered_pair_diff = E2ETestResultsHandler.filter_insignificant_changes(pair_diff, tolerance)
+            filtered_pair_diff = E2ETestResultsHandler.filter_insignificant_changes(
+                pair_diff, tolerance, tolerance_type, variable_tolerances
+            )
             if filtered_pair_diff == {}:
                 must_change_violations[variable_name] = (
                     "Flagged as must change but the value still matches the expected results within the tolerance."
@@ -1453,6 +1544,165 @@ class E2ETestResultsHandler:
         return False
 
     @staticmethod
+    def _load_variable_tolerances(test_result_path_sets: list[ResultPathType]) -> dict[str, dict[str, Any]]:
+        """
+        Loads the tolerance overrides of the variables of an end-to-end testing input set.
+
+        Parameters
+        ----------
+        test_result_path_sets : list[ResultPathType]
+            List of result path sets for the input set, each optionally referencing a variable tolerances file
+            through its ``variable_tolerances_path`` field.
+
+        Returns
+        -------
+        dict[str, dict[str, Any]]
+            The tolerance overrides read from the referenced files, keyed by variable name. Each override is the
+            entry recorded in the file, holding its ``tolerance`` and its ``tolerance_type``, which is filled in with
+            ``percent`` when the file leaves it out. Path sets with an empty ``variable_tolerances_path`` are
+            skipped.
+
+        Raises
+        ------
+        FileNotFoundError
+            If a referenced variable tolerances file does not exist.
+        ValueError
+            If a referenced file is not valid JSON, does not contain a dictionary of overrides under the
+            ``variable_tolerances`` key, or contains an override without a valid ``tolerance`` for its
+            ``tolerance_type`` (see ``_is_valid_tolerance``).
+        """
+        om = OutputManager()
+        info_map: dict[str, Any] = {
+            "class": E2ETestResultsHandler.__name__,
+            "function": E2ETestResultsHandler._load_variable_tolerances.__name__,
+        }
+        error_title = "End-to-end testing tolerance configuration error"
+        variable_tolerances: dict[str, dict[str, Any]] = {}
+        variable_tolerances_paths = {
+            path_set.variable_tolerances_path for path_set in test_result_path_sets if path_set.variable_tolerances_path
+        }
+        for path_str in sorted(variable_tolerances_paths):
+            path = Path(path_str)
+            if not path.exists():
+                om.add_error(error_title, f"Variable tolerances file not found: {path}", info_map)
+                raise FileNotFoundError(f"E2E testing error: Variable tolerances file not found: {path}")
+            try:
+                with open(path, "r", encoding="utf-8") as variable_tolerances_file:
+                    file_contents = json.load(variable_tolerances_file)
+            except json.JSONDecodeError as e:
+                om.add_error(error_title, f"Variable tolerances file {path} is not valid JSON: {e}", info_map)
+                raise ValueError(f"E2E testing error: Variable tolerances file {path} is not valid JSON.") from e
+            file_tolerances = file_contents.get(VARIABLE_TOLERANCES_KEY) if isinstance(file_contents, dict) else None
+            if not isinstance(file_tolerances, dict):
+                message = (
+                    f"Variable tolerances file {path} must contain a dictionary of tolerance overrides under the "
+                    f"'{VARIABLE_TOLERANCES_KEY}' key."
+                )
+                om.add_error(error_title, message, info_map)
+                raise ValueError(f"E2E testing error: {message}")
+            invalid_overrides = sorted(
+                name
+                for name, variable_tolerance in file_tolerances.items()
+                if not E2ETestResultsHandler._is_valid_variable_tolerance(variable_tolerance)
+            )
+            if invalid_overrides:
+                message = (
+                    f"Variable tolerances file {path} has invalid tolerance overrides for {invalid_overrides}: each "
+                    f"override must have a '{TOLERANCE_KEY}' and {TOLERANCE_REQUIREMENTS}."
+                )
+                om.add_error(error_title, message, info_map)
+                raise ValueError(f"E2E testing error: {message}")
+            for name, variable_tolerance in file_tolerances.items():
+                variable_tolerances[name] = {TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT, **variable_tolerance}
+        return variable_tolerances
+
+    @staticmethod
+    def _collect_variable_tolerances(
+        test_result_path_sets: list[ResultPathType], errors: list[str]
+    ) -> dict[str, dict[str, Any]]:
+        """
+        Loads every variable tolerances file of an input set, recording the files that cannot be loaded.
+
+        Parameters
+        ----------
+        test_result_path_sets : list[ResultPathType]
+            List of result path sets for the input set, each optionally referencing a variable tolerances file
+            through its ``variable_tolerances_path`` field.
+        errors : list[str]
+            The list that the problem of every file that cannot be loaded is appended to, so that the caller can
+            report them all together.
+
+        Returns
+        -------
+        dict[str, dict[str, Any]]
+            The tolerance overrides read from the files that could be loaded, keyed by variable name.
+
+        Notes
+        -----
+        Each distinct file is loaded on its own with ``_load_variable_tolerances``, so that one unreadable file does
+        not hide the problems of another.
+        """
+        variable_tolerances: dict[str, dict[str, Any]] = {}
+        checked_variable_tolerances_paths: set[str] = set()
+        for path_set in test_result_path_sets:
+            if path_set.variable_tolerances_path in checked_variable_tolerances_paths:
+                continue
+            checked_variable_tolerances_paths.add(path_set.variable_tolerances_path)
+            try:
+                variable_tolerances.update(E2ETestResultsHandler._load_variable_tolerances([path_set]))
+            except (FileNotFoundError, ValueError) as e:
+                E2ETestResultsHandler._record_configuration_error(errors, str(e))
+        return variable_tolerances
+
+    @staticmethod
+    def _is_valid_variable_tolerance(variable_tolerance: Any) -> bool:
+        """
+        Checks that a tolerance override entry has a valid tolerance for its tolerance type.
+
+        Parameters
+        ----------
+        variable_tolerance : Any
+            The override entry read from a variable tolerances file.
+
+        Returns
+        -------
+        bool
+            ``True`` if the entry is a dictionary whose ``tolerance`` is valid for its ``tolerance_type``, taken as
+            ``percent`` when absent (see ``_is_valid_tolerance``), ``False`` otherwise. Any other keys of the entry
+            are ignored.
+        """
+        if not isinstance(variable_tolerance, dict):
+            return False
+        return E2ETestResultsHandler._is_valid_tolerance(
+            variable_tolerance.get(TOLERANCE_KEY), variable_tolerance.get(TOLERANCE_TYPE_KEY, TOLERANCE_TYPE_PERCENT)
+        )
+
+    @staticmethod
+    def _is_valid_tolerance(tolerance: Any, tolerance_type: Any) -> bool:
+        """
+        Checks that a tolerance is valid for its tolerance type.
+
+        Parameters
+        ----------
+        tolerance : Any
+            The tolerance to check.
+        tolerance_type : Any
+            The tolerance type, expected to be one of ``TOLERANCE_TYPES``.
+
+        Returns
+        -------
+        bool
+            ``True`` if ``tolerance_type`` is one of ``TOLERANCE_TYPES`` and ``tolerance`` is a number of at least 0
+            for ``percent`` and ``absolute``, or a whole number of at least 1 for ``significant_digits``; ``False``
+            otherwise.
+        """
+        if tolerance_type not in TOLERANCE_TYPES or not DataValidator.is_number(tolerance):
+            return False
+        if tolerance_type == TOLERANCE_TYPE_SIGNIFICANT_DIGITS:
+            return float(tolerance).is_integer() and tolerance >= 1
+        return tolerance >= 0
+
+    @staticmethod
     def _evaluate_accepted_ranges(
         actual_results: dict[str, Any], domain_accepted_ranges: dict[str, dict[str, Any]]
     ) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
@@ -1568,13 +1818,137 @@ class E2ETestResultsHandler:
             else:
                 continue
             for changed_path in changed_paths:
-                match = TOP_LEVEL_DIFF_PATH_PATTERN.match(str(changed_path))
-                if match:
-                    changed_variable_names.add(match.group(1))
+                variable_name = E2ETestResultsHandler._get_top_level_variable_name(changed_path)
+                if variable_name is not None:
+                    changed_variable_names.add(variable_name)
         return sorted(changed_variable_names)
 
     @staticmethod
-    def is_significant(changes: dict[str, Any], tolerance: float) -> bool:
+    def _get_top_level_variable_name(changed_path: Any) -> str | None:
+        """
+        Extracts the top-level variable name from a ``DeepDiff`` path such as ``root['name']['values'][3]``.
+
+        Parameters
+        ----------
+        changed_path : Any
+            A changed path reported by ``DeepDiff``.
+
+        Returns
+        -------
+        str | None
+            The top-level variable name, or ``None`` when the path does not start with a top-level dictionary key
+            (e.g. a change to the results root).
+
+        Notes
+        -----
+        ``DeepDiff`` writes a key containing a single quote between double quotes instead, so both quoting styles
+        are recognized.
+        """
+        match = TOP_LEVEL_DIFF_PATH_PATTERN.match(str(changed_path))
+        if match is None:
+            return None
+        return match.group(1) if match.group(1) is not None else match.group(2)
+
+    @staticmethod
+    def _resolve_tolerance(
+        changed_path: str,
+        tolerance: float,
+        tolerance_type: str,
+        variable_tolerances: dict[str, dict[str, Any]] | None,
+    ) -> tuple[float, str]:
+        """
+        Picks the tolerance that applies to a changed ``DeepDiff`` path.
+
+        Parameters
+        ----------
+        changed_path : str
+            The changed path reported by ``DeepDiff``.
+        tolerance : float
+            The domain tolerance.
+        tolerance_type : str
+            The domain tolerance type, one of ``TOLERANCE_TYPES``.
+        variable_tolerances : dict[str, dict[str, Any]] | None
+            Tolerance overrides keyed by variable name, or ``None`` when there are none.
+
+        Returns
+        -------
+        tuple[float, str]
+            The ``tolerance`` and ``tolerance_type`` of the override of the path's top-level variable when there is
+            one, the domain tolerance and tolerance type otherwise.
+        """
+        variable_name = E2ETestResultsHandler._get_top_level_variable_name(changed_path)
+        if variable_tolerances and variable_name in variable_tolerances:
+            variable_tolerance = variable_tolerances[variable_name]
+            return variable_tolerance[TOLERANCE_KEY], variable_tolerance.get(TOLERANCE_TYPE_KEY, TOLERANCE_TYPE_PERCENT)
+        return tolerance, tolerance_type
+
+    @staticmethod
+    def _exceeds_tolerance(old_value: float, new_value: float, tolerance: float, tolerance_type: str) -> bool:
+        """
+        Checks whether two numbers differ beyond a tolerance.
+
+        Parameters
+        ----------
+        old_value : float
+            The expected value.
+        new_value : float
+            The actual value.
+        tolerance : float
+            The tolerance, interpreted according to ``tolerance_type``.
+        tolerance_type : str
+            One of ``TOLERANCE_TYPES``: ``percent`` allows a difference of up to ``tolerance`` percent of the
+            expected value (of 1 when the expected value is 0), ``absolute`` allows a difference of up to
+            ``tolerance``, and ``significant_digits`` requires the two values to agree once rounded to ``tolerance``
+            significant digits.
+
+        Returns
+        -------
+        bool
+            ``True`` if the values differ beyond the tolerance, ``False`` otherwise.
+
+        Raises
+        ------
+        ValueError
+            If ``tolerance_type`` is not one of ``TOLERANCE_TYPES``.
+        """
+        if tolerance_type == TOLERANCE_TYPE_SIGNIFICANT_DIGITS:
+            significant_digits = int(tolerance)
+            rounded_old_value = E2ETestResultsHandler._round_to_significant_digits(old_value, significant_digits)
+            rounded_new_value = E2ETestResultsHandler._round_to_significant_digits(new_value, significant_digits)
+            return rounded_old_value != rounded_new_value
+        difference = abs(new_value - old_value)
+        if tolerance_type == TOLERANCE_TYPE_ABSOLUTE:
+            return difference > tolerance
+        if tolerance_type == TOLERANCE_TYPE_PERCENT:
+            reference = abs(old_value) if abs(old_value) > 0 else 1
+            return difference > tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
+        raise ValueError(
+            f"E2E testing error: unknown tolerance type '{tolerance_type}', expected one of {list(TOLERANCE_TYPES)}."
+        )
+
+    @staticmethod
+    def _round_to_significant_digits(value: float, significant_digits: int) -> float:
+        """
+        Rounds a number to a number of significant digits.
+
+        Parameters
+        ----------
+        value : float
+            The number to round.
+        significant_digits : int
+            The number of significant digits to keep, at least 1.
+
+        Returns
+        -------
+        float
+            The rounded number. Zero, infinities, and NaN are returned unchanged.
+        """
+        if value == 0 or not math.isfinite(value):
+            return value
+        return round(value, significant_digits - int(math.floor(math.log10(abs(value)))) - 1)
+
+    @staticmethod
+    def is_significant(changes: dict[str, Any], tolerance: float, tolerance_type: str = TOLERANCE_TYPE_PERCENT) -> bool:
         """
         Determines if a numerical change is significant based on if the change between the
         "old_value" and "new_value" exceeds the specified tolerance.
@@ -1584,7 +1958,10 @@ class E2ETestResultsHandler:
         changes : dict[str, Any]
             A dictionary representing changes with "old_value" and "new_value".
         tolerance : float
-            The threshold for considering a difference as significant.
+            The threshold for considering a difference as significant, interpreted according to ``tolerance_type``.
+        tolerance_type : str, optional
+            How ``tolerance`` is interpreted, one of ``TOLERANCE_TYPES`` (see ``_exceeds_tolerance``). Defaults to
+            ``percent``.
 
         Returns
         -------
@@ -1594,9 +1971,9 @@ class E2ETestResultsHandler:
 
         Notes
         -----
-        The comparison is based on the absolute difference between the "old_value" and "new_value",
-        relative to the "old_value". If the "old_value" is zero, a fallback reference value of 1 is used
-        to ensure the tolerance comparison remains meaningful.
+        With the default ``percent`` tolerance type, the comparison is based on the absolute difference between the
+        "old_value" and "new_value", relative to the "old_value". If the "old_value" is zero, a fallback reference
+        value of 1 is used to ensure the tolerance comparison remains meaningful.
         """
         if not (isinstance(changes, dict) and "old_value" in changes and "new_value" in changes):
             return True
@@ -1608,10 +1985,7 @@ class E2ETestResultsHandler:
             return False
 
         if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
-            reference = abs(old_value) if abs(old_value) > 0 else 1
-            difference = abs(new_value - old_value)
-            threshold = tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
-            return difference > threshold
+            return E2ETestResultsHandler._exceeds_tolerance(old_value, new_value, tolerance, tolerance_type)
 
         if isinstance(old_value, dict) and isinstance(new_value, dict):
             for key in old_value.keys() | new_value.keys():
@@ -1623,7 +1997,7 @@ class E2ETestResultsHandler:
                     "new_value": new_value[key],
                 }
 
-                if E2ETestResultsHandler.is_significant(nested_change, tolerance):
+                if E2ETestResultsHandler.is_significant(nested_change, tolerance, tolerance_type):
                     return True
 
             return False
@@ -1631,7 +2005,12 @@ class E2ETestResultsHandler:
         return True
 
     @staticmethod
-    def filter_nested(values_changed: dict[str, dict[str, float | str]], tolerance: float) -> None:
+    def filter_nested(
+        values_changed: dict[str, dict[str, float | str]],
+        tolerance: float,
+        tolerance_type: str = TOLERANCE_TYPE_PERCENT,
+        variable_tolerances: dict[str, dict[str, Any]] | None = None,
+    ) -> None:
         """
         Recursively filters out insignificant numerical changes from a nested structure.
 
@@ -1640,7 +2019,14 @@ class E2ETestResultsHandler:
         values_changed : dict[str, dict[str, float | str]]
             The ``values_changed`` section of a ``DeepDiff`` result.
         tolerance : float
-            The threshold for considering a difference as significant.
+            The threshold for considering a difference as significant, interpreted according to ``tolerance_type``.
+        tolerance_type : str, optional
+            How ``tolerance`` is interpreted, one of ``TOLERANCE_TYPES`` (see ``_exceeds_tolerance``). Defaults to
+            ``percent``.
+        variable_tolerances : dict[str, dict[str, Any]] | None, optional
+            Tolerance overrides keyed by variable name. A change whose ``DeepDiff`` path starts with an overridden
+            variable is graded with the override's ``tolerance`` and ``tolerance_type`` instead (see
+            ``_resolve_tolerance``). ``None`` (the default) grades every change with the given tolerance.
 
         Notes
         -----
@@ -1648,11 +2034,14 @@ class E2ETestResultsHandler:
         """
         keys_to_remove = []
         for key, change in values_changed.items():
+            key_tolerance, key_tolerance_type = E2ETestResultsHandler._resolve_tolerance(
+                key, tolerance, tolerance_type, variable_tolerances
+            )
             if isinstance(change, dict) and "old_value" not in change and "new_value" not in change:
-                E2ETestResultsHandler.filter_nested(change, tolerance)
+                E2ETestResultsHandler.filter_nested(change, key_tolerance, key_tolerance_type)
                 if not change:
                     keys_to_remove.append(key)
-            elif not E2ETestResultsHandler.is_significant(change, tolerance):
+            elif not E2ETestResultsHandler.is_significant(change, key_tolerance, key_tolerance_type):
                 keys_to_remove.append(key)
 
         for key in keys_to_remove:
@@ -1660,7 +2049,10 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def filter_insignificant_changes(
-        diff_result: dict[str, dict[str, dict[str, float | str]]], tolerance: float
+        diff_result: dict[str, dict[str, dict[str, float | str]]],
+        tolerance: float,
+        tolerance_type: str = TOLERANCE_TYPE_PERCENT,
+        variable_tolerances: dict[str, dict[str, Any]] | None = None,
     ) -> dict[str, dict[str, dict[str, float | str]]]:
         """
         Removes insignificant changes from a ``DeepDiff`` ``values_changed`` section.
@@ -1670,7 +2062,13 @@ class E2ETestResultsHandler:
         diff_result : dict[str, dict[str, dict[str, float | str]]]
             The ``DeepDiff`` result to filter.
         tolerance : float
-            The threshold for considering a difference as significant.
+            The threshold for considering a difference as significant, interpreted according to ``tolerance_type``.
+        tolerance_type : str, optional
+            How ``tolerance`` is interpreted, one of ``TOLERANCE_TYPES`` (see ``_exceeds_tolerance``). Defaults to
+            ``percent``.
+        variable_tolerances : dict[str, dict[str, Any]] | None, optional
+            Tolerance overrides keyed by variable name, applied to the changes of the variables they list instead of
+            ``tolerance`` (see ``filter_nested``). ``None`` (the default) grades every change with ``tolerance``.
 
         Returns
         -------
@@ -1678,7 +2076,7 @@ class E2ETestResultsHandler:
             The filtered ``DeepDiff`` result.
         """
         values_changed = diff_result.get("values_changed", {})
-        E2ETestResultsHandler.filter_nested(values_changed, tolerance)
+        E2ETestResultsHandler.filter_nested(values_changed, tolerance, tolerance_type, variable_tolerances)
         if "values_changed" in diff_result and diff_result["values_changed"] == {}:
             del diff_result["values_changed"]
         return diff_result

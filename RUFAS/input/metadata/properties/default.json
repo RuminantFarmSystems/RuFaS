@@ -6366,9 +6366,15 @@
           },
           "tolerance": {
             "type": "number",
-            "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
+            "description": "The tolerance used to compare expected and actual results for changed values found in the e2e results comparison, interpreted according to 'tolerance_type' (a percent of the expected value by default).",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "tolerance_type": {
+            "type": "string",
+            "pattern": "^(percent|absolute|significant_digits)$",
+            "description": "How the domain tolerance is interpreted: 'percent' allows a difference of up to the tolerance percent of the expected value, 'absolute' allows a difference of up to the tolerance, and 'significant_digits' requires the expected and actual values to agree once rounded to the tolerance significant digits.",
+            "default": "percent"
           },
           "must_change_variables_path": {
             "type": "string",
@@ -6378,6 +6384,11 @@
           "accepted_ranges_path": {
             "type": "string",
             "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
+            "default": ""
+          },
+          "variable_tolerances_path": {
+            "type": "string",
+            "description": "Path to the file with the tolerance overrides of this input set's variables. Each listed variable is compared with its own tolerance and tolerance type instead of the domain's.",
             "default": ""
           }
         }
@@ -6400,9 +6411,15 @@
           },
           "tolerance": {
             "type": "number",
-            "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
+            "description": "The tolerance used to compare expected and actual results for changed values found in the e2e results comparison, interpreted according to 'tolerance_type' (a percent of the expected value by default).",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "tolerance_type": {
+            "type": "string",
+            "pattern": "^(percent|absolute|significant_digits)$",
+            "description": "How the domain tolerance is interpreted: 'percent' allows a difference of up to the tolerance percent of the expected value, 'absolute' allows a difference of up to the tolerance, and 'significant_digits' requires the expected and actual values to agree once rounded to the tolerance significant digits.",
+            "default": "percent"
           },
           "must_change_variables_path": {
             "type": "string",
@@ -6412,6 +6429,11 @@
           "accepted_ranges_path": {
             "type": "string",
             "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
+            "default": ""
+          },
+          "variable_tolerances_path": {
+            "type": "string",
+            "description": "Path to the file with the tolerance overrides of this input set's variables. Each listed variable is compared with its own tolerance and tolerance type instead of the domain's.",
             "default": ""
           }
         }
@@ -6434,9 +6456,15 @@
           },
           "tolerance": {
             "type": "number",
-            "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
+            "description": "The tolerance used to compare expected and actual results for changed values found in the e2e results comparison, interpreted according to 'tolerance_type' (a percent of the expected value by default).",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "tolerance_type": {
+            "type": "string",
+            "pattern": "^(percent|absolute|significant_digits)$",
+            "description": "How the domain tolerance is interpreted: 'percent' allows a difference of up to the tolerance percent of the expected value, 'absolute' allows a difference of up to the tolerance, and 'significant_digits' requires the expected and actual values to agree once rounded to the tolerance significant digits.",
+            "default": "percent"
           },
           "must_change_variables_path": {
             "type": "string",
@@ -6446,6 +6474,11 @@
           "accepted_ranges_path": {
             "type": "string",
             "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
+            "default": ""
+          },
+          "variable_tolerances_path": {
+            "type": "string",
+            "description": "Path to the file with the tolerance overrides of this input set's variables. Each listed variable is compared with its own tolerance and tolerance type instead of the domain's.",
             "default": ""
           }
         }
@@ -6468,9 +6501,15 @@
           },
           "tolerance": {
             "type": "number",
-            "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
+            "description": "The tolerance used to compare expected and actual results for changed values found in the e2e results comparison, interpreted according to 'tolerance_type' (a percent of the expected value by default).",
             "default": 0.0,
             "minimum": 0.0
+          },
+          "tolerance_type": {
+            "type": "string",
+            "pattern": "^(percent|absolute|significant_digits)$",
+            "description": "How the domain tolerance is interpreted: 'percent' allows a difference of up to the tolerance percent of the expected value, 'absolute' allows a difference of up to the tolerance, and 'significant_digits' requires the expected and actual values to agree once rounded to the tolerance significant digits.",
+            "default": "percent"
           },
           "must_change_variables_path": {
             "type": "string",
@@ -6480,6 +6519,11 @@
           "accepted_ranges_path": {
             "type": "string",
             "description": "Path to the file with the accepted ranges of this input set's variables. Each listed variable must stay within its range, instead of matching the expected results, for the end-to-end test to pass.",
+            "default": ""
+          },
+          "variable_tolerances_path": {
+            "type": "string",
+            "description": "Path to the file with the tolerance overrides of this input set's variables. Each listed variable is compared with its own tolerance and tolerance type instead of the domain's.",
             "default": ""
           }
         }
