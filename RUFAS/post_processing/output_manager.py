@@ -1,9 +1,13 @@
 from __future__ import annotations
+from typing import Any
 
 from RUFAS.post_processing.file_manager import FileManager
+from RUFAS.post_processing.rufas_logger import get_logger, log
 from RUFAS.post_processing.output_config_validator import OutputConfigValidator
 from RUFAS.post_processing.pool_manager import PoolManager
 from RUFAS.rufas_time import RufasTime
+
+import logging
 
 
 class OutputManager:
@@ -41,6 +45,7 @@ class OutputManager:
             self.file_manager = FileManager(self.__metadata_prefix, self._filter_prefixes)
             self.pool_manager = PoolManager(self.file_manager)
             self.output_config_validator = OutputConfigValidator()
+            self._logger = get_logger(self.__class__.__name__)
 
     @property
     def _filter_prefixes(self) -> dict[str, str]:
@@ -92,3 +97,45 @@ class OutputManager:
 
     def _list_filter_files_in_dir() -> None:
         pass
+
+    def add_log(
+        self,
+        name: str,
+        message: str,
+        info_map: dict[str, Any],
+    ) -> None:
+        log(
+            logger=self._logger,
+            level=logging.INFO,
+            name=name,
+            message=message,
+            info_map=info_map,
+        )
+
+    def add_warning(
+        self,
+        name: str,
+        message: str,
+        info_map: dict[str, Any],
+    ) -> None:
+        log(
+            logger=self._logger,
+            level=logging.WARNING,
+            name=name,
+            message=message,
+            info_map=info_map,
+        )
+
+    def add_error(
+        self,
+        name: str,
+        message: str,
+        info_map: dict[str, Any],
+    ) -> None:
+        log(
+            logger=self._logger,
+            level=logging.ERROR,
+            name=name,
+            message=message,
+            info_map=info_map,
+        )
