@@ -133,3 +133,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3206](https://github.com/RuminantFarmSystems/RuFaS/pull/3206) - [minor change] [Animal] [NoInputChange] [OutputChange] Fixes the off-by-one error where cow milking history skipped DIM = 1 on calving day.
 - [3309](https://github.com/RuminantFarmSystems/RuFaS/pull/3309) - [minor change] [PostProcessing] [ReportGenerator] [NoInputChange] [NoOutputChange] Sets up the functions and unit tests of the overhauled ReportGenerator.
 - [3310](https://github.com/RuminantFarmSystems/RuFaS/pull/3310) - [minor change] [E2E Testing] [NoInputChange] [OutputChange] Updates expected e2e results.
+- [3318](https://github.com/RuminantFarmSystems/RuFaS/pull/3318) - [minor change] [pyproject.toml] [dependencies] [NoInputChange] [OutputChange] Updates pyproject.toml minimum deepdiff compatible version number.
