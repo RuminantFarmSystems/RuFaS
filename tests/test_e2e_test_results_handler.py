@@ -1,16 +1,25 @@
 import json
+import math
 from pathlib import Path
+import re
 from typing import Any
+from unittest.mock import MagicMock
 
 import pandas as pd
+from RUFAS.output_manager import OutputManager
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.e2e_test_results_handler import E2ETestResultsHandler, MUST_CHANGE_VARIABLES_KEY, ResultPathType
+from RUFAS.e2e_test_results_handler import (
+    ACCEPTED_RANGES_KEY,
+    E2ETestResultsHandler,
+    MUST_CHANGE_VARIABLES_KEY,
+    ResultPathType,
+)
 
 
-def write_must_change_file(path: Path, contents: Any) -> None:
-    """Writes a must-change variables file used by the must-change tests."""
+def write_json_file(path: Path, contents: Any) -> None:
+    """Writes JSON, or the raw text of a string, to the given path."""
     with open(path, "w", encoding="utf-8") as file:
         if isinstance(contents, str):
             file.write(contents)
@@ -49,13 +58,12 @@ def test_compare_simulation_outputs_to_expected_outputs(
     add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     add_var = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
-    mocker.patch.object(E2ETestResultsHandler, "_load_must_change_variables", return_value=set())
     mock_convert_variable_name = mocker.patch(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names"
     )
 
     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix"
+        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix", set(), {}
     )
 
     get_result_paths.assert_called_once()
@@ -75,6 +83,787 @@ def test_compare_simulation_outputs_to_expected_outputs(
         mock_convert_variable_name.assert_called_once()
     else:
         mock_convert_variable_name.assert_not_called()
+
+
+def test_process_test_result_averaging(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests process_test_result_averaging in E2ETestResultsHandler."""
+    e2e_group = "test_e2e_group"
+    e2e_runs = [
+        {
+            "output_prefix": "run_1",
+            "e2e_group": e2e_group,
+            "json_output_directory": str(tmp_path),
+        },
+        {
+            "output_prefix": "run_2",
+            "e2e_group": e2e_group,
+            "json_output_directory": str(tmp_path),
+        },
+    ]
+
+    path_set_1 = mocker.Mock(actual_results_path="test_e2e_group_animal_results.json")
+    path_set_2 = mocker.Mock(actual_results_path="test_e2e_group_field_results.json")
+
+    result_paths_1 = [
+        tmp_path / "run_1_animal_results.json",
+        tmp_path / "run_2_animal_results.json",
+    ]
+    result_paths_2 = [
+        tmp_path / "run_1_field_results.json",
+        tmp_path / "run_2_field_results.json",
+    ]
+
+    averaged_results_1 = {"animal_output": {"values": [1.0, 2.0]}}
+    averaged_results_2 = {"field_output": {"values": [3.0, 4.0]}}
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_get_test_result_paths",
+        return_value=[path_set_1, path_set_2],
+    )
+    extract_results_paths = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_extract_results_paths",
+        side_effect=[result_paths_1, result_paths_2],
+    )
+    average_test_results = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_test_results",
+        side_effect=[averaged_results_1, averaged_results_2],
+    )
+
+    result = E2ETestResultsHandler.process_test_result_averaging(
+        e2e_group,
+        e2e_runs,
+    )
+
+    expected_directory = tmp_path / "averaged" / e2e_group
+
+    assert result == expected_directory
+    assert expected_directory.exists()
+
+    assert extract_results_paths.call_args_list == [
+        mocker.call(
+            e2e_runs=e2e_runs,
+            json_output_directory=tmp_path,
+            actual_results_path=Path(path_set_1.actual_results_path),
+        ),
+        mocker.call(
+            e2e_runs=e2e_runs,
+            json_output_directory=tmp_path,
+            actual_results_path=Path(path_set_2.actual_results_path),
+        ),
+    ]
+
+    assert average_test_results.call_args_list == [
+        mocker.call(result_paths_1),
+        mocker.call(result_paths_2),
+    ]
+
+    with open(
+        expected_directory / "test_e2e_group_animal_results.json_averaged.json",
+        "r",
+        encoding="utf-8",
+    ) as averaged_file:
+        assert json.load(averaged_file) == averaged_results_1
+
+    with open(
+        expected_directory / "test_e2e_group_field_results.json_averaged.json",
+        "r",
+        encoding="utf-8",
+    ) as averaged_file:
+        assert json.load(averaged_file) == averaged_results_2
+
+
+def test_process_test_result_averaging_raises_error_when_no_runs_are_provided(
+    mocker: MockerFixture,
+) -> None:
+    e2e_group = "test_e2e_group"
+    add_error = mocker.patch.object(OutputManager, "add_error")
+
+    with pytest.raises(
+        ValueError,
+        match=f"Cannot average E2E results for '{e2e_group}' because no runs were provided.",
+    ):
+        E2ETestResultsHandler.process_test_result_averaging(
+            e2e_group,
+            [],
+        )
+
+    add_error.assert_called_once_with(
+        "E2E Results Averaging Error",
+        "No E2E runs data sent to 'process_test_result_averaging()' function.",
+        info_map={
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler.process_test_result_averaging.__name__,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "test_results, validate_values_return, expected_result, expected_warning",
+    [
+        (
+            [
+                {"DISCLAIMER": "Test disclaimer"},
+                {"DISCLAIMER": "Different disclaimer"},
+            ],
+            True,
+            {"DISCLAIMER": "Test disclaimer"},
+            None,
+        ),
+        (
+            [
+                {"test_output": {"metadata": "test"}},
+                {"test_output": {"metadata": "test"}},
+            ],
+            True,
+            {"test_output": {"metadata": "test"}},
+            None,
+        ),
+        (
+            [
+                {"test_output": {"metadata": "first"}},
+                {"test_output": {"metadata": "second"}},
+            ],
+            True,
+            {},
+            "Non-matching data in reference output for test_output",
+        ),
+        (
+            [
+                {"test_output": {"values": [1.0]}},
+                {"test_output": {"values": [2.0]}},
+            ],
+            False,
+            {},
+            None,
+        ),
+    ],
+)
+def test_average_test_results_special_cases(
+    mocker: MockerFixture,
+    test_results: list[dict[str, Any]],
+    validate_values_return: bool,
+    expected_result: dict[str, Any],
+    expected_warning: str | None,
+) -> None:
+    results_paths = [
+        Path("run_1.json"),
+        Path("run_2.json"),
+    ]
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_load_results",
+        return_value=test_results,
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_results",
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_values",
+        return_value=validate_values_return,
+    )
+    average_output_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_output_values",
+    )
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    actual = E2ETestResultsHandler._average_test_results(results_paths)
+
+    assert actual == expected_result
+    average_output_values.assert_not_called()
+
+    if expected_warning is None:
+        add_warning.assert_not_called()
+    else:
+        add_warning.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_warning,
+            info_map={
+                "class": E2ETestResultsHandler.__class__.__name__,
+                "function": E2ETestResultsHandler._average_test_results.__name__,
+            },
+        )
+
+
+def test_average_test_results_averages_valid_output_values(mocker: MockerFixture) -> None:
+    results_paths = [
+        Path("run_1.json"),
+        Path("run_2.json"),
+    ]
+    test_results = [
+        {
+            "test_output": {
+                "values": [1.0, 2.0],
+                "units": "kg",
+            },
+        },
+        {
+            "test_output": {
+                "values": [3.0, 4.0],
+                "units": "kg",
+            },
+        },
+    ]
+    averaged_values = [2.0, 3.0]
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_load_results",
+        return_value=test_results,
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_results",
+    )
+    validate_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_values",
+        return_value=True,
+    )
+    average_output_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_output_values",
+        return_value=averaged_values,
+    )
+
+    actual = E2ETestResultsHandler._average_test_results(results_paths)
+
+    assert actual == {
+        "test_output": {
+            "values": averaged_values,
+            "units": "kg",
+        },
+    }
+
+    validate_values.assert_called_once_with(
+        results_paths,
+        "test_output",
+        [test_results[0]["test_output"], test_results[1]["test_output"]],
+        [1.0, 2.0],
+    )
+    average_output_values.assert_called_once_with(
+        "test_output",
+        [1.0, 2.0],
+        [test_results[0]["test_output"], test_results[1]["test_output"]],
+    )
+
+
+@pytest.mark.parametrize(
+    "reference_values, matching_values, expected_values, expected_warning",
+    [
+        (
+            ["test"],
+            ["test", "test"],
+            ["test"],
+            None,
+        ),
+        (
+            ["test"],
+            ["test", "different"],
+            ["test"],
+            "Non-numeric values differ for 'test_output' at index 0.",
+        ),
+        (
+            [1.0],
+            [1.0, "invalid"],
+            [1.0],
+            (
+                "Inconsistent numeric value types for 'test_output' at index 0. "
+                "Values: [1.0, 'invalid']. "
+                "Types: ['float', 'str']."
+            ),
+        ),
+        (
+            [1],
+            [1, 1],
+            [1],
+            None,
+        ),
+        (
+            [1.0],
+            [1.0, 3.0],
+            [2.0],
+            None,
+        ),
+        (
+            [float("nan")],
+            [float("nan"), float("nan")],
+            [float("nan")],
+            None,
+        ),
+    ],
+)
+def test_average_output_values(
+    mocker: MockerFixture,
+    reference_values: list[Any],
+    matching_values: list[Any],
+    expected_values: list[Any],
+    expected_warning: str | None,
+) -> None:
+    output_name = "test_output"
+    matching_outputs = [{"values": [value]} for value in matching_values]
+
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    actual = E2ETestResultsHandler._average_output_values(
+        output_name,
+        reference_values,
+        matching_outputs,
+    )
+
+    if all(isinstance(value, float) and math.isnan(value) for value in expected_values):
+        assert len(actual) == 1
+        assert math.isnan(actual[0])
+    else:
+        assert actual == expected_values
+
+    if expected_warning is None:
+        add_warning.assert_not_called()
+    else:
+        add_warning.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_warning,
+            info_map={
+                "class": E2ETestResultsHandler.__class__.__name__,
+                "function": E2ETestResultsHandler._average_output_values.__name__,
+            },
+        )
+
+
+@pytest.mark.parametrize(
+    "matching_output, expected_result, expected_error, expected_warning",
+    [
+        (
+            {"values": [1.0, 2.0]},
+            True,
+            None,
+            None,
+        ),
+        (
+            {},
+            False,
+            "E2E output 'test_output' in 'run_1.json' does not contain a 'values' list.",
+            None,
+        ),
+        (
+            "invalid_output",
+            False,
+            "E2E output 'test_output' in 'run_1.json' does not contain a 'values' list.",
+            None,
+        ),
+        (
+            {"values": [1.0]},
+            False,
+            None,
+            "E2E output 'test_output' has 1 values in 'run_1.json', but 2 were expected.",
+        ),
+    ],
+)
+def test_validate_values(
+    mocker: MockerFixture,
+    matching_output: Any,
+    expected_result: bool,
+    expected_error: str | None,
+    expected_warning: str | None,
+) -> None:
+    result_paths = [Path("run_1.json")]
+    output_name = "test_output"
+    reference_values = [1.0, 2.0]
+    matching_outputs = [matching_output]
+
+    add_error = mocker.patch.object(OutputManager, "add_error")
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    actual = E2ETestResultsHandler._validate_values(
+        result_paths,
+        output_name,
+        matching_outputs,
+        reference_values,
+    )
+
+    assert actual is expected_result
+
+    info_map = {
+        "class": E2ETestResultsHandler.__class__.__name__,
+        "function": E2ETestResultsHandler._validate_values.__name__,
+    }
+
+    if expected_error is None:
+        add_error.assert_not_called()
+    else:
+        add_error.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_error,
+            info_map=info_map,
+        )
+
+    if expected_warning is None:
+        add_warning.assert_not_called()
+    else:
+        add_warning.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_warning,
+            info_map=info_map,
+        )
+
+
+@pytest.mark.parametrize(
+    "test_results, expected_warnings",
+    [
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}, "output_2": {}},
+            ],
+            [],
+        ),
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}},
+            ],
+            [
+                (
+                    Path("run_2.json"),
+                    ["output_2"],
+                    [],
+                ),
+            ],
+        ),
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}, "output_2": {}, "output_3": {}},
+            ],
+            [
+                (
+                    Path("run_2.json"),
+                    [],
+                    ["output_3"],
+                ),
+            ],
+        ),
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}, "output_3": {}},
+            ],
+            [
+                (
+                    Path("run_2.json"),
+                    ["output_2"],
+                    ["output_3"],
+                ),
+            ],
+        ),
+        (
+            [
+                {"output_1": {}, "output_2": {}},
+                {"output_1": {}},
+                {"output_2": {}, "output_3": {}},
+            ],
+            [
+                (
+                    Path("run_2.json"),
+                    ["output_2"],
+                    [],
+                ),
+                (
+                    Path("run_3.json"),
+                    ["output_1"],
+                    ["output_3"],
+                ),
+            ],
+        ),
+    ],
+)
+def test_validate_results(
+    mocker: MockerFixture,
+    test_results: list[dict[str, Any]],
+    expected_warnings: list[tuple[Path, list[str], list[str]]],
+) -> None:
+    result_paths = [Path(f"run_{index}.json") for index in range(1, len(test_results) + 1)]
+    reference_keys = {"output_1", "output_2"}
+
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    E2ETestResultsHandler._validate_results(
+        result_paths,
+        test_results,
+        reference_keys,
+    )
+
+    expected_calls = [
+        mocker.call(
+            "E2E Results Averaging Warning",
+            (
+                f"E2E result structure differs for '{result_path}'. "
+                f"Missing keys: {missing_keys}. "
+                f"Unexpected keys: {unexpected_keys}."
+            ),
+            info_map={
+                "class": E2ETestResultsHandler.__class__.__name__,
+                "function": E2ETestResultsHandler._validate_results.__name__,
+            },
+        )
+        for result_path, missing_keys, unexpected_keys in expected_warnings
+    ]
+
+    assert add_warning.call_args_list == expected_calls
+
+
+def test_load_results(tmp_path: Path) -> None:
+    result_1 = {
+        "output_1": {"values": [1.0, 2.0]},
+        "DISCLAIMER": "First result",
+    }
+    result_2 = {
+        "output_2": {"values": [3.0, 4.0]},
+        "DISCLAIMER": "Second result",
+    }
+
+    result_path_1 = tmp_path / "run_1.json"
+    result_path_2 = tmp_path / "run_2.json"
+
+    result_path_1.write_text(json.dumps(result_1), encoding="utf-8")
+    result_path_2.write_text(json.dumps(result_2), encoding="utf-8")
+
+    actual = E2ETestResultsHandler._load_results(
+        [result_path_1, result_path_2],
+    )
+
+    assert actual == [
+        result_1,
+        result_2,
+    ]
+
+
+def test_extract_results_paths(tmp_path: Path) -> None:
+    e2e_runs = [
+        {
+            "output_prefix": "run_1",
+            "e2e_group": "animals_e2e",
+        },
+        {
+            "output_prefix": "run_2",
+            "e2e_group": "animals_e2e",
+        },
+    ]
+    actual_results_path = Path("animals_e2e_animal_results.json")
+
+    result_path_1 = tmp_path / "run_1_animal_results.json"
+    result_path_2 = tmp_path / "run_2_animal_results.json"
+    unrelated_path = tmp_path / "unrelated_results.json"
+
+    result_path_1.touch()
+    result_path_2.touch()
+    unrelated_path.touch()
+
+    actual = E2ETestResultsHandler._extract_results_paths(
+        e2e_runs,
+        tmp_path,
+        actual_results_path,
+    )
+
+    assert actual == [
+        result_path_1,
+        result_path_2,
+    ]
+
+
+@pytest.mark.parametrize(
+    "matching_filenames, expected_match_count",
+    [
+        ([], 0),
+        (
+            [
+                "run_1_animal_results.json",
+                "run_1_animal_results.json_extra",
+            ],
+            2,
+        ),
+    ],
+)
+def test_extract_results_paths_raises_error_for_invalid_number_of_matches(
+    mocker: MockerFixture,
+    tmp_path: Path,
+    matching_filenames: list[str],
+    expected_match_count: int,
+) -> None:
+    e2e_runs = [
+        {
+            "output_prefix": "run_1",
+            "e2e_group": "animals_e2e",
+        },
+    ]
+    actual_results_path = Path("animals_e2e_animal_results.json")
+
+    for filename in matching_filenames:
+        (tmp_path / filename).touch()
+
+    add_error = mocker.patch.object(OutputManager, "add_error")
+
+    expected_message = (
+        "Expected exactly one E2E result file for "
+        "'run_1' matching "
+        "'animal_results.json', but found "
+        f"{expected_match_count}."
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape(expected_message),
+    ):
+        E2ETestResultsHandler._extract_results_paths(
+            e2e_runs,
+            tmp_path,
+            actual_results_path,
+        )
+
+    add_error.assert_called_once_with(
+        "E2E Results Averaging Error",
+        expected_message,
+        info_map={
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._extract_results_paths.__name__,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "test_results, expected_result, expected_warning",
+    [
+        (
+            [
+                {"DISCLAIMER": "Test disclaimer"},
+                {"DISCLAIMER": "Different disclaimer"},
+            ],
+            {"DISCLAIMER": "Test disclaimer"},
+            None,
+        ),
+        (
+            [
+                {"test_output": {"metadata": "test"}},
+                {"test_output": {"metadata": "test"}},
+            ],
+            {"test_output": {"metadata": "test"}},
+            None,
+        ),
+        (
+            [
+                {"test_output": {"metadata": "first"}},
+                {"test_output": {"metadata": "second"}},
+            ],
+            {},
+            "Non-matching data in reference output for test_output",
+        ),
+    ],
+)
+def test_average_test_results_handles_non_averaged_outputs(
+    mocker: MockerFixture,
+    test_results: list[dict[str, Any]],
+    expected_result: dict[str, Any],
+    expected_warning: str | None,
+) -> None:
+    results_paths = [
+        Path("run_1.json"),
+        Path("run_2.json"),
+    ]
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_load_results",
+        return_value=test_results,
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_results",
+    )
+    validate_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_values",
+    )
+    average_output_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_output_values",
+    )
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    actual = E2ETestResultsHandler._average_test_results(results_paths)
+
+    assert actual == expected_result
+    validate_values.assert_not_called()
+    average_output_values.assert_not_called()
+
+    if expected_warning is None:
+        add_warning.assert_not_called()
+    else:
+        add_warning.assert_called_once_with(
+            "E2E Results Averaging Error",
+            expected_warning,
+            info_map={
+                "class": E2ETestResultsHandler.__class__.__name__,
+                "function": E2ETestResultsHandler._average_test_results.__name__,
+            },
+        )
+
+
+def test_average_test_results_excludes_output_missing_from_run(mocker: MockerFixture) -> None:
+    results_paths = [
+        Path("run_1.json"),
+        Path("run_2.json"),
+        Path("run_3.json"),
+    ]
+    test_results = [
+        {"test_output": {"values": [1.0]}},
+        {},
+        {"test_output": {"values": [3.0]}},
+    ]
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_load_results",
+        return_value=test_results,
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_results",
+    )
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
+    validate_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_validate_values",
+    )
+    average_output_values = mocker.patch.object(
+        E2ETestResultsHandler,
+        "_average_output_values",
+    )
+
+    actual = E2ETestResultsHandler._average_test_results(results_paths)
+
+    assert actual == {}
+
+    add_warning.assert_called_once_with(
+        "E2E Results Averaging Warning",
+        (
+            "E2E output 'test_output' is missing from 1 of 3 runs "
+            "and will be excluded from the averaged results. "
+            f"Missing from: [{results_paths[1]!r}]."
+        ),
+        info_map={
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._average_test_results.__name__,
+        },
+    )
+
+    validate_values.assert_not_called()
+    average_output_values.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -193,7 +982,7 @@ def test_duplicate_mappings_exist(
     mock_add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
 
     info_map: dict[str, str] = {
-        "class": E2ETestResultsHandler.__class__.__name__,
+        "class": E2ETestResultsHandler.__name__,
         "function": E2ETestResultsHandler._duplicate_mappings_exist.__name__,
     }
     dummy_df = pd.DataFrame({"Original": [], "New": []})
@@ -245,12 +1034,14 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
                 "expected_results_path": "expected_2",
                 "actual_results_path": "actual_2",
                 "tolerance": 0.01,
+                "must_change_variables_path": "must_change_2",
+                "accepted_ranges_path": "ranges_2",
             },
         ],
     )
     expected = [
         ResultPathType("one", "expected_1", "actual_1", 0.01),
-        ResultPathType("two", "expected_2", "actual_2", 0.01),
+        ResultPathType("two", "expected_2", "actual_2", 0.01, "must_change_2", "ranges_2"),
     ]
 
     actual = E2ETestResultsHandler._get_test_result_paths("dummy_prefix")
@@ -661,9 +1452,9 @@ def test_write_formatted_json(data: dict[str, dict[str, str]], should_raise: boo
         assert written_data.count(expected_results_str) == 1
 
 
-def make_result_path_set(must_change_variables_path: str) -> ResultPathType:
-    """Returns a ResultPathType with dummy paths and the given must-change variables path."""
-    return ResultPathType("domain", "expected", "actual_", 0.1, must_change_variables_path)
+def make_result_path_set(must_change_variables_path: str = "", accepted_ranges_path: str = "") -> ResultPathType:
+    """Returns a ResultPathType with dummy paths and the given must-change variables and accepted ranges paths."""
+    return ResultPathType("domain", "expected", "actual_", 0.1, must_change_variables_path, accepted_ranges_path)
 
 
 def test_load_must_change_variables(mocker: MockerFixture, tmp_path: Path) -> None:
@@ -672,8 +1463,8 @@ def test_load_must_change_variables(mocker: MockerFixture, tmp_path: Path) -> No
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     file_one = tmp_path / "must_change_one.json"
     file_two = tmp_path / "must_change_two.json"
-    write_must_change_file(file_one, {"description": "ignored", MUST_CHANGE_VARIABLES_KEY: ["A.x", "A.y"]})
-    write_must_change_file(file_two, {MUST_CHANGE_VARIABLES_KEY: ["A.y", "B.z"]})
+    write_json_file(file_one, {"description": "ignored", MUST_CHANGE_VARIABLES_KEY: ["A.x", "A.y"]})
+    write_json_file(file_two, {MUST_CHANGE_VARIABLES_KEY: ["A.y", "B.z"]})
     path_sets = [
         make_result_path_set(str(file_one)),
         make_result_path_set(str(file_one)),
@@ -720,7 +1511,7 @@ def test_load_must_change_variables_invalid_contents(mocker: MockerFixture, tmp_
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     file_path = tmp_path / "must_change.json"
-    write_must_change_file(file_path, file_contents)
+    write_json_file(file_path, file_contents)
 
     with pytest.raises(ValueError):
         E2ETestResultsHandler._load_must_change_variables([make_result_path_set(str(file_path))])
@@ -818,8 +1609,9 @@ def test_extract_changed_variable_names(diff_result: dict[str, Any], expected_na
         ({"A.y": {"values": [2.0]}}, ["A.x"], False, 1, None, [], {"A.x"}),
         # Unflagged variable changed: the run fails and the variable is compiled into changed_variables.
         ({"A.x": {"values": [1.0]}, "A.y": {"values": [9.0]}}, [], False, 1, ["A.y"], None, None),
-        # Flagged variable does not exist in the expected results: configuration error.
-        ({"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}, ["A.z"], True, 1, None, None, None),
+        # Flagged variable does not exist in the expected results: ignored by the comparison, which relies on
+        # validate_comparison_configuration having rejected it before the simulation.
+        ({"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}, ["A.z"], True, 0, None, None, None),
     ],
 )
 def test_compare_actual_and_expected_results_with_must_change(
@@ -842,16 +1634,16 @@ def test_compare_actual_and_expected_results_with_must_change(
     expected_results_path = tmp_path / "e2e_json_test_filter.json"
     with open(expected_results_path, "w", encoding="utf-8") as file:
         json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
-    must_change_path = tmp_path / "must_change_variables.json"
-    write_must_change_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names})
-    path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1, str(must_change_path))
+    path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1)
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
     add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
     add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
 
-    E2ETestResultsHandler.compare_actual_and_expected_test_results(json_output_path, None, "dummy_prefix")
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(
+        json_output_path, None, "dummy_prefix", set(must_change_names), {}
+    )
 
     reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
     assert reported["end_to_end_testing_passing"] is expect_passing
@@ -868,3 +1660,624 @@ def test_compare_actual_and_expected_results_with_must_change(
         assert "must_change_violations" not in reported
     else:
         assert set(reported["must_change_violations"].keys()) == expect_violations
+
+
+VALIDATION_OUTPUT_PREFIX = "dummy_prefix"
+
+
+def patch_output_manager(mocker: MockerFixture) -> tuple[MagicMock, MagicMock]:
+    """Stubs the OutputManager used by the handler and returns its add_log and add_error mocks."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    return add_log, add_error
+
+
+def write_expected_results_file(path: Path, expected_results: dict[str, Any]) -> None:
+    """Writes a valid expected results file, named after the file stem, for the configuration validation tests."""
+    write_json_file(
+        path,
+        {
+            "name": path.stem,
+            "filters": ["A.*"],
+            "expected_results_last_updated": "2026-09-11T00:00:00",
+            "expected_results": expected_results,
+        },
+    )
+
+
+def make_validation_path_sets(
+    tmp_path: Path,
+    must_change_names: list[str] | None = None,
+    accepted_ranges: dict[str, dict[str, Any]] | None = None,
+) -> list[ResultPathType]:
+    """Writes valid expected results, must-change and accepted ranges files under tmp_path and returns path sets."""
+    animal_path = tmp_path / "e2e_json_animal_filter.json"
+    feed_path = tmp_path / "e2e_json_feed_filter.json"
+    must_change_path = tmp_path / "must_change_variables.json"
+    accepted_ranges_path = tmp_path / "accepted_ranges.json"
+    write_expected_results_file(animal_path, {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}})
+    write_expected_results_file(feed_path, {"F.z": {"values": [3.0]}})
+    write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names or []})
+    write_json_file(accepted_ranges_path, {ACCEPTED_RANGES_KEY: accepted_ranges or {}})
+    return [
+        ResultPathType(
+            "Animal",
+            str(animal_path),
+            f"{VALIDATION_OUTPUT_PREFIX}_saved_variables_{animal_path.stem}_",
+            0.1,
+            str(must_change_path),
+            str(accepted_ranges_path),
+        ),
+        ResultPathType(
+            "Feed",
+            str(feed_path),
+            f"{VALIDATION_OUTPUT_PREFIX}_saved_variables_{feed_path.stem}_",
+            0.1,
+            str(must_change_path),
+            str(accepted_ranges_path),
+        ),
+    ]
+
+
+@pytest.mark.parametrize("use_conversion_table", [False, True])
+def test_validate_comparison_configuration(mocker: MockerFixture, tmp_path: Path, use_conversion_table: bool) -> None:
+    """Tests that a valid configuration passes, matching must-change names after any variable name conversion."""
+    _, add_error = patch_output_manager(mocker)
+    conversion_csv_path: str | None = None
+    flagged_feed_name = "F.z"
+    if use_conversion_table:
+        conversion_csv_path = str(tmp_path / "conversion.csv")
+        pd.DataFrame({"Original": ["F.z"], "New": ["F.renamed"]}).to_csv(conversion_csv_path, index=False)
+        flagged_feed_name = "F.renamed"
+    path_sets = make_validation_path_sets(tmp_path, ["A.y", flagged_feed_name])
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
+        VALIDATION_OUTPUT_PREFIX, conversion_csv_path, tmp_path, True
+    )
+
+    assert must_change_variables == {"A.y", flagged_feed_name}
+    assert accepted_ranges == {}
+    add_error.assert_not_called()
+
+
+def test_validate_comparison_configuration_unknown_must_change_variable(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a must-change name absent from every domain's expected results fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path, ["A.y", "A.typo"])
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match=r"\['A\.typo'\]"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+    assert "A.typo" in add_error.call_args.args[1]
+    assert "A.y" not in add_error.call_args.args[1]
+
+
+def test_validate_comparison_configuration_missing_must_change_file(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a missing must-change variables file fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    (tmp_path / "must_change_variables.json").unlink()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="Must-change variables file not found"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+
+
+def test_validate_comparison_configuration_missing_expected_results_file(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a missing expected results file fails the validation even when no variable is flagged."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    (tmp_path / "e2e_json_feed_filter.json").unlink()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="could not be loaded"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "file_contents",
+    [
+        '// WARNING: This is an autogenerated file. Remove this line for valid JSON.\n{"expected_results": {}}',
+        ["A.x"],
+        {"name": "e2e_json_feed_filter", "filters": ["A.*"], "expected_results_last_updated": ""},
+    ],
+)
+def test_validate_comparison_configuration_invalid_expected_results_file(
+    mocker: MockerFixture, tmp_path: Path, file_contents: Any
+) -> None:
+    """Tests that an unparsable or malformed expected results file fails the validation without flagged variables."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    write_json_file(tmp_path / "e2e_json_feed_filter.json", file_contents)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="could not be loaded"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+
+
+def test_validate_comparison_configuration_expected_results_outside_filters_directory(
+    mocker: MockerFixture, tmp_path: Path
+) -> None:
+    """Tests that expected results files outside the task's filters directory fail the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    filters_directory = tmp_path / "filters"
+    filters_directory.mkdir()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="filters directory") as error:
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, filters_directory, True)
+    assert "e2e_json_animal_filter.json" in str(error.value)
+    assert "e2e_json_feed_filter.json" in str(error.value)
+    assert add_error.call_count == 2
+
+
+@pytest.mark.parametrize(
+    "actual_results_path",
+    [
+        "",
+        f"{VALIDATION_OUTPUT_PREFIX}_saved_variables_e2e_json_feeed_filter_",
+        "other_prefix_saved_variables_e2e_json_feed_filter_",
+    ],
+)
+def test_validate_comparison_configuration_actual_results_path_mismatch(
+    mocker: MockerFixture, tmp_path: Path, actual_results_path: str
+) -> None:
+    """Tests that an actual_results_path the run's output file names will not start with fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    path_sets[1] = path_sets[1]._replace(actual_results_path=actual_results_path)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="actual_results_path"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+    assert "Feed" in add_error.call_args.args[0]
+
+
+@pytest.mark.parametrize(
+    "conversion_table",
+    [None, pd.DataFrame({"Original": ["F.z"], "Renamed": ["F.renamed"]})],
+)
+def test_validate_comparison_configuration_invalid_conversion_table(
+    mocker: MockerFixture, tmp_path: Path, conversion_table: pd.DataFrame | None
+) -> None:
+    """Tests that a missing or malformed conversion table fails the validation."""
+    patch_output_manager(mocker)
+    conversion_csv_path = tmp_path / "conversion.csv"
+    if conversion_table is not None:
+        conversion_table.to_csv(conversion_csv_path, index=False)
+    path_sets = make_validation_path_sets(tmp_path)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="could not be loaded"):
+        E2ETestResultsHandler.validate_comparison_configuration(
+            VALIDATION_OUTPUT_PREFIX, str(conversion_csv_path), tmp_path, True
+        )
+
+
+def test_validate_comparison_configuration_reports_every_problem(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that one validation reports bad must-change, accepted ranges, expected and actual results paths."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path, ["A.y", "F.z"])
+    path_sets[1] = ResultPathType("Feed", "gloop", "glop", 0.1, "gleep", "glorp")
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError) as error:
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+
+    message = str(error.value)
+    assert "Must-change variables file not found: gleep" in message
+    assert "Accepted ranges file not found: glorp" in message
+    assert "Expected results file gloop for Feed could not be loaded" in message
+    assert "actual_results_path 'glop' for Feed" in message
+    # "F.z" is flagged and only exists in the file that could not be loaded, so it must not be reported as unknown.
+    assert "not found in the expected results" not in message
+    assert add_error.call_count == 4
+
+
+def test_validate_update_configuration(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a valid update configuration passes without reading the must-change variables files."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    (tmp_path / "must_change_variables.json").unlink()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    E2ETestResultsHandler.validate_update_configuration(VALIDATION_OUTPUT_PREFIX, tmp_path)
+
+    add_error.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "mistake, expected_message",
+    [
+        ("missing_expected_results_file", "could not be loaded"),
+        ("expected_results_file_missing_keys", "Missing required keys"),
+        ("actual_results_path_mismatch", "actual_results_path"),
+    ],
+)
+def test_validate_update_configuration_failures(
+    mocker: MockerFixture, tmp_path: Path, mistake: str, expected_message: str
+) -> None:
+    """Tests that a result path set that the update could not resolve after the simulation fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    feed_path = tmp_path / "e2e_json_feed_filter.json"
+    if mistake == "missing_expected_results_file":
+        feed_path.unlink()
+    elif mistake == "expected_results_file_missing_keys":
+        write_json_file(feed_path, {"name": feed_path.stem, "expected_results": {}})
+    else:
+        path_sets[1] = path_sets[1]._replace(actual_results_path="freestall_e2e_saved_variables_e2e_feed_")
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match=expected_message):
+        E2ETestResultsHandler.validate_update_configuration(VALIDATION_OUTPUT_PREFIX, tmp_path)
+    add_error.assert_called_once()
+
+
+def test_validate_update_configuration_reports_every_problem(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that one update validation reports the problems of every result path set."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    (tmp_path / "e2e_json_animal_filter.json").unlink()
+    path_sets[1] = path_sets[1]._replace(actual_results_path="glop")
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError) as error:
+        E2ETestResultsHandler.validate_update_configuration(VALIDATION_OUTPUT_PREFIX, tmp_path)
+
+    message = str(error.value)
+    assert "e2e_json_animal_filter.json for Animal could not be loaded" in message
+    assert "actual_results_path 'glop' for Feed" in message
+    assert add_error.call_count == 2
+
+
+def test_load_accepted_ranges(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that _load_accepted_ranges merges the files referenced by the path sets and keeps extra range keys."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    file_one = tmp_path / "accepted_ranges_one.json"
+    file_two = tmp_path / "accepted_ranges_two.json"
+    write_json_file(
+        file_one,
+        {
+            "description": "ignored",
+            ACCEPTED_RANGES_KEY: {
+                "A.x": {"min": 0, "max": 10, "reference": "NRC 2001"},
+                "A.y": {"min": 1.5, "max": 1.5},
+            },
+        },
+    )
+    write_json_file(file_two, {ACCEPTED_RANGES_KEY: {"B.z": {"min": -5, "max": 5}}})
+    path_sets = [
+        make_result_path_set(accepted_ranges_path=str(file_one)),
+        make_result_path_set(accepted_ranges_path=str(file_one)),
+        make_result_path_set(accepted_ranges_path=str(file_two)),
+        make_result_path_set(),
+    ]
+
+    result = E2ETestResultsHandler._load_accepted_ranges(path_sets)
+
+    assert result == {
+        "A.x": {"min": 0, "max": 10, "reference": "NRC 2001"},
+        "A.y": {"min": 1.5, "max": 1.5},
+        "B.z": {"min": -5, "max": 5},
+    }
+    add_error.assert_not_called()
+
+
+def test_load_accepted_ranges_without_configured_paths(mocker: MockerFixture) -> None:
+    """Tests that _load_accepted_ranges returns an empty dictionary when no paths are configured."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+
+    assert E2ETestResultsHandler._load_accepted_ranges([make_result_path_set()]) == {}
+
+
+def test_load_accepted_ranges_missing_file(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that _load_accepted_ranges raises when a referenced file does not exist."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    path_sets = [make_result_path_set(accepted_ranges_path=str(tmp_path / "no_such_file.json"))]
+
+    with pytest.raises(FileNotFoundError):
+        E2ETestResultsHandler._load_accepted_ranges(path_sets)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "file_contents",
+    [
+        "{not valid json",
+        [{"A.x": {"min": 0, "max": 1}}],
+        {"wrong_key": {"A.x": {"min": 0, "max": 1}}},
+        {ACCEPTED_RANGES_KEY: [{"min": 0, "max": 1}]},
+        {ACCEPTED_RANGES_KEY: {"A.x": [0, 1]}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": 0}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": "0", "max": 1}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": False, "max": 1}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": 0, "max": None}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": 2, "max": 1}}},
+        {ACCEPTED_RANGES_KEY: {"A.x": {"min": 0, "max": 1}, "A.y": {"min": 2, "max": 1}}},
+    ],
+)
+def test_load_accepted_ranges_invalid_contents(mocker: MockerFixture, tmp_path: Path, file_contents: Any) -> None:
+    """Tests that _load_accepted_ranges raises for unparsable or malformed files."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    file_path = tmp_path / "accepted_ranges.json"
+    write_json_file(file_path, file_contents)
+
+    with pytest.raises(ValueError):
+        E2ETestResultsHandler._load_accepted_ranges([make_result_path_set(accepted_ranges_path=str(file_path))])
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "value, expected_numbers",
+    [
+        ({"values": [1.0, 2, 3.5]}, [1.0, 2, 3.5]),
+        # None entries of a daily series are skipped
+        ({"values": [None, -2.75, None, 3.5]}, [-2.75, 3.5]),
+        # Booleans are not numbers
+        ({"values": [True, False, 1]}, [1]),
+        ({"values": [["Holstein"]]}, []),
+        ({"values": ["BARE", "CROP"]}, []),
+        # Numbers nested inside records
+        ({"values": [{"202": 1.5, "dry_matter_intake_total": 3.0, "name": "x"}, {"202": 2.5}]}, [1.5, 3.0, 2.5]),
+        ({"values": []}, []),
+        (7, [7]),
+        (None, []),
+    ],
+)
+def test_collect_numerical_values(value: Any, expected_numbers: list[int | float]) -> None:
+    """Tests that _collect_numerical_values finds numbers at any depth and skips booleans, strings, and None."""
+    assert E2ETestResultsHandler._collect_numerical_values(value) == expected_numbers
+
+
+@pytest.mark.parametrize(
+    "actual_value, accepted_range, expected_observed, expected_reason_fragment",
+    [
+        # Every value within the range
+        ({"values": [1.0, 5.0, 9.5]}, {"min": 0, "max": 10}, {"observed_min": 1.0, "observed_max": 9.5}, None),
+        # The bounds are inclusive
+        ({"values": [0, 10]}, {"min": 0, "max": 10}, {"observed_min": 0, "observed_max": 10}, None),
+        # None values are skipped and extra range keys are echoed
+        (
+            {"values": [None, 3.0]},
+            {"min": 0, "max": 10, "reference": "NRC 2001"},
+            {"observed_min": 3.0, "observed_max": 3.0},
+            None,
+        ),
+        # A value above the range
+        ({"values": [1.0, 12.0]}, {"min": 0, "max": 10}, {"observed_min": 1.0, "observed_max": 12.0}, "1 of 2 values"),
+        # A value below the range
+        ({"values": [-0.5, 1.0]}, {"min": 0, "max": 10}, {"observed_min": -0.5, "observed_max": 1.0}, "1 of 2 values"),
+        # Numbers nested inside records
+        (
+            {"values": [{"amount": 13.5}, {"amount": 25.0}]},
+            {"min": 0, "max": 20},
+            {"observed_min": 13.5, "observed_max": 25.0},
+            "1 of 2 values",
+        ),
+        # No numerical values to check
+        ({"values": ["Calf", "Cow"]}, {"min": 0, "max": 10}, {}, "no numerical values"),
+    ],
+)
+def test_evaluate_accepted_ranges(
+    actual_value: dict[str, Any],
+    accepted_range: dict[str, Any],
+    expected_observed: dict[str, float],
+    expected_reason_fragment: str | None,
+) -> None:
+    """Tests _evaluate_accepted_ranges on satisfied and violated ranges."""
+    actual_results = {"A.x": actual_value, "A.y": {"values": [2.0]}}
+
+    satisfied, violations = E2ETestResultsHandler._evaluate_accepted_ranges(actual_results, {"A.x": accepted_range})
+
+    if expected_reason_fragment is None:
+        assert violations == {}
+        assert satisfied == {"A.x": {**accepted_range, **expected_observed}}
+    else:
+        assert satisfied == {}
+        assert list(violations.keys()) == ["A.x"]
+        reason = violations["A.x"].pop("reason")
+        assert expected_reason_fragment in reason
+        assert violations["A.x"] == {**accepted_range, **expected_observed}
+
+
+def test_evaluate_accepted_ranges_missing_from_actual() -> None:
+    """Tests that a ranged variable missing from the actual results is reported as a violation."""
+    satisfied, violations = E2ETestResultsHandler._evaluate_accepted_ranges({}, {"A.x": {"min": 0, "max": 1}})
+
+    assert satisfied == {}
+    assert list(violations.keys()) == ["A.x"]
+    assert violations["A.x"]["min"] == 0
+    assert violations["A.x"]["max"] == 1
+    assert "missing" in violations["A.x"]["reason"]
+
+
+@pytest.mark.parametrize(
+    "actual_results, accepted_ranges, must_change_names, expect_passing, expect_error_count, expect_changed,"
+    " expect_satisfied, expect_violations",
+    [
+        # Ranged variable changed but stayed within its range: the run passes.
+        (
+            {"A.x": {"values": [5.0]}, "A.y": {"values": [2.0]}},
+            {"A.x": {"min": 0, "max": 10}},
+            [],
+            True,
+            0,
+            None,
+            ["A.x"],
+            set(),
+        ),
+        # Ranged variable outside its range: the run fails.
+        (
+            {"A.x": {"values": [50.0]}, "A.y": {"values": [2.0]}},
+            {"A.x": {"min": 0, "max": 10}},
+            [],
+            False,
+            1,
+            None,
+            [],
+            {"A.x"},
+        ),
+        # Ranged variable missing from the actual results: the run fails.
+        ({"A.y": {"values": [2.0]}}, {"A.x": {"min": 0, "max": 10}}, [], False, 1, None, [], {"A.x"}),
+        # No accepted ranges (e.g. the task setting is off): the change is graded by the regular comparison.
+        ({"A.x": {"values": [5.0]}, "A.y": {"values": [2.0]}}, {}, [], False, 1, ["A.x"], None, None),
+        # Ranged variable does not exist in the expected results: ignored by the comparison, which relies on
+        # validate_comparison_configuration having rejected it before the simulation.
+        (
+            {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}},
+            {"A.z": {"min": 0, "max": 10}},
+            [],
+            True,
+            0,
+            None,
+            None,
+            None,
+        ),
+        # Variable both flagged as must change and ranged: it must change and stay within its range.
+        (
+            {"A.x": {"values": [5.0]}, "A.y": {"values": [2.0]}},
+            {"A.x": {"min": 0, "max": 10}},
+            ["A.x"],
+            True,
+            0,
+            None,
+            ["A.x"],
+            set(),
+        ),
+    ],
+)
+def test_compare_actual_and_expected_results_with_accepted_ranges(
+    mocker: MockerFixture,
+    tmp_path: Path,
+    actual_results: dict[str, Any],
+    accepted_ranges: dict[str, dict[str, Any]],
+    must_change_names: list[str],
+    expect_passing: bool,
+    expect_error_count: int,
+    expect_changed: list[str] | None,
+    expect_satisfied: list[str] | None,
+    expect_violations: set[str] | None,
+) -> None:
+    """End-to-end tests of compare_actual_and_expected_test_results with accepted ranges, on real files."""
+    expected_results = {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}
+    json_output_path = tmp_path / "output"
+    json_output_path.mkdir()
+    with open(json_output_path / "actual_prefix_results.json", "w", encoding="utf-8") as file:
+        json.dump(actual_results, file)
+    expected_results_path = tmp_path / "e2e_json_test_filter.json"
+    with open(expected_results_path, "w", encoding="utf-8") as file:
+        json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
+    path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
+
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(
+        json_output_path, None, "dummy_prefix", set(must_change_names), accepted_ranges
+    )
+
+    reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
+    assert list(reported.keys())[-1] == "end_to_end_testing_passing"
+    assert reported["end_to_end_testing_passing"] is expect_passing
+    assert add_error.call_count == expect_error_count
+    if expect_changed is None:
+        assert "changed_variables" not in reported
+    else:
+        assert reported["changed_variables"] == expect_changed
+    if expect_satisfied is None:
+        assert "accepted_range_satisfied" not in reported
+    else:
+        assert list(reported["accepted_range_satisfied"].keys()) == expect_satisfied
+        for name in expect_satisfied:
+            assert reported["accepted_range_satisfied"][name] == {
+                **accepted_ranges[name],
+                "observed_min": 5.0,
+                "observed_max": 5.0,
+            }
+    if expect_violations is None:
+        assert "accepted_range_violations" not in reported
+    else:
+        assert set(reported["accepted_range_violations"].keys()) == expect_violations
+    if must_change_names:
+        assert reported["must_change_satisfied"] == must_change_names
+
+
+def test_validate_comparison_configuration_with_accepted_ranges(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that the accepted ranges of a valid configuration are loaded and returned with the must-change names."""
+    _, add_error = patch_output_manager(mocker)
+    accepted_ranges: dict[str, dict[str, Any]] = {
+        "A.y": {"min": 0, "max": 5},
+        "F.z": {"min": 0, "max": 5, "reference": "NRC 2001"},
+    }
+    path_sets = make_validation_path_sets(tmp_path, ["A.x"], accepted_ranges)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    result = E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+
+    assert result == ({"A.x"}, accepted_ranges)
+    add_error.assert_not_called()
+
+
+def test_validate_comparison_configuration_without_accepted_ranges(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that the accepted ranges files are not read when accepted ranges are not used."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path, ["A.x"], {"A.y": {"min": 0, "max": 5}})
+    (tmp_path / "accepted_ranges.json").unlink()
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    result = E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, False)
+
+    assert result == ({"A.x"}, {})
+    add_error.assert_not_called()
+
+
+def test_validate_comparison_configuration_unknown_ranged_variable(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a ranged variable absent from every domain's expected results fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path, None, {"A.y": {"min": 0, "max": 5}, "A.typo": {"min": 0, "max": 5}})
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match=r"accepted range not found in the expected results.*\['A\.typo'\]"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+    assert "A.typo" in add_error.call_args.args[1]
+    assert "A.y" not in add_error.call_args.args[1]
+
+
+@pytest.mark.parametrize(
+    "mistake, expected_message",
+    [
+        ("missing_file", "Accepted ranges file not found"),
+        ("reversed_bounds", "invalid ranges"),
+    ],
+)
+def test_validate_comparison_configuration_invalid_accepted_ranges_file(
+    mocker: MockerFixture, tmp_path: Path, mistake: str, expected_message: str
+) -> None:
+    """Tests that a missing or malformed accepted ranges file fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    accepted_ranges_path = tmp_path / "accepted_ranges.json"
+    if mistake == "missing_file":
+        accepted_ranges_path.unlink()
+    else:
+        write_json_file(accepted_ranges_path, {ACCEPTED_RANGES_KEY: {"A.y": {"min": 5, "max": 0}}})
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match=expected_message):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()

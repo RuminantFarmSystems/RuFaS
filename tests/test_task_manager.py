@@ -212,10 +212,7 @@ def test_task_manager_start(
         tm,
         "_run_end_to_end_testing_comparisons",
     )
-    mock_summarize = mocker.patch.object(
-        mock_output_manager,
-        "summarize_e2e_test_results",
-    )
+    mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
 
     tm.start(
         metadata_path=Path("metadata/path"),
@@ -353,6 +350,7 @@ def test_task_manager_start(
             Path("out/e2e"),
             ["test_group"],
             {"test_group": [42]},
+            [],
         )
 
     else:
@@ -684,7 +682,7 @@ def test_handle_post_processing_export_input_tocsv(
     )
 
 
-def test_handle_end_to_end_testing(
+def test_run_end_to_end_testing_simulation(
     mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
 ) -> None:
     """Test that end-to-end testing is executed correctly."""
@@ -693,12 +691,19 @@ def test_handle_end_to_end_testing(
         "json_output_directory": "json_path",
         "convert_variable_table_path": "compare_path",
         "output_prefix": "dummy_prefix",
+        "filters_directory": Path("filters"),
+        "use_accepted_ranges": True,
     }
     mock_input_manager = mocker.MagicMock()
     add_log = mocker.patch.object(mock_output_manager, "add_log")
+    call_order = mocker.MagicMock()
+    call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
-    task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", True, True)
+    task_manager._run_end_to_end_testing_simulation(
+        args, mock_input_manager, mock_output_manager, "test_task", True, True
+    )
 
+    assert [name for name, _, _ in call_order.mock_calls] == ["sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
         args=args,
         input_manager=mock_input_manager,
@@ -707,6 +712,7 @@ def test_handle_end_to_end_testing(
         produce_graphics=True,
         should_flush_im_pool=True,
     )
+
     assert add_log.call_count == 2
 
 
@@ -718,15 +724,21 @@ def test_handle_update_e2e_test_results(
     # Arrange
     sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
     update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
+    validate_configuration = mocker.patch.object(E2ETestResultsHandler, "validate_update_configuration")
     add_log = mocker.patch.object(mock_output_manager, "add_log")
+    call_order = mocker.MagicMock()
+    call_order.attach_mock(validate_configuration, "validate_configuration")
+    call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
     mock_input_manager = MagicMock()
-    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix"}
+    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix", "filters_directory": Path("filters")}
 
     # Act
     task_manager._handle_update_e2e_test_results(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     # Assert
+    validate_configuration.assert_called_once_with(args["output_prefix"], args["filters_directory"])
+    assert [name for name, _, _ in call_order.mock_calls] == ["validate_configuration", "sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
         args=args,
         input_manager=mock_input_manager,
@@ -749,6 +761,24 @@ def test_handle_update_e2e_test_results(
         "Completed generation of new set of end-to-end expected test results",
         {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
     )
+
+
+def test_handle_update_e2e_test_results_invalid_configuration(
+    mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
+) -> None:
+    """Test that an invalid update configuration stops the expected results update before the simulation runs."""
+    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
+    update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
+    mocker.patch.object(
+        E2ETestResultsHandler, "validate_update_configuration", side_effect=ValueError("invalid configuration")
+    )
+    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix", "filters_directory": Path("filters")}
+
+    with pytest.raises(ValueError, match="invalid configuration"):
+        task_manager._handle_update_e2e_test_results(args, MagicMock(), mock_output_manager, "test_task", True, True)
+
+    sim_engine_run_tasks.assert_not_called()
+    update_test_results.assert_not_called()
 
 
 def test_handle_post_processing_load_pool(
@@ -1634,7 +1664,7 @@ def test_expand_sensitivity_analysis_args(
             "output_prefix": expected_output_prefixes[i],
             "log_verbosity": "errors",
             "sampler": multi_run_args["sampler"],
-            "random_seeds": [42],
+            "random_seed": multi_run_args["random_seeds"][0],
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
             "skip_values": 0,
@@ -1675,6 +1705,7 @@ def test_expand_sensitivity_analysis_args(
             "output_prefix": "Task 4",
             "log_verbosity": "errors",
             "sampler": "invalid_sampler",
+            "random_seeds": [42],
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
             "SA_input_variables": [
@@ -1703,6 +1734,7 @@ def test_expand_sensitivity_analysis_args(
             "output_prefix": "Task 5",
             "log_verbosity": "warning",
             "sampler": "random_sampler",
+            "random_seeds": [42],
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
             "SA_input_variables": [
@@ -1882,7 +1914,7 @@ def test_run_tasks(
     task_manager.pool = None
     verbosity = None
 
-    task_manager._run_tasks(
+    failed_tasks = task_manager._run_tasks(
         single_run_tasks,
         produce_graphics=produce_graphics,
         metadata_depth_limit=metadata_depth_limit,
@@ -1891,6 +1923,8 @@ def test_run_tasks(
         output_directory=Path("output"),
         verbosity=verbosity,
     )
+
+    assert failed_tasks == []
 
     mock_task_call_list = [
         call(
@@ -2023,7 +2057,7 @@ def test_run_tasks_fail(
     task_manager.pool = None
     verbosity = LogVerbosity.LOGS
 
-    task_manager._run_tasks(
+    failed_tasks = task_manager._run_tasks(
         single_run_tasks,
         produce_graphics=produce_graphics,
         metadata_depth_limit=metadata_depth_limit,
@@ -2036,6 +2070,7 @@ def test_run_tasks_fail(
     mock_om_init.assert_called_once()
     info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
     failed = [fail for fail in task_return_values if fail is not None]
+    assert failed_tasks == failed
     mock_add_error.assert_called_once_with(
         "Task(s) failed",
         f"Failed task(s) and output prefix are: {failed}",

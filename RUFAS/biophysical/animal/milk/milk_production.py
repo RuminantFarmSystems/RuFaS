@@ -123,6 +123,9 @@ class MilkProduction:
         )
 
         if not milk_production_inputs.is_milking:
+            if milk_production_inputs.just_calved:
+                self.record_first_day_in_milk(milk_production_inputs.days_born, time)
+                return milk_production_outputs
             self.daily_milk_produced = 0.0
             self._update_milking_history(
                 days_in_milk=milk_production_inputs.days_in_milk,
@@ -150,8 +153,28 @@ class MilkProduction:
             return milk_production_outputs
 
         milk_production_outputs.days_in_milk += 1
+        self._update_daily_milk_production(
+            days_in_milk=milk_production_outputs.days_in_milk, days_born=milk_production_inputs.days_born, time=time
+        )
+
+        return milk_production_outputs
+
+    def _update_daily_milk_production(self, days_in_milk: int, days_born: int, time: RufasTime) -> None:
+        """
+        Calculates the milk yield and milk component contents for the current lactating day, and records
+        the result in the milk production history.
+
+        Parameters
+        ----------
+        days_in_milk : int
+            Days into milk of the cow on the current day.
+        days_born : int
+            The number of days since the animal was born (simulation days).
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
+        """
         self._daily_milk_produced = self.calculate_daily_milk_production(
-            milk_production_inputs.days_in_milk,
+            days_in_milk,
             self.wood_l,
             self.wood_m,
             self.wood_n,
@@ -169,13 +192,11 @@ class MilkProduction:
         self.lactose_content = self._calculate_nutrient_content(self.daily_milk_produced, self.lactose_percent)
 
         self._update_milking_history(
-            days_in_milk=milk_production_outputs.days_in_milk,
-            days_born=milk_production_inputs.days_born,
+            days_in_milk=days_in_milk,
+            days_born=days_born,
             daily_milk_produced=self.daily_milk_produced,
             time=time,
         )
-
-        return milk_production_outputs
 
     def perform_daily_milking_update_without_history(
         self, milk_production_inputs: MilkProductionInputs
@@ -214,7 +235,7 @@ class MilkProduction:
 
         milk_production_outputs.days_in_milk += 1
         self._daily_milk_produced = self.calculate_daily_milk_production(
-            milk_production_inputs.days_in_milk,
+            milk_production_outputs.days_in_milk,
             self.wood_l,
             self.wood_m,
             self.wood_n,
@@ -232,6 +253,19 @@ class MilkProduction:
         self.lactose_content = self._calculate_nutrient_content(self.daily_milk_produced, self.lactose_percent)
 
         return milk_production_outputs
+
+    def record_first_day_in_milk(self, days_born: int, time: RufasTime) -> None:
+        """
+        Records the first day-in-milk (DIM = 1) entry of a new lactation.
+
+        Parameters
+        ----------
+        days_born : int
+            The number of days since the animal was born, (simulation days).
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
+        """
+        self._update_daily_milk_production(days_in_milk=1, days_born=days_born, time=time)
 
     @staticmethod
     @njit
