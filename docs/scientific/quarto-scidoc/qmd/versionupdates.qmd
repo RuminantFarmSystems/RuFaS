@@ -1,4 +1,5 @@
-# Highlighted Updates
+# Highlighted Updates {.unnumbered}
+
 <!-- reuse code to import functions from "../scripts/": -->
 {{< include ../scripts/_import-from-scripts.qmd >}}
 

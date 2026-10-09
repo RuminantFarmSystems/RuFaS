@@ -1,0 +1,6 @@
+Variable,Units,Description
+ Name , none , Unique identifier of the specific handler configuration used.
+ Type , none ,"The type (alley scraper, manual scraping, flushing, or parlor scraping) of manure handler."
+ cleaning_water_use_amount , L/animal/day ,"The rate of water use (L per animal per day, total of fresh and/or recycled water) by a specified manure handler."
+ cleaning_water_recycle_fraction , none , The fraction (0.XX) of cleaning water used by a specified handler that is from recycled (not fresh) water sources.
+ use_parlor_flush , true/false ,"True/false indication for if a parlor flush (which may be partially or fully recycled water) is used in addition to routine parlor water cleaning with fresh water."

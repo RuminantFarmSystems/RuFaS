@@ -1,0 +1,10 @@
+﻿Variable , Definition , Default , Min , Max 
+field_size , Size of the field (ha) , -- , 0 , -- 
+absolute_latitude , The absolute latitude of the center of this field (degrees) , 43.5 , 0 , 90  
+longitude , The longitude of the center of this field (degrees) , -89.4 , -180 , 180  
+watering_amount_in_liters , Amount of water to be applied as irrigation at the end of a specified interval (L) , 0 , 0 , --  
+watering_interval , Number of days that make up the irrigation interval between irrigation events (d) , 0 , 0 , --  
+simulate_water_stress , Whether water stress affects crops grown in this field , TRUE , -- , --  
+simulate_temp_stress , Whether temperature stress affects crops grown in this field , TRUE , -- , --  
+simulate_nitrogen_stress , Whether nitrogen stress affects crops grown in this field , TRUE , -- , --  
+simulate_phosphorus_stress , Whether phosphorus stress affects crops grown in this field , TRUE , -- , --  

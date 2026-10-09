@@ -1,0 +1,6 @@
+﻿Variable, Units, Description
+Name, -- ,  Unique identifier of the specific anaerobic lagoon configuration used.  
+Capacity, m$^3$,"  The volumetric capacity of the anaerobic lagoon, in m$^3$. Note that this variable is a placeholder at this time,  and does not influence model calculations.  "
+Cover,  -- ,The type of cover used with the anaerobic lagoon. 
+Surface_area,  m$^2$,  The surface area of the anaerobic lagoon at the minimum operating level. 
+Storage_time_period, days ,"  The number of days that manure is stored between emptying events. At the end of this interval, the manure storage is emptied completely.  "

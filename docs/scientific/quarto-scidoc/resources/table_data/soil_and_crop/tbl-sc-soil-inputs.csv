@@ -1,0 +1,34 @@
+﻿Variable , Definition , Default , Min , Max
+second_moisture _condition_parameter , Curve number parameter for average moisture condition equation (unitless) ,85,20,99
+average_subbasin_slope ," Slope of the field, measured as rise over run (unitless)",0.05,0, -- 
+slope_length ," Slope of the field, measure as rise over run (m)",50,0, -- 
+manning_roughness_coefficient , Roughness coefficient for overland flow (unitless) ,0.4,0.001, --
+support_practice_factor ," Ratio of soil loss with a specific support practice based on slope characteristics. This value adjusts for terracing, contouring, and stripcropping, and these features are not present in V1, so this value IS NOT used (unitless)",0.08,--,--  
+albedo , The ratio of reflected to total incident short-wave solar radiation. Related primarily to soil color and cover (unitless) ,0.16,0,1
+residue_fresh_organic _mineralization_rate , Fraction of residue that will decompose in a day given optimal conditions (unitless) ,0.05,0, -- 
+soil_evaporation _compensation_coefficient , Modifies depth distribution used to meet soil evaporative demand (unitless) ,0.95,0.01,1
+initial_residue , Residual plant biomass remaining after a crop is harvested (kg h$^{-1}$) ,0,0,  --
+soil_layers , The soil layers that this profile contains. Each element of the array should be a `soil_layer` object , -- ,1,  --
+bottom_depth , The bottom depth of each soil layer object within the soil_layers array (mm) , -- ,20,500
+wilting_point_water_concentration , Condition of soil moisture at which soil water becomes unavailable and water held in the soil at a tension of 1.5 Mpa (mm H$_2$O/mm soil) ,0.2,0,0.95
+field_capacity_water_concentration , Soil moisture condition at which the soil matric potential is zero or water held by the soil at 0.033 MPa (mm H$_2$O/mm soil) ,0.3,0,0.95
+saturation_point_water _concentration , Concentration of water in a layer when it has become saturated (mm H$_2$O/mm soil) ,0.5,0,0.95
+saturated_hydraulic_conductivity , Measure of ease of water movement through the soil (mm h$^{-1}$) ,9.5,0.01,15
+bulk_density , Ratio of mass of solid particles to total volume of soil (g cm$^{-3}$) ,1.4,1.1,1.9
+organic_carbon_fraction , Fraction of soil weight that is organic carbon at beginning of the simulation. ,0.012,0,1
+clay_fraction , Fraction of soil mass that is clay (unitless) ,0.225,0,1
+silt_fraction , Fraction of soil mass that is silt (unitless) ,0.625,0,1
+sand_fraction , Fraction of soil mass that is sand (unitless) ,0.125,0,1
+rock_fraction , Fraction of soil mass that is rock (unitless) ,0.013,0,1
+soil_water_concentration , Concentration of water in a soil layer at the beginning of the simulation (mm H$_2$O/mm soil) ,0.25,0,0.95
+pH , pH of the soil layer (pH) ,7,0,14
+initial_temperature , Temperature of the layer at the beginning of the simulation ($^{\circ}$C) ,15.05, -- , --  
+initial_labile_inorganic _phosphorus_concentration , Concentration of labile inorganic phosphorus in the layer at the beginning of the simulation (mg kg$^{-1}$ soil) , null ,0, --
+initial_fresh_organic _phosphorus_concentration , Concentration of initial fresh organic phosphorus in the layer at the beginning of the simulation (mg kg$^{-1}$ soil) ,0,0, --
+initial_soil_nitrate_concentration , Concentration of nitrate in the layer at the beginning of the simulation (mg kg$^{-1}$ soil) , null ,0, -- 
+initial_soil_ammonium_concentration , Concentration of ammonium in the layer at the beginning of the simulation (mg kg$^{-1}$ soil) , null ,0, -- 
+humus_mineralization_rate_factor , Rate factor for humus mineralization of active organic nutrients (N and P) (unitless) ,0.003,0,0.003
+ammonium_volatilization _cation_exchange_factor , Controls the rate of ammonia volatilization (unitless) ,0.45,0.01, --
+denitrification_rate_coefficient , Controls the rate of denitrification (unitless) ,1.4,0,3
+denitrification _threshold_water_content , Fraction of field capacity water content above which denitrification takes place (unitless) ,1,0,1
+residue_fresh _organic_mineralization_rate , The fraction of residue that will decompose in a day given optimal conditions (unitless) ,0.05,0, -- 

@@ -1,0 +1,6 @@
+﻿Variable , Definition , Default , Min , Max
+name , Name of the fertilizer mix , -- , -- , --   
+N , Fraction of nitrogen contained in the fertilizer mix by mass , 1 , 0 , 1  
+P , Fraction of phosphorus contained in the fertilizer mix by mass , 1 , 0 , 1  
+K , Fraction of potassium contained in the fertilizer mix by mass , 1 , 0 , 1  
+ammonium_fraction , Fraction fertilizer nitrogen that is ammonium. All non-ammonium nitrogen is assumed to be nitrate. , 0.5 , 0 , 1  

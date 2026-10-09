@@ -454,7 +454,7 @@ class Field:
         mix_name : str
             The name of the mix this fertilizer application is composed of.
         total_mass : float
-            The total mass of phosphorus applied (kg).
+            The total mass of fertilizer applied (kg).
         nitrogen_mass : float
             The mass of nitrogen applied (kg).
         phosphorus_mass : float

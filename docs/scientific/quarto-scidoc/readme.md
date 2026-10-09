@@ -13,8 +13,7 @@ In addition to this `readme.md` file, the important files contained in this root
 
 * _quarto.yml: the quarto project file. It configures how `quarto` generates the final documentation. Some 
 important features to note are: defining which qmd files are used (`book:chapters`), defining the `.bib` file(s)
-to use for the project (`bibliography`), defining which template files to use for the website (`format:html:css`) and 
-for the PDF (`format:pdf:include-in-header`).
+to use for the project (`bibliography`), defining which template files to use for the website (`format:html:css`).
 
 * index.qmd: the first qmd file that serves as the site index, which is the home page users will see when
 opening the documentation website. 
@@ -22,6 +21,8 @@ opening the documentation website.
 
 * .gitignore: a directory-level gitignore file (separate from the main project `.gitignore`), which specifies which
 paths should be excluded relative to this folder (e.g., ".quarto/" ignores the entire .quarto sub-folder).
+
+* quarto_reference_audit.xlsx: results from the `scripts/quarto_audit.py` script
 
 ##### Folders
 
@@ -41,15 +42,14 @@ into subfolders by data type:
   
   - templates: template files for this project (i.e., templates for rendering output, qmd templates, etc.)
   
-  - references-audit: files relating to the reference audit <!-- Needed??? -->
   
 * scripts: code files that do something useful related to the quarto documentation, examples include the 
-code to audit the references (`quarto_audit.py`), scripts to render the documentation (`render-quarto.sh`), and
-code to facilitate importing tables (`markdown_tables.py`<!-- placeholder -->)
+code to audit the references (`quarto_audit.py`) and code to facilitate importing tables (`make_grid_table.py` and 
+the reusable quarto chunk `_import-from-scripts.qmd`).
 
 * _book: the rendered output files created by `quarto`. Of particular interest are `index.hmtl` and `qmd/*.html`,
-which is the website version of the documentation; as well as `rufas-scientific-documentation.pdf`, which is the 
-PDF version. <!-- Note: this folder should ultimately be ignored by git, since we will use GitHub Actions to render
+which is the website version of the documentation.
+<!-- Note: this folder should ultimately be ignored by git, since we will use GitHub Actions to render
 it from the source code on GitHub. -->
 
 # Usage
