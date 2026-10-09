@@ -27,6 +27,9 @@ class SlurryStorageUnderfloor(Storage):
         The surface area of the manure storage (m^2).
     capacity : float, default=inf
         The volumetric capacity of the storage (m^3).
+    emptying_fraction : float | None, default None
+        Fraction of the stored manure that is removed at each emptying event (unitless, 0.0-1.0). If None, the
+        storage is fully emptied.
 
     """
 
@@ -37,6 +40,7 @@ class SlurryStorageUnderfloor(Storage):
         storage_time_period: int | None,
         surface_area: float,
         capacity: float = inf,
+        emptying_fraction: float | None = None,
     ):
         """Initializes a new instance of the SlurryStorageUnderfloor class."""
         super().__init__(
@@ -46,6 +50,7 @@ class SlurryStorageUnderfloor(Storage):
             storage_time_period=storage_time_period,
             surface_area=surface_area,
             capacity=capacity,
+            emptying_fraction=emptying_fraction,
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
