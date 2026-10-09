@@ -60,6 +60,7 @@ class CarbonCycling:
 
         """
         self.decomposition.decompose()
+        self.residue_partition.partition_manure_residue()
         self.residue_partition.partition_residue(rainfall)
         self.pool_gas_partition.partition_pool_gas()
         self._soil_carbon_aggregation(field_size)
@@ -98,10 +99,10 @@ class CarbonCycling:
                 layer.slow_carbon_amount,
                 layer.passive_carbon_amount,
             )
-            total_plant_carbon_CO2_loss = self._determine_total_plant_carbon_CO2_loss(
-                layer.plant_metabolic_active_carbon_loss,
-                layer.plant_structural_active_carbon_loss,
-                layer.plant_structural_slow_carbon_loss,
+            total_residue_carbon_CO2_loss = self._determine_total_residue_carbon_CO2_loss(
+                layer.residue_metabolic_active_carbon_loss,
+                layer.residue_structural_active_carbon_loss,
+                layer.residue_structural_slow_carbon_loss,
             )
             total_soil_carbon_CO2_loss = self._determine_total_soil_carbon_CO2_loss(
                 layer.soil_metabolic_active_carbon_loss,
@@ -114,7 +115,7 @@ class CarbonCycling:
                 layer.passive_carbon_co2_lost_amount,
             )
             layer.annual_carbon_CO2_lost = self._determine_total_carbon_CO2_lost(
-                total_plant_carbon_CO2_loss,
+                total_residue_carbon_CO2_loss,
                 total_soil_carbon_CO2_loss,
                 layer.annual_decomposition_carbon_CO2_lost,
             )
@@ -302,27 +303,27 @@ class CarbonCycling:
         return active_carbon_amount + slow_carbon_amount + passive_carbon_amount
 
     @staticmethod
-    def _determine_total_plant_carbon_CO2_loss(
-        plant_metabolic_active_carbon_loss: float,
-        plant_structural_active_carbon_loss: float,
-        plant_structural_slow_carbon_loss: float,
+    def _determine_total_residue_carbon_CO2_loss(
+        residue_metabolic_active_carbon_loss: float,
+        residue_structural_active_carbon_loss: float,
+        residue_structural_slow_carbon_loss: float,
     ) -> float:
         """
-        This method calculates the total amount plant carbon lost as CO2.
+        This method calculates the total amount residue carbon lost as CO2.
 
         Parameters
         ----------
-        plant_metabolic_active_carbon_loss: float
-            Plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
-        plant_structural_active_carbon_loss: float
-            Plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
-        plant_structural_slow_carbon_loss: float
-            Plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
+        residue_metabolic_active_carbon_loss: float
+            Residue metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+        residue_structural_active_carbon_loss: float
+            Residue structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha).
+        residue_structural_slow_carbon_loss: float
+            Residue structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha).
 
         Returns
         -------
         float
-            Total amount plant carbon lost as CO2 (kg/ha).
+            Total amount residue carbon lost as CO2 (kg/ha).
 
         References
         -------
@@ -330,7 +331,9 @@ class CarbonCycling:
 
         """
         return (
-            plant_metabolic_active_carbon_loss + plant_structural_active_carbon_loss + plant_structural_slow_carbon_loss
+            residue_metabolic_active_carbon_loss
+            + residue_structural_active_carbon_loss
+            + residue_structural_slow_carbon_loss
         )
 
     @staticmethod
@@ -393,7 +396,7 @@ class CarbonCycling:
 
     @staticmethod
     def _determine_total_carbon_CO2_lost(
-        total_plant_carbon_CO2_loss: float,
+        total_residue_carbon_CO2_loss: float,
         total_soil_carbon_CO2_loss: float,
         total_decomposition_carbon_CO2_lost: float,
     ) -> float:
@@ -402,8 +405,8 @@ class CarbonCycling:
 
         Parameters
         ----------
-        total_plant_carbon_CO2_loss: float
-            Total amount plant carbon lost as CO2 (kg/ha).
+        total_residue_carbon_CO2_loss: float
+            Total amount residue carbon lost as CO2 (kg/ha).
         total_soil_carbon_CO2_loss: float
             Total amount soil carbon lost as CO2 (kg/ha).
         total_decomposition_carbon_CO2_lost: float
@@ -419,4 +422,4 @@ class CarbonCycling:
         pseudocode_soil S.6.D.7
 
         """
-        return total_decomposition_carbon_CO2_lost + total_plant_carbon_CO2_loss + total_soil_carbon_CO2_loss
+        return total_decomposition_carbon_CO2_lost + total_residue_carbon_CO2_loss + total_soil_carbon_CO2_loss
