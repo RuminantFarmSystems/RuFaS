@@ -473,25 +473,34 @@ class TaskManager:
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
             input_task["input_data_csv_import_path"] = input_data_csv_import_path
             input_task["task_manager_metadata_properties"] = task_manager_metadata_properties
-            input_task["random_seeds"] = input_task.get("random_seeds", [0])
+            random_seeds = input_task.get("random_seeds", [0])
+            if not isinstance(random_seeds, list) or not random_seeds:
+                self.output_manager.add_error(
+                    "Invalid Random Seeds",
+                    "Random seeds must be provided as a non-empty list, or omitted to use the default seed [0].",
+                    info_map={"class": TaskManager.__name__, "function": self._parse_input_tasks.__name__},
+                )
+                raise ValueError("Random seeds must be a non-empty list.")
+
+            input_task["random_seeds"] = random_seeds
+
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
-                random_seeds = input_task.pop("random_seeds", None)
-                if random_seeds is not None:
-                    if input_task["task_type"] == TaskType.SIMULATION_SINGLE_RUN and len(random_seeds) != 1:
-                        self.output_manager.add_error(
-                            "Single Run Random Seed Error",
-                            "SIMULATION_SINGLE_RUN task type requires exactly one random seed, but the specified "
-                            f"random seeds list contains {len(random_seeds)} seeds. Check task input specifications "
-                            "and confirm the task type and random seeds selected.",
-                            info_map={"class": TaskManager.__name__, "function": self._parse_input_tasks.__name__},
-                        )
-                        raise ValueError(
-                            "SIMULATION_SINGLE_RUN task type selected but multiple random seeds specified.  "
-                            "Check task input specifications and confirm task type and random seeds selected."
-                        )
-                    input_task["random_seed"] = random_seeds[0]
+                random_seeds = input_task.pop("random_seeds")
+                if input_task["task_type"] == TaskType.SIMULATION_SINGLE_RUN and len(random_seeds) != 1:
+                    self.output_manager.add_error(
+                        "Single Run Random Seed Error",
+                        "SIMULATION_SINGLE_RUN task type requires exactly one random seed, but the specified "
+                        f"random seeds list contains {len(random_seeds)} seeds. Check task input specifications "
+                        "and confirm the task type and random seeds selected.",
+                        info_map={"class": TaskManager.__name__, "function": self._parse_input_tasks.__name__},
+                    )
+                    raise ValueError(
+                        "SIMULATION_SINGLE_RUN task type selected but multiple random seeds specified.  "
+                        "Check task input specifications and confirm task type and random seeds selected."
+                    )
+                input_task["random_seed"] = random_seeds[0]
                 parsed_single_run_args.append(input_task)
         return parsed_single_run_args, parsed_multi_run_args
 
@@ -1148,7 +1157,8 @@ class TaskManager:
         Returns
         -------
         str or None
-            The E2E group name if averaging, comparison, or post-processing fails; otherwise ``None``.
+            The E2E group name if input validation, averaging, comparison, or post-processing fails; otherwise
+            ``None``.
         """
 
         e2e_group: str = comparison_args["e2e_group"]
@@ -1190,7 +1200,7 @@ class TaskManager:
                 },
             )
             TaskManager.handle_post_processing(comparison_args, input_manager, output_manager, task_id, False)
-            return None
+            return e2e_group
 
         try:
             averaged_results_path = E2ETestResultsHandler.process_test_result_averaging(
