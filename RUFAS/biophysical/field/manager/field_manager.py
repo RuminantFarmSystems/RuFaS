@@ -337,7 +337,7 @@ class FieldManager:
         im = InputManager()
         manure_schedule_data: dict[str, Any] = im.get_data(manure_schedule, required=False)
         if manure_schedule_data is None:
-            return []
+            return [], None
         manure_type_strings: list[str] = manure_schedule_data["manure_types"]
         manure_supplement_methods_strings: list[str] = manure_schedule_data["supplement_manure_nutrient_deficiencies"]
         manure_supplement_methods: list[ManureSupplementMethod] = [
@@ -412,7 +412,8 @@ class FieldManager:
         Returns
         -------
         list[CropSchedule]
-            List of all crop schedules that have been created from the input specifications.
+            List of all crop schedules that have been created from the input specifications. Empty if the crop
+            rotation blob is excluded from the input pool, in which case the field is simulated without crops.
 
         Raises
         ------
@@ -421,16 +422,10 @@ class FieldManager:
 
         """
         im = InputManager()
-        schedules = []
-        crop_rotation_data: list[dict[str, Any]] = im.get_data(f"{crop_rotation}.crop_schedules")
+        schedules: list[CropSchedule] = []
+        crop_rotation_data: list[dict[str, Any]] | None = im.get_data(f"{crop_rotation}.crop_schedules", required=False)
         if crop_rotation_data is None:
-            om = OutputManager()
-            info_map = {
-                "class": FieldManager.__class__.__name__,
-                "function": FieldManager._setup_crop_schedules.__name__,
-            }
-            om.add_error("No crop rotation data", "Field data provided with empty crop rotation data.", info_map)
-            raise ValueError("No crop rotation data")
+            return schedules
 
         for index, rotation in enumerate(crop_rotation_data):
             crop_species = rotation["crop_species"]
