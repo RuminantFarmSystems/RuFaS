@@ -1703,6 +1703,56 @@ def test_handle_log_output(capsys: CaptureFixture[str], log_level: LogVerbosity,
     assert expected_message in captured.out
 
 
+def test_clear_variables_pool_preserves_other_pools(mocker: MockerFixture) -> None:
+    om = OutputManager()
+    mocker.patch.object(om, "chunkification", False)
+    mocker.patch.object(om, "time", MagicMock(simulation_day=365))
+    mocker.patch.object(om, "variables_pool", {"old": {"values": [1]}})
+    mocker.patch.object(om, "current_pool_size", 1000)
+    mocker.patch.object(om, "logs_pool", {"existing": {"values": ["log"]}})
+    mocker.patch.object(om, "warnings_pool", {"existing": {"values": ["warning"]}})
+    mocker.patch.object(om, "errors_pool", {"existing": {"values": ["error"]}})
+    add_log = mocker.spy(om, "add_log")
+
+    om.clear_variables_pool()
+
+    assert om.variables_pool == {}
+    assert om.current_pool_size == sys.getsizeof({}.__repr__())
+    assert om.logs_pool["existing"] == {"values": ["log"]}
+    assert om.warnings_pool == {"existing": {"values": ["warning"]}}
+    assert om.errors_pool == {"existing": {"values": ["error"]}}
+    add_log.assert_called_once_with(
+        "Variables pool cleared",
+        "Cleared the variables pool at the start of simulation day 365; "
+        "previously saved variable chunks are excluded from final output.",
+        {"class": "OutputManager", "function": "clear_variables_pool", "timestamp": ANY},
+    )
+
+
+def test_clear_variables_pool_excludes_warmup_chunks(tmp_path: Path, mocker: MockerFixture) -> None:
+    om = OutputManager()
+    mocker.patch.object(om, "time", MagicMock(simulation_day=2))
+    mocker.patch.object(om, "chunkification", True)
+    mocker.patch.object(om, "saved_pool_chunks_path", tmp_path)
+    mocker.patch.object(om, "_discarded_pool_chunks", set())
+    mocker.patch.object(om, "variables_pool", {"warmup": {"values": [1]}})
+    mocker.patch.object(om, "current_pool_size", 1000)
+    mocker.patch.object(om, "add_log")
+    warmup_chunk = tmp_path / "saved_pool_0_test.json"
+    warmup_chunk.write_text(json.dumps({"daily": {"values": [0, 1], "info_maps": [{}, {}]}}))
+
+    om.clear_variables_pool()
+
+    assert warmup_chunk.exists()
+    assert om._sort_saved_chunk_files() == []
+    evaluation_chunk = tmp_path / "saved_pool_1_test.json"
+    evaluation_chunk.write_text(json.dumps({"daily": {"values": [2], "info_maps": [{}]}}))
+    om.load_saved_pools()
+
+    assert om.variables_pool == {"daily": {"values": [2], "info_maps": [{}]}}
+    assert om._sort_saved_chunk_files() == [evaluation_chunk]
+
+
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
