@@ -15,6 +15,12 @@ from RUFAS.e2e_test_results_handler import (
     E2ETestResultsHandler,
     MUST_CHANGE_VARIABLES_KEY,
     ResultPathType,
+    TOLERANCE_KEY,
+    TOLERANCE_TYPE_ABSOLUTE,
+    TOLERANCE_TYPE_KEY,
+    TOLERANCE_TYPE_PERCENT,
+    TOLERANCE_TYPE_SIGNIFICANT_DIGITS,
+    VARIABLE_TOLERANCES_KEY,
 )
 
 
@@ -63,7 +69,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
     )
 
     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix", set(), {}
+        json_dir_path, convert_variable_name if convert_variable_name else None, "dummy_prefix", set(), {}, {}
     )
 
     get_result_paths.assert_called_once()
@@ -1036,12 +1042,16 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
                 "tolerance": 0.01,
                 "must_change_variables_path": "must_change_2",
                 "accepted_ranges_path": "ranges_2",
+                "tolerance_type": TOLERANCE_TYPE_ABSOLUTE,
+                "variable_tolerances_path": "tolerances_2",
             },
         ],
     )
     expected = [
-        ResultPathType("one", "expected_1", "actual_1", 0.01),
-        ResultPathType("two", "expected_2", "actual_2", 0.01, "must_change_2", "ranges_2"),
+        ResultPathType("one", "expected_1", "actual_1", 0.01, "", "", TOLERANCE_TYPE_PERCENT, ""),
+        ResultPathType(
+            "two", "expected_2", "actual_2", 0.01, "must_change_2", "ranges_2", TOLERANCE_TYPE_ABSOLUTE, "tolerances_2"
+        ),
     ]
 
     actual = E2ETestResultsHandler._get_test_result_paths("dummy_prefix")
@@ -1452,9 +1462,20 @@ def test_write_formatted_json(data: dict[str, dict[str, str]], should_raise: boo
         assert written_data.count(expected_results_str) == 1
 
 
-def make_result_path_set(must_change_variables_path: str = "", accepted_ranges_path: str = "") -> ResultPathType:
-    """Returns a ResultPathType with dummy paths and the given must-change variables and accepted ranges paths."""
-    return ResultPathType("domain", "expected", "actual_", 0.1, must_change_variables_path, accepted_ranges_path)
+def make_result_path_set(
+    must_change_variables_path: str = "", accepted_ranges_path: str = "", variable_tolerances_path: str = ""
+) -> ResultPathType:
+    """Returns a ResultPathType with dummy paths and the given must-change, accepted ranges, and tolerances paths."""
+    return ResultPathType(
+        "domain",
+        "expected",
+        "actual_",
+        0.1,
+        must_change_variables_path,
+        accepted_ranges_path,
+        TOLERANCE_TYPE_PERCENT,
+        variable_tolerances_path,
+    )
 
 
 def test_load_must_change_variables(mocker: MockerFixture, tmp_path: Path) -> None:
@@ -1589,6 +1610,15 @@ def test_evaluate_must_change_variables_missing_from_actual() -> None:
             },
             ["B.z", "C.w"],
         ),
+        # DeepDiff double-quotes a key containing a single quote
+        (
+            {
+                "values_changed": {
+                    "root[\"harvest_yield.field='field_1'\"]['values'][0]": {"old_value": 1, "new_value": 2}
+                }
+            },
+            ["harvest_yield.field='field_1'"],
+        ),
         ({"end_to_end_testing_passing": True}, []),
     ],
 )
@@ -1642,7 +1672,7 @@ def test_compare_actual_and_expected_results_with_must_change(
     add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
 
     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        json_output_path, None, "dummy_prefix", set(must_change_names), {}
+        json_output_path, None, "dummy_prefix", set(must_change_names), {}, {}
     )
 
     reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
@@ -1690,16 +1720,19 @@ def make_validation_path_sets(
     tmp_path: Path,
     must_change_names: list[str] | None = None,
     accepted_ranges: dict[str, dict[str, Any]] | None = None,
+    variable_tolerances: dict[str, dict[str, Any]] | None = None,
 ) -> list[ResultPathType]:
-    """Writes valid expected results, must-change and accepted ranges files under tmp_path and returns path sets."""
+    """Writes valid expected results, must-change, accepted ranges, and variable tolerances files under tmp_path."""
     animal_path = tmp_path / "e2e_json_animal_filter.json"
     feed_path = tmp_path / "e2e_json_feed_filter.json"
     must_change_path = tmp_path / "must_change_variables.json"
     accepted_ranges_path = tmp_path / "accepted_ranges.json"
+    variable_tolerances_path = tmp_path / "variable_tolerances.json"
     write_expected_results_file(animal_path, {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}})
     write_expected_results_file(feed_path, {"F.z": {"values": [3.0]}})
     write_json_file(must_change_path, {MUST_CHANGE_VARIABLES_KEY: must_change_names or []})
     write_json_file(accepted_ranges_path, {ACCEPTED_RANGES_KEY: accepted_ranges or {}})
+    write_json_file(variable_tolerances_path, {VARIABLE_TOLERANCES_KEY: variable_tolerances or {}})
     return [
         ResultPathType(
             "Animal",
@@ -1708,6 +1741,8 @@ def make_validation_path_sets(
             0.1,
             str(must_change_path),
             str(accepted_ranges_path),
+            TOLERANCE_TYPE_PERCENT,
+            str(variable_tolerances_path),
         ),
         ResultPathType(
             "Feed",
@@ -1716,6 +1751,8 @@ def make_validation_path_sets(
             0.1,
             str(must_change_path),
             str(accepted_ranges_path),
+            TOLERANCE_TYPE_PERCENT,
+            str(variable_tolerances_path),
         ),
     ]
 
@@ -1733,12 +1770,15 @@ def test_validate_comparison_configuration(mocker: MockerFixture, tmp_path: Path
     path_sets = make_validation_path_sets(tmp_path, ["A.y", flagged_feed_name])
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
-    must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
-        VALIDATION_OUTPUT_PREFIX, conversion_csv_path, tmp_path, True
+    must_change_variables, accepted_ranges, variable_tolerances = (
+        E2ETestResultsHandler.validate_comparison_configuration(
+            VALIDATION_OUTPUT_PREFIX, conversion_csv_path, tmp_path, True
+        )
     )
 
     assert must_change_variables == {"A.y", flagged_feed_name}
     assert accepted_ranges == {}
+    assert variable_tolerances == {}
     add_error.assert_not_called()
 
 
@@ -2187,7 +2227,7 @@ def test_compare_actual_and_expected_results_with_accepted_ranges(
     add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
 
     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        json_output_path, None, "dummy_prefix", set(must_change_names), accepted_ranges
+        json_output_path, None, "dummy_prefix", set(must_change_names), accepted_ranges, {}
     )
 
     reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
@@ -2228,7 +2268,7 @@ def test_validate_comparison_configuration_with_accepted_ranges(mocker: MockerFi
 
     result = E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
 
-    assert result == ({"A.x"}, accepted_ranges)
+    assert result == ({"A.x"}, accepted_ranges, {})
     add_error.assert_not_called()
 
 
@@ -2241,7 +2281,7 @@ def test_validate_comparison_configuration_without_accepted_ranges(mocker: Mocke
 
     result = E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, False)
 
-    assert result == ({"A.x"}, {})
+    assert result == ({"A.x"}, {}, {})
     add_error.assert_not_called()
 
 
@@ -2279,5 +2319,448 @@ def test_validate_comparison_configuration_invalid_accepted_ranges_file(
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
     with pytest.raises(ValueError, match=expected_message):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "value, significant_digits, expected",
+    [
+        (1234.5678, 2, 1200.0),
+        (1234.5678, 4, 1235.0),
+        (0.00123456, 3, 0.00123),
+        (-98765, 1, -100000),
+        (0.0, 3, 0.0),
+        (float("inf"), 3, float("inf")),
+    ],
+)
+def test_round_to_significant_digits(value: float, significant_digits: int, expected: float) -> None:
+    """Tests that _round_to_significant_digits keeps the requested number of leading digits."""
+    assert E2ETestResultsHandler._round_to_significant_digits(value, significant_digits) == expected
+
+
+def test_round_to_significant_digits_nan() -> None:
+    """Tests that _round_to_significant_digits returns NaN unchanged."""
+    assert math.isnan(E2ETestResultsHandler._round_to_significant_digits(float("nan"), 3))
+
+
+@pytest.mark.parametrize(
+    "tolerance, tolerance_type, expected",
+    [
+        (0.1, TOLERANCE_TYPE_PERCENT, True),
+        (0, TOLERANCE_TYPE_PERCENT, True),
+        (2.5, TOLERANCE_TYPE_ABSOLUTE, True),
+        (3, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, True),
+        (3.0, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, True),
+        (-0.1, TOLERANCE_TYPE_PERCENT, False),
+        (-1, TOLERANCE_TYPE_ABSOLUTE, False),
+        (0, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, False),
+        (2.5, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, False),
+        ("0.1", TOLERANCE_TYPE_PERCENT, False),
+        (True, TOLERANCE_TYPE_PERCENT, False),
+        (None, TOLERANCE_TYPE_PERCENT, False),
+        (0.1, "percentage", False),
+        (0.1, None, False),
+    ],
+)
+def test_is_valid_tolerance(tolerance: Any, tolerance_type: Any, expected: bool) -> None:
+    """Tests _is_valid_tolerance for each tolerance type and for malformed inputs."""
+    assert E2ETestResultsHandler._is_valid_tolerance(tolerance, tolerance_type) is expected
+
+
+@pytest.mark.parametrize(
+    "old_value, new_value, tolerance, tolerance_type, expected",
+    [
+        # Percent: 1 percent of 100 is the boundary
+        (100.0, 101.0, 1, TOLERANCE_TYPE_PERCENT, False),
+        (100.0, 101.5, 1, TOLERANCE_TYPE_PERCENT, True),
+        # Percent falls back to a reference of 1 when the expected value is 0
+        (0.0, 0.005, 1, TOLERANCE_TYPE_PERCENT, False),
+        (0.0, 0.02, 1, TOLERANCE_TYPE_PERCENT, True),
+        # Absolute
+        (100.0, 100.5, 0.5, TOLERANCE_TYPE_ABSOLUTE, False),
+        (100.0, 100.51, 0.5, TOLERANCE_TYPE_ABSOLUTE, True),
+        (0.0, -0.3, 0.5, TOLERANCE_TYPE_ABSOLUTE, False),
+        # Significant digits
+        (1234.5, 1234.9, 3, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, False),
+        (1234.5, 1236.0, 3, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, True),
+        (1234.5, 1236.0, 2, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, False),
+        (0.0012341, 0.0012344, 4, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, False),
+        (0.0, 0.0001, 3, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, True),
+        (12, 12.4, 2, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, False),
+    ],
+)
+def test_exceeds_tolerance(
+    old_value: float, new_value: float, tolerance: float, tolerance_type: str, expected: bool
+) -> None:
+    """Tests _exceeds_tolerance for each tolerance type, including the boundaries."""
+    assert E2ETestResultsHandler._exceeds_tolerance(old_value, new_value, tolerance, tolerance_type) is expected
+
+
+def test_exceeds_tolerance_unknown_type() -> None:
+    """Tests that _exceeds_tolerance rejects a tolerance type it does not know."""
+    with pytest.raises(ValueError, match="unknown tolerance type 'percentage'"):
+        E2ETestResultsHandler._exceeds_tolerance(1.0, 2.0, 1, "percentage")
+
+
+@pytest.mark.parametrize(
+    "changes, tolerance, tolerance_type, expected",
+    [
+        ({"old_value": 10.0, "new_value": 10.4}, 0.5, TOLERANCE_TYPE_ABSOLUTE, False),
+        ({"old_value": 10.0, "new_value": 10.6}, 0.5, TOLERANCE_TYPE_ABSOLUTE, True),
+        ({"old_value": 10.04, "new_value": 10.0}, 3, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, False),
+        ({"old_value": 10.04, "new_value": 10.0}, 4, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, True),
+        # The tolerance type is passed down to nested values
+        ({"old_value": {"a": 10.0}, "new_value": {"a": 10.4}}, 0.5, TOLERANCE_TYPE_ABSOLUTE, False),
+        ({"old_value": {"a": 10.0}, "new_value": {"a": 10.6}}, 0.5, TOLERANCE_TYPE_ABSOLUTE, True),
+        # Non-numerical changes stay significant for every tolerance type
+        ({"old_value": "a", "new_value": "b"}, 3, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, True),
+    ],
+)
+def test_is_significant_tolerance_types(
+    changes: dict[str, Any], tolerance: float, tolerance_type: str, expected: bool
+) -> None:
+    """Tests is_significant with the absolute and significant digits tolerance types."""
+    assert E2ETestResultsHandler.is_significant(changes, tolerance, tolerance_type) is expected
+
+
+@pytest.mark.parametrize(
+    "changed_path, expected_name",
+    [
+        ("root['A.x']['values'][0]", "A.x"),
+        ("root[\"harvest_yield.field='field_1'\"]['values'][0]", "harvest_yield.field='field_1'"),
+        ("root['A.x']", "A.x"),
+        ("root", None),
+        ("root[0]", None),
+    ],
+)
+def test_get_top_level_variable_name(changed_path: str, expected_name: str | None) -> None:
+    """Tests that _get_top_level_variable_name reads both DeepDiff quoting styles."""
+    assert E2ETestResultsHandler._get_top_level_variable_name(changed_path) == expected_name
+
+
+def test_filter_insignificant_changes_with_variable_tolerances() -> None:
+    """Tests that a variable's tolerance override replaces the domain tolerance for its changes only."""
+    diff_result = {
+        "values_changed": {
+            "root['A.x']['values'][0]": {"old_value": 100.0, "new_value": 104.0},
+            "root['A.y']['values'][0]": {"old_value": 100.0, "new_value": 104.0},
+            "root['A.z']['values'][0]": {"old_value": 100.0, "new_value": 100.004},
+            "root[\"A'w\"]['values'][0]": {"old_value": 100.0, "new_value": 104.0},
+        }
+    }
+    variable_tolerances = {
+        # Looser than the domain tolerance
+        "A.x": {TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT},
+        # Tighter than the domain tolerance
+        "A.z": {TOLERANCE_KEY: 0.001, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_ABSOLUTE},
+        # Double-quoted DeepDiff path
+        "A'w": {TOLERANCE_KEY: 2, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS},
+    }
+
+    filtered_result = E2ETestResultsHandler.filter_insignificant_changes(
+        diff_result, 1, TOLERANCE_TYPE_PERCENT, variable_tolerances
+    )
+
+    assert set(filtered_result["values_changed"]) == {"root['A.y']['values'][0]", "root['A.z']['values'][0]"}
+
+
+def test_filter_nested_passes_variable_tolerance_to_nested_sections() -> None:
+    """Tests that a nested values_changed section is graded with the tolerance resolved for its top-level path."""
+    values_changed: dict[str, Any] = {
+        "root['A.x']": {"nested": {"old_value": 100.0, "new_value": 104.0}},
+        "root['A.y']": {"nested": {"old_value": 100.0, "new_value": 104.0}},
+    }
+    variable_tolerances = {"A.x": {TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT}}
+
+    E2ETestResultsHandler.filter_nested(values_changed, 1, TOLERANCE_TYPE_PERCENT, variable_tolerances)
+
+    assert list(values_changed) == ["root['A.y']"]
+
+
+def test_load_variable_tolerances(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that _load_variable_tolerances merges the referenced files and fills in the default tolerance type."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    file_one = tmp_path / "variable_tolerances_one.json"
+    file_two = tmp_path / "variable_tolerances_two.json"
+    write_json_file(
+        file_one,
+        {
+            "description": "ignored",
+            VARIABLE_TOLERANCES_KEY: {
+                "A.x": {TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT, "reason": "noisy"},
+                "A.y": {TOLERANCE_KEY: 2, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS},
+            },
+        },
+    )
+    write_json_file(file_two, {VARIABLE_TOLERANCES_KEY: {"B.z": {TOLERANCE_KEY: 0.5}}})
+    path_sets = [
+        make_result_path_set(variable_tolerances_path=str(file_one)),
+        make_result_path_set(variable_tolerances_path=str(file_one)),
+        make_result_path_set(variable_tolerances_path=str(file_two)),
+        make_result_path_set(),
+    ]
+
+    result = E2ETestResultsHandler._load_variable_tolerances(path_sets)
+
+    assert result == {
+        "A.x": {TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT, "reason": "noisy"},
+        "A.y": {TOLERANCE_KEY: 2, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS},
+        "B.z": {TOLERANCE_KEY: 0.5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT},
+    }
+    add_error.assert_not_called()
+
+
+def test_load_variable_tolerances_without_configured_paths(mocker: MockerFixture) -> None:
+    """Tests that _load_variable_tolerances returns an empty dictionary when no paths are configured."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+
+    assert E2ETestResultsHandler._load_variable_tolerances([make_result_path_set()]) == {}
+
+
+def test_load_variable_tolerances_missing_file(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that _load_variable_tolerances raises when a referenced file does not exist."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    path_sets = [make_result_path_set(variable_tolerances_path=str(tmp_path / "no_such_file.json"))]
+
+    with pytest.raises(FileNotFoundError):
+        E2ETestResultsHandler._load_variable_tolerances(path_sets)
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "file_contents",
+    [
+        "{not valid json",
+        [{"A.x": {TOLERANCE_KEY: 1}}],
+        {"wrong_key": {"A.x": {TOLERANCE_KEY: 1}}},
+        {VARIABLE_TOLERANCES_KEY: [{TOLERANCE_KEY: 1}]},
+        {VARIABLE_TOLERANCES_KEY: {"A.x": 1}},
+        {VARIABLE_TOLERANCES_KEY: {"A.x": {}}},
+        {VARIABLE_TOLERANCES_KEY: {"A.x": {TOLERANCE_KEY: "1"}}},
+        {VARIABLE_TOLERANCES_KEY: {"A.x": {TOLERANCE_KEY: -1}}},
+        {VARIABLE_TOLERANCES_KEY: {"A.x": {TOLERANCE_KEY: 1, TOLERANCE_TYPE_KEY: "percentage"}}},
+        {VARIABLE_TOLERANCES_KEY: {"A.x": {TOLERANCE_KEY: 2.5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS}}},
+        {
+            VARIABLE_TOLERANCES_KEY: {
+                "A.x": {TOLERANCE_KEY: 1},
+                "A.y": {TOLERANCE_KEY: 0, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS},
+            }
+        },
+    ],
+)
+def test_load_variable_tolerances_invalid_contents(mocker: MockerFixture, tmp_path: Path, file_contents: Any) -> None:
+    """Tests that _load_variable_tolerances raises for unparsable or malformed files."""
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    file_path = tmp_path / "variable_tolerances.json"
+    write_json_file(file_path, file_contents)
+
+    with pytest.raises(ValueError):
+        E2ETestResultsHandler._load_variable_tolerances([make_result_path_set(variable_tolerances_path=str(file_path))])
+    add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "variable_tolerance, expect_satisfied",
+    [
+        # The domain tolerance of 0.1 percent counts a 1 percent change as a change
+        (None, True),
+        # A looser override on the flagged variable makes the same change count as no change
+        ({TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT}, False),
+        ({TOLERANCE_KEY: 2, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS}, False),
+        ({TOLERANCE_KEY: 0.5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_ABSOLUTE}, True),
+    ],
+)
+def test_evaluate_must_change_variables_with_variable_tolerance(
+    variable_tolerance: dict[str, Any] | None, expect_satisfied: bool
+) -> None:
+    """Tests that a must-change variable is graded with its tolerance override."""
+    expected_results = {"A.x": {"values": [100.0]}}
+    actual_results = {"A.x": {"values": [101.0]}}
+    variable_tolerances = {} if variable_tolerance is None else {"A.x": variable_tolerance}
+
+    satisfied, violations = E2ETestResultsHandler._evaluate_must_change_variables(
+        expected_results, actual_results, ["A.x"], 0.1, TOLERANCE_TYPE_PERCENT, variable_tolerances
+    )
+
+    if expect_satisfied:
+        assert satisfied == ["A.x"]
+        assert violations == {}
+    else:
+        assert satisfied == []
+        assert "within the tolerance" in violations["A.x"]
+
+
+@pytest.mark.parametrize(
+    "actual_value, variable_tolerances, expect_passing, expect_changed",
+    [
+        # Within the domain tolerance of 0.1 percent
+        (1.0008, {}, True, None),
+        # Beyond the domain tolerance: the run fails
+        (1.04, {}, False, ["A.x"]),
+        # A looser percent override on the variable makes the run pass
+        (1.04, {"A.x": {TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT}}, True, None),
+        # Significant digits overrides
+        (1.04, {"A.x": {TOLERANCE_KEY: 1, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS}}, True, None),
+        (1.04, {"A.x": {TOLERANCE_KEY: 3, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS}}, False, ["A.x"]),
+        # An absolute override tighter than the domain tolerance fails a change the domain tolerance accepts
+        (1.0008, {"A.x": {TOLERANCE_KEY: 0.0001, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_ABSOLUTE}}, False, ["A.x"]),
+        # An override on another variable does not affect this one
+        (1.04, {"A.y": {TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT}}, False, ["A.x"]),
+        # An override on a variable that does not exist in the expected results is ignored by the comparison, which
+        # relies on validate_comparison_configuration having rejected it before the simulation
+        (1.04, {"A.z": {TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT}}, False, ["A.x"]),
+    ],
+)
+def test_compare_actual_and_expected_results_with_variable_tolerances(
+    mocker: MockerFixture,
+    tmp_path: Path,
+    actual_value: float,
+    variable_tolerances: dict[str, dict[str, Any]],
+    expect_passing: bool,
+    expect_changed: list[str] | None,
+) -> None:
+    """End-to-end tests of compare_actual_and_expected_test_results with tolerance overrides, on real files."""
+    expected_results = {"A.x": {"values": [1.0]}, "A.y": {"values": [2.0]}}
+    actual_results = {"A.x": {"values": [actual_value]}, "A.y": {"values": [2.0]}}
+    json_output_path = tmp_path / "output"
+    json_output_path.mkdir()
+    with open(json_output_path / "actual_prefix_results.json", "w", encoding="utf-8") as file:
+        json.dump(actual_results, file)
+    expected_results_path = tmp_path / "e2e_json_test_filter.json"
+    with open(expected_results_path, "w", encoding="utf-8") as file:
+        json.dump({"name": "test", "filters": ["A.*"], "expected_results": expected_results}, file)
+    path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", 0.1)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
+
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(
+        json_output_path, None, "dummy_prefix", set(), {}, variable_tolerances
+    )
+
+    reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
+    assert reported["end_to_end_testing_passing"] is expect_passing
+    assert add_error.call_count == (0 if expect_passing else 1)
+    if expect_changed is None:
+        assert "changed_variables" not in reported
+    else:
+        assert reported["changed_variables"] == expect_changed
+
+
+@pytest.mark.parametrize(
+    "tolerance, tolerance_type, expect_passing",
+    [
+        (0.1, TOLERANCE_TYPE_PERCENT, False),
+        (0.05, TOLERANCE_TYPE_ABSOLUTE, True),
+        (0.03, TOLERANCE_TYPE_ABSOLUTE, False),
+        (2, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, True),
+        (3, TOLERANCE_TYPE_SIGNIFICANT_DIGITS, False),
+    ],
+)
+def test_compare_actual_and_expected_results_with_domain_tolerance_type(
+    mocker: MockerFixture, tmp_path: Path, tolerance: float, tolerance_type: str, expect_passing: bool
+) -> None:
+    """Tests that a domain's tolerance type is applied to the regular comparison."""
+    json_output_path = tmp_path / "output"
+    json_output_path.mkdir()
+    with open(json_output_path / "actual_prefix_results.json", "w", encoding="utf-8") as file:
+        json.dump({"A.x": {"values": [1.04]}}, file)
+    expected_results_path = tmp_path / "e2e_json_test_filter.json"
+    with open(expected_results_path, "w", encoding="utf-8") as file:
+        json.dump({"name": "test", "filters": ["A.*"], "expected_results": {"A.x": {"values": [1.0]}}}, file)
+    path_set = ResultPathType("Animal", str(expected_results_path), "actual_prefix_", tolerance, "", "", tolerance_type)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[path_set])
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    add_variable = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
+
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(
+        json_output_path, None, "dummy_prefix", set(), {}, {}
+    )
+
+    reported = {call.args[0]: call.args[1] for call in add_variable.call_args_list}
+    assert reported["end_to_end_testing_passing"] is expect_passing
+
+
+def test_validate_comparison_configuration_with_variable_tolerances(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that the tolerance overrides of a valid configuration are loaded, completed, and returned."""
+    _, add_error = patch_output_manager(mocker)
+    variable_tolerances: dict[str, dict[str, Any]] = {
+        "A.y": {TOLERANCE_KEY: 5},
+        "F.z": {TOLERANCE_KEY: 2, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS, "reason": "noisy"},
+    }
+    path_sets = make_validation_path_sets(tmp_path, ["A.x"], None, variable_tolerances)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    result = E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+
+    assert result == (
+        {"A.x"},
+        {},
+        {
+            "A.y": {TOLERANCE_KEY: 5, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_PERCENT},
+            "F.z": {TOLERANCE_KEY: 2, TOLERANCE_TYPE_KEY: TOLERANCE_TYPE_SIGNIFICANT_DIGITS, "reason": "noisy"},
+        },
+    )
+    add_error.assert_not_called()
+
+
+def test_validate_comparison_configuration_unknown_overridden_variable(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that an overridden variable absent from every domain's expected results fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(
+        tmp_path, None, None, {"A.y": {TOLERANCE_KEY: 5}, "A.typo": {TOLERANCE_KEY: 5}}
+    )
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match=r"tolerance override not found in the expected results.*\['A\.typo'\]"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+    assert "A.typo" in add_error.call_args.args[1]
+    assert "A.y" not in add_error.call_args.args[1]
+
+
+@pytest.mark.parametrize(
+    "mistake, expected_message",
+    [
+        ("missing_file", "Variable tolerances file not found"),
+        ("negative_tolerance", "invalid tolerance overrides"),
+    ],
+)
+def test_validate_comparison_configuration_invalid_variable_tolerances_file(
+    mocker: MockerFixture, tmp_path: Path, mistake: str, expected_message: str
+) -> None:
+    """Tests that a missing or malformed variable tolerances file fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    variable_tolerances_path = tmp_path / "variable_tolerances.json"
+    if mistake == "missing_file":
+        variable_tolerances_path.unlink()
+    else:
+        write_json_file(variable_tolerances_path, {VARIABLE_TOLERANCES_KEY: {"A.y": {TOLERANCE_KEY: -1}}})
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match=expected_message):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+
+
+def test_validate_comparison_configuration_invalid_domain_tolerance(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that a domain tolerance that is not valid for its tolerance type fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+    path_sets[0] = path_sets[0]._replace(tolerance=2.5, tolerance_type=TOLERANCE_TYPE_SIGNIFICANT_DIGITS)
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(
+        ValueError, match=r"tolerance '2.5' with tolerance_type 'significant_digits' for Animal is not valid"
+    ):
         E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
     add_error.assert_called_once()
