@@ -1,5 +1,5 @@
 {
-    "start_date": "2013:1",
+    "start_date": "2015:1",
     "end_date": "2019:365",
     "set_seed": true,
     "simulation_type": "full_farm",
