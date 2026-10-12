@@ -9,7 +9,6 @@ import pytest
 from pytest_mock import MockerFixture
 from packaging.version import Version
 
-from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.task_manager import MINIMUM_PYTHON_VERSION, TaskManager, TaskType
@@ -177,7 +176,9 @@ def test_task_manager_start(
     elif is_update_end_to_end_test_task:
         update_e2e_task = {
             "task_type": TaskType.UPDATE_E2E_TEST_RESULTS,
-            "output_prefix": "update_prefix",
+            "output_prefix": "update_prefix_run_1",
+            "e2e_group": "update_prefix",
+            "random_seed": 42,
             "json_output_directory": Path("out/update_e2e"),
         }
 
@@ -208,10 +209,7 @@ def test_task_manager_start(
         tm,
         "_run_tasks",
     )
-    mock_run_e2e_comparisons = mocker.patch.object(
-        tm,
-        "_run_end_to_end_testing_comparisons",
-    )
+    mock_run_e2e_comparisons = mocker.patch.object(tm, "_run_end_to_end_testing_comparisons", return_value=True)
     mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
 
     tm.start(
@@ -338,6 +336,8 @@ def test_task_manager_start(
             workers=workers,
             output_directory=Path("output/directory"),
             verbosity=verbosity,
+            is_end_to_end_test_task=True,
+            is_update_end_to_end_test_task=False,
         )
 
         mock_add_log.assert_any_call(
@@ -364,7 +364,31 @@ def test_task_manager_start(
         assert args[3] == workers
         assert args[4] == Path("metadata/path")
 
-        mock_run_e2e_comparisons.assert_not_called()
+        mock_run_e2e_comparisons.assert_called_once_with(
+            comparison_args=[
+                {
+                    "e2e_group": "update_prefix",
+                    "e2e_runs": [
+                        {
+                            "task_type": TaskType.UPDATE_E2E_TEST_RESULTS,
+                            "output_prefix": "update_prefix_run_1",
+                            "e2e_group": "update_prefix",
+                            "random_seed": 42,
+                            "json_output_directory": Path("out/update_e2e"),
+                            "task_id": "1/1",
+                        }
+                    ],
+                    "task_id": "E2E comparison 1/1",
+                }
+            ],
+            produce_graphics=produce_graphics,
+            metadata_depth_limit=metadata_depth_limit,
+            workers=workers,
+            output_directory=Path("output/directory"),
+            verbosity=verbosity,
+            is_end_to_end_test_task=False,
+            is_update_end_to_end_test_task=True,
+        )
         mock_summarize.assert_not_called()
 
         captured = capsys.readouterr()
@@ -723,11 +747,8 @@ def test_handle_update_e2e_test_results(
 
     # Arrange
     sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
-    update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
-    validate_configuration = mocker.patch.object(E2ETestResultsHandler, "validate_update_configuration")
     add_log = mocker.patch.object(mock_output_manager, "add_log")
     call_order = mocker.MagicMock()
-    call_order.attach_mock(validate_configuration, "validate_configuration")
     call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
     mock_input_manager = MagicMock()
@@ -737,8 +758,7 @@ def test_handle_update_e2e_test_results(
     task_manager._handle_update_e2e_test_results(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     # Assert
-    validate_configuration.assert_called_once_with(args["output_prefix"], args["filters_directory"])
-    assert [name for name, _, _ in call_order.mock_calls] == ["validate_configuration", "sim_engine_run_tasks"]
+    assert [name for name, _, _ in call_order.mock_calls] == ["sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
         args=args,
         input_manager=mock_input_manager,
@@ -748,37 +768,12 @@ def test_handle_update_e2e_test_results(
         should_flush_im_pool=True,
     )
 
-    update_test_results.assert_called_once_with(args["json_output_directory"], args["output_prefix"])
-
-    assert add_log.call_count == 2
+    assert add_log.call_count == 1
     add_log.assert_any_call(
         "End-to-end testing",
         "Generating new set of end-to-end expected test results.",
         {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
     )
-    add_log.assert_any_call(
-        "End-to-end testing",
-        "Completed generation of new set of end-to-end expected test results",
-        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
-    )
-
-
-def test_handle_update_e2e_test_results_invalid_configuration(
-    mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
-) -> None:
-    """Test that an invalid update configuration stops the expected results update before the simulation runs."""
-    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
-    update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
-    mocker.patch.object(
-        E2ETestResultsHandler, "validate_update_configuration", side_effect=ValueError("invalid configuration")
-    )
-    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix", "filters_directory": Path("filters")}
-
-    with pytest.raises(ValueError, match="invalid configuration"):
-        task_manager._handle_update_e2e_test_results(args, MagicMock(), mock_output_manager, "test_task", True, True)
-
-    sim_engine_run_tasks.assert_not_called()
-    update_test_results.assert_not_called()
 
 
 def test_handle_post_processing_load_pool(
