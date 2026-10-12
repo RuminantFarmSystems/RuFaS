@@ -219,19 +219,6 @@ class TaskManager:
             info_map,
         )
 
-        update_e2e_args = [
-            args for args in runnable_args
-            if args["task_type"] == TaskType.UPDATE_E2E_TEST_RESULTS
-        ]
-        if update_e2e_args:
-            update_e2e_groups = self._group_end_to_end_testing_runs(update_e2e_args)
-
-            for e2e_group, e2e_runs in update_e2e_groups.items():
-                E2ETestResultsHandler.validate_update_configuration(
-                    output_prefix=e2e_group,
-                    filters_directory=Path(e2e_runs[0]["filters_directory"]),
-                )
-
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
         failed_tasks = self._run_tasks(
@@ -961,6 +948,12 @@ class TaskManager:
             filters_path = Path(args["filters_directory"])
             output_manager.validate_filter_constant_content(filters_path)
 
+            if task_type == TaskType.UPDATE_E2E_TEST_RESULTS:
+                E2ETestResultsHandler.validate_update_configuration(
+                    output_prefix=args["e2e_group"],
+                    filters_directory=filters_path,
+                )
+
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
             handler = simulation_and_analysis_handlers.get(task_type)
@@ -1242,11 +1235,6 @@ class TaskManager:
             output_manager.is_first_post_processing = False
 
             if is_end_to_end_test_task:
-                E2ETestResultsHandler.compare_actual_and_expected_test_results(
-                    json_output_path=averaged_results_path,
-                    convert_variable_table_path=group_args["convert_variable_table_path"],
-                    output_prefix=e2e_group,
-                )
                 must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
                     group_args["output_prefix"],
                     group_args["convert_variable_table_path"],
