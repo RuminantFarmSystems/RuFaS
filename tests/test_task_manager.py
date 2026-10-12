@@ -9,7 +9,6 @@ import pytest
 from pytest_mock import MockerFixture
 from packaging.version import Version
 
-from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.task_manager import MINIMUM_PYTHON_VERSION, TaskManager, TaskType
