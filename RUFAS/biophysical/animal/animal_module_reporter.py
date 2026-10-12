@@ -313,6 +313,80 @@ class AnimalModuleReporter:
 
         om.add_variable(f"avg_rqmts_for_{pen_base_name}", avg_requirements, info_map)
 
+    
+    @classmethod
+    def report_individual_nutrition_requirements(
+        cls,
+        animal_id: int,
+        pen_id: int,
+        animal_type: AnimalType,
+        requirements: NutritionRequirements,
+        body_weight: float,
+        simulation_day: int,
+    ) -> None:
+        """Report individual nutrient requirements at ration formulation."""
+    
+        individual_requirements = {
+            "simulation_day": simulation_day,
+            "animal_id": animal_id,
+            "pen_id": pen_id,
+            "animal_type": animal_type.value,
+            "body_weight": body_weight,
+    
+            # Energy requirements (Mcal/day)
+            "NEmaint_requirement": requirements.maintenance_energy,
+            "NEa_requirement": requirements.activity_energy,
+            "NEg_requirement": requirements.growth_energy,
+            "NEpreg_requirement": requirements.pregnancy_energy,
+            "NEl_requirement": requirements.lactation_energy,
+            "NEtotal_requirement": requirements.total_energy_requirement,
+    
+            # Protein and minerals (g/day)
+            "MP_requirement": requirements.metabolizable_protein,
+            "Ca_requirement": requirements.calcium,
+            "P_req": requirements.phosphorus,
+            "P_req_process": requirements.process_based_phosphorus,
+    
+            # Dry matter (kg/day)
+            "DMIest_requirement": requirements.dry_matter,
+        }
+    
+        units = {
+            "simulation_day": MeasurementUnits.SIMULATION_DAY,
+            "animal_id": MeasurementUnits.UNITLESS,
+            "pen_id": MeasurementUnits.UNITLESS,
+            "animal_type": MeasurementUnits.UNITLESS,
+            "body_weight": MeasurementUnits.KILOGRAMS,
+    
+            "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
+            "NEa_requirement": MeasurementUnits.MEGACALORIES,
+            "NEg_requirement": MeasurementUnits.MEGACALORIES,
+            "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
+            "NEl_requirement": MeasurementUnits.MEGACALORIES,
+            "NEtotal_requirement": MeasurementUnits.MEGACALORIES,
+    
+            "MP_requirement": MeasurementUnits.GRAMS,
+            "Ca_requirement": MeasurementUnits.GRAMS,
+            "P_req": MeasurementUnits.GRAMS,
+            "P_req_process": MeasurementUnits.GRAMS,
+            "DMIest_requirement": MeasurementUnits.KILOGRAMS,
+        }
+    
+        info_map = {
+            "class": cls.__name__,
+            "function": cls.report_individual_nutrition_requirements.__name__,
+            "simulation_day": simulation_day,
+            "is_daily_variable": False,
+            "units": units,
+        }
+    
+        om.add_variable(
+            "individual_nutrition_requirements",
+            individual_requirements,
+            info_map,
+        )
+
+    
     @classmethod
     def report_average_nutrient_evaluation_results(
         cls, pen_base_name: str, average_nutrition_evaluation: NutritionEvaluationResults, simulation_day: int
