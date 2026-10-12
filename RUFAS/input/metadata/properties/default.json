@@ -35,6 +35,11 @@
       "type": "bool",
       "description": "Whether or not to add detailed_values property to the json output",
       "default": false
+    },
+    "enable_individual_nutrition_reporting": {
+      "type": "bool",
+      "description": "Enable reporting individual nutrient requirements for each animal during ration formulation.",
+      "default": false
     }
   },
   "animal_properties": {

@@ -169,6 +169,8 @@ class HerdManager:
 
         AnimalConfig.initialize_animal_config()
 
+        self.enable_individual_nutrition_reporting = config_data.get("enable_individual_nutrition_reporting", False)
+
         LactationCurve.set_lactation_parameters(time)
         MilkProduction.set_milk_quality(
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
@@ -2425,17 +2427,18 @@ class HerdManager:
                 AnimalModuleReporter.report_average_nutrient_evaluation_results(
                     pen_base_name, pen.average_nutrition_evaluation, simulation_day
                 )
-                
+
                 # Report individual nutrient requirements
-                for animal in pen.animals_in_pen.values():
-                    AnimalModuleReporter.report_individual_nutrition_requirements(
-                        animal_id=animal.id,
-                        pen_id=pen.id,
-                        animal_type=animal.animal_type,
-                        requirements=animal.nutrition_requirements,
-                        body_weight=animal.body_weight,
-                        simulation_day=simulation_day,
-                    )
+                if self.enable_individual_nutrition_reporting:
+                    for animal in pen.animals_in_pen.values():
+                        AnimalModuleReporter.report_individual_nutrition_requirements(
+                            animal_id=animal.id,
+                            pen_id=pen.id,
+                            animal_type=animal.animal_type,
+                            requirements=animal.nutrition_requirements,
+                            body_weight=animal.body_weight,
+                            simulation_day=simulation_day,
+                        )
 
 
     def _update_total_enteric_methane(self, digestive_outputs: list[dict[AnimalType, dict[str, float]]]) -> None:
