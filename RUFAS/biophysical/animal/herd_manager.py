@@ -2421,9 +2421,22 @@ class HerdManager:
                     num_animals,
                     simulation_day,
                 )
+
                 AnimalModuleReporter.report_average_nutrient_evaluation_results(
                     pen_base_name, pen.average_nutrition_evaluation, simulation_day
                 )
+                
+                # Report individual nutrient requirements
+                for animal in pen.animals_in_pen.values():
+                    AnimalModuleReporter.report_individual_nutrition_requirements(
+                        animal_id=animal.id,
+                        pen_id=pen.id,
+                        animal_type=animal.animal_type,
+                        requirements=animal.nutrition_requirements,
+                        body_weight=animal.body_weight,
+                        simulation_day=simulation_day,
+                    )
+
 
     def _update_total_enteric_methane(self, digestive_outputs: list[dict[AnimalType, dict[str, float]]]) -> None:
         """Update the amount of total enteric methane in the herd statistics."""
