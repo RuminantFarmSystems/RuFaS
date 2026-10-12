@@ -210,11 +210,7 @@ def test_task_manager_start(
         tm,
         "_run_tasks",
     )
-    mock_run_e2e_comparisons = mocker.patch.object(
-        tm,
-        "_run_end_to_end_testing_comparisons",
-        return_value=True
-    )
+    mock_run_e2e_comparisons = mocker.patch.object(tm, "_run_end_to_end_testing_comparisons", return_value=True)
     mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
 
     tm.start(
