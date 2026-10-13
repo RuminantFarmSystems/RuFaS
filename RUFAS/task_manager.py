@@ -1280,8 +1280,9 @@ class TaskManager:
                         "units": MeasurementUnits.UNITLESS,
                     },
                 )
+                return e2e_group
 
-            return e2e_group
+            return None
 
         except Exception as e:
             info_map = {
