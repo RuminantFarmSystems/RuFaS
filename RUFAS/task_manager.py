@@ -250,7 +250,7 @@ class TaskManager:
                     }
                 )
 
-            comparisons_succeeded = self._run_end_to_end_testing_comparisons(
+            comparisons_succeeded = self._process_e2e_results(
                 comparison_args=comparison_args,
                 produce_graphics=produce_graphics,
                 metadata_depth_limit=metadata_depth_limit,
@@ -893,9 +893,9 @@ class TaskManager:
             TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
-            TaskType.END_TO_END_TESTING: TaskManager._run_end_to_end_testing_simulation,
+            TaskType.END_TO_END_TESTING: TaskManager._run_e2e_simulation,
             TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
-            TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._handle_update_e2e_test_results,
+            TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._run_e2e_simulation,
         }
         try:
             task_type: TaskType = args["task_type"]
@@ -1059,7 +1059,7 @@ class TaskManager:
                 e2e_groups[args["e2e_group"]].append(args)
         return e2e_groups
 
-    def _run_end_to_end_testing_comparisons(
+    def _process_e2e_results(
         self,
         comparison_args: list[dict[str, Any]],
         produce_graphics: bool,
@@ -1096,13 +1096,13 @@ class TaskManager:
 
         Notes
         -----
-        Each E2E group is processed independently by ``_process_end_to_end_testing_group``, which averages the results
+        Each E2E group is processed independently by ``_process_e2e_group_results``, which averages the results
         from the group's simulation runs and compares the averaged results against the expected E2E results. Failed
         comparison tasks are collected and reported as an error via the ``OutputManager``.
         """
 
         comparison_with_args = partial(
-            self._process_end_to_end_testing_group,
+            self._process_e2e_group_results,
             produce_graphics=produce_graphics,
             metadata_depth_limit=metadata_depth_limit,
             workers=workers,
@@ -1133,7 +1133,7 @@ class TaskManager:
                 f"Failed E2E comparison task(s): {failed}",
                 {
                     "class": TaskManager.__name__,
-                    "function": (self._run_end_to_end_testing_comparisons.__name__),
+                    "function": (self._process_e2e_results.__name__),
                 },
             )
             return False
@@ -1141,7 +1141,7 @@ class TaskManager:
         return True
 
     @staticmethod
-    def _process_end_to_end_testing_group(
+    def _process_e2e_group_results(
         comparison_args: dict[str, Any],
         produce_graphics: bool,
         metadata_depth_limit: int,
@@ -1219,7 +1219,7 @@ class TaskManager:
                 f"Data not valid for {e2e_group}, task not run",
                 info_map={
                     "class": TaskManager.__name__,
-                    "function": TaskManager._process_end_to_end_testing_group.__name__,
+                    "function": TaskManager._process_e2e_group_results.__name__,
                     "units": MeasurementUnits.UNITLESS,
                 },
             )
@@ -1266,7 +1266,7 @@ class TaskManager:
                     "Completed generation of new set of end-to-end expected test results",
                     info_map={
                         "class": TaskManager.__name__,
-                        "function": TaskManager._process_end_to_end_testing_group.__name__,
+                        "function": TaskManager._process_e2e_group_results.__name__,
                         "units": MeasurementUnits.UNITLESS,
                     },
                 )
@@ -1276,7 +1276,7 @@ class TaskManager:
                     "At stage of processing e2e testing group and task is neither e2e task or update e2e results task.",
                     info_map={
                         "class": TaskManager.__name__,
-                        "function": TaskManager._process_end_to_end_testing_group.__name__,
+                        "function": TaskManager._process_e2e_group_results.__name__,
                         "units": MeasurementUnits.UNITLESS,
                     },
                 )
@@ -1286,7 +1286,7 @@ class TaskManager:
         except Exception as e:
             info_map = {
                 "class": TaskManager.__name__,
-                "function": TaskManager._process_end_to_end_testing_group.__name__,
+                "function": TaskManager._process_e2e_group_results.__name__,
             }
 
             output_manager.add_error(
@@ -1304,7 +1304,7 @@ class TaskManager:
             return e2e_group
 
     @staticmethod
-    def _run_end_to_end_testing_simulation(
+    def _run_e2e_simulation(
         args: dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
@@ -1312,66 +1312,15 @@ class TaskManager:
         produce_graphics: bool,
         should_flush_im_pool: bool,
     ) -> None:
-        """Runs a simulation as part of end-to-end testing.
-
-        Parameters
-        ----------
-        args : dict[str, Any]
-            The arguments used to configure the simulation.
-        input_manager : InputManager
-            The input manager associated with the simulation.
-        output_manager : OutputManager
-            The output manager associated with the simulation.
-        task_id : str
-            The identifier for the E2E simulation task.
-        produce_graphics : bool
-            Whether graphics should be generated for the simulation.
-        should_flush_im_pool : bool
-            Whether the InputManager pool should be flushed during simulation processing.
-
-        Notes
-        -----
-        Logs the start and completion of the E2E simulation and delegates the simulation execution to the standard
-        simulation engine task handler. Averaging and comparison of E2E results are performed separately after all
-        simulations in the E2E group have completed.
-        """
+        """Run a simulation for E2E testing or expected results generation."""
         info_map = {
             "class": TaskManager.__name__,
-            "function": TaskManager._run_end_to_end_testing_simulation.__name__,
+            "function": TaskManager._run_e2e_simulation.__name__,
             "task_id": task_id,
             "produce_graphics": produce_graphics,
         }
 
-        output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
-        TaskManager._handle_simulation_engine_run_tasks(
-            args=args,
-            input_manager=input_manager,
-            output_manager=output_manager,
-            task_id=task_id,
-            produce_graphics=produce_graphics,
-            should_flush_im_pool=should_flush_im_pool,
-        )
-
-        output_manager.add_log("End-to-end testing", "Completed simulation for end-to-end testing", info_map)
-
-    @staticmethod
-    def _handle_update_e2e_test_results(
-        args: dict[str, Any],
-        input_manager: InputManager,
-        output_manager: OutputManager,
-        task_id: str,
-        produce_graphics: bool,
-        should_flush_im_pool: bool,
-    ) -> None:
-        """Validates the update configuration, then generates a new set of end-to-end expected test results."""
-        info_map = {
-            "class": TaskManager.__name__,
-            "function": TaskManager._handle_update_e2e_test_results.__name__,
-        }
-
-        output_manager.add_log(
-            "End-to-end testing", "Generating new set of end-to-end expected test results.", info_map
-        )
+        output_manager.add_log("End-to-end testing", "Starting E2E simulation.", info_map)
 
         TaskManager._handle_simulation_engine_run_tasks(
             args=args,
@@ -1381,6 +1330,8 @@ class TaskManager:
             produce_graphics=produce_graphics,
             should_flush_im_pool=should_flush_im_pool,
         )
+
+        output_manager.add_log("End-to-end testing", "Completed E2E simulation.", info_map)
 
     @staticmethod
     def handle_input_data_audit(

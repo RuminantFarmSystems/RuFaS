@@ -209,7 +209,7 @@ def test_task_manager_start(
         tm,
         "_run_tasks",
     )
-    mock_run_e2e_comparisons = mocker.patch.object(tm, "_run_end_to_end_testing_comparisons", return_value=True)
+    mock_process_e2e_results = mocker.patch.object(tm, "_process_e2e_results", return_value=True)
     mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
 
     tm.start(
@@ -300,7 +300,7 @@ def test_task_manager_start(
             verbosity,
         )
 
-        mock_run_e2e_comparisons.assert_not_called()
+        mock_process_e2e_results.assert_not_called()
         mock_summarize.assert_not_called()
 
     elif is_end_to_end_test_task:
@@ -314,7 +314,7 @@ def test_task_manager_start(
         assert args[3] == workers
         assert args[4] == Path("metadata/path")
 
-        mock_run_e2e_comparisons.assert_called_once_with(
+        mock_process_e2e_results.assert_called_once_with(
             comparison_args=[
                 {
                     "e2e_group": "test_group",
@@ -364,7 +364,7 @@ def test_task_manager_start(
         assert args[3] == workers
         assert args[4] == Path("metadata/path")
 
-        mock_run_e2e_comparisons.assert_called_once_with(
+        mock_process_e2e_results.assert_called_once_with(
             comparison_args=[
                 {
                     "e2e_group": "update_prefix",
@@ -706,7 +706,7 @@ def test_handle_post_processing_export_input_tocsv(
     )
 
 
-def test_run_end_to_end_testing_simulation(
+def test_run_e2e_simulation(
     mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
 ) -> None:
     """Test that end-to-end testing is executed correctly."""
@@ -723,7 +723,7 @@ def test_run_end_to_end_testing_simulation(
     call_order = mocker.MagicMock()
     call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
-    task_manager._run_end_to_end_testing_simulation(
+    task_manager._run_e2e_simulation(
         args, mock_input_manager, mock_output_manager, "test_task", True, True
     )
 
@@ -755,7 +755,7 @@ def test_handle_update_e2e_test_results(
     args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix", "filters_directory": Path("filters")}
 
     # Act
-    task_manager._handle_update_e2e_test_results(args, mock_input_manager, mock_output_manager, "test_task", True, True)
+    task_manager._run_e2e_simulation(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     # Assert
     assert [name for name, _, _ in call_order.mock_calls] == ["sim_engine_run_tasks"]
@@ -768,12 +768,7 @@ def test_handle_update_e2e_test_results(
         should_flush_im_pool=True,
     )
 
-    assert add_log.call_count == 1
-    add_log.assert_any_call(
-        "End-to-end testing",
-        "Generating new set of end-to-end expected test results.",
-        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
-    )
+    assert add_log.call_count == 2
 
 
 def test_handle_post_processing_load_pool(
