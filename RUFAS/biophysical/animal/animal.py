@@ -10,7 +10,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus, CowParity
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus, RemovalRiskParityGroup
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -2434,31 +2434,32 @@ class Animal:
             parity=self.calves,
         )
 
-    def assess_removal_risk(
+    def assess_and_schedule_removal(
         self,
         percent_fresh: float,
-        annual_death_risk_by_parity: dict[CowParity, float],
-        annual_acute_sale_risk_by_parity: dict[CowParity, float],
+        annual_death_risk_by_parity: dict[RemovalRiskParityGroup, float],
+        annual_acute_sale_risk_by_parity: dict[RemovalRiskParityGroup, float],
         time: RufasTime,
     ) -> None:
         """
-        Roll a cow's daily mortality and acute-sale risk and schedule any resulting removal.
+        Randomly determine whether the cow dies or is acutely sold today and schedule any resulting removal.
 
         Parameters
         ----------
         percent_fresh : float
             Fraction of the herd currently fresh, used to scale the daily death and
             acute-sale selection probabilities.
-        annual_death_risk_by_parity : dict[CowParity, float]
-            Annual death risk for each parity group, keyed by :class:`CowParity`, (unitless).
-        annual_acute_sale_risk_by_parity : dict[CowParity, float]
-            Annual acute-sale risk for each parity group, keyed by :class:`CowParity`, (unitless).
+        annual_death_risk_by_parity : dict[RemovalRiskParityGroup, float]
+            Annual death risk for each parity group, keyed by :class:`RemovalRiskParityGroup`, (unitless).
+        annual_acute_sale_risk_by_parity : dict[RemovalRiskParityGroup, float]
+            Annual acute-sale risk for each parity group, keyed by :class:`RemovalRiskParityGroup`, (unitless).
         time : RufasTime
             Current simulation time, used to record the day of death or sale.
 
-        Returns
-        -------
-        None
+        Notes
+        -----
+        Acute sale is checked before death. If the cow is selected for acute sale, death is not
+        checked on that day, so a cow is never both sold and dead on the same day.
         """
         if self.future_cull_date == sys.maxsize:
             if self.is_selected_for_removal(annual_acute_sale_risk_by_parity[self.parity_index], percent_fresh):
@@ -2473,29 +2474,29 @@ class Animal:
                 self.dead_at_day = time.simulation_day
 
     @property
-    def parity_index(self) -> CowParity:
+    def parity_index(self) -> RemovalRiskParityGroup:
         """
         The parity group of the animal.
 
         Returns
         -------
-        CowParity
-            ``CowParity.ONE`` or ``CowParity.TWO`` for cows in their 1st or 2nd lactation,
-            ``CowParity.THREE_PLUS`` for cows in any later lactation, and ``CowParity.NONE`` for
-            animals that are not cows.
+        RemovalRiskParityGroup
+            ``RemovalRiskParityGroup.ONE`` or ``RemovalRiskParityGroup.TWO`` for cows in their 1st or
+            2nd lactation, ``RemovalRiskParityGroup.THREE_PLUS`` for cows in any later lactation, and
+            ``RemovalRiskParityGroup.NONE`` for animals that are not cows.
         """
         if self.animal_type.is_cow:
             if self.calves == 1:
-                return CowParity.ONE
+                return RemovalRiskParityGroup.ONE
             elif self.calves == 2:
-                return CowParity.TWO
+                return RemovalRiskParityGroup.TWO
             else:
-                return CowParity.THREE_PLUS
-        return CowParity.NONE
+                return RemovalRiskParityGroup.THREE_PLUS
+        return RemovalRiskParityGroup.NONE
 
     def is_selected_for_removal(self, annual_risk: float, percent_fresh: float) -> bool:
         """
-        Roll the cow's daily removal (death or acute-sale) risk.
+        Randomly determine whether the cow is selected for daily removal (death or acute sale).
 
         Parameters
         ----------

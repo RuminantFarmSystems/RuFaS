@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.bedding.bedding import Bedding
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed, CowParity
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed, RemovalRiskParityGroup
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
@@ -1348,13 +1348,17 @@ def test_get_cow_removal_index_invalid_criteria_raises(herd_manager: HerdManager
         herd_manager._get_cow_removal_index([])
 
 
-def _by_parity(one: float, two: float, three_plus: float) -> dict[CowParity, float]:
+def _by_parity(one: float, two: float, three_plus: float) -> dict[RemovalRiskParityGroup, float]:
     """Builds a dict keyed by the 1st, 2nd, and 3rd+ parity groups."""
-    return {CowParity.ONE: one, CowParity.TWO: two, CowParity.THREE_PLUS: three_plus}
+    return {
+        RemovalRiskParityGroup.ONE: one,
+        RemovalRiskParityGroup.TWO: two,
+        RemovalRiskParityGroup.THREE_PLUS: three_plus,
+    }
 
 
 @pytest.mark.parametrize(
-    "herd_annual_risk,parity_distribution,parity_group_fractions,expected",
+    "herd_annual_risk,event_fractions_by_parity,parity_group_fractions,expected",
     [
         (0.05, _by_parity(0.2, 0.3, 0.5), _by_parity(0.4, 0.3, 0.3), _by_parity(0.025, 0.05, 0.05 * 0.5 / 0.3)),
         (0.096, _by_parity(0.2, 0.3, 0.5), _by_parity(0.2, 0.3, 0.5), _by_parity(0.096, 0.096, 0.096)),
@@ -1365,19 +1369,19 @@ def _by_parity(one: float, two: float, three_plus: float) -> dict[CowParity, flo
 def test_calculate_annual_risk_by_parity(
     herd_manager: HerdManager,
     herd_annual_risk: float,
-    parity_distribution: dict[CowParity, float],
-    parity_group_fractions: dict[CowParity, float],
-    expected: dict[CowParity, float],
+    event_fractions_by_parity: dict[RemovalRiskParityGroup, float],
+    parity_group_fractions: dict[RemovalRiskParityGroup, float],
+    expected: dict[RemovalRiskParityGroup, float],
 ) -> None:
     """Whole-herd annual risk is split across parity groups by the event distribution and group size."""
     actual = herd_manager._calculate_annual_risk_by_parity(
-        herd_annual_risk, parity_distribution, parity_group_fractions
+        herd_annual_risk, event_fractions_by_parity, parity_group_fractions
     )
 
     assert actual == pytest.approx(expected)
 
 
-def test_assess_removal_risk(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+def test_process_daily_removals(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Cows are assessed with the herd fresh fraction and parity-group risks; removed cows are collected."""
     fresh_first_parity_cow = mock_animal(AnimalType.LAC_COW, days_in_milk=10, calves=1)
     sold_cow = mock_animal(AnimalType.LAC_COW, days_in_milk=100, calves=2)
@@ -1386,8 +1390,8 @@ def test_assess_removal_risk(herd_manager: HerdManager, mocker: MockerFixture) -
     for cow in [fresh_first_parity_cow, sold_cow, dead_cow]:
         cow.sold = False
         cow.dead = False
-    sold_cow.assess_removal_risk.side_effect = lambda *_: setattr(sold_cow, "sold", True)
-    dead_cow.assess_removal_risk.side_effect = lambda *_: setattr(dead_cow, "dead", True)
+    sold_cow.assess_and_schedule_removal.side_effect = lambda *_: setattr(sold_cow, "sold", True)
+    dead_cow.assess_and_schedule_removal.side_effect = lambda *_: setattr(dead_cow, "dead", True)
     cows = [fresh_first_parity_cow, sold_cow, dead_cow]
     mocker.patch.object(HerdManager, "all_animals", new_callable=mocker.PropertyMock, return_value=cows + [heifer])
     mocker.patch.object(AnimalConfig, "annual_death_probability", 0.06)
@@ -1397,22 +1401,22 @@ def test_assess_removal_risk(herd_manager: HerdManager, mocker: MockerFixture) -
     herd_manager.herd_statistics.animals_deaths_by_stage[AnimalType.DRY_COW] = 0
     time = MagicMock(auto_spec=RufasTime)
 
-    sold_cows, dead_cows = herd_manager._assess_removal_risk(cows + [heifer], time)
+    sold_cows, dead_cows = herd_manager._process_daily_removals(cows + [heifer], time)
 
     assert sold_cows == [sold_cow]
     assert dead_cows == [dead_cow]
     assert herd_manager.herd_statistics.animals_deaths_by_stage[AnimalType.DRY_COW] == 1
-    heifer.assess_removal_risk.assert_not_called()
+    heifer.assess_and_schedule_removal.assert_not_called()
     expected_death_risk = pytest.approx(_by_parity(0.06 * 0.2 * 3, 0.06 * 0.3 * 3, 0.06 * 0.5 * 3))
     expected_acute_sale_risk = pytest.approx(_by_parity(0.09 * 0.1 * 3, 0.09 * 0.4 * 3, 0.09 * 0.5 * 3))
     for cow in cows:
-        cow.assess_removal_risk.assert_called_once_with(
+        cow.assess_and_schedule_removal.assert_called_once_with(
             pytest.approx(1 / 3), expected_death_risk, expected_acute_sale_risk, time
         )
 
 
-def test_assess_removal_risk_no_cows(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+def test_process_daily_removals_no_cows(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """With no cows in the herd, nothing is assessed or removed."""
     mocker.patch.object(HerdManager, "all_animals", new_callable=mocker.PropertyMock, return_value=[])
 
-    assert herd_manager._assess_removal_risk([], MagicMock(auto_spec=RufasTime)) == ([], [])
+    assert herd_manager._process_daily_removals([], MagicMock(auto_spec=RufasTime)) == ([], [])

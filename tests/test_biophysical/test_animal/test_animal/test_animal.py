@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus, CowParity
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus, RemovalRiskParityGroup
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
     NewBornCalfValuesTypedDict,
@@ -3108,14 +3108,14 @@ def test_is_selected_for_removal_fresh_scaling(
 @pytest.mark.parametrize(
     "calves,expected",
     [
-        (1, CowParity.ONE),
-        (2, CowParity.TWO),
-        (3, CowParity.THREE_PLUS),
-        (4, CowParity.THREE_PLUS),
-        (7, CowParity.THREE_PLUS),
+        (1, RemovalRiskParityGroup.ONE),
+        (2, RemovalRiskParityGroup.TWO),
+        (3, RemovalRiskParityGroup.THREE_PLUS),
+        (4, RemovalRiskParityGroup.THREE_PLUS),
+        (7, RemovalRiskParityGroup.THREE_PLUS),
     ],
 )
-def test_parity_index_cow(mock_lactating_cow: Animal, calves: int, expected: CowParity) -> None:
+def test_parity_index_cow(mock_lactating_cow: Animal, calves: int, expected: RemovalRiskParityGroup) -> None:
     """A cow's parity maps to the 1st, 2nd, or 3rd+ parity group."""
     mock_lactating_cow.calves = calves
     assert mock_lactating_cow.parity_index == expected
@@ -3123,14 +3123,22 @@ def test_parity_index_cow(mock_lactating_cow: Animal, calves: int, expected: Cow
 
 def test_parity_index_non_cow(mock_heiferI: Animal) -> None:
     """Animals that are not cows have no parity group."""
-    assert mock_heiferI.parity_index == CowParity.NONE
+    assert mock_heiferI.parity_index == RemovalRiskParityGroup.NONE
 
 
-DEATH_RISK_BY_PARITY = {CowParity.ONE: 0.01, CowParity.TWO: 0.02, CowParity.THREE_PLUS: 0.03}
-ACUTE_SALE_RISK_BY_PARITY = {CowParity.ONE: 0.04, CowParity.TWO: 0.05, CowParity.THREE_PLUS: 0.06}
+DEATH_RISK_BY_PARITY = {
+    RemovalRiskParityGroup.ONE: 0.01,
+    RemovalRiskParityGroup.TWO: 0.02,
+    RemovalRiskParityGroup.THREE_PLUS: 0.03,
+}
+ACUTE_SALE_RISK_BY_PARITY = {
+    RemovalRiskParityGroup.ONE: 0.04,
+    RemovalRiskParityGroup.TWO: 0.05,
+    RemovalRiskParityGroup.THREE_PLUS: 0.06,
+}
 
 
-def test_assess_removal_risk_acute_sale(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+def test_assess_and_schedule_removal_acute_sale(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     """A cow selected for acute sale is sold today and death risk is not rolled."""
     mock_lactating_cow.calves = 2
     mock_lactating_cow.days_born = 900
@@ -3139,7 +3147,7 @@ def test_assess_removal_risk_acute_sale(mock_lactating_cow: Animal, mocker: Mock
     mock_select = mocker.patch.object(mock_lactating_cow, "is_selected_for_removal", return_value=True)
     time = MagicMock(simulation_day=42)
 
-    mock_lactating_cow.assess_removal_risk(0.1, DEATH_RISK_BY_PARITY, ACUTE_SALE_RISK_BY_PARITY, time)
+    mock_lactating_cow.assess_and_schedule_removal(0.1, DEATH_RISK_BY_PARITY, ACUTE_SALE_RISK_BY_PARITY, time)
 
     mock_select.assert_called_once_with(0.05, 0.1)
     assert mock_lactating_cow.future_cull_date == 900
@@ -3148,7 +3156,7 @@ def test_assess_removal_risk_acute_sale(mock_lactating_cow: Animal, mocker: Mock
     assert mock_lactating_cow.future_death_date == sys.maxsize
 
 
-def test_assess_removal_risk_death(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+def test_assess_and_schedule_removal_death(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     """A cow not selected for acute sale but selected for death dies today."""
     mock_lactating_cow.calves = 5
     mock_lactating_cow.days_born = 1500
@@ -3157,7 +3165,7 @@ def test_assess_removal_risk_death(mock_lactating_cow: Animal, mocker: MockerFix
     mock_select = mocker.patch.object(mock_lactating_cow, "is_selected_for_removal", side_effect=[False, True])
     time = MagicMock(simulation_day=7)
 
-    mock_lactating_cow.assess_removal_risk(0.1, DEATH_RISK_BY_PARITY, ACUTE_SALE_RISK_BY_PARITY, time)
+    mock_lactating_cow.assess_and_schedule_removal(0.1, DEATH_RISK_BY_PARITY, ACUTE_SALE_RISK_BY_PARITY, time)
 
     assert mock_select.call_args_list == [call(0.06, 0.1), call(0.03, 0.1)]
     assert mock_lactating_cow.future_death_date == 1500
@@ -3166,14 +3174,14 @@ def test_assess_removal_risk_death(mock_lactating_cow: Animal, mocker: MockerFix
     assert mock_lactating_cow.future_cull_date == sys.maxsize
 
 
-def test_assess_removal_risk_skips_pending_removals(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+def test_assess_and_schedule_removal_skips_pending_removals(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     """Risks are not rolled when a removal of that type is already scheduled."""
     mock_lactating_cow.calves = 1
     mock_lactating_cow._future_cull_date = 10
     mock_lactating_cow._future_death_date = 20
     mock_select = mocker.patch.object(mock_lactating_cow, "is_selected_for_removal")
 
-    mock_lactating_cow.assess_removal_risk(0.1, DEATH_RISK_BY_PARITY, ACUTE_SALE_RISK_BY_PARITY, MagicMock())
+    mock_lactating_cow.assess_and_schedule_removal(0.1, DEATH_RISK_BY_PARITY, ACUTE_SALE_RISK_BY_PARITY, MagicMock())
 
     mock_select.assert_not_called()
 

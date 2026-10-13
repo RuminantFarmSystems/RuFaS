@@ -5,7 +5,7 @@ import pytest
 import pytest_mock
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.data_types.animal_enums import CowParity
+from RUFAS.biophysical.animal.data_types.animal_enums import RemovalRiskParityGroup
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     HeiferTAISubProtocol,
@@ -205,15 +205,15 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
 
     assert AnimalConfig.annual_death_probability == 0.05
     assert AnimalConfig.parity_death_distribution == {
-        CowParity.ONE: 0.2,
-        CowParity.TWO: 0.3,
-        CowParity.THREE_PLUS: 0.5,
+        RemovalRiskParityGroup.ONE: 0.2,
+        RemovalRiskParityGroup.TWO: 0.3,
+        RemovalRiskParityGroup.THREE_PLUS: 0.5,
     }
     assert AnimalConfig.annual_sale_probability == 0.32
     assert AnimalConfig.parity_sale_distribution == {
-        CowParity.ONE: 0.2,
-        CowParity.TWO: 0.3,
-        CowParity.THREE_PLUS: 0.5,
+        RemovalRiskParityGroup.ONE: 0.2,
+        RemovalRiskParityGroup.TWO: 0.3,
+        RemovalRiskParityGroup.THREE_PLUS: 0.5,
     }
 
     mock_om.add_warning.assert_not_called()

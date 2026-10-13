@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingSce
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, CowParity
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, RemovalRiskParityGroup
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
@@ -573,9 +573,9 @@ class HerdManager:
     def _calculate_annual_risk_by_parity(
         self,
         herd_annual_risk: float,
-        parity_distribution: dict[CowParity, float],
-        parity_group_fractions: dict[CowParity, float],
-    ) -> dict[CowParity, float]:
+        event_fractions_by_parity: dict[RemovalRiskParityGroup, float],
+        parity_group_fractions: dict[RemovalRiskParityGroup, float],
+    ) -> dict[RemovalRiskParityGroup, float]:
         """
         Converts a whole-herd annual risk into an annual risk for each parity group.
 
@@ -583,50 +583,50 @@ class HerdManager:
         ----------
         herd_annual_risk : float
             Annual risk of the event for the whole cow herd, (unitless).
-        parity_distribution : dict[CowParity, float]
-            Fractions of all events that come from each parity group, keyed by :class:`CowParity`,
+        event_fractions_by_parity : dict[RemovalRiskParityGroup, float]
+            Fractions of all events that come from each parity group, keyed by :class:`RemovalRiskParityGroup`,
             (unitless).
-        parity_group_fractions : dict[CowParity, float]
-            Fractions of the cow herd currently in each parity group, keyed by :class:`CowParity`,
+        parity_group_fractions : dict[RemovalRiskParityGroup, float]
+            Fractions of the cow herd currently in each parity group, keyed by :class:`RemovalRiskParityGroup`,
             (unitless).
 
         Returns
         -------
-        dict[CowParity, float]
+        dict[RemovalRiskParityGroup, float]
             Annual risk of the event for a cow in each of the ``ONE``, ``TWO``, and ``THREE_PLUS``
             parity groups, (unitless). A parity group with no cows is assigned a risk of 0.
 
         Notes
         -----
         The expected number of events coming from parity group ``p`` is
-        ``herd_annual_risk * parity_distribution[p] * N``, spread over the
+        ``herd_annual_risk * event_fractions_by_parity[p] * N``, spread over the
         ``parity_group_fractions[p] * N`` cows in that group, so the per-cow risk for the group is
-        ``herd_annual_risk * parity_distribution[p] / parity_group_fractions[p]``.
+        ``herd_annual_risk * event_fractions_by_parity[p] / parity_group_fractions[p]``.
         """
-        annual_risk_by_parity: dict[CowParity, float] = {
-            CowParity.ONE: 0.0,
-            CowParity.TWO: 0.0,
-            CowParity.THREE_PLUS: 0.0,
+        annual_risk_by_parity: dict[RemovalRiskParityGroup, float] = {
+            RemovalRiskParityGroup.ONE: 0.0,
+            RemovalRiskParityGroup.TWO: 0.0,
+            RemovalRiskParityGroup.THREE_PLUS: 0.0,
         }
-        for parity in annual_risk_by_parity.keys():
+        for parity in annual_risk_by_parity:
             if parity_group_fractions[parity] > 0:
                 annual_risk_by_parity[parity] = (
-                    herd_annual_risk * parity_distribution[parity] / parity_group_fractions[parity]
+                    herd_annual_risk * event_fractions_by_parity[parity] / parity_group_fractions[parity]
                 )
         return annual_risk_by_parity
 
-    def _assess_removal_risk(self, animals: list[Animal], time: RufasTime) -> tuple[list[Animal], list[Animal]]:
+    def _process_daily_removals(self, animals: list[Animal], time: RufasTime) -> tuple[list[Animal], list[Animal]]:
         """
         Assess daily removal risk for each cow and collect those removed.
 
         Computes the fresh fraction and the 1st, 2nd, and 3rd+ parity group fractions across all
         cows in the herd, converts the whole-herd annual death and acute-sale risks into annual
-        risks for each parity group, then rolls death and acute-sale risk for every cow in
-        ``animals`` via :meth:`Animal.assess_removal_risk`. Non-cow animals are skipped.
+        risks for each parity group, then randomly determines death and acute sale for every cow in
+        ``animals`` via :meth:`Animal.assess_and_schedule_removal`. Non-cow animals are skipped.
 
         Parameters
         ----------
-        animals : list of Animal
+        animals : list of Animal objects.
             Animals to assess on the current day.
         time : RufasTime
             Current simulation time, passed through to the per-animal risk assessment.
@@ -642,14 +642,21 @@ class HerdManager:
 
         all_cows = [animal for animal in self.all_animals if animal.animal_type.is_cow]
         num_cows = len(all_cows)
-        fresh_cows: list[Animal] = [cow for cow in all_cows if cow.days_in_milk < 50]
-        percent_fresh_cows = len(fresh_cows) / num_cows if num_cows > 0 else 0
+        if num_cows == 0:
+            return sold_cows, dead_cows
 
-        parity_group_counts = {CowParity.ONE: 0, CowParity.TWO: 0, CowParity.THREE_PLUS: 0}
+        fresh_cow_count = sum(cow.days_in_milk < 50 for cow in all_cows)
+        fresh_cow_fraction = fresh_cow_count / num_cows
+
+        parity_group_counts = {
+            RemovalRiskParityGroup.ONE: 0,
+            RemovalRiskParityGroup.TWO: 0,
+            RemovalRiskParityGroup.THREE_PLUS: 0,
+        }
         for cow in all_cows:
             parity_group_counts[cow.parity_index] += 1
-        parity_group_fractions: dict[CowParity, float] = {
-            parity: count / num_cows if num_cows > 0 else 0.0 for parity, count in parity_group_counts.items()
+        parity_group_fractions: dict[RemovalRiskParityGroup, float] = {
+            parity: count / num_cows for parity, count in parity_group_counts.items()
         }
 
         annual_death_risk_by_parity = self._calculate_annual_risk_by_parity(
@@ -663,15 +670,15 @@ class HerdManager:
 
         for animal in animals:
             if animal.animal_type.is_cow:
-                animal.assess_removal_risk(
-                    percent_fresh_cows, annual_death_risk_by_parity, annual_acute_sale_risk_by_parity, time
+                animal.assess_and_schedule_removal(
+                    fresh_cow_fraction, annual_death_risk_by_parity, annual_acute_sale_risk_by_parity, time
                 )
                 if animal.sold:
                     sold_cows.append(animal)
                 if animal.dead:
                     dead_cows.append(animal)
                     self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
-        return (sold_cows, dead_cows)
+        return sold_cows, dead_cows
 
     def _update_genetic_values_at_lactation_start(self, animal: Animal, time: RufasTime) -> None:
         """
@@ -753,13 +760,13 @@ class HerdManager:
             if animal_group_name == "heiferIIs":
                 daily_herd_updates.sold_heiferIIs = sold_animals
             elif animal_group_name == "heiferIIIs":
-                sold_cows, dead_cows = self._assess_removal_risk(group_graduated_animals, time)
+                sold_cows, dead_cows = self._process_daily_removals(group_graduated_animals, time)
                 sold_animals.extend(sold_cows)
                 sold_animals.extend(dead_cows)
                 daily_herd_updates.sold_and_died_cows.extend(sold_cows)
                 daily_herd_updates.sold_and_died_cows.extend(dead_cows)
             elif animal_group_name == "cows":
-                sold_cows, dead_cows = self._assess_removal_risk(animals, time)
+                sold_cows, dead_cows = self._process_daily_removals(animals, time)
                 sold_animals.extend(sold_cows)
                 sold_animals.extend(dead_cows)
                 daily_herd_updates.sold_and_died_cows.extend(sold_animals)

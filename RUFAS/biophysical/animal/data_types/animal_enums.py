@@ -25,7 +25,7 @@ class AnimalStatus(Enum):
     STILLBORN = "stillborn"
 
 
-class CowParity(Enum):
+class RemovalRiskParityGroup(Enum):
     """Enum indicating the parity group of the animal, used to look up parity-group-specific removal risks."""
 
     NONE = "none"

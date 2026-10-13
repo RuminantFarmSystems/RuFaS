@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
-from RUFAS.biophysical.animal.data_types.animal_enums import CowParity
+from RUFAS.biophysical.animal.data_types.animal_enums import RemovalRiskParityGroup
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
@@ -568,9 +568,11 @@ def mock_animal(
     animal.stillborn = stillborn
     animal.calves = calves
     if animal_type.is_cow:
-        animal.parity_index = {1: CowParity.ONE, 2: CowParity.TWO}.get(calves, CowParity.THREE_PLUS)
+        animal.parity_index = {1: RemovalRiskParityGroup.ONE, 2: RemovalRiskParityGroup.TWO}.get(
+            calves, RemovalRiskParityGroup.THREE_PLUS
+        )
     else:
-        animal.parity_index = CowParity.NONE
+        animal.parity_index = RemovalRiskParityGroup.NONE
     animal.calving_interval = calving_interval
     animal.sold_at_day = sold_at_day
     animal.stillborn_day = stillborn_day
