@@ -1,13 +1,89 @@
-====================
-**Welcome to RuFaS**
-====================
+Getting Started with RuFaS
+============================
+
+This page takes you from installation to running the supplied dairy farm
+example. You need Python 3.12 or 3.13 and a local copy of the repository.
+VS Code and GitHub Desktop are optional; you can use any editor and a
+terminal. The illustrated material below gives more background on the
+modules and tools.
+
+Install and run the example
+-----------------------------
+
+#. **Get RuFaS and install its dependencies.** If you do not already have
+   a checkout, clone the stable release branch:
+
+   .. code-block:: console
+
+      git clone --branch main https://github.com/RuminantFarmSystems/RuFaS.git
+      cd RuFaS
+
+   Check that ``python --version`` reports 3.12 or 3.13, then create a
+   virtual environment:
+
+   .. code-block:: console
+
+      python -m venv .venv
+
+   Activate it using the command for your terminal:
+
+   * Windows PowerShell:
+
+     .. code-block:: powershell
+
+        .\.venv\Scripts\Activate.ps1
+
+   * Windows Command Prompt:
+
+     .. code-block:: bat
+
+        .venv\Scripts\activate.bat
+
+   * macOS or Linux:
+
+     .. code-block:: console
+
+        source .venv/bin/activate
+
+   On macOS or Linux, use ``python3`` to create the environment if that
+   is the command for your supported Python installation. Once activated,
+   install RuFaS and its dependencies:
+
+   .. code-block:: console
+
+      python -m pip install .
+
+#. **Enable a CSV output and check the selected example.** Copy
+   ``output/output_filters/_csv_all_variables.txt`` to
+   ``output/output_filters/csv_all_variables.txt``. Removing the leading
+   underscore enables the filter. Open ``input/task_manager_metadata.json``
+   and confirm ``files.tasks.path`` points to
+   ``input/data/tasks/example_freestall_task.json``.
+#. **Run from the repository root.** Display available options, then run
+   the selected tasks with warnings visible:
+
+   .. code-block:: console
+
+      python main.py --help
+      python main.py -v warnings
+
+   After the simulation finishes, look for CSV files under
+   ``output/CSVs`` and check ``output/logs`` for errors or failed
+   tasks. The example task uses the output prefix ``freestall``. The
+   supplied configuration runs multiple years, so completion can take
+   time depending on your computer.
+
+If installation or the simulation fails, use :doc:`FAQ`. Before
+interpreting results, read :doc:`Known-Limitations` and
+:doc:`Scientific-Documentation`. To change the scenario or output
+selection, follow :doc:`How-to-Guides`. To help develop RuFaS, start with
+:doc:`Contributing-to-RuFaS`.
 
 .. container:: titlepage
 
-   **Welcome to RuFaS**
-    `Scientific documentation <https://github.com/RuminantFarmSystems/RuFaS/blob/main/docs/scientific/main.pdf>`__
+   **Illustrated introduction to RuFaS**
 
-   Introduction to RuFaS for New Team Members
+   Background for Users and Contributors
 
    2025-06-20
 
@@ -19,7 +95,7 @@
    Onboarding Document v.2
 
 **The Modules of RuFaS**
-------------------------
+--------------------------
 
 This section is not required for installing software or working with the
 RuFaS model specifically, but instead provides a general overview of the
@@ -148,7 +224,7 @@ capabilities of RuFaS and expected outputs of each module.
 .. figure:: /_static/Modules.png
    :align: center
    :alt: This image summarizes the processes and outputs of the four modules of the RuFaS Model
-   :name: fig:example
+   :name: fig:onboarding-example-2
    :width: 80.0%
 
 This image summarizes the processes and outputs of the four
@@ -157,15 +233,15 @@ modules of the RuFaS Model
 .. figure:: /_static/EEE.png
    :align: center
    :alt: This is my image
-   :name: fig:example
+   :name: fig:onboarding-example-3
    :width: 80.0%
 
 If you are interested in reading more about any of the modules or the
 science and formulas behind the curtain, please take some time to review
-our Scientific Documentation Manual available in This is XXXXXXXXXXX.
+the :doc:`Scientific Documentation Manual <Scientific-Documentation>`.
 
 **Downloading the Software**
-----------------------------
+------------------------------
 
 The purpose of this section is to guide you, the user, in downloading
 the tools needed to work with RuFaS. You will be downloading:
@@ -175,8 +251,8 @@ the tools needed to work with RuFaS. You will be downloading:
    on a project without overwriting each other’s work. We need this so
    that VS Code can better communicate with RuFaS through VS Code (or
    another IDE). This is not to be confused with our online GitHub
-   repository or the GitHub Desktop Application, but more details about
-   these are available in `section 3.1. <#sec:vocab>`__
+   repository or the GitHub Desktop Application; see
+   :ref:`basic-vocabulary` for more details.
 
 #. **Python** - If you are not familiar with Python, you may be familiar
    with other programming languages like ’R’ or ’SAS.’ Similarly, Python
@@ -244,7 +320,7 @@ The following sections will describe the steps of installation in more
 detail. Let’s get started!
 
 *Install Git* 
---------------
+---------------
 
 The purpose of installing Git Desktop is to allow you to work and make
 changes without impacting the remote repository. You will be downloading
@@ -290,17 +366,17 @@ repository for your offline repository.
 
 
 *Install Python*
-----------------
+------------------
 
-If you don’t already have Python 3.12 or 3.13 installed, download the
-latest version from the `official Python
+If you don’t already have Python 3.12 or 3.13 installed, download one of
+these supported versions from the `official Python
 website <https://www.python.org/downloads/>`__. To check that you have
 the correct version of Python installed, follow the steps provided for
 Windows or MacOS depending on the device you are working with.
 
 -  **Windows**
 
-   -  Download the latest Python installer from the official `Python
+   -  Download a Python 3.12 or 3.13 installer from the official `Python
       website <https://www.python.org/downloads/>`__.
 
    -  Follow the setup wizard to install Python. (Keep hitting next)
@@ -321,17 +397,17 @@ Windows or MacOS depending on the device you are working with.
 
          ::
 
-             python -v
+             python --version
 
       -  A message indicating the Python version should be printed out
-         on your screen: "Python"
+         on your screen, beginning with ``Python 3.12`` or ``Python 3.13``.
 
    -  Detailed tutorial by
       `DigitalOcean <https://www.digitalocean.com/community/tutorials/install-python-windows-10>`__.
 
 -  **MacOS**
 
-   -  Download the latest Python installer from the official `Python
+   -  Download a Python 3.12 or 3.13 installer from the official `Python
       website <https://www.python.org/downloads/>`__.
 
    -  Follow the setup wizard to install Python. (Keep hitting next)
@@ -351,17 +427,17 @@ Windows or MacOS depending on the device you are working with.
 
          ::
 
-             python3 -v
+             python3 --version
 
       -  A message indicating the Python version should be printed out
-         on your screen: Python 3.11.4
+         on your screen, beginning with ``Python 3.12`` or ``Python 3.13``.
 
    -  Detailed tutorial by `tutorial by
       DataQuest <https://www.dataquest.io/blog/installing-python-on-mac/>`__
 
 
 *Install VS Code (the IDE)*
----------------------------
+-----------------------------
 
 Recall that this IDE will allow us to write, edit, debug, and pilot test
 RuFaS. VS Code is commonly used by RuFaS team members, but there are
@@ -399,12 +475,13 @@ with VS Code so a RuFaS team member can be of maximal assistance troubleshooting
    .. image:: /_static/newterminal.png
       :alt: image
 
-   -  You'll need to have at least the minimum supported versions of each dependency installed to run RuFaS.
-To ensure your dependencies are up to date, you'll just need to run:
+   -  Create and activate a virtual environment using the commands in
+      **Install and run the example** above. Install the dependencies
+      from the repository root:
 
       ::
 
-                  pip install .
+         python -m pip install .
 
   .. image:: /_static/configrufas.png
      :alt: RuFaS Configuration
@@ -425,7 +502,7 @@ the program and some basic principles to make running RuFaS a little
 more straighforward.
 
 **Beginner’s Guide to RuFaS: Basic Principles and Practice**
-------------------------------------------------------------
+--------------------------------------------------------------
 
 If you have experience working in collaborative software development
 projects and using these tools, you may want to skip this section. If
@@ -465,8 +542,10 @@ In this section, you will review:
 After this section, if you have any remaining questions, be sure to
 reach out to a RuFaS team member for more assistance.
 
+.. _basic-vocabulary:
+
 *Basic Vocabulary Used by Developers: Learning to Communicate with RuFaS*
--------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 To work successfully in interdisciplinary environments like RuFaS we
 have to learn a new language. You don’t need to be fluent, but here are
@@ -562,7 +641,7 @@ of your role on the team).
    other projects.
 
 *Basic Principles of RuFaS Structure: What is RuFaS Doing?*
------------------------------------------------------------
+-------------------------------------------------------------
 
 Everyone has their own workflow and style when running RuFaS. We are
 going to do a walk through of just one way to run the program, but you
@@ -578,7 +657,7 @@ Git Desktop.
 
    .. figure:: /_static/terminal.png
       :alt: Your terminal will appear at the bottom of your VS Code screen.
-      :name: fig:example
+      :name: fig:onboarding-example-4
 
       Your terminal will appear at the bottom of your VS Code screen.
 
@@ -731,7 +810,7 @@ We hope that this section has made you feel a little more familiar with
 the structure of RuFaS. Now let’s practice running a simulation.
 
 *Beginner’s Simulation Worksheet: Practice Making Simple Changes*
------------------------------------------------------------------
+-------------------------------------------------------------------
 
 Once everything has been installed and tested, let’s take a minute to
 run a quick simulation. We will adjust one or two inputs and then check
@@ -744,8 +823,8 @@ open your Git Desktop and VS Code.
 
    .. figure:: /_static/checkbranch.png
       :alt: The bottom of your VS Code window is where you will find the
-      branch you’re working in.
-      :name: fig:example
+         branch you’re working in.
+      :name: fig:onboarding-example-5
       :width: 80.0%
 
       The bottom of your VS Code window is where you will find the
@@ -755,10 +834,11 @@ open your Git Desktop and VS Code.
    our way through the various file paths to understand how RuFaS
    ’knows’ what inputs to use.
 
-   -  In the menu to the left select the input dropdown and then select
-      metadata dropdown.
+   -  In the menu to the left select the input dropdown. The task manager
+      metadata is ``input/task_manager_metadata.json``; simulation
+      metadata files are in the ``input/metadata`` dropdown.
 
-    .. figure:: /_static/findmeta.png
+   .. figure:: /_static/findmeta.png
       :alt: Navigating metadata
       :name: fig:findmeta
       :width: 80.0%
@@ -783,7 +863,7 @@ open your Git Desktop and VS Code.
 
    .. figure:: /_static/default_task.png
       :alt: default task mngr
-      :name: fig:example
+      :name: fig:onboarding-example-6
       :width: 100.0%
 
       This figure demonstrates where you may find the
@@ -796,14 +876,14 @@ open your Git Desktop and VS Code.
    adjustments to tailor the simulation to your needs. Following the
    path, navigate to the metadata json file.
 
-    .. figure:: /_static/default_task.png
-       :alt: default task
-       :name: fig:example
-       :width: 100.0%
+   .. figure:: /_static/default_task.png
+      :alt: default task
+      :name: fig:onboarding-example-7
+      :width: 100.0%
 
-        When you open the example_freestall_task.json file, this is what you should
-        see. Notice that the example scenario is a single run of a
-        simulation titled, "SIMULATION_SINGLE_RUN."
+      When you open the example_freestall_task.json file, this is what you should
+      see. Notice that the example scenario is a single run of a
+      simulation titled, "SIMULATION_SINGLE_RUN."
 
 #. In the example_freestall_dairy_metadata.json file, you will observe a long list of
    paths to different input or config files. These are where you will be
@@ -812,7 +892,7 @@ open your Git Desktop and VS Code.
 
    -  \**\*\ **Tip:** If you will be making changes to multiple aspects
       of animal module, feed storage, crop and soil, and/or manure
-      files, we recommend that you make a copy of example_metadata.json
+      files, we recommend that you make a copy of example_freestall_dairy_metadata.json
       (you may right click the file and copy it to the same location or
       use CTRL+C then CTRL+V).
 
@@ -820,15 +900,15 @@ open your Git Desktop and VS Code.
          remember. We recommend "example_metadatav1.json" or something
          similar.
 
-    .. figure:: /_static/example_metadata.png
-       :alt: default meta
-       :name: fig:example
-       :width: 100.0%
+   .. figure:: /_static/example_metadata.png
+      :alt: default meta
+      :name: fig:onboarding-example-8
+      :width: 100.0%
 
-        This is an example of what you will see when you open your example
-        metadata json file. Depending on what you are looking for, you may
-        use this to better understand what input or config files you will
-        need to look at.
+      This is an example of what you will see when you open your example
+      metadata json file. Depending on what you are looking for, you may
+      use this to better understand what input or config files you will
+      need to look at.
 
 #. Using the paths in either the example_freestall_dairy_metadata.json file or the
    version of the file that you created, locate the values that you wish
@@ -836,13 +916,14 @@ open your Git Desktop and VS Code.
 
    -  For practice, navigate to the portion of text titled "Animal data"
       in the file. Follow this path to the example_freestall_animal.json file in
-      the metadata dropdown.
+      the ``input/data/animal`` dropdown.
 
    -  Create a copy of example_freestall_animal.json and give it the title
       **"example_freestall_animal1.json"**
 
-   -  In your newly created json file, change the "cow_num" from 100 to
-      10000 and your "replace_num" from 500 to 3000.
+   -  In your newly created JSON file, make a small change to ``cow_num``
+      so you can compare herd size with the baseline. Start with a small
+      scenario while learning; larger herds use more resources.
 
    .. image:: /_static/cownum.png
       :alt: image
@@ -873,8 +954,8 @@ open your Git Desktop and VS Code.
 
    -  It may take a little while to run. You can always check under
       output and logs to see the status and any errors that may arise.
-      Most errors can be ignored, however feel free to reach out the dev
-      team if you have any questions.
+      Review validation errors and failed tasks before using the results.
+      See :doc:`FAQ` if you need help interpreting the logs.
 
    -  When the simulation is complete, you can find the results in
       output dropdown on the menu of VS Code. If you want to view the
@@ -892,10 +973,9 @@ open your Git Desktop and VS Code.
    .. image:: /_static/reveal.png
       :alt: image
 
-#. You may have noticed that your output includes ALL possible variables
-   and outputs by the model. This is because we haven’t set up any
-   **Output Filters** to control what results you will view and how they
-   are reported.
+#. If you enabled ``csv_all_variables.txt`` in the quick start, your CSV
+   includes all collected variables. Use **Output Filters** to select
+   the results you want and how they are reported.
 
 #. You can borrow the files for Output Filters from other team members
    or create some on your own. For more details on how to create your
@@ -909,11 +989,10 @@ open your Git Desktop and VS Code.
       RuFaS,
       `Reports <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Report-Generator.html>`__
       and
-      `Graphs <https://github.com/RuminantFarmSystems/MASM/wiki/Graph-Generator>`__
+      :doc:`Graphs <Graph-Generator>`
       must be generated using filters.
 
-   -  The `Output
-      Manager <https://ruminantfarmsystems.github.io/RuFaS/_wiki/Graph-Generator.html>`__
+   -  The :doc:`Output Manager <Output-Manager>`
       also has some sample filters that you can use and add into your VS
       Code to help you.
 
@@ -927,7 +1006,7 @@ open your Git Desktop and VS Code.
       :alt: image
 
 Additional Materials
---------------------
+----------------------
 
 -  Now that you’re familiar with the basics, we encourage you to review
    the `onboarding video series <https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1>`__
