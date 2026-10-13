@@ -49,7 +49,13 @@ class HerdStatistics:
         Number of stillborn calves during a specific period, (unitless).
     sold_calf_num : int
         Number of calves sold during a specific period, (unitless).
-    sold_cow_low_production_num : int
+    dairy_male_sold_calf_num : int
+        Number of dairy male calves sold during a specific period, (unitless).
+    dairy_female_sold_calf_num : int
+        Number of dairy female calves sold during a specific period, (unitless).
+    beef_sold_calf_num : int
+        Number of beef-on-dairy calves sold during a specific period, (unitless).
+    sold_cow_oversupply_num : int
         Number of surplus cow sold, (unitless).
     bought_heifer_num : int
         Number of heifers purchased during a specific period, (unitless).
@@ -184,7 +190,10 @@ class HerdStatistics:
 
     stillborn_calf_num = 0
     sold_calf_num = 0
-    sold_cow_low_production_num = 0
+    dairy_male_sold_calf_num = 0
+    dairy_female_sold_calf_num = 0
+    beef_sold_calf_num = 0
+    sold_cow_oversupply_num = 0
     bought_heifer_num = 0
     sold_heiferII_num = 0
     cow_herd_exit_num = 0
@@ -320,7 +329,10 @@ class HerdStatistics:
 
         self.stillborn_calf_num = 0
         self.sold_calf_num = 0
-        self.sold_cow_low_production_num = 0
+        self.dairy_male_sold_calf_num = 0
+        self.dairy_female_sold_calf_num = 0
+        self.beef_sold_calf_num = 0
+        self.sold_cow_oversupply_num = 0
         self.bought_heifer_num = 0
         self.sold_heiferII_num = 0
         self.cow_herd_exit_num = 0
