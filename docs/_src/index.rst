@@ -3,16 +3,28 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Ruminant Farm Simulation (RuFaS)'s documentation!
-============================================================
+RuFaS User and Contributor Guide
+==================================
+
+RuFaS is an open-source model of dairy farm production and environmental
+impacts. Start with the path that matches what you want to do:
+
+* **Run RuFaS for the first time:** follow :doc:`_wiki/onboarding`, then
+  use :doc:`_wiki/How-to-Guides` to customize your simulation and outputs.
+* **Contribute to RuFaS:** start with :doc:`_wiki/Contributing-to-RuFaS`
+  for ways to help and a guide to the development and review process.
+* **Understand the model:** read :doc:`_wiki/Scientific-Documentation`
+  and :doc:`_wiki/Known-Limitations` before interpreting results.
+
+For common setup and simulation questions, see :doc:`_wiki/FAQ`.
 
 Vision
-------
+--------
 To support research and sustainable decision-making in ruminant animal production through a state-of-the-art,
 open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
 Mission
--------
+---------
 To build an integrated, whole-farm model that simulates milk, meat, and crop production, greenhouse gas emissions, water
 quality impacts, soil health, and other sustainability outcomes of ruminant farms. We strive to achieve the highest
 standards for prediction accuracy, code structure, and clarity, documentation, and accessibility. Through continuous
@@ -20,13 +32,7 @@ learning and improvement of our methods and algorithms, we are creating an open 
 collaboration.
 
 Navigation
-----------
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Documentation:
-
-   _code/modules
+------------
 
 .. toctree::
    :maxdepth: 1
@@ -34,11 +40,20 @@ Navigation
 
    _wiki/onboarding
    _wiki/Onboarding-videos
+   _wiki/FAQ
+   _wiki/Known-Limitations
+
+.. toctree::
+   :maxdepth: 1
+   :caption: How-to Guides:
+
+   _wiki/How-to-Guides
+   _wiki/Data-Collection-App
 
 .. toctree::
    :maxdepth: 2
    :titlesonly:
-   :caption: Infrastructure for Simulation:
+   :caption: Simulation Reference:
 
    _wiki/Task-Manager
    _wiki/Input-Manager
@@ -47,13 +62,29 @@ Navigation
    _wiki/Data-Origins
    _wiki/Report-Generator
    _wiki/Graph-Generator
-   _wiki/End‐to‐End-Testing
-   _wiki/Data-Collection-App
 
-Tools
------
 .. toctree::
    :maxdepth: 1
+   :caption: Documentation:
+
+   _wiki/Scientific-Documentation
+   Code Reference <_code/modules>
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contributing to RuFaS:
+
+   _wiki/Contributing-to-RuFaS
+   _wiki/creating_github_issue
+   _wiki/How-to-write-a-design-doc
+   _wiki/Branching-Strategy-in-RuFaS
+   _wiki/Code-review
+   _wiki/best_practices
+   _wiki/End‐to‐End-Testing
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer Tools:
 
    _wiki/Github-Actions
    _wiki/Using-Mypy
@@ -61,44 +92,30 @@ Tools
    _wiki/Using-Sphinx
    _wiki/Using-Flake8
 
-Team Culture
-------------
 .. toctree::
    :maxdepth: 1
+   :caption: Team Culture and Workflow:
 
-   _wiki/RuFaS-Versioning-Policy
+   Communication: What, Why, How <_wiki/what_why_how>
    _wiki/SCRUM-at-RuFaS
-   _wiki/Version-Update-Workflows
+   _wiki/RuFaS-Versioning-Policy
+   _wiki/Version-Update-Workflow
 
-Release Notes
--------------
 .. toctree::
    :maxdepth: 1
    :caption: Release Notes:
 
    _wiki/_release_notes/index
 
-Contributing to RuFaS
----------------------
-.. toctree::
-   :maxdepth: 1
-   :caption: Contributing to RuFaS:
-
-   _wiki/creating_github_issue
-   _wiki/How-to-write-a-design-doc
-   _wiki/Branching-Strategy-in-RuFaS
-   _wiki/Code-review
-   _wiki/best_practices
-
 Other Resources
----------------
+-----------------
 - `Uncle Bob Clean Code Lessons <https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx>`_
 - `Unit Testing Reference <https://realpython.com/python-testing/>`_
 - `Doc String Reference <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 - `Doc String Guide <https://realpython.com/documenting-python-code/>`_
 
 Indices and tables
-------------------
+--------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -56,6 +56,8 @@ python main.py
 ```
 6. **Learn more** if you have further questions read through the documentation on our [GitHub Pages site](https://ruminantfarmsystems.github.io/RuFaS/) or watch our [onboarding video series](https://www.youtube.com/playlist?list=PLqq6i4QOoueR-a2mxVX3Gc78s1wvTRfr1).
 
+The documentation is organized for new users and contributors. Start with [Getting Started](https://ruminantfarmsystems.github.io/RuFaS/_wiki/onboarding.html), then use the [How-to Guides](https://ruminantfarmsystems.github.io/RuFaS/_wiki/How-to-Guides.html) for common tasks. See the [Frequently Asked Questions](https://ruminantfarmsystems.github.io/RuFaS/_wiki/FAQ.html), [Known Limitations](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Known-Limitations.html), and [Scientific Documentation](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Scientific-Documentation.html) for troubleshooting and interpreting results.
+
 ---
 
 ### 🤝 How to Contribute
@@ -70,6 +72,8 @@ RuFaS welcomes coding and noncoding contributions from individuals demonstrating
 - 📣  Promote RuFaS within your networks
 
 > Please see the [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) code of conduct and [CONTRIBUTING.md](https://github.com/RuminantFarmSystems/RuFaS/blob/dev/CONTRIBUTING.md?plain=1) for full details.
+
+Start with the [Contributing to RuFaS guide](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Contributing-to-RuFaS.html) for ways to help, your first pull request, and links to the team's workflow.
 
 > For prerequisites and testing read the [PREREQUISITES](https://ruminantfarmsystems.github.io/RuFaS/_wiki/Github-Actions.html) and [End-to-End Testing](https://ruminantfarmsystems.github.io/RuFaS/_wiki/End%E2%80%90to%E2%80%90End-Testing.html) files.
 
