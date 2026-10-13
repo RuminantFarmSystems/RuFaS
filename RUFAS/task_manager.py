@@ -1281,7 +1281,7 @@ class TaskManager:
                     },
                 )
 
-            return None
+            return e2e_group
 
         except Exception as e:
             info_map = {
@@ -1290,7 +1290,7 @@ class TaskManager:
             }
 
             output_manager.add_error(
-                f"E2E comparison failed for {e2e_group}",
+                f"E2E result processing failed for {e2e_group}",
                 (f"Failed to average and compare E2E results: {e}; " f"traceback: {traceback.format_exc()}"),
                 info_map,
             )
