@@ -426,8 +426,9 @@ class ManureApplication:
         practice will be changed when issue #444 is addressed.
 
         """
+        top_depths = self.data.get_vectorized_layer_attribute("top_depth")
         bottom_depths = self.data.get_vectorized_layer_attribute("bottom_depth")
-        depth_factors = FertilizerApplication.generate_depth_factors(application_depth, bottom_depths)
+        depth_factors = FertilizerApplication.generate_depth_factors(application_depth, top_depths, bottom_depths)
         water_extractable_inorganic_phosphorus = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction
         water_extractable_organic_phosphorus = (
             total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * 0.95

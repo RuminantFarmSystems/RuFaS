@@ -168,6 +168,62 @@ def test_perform_daily_milking_update(
         mock_add_event.assert_not_called()
 
 
+def test_perform_daily_milking_update_records_dim_1_when_just_calved(mocker: MockerFixture) -> None:
+    """
+    On the calving day the cow is still flagged dry (days_in_milk == 0), but the ``just_calved``
+    flag should make the milking update record a DIM = 1 entry instead of a dry-day record.
+    """
+    milk_production = MilkProduction()
+    milk_production.set_wood_parameters(0.1, 0.2, 0.3)
+
+    mock_milk_inputs = mocker.MagicMock(spec=MilkProductionInputs)
+    mock_milk_inputs.days_in_milk = 0
+    mock_milk_inputs.days_in_pregnancy = 280
+    mock_milk_inputs.is_milking = False
+    mock_milk_inputs.just_calved = True
+    mock_milk_inputs.days_born = 800
+
+    mock_time = mocker.MagicMock(spec=RufasTime)
+    mock_time.simulation_day = 800
+
+    mock_record_first_day = mocker.patch.object(milk_production, "record_first_day_in_milk")
+
+    output = milk_production.perform_daily_milking_update(mock_milk_inputs, mock_time)
+
+    # days_in_milk stays 0 in the output; the reproduction update sets it to 1 later in the routine.
+    assert output.days_in_milk == 0
+    mock_record_first_day.assert_called_once_with(mock_milk_inputs.days_born, mock_time)
+
+
+def test_record_first_day_in_milk(mocker: MockerFixture) -> None:
+    """
+    ``record_first_day_in_milk`` computes production at DIM = 1, refreshes nutrient contents, and
+    appends a single DIM = 1 record to the milking history.
+    """
+    milk_production = MilkProduction()
+    milk_production.set_wood_parameters(0.1, 0.2, 0.3)
+    milk_production.milk_production_history = []
+
+    mock_time = mocker.MagicMock(spec=RufasTime)
+    mock_time.simulation_day = 800
+
+    mock_calc_daily_milk = mocker.patch.object(milk_production, "calculate_daily_milk_production", return_value=15.0)
+    mocker.patch.object(milk_production, "_calculate_nutrient_content", return_value=0.0)
+    mocker.patch.object(Utility, "generate_random_number", return_value=0.0)
+
+    milk_production.record_first_day_in_milk(days_born=800, time=mock_time)
+
+    mock_calc_daily_milk.assert_called_once_with(
+        1, milk_production.wood_l, milk_production.wood_m, milk_production.wood_n
+    )
+    assert milk_production._daily_milk_produced == 15.0
+    assert len(milk_production.milk_production_history) == 1
+    record = milk_production.milk_production_history[0]
+    assert record["days_in_milk"] == 1
+    assert record["days_born"] == 800
+    assert record["simulation_day"] == 800
+
+
 @pytest.fixture
 def milk_production() -> MilkProduction:
     """Create a MilkProduction instance with basic required attributes set."""
@@ -251,7 +307,8 @@ def test_perform_daily_milking_update_without_history_normal_milking_day(
 ) -> None:
     """
     On a normal milking day (milking and not dry-off day), days_in_milk increments,
-    daily milk is calculated, and nutrient contents are updated via _calculate_nutrient_content.
+    daily milk is calculated at the incremented days_in_milk, and nutrient contents are updated
+    via _calculate_nutrient_content.
     """
     if AnimalConfig.dry_off_day_of_pregnancy > 0:
         days_in_pregnancy = AnimalConfig.dry_off_day_of_pregnancy - 1
@@ -293,7 +350,7 @@ def test_perform_daily_milking_update_without_history_normal_milking_day(
     assert milk_production.lactose_content == 4.4
 
     mock_calc_daily_milk.assert_called_once_with(
-        inputs.days_in_milk,
+        inputs.days_in_milk + 1,
         milk_production.wood_l,
         milk_production.wood_m,
         milk_production.wood_n,
