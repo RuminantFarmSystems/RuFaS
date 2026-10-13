@@ -560,6 +560,7 @@ class AnimalModuleReporter:
             "phosphorus": MeasurementUnits.GRAMS,
             "phosphorus_fraction": MeasurementUnits.UNITLESS,
             "potassium": MeasurementUnits.GRAMS,
+            "manure_lignin": MeasurementUnits.KILOGRAMS,
         }
         info_map = {
             "class": AnimalModuleReporter.__name__,
