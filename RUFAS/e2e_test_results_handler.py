@@ -1,6 +1,9 @@
 import json
 import re
 from collections import namedtuple
+import math
+from numbers import Number
+from collections.abc import Iterable
 from pathlib import Path
 import shutil
 from typing import Any
@@ -8,6 +11,7 @@ from typing import Any
 import pandas as pd
 from deepdiff import DeepDiff
 
+from RUFAS.data_validator import DataValidator
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -16,11 +20,21 @@ from RUFAS.util import Utility
 
 ResultPathType = namedtuple(
     "ResultPathType",
-    ["domain", "expected_results_path", "actual_results_path", "tolerance", "must_change_variables_path"],
-    defaults=[""],
+    [
+        "domain",
+        "expected_results_path",
+        "actual_results_path",
+        "tolerance",
+        "must_change_variables_path",
+        "accepted_ranges_path",
+    ],
+    defaults=["", ""],
 )
 ORDERED_EXPECTED_RESULTS_FILE_KEYS = ["name", "filters", "expected_results_last_updated", "expected_results"]
 MUST_CHANGE_VARIABLES_KEY = "must_change_variables"
+ACCEPTED_RANGES_KEY = "accepted_ranges"
+ACCEPTED_RANGE_MIN_KEY = "min"
+ACCEPTED_RANGE_MAX_KEY = "max"
 TOP_LEVEL_DIFF_PATH_PATTERN = re.compile(r"^root\['([^']+)'\]")
 
 
@@ -33,6 +47,7 @@ class E2ETestResultsHandler:
         convert_variable_table_path: str | None,
         output_prefix: str,
         must_change_variables: set[str],
+        accepted_ranges: dict[str, dict[str, Any]],
     ) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
@@ -48,6 +63,9 @@ class E2ETestResultsHandler:
             The output prefix for the current e2e run.
         must_change_variables : set[str]
             The names of the variables flagged as must-change, as returned by ``validate_comparison_configuration``.
+        accepted_ranges : dict[str, dict[str, Any]]
+            The accepted ranges of the input set's variables, keyed by variable name, as returned by
+            ``validate_comparison_configuration``. Empty when accepted ranges are not used.
 
         Notes
         -----
@@ -56,6 +74,11 @@ class E2ETestResultsHandler:
         tolerance, and its differences are not reported as regular failures. The comparison results additionally
         report ``changed_variables``, the names of the unflagged variables whose values differ from the expected
         results, so a subject matter expert can evaluate them and flag the ones that are expected to change.
+
+        The variables with an accepted range are likewise left out of the regular comparison and are graded against
+        their accepted range instead: every numerical value of such a variable must fall within the range, whether or
+        not it differs from the recorded expected value. The comparison results report each range together with the
+        observed extremes of its variable.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -88,16 +111,18 @@ class E2ETestResultsHandler:
             ]
 
             domain_must_change_variables = sorted(name for name in must_change_variables if name in expected_results)
-            comparison_expected_not_must_change = {
-                k: v for k, v in expected_results.items() if k not in must_change_variables
+            domain_accepted_ranges = {
+                name: accepted_ranges[name] for name in sorted(accepted_ranges) if name in expected_results
             }
-            comparison_actual_not_must_change = {
-                k: v for k, v in actual_results.items() if k not in must_change_variables
+            excluded_variables = must_change_variables | set(accepted_ranges)
+            comparison_expected_not_excluded = {
+                k: v for k, v in expected_results.items() if k not in excluded_variables
             }
+            comparison_actual_not_excluded = {k: v for k, v in actual_results.items() if k not in excluded_variables}
 
             diff = DeepDiff(
-                comparison_expected_not_must_change,
-                comparison_actual_not_must_change,
+                comparison_expected_not_excluded,
+                comparison_actual_not_excluded,
                 ignore_order=True,
                 verbose_level=2,
                 significant_digits=3,
@@ -107,19 +132,27 @@ class E2ETestResultsHandler:
             must_change_satisfied, must_change_violations = E2ETestResultsHandler._evaluate_must_change_variables(
                 expected_results, actual_results, domain_must_change_variables, path_set.tolerance
             )
+            accepted_range_satisfied, accepted_range_violations = E2ETestResultsHandler._evaluate_accepted_ranges(
+                actual_results, domain_accepted_ranges
+            )
             E2ETestResultsHandler._report_domain_comparison_results(
                 domain=path_set.domain,
                 filtered_diff=filtered_diff,
                 domain_must_change_variables=domain_must_change_variables,
                 must_change_satisfied=must_change_satisfied,
                 must_change_violations=must_change_violations,
+                accepted_range_satisfied=accepted_range_satisfied,
+                accepted_range_violations=accepted_range_violations,
                 info_map=info_map,
             )
 
     @staticmethod
     def validate_comparison_configuration(
-        output_prefix: str, convert_variable_table_path: str | None, filters_directory: Path
-    ) -> set[str]:
+        output_prefix: str,
+        convert_variable_table_path: str | None,
+        filters_directory: Path,
+        use_accepted_ranges: bool,
+    ) -> tuple[set[str], dict[str, dict[str, Any]]]:
         """
         Validates the comparison configuration of an end-to-end testing input set before the simulation runs.
 
@@ -132,32 +165,39 @@ class E2ETestResultsHandler:
             variable names in the actual results.
         filters_directory : Path
             The directory the task loads its filter files from.
+        use_accepted_ranges : bool
+            Whether the input set's accepted ranges files are loaded, so that the comparison grades the listed
+            variables against their accepted range instead of the recorded expected results. When ``False``, the
+            files are not read.
 
         Returns
         -------
-        set[str]
-            The names of the variables flagged as must change, for ``compare_actual_and_expected_test_results``.
+        tuple[set[str], dict[str, dict[str, Any]]]
+            The names of the variables flagged as must change, and the accepted ranges keyed by variable name (empty
+            when ``use_accepted_ranges`` is ``False``), for ``compare_actual_and_expected_test_results``.
 
         Raises
         ------
         ValueError
             If the configuration is not valid. The message lists every problem found: must-change variables files,
-            expected results files, or a conversion table that cannot be loaded, result path sets that cannot be
-            resolved once the simulation has run (see ``_validate_result_path_set``), and must-change variables that
-            are not found in the expected results of any domain.
+            accepted ranges files, expected results files, or a conversion table that cannot be loaded, result path
+            sets that cannot be resolved once the simulation has run (see ``_validate_result_path_set``), and
+            must-change variables or variables with an accepted range that are not found in the expected results of
+            any domain.
 
         Notes
         -----
         Runs the checks of ``compare_actual_and_expected_test_results`` that do not depend on the actual results:
-        the input set's must-change variables files, expected results files, and conversion table must load, every
-        result path set must resolve to actual results the run will write, and every must-change variable must be a
-        key of at least one domain's expected results. Running these checks before the simulation makes a
-        configuration mistake, such as a mistyped path or variable name, fail the task in seconds instead of after
-        the full simulation. The comparison does not repeat them, so it relies on this validation having passed.
+        the input set's must-change variables files, accepted ranges files, expected results files, and conversion
+        table must load, every result path set must resolve to actual results the run will write, and every
+        must-change variable and every variable with an accepted range must be a key of at least one domain's
+        expected results. Running these checks before the simulation makes a configuration mistake, such as a
+        mistyped path or variable name, fail the task in seconds instead of after the full simulation. The
+        comparison does not repeat them, so it relies on this validation having passed.
 
         Every check runs before the error is raised, so one run reports all the problems of the input set. The
-        must-change variable names are only checked when every expected results file could be loaded, because a name
-        may belong to a file that could not be read.
+        must-change and ranged variable names are only checked when every expected results file could be loaded,
+        because a name may belong to a file that could not be read.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -178,7 +218,12 @@ class E2ETestResultsHandler:
             except (FileNotFoundError, ValueError) as e:
                 E2ETestResultsHandler._record_configuration_error(errors, str(e))
 
+        accepted_ranges: dict[str, dict[str, Any]] = (
+            E2ETestResultsHandler._collect_accepted_ranges(test_result_path_sets, errors) if use_accepted_ranges else {}
+        )
+
         matched_must_change_variables: set[str] = set()
+        matched_ranged_variables: set[str] = set()
         all_expected_results_loaded = True
         for path_set in test_result_path_sets:
             file_content = E2ETestResultsHandler._validate_result_path_set(
@@ -189,6 +234,7 @@ class E2ETestResultsHandler:
                 continue
             expected_results = file_content["expected_results"]
             matched_must_change_variables.update(name for name in must_change_variables if name in expected_results)
+            matched_ranged_variables.update(name for name in accepted_ranges if name in expected_results)
 
         unknown_must_change_variables = must_change_variables - matched_must_change_variables
         if unknown_must_change_variables and all_expected_results_loaded:
@@ -198,9 +244,17 @@ class E2ETestResultsHandler:
             )
             om.add_error("End-to-end testing must-change configuration error", message, info_map)
             E2ETestResultsHandler._record_configuration_error(errors, message)
+        unknown_ranged_variables = set(accepted_ranges) - matched_ranged_variables
+        if unknown_ranged_variables and all_expected_results_loaded:
+            message = (
+                "Variables with an accepted range not found in the expected results of any domain: "
+                f"{sorted(unknown_ranged_variables)}"
+            )
+            om.add_error("End-to-end testing accepted-range configuration error", message, info_map)
+            E2ETestResultsHandler._record_configuration_error(errors, message)
         if errors:
             E2ETestResultsHandler._raise_configuration_errors(errors)
-        return must_change_variables
+        return must_change_variables, accepted_ranges
 
     @staticmethod
     def validate_update_configuration(output_prefix: str, filters_directory: Path) -> None:
@@ -253,6 +307,8 @@ class E2ETestResultsHandler:
         domain_must_change_variables: list[str],
         must_change_satisfied: list[str],
         must_change_violations: dict[str, str],
+        accepted_range_satisfied: dict[str, dict[str, Any]],
+        accepted_range_violations: dict[str, dict[str, Any]],
         info_map: dict[str, Any],
     ) -> None:
         """
@@ -270,15 +326,21 @@ class E2ETestResultsHandler:
             The must-change variables whose values differ from the expected results.
         must_change_violations : dict[str, str]
             The violating must-change variables, mapped to the reason each one failed.
+        accepted_range_satisfied : dict[str, dict[str, Any]]
+            The variables whose values all fall within their accepted range, mapped to the range and the observed
+            extremes.
+        accepted_range_violations : dict[str, dict[str, Any]]
+            The variables violating their accepted range, mapped to the range, the observed extremes when available,
+            and the reason each one failed.
         info_map : dict[str, Any]
             Information about the source of the recorded variables. Updated in place with the units and the
             ``domain`` output prefix.
 
         Notes
         -----
-        The domain passes when the filtered diff is empty and there are no must-change violations; each failure
-        cause is logged as an error, and the recorded results include ``changed_variables`` (the names of the
-        unflagged variables that differ) and the must-change outcomes.
+        The domain passes when the filtered diff is empty and there are no must-change or accepted-range violations;
+        each failure cause is logged as an error, and the recorded results include ``changed_variables`` (the names
+        of the unflagged variables that differ), the must-change outcomes, and the accepted-range outcomes.
         """
         om = OutputManager()
         changed_variables = E2ETestResultsHandler._extract_changed_variable_names(filtered_diff)
@@ -295,23 +357,505 @@ class E2ETestResultsHandler:
                 f"Must-change variables did not change: {sorted(must_change_violations)}",
                 info_map,
             )
-        if not is_difference_in_results and not must_change_violations:
+        if accepted_range_violations:
+            om.add_error(
+                f"End-to-end testing failed for {domain}",
+                f"Variables violating their accepted range: {sorted(accepted_range_violations)}",
+                info_map,
+            )
+        end_to_end_testing_passing: bool = (
+            not is_difference_in_results and not must_change_violations and not accepted_range_violations
+        )
+        if end_to_end_testing_passing:
             om.add_log(
                 f"End-to-end testing succeeded for {domain}",
                 "No differences found between actual and expected end-to-end testing results.",
                 info_map,
             )
-        end_to_end_testing_passing: bool = not is_difference_in_results and not must_change_violations
         comparison_results: dict[str, Any] = dict(filtered_diff)
         if changed_variables:
             comparison_results["changed_variables"] = changed_variables
         if domain_must_change_variables:
             comparison_results["must_change_satisfied"] = must_change_satisfied
             comparison_results["must_change_violations"] = must_change_violations
+        if accepted_range_satisfied or accepted_range_violations:
+            comparison_results["accepted_range_satisfied"] = accepted_range_satisfied
+            comparison_results["accepted_range_violations"] = accepted_range_violations
         comparison_results["end_to_end_testing_passing"] = end_to_end_testing_passing
         info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": domain})
         for comparison_type, difference in comparison_results.items():
             om.add_variable(comparison_type, difference, info_map)
+
+    @staticmethod
+    def process_test_result_averaging(
+        e2e_group: str,
+        e2e_runs: list[dict[str, Any]],
+    ) -> Path:
+        """
+        Processes the averaging of end-to-end test results across multiple runs in the same E2E test group.
+
+        Creates a directory for the averaged results, identifies each set of E2E result files to average, averages the
+        corresponding results across the provided runs, and writes each set of averaged results to a JSON file.
+
+        Parameters
+        ----------
+        e2e_group : str
+            The name of the E2E test group whose results are being averaged.
+        e2e_runs : list[dict[str, Any]]
+            The E2E run configurations belonging to the test group. Each run must contain the information needed to
+            locate its generated result files.
+
+        Returns
+        -------
+        Path
+            The directory containing the averaged E2E result files.
+
+        Raises
+        ------
+        ValueError
+            If no E2E runs are provided or if the result files for a run cannot be uniquely identified.
+        """
+        if not e2e_runs:
+            OutputManager().add_error(
+                "E2E Results Averaging Error",
+                "No E2E runs data sent to 'process_test_result_averaging()' function.",
+                info_map={
+                    "class": E2ETestResultsHandler.__class__.__name__,
+                    "function": E2ETestResultsHandler.process_test_result_averaging.__name__,
+                },
+            )
+            raise ValueError(f"Cannot average E2E results for '{e2e_group}' because no runs were provided.")
+
+        json_output_directory = Path(e2e_runs[0]["json_output_directory"])
+
+        averaged_results_directory = json_output_directory / "averaged" / e2e_group
+        OutputManager().create_directory(averaged_results_directory)
+
+        test_result_path_sets = E2ETestResultsHandler._get_test_result_paths(e2e_group)
+
+        for path_set in test_result_path_sets:
+            result_paths = E2ETestResultsHandler._extract_results_paths(
+                e2e_runs=e2e_runs,
+                json_output_directory=json_output_directory,
+                actual_results_path=Path(path_set.actual_results_path),
+            )
+
+            averaged_results = E2ETestResultsHandler._average_test_results(
+                result_paths,
+            )
+
+            averaged_result_path = (
+                averaged_results_directory / f"{Path(path_set.actual_results_path).name}_averaged.json"
+            )
+
+            with open(
+                averaged_result_path,
+                "w",
+                encoding="utf-8",
+            ) as averaged_file:
+                json.dump(
+                    averaged_results,
+                    averaged_file,
+                    separators=(",", ":"),
+                )
+
+        return averaged_results_directory
+
+    @staticmethod
+    def _average_test_results(
+        results_paths: list[Path],
+    ) -> dict[str, Any]:
+        """
+        Averages the E2E test results from a collection of result files.
+
+        Parameters
+        ----------
+        results_paths : list[Path]
+            The paths to the E2E result files to average.
+
+        Notes
+        -----
+        Loads and validates the result files and uses the first result file as the reference structure. Outputs that are
+        missing from one or more runs or have invalid value structures are excluded from the averaged results. Outputs
+        that do not contain a ``values`` list are preserved when they are identical across all runs. Numeric values
+        within valid ``values`` lists are averaged across runs, while non-numeric values are preserved from the
+        reference result.
+
+        Returns
+        -------
+        dict[str, Any]
+            The averaged E2E test results, retaining the structure and metadata of the reference result where
+            applicable.
+        """
+        test_results = E2ETestResultsHandler._load_results(results_paths)
+
+        reference_results = test_results[0]
+        reference_keys = set(reference_results)
+
+        E2ETestResultsHandler._validate_results(
+            results_paths,
+            test_results,
+            reference_keys,
+        )
+
+        averaged_results: dict[str, Any] = {}
+
+        for output_name, reference_output in reference_results.items():
+            if output_name == "DISCLAIMER":
+                averaged_results[output_name] = reference_output
+                continue
+
+            missing_results_paths = [
+                result_path for result_path, result in zip(results_paths, test_results) if output_name not in result
+            ]
+
+            if missing_results_paths:
+                OutputManager().add_warning(
+                    "E2E Results Averaging Warning",
+                    (
+                        f"E2E output '{output_name}' is missing from "
+                        f"{len(missing_results_paths)} of {len(test_results)} runs "
+                        "and will be excluded from the averaged results. "
+                        f"Missing from: {missing_results_paths}."
+                    ),
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": E2ETestResultsHandler._average_test_results.__name__,
+                    },
+                )
+                continue
+
+            matching_outputs = [result[output_name] for result in test_results]
+
+            if not isinstance(reference_output, dict) or "values" not in reference_output:
+                if not all(output == reference_output for output in matching_outputs):
+                    OutputManager().add_warning(
+                        "E2E Results Averaging Error",
+                        f"Non-matching data in reference output for {output_name}",
+                        info_map={
+                            "class": E2ETestResultsHandler.__class__.__name__,
+                            "function": E2ETestResultsHandler._average_test_results.__name__,
+                        },
+                    )
+                    continue
+
+                averaged_results[output_name] = reference_output
+                continue
+
+            reference_values = reference_output["values"]
+
+            values_are_valid = E2ETestResultsHandler._validate_values(
+                results_paths,
+                output_name,
+                matching_outputs,
+                reference_values,
+            )
+
+            if not values_are_valid:
+                continue
+
+            averaged_values = E2ETestResultsHandler._average_output_values(
+                output_name,
+                reference_values,
+                matching_outputs,
+            )
+
+            averaged_results[output_name] = {
+                **reference_output,
+                "values": averaged_values,
+            }
+
+        return averaged_results
+
+    @staticmethod
+    def _average_output_values(
+        output_name: str,
+        reference_values: list[Any],
+        matching_outputs: list[dict[str, Any]],
+    ) -> list[Any]:
+        """
+        Averages the values for a single E2E output across multiple test runs.
+
+        Parameters
+        ----------
+        output_name : str
+            The name of the E2E output being averaged.
+        reference_values : list[Any]
+            The values from the reference E2E result.
+        matching_outputs : list[dict[str, Any]]
+            The corresponding E2E outputs from each test run.
+
+        Notes
+        -----
+        Numeric values are averaged across runs after excluding NaN values. If all numeric values are identical, the
+        reference value is preserved without conversion. Non-numeric values are not averaged and the reference value is
+        preserved. If numeric types are inconsistent or non-numeric values differ between runs, a warning is logged and
+        the reference value is retained.
+
+        Returns
+        -------
+        list[Any]
+            The averaged values for the E2E output, with reference values retained where averaging is not applicable.
+        """
+        averaged_values: list[Any] = []
+
+        for index, reference_value in enumerate(reference_values):
+            matching_values = [output["values"][index] for output in matching_outputs]
+
+            is_numeric = isinstance(reference_value, Number) and not isinstance(reference_value, bool)
+
+            if not is_numeric:
+                if not all(value == reference_value for value in matching_values):
+                    OutputManager().add_warning(
+                        "E2E Results Averaging Error",
+                        f"Non-numeric values differ for '{output_name}' at index {index}.",
+                        info_map={
+                            "class": E2ETestResultsHandler.__class__.__name__,
+                            "function": E2ETestResultsHandler._average_output_values.__name__,
+                        },
+                    )
+
+                averaged_values.append(reference_value)
+                continue
+
+            if not all(isinstance(value, Number) and not isinstance(value, bool) for value in matching_values):
+                OutputManager().add_warning(
+                    "E2E Results Averaging Error",
+                    (
+                        f"Inconsistent numeric value types for '{output_name}' at index {index}. "
+                        f"Values: {matching_values}. "
+                        f"Types: {[type(value).__name__ for value in matching_values]}."
+                    ),
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": E2ETestResultsHandler._average_output_values.__name__,
+                    },
+                )
+
+                averaged_values.append(reference_value)
+                continue
+
+            if all(value == reference_value for value in matching_values):
+                averaged_values.append(reference_value)
+                continue
+
+            numeric_values = [float(value) for value in matching_values if not math.isnan(float(value))]
+
+            averaged_value = sum(numeric_values) / len(numeric_values) if numeric_values else float("nan")
+
+            averaged_values.append(averaged_value)
+
+        return averaged_values
+
+    @staticmethod
+    def _validate_values(
+        result_paths: list[Path],
+        output_name: str,
+        matching_outputs: list[dict[str, Any]],
+        reference_values: list[Any],
+    ) -> bool:
+        """
+        Validates the value structures for a single E2E output across multiple test runs.
+
+        Parameters
+        ----------
+        result_paths : list[Path]
+            The paths to the E2E result files containing the outputs being validated.
+        output_name : str
+            The name of the E2E output being validated.
+        matching_outputs : list[dict[str, Any]]
+            The corresponding E2E outputs from each test run.
+        reference_values : list[Any]
+            The values from the reference E2E output used to determine the expected number of values.
+
+        Notes
+        -----
+        Verifies that each matching output contains a ``values`` list and that the number of values matches the number
+        in the reference output. If an output does not contain a ``values`` list, an error is logged and validation
+        immediately fails. If an output contains a different number of values, a warning is logged and validation
+        continues so that all matching outputs can be checked.
+
+        Returns
+        -------
+        bool
+            True if every matching output contains a ``values`` list with the expected number of values, otherwise
+            False.
+        """
+        values_are_valid = True
+
+        for result_path, output in zip(result_paths, matching_outputs):
+            if not isinstance(output, dict) or "values" not in output:
+                OutputManager().add_error(
+                    "E2E Results Averaging Error",
+                    f"E2E output '{output_name}' in '{result_path}' does not contain a 'values' list.",
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": E2ETestResultsHandler._validate_values.__name__,
+                    },
+                )
+                return False
+
+            if len(output["values"]) != len(reference_values):
+                OutputManager().add_warning(
+                    "E2E Results Averaging Error",
+                    (
+                        f"E2E output '{output_name}' has {len(output['values'])} values "
+                        f"in '{result_path}', but {len(reference_values)} were expected."
+                    ),
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": E2ETestResultsHandler._validate_values.__name__,
+                    },
+                )
+                values_are_valid = False
+
+        return values_are_valid
+
+    @staticmethod
+    def _validate_results(
+        result_paths: list[Path],
+        test_results: list[dict[str, Any]],
+        reference_keys: set[str],
+    ) -> None:
+        """
+        Validates the structure of E2E test results against the reference result.
+
+        Parameters
+        ----------
+        result_paths : list[Path]
+            The paths to the E2E result files being validated.
+        test_results : list[dict[str, Any]]
+            The loaded E2E test results. The first result is treated as the reference result and is not validated
+            against itself.
+        reference_keys : set[str]
+            The top-level keys from the reference E2E result that are expected in the other results.
+
+        Notes
+        -----
+        Compares the top-level keys of each test result after the reference result with the expected reference keys. A
+        warning is logged for any result containing missing or unexpected keys. Structural differences are reported but
+        do not stop validation or raise an exception.
+        """
+        for result_path, result in zip(
+            result_paths[1:],
+            test_results[1:],
+        ):
+            result_keys = set(result)
+
+            missing_keys = reference_keys - result_keys
+            unexpected_keys = result_keys - reference_keys
+
+            if missing_keys or unexpected_keys:
+                OutputManager().add_warning(
+                    "E2E Results Averaging Warning",
+                    (
+                        f"E2E result structure differs for "
+                        f"'{result_path}'. "
+                        f"Missing keys: {sorted(missing_keys)}. "
+                        f"Unexpected keys: {sorted(unexpected_keys)}."
+                    ),
+                    info_map={
+                        "class": (E2ETestResultsHandler.__class__.__name__),
+                        "function": (E2ETestResultsHandler._validate_results.__name__),
+                    },
+                )
+
+    @staticmethod
+    def _load_results(result_paths: list[Path]) -> list[dict[str, Any]]:
+        """
+        Loads E2E test results from JSON files.
+
+        Reads each provided JSON result file and collects the deserialized contents in the same order as the provided
+        paths.
+
+        Parameters
+        ----------
+        result_paths : list[Path]
+            The paths to the JSON result files to load.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            The loaded E2E test results in the same order as ``result_paths``.
+        """
+        test_results: list[dict[str, Any]] = []
+
+        for result_path in result_paths:
+            with open(result_path, "r", encoding="utf-8") as result_file:
+                test_results.append(json.load(result_file))
+        return test_results
+
+    @staticmethod
+    def _extract_results_paths(
+        e2e_runs: list[dict[str, Any]],
+        json_output_directory: Path,
+        actual_results_path: Path,
+    ) -> list[Path]:
+        """
+        Extracts the result file corresponding to each E2E run for a specific E2E output.
+
+        Parameters
+        ----------
+        e2e_runs : list[dict[str, Any]]
+            The E2E run configurations for which result files should be located. Each run must contain an
+            ``output_prefix`` and ``e2e_group``.
+        json_output_directory : Path
+            The directory containing the generated E2E JSON result files.
+        actual_results_path : Path
+            The configured actual results path used to determine the result filename associated with each E2E run.
+
+        Notes
+        -----
+        Determines the expected result filename prefix for each E2E run using the run's output prefix and the provided
+        actual results path. Searches the JSON output directory for the corresponding result file and requires exactly
+        one matching file for each run.
+
+        Returns
+        -------
+        list[Path]
+            The matching E2E result file paths, in the same order as ``e2e_runs``.
+
+        Raises
+        ------
+        ValueError
+            If exactly one matching result file cannot be found for any E2E run.
+        """
+        result_paths: list[Path] = []
+
+        for run in e2e_runs:
+            run_output_prefix = run["output_prefix"]
+            e2e_group = run["e2e_group"]
+
+            result_name = actual_results_path.name.removeprefix(f"{e2e_group}_")
+
+            expected_prefix = f"{run_output_prefix}_" f"{result_name}"
+
+            matching_paths = [path for path in json_output_directory.iterdir() if path.name.startswith(expected_prefix)]
+
+            if len(matching_paths) != 1:
+                OutputManager().add_error(
+                    "E2E Results Averaging Error",
+                    (
+                        f"Expected exactly one E2E result file for "
+                        f"'{run_output_prefix}' matching "
+                        f"'{result_name}', but found "
+                        f"{len(matching_paths)}."
+                    ),
+                    info_map={
+                        "class": E2ETestResultsHandler.__class__.__name__,
+                        "function": E2ETestResultsHandler._extract_results_paths.__name__,
+                    },
+                )
+                raise ValueError(
+                    f"Expected exactly one E2E result file for "
+                    f"'{run_output_prefix}' matching "
+                    f"'{result_name}', but found "
+                    f"{len(matching_paths)}."
+                )
+
+            result_paths.append(matching_paths[0])
+
+        return result_paths
 
     @staticmethod
     def _convert_expected_result_variable_names(
@@ -476,7 +1020,8 @@ class E2ETestResultsHandler:
         -------
         list[ResultPathType]
             List of result path sets, each containing the domain, expected results path,
-            actual results path, and tolerance for one test domain.
+            actual results path, tolerance, and the optional must-change variables and accepted ranges
+            file paths for one test domain.
         """
         im = InputManager()
         result_paths: list[dict[str, str]] = im.get_data(
@@ -491,6 +1036,7 @@ class E2ETestResultsHandler:
                     path_set["actual_results_path"],
                     path_set["tolerance"],
                     path_set.get("must_change_variables_path", ""),
+                    path_set.get("accepted_ranges_path", ""),
                 )
             )
         return test_result_paths
@@ -773,6 +1319,231 @@ class E2ETestResultsHandler:
         return must_change_satisfied, must_change_violations
 
     @staticmethod
+    def _load_accepted_ranges(test_result_path_sets: list[ResultPathType]) -> dict[str, dict[str, Any]]:
+        """
+        Loads the accepted ranges of the variables of an end-to-end testing input set.
+
+        Parameters
+        ----------
+        test_result_path_sets : list[ResultPathType]
+            List of result path sets for the input set, each optionally referencing an accepted ranges file through
+            its ``accepted_ranges_path`` field.
+
+        Returns
+        -------
+        dict[str, dict[str, Any]]
+            The accepted ranges read from the referenced files, keyed by variable name. Each range is the entry
+            recorded in the file, holding at least its numerical ``min`` and ``max`` bounds. Path sets with an empty
+            ``accepted_ranges_path`` are skipped.
+
+        Raises
+        ------
+        FileNotFoundError
+            If a referenced accepted ranges file does not exist.
+        ValueError
+            If a referenced file is not valid JSON, does not contain a dictionary of ranges under the
+            ``accepted_ranges`` key, or contains a range without numerical ``min`` and ``max`` bounds where ``min``
+            is no greater than ``max``.
+        """
+        om = OutputManager()
+        info_map: dict[str, Any] = {
+            "class": E2ETestResultsHandler.__name__,
+            "function": E2ETestResultsHandler._load_accepted_ranges.__name__,
+        }
+        error_title = "End-to-end testing accepted-range configuration error"
+        accepted_ranges: dict[str, dict[str, Any]] = {}
+        accepted_ranges_paths = {
+            path_set.accepted_ranges_path for path_set in test_result_path_sets if path_set.accepted_ranges_path
+        }
+        for path_str in sorted(accepted_ranges_paths):
+            path = Path(path_str)
+            if not path.exists():
+                om.add_error(error_title, f"Accepted ranges file not found: {path}", info_map)
+                raise FileNotFoundError(f"E2E testing error: Accepted ranges file not found: {path}")
+            try:
+                with open(path, "r", encoding="utf-8") as accepted_ranges_file:
+                    file_contents = json.load(accepted_ranges_file)
+            except json.JSONDecodeError as e:
+                om.add_error(error_title, f"Accepted ranges file {path} is not valid JSON: {e}", info_map)
+                raise ValueError(f"E2E testing error: Accepted ranges file {path} is not valid JSON.") from e
+            file_ranges = file_contents.get(ACCEPTED_RANGES_KEY) if isinstance(file_contents, dict) else None
+            if not isinstance(file_ranges, dict):
+                message = (
+                    f"Accepted ranges file {path} must contain a dictionary of variable ranges under the "
+                    f"'{ACCEPTED_RANGES_KEY}' key."
+                )
+                om.add_error(error_title, message, info_map)
+                raise ValueError(f"E2E testing error: {message}")
+            invalid_ranges = sorted(
+                name
+                for name, accepted_range in file_ranges.items()
+                if not E2ETestResultsHandler._is_valid_accepted_range(accepted_range)
+            )
+            if invalid_ranges:
+                message = (
+                    f"Accepted ranges file {path} has invalid ranges for {invalid_ranges}: each range must have "
+                    f"numerical '{ACCEPTED_RANGE_MIN_KEY}' and '{ACCEPTED_RANGE_MAX_KEY}' bounds, with "
+                    f"'{ACCEPTED_RANGE_MIN_KEY}' no greater than '{ACCEPTED_RANGE_MAX_KEY}'."
+                )
+                om.add_error(error_title, message, info_map)
+                raise ValueError(f"E2E testing error: {message}")
+            accepted_ranges.update(file_ranges)
+        return accepted_ranges
+
+    @staticmethod
+    def _collect_accepted_ranges(
+        test_result_path_sets: list[ResultPathType], errors: list[str]
+    ) -> dict[str, dict[str, Any]]:
+        """
+        Loads every accepted ranges file of an input set, recording the files that cannot be loaded.
+
+        Parameters
+        ----------
+        test_result_path_sets : list[ResultPathType]
+            List of result path sets for the input set, each optionally referencing an accepted ranges file through
+            its ``accepted_ranges_path`` field.
+        errors : list[str]
+            The list that the problem of every file that cannot be loaded is appended to, so that the caller can
+            report them all together.
+
+        Returns
+        -------
+        dict[str, dict[str, Any]]
+            The accepted ranges read from the files that could be loaded, keyed by variable name.
+
+        Notes
+        -----
+        Each distinct file is loaded on its own with ``_load_accepted_ranges``, so that one unreadable file does not
+        hide the problems of another.
+        """
+        accepted_ranges: dict[str, dict[str, Any]] = {}
+        checked_accepted_ranges_paths: set[str] = set()
+        for path_set in test_result_path_sets:
+            if path_set.accepted_ranges_path in checked_accepted_ranges_paths:
+                continue
+            checked_accepted_ranges_paths.add(path_set.accepted_ranges_path)
+            try:
+                accepted_ranges.update(E2ETestResultsHandler._load_accepted_ranges([path_set]))
+            except (FileNotFoundError, ValueError) as e:
+                E2ETestResultsHandler._record_configuration_error(errors, str(e))
+        return accepted_ranges
+
+    @staticmethod
+    def _is_valid_accepted_range(accepted_range: Any) -> bool:
+        """
+        Checks that an accepted range entry has numerical bounds in the right order.
+
+        Parameters
+        ----------
+        accepted_range : Any
+            The range entry read from an accepted ranges file.
+
+        Returns
+        -------
+        bool
+            ``True`` if the entry is a dictionary with numerical ``min`` and ``max`` bounds where ``min`` is no
+            greater than ``max``, ``False`` otherwise. Any other keys of the entry are ignored.
+        """
+        if not isinstance(accepted_range, dict):
+            return False
+        lower_bound = accepted_range.get(ACCEPTED_RANGE_MIN_KEY)
+        upper_bound = accepted_range.get(ACCEPTED_RANGE_MAX_KEY)
+        if DataValidator.is_number(lower_bound) and DataValidator.is_number(upper_bound):
+            return lower_bound <= upper_bound
+        return False
+
+    @staticmethod
+    def _evaluate_accepted_ranges(
+        actual_results: dict[str, Any], domain_accepted_ranges: dict[str, dict[str, Any]]
+    ) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
+        """
+        Checks that every numerical value of each variable with an accepted range falls within its range.
+
+        Parameters
+        ----------
+        actual_results : dict[str, Any]
+            The actual results for a domain, keyed by variable name.
+        domain_accepted_ranges : dict[str, dict[str, Any]]
+            The accepted ranges of the variables present in the domain's expected results, keyed by variable name.
+
+        Returns
+        -------
+        tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]
+            The satisfied and the violated ranges, both keyed by variable name. Each entry is the accepted range
+            extended with the observed minimum and maximum of the variable (``observed_min`` and ``observed_max``);
+            a violated entry also holds the ``reason`` it failed: values outside the range, no numerical values to
+            check, or the variable missing from the actual results.
+
+        Notes
+        -----
+        The bounds are inclusive. The numerical values of a variable are collected from anywhere inside its recorded
+        value (see ``_collect_numerical_values``), so the range applies to every number of a daily series or of a
+        list of records alike.
+        """
+        accepted_range_satisfied: dict[str, dict[str, Any]] = {}
+        accepted_range_violations: dict[str, dict[str, Any]] = {}
+        for variable_name, accepted_range in domain_accepted_ranges.items():
+            if variable_name not in actual_results:
+                accepted_range_violations[variable_name] = {
+                    **accepted_range,
+                    "reason": "Assigned an accepted range but the variable is missing from the actual results.",
+                }
+                continue
+            numerical_values = E2ETestResultsHandler._collect_numerical_values(actual_results[variable_name])
+            if not numerical_values:
+                accepted_range_violations[variable_name] = {
+                    **accepted_range,
+                    "reason": "Assigned an accepted range but the variable has no numerical values to check.",
+                }
+                continue
+            range_outcome: dict[str, Any] = {
+                **accepted_range,
+                "observed_min": min(numerical_values),
+                "observed_max": max(numerical_values),
+            }
+            lower_bound = accepted_range[ACCEPTED_RANGE_MIN_KEY]
+            upper_bound = accepted_range[ACCEPTED_RANGE_MAX_KEY]
+            out_of_range_count = sum(1 for value in numerical_values if not lower_bound <= value <= upper_bound)
+            if out_of_range_count:
+                range_outcome["reason"] = (
+                    f"{out_of_range_count} of {len(numerical_values)} values fall outside the accepted range."
+                )
+                accepted_range_violations[variable_name] = range_outcome
+            else:
+                accepted_range_satisfied[variable_name] = range_outcome
+        return accepted_range_satisfied, accepted_range_violations
+
+    @staticmethod
+    def _collect_numerical_values(value: Any) -> list[int | float]:
+        """
+        Collects the numbers nested anywhere inside a recorded variable value.
+
+        Parameters
+        ----------
+        value : Any
+            A recorded variable value, e.g. the ``{"values": [...]}`` dictionary of an end-to-end results file.
+
+        Returns
+        -------
+        list[int | float]
+            The numbers found, in traversal order. Lists and dictionary values are searched recursively; booleans,
+            strings, and ``None`` are not numbers and are skipped.
+        """
+        if DataValidator.is_number(value):
+            return [value]
+        nested_values: Iterable[Any]
+        if isinstance(value, dict):
+            nested_values = value.values()
+        elif isinstance(value, (list, tuple)):
+            nested_values = value
+        else:
+            return []
+        numerical_values: list[int | float] = []
+        for nested_value in nested_values:
+            numerical_values.extend(E2ETestResultsHandler._collect_numerical_values(nested_value))
+        return numerical_values
+
+    @staticmethod
     def _extract_changed_variable_names(diff_result: dict[str, Any]) -> list[str]:
         """
         Compiles the names of the variables that a ``DeepDiff`` result reports as different.
@@ -818,7 +1589,8 @@ class E2ETestResultsHandler:
         Returns
         -------
         bool
-            ``True`` if the change is both numerical and significant, ``False`` otherwise.
+            ``True`` if the values differ beyond the numerical tolerance or contain a non-numerical or structural
+            difference; ``False`` otherwise.
 
         Notes
         -----
@@ -831,6 +1603,9 @@ class E2ETestResultsHandler:
 
         old_value = changes["old_value"]
         new_value = changes["new_value"]
+
+        if old_value == new_value:
+            return False
 
         if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
             reference = abs(old_value) if abs(old_value) > 0 else 1
