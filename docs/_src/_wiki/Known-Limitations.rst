@@ -27,6 +27,26 @@ Model scope and assumptions
   settings when comparing scenarios. Use repeated runs where your study
   needs to characterize variation; see :doc:`Task-Manager`.
 
+Module-specific constraints
+-----------------------------
+
+* **Separator retention and emissions.** Separator processors split
+  manure into solid and liquid streams using configured efficiencies.
+  They do not calculate gas emissions during prolonged retention in
+  gravity lanes, settling basins, or weeping walls. Changing separator
+  efficiencies alone does not represent those additional processes.
+  See :ref:`faq-separators`.
+* **Manure storage overflow.** The base storage implementation compares
+  stored volume with ``capacity`` and logs an overflow warning. It does
+  not automatically remove or reroute excess manure when that limit is
+  exceeded. Review the warning and storage outputs when interpreting
+  results; see :ref:`faq-storage-capacity`.
+* **Harvest routing.** A harvested crop without a matching active feed
+  storage is treated as exported and generates a warning. A storage's
+  feed ID must also be in the available feed list for its inventory to
+  be used for feeding. Check the crop, field, and feed mappings; see
+  :ref:`faq-missing-storage`.
+
 Runtime and input constraints
 -------------------------------
 
