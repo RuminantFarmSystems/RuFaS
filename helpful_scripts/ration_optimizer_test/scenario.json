@@ -1,0 +1,52 @@
+{
+  "description": "Illustrative synthetic NASEM lactating-cow requirements, NOT a simulation capture.",
+  "seed": 42,
+  "timeout_seconds": 120,
+  "tolerances": {
+    "nonnegative_kg": 1e-08,
+    "constraint_residual": 1e-06
+  },
+  "globals": {
+    "intake_options": {
+      "lac_cow": "predict_DMI"
+    },
+    "intake_values": {
+      "lac_cow": null
+    }
+  },
+  "arguments": {
+    "nutrient_standard": "NASEM",
+    "pen_average_body_weight": 650.0,
+    "pen_average_enteric_methane": 400.0,
+    "pen_average_urine_nitrogen": 0.2,
+    "requirements": {
+      "maintenance_energy": 10.0,
+      "growth_energy": 0.0,
+      "pregnancy_energy": 0.0,
+      "lactation_energy": 29.0,
+      "metabolizable_protein": 2400.0,
+      "calcium": 70.0,
+      "phosphorus": 50.0,
+      "process_based_phosphorus": 55.0,
+      "dry_matter": 24.0,
+      "activity_energy": 1.0,
+      "essential_amino_acids": {
+        "histidine": 0.0,
+        "isoleucine": 0.0,
+        "leucine": 0.0,
+        "lysine": 0.0,
+        "methionine": 0.0,
+        "phenylalanine": 0.0,
+        "threonine": 0.0,
+        "thryptophan": 0.0,
+        "valine": 0.0
+      }
+    },
+    "initial_dry_matter_requirement": 25.0,
+    "initial_protein_requirement": 2500.0,
+    "animal_combination": "lac_cow",
+    "previous_ration": null,
+    "user_defined_ration_dictionary": null,
+    "user_defined_ration_tolerance": null
+  }
+}
