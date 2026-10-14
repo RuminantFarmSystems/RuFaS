@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
@@ -190,6 +191,7 @@ class HerdStatistics:
     cow_herd_exit_num = 0
     sold_cow_num = 0
     born_calf_num = 0
+    heiferIII_to_cow_transitions = 0
 
     calf_percent = 0.0
     heiferI_percent = 0.0
@@ -238,6 +240,19 @@ class HerdStatistics:
 
     parity_culling_stats_range: dict[str, int]
 
+    acute_sale_cows_parity_1 = 0
+    acute_sale_cows_parity_2 = 0
+    acute_sale_cows_parity_3_plus = 0
+    total_cow_removals_parity_1 = 0
+    total_cow_removals_parity_2 = 0
+    total_cow_removals_parity_3_plus = 0
+    cow_deaths_parity_1 = 0
+    cow_deaths_parity_2 = 0
+    cow_deaths_parity_3_plus = 0
+    sold_cow_low_production_parity_1 = 0
+    sold_cow_low_production_parity_2 = 0
+    sold_cow_low_production_parity_3_plus = 0
+
     avg_age_for_calving: dict[str, float]
     avg_age_for_parity: dict[str, float]
     cull_reason_stats_percent: dict[str, float]
@@ -251,6 +266,8 @@ class HerdStatistics:
 
     heifer_average_daily_gain_by_pen: dict[str, float | None]
     heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
+
+    milk_production_at_removal: list[dict[str, Any]] = field(default_factory=list)
 
     def __init__(self) -> None:
         """
@@ -309,6 +326,7 @@ class HerdStatistics:
             AnimalType.HEIFER_II: None,
             AnimalType.HEIFER_III: None,
         }
+        self.milk_production_at_removal: list[dict[str, Any]] = []
 
     def reset_daily_stats(self) -> None:
         """Resets daily-based attributes."""
@@ -326,6 +344,7 @@ class HerdStatistics:
         self.cow_herd_exit_num = 0
         self.sold_cow_num = 0
         self.born_calf_num = 0
+        self.heiferIII_to_cow_transitions = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -378,6 +397,22 @@ class HerdStatistics:
         self.avg_heifer_culling_age = 0.0
         self.avg_cow_culling_age = 0.0
         self.avg_mature_body_weight = 0.0
+
+        self.acute_sale_cows_parity_1 = 0
+        self.acute_sale_cows_parity_2 = 0
+        self.acute_sale_cows_parity_3_plus = 0
+
+        self.total_cow_removals_parity_1 = 0
+        self.total_cow_removals_parity_2 = 0
+        self.total_cow_removals_parity_3_plus = 0
+
+        self.cow_deaths_parity_1 = 0
+        self.cow_deaths_parity_2 = 0
+        self.cow_deaths_parity_3_plus = 0
+
+        self.sold_cow_low_production_parity_1 = 0
+        self.sold_cow_low_production_parity_2 = 0
+        self.sold_cow_low_production_parity_3_plus = 0
 
         self.daily_milk_production = 0.0
         self.herd_milk_fat_kg = 0.0
