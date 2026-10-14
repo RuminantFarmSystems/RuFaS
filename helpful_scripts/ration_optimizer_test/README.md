@@ -217,3 +217,19 @@ reconstrução NRC, nulos, vetores inválidos, tolerâncias, inviabilidade apesa
 sucesso, objetivo independente, regras de fósforo/proteína, limites manuais,
 configuração DMI e continuidade após exceção com mutações deliberadas no processo
 do usuário. Não exige dependências de testes adicionais.
+
+## Executar somente a estratégia do usuário
+
+```bash
+python helpful_scripts/ration_optimizer_test/user_optimizer_isolated_test.py
+```
+
+Esse comando lê os mesmos JSONs e executa apenas uma tentativa de
+`UserRationOptimizer` em um processo isolado. Valida o contrato de retorno e mostra
+status, mensagem, tempo, custo recalculado, MS total, quantidades por ingrediente,
+limites e resíduos das restrições originais. Não executa uma segunda otimização
+baseline; usa apenas os métodos de avaliação originais. Enquanto o código do
+usuário delegar ao original, essa única tentativa continuará usando tal delegação.
+
+Os códigos de saída são 0 para retorno válido com sucesso e viabilidade, 1 para
+falha/retorno inválido/inviabilidade e 2 para erro de cenário ou relatório.
