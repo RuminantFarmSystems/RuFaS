@@ -149,6 +149,8 @@ class HerdReproductionStatistics:
     cow_num_successful_conceptions_in_TAI: int = 0
     cow_num_successful_conceptions_in_ED_TAI: int = 0
 
+    num_do_not_breed_cows: int = 0
+
     @property
     def overall_conception_rate(self) -> float:
         """Returns the overall conception rate across all animals in the herd."""
