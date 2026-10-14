@@ -988,8 +988,7 @@ class HerdManager:
         )
         # Primaparous calvings
         self.herd_statistics.heiferIII_to_cow_transitions = sum(
-            animal.animal_type == AnimalType.LAC_COW
-            for animal in daily_herd_updates.graduated_animals
+            animal.animal_type == AnimalType.LAC_COW for animal in daily_herd_updates.graduated_animals
         )
 
         self._update_sold_animal_statistics(
@@ -2349,8 +2348,7 @@ class HerdManager:
 
         # Number oversupply (low production) cows by parity
         low_production_cows = [
-            cow for cow in sold_and_died_cows
-            if cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL
+            cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL
         ]
 
         self.herd_statistics.sold_cow_low_production_num += len(low_production_cows)
@@ -2364,7 +2362,6 @@ class HerdManager:
         self.herd_statistics.sold_cow_low_production_parity_3_plus += sum(
             cow.reproduction.calves >= 3 for cow in low_production_cows
         )
-
 
         sold_cows: list[Animal] = [cow for cow in sold_and_died_cows if cow.cull_reason != animal_constants.DEATH_CULL]
         self.herd_statistics.sold_cows_info += [
@@ -2383,17 +2380,10 @@ class HerdManager:
         self.herd_statistics.sold_cow_num += len(sold_cows)
 
         # Acute sale by parity
-        acute_sale_cows = [
-            cow for cow in sold_and_died_cows
-            if cow.cull_reason == animal_constants.ACUTE_SALE_CULL
-        ]
+        acute_sale_cows = [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.ACUTE_SALE_CULL]
 
-        self.herd_statistics.acute_sale_cows_parity_1 += sum(
-            cow.reproduction.calves == 1 for cow in acute_sale_cows
-        )
-        self.herd_statistics.acute_sale_cows_parity_2 += sum(
-            cow.reproduction.calves == 2 for cow in acute_sale_cows
-        )
+        self.herd_statistics.acute_sale_cows_parity_1 += sum(cow.reproduction.calves == 1 for cow in acute_sale_cows)
+        self.herd_statistics.acute_sale_cows_parity_2 += sum(cow.reproduction.calves == 2 for cow in acute_sale_cows)
         self.herd_statistics.acute_sale_cows_parity_3_plus += sum(
             cow.reproduction.calves >= 3 for cow in acute_sale_cows
         )
@@ -2410,20 +2400,11 @@ class HerdManager:
         )
 
         # Deaths by parity group
-        dead_cows = [
-            cow for cow in sold_and_died_cows
-            if cow.cull_reason == animal_constants.DEATH_CULL
-        ]
+        dead_cows = [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DEATH_CULL]
 
-        self.herd_statistics.cow_deaths_parity_1 += sum(
-            cow.reproduction.calves == 1 for cow in dead_cows
-        )
-        self.herd_statistics.cow_deaths_parity_2 += sum(
-            cow.reproduction.calves == 2 for cow in dead_cows
-        )
-        self.herd_statistics.cow_deaths_parity_3_plus += sum(
-            cow.reproduction.calves >= 3 for cow in dead_cows
-        )
+        self.herd_statistics.cow_deaths_parity_1 += sum(cow.reproduction.calves == 1 for cow in dead_cows)
+        self.herd_statistics.cow_deaths_parity_2 += sum(cow.reproduction.calves == 2 for cow in dead_cows)
+        self.herd_statistics.cow_deaths_parity_3_plus += sum(cow.reproduction.calves >= 3 for cow in dead_cows)
 
         # Milk production at removal
         for cow in sold_and_died_cows:
@@ -2432,7 +2413,7 @@ class HerdManager:
                     "cow_id": cow.id,
                     "removal_day": cow.sold_at_day if cow.sold_at_day is not None else cow.dead_at_day,
                     "cull_reason": cow.cull_reason,
-                    "estimated_daily_milk_produced": cow.milk_production.daily_milk_produced
+                    "estimated_daily_milk_produced": cow.milk_production.daily_milk_produced,
                 }
             )
 

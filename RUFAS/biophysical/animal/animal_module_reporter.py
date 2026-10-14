@@ -169,7 +169,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_milk.__name__,
             "data_origin": [("MilkProduction", "perform_daily_milking_update")],
-            "units": MeasurementUnits.ANIMALS
+            "units": MeasurementUnits.ANIMALS,
         }
         # Fresh cow number
         om.add_variable("fresh_cow_num", fresh_cows, cow_stat_info_map)
