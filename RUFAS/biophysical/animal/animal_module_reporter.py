@@ -165,10 +165,17 @@ class AnimalModuleReporter:
 
             om.add_variable("milk_data_at_milk_update", updated_milk_data, info_map)
 
+        cow_stat_info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_milk.__name__,
+            "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+            "units": MeasurementUnits.ANIMALS
+        }
         # Fresh cow number
-        om.add_variable("fresh_cow_num", fresh_cows, info_map)
+        om.add_variable("fresh_cow_num", fresh_cows, cow_stat_info_map)
+
         # Other cow number (> 50 DIM)
-        om.add_variable("cows_at_or_above_50_dim", cows_at_or_above_50_dim, info_map)
+        om.add_variable("cows_at_or_above_50_dim", cows_at_or_above_50_dim, cow_stat_info_map)
 
         for parity_group, data in parity_data.items():
             average_milk = sum(data["milk"]) / len(data["milk"]) if data["milk"] else 0.0
@@ -180,13 +187,13 @@ class AnimalModuleReporter:
             om.add_variable(
                 f"average_estimated_daily_milk_produced_{parity_group}",
                 average_milk,
-                info_map,
+                cow_stat_info_map,
             )
             # Avg DIM by parity (1, 2, 3+)
             om.add_variable(
                 f"average_days_in_milk_{parity_group}",
                 average_days_in_milk,
-                info_map,
+                cow_stat_info_map,
             )
 
     @classmethod
@@ -972,7 +979,7 @@ class AnimalModuleReporter:
             om.add_variable(
                 "milk_production_at_removal",
                 record,
-                info_map,
+                dict(info_map, **{"units": MeasurementUnits.LITERS}),
             )
 
         # Num oversupply/low-production by parity
