@@ -209,7 +209,7 @@ def test_report_milk(mocker: MockerFixture) -> None:
             info_map,
         ),
     ]
-    
+
     cow_stat_info_map = {
         "class": AnimalModuleReporter.__name__,
         "function": AnimalModuleReporter.report_milk.__name__,

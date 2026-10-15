@@ -937,16 +937,12 @@ class AnimalModuleReporter:
         om.add_variable(
             "num_heiferIII_to_cow_transitions",
             herd_statistics.heiferIII_to_cow_transitions,
-            {
-                **info_map,
-                "units": MeasurementUnits.ANIMALS,
-                "data_origin": [("HerdManager", "execute_daily_routine")]
-            },
+            {**info_map, "units": MeasurementUnits.ANIMALS, "data_origin": [("HerdManager", "execute_daily_routine")]},
         )
         sold_and_died_info_map = {
             **info_map,
             "units": MeasurementUnits.ANIMALS,
-            "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")]
+            "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
         }
         # Acute sale by parity
         for parity, count in (
@@ -954,11 +950,7 @@ class AnimalModuleReporter:
             ("2", herd_statistics.acute_sale_cows_parity_2),
             ("3_plus", herd_statistics.acute_sale_cows_parity_3_plus),
         ):
-            om.add_variable(
-                f"acute_sale_cows_parity_{parity}",
-                count,
-                sold_and_died_info_map
-            )
+            om.add_variable(f"acute_sale_cows_parity_{parity}", count, sold_and_died_info_map)
         # Total cow removals by parity
         om.add_variable(
             "total_cow_removals_parity_1",
@@ -995,11 +987,7 @@ class AnimalModuleReporter:
 
         # Milk production at removal
         for record in herd_statistics.milk_production_at_removal:
-            om.add_variable(
-                "milk_production_at_removal",
-                record,
-                sold_and_died_info_map
-            )
+            om.add_variable("milk_production_at_removal", record, sold_and_died_info_map)
 
         # Num oversupply/low-production by parity
         om.add_variable(
