@@ -933,11 +933,11 @@ class AnimalModuleReporter:
             herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III],
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
-        # Primaparous calvings
+        # Primiparous calvings
         om.add_variable(
             "num_heiferIII_to_cow_transitions",
             herd_statistics.heiferIII_to_cow_transitions,
-            {**info_map, "units": MeasurementUnits.ANIMALS, "data_origin": [("HerdManager", "execute_daily_routine")]},
+            {**info_map, "units": MeasurementUnits.ANIMALS, "data_origin": [("HerdManager", "execute_daily_routines")]},
         )
         sold_and_died_info_map = {
             **info_map,
@@ -986,8 +986,25 @@ class AnimalModuleReporter:
         )
 
         # Milk production at removal
-        for record in herd_statistics.milk_production_at_removal:
-            om.add_variable("milk_production_at_removal", record, sold_and_died_info_map)
+        om.add_variable(
+            "milk_production_at_removal_sum",
+            herd_statistics.milk_production_at_removal_sum,
+            {
+                **info_map,
+                "units": MeasurementUnits.KILOGRAMS_PER_DAY,
+                "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+            },
+        )
+
+        om.add_variable(
+            "milk_production_at_removal_count",
+            herd_statistics.milk_production_at_removal_count,
+            {
+                **info_map,
+                "units": MeasurementUnits.ANIMALS,
+                "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+            },
+        )
 
         # Num oversupply/low-production by parity
         om.add_variable(

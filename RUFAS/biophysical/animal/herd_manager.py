@@ -752,6 +752,10 @@ class HerdManager:
                 group_newborn_calves,
                 group_sold_newborn_calves,
             ) = self._perform_daily_routines_for_animals(time, animals)
+            if animal_group_name == "heiferIIIs":
+                self.herd_statistics.heiferIII_to_cow_transitions += sum(
+                    animal.animal_type == AnimalType.LAC_COW for animal in group_graduated_animals
+                )
             collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
             if collect_birth_results:
                 daily_herd_updates.stillborn_newborn_calves += group_stillborn_newborn_calves
@@ -985,10 +989,6 @@ class HerdManager:
             daily_herd_updates.stillborn_newborn_calves
             + daily_herd_updates.sold_newborn_calves
             + daily_herd_updates.newborn_calves
-        )
-        # Primaparous calvings
-        self.herd_statistics.heiferIII_to_cow_transitions = sum(
-            animal.animal_type == AnimalType.LAC_COW for animal in daily_herd_updates.graduated_animals
         )
 
         self._update_sold_animal_statistics(
@@ -2408,14 +2408,8 @@ class HerdManager:
 
         # Milk production at removal
         for cow in sold_and_died_cows:
-            self.herd_statistics.milk_production_at_removal.append(
-                {
-                    "cow_id": cow.id,
-                    "removal_day": cow.sold_at_day if cow.sold_at_day is not None else cow.dead_at_day,
-                    "cull_reason": cow.cull_reason,
-                    "estimated_daily_milk_produced": cow.milk_production.daily_milk_produced,
-                }
-            )
+            self.herd_statistics.milk_production_at_removal_sum += cow.milk_production.daily_milk_produced
+            self.herd_statistics.milk_production_at_removal_count += 1
 
         for parity in self.herd_statistics.parity_culling_stats_range.keys():
             if parity == "greater_than_5":

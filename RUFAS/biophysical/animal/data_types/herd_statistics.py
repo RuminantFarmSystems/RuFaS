@@ -292,11 +292,11 @@ class HerdStatistics:
     herd_milk_fat_percent = 0.0
     herd_milk_protein_kg = 0.0
     herd_milk_protein_percent = 0.0
+    milk_production_at_removal_sum = 0.0
+    milk_production_at_removal_count = 0
 
     heifer_average_daily_gain_by_pen: dict[str, float | None]
     heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
-
-    milk_production_at_removal: list[dict[str, Any]] = field(default_factory=list)
 
     def __init__(self) -> None:
         """
@@ -448,6 +448,8 @@ class HerdStatistics:
         self.herd_milk_fat_percent = 0.0
         self.herd_milk_protein_kg = 0.0
         self.herd_milk_protein_percent = 0.0
+        self.milk_production_at_removal_sum = 0.0
+        self.milk_production_at_removal_count = 0
 
         for pen_id in self.heifer_average_daily_gain_by_pen:
             self.heifer_average_daily_gain_by_pen[pen_id] = None
@@ -456,8 +458,6 @@ class HerdStatistics:
             AnimalType.HEIFER_II: None,
             AnimalType.HEIFER_III: None,
         }
-
-        self.milk_production_at_removal = []
 
     def reset_parity(self) -> None:
         """Resets parity-based attributes."""
