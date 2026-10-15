@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
@@ -61,6 +62,8 @@ class HerdStatistics:
         Number of cows sold during the specific period, (unitless).
     born_calf_num : int
         The total amount of calf born, including stillborn, newborn and sold.
+    heiferIII_to_cow_transitions : int
+        The total number of heiferIIIs transitioning to cows on a particular day.
     calf_percent : float
         Proportion of calves in the herd expressed as a percentage, (unitless).
     heiferI_percent : float
@@ -160,6 +163,33 @@ class HerdStatistics:
         The average daily bodyweight gain for heifers in pens by pen id, (kg).
     heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
         The average daily bodyweight gain for heifers by animal type, (kg).
+    acute_sale_cows_parity_1 : int
+        Number of cows sold from parity 1 group.
+    acute_sale_cows_parity_2 : int
+        Number of cows sold from parity 2 group.
+    acute_sale_cows_parity_3_plus : int
+        Number of cows sold from parity 3+ group.
+    total_cow_removals_parity_1 : int
+        Total number of cows removed from parity 1 group.
+    total_cow_removals_parity_2 : int
+        Total number of cows removed from parity 2 group.
+    total_cow_removals_parity_3_plus : int
+        Total number of cows removed from parity 3+ group.
+    cow_deaths_parity_1 : int
+        Number of cow deaths in parity 1 group.
+    cow_deaths_parity_2 : int
+        Number of cow deaths in parity 2 group.
+    cow_deaths_parity_3_plus : int
+        Number of cow deaths in parity 3+ group.
+    sold_cow_low_production_parity_1 : int
+        Number of parity 1 cows sold due to low milk production.
+    sold_cow_low_production_parity_2 : int
+        Number of parity 2 cows sold due to low milk production.
+    sold_cow_low_production_parity_3_plus : int
+        Number of parity 3+ cows sold due to low milk production.
+    milk_production_at_removal : list[dict[str, Any]]
+        Records of cows removed from the herd, including cow ID, removal day, culling reason, and estimated daily milk
+        production at the time of removal.
     """
 
     avg_calving_to_preg_time: dict[str, float]
@@ -190,6 +220,7 @@ class HerdStatistics:
     cow_herd_exit_num = 0
     sold_cow_num = 0
     born_calf_num = 0
+    heiferIII_to_cow_transitions = 0
 
     calf_percent = 0.0
     heiferI_percent = 0.0
@@ -238,6 +269,19 @@ class HerdStatistics:
 
     parity_culling_stats_range: dict[str, int]
 
+    acute_sale_cows_parity_1 = 0
+    acute_sale_cows_parity_2 = 0
+    acute_sale_cows_parity_3_plus = 0
+    total_cow_removals_parity_1 = 0
+    total_cow_removals_parity_2 = 0
+    total_cow_removals_parity_3_plus = 0
+    cow_deaths_parity_1 = 0
+    cow_deaths_parity_2 = 0
+    cow_deaths_parity_3_plus = 0
+    sold_cow_low_production_parity_1 = 0
+    sold_cow_low_production_parity_2 = 0
+    sold_cow_low_production_parity_3_plus = 0
+
     avg_age_for_calving: dict[str, float]
     avg_age_for_parity: dict[str, float]
     cull_reason_stats_percent: dict[str, float]
@@ -248,6 +292,8 @@ class HerdStatistics:
     herd_milk_fat_percent = 0.0
     herd_milk_protein_kg = 0.0
     herd_milk_protein_percent = 0.0
+    milk_production_at_removal_sum = 0.0
+    milk_production_at_removal_count = 0
 
     heifer_average_daily_gain_by_pen: dict[str, float | None]
     heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
@@ -309,6 +355,7 @@ class HerdStatistics:
             AnimalType.HEIFER_II: None,
             AnimalType.HEIFER_III: None,
         }
+        self.milk_production_at_removal: list[dict[str, Any]] = []
 
     def reset_daily_stats(self) -> None:
         """Resets daily-based attributes."""
@@ -326,6 +373,7 @@ class HerdStatistics:
         self.cow_herd_exit_num = 0
         self.sold_cow_num = 0
         self.born_calf_num = 0
+        self.heiferIII_to_cow_transitions = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -379,11 +427,29 @@ class HerdStatistics:
         self.avg_cow_culling_age = 0.0
         self.avg_mature_body_weight = 0.0
 
+        self.acute_sale_cows_parity_1 = 0
+        self.acute_sale_cows_parity_2 = 0
+        self.acute_sale_cows_parity_3_plus = 0
+
+        self.total_cow_removals_parity_1 = 0
+        self.total_cow_removals_parity_2 = 0
+        self.total_cow_removals_parity_3_plus = 0
+
+        self.cow_deaths_parity_1 = 0
+        self.cow_deaths_parity_2 = 0
+        self.cow_deaths_parity_3_plus = 0
+
+        self.sold_cow_low_production_parity_1 = 0
+        self.sold_cow_low_production_parity_2 = 0
+        self.sold_cow_low_production_parity_3_plus = 0
+
         self.daily_milk_production = 0.0
         self.herd_milk_fat_kg = 0.0
         self.herd_milk_fat_percent = 0.0
         self.herd_milk_protein_kg = 0.0
         self.herd_milk_protein_percent = 0.0
+        self.milk_production_at_removal_sum = 0.0
+        self.milk_production_at_removal_count = 0
 
         for pen_id in self.heifer_average_daily_gain_by_pen:
             self.heifer_average_daily_gain_by_pen[pen_id] = None
