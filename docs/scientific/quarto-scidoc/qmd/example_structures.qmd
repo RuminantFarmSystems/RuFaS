@@ -1,6 +1,8 @@
 <!-- reuse code to import functions from "../scripts/": -->
 {{< include ../scripts/_import-from-scripts.qmd >}}
-# Example Inserts
+
+# Example quarto structures {.unnumbered}
+
 ## Sectioning and Structure
 
 There is some variation between modules and documentation bassed on structure and needs of the model. However there are some materials, or ingredients if you will, that will remain consistent between modules. These include: Module Header, module introduction, sections representing components of module, section introductions, methodologies, relevant inputs, and relevant outputs.
@@ -127,6 +129,8 @@ import_table(
   colalign = ["left", "left", "right", "right", "right"]
 )
 ```
+
+to reference this table within the text (like this: @tbl-an-example-struct), use `@tbl-an-example-struct`
 
 ```markdown
 Each time you create a new table, you need to update 3 things within this code block: 

@@ -1,0 +1,7 @@
+Variable,Description,Units
+annual_irrigation_water_use_total.field=[FIELD_NAME],Cumulative total of water used for irrigation in a year,mm
+current_residue.field=[FIELD_NAME],Total amount of residue on the current day,kg/ha
+transpiration.field=[FIELD_NAME],Total amount of water lost to transpiration in the field on the current day,mm
+max_transpiration.field=[FIELD_NAME],Maximum possible amount of water that could be lost to transpiration in the field for the current day,mm
+max_evapotranspiration.field=[FIELD_NAME],Maximum possible amount of water that could be lost to evapotranspiration in the field for the current day,mm
+days_into_watering_interval.field=[FIELD_NAME],Number of days since the start of the current watering interval,days

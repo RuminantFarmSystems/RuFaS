@@ -1,4 +1,5 @@
-# Preface: A Day in the Life on a RuFaS Farm
+
+# Preface: A Day in the Life on a RuFaS Farm {.unnumbered}
 
 ![](resources/images/rufas_icon.png){width=90}
 
@@ -127,3 +128,4 @@ another long day. She goes back to the farmhouse and rests up, preparing
 to do the whole thing over again tomorrow. Her daily routine might seem
 repetitive, but each day is a crucial part of the larger, continuous
 process that keeps her farm running efficiently and sustainably.
+

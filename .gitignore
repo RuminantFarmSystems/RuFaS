@@ -52,10 +52,6 @@ dist/
 *.egg-info/
 build/
 
-# ignore Quarto build output
-docs/scientific/quarto-scidoc/_book/
-docs/scientific/quarto-scidoc/.quarto/
-
 # ignore .DS_store
 .DS_store
 
@@ -70,8 +66,8 @@ DataCollectionApp/schema/*
 
 docs/_build/
 
-# Ignore some R files
+# Ignore files from R programming language and Rstudio
 .Rproj*
 *.Rproj*
-.positai
 .Rproj.user
+.Rhistory

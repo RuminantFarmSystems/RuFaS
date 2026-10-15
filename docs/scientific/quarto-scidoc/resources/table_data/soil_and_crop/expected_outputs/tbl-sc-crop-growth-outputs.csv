@@ -1,0 +1,40 @@
+Variable,Description,Units
+max_transpiration.[X],the maximum transpiration rate for the crop,
+root_depth.[X],the root depth of the crop,mm
+biomass.[X],biomass of the crop,kg/ha
+usable_light.[X],,
+biomass_growth_max.[X],theoretical maximum single-day growth for this crop,kg/ha
+biomass_growth.[X],actual biomass accumulated since previous day,kg/ha
+growth_factor.[X],growth factor value,
+above_ground_biomass.[X],above ground (shoot) biomass of the crop,kg/ha
+root_biomass.[X],below ground (root) biomass of the crop,kg/ha
+water_uptake.[X],amount of water taken up by the crop,mm
+crop_nitrogen.[X],nitrogen in the crop,kg/ha
+optimal_crop_nitrogen.[X],expected nitrogen under ideal growth conditions,kg/ha
+accumulated_heat_units.[X],heat units accumulated from the start of the year to the current day,
+heat_fraction.[X],fraction of optimal growth heat units,
+is_growing.[X],boolean that indicates if the crop is growing on this day,
+is_dormant.[X],boolean that indicates if the crop is dormant on this day,
+leaf_area_index.[X],current LAI value,
+canopy_height.[X],current height of the crop,m
+leaf_area_added.[X],LAI change during the day,
+optimal_leaf_area_change.[X],Expected LAI change under ideal conditions,
+potential_nitrogen_uptake.[X],Potential uptake of N under ideal conditions,kg/ha
+total_nitrogen_uptake.[X],total nitrogen taken up by the plant,kg/ha
+actual_nitrogen_uptakes.[X],total nitrogen taken up by the plant from the soil layer,kg/ha
+optimal_nitrogen_fraction.[X],fraction of nitrogen in the plant under ideal conditions,
+potential_phosphorus_uptake.[X],Potential uptake of P under ideal conditions,kg/ha
+total_phosphorus_uptake.[X],total phosphorus taken up by the plant,kg/ha
+actual_phosphorus_uptakes.[X],total phosphorus taken up by the plant from the soil layer,kg/ha
+cumulative_evaporation.[X],total water lost to evaporation to date,mm
+cumulative_transpiration.[X],total water lost to transpiration to date,mm
+cumulative_evapotranspiration.[X],total water lost to evapotranspiration to date,mm
+water_deficiency.[X],water deficiency factor,
+canopy_water.[X],amount of water currently held in the canopy,mm
+cut_biomass.[X],biomass of the harvested crop product,kg/ha
+wet_yield_collected.[X],mass of the collected portion of the harvest crop product before drying,kg/ha
+dry_matter_yield_residue.[X],residue biomass of the yield after drying,kg/ha
+yield_nitrogen.[X],nitrogen contained in the harvested yield,kg/ha
+yield_phosphorus.[X],phosphorus contained in the harvested yield,kg/ha
+residue_nitrogen.[X],nitrogen contained in the residue,kg/ha
+residue_phosphorus.[X],phosphorus contained in the harvested yield,kg/ha

@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "c2048453",
+   "id": "05638c71",
    "metadata": {},
    "source": [
     "![Animal module icon](../resources/images/ani_icon.png){width=25%}\n",
@@ -13,7 +13,7 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "3de02282",
+   "id": "f233c43d",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -24,7 +24,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ab6f2947",
+   "id": "1ae654e8",
    "metadata": {},
    "source": [
     "## Introduction\n",
@@ -121,7 +121,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "dd59ec4e",
+   "id": "7ba6065f",
    "metadata": {},
    "source": [
     "#### Required User Inputs"
@@ -179,7 +179,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c3798709",
+   "id": "bfc5f914",
    "metadata": {},
    "source": [
     "#### Relevant Outputs\n",
@@ -290,7 +290,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c25c8645",
+   "id": "826cd458",
    "metadata": {},
    "source": [
     "#### Relevant Outputs\n",
@@ -350,7 +350,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9989006a",
+   "id": "98fdcf8b",
    "metadata": {},
    "source": [
     "Currently there are only two options for assigning `AnimalCombinations` to pens. \n",
@@ -394,18 +394,18 @@
     "changing the compositions of the existing feeds or by adding new feeds. \n",
     "\n",
     "Regardless of whether or not a user chooses to provide their own ration or have RuFaS build and feed a ration optimized for least-cost, \n",
-    "RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients and ingredients that \n",
-    "are in both the NASEM and NRC libraries can be used. Users interested in feeding a ration that they define, need to provide a list of ingredients \n",
+    "RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients that \n",
+    "has been adapted from the NASEM and NRC feed libraries for use with these nutrient requirement models. Users interested in feeding a ration that they define, need to provide a list of ingredients \n",
     "and their relative % dry matter intake for each animal class (pre-weaned calves, growing heifers, close-up animals, and lactating cows). \n",
     "\n",
-    "If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, it is imperative that proper costs are inputted for each \n",
-    "ingredient listed, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in \n",
+    "If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, providing the proper costs for each \n",
+    "ingredient listed is essential, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in \n",
     "kg/DM. RuFaS will then use all the ingredients available (based on costs and inventory available if the feed is homegrown) to create a ration that \n",
     "meets the nutritional requirements of the animal class and is cost-optimized. \n",
     "\n",
     "\n",
     "::: {.callout-note}\n",
-    "For the time being, only one set of feeds and ration formula can be provided for each animal class. \n",
+    "At this time, only one set of feeds and ration recipe can be provided for each animal class. \n",
     ":::\n",
     "\n",
     "Below are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by @nrc_2001 and more \n",
@@ -429,9 +429,12 @@
     "For details about the variables included in each calculation, please refer to @tbl-an-energy-nrc for a full list.\n",
     "\n",
     "**Maintenance** <br>\n",
-    "The maintenance requirement is calculated based on metabolic body weight ($\\text{body weight}^{0.75}$).\n",
+    "The maintenance requirement is calculated based on metabolic body weight ($\\text{BW}^{0.75}$).\n",
     "\n",
-    "* Lactating and Dry Cows\n",
+    "* **Lactating and Dry Cows**\n",
+    "\n",
+    "First the conceptus weight ($\\text{CW}$) is estimated as a function of the expected calf\n",
+    "birth weight ($\\text{CBW}$) which is estimated as fraction of the cow's mature bodyweight ($\\text{MW}$): \n",
     "\n",
     ":::{#eq-an-nrc-1}\n",
     "[[**AN.NRC.1**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -441,14 +444,20 @@
     ":::\n",
     "\n",
     "\n",
+    "\n",
+    "\n",
     ":::{#eq-an-nrc-2}\n",
     "[[**AN.NRC.2**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
-    "\\text{CW} = (18 + (\\text{DOP} - 190) \\times 0.665) \\times \\left(\\frac{\\text{CBW}}{45}\\right), \\text{if DOP} > 190.0 \n",
+    "\\text{CW} = (18 + (\\text{DOP} - 190) \\times 0.665) \\times \\left(\\frac{\\text{CBW}}{45}\\right),  \\text{ if DOP} \\geq 190.0 \n",
+    "$$\n",
+    "$$\n",
+    "\\text{CW} = 0, \\text{ if DOP} < 190.0 \n",
     "$$\n",
     ":::\n",
     "\n",
-    "*Otherwise*\n",
+    "\n",
+    "Then maintenance energy requirements are estimated as a function of the metabolic bodyweight without the conceptus weight. \n",
     "\n",
     ":::{#eq-an-nrc-3}\n",
     "[[**AN.NRC.3**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -457,24 +466,11 @@
     "$$\n",
     ":::\n",
     "\n",
-    "* Heifers: The maintenance requirement is calculated based on metabolic body weight $(\\text{body weight}^{0.75})$, body condition score, and the previous month's temperatures.\n",
+    "* **Heifers** \n",
     "\n",
-    ":::{}\n",
-    "[See [AN.NRC.1](#eq-an-nrc-1)]{.aside .content-visible when-format=\"html\"}\n",
-    "$$\n",
-    "\\text{CBW} = \\text{MW} \\times 0.06275\n",
-    "$$\n",
-    ":::\n",
+    "The maintenance requirement is calculated based on metabolic body weight $(\\text{BW}^{0.75})$, body condition score, and the previous month's temperatures.\n",
     "\n",
-    "\n",
-    ":::{}\n",
-    "[See [AN.NRC.2](#eq-an-nrc-2)]{.aside .content-visible when-format=\"html\"}\n",
-    "$$\n",
-    "\\text{CW} = (18 + (\\text{DOP} - 190) \\times 0.665) \\times \\left(\\frac{\\text{CBW}}{45}\\right), \\text{if DOP} > 190.0 \n",
-    "$$\n",
-    ":::\n",
-    "\n",
-    "*Otherwise*\n",
+    "First the body condition score must be translated to a 9 point scale $(\\text{BSC9})$. The conceptus weight $(\\text{CW})$ is calculated the same as for lactating and dry cows.\n",
     "\n",
     ":::{#eq-an-nrc-6}\n",
     "[[**AN.NRC.6**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -491,18 +487,22 @@
     ":::\n",
     "\n",
     "**Activity** <br>\n",
-    "Activity requirement is proportional to body weight and daily walking distance. A grazing system and hilly topography will cost additional energy. \n",
+    "Activity requirement is proportional to body weight and daily walking distance in kilometers. A grazing system and hilly topography will cost additional energy. \n",
     "\n",
-    "* Lactating and Dry Cows\n",
+    "* **Lactating and Dry Cows**\n",
     "\n",
     ":::{#eq-an-nrc-8}\n",
     "[[**AN.NRC.8**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
-    "\\text{NEa1} = 0.0012\\times \\text{BW}, \\qquad \\text{if Housing = Grazing = 0}\n",
+    "\\text{NEa1} = 0.0012\\times \\text{BW}, \\qquad \\text{if Housing = Grazing}\n",
     "$$\n",
+    "$$\n",
+    "\\text{NEa1} = 0.0,  \\qquad \\text{if Housing } \\neq \\text{Grazing}\n",
+    "$$\n",
+    "\n",
     ":::\n",
     "\n",
-    "*Otherwise*\n",
+    "\n",
     "\n",
     ":::{#eq-an-nrc-9}\n",
     "[[**AN.NRC.9**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -511,12 +511,11 @@
     "$$\n",
     ":::\n",
     "\n",
-    "*Otherwise*\n",
     "\n",
     ":::{#eq-an-nrc-10}\n",
     "[[**AN.NRC.10**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
-    "\\text{NEa2} = (0.00045 \\times \\text{Distance} \\times \\text{BW}) + \\text{NEa1} + \\text{NEa2}\n",
+    "\\text{NEa2} = (0.00045 \\times \\text{Distance} \\times \\text{BW}) + \\text{NEa1}\n",
     "$$\n",
     ":::\n",
     "\n",
@@ -530,26 +529,22 @@
     "$$\n",
     ":::\n",
     "\n",
-    "*Otherwise*\n",
     "\n",
-    ":::{#eq-an-nrc-12}\n",
-    "[[**AN.NRC.12**]]{.aside .content-visible when-format=\"html\"}\n",
-    "$$\n",
-    "\\text{NEa2} = 0.006 \\times \\text{BW},\n",
-    "\\qquad \\text{if Topography = Hilly}\n",
-    "$$\n",
-    ":::\n",
     "\n",
-    "*Otherwise*\n",
+    "\n",
     "\n",
     "$$\n",
-    "\\text{NEa2} = (0.00045 \\times \\text{Distance} \\times \\text{BW}) + \\text{NEa1} + \\text{NEa2}\n",
+    "\\text{NEa2} = (0.00045 \\times \\text{Distance} \\times \\text{BW}) + \\text{NEa1}\n",
     "$$\n",
     "[See [AN.NRC.10](#eq-an-nrc-10)]{.aside .content-visible when-format=\"html\"}\n",
     "\n",
     "**Growth** <br>\n",
     "\n",
-    "* Lactating and Dry Cows - will continue to grow toward their mature body weight until the end of their second lactation.\n",
+    "* **Lactating and Dry Cows**\n",
+    "Cows will continue to grow toward their mature body weight until the end of their second lactation. Their growth rate is estimated as a linear increase to reach the expected proportion of their mature bodyweight $\\text{MW}$ at the beginning of their next parity. \n",
+    "\n",
+    "\n",
+    "First the shrunk bodweight $(\\text{SBW})$, the mature shrunk bodyweight $(\\text{MSBW})$ and the equivalent shrunk bodyweight are calculated $(\\text{EQSBW})$ to remove the effect of gut fill on bodyweight, the conceptus, and relate the animal's weight to the reference animal of 478 kg. \n",
     "\n",
     ":::{#eq-an-nrc-13}\n",
     "[[**AN.NRC.13**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -565,19 +560,14 @@
     "$$\n",
     ":::\n",
     "\n",
-    ":::{#eq-an-nrc-15}\n",
-    "[[**AN.NRC.15**]]{.aside .content-visible when-format=\"html\"}\n",
-    "$$\n",
-    "\\text{EBW} = 0.96 \\times \\text{SBW}\n",
-    "$$\n",
-    ":::\n",
-    "\n",
     ":::{#eq-an-nrc-16}\n",
     "[[**AN.NRC.16**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
     "\\text{EQSBW} = (\\text{SBW} - \\text{CW}) \\times \\frac{478}{\\text{MSBW}} \\times \\text{SBW}\n",
     "$$\n",
     ":::\n",
+    "\n",
+    "Next the average daily gain $(\\text{ADG})$, is calculated as the difference between the target fraction of $(\\text{MSBW})$ at the start of the current parity and the start of the next parity divided by the calving interval ($(\\text{CI})$). Specifically, cows are expected to be 82%, 92% and 100% of their $(\\text{MSBW})$ at the start of their 1st, 2nd, and 3rd parities. \n",
     "\n",
     ":::{#eq-an-nrc-17}\n",
     "[[**AN.NRC.17**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -590,6 +580,8 @@
     "\\end{cases}\n",
     "$$\n",
     ":::\n",
+    "\n",
+    "Finally, the expected $(\\text{ADG})$ and $(\\text{EQSBW})$ are adjusted for the weight associated with internal organs to get the equivalent empty bodyweight gain $(\\text{EQEBG})$ and the equivalent empty body weight $(\\text{EQEBW})$ which is then used to estimate the net energy for gain.\n",
     "\n",
     ":::{#eq-an-nrc-18}\n",
     "[[**AN.NRC.18**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -612,7 +604,9 @@
     "$$\n",
     ":::\n",
     "\n",
-    "* Heifers\n",
+    "* **Heifers**\n",
+    "\n",
+    "Heifer growth is estimated according to a similar principal as lactating cow growth. Growth targets for heifers are set based on their expected weights at the start of breeding (55% of $\\text{MSBW}$) and age at first calving (82% of $(\\text{BSC9})$ which is equivalent to the start of parity 1). \n",
     "\n",
     ":::{#eq-an-nrc-21}\n",
     "[[**AN.NRC.21**]]{.aside .content-visible when-format=\"html\"}\n",
@@ -838,7 +832,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "177b6afd",
+   "id": "7da0e67a",
    "metadata": {},
    "source": [
     "##### Mineral Requirements\n",
@@ -1039,7 +1033,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3ef9dbdd",
+   "id": "2b7d690b",
    "metadata": {},
    "source": [
     "##### DMI Estimation\n",
@@ -1138,7 +1132,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3e1c8216",
+   "id": "dd45a3ad",
    "metadata": {},
    "source": [
     "#### Nutrient Requirements of Dairy Cattle: NASEM\n",
@@ -1602,7 +1596,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d570279b",
+   "id": "1b88fc45",
    "metadata": {},
    "source": [
     "::: {.callout-note}\n",
@@ -1796,7 +1790,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "74d8e728",
+   "id": "bf61fb8a",
    "metadata": {},
    "source": [
     "##### DMI Estimation\n",
@@ -1880,7 +1874,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "94db378b",
+   "id": "a398c93f",
    "metadata": {},
    "source": [
     "##### Amino Acid Requirements\n",
@@ -1944,7 +1938,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "207d9c91",
+   "id": "7dd079d5",
    "metadata": {},
    "source": [
     "The AA requirements for lactating cows are categorized into maintenance, growth, pregnancy, and lactation. Notice that the first variable from each equation comes from the outputs of the metabolizable protein equations that are already in the RuFaS model. The second variable corresponds to the composition of AA used or secreted for each metabolic state (maintenance, growth, pregnancy, and lactation) of the cow, we can find those values in Table 6-2 (page 79) of @nrc_2021. The subscript \"i\" in the equations represents each specific amino acid being calculated; for example, TotalAArequirementsi_ii refers to the total requirements for individual amino acids such as methionine, lysine, arginine, and others.\n",
@@ -2122,7 +2116,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "8a9c4e6e",
+   "id": "58ad6ad0",
    "metadata": {},
    "source": [
     "::: {.callout-note}\n",
@@ -2196,7 +2190,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3b051cfe",
+   "id": "b39d8c72",
    "metadata": {},
    "source": [
     "**Total Digestible Nutrients (TDN)**\n",
@@ -2394,7 +2388,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "972e90c3",
+   "id": "f6602558",
    "metadata": {},
    "source": [
     "The nutrient compositions of each feed ($\\text{NDF}_\\text{i}$, $\\text{Starch}_\\text{i}$, $\\text{EE}_\\text{i}$, $\\text{RUP}_\\text{i}$) are provided in the feed library. \n",
@@ -2709,7 +2703,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "8cedb87f",
+   "id": "865f49c9",
    "metadata": {},
    "source": [
     "##### Relevant Outputs\n",
@@ -2816,7 +2810,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "92420175",
+   "id": "270a2149",
    "metadata": {},
    "source": [
     "#### User-Defined Ration Formulation\n",
@@ -2867,7 +2861,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "20a4f403",
+   "id": "a9e7822b",
    "metadata": {},
    "source": [
     "##### Methodology\n",
@@ -3105,7 +3099,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b1179f99",
+   "id": "05dd0cd5",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -3341,7 +3335,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "61942a57",
+   "id": "aa93729b",
    "metadata": {},
    "source": [
     "During the dry period, the net tissue change is assumed to be restored during the dry period. The net tissue change is \n",
@@ -3581,7 +3575,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b2e296ba",
+   "id": "3416f852",
    "metadata": {},
    "source": [
     "::: {.callout-note}\n",
@@ -3627,7 +3621,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "1a1a0c9c",
+   "id": "0689c5fe",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -3792,7 +3786,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "07f24012",
+   "id": "d2d4d192",
    "metadata": {},
    "source": [
     "### Milk Production\n",
@@ -3930,7 +3924,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2a0a641f",
+   "id": "4bd1eb33",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -4280,7 +4274,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "52472932",
+   "id": "beeaf847",
    "metadata": {},
    "source": [
     "#### Expected Outputs"
@@ -4324,7 +4318,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "10c5c918",
+   "id": "d2de23d1",
    "metadata": {},
    "source": [
     "#### Methodology\n",
@@ -4550,7 +4544,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "1071fa70",
+   "id": "e0a55459",
    "metadata": {},
    "source": [
     "::: {.callout-note}\n",
@@ -4622,7 +4616,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "63633316",
+   "id": "7b2d3245",
    "metadata": {},
    "source": [
     "Determination of death date (once already determined that death will occur this lactation): \n",
@@ -4752,7 +4746,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "1de60310",
+   "id": "36da24fe",
    "metadata": {},
    "source": [
     "Determination of sale date (once already determined that death will occur this lactation): \n",
@@ -4812,7 +4806,7 @@
     "If a cow is not pregnant when she reaches the days in milk cutoff specified by the user, she will be marked as Do Not Breed and no longer participate in reproductive protocols. When her milk production drops below the production cutoff specified by the user, she is sold for the reason of low production. Note that the only cows who are sold for “low production” are those flagged as DNB for reproductive failure; no low-producing cow who is pregnant or has fewer DIM than the cutoff will be sold for low production.\n",
     ":::\n",
     "\n",
-    "## Manure Excretion\n",
+    "## Methane Emission and Manure Excretion\n",
     "\n",
     "### Introduction\n",
     "\n",
@@ -4856,15 +4850,27 @@
     {
      "data": {
       "text/markdown": [
-       "+-------------------+-------------------------------------------------------------------------------------+----------------+\n",
-       "|  Variable         |  Definition                                                                         |  Units         |\n",
-       "+:==================+:====================================================================================+:==============:+\n",
-       "| body_weight       | Body weight of the current animal                                                   | kg             |\n",
-       "+-------------------+-------------------------------------------------------------------------------------+----------------+\n",
-       "| dry_matter_intake | Dry matter intake from pen ration                                                   | kg             |\n",
-       "+-------------------+-------------------------------------------------------------------------------------+----------------+\n",
-       "| nutrient_amounts  | An instance of the NutritionSupply that includes all nutrients supplied by the diet | kg, g, or Mcal |\n",
-       "+-------------------+-------------------------------------------------------------------------------------+----------------+"
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "|  Variable                             |  Definition                                       |  Units    |\n",
+       "+:======================================+:==================================================+:=========:+\n",
+       "| body_weight                           | Body weight of the current animal                 | kg        |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "| dry_matter_intake                     | Dry matter intake from pen ration                 | kg        |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "| dry_matter_concentration              | Dry matter intake from pen ration                 | kg        |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "| crude_protein_conc                    | Crude protein concentration in the diet           | %         |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "| potassium_concentration               | Potassium concentration in the diet               | %         |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "| ash_diet_content                      | Ash content in the diet                           | %         |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "| neutral_detergent_fiber_concentration | Neutral detergent fiber concentration             | %         |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "| acid_detergent_fiber_concentrations   | Acid detergent concentration                      | %         |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+\n",
+       "| nutrient_concentrations               | Nutrient concentrations (e.g., CP, NDF, ADF, ash) | %         |\n",
+       "+---------------------------------------+---------------------------------------------------+-----------+"
       ],
       "text/plain": [
        "<IPython.core.display.Markdown object>"
@@ -4892,21 +4898,23 @@
     {
      "data": {
       "text/markdown": [
-       "+-----------------------+---------------------------------------------------------------------------+-----------+-------------+\n",
-       "|  Variable             |  Definition                                                               |  Units    |  Default    |\n",
-       "+:======================+:==========================================================================+:=========:+:===========:+\n",
-       "| is_lactating          | Indicates the cow's lactating status                                      | Boolean   | --          |\n",
-       "+-----------------------+---------------------------------------------------------------------------+-----------+-------------+\n",
-       "| days_in_milk          | Days post-parturition; for lactating cows only; Intermediate model output | days      | --          |\n",
-       "+-----------------------+---------------------------------------------------------------------------+-----------+-------------+\n",
-       "| milk_protein          | Milk protein content; for lactating cows only                             | %         | 3.2         |\n",
-       "+-----------------------+---------------------------------------------------------------------------+-----------+-------------+\n",
-       "| daily_milk_production | Daily milk production; for lactating cows only                            | kg        | --          |\n",
-       "+-----------------------+---------------------------------------------------------------------------+-----------+-------------+\n",
-       "| body_weight           | Body weight of the cow                                                    | kg        | --          |\n",
-       "+-----------------------+---------------------------------------------------------------------------+-----------+-------------+\n",
-       "| milk_fat              | Milk fat content                                                          | %         | 3.5         |\n",
-       "+-----------------------+---------------------------------------------------------------------------+-----------+-------------+"
+       "+-----------------------------+---------------------------------------------------------------------------+------------+-------------+\n",
+       "|  Variable                   |  Definition                                                               |  Units     |  Default    |\n",
+       "+:============================+:==========================================================================+:==========:+:===========:+\n",
+       "| is_lactating                | Indicates the cow's lactating status                                      | Boolean    | --          |\n",
+       "+-----------------------------+---------------------------------------------------------------------------+------------+-------------+\n",
+       "| days_in_milk                | Days post-parturition; for lactating cows only; Intermediate model output | days       | --          |\n",
+       "+-----------------------------+---------------------------------------------------------------------------+------------+-------------+\n",
+       "| milk_protein                | Milk protein content; for lactating cows only                             | %          | 3.2         |\n",
+       "+-----------------------------+---------------------------------------------------------------------------+------------+-------------+\n",
+       "| daily_milk_production       | Daily milk production; for lactating cows only                            | kg         | --          |\n",
+       "+-----------------------------+---------------------------------------------------------------------------+------------+-------------+\n",
+       "| body_weight                 | Body weight of the cow                                                    | kg         | --          |\n",
+       "+-----------------------------+---------------------------------------------------------------------------+------------+-------------+\n",
+       "| milk_fat                    | Milk fat content                                                          | %          | 3.5         |\n",
+       "+-----------------------------+---------------------------------------------------------------------------+------------+-------------+\n",
+       "| metabolizable_energy_intake | Metabolizable energy intake per kg DM                                     | Mcal/kg DM | --          |\n",
+       "+-----------------------------+---------------------------------------------------------------------------+------------+-------------+"
       ],
       "text/plain": [
        "<IPython.core.display.Markdown object>"
@@ -4940,6 +4948,8 @@
        "| fecal_phosphorus          | Amount of fecal phosphorus excreted by the current animal; Intermediate model output | g         |\n",
        "+---------------------------+--------------------------------------------------------------------------------------+-----------+\n",
        "| urine_phosphorus_required | Phosphorus required for urine production; Intermediate model output                  | g         |\n",
+       "+---------------------------+--------------------------------------------------------------------------------------+-----------+\n",
+       "| total_manure_excreted     | Total manure excreted by the animal; Intermediate model output                       | kg        |\n",
        "+---------------------------+--------------------------------------------------------------------------------------+-----------+"
       ],
       "text/plain": [
@@ -4961,7 +4971,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "31ea5370",
+   "id": "8ba0e808",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",
@@ -5066,7 +5076,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c0ece389",
+   "id": "acd140a3",
    "metadata": {},
    "source": [
     "### Methodology\n",
@@ -5380,7 +5390,6 @@
     ":::\n",
     "\n",
     "Fecal nitrogen (kg/d):\n",
-    "\n",
     "::: {#eq-an-exc-26}\n",
     "[[**AN.EXC.26**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
@@ -5558,17 +5567,15 @@
     "and 2024.\n",
     "::: \n",
     "\n",
-    "## Enteric Methane Emission \n",
-    "\n",
-    "### Introduction\n",
+    "### Enteric Methane Emission Introduction\n",
     "\n",
     "The Enteric Methane Calculator module calculates daily enteric methane emissions for calves, heifers, lactating cows, \n",
     "and dry cows. Methane emissions are estimated based on animal characteristics, dietary intake, and a variety of \n",
     "animal category specific methane models. The IPCC model is available for all animal classes except \n",
     "calves [@IPCC2006]. The equation from @Mills2003 is also available for dry and lactating cows and the \n",
-    "@Niu2018 equation is available for lactating cows. Finally, a separate equation published by @Pattanaik2003 is used for calves. \n",
+    "@Niu2018 equation is available for lactating cows. <br>\n",
     "\n",
-    "<br> Simulation of enteric methane mitigation via mitigation supplements 3-NOP or monensin are also available for lactating cows The module integrates with the `DigestiveSystem` class and supports methane mitigation strategies using feed additives.\n",
+    "Finally, a separate equation published by @Pattanaik2003 is used for calves. Simulation of enteric methane mitigation via mitigation supplements 3-NOP or monensin are also available for lactating cows The module integrates with the `DigestiveSystem` class and supports methane mitigation strategies using feed additives.\n",
     "\n",
     "* *Classes:* `EntericMethaneCalculator`\n",
     "* *Key Methods:*\n",
@@ -5580,7 +5587,7 @@
     "\n",
     "The calculated enteric methane emissions are directly output to the Output Manager to generate the final reports.\n",
     "\n",
-    "### Required User Inputs"
+    "#### Required User Inputs"
    ]
   },
   {
@@ -5664,15 +5671,15 @@
     {
      "data": {
       "text/markdown": [
-       "+------------------------------------+----------------------------------------------------------------------------+-----------------------------------------------------------------------------------------+\n",
-       "|  Variable Name                     |  Definition                                                                |  Default (Range)                                                                        |\n",
-       "+:===================================+:===========================================================================+:=======================================================================================:+\n",
-       "| methane_model                      | Selected methane model for emission estimation. One entry per animal class | \"Mutian\", \"Mills\", \"IPCC\"                                                               |\n",
-       "+------------------------------------+----------------------------------------------------------------------------+-----------------------------------------------------------------------------------------+\n",
-       "| methane_mitigation_method          | Selected feed additive for methane mitigation                              | \"3-NOP\", \"Monensin\", \"Essential Oils\", \"Seaweed\"                                        |\n",
-       "+------------------------------------+----------------------------------------------------------------------------+-----------------------------------------------------------------------------------------+\n",
-       "| methane_mitigation_additive_amount | Amount of additive used for methane mitigation (mg/kg DMI)                 | 3-NOP (70; 40-100), Monensin (24; 20-36), Essential Oils (0; 0-100), Seaweed (0; 0-100) |\n",
-       "+------------------------------------+----------------------------------------------------------------------------+-----------------------------------------------------------------------------------------+"
+       "+------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------------+\n",
+       "|  Variable Name                     |  Definition                                                |  Default (Range)                                                                        |\n",
+       "+:===================================+:===========================================================+:=======================================================================================:+\n",
+       "| methane_model                      | Selected methane model for emission estimation             | \"Mutian\", \"Mills\", \"IPCC\"                                                               |\n",
+       "+------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------------+\n",
+       "| methane_mitigation_method          | Selected feed additive for methane mitigation              | \"3-NOP\", \"Monensin\", \"Essential Oils\", \"Seaweed\"                                        |\n",
+       "+------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------------+\n",
+       "| methane_mitigation_additive_amount | Amount of additive used for methane mitigation (mg/kg DMI) | 3-NOP (70; 40-100), Monensin (24; 20-36), Essential Oils (0; 0-100), Seaweed (0; 0-100) |\n",
+       "+------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------------+"
       ],
       "text/plain": [
        "<IPython.core.display.Markdown object>"
@@ -5693,10 +5700,10 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9a6186e5",
+   "id": "a0ff1aa4",
    "metadata": {},
    "source": [
-    "### Expected Outputs\n",
+    "#### Expected Outputs\n",
     "\n",
     "This module predicts the daily enteric methane emissions for individual animals:"
    ]
@@ -5735,7 +5742,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e4000b36",
+   "id": "31f3341b",
    "metadata": {},
    "source": [
     "### Methodology\n",
@@ -5758,10 +5765,9 @@
     "[[**AN.MET.2**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
     "\\begin{aligned}\n",
-    "\\text{gross\\_energy\\_concentration} &= 0.263 \\times \\text{crude\\_protein\\_concentration} + \\\\\n",
-    "&\\qquad 0.522 \\times \\text{ethyl\\_ester\\_concentration} + \\\\\n",
-    "&\\qquad 0.198 \\times \\text{neutral\\_detergent\\_fiber\\_concentration} +  \\\\\n",
-    "&\\qquad 0.160 \\times \\text{soluble\\_residue}\n",
+    "\\text{gross\\_energy\\_concentration} &= 0.263 \\times \\left(\\text{crude\\_protein\\_concentration} + 0.522\\right) \\\\\n",
+    "&\\qquad \\times \\left(\\text{ethyl\\_ester\\_concentration} + 0.198\\right) \\times \\left(\\text{neutral\\_detergent\\_fiber\\_concentration} + 0.160\\right) \\\\\n",
+    "&\\qquad \\times \\text{soluble\\_residue}\n",
     "\\end{aligned}\n",
     "$$\n",
     ":::\n",
@@ -5792,7 +5798,7 @@
     "::: {#eq-an-met-5}\n",
     "[[**AN.MET.5**]]{.aside .content-visible when-format=\"html\"}\n",
     "$$\n",
-    "\\text{methane\\_emission} = \\frac{0.065 \\times \\text{gross\\_energy\\_concentration} \\times \\text{dry\\_matter\\_intake}}{0.05565}\n",
+    "\\text{methane\\_emission} = \\frac{0.065 \\times \\text{gross\\_energy\\_concentrationdry\\_matter\\_intake}}{0.05565}\n",
     "$$\n",
     ":::\n",
     "\n",
@@ -5844,7 +5850,7 @@
     "[See [AN.MET.5](#eq-an-met-5)]{.aside .content-visible when-format=\"html\"}\n",
     "\n",
     "$$\n",
-    "\\text{methane\\_emission} = \\frac{0.065 \\times \\text{gross\\_energy\\_concentration} \\times \\text{dry\\_matter\\_intake}}{0.05565}\n",
+    "\\text{methane\\_emission} = \\frac{0.065 \\times \\text{gross\\_energy\\_concentrationdry\\_matter\\_intake}}{0.05565}\n",
     "$$\n",
     ":::\n",
     "\n",
@@ -5872,13 +5878,18 @@
     "[See [AN.EXC.5](#eq-an-exc-5)]{.aside .content-visible when-format=\"html\"}\n",
     "\n",
     "$$\n",
-    "\\text{methane\\_emission} = \\frac{0.065 \\times \\text{gross\\_energy\\_concentration} \\times \\text{dry\\_matter\\_intake}}{0.05565} \n",
+    "\\text{methane\\_emission} = \\frac{0.065 \\times \\text{gross\\_energy\\_concentrationdry\\_matter\\_intake}}{0.05565} \n",
     "$$\n",
     ":::\n",
     "\n",
     "### Methane Mitigation\n",
     "\n",
-    "\n",
+    "- Methane mitigation strategies are applied exclusively to lactating and dry cows. However, caution is advised when \n",
+    "interpreting the outcomes for dry cows, as the equations used were developed based on datasets from lactating cows.\n",
+    "- Currently, the implemented methane mitigation feed additives include 3-NOP and monensin, with essential oils and \n",
+    "seaweed planned for future integration.\n",
+    "- The detailed methodology for methane mitigation calculations will be provided in a separate document titled Methane \n",
+    "Mitigation Calculator.\n",
     "\n",
     "#### Introduction\n",
     "\n",
@@ -5948,7 +5959,7 @@
        "+-------------------------------------+-----------------------------------------------+--------------------------------------------------------------+\n",
        "|  Variable Name                      |  Definition                                   |  Default and Range                                           |\n",
        "+:====================================+:==============================================+:============================================================:+\n",
-       "| methane_mitigation_method           | Selected feed additive for methane mitigation | \"3-NOP\", \"Monensin\"                                          |\n",
+       "| methane_mitigation_-method          | Selected feed additive for methane mitigation | \"3-NOP\", \"Monensin\"                                          |\n",
        "+-------------------------------------+-----------------------------------------------+--------------------------------------------------------------+\n",
        "| methane_mitigation_additive_-amount | Dosage per kg of dry matter intake (DMI)      | 3-NOP: 70 (40-100) mg/kg DMI; Monensin: 24 (20-36) mg/kg DMI |\n",
        "+-------------------------------------+-----------------------------------------------+--------------------------------------------------------------+"
@@ -5972,7 +5983,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "74048e23",
+   "id": "6fd812f4",
    "metadata": {},
    "source": [
     "#### Expected Outputs\n",

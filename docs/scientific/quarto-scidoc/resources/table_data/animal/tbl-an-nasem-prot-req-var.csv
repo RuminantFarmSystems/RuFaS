@@ -1,4 +1,4 @@
-﻿Variable,Description,Units
+Variable,Description,Units
 125 (coefficient) , Daily gain in mass of the gravid uterus ,Estimated constant 125 grams (g) of protein per kilogram (kg) of wet weight.
 AAcalcMilk , Estimated AA composition of the true protein (TP) fraction involved in the estimation of AA Supply and recommendations ,g of AA per 100 g of TP
 AACorrMFP , AA corrected for MFP , Fixed Value
@@ -19,8 +19,8 @@ NetAAscurf , Net AA demand for scurf excretion ,g/d
 NDF , Neutral detergent fiber in the diet ,% DM
 NPGest , Net protein requirement for pregnancy ,g/d
 NPGrowth , Net protein requirement for body frame weight gain ,g/d
-NPMFP , Net protein requirement for metabolic fecal protein i ,g/d; assuming 73 % of TP in MFP
+NPMFP , Net protein requirement for metabolic fecal protein ,g/d
 NPMilk , Milk's TP yield ,g/d
 NPscurf ,  Net protein requirement for scurf ,g/d
-PEndUrin ,  Net protein requirement for endogenous urinary excretion ,g/d
+NPEndUrin ,  Net protein requirement for endogenous urinary excretion ,g/d
 TargetEffMP and TargetEffAA , Proposed target efficiencies of converting metabolizable protein (MP) and essential amino acids (EAA) to export proteins and body gain , Fixed Value

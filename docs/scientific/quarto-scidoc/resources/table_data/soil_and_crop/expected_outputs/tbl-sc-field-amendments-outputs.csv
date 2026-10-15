@@ -1,0 +1,17 @@
+Variable,Description,Unit
+fertilizer_application.field=[FIELD_NAME].mass,The total mass of fertilizer applied,kg
+fertilizer_application.field=[FIELD_NAME].nitrogen,Total mass of nitrogen applied via fertilizer,kg
+fertilizer_application.field=[FIELD_NAME].phosphorus,Total mass of phosphorus applied via fertilizer,kg
+fertilizer_application.field=[FIELD_NAME].potassium,Total mass of potassium applied via fertilizer,kg
+fertilizer_application.field=[FIELD_NAME].ammonium_fraction,Fraction of requested nitrogen which is ammonium and not nitrate,
+fertilizer_application.field=[FIELD_NAME].application_depth,Depth at which fertilizer is injected into the soil,mm
+fertilizer_application.field=[FIELD_NAME].surface_remainder_fraction,Fraction of fertilizer applied that remains on the soil surface after application,
+manure_[application|request].field=[FIELD_NAME].dry_matter_mass,Dry weight equivalent of this application ,kg
+manure_[application|request].field=[FIELD_NAME].dry_matter_fraction,Fraction of this manure application that is dry matter,""
+manure_[application|request].field=[FIELD_NAME].field_coverage,Fraction of the field this manure is applied to,
+manure_[application|request].field=[FIELD_NAME].application_depth,Depth at which manure is injected into the soil,mm
+manure_[application|request].field=[FIELD_NAME].surface_remainder_fraction,Fraction of fertilizer applied that remains on the soil surface after application,
+manure_[application|request].field=[FIELD_NAME].nitrogen,Mass of nitrogen in the manure applied,kg
+manure_[application|request].field=[FIELD_NAME].phosphorus,Mass of phosphorus in the manure applied,kg
+manure_[application|request].field=[FIELD_NAME].potassium,Mass of potassium in the manure applied,kg
+manure_water.field=[FIELD_NAME],Amount of water added to the field via manure application,mm
