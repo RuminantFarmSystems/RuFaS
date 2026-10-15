@@ -639,8 +639,8 @@
       ]
     },
     {
-      "description": "When cow repro method is TAI and resynch_program is in ['PGFatPD', 'none']: estrus_detection_rate and ED_conception_rate must be positive (subsequent breedings rely on estrus detection under these resynch protocols)",
-      "failure_message": "When animal.animal_config.management_decisions.cow_repro_method is 'TAI' and animal.animal_config.farm_level.repro.cows.resynch_program is 'PGFatPD' or 'none', later breedings rely on estrus detection, so animal.animal_config.farm_level.repro.cows.estrus_detection_rate and animal.animal_config.farm_level.repro.cows.ED_conception_rate must be greater than 0.",
+      "description": "When cow repro method is TAI and resynch_program is in ['PGFatPD', 'None']: estrus_detection_rate and ED_conception_rate must be positive (subsequent breedings rely on estrus detection under these resynch protocols)",
+      "failure_message": "When animal.animal_config.management_decisions.cow_repro_method is 'TAI' and animal.animal_config.farm_level.repro.cows.resynch_program is 'PGFatPD' or 'None', later breedings rely on estrus detection, so animal.animal_config.farm_level.repro.cows.estrus_detection_rate and animal.animal_config.farm_level.repro.cows.ED_conception_rate must be greater than 0.",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -652,7 +652,7 @@
           "TAI": "TAI",
           "zero": 0,
           "PGFatPD": "PGFatPD",
-          "none": "none"
+          "none": "None"
         }
       },
       "apply_when": [

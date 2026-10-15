@@ -505,9 +505,9 @@ Each block has the following top-level keys:
 - ``description`` — short label identifying the block.
 - ``failure_message`` *(optional)* — plain-language explanation of
   what the block enforces, naming the input variables involved and how
-  to fix them. This is the message reported when the block fails. If it
-  is missing or not a non-empty string, ``description`` is reported
-  instead.
+  to fix them. When the block fails, it is reported together with the
+  description as ``<description>: <failure_message>``. If it is missing
+  or not a non-empty string, ``description`` alone is reported instead.
 - ``aliases`` — maps short local names (used inside this block) to
   actual data addresses or literal constant values.
 - ``apply_when`` *(optional)* — an array of condition clauses that
@@ -711,9 +711,11 @@ Error behaviour and ``eager_termination``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When a block's rules fail, Input Manager adds one
-``Cross Validation Failure`` error for that block, whose message is the
-block's ``failure_message`` (or its ``description`` if no
-``failure_message`` is given). Two termination modes control what
+``Cross Validation Failure`` error for that block, whose message is
+``<description>: <failure_message>`` (or the ``description`` alone if no
+``failure_message`` is given). Each rule that is not satisfied is also
+logged as ``Rule not satisfied: <comparison>``, naming the compared
+variables and their data addresses. Two termination modes control what
 happens next:
 
 - **Eager termination on** (normal simulation): the first failing rule

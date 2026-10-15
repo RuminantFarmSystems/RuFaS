@@ -238,36 +238,50 @@ class InputManager:
         """
         is_input_data_valid = True
         cross_validation_rules = self._load_cross_validation(cross_validation_file_paths)
-        try:
-            if cross_validation_rules is not None and len(cross_validation_rules) > 0:
-                for cross_validation_ruleset in cross_validation_rules:
-                    cross_validation_blocks = cross_validation_ruleset.get("cross_validation", [])
-                    for block in cross_validation_blocks:
-                        target_and_save_block = block.get("aliases", {})
-                        target_and_save_result = self._extract_target_and_save_block(
-                            target_and_save_block, eager_termination
-                        )
+        if cross_validation_rules is not None and len(cross_validation_rules) > 0:
+            for cross_validation_ruleset in cross_validation_rules:
+                cross_validation_blocks = cross_validation_ruleset.get("cross_validation", [])
+                for block in cross_validation_blocks:
+                    target_and_save_block = block.get("aliases", {})
+                    target_and_save_result = self._extract_target_and_save_block(
+                        target_and_save_block, eager_termination
+                    )
+                    try:
                         is_cross_validation_successful = self.cross_validator.cross_validate_data(
                             target_and_save_result,
                             block,
                             eager_termination,
                         )
-                        if not is_cross_validation_successful:
-                            is_input_data_valid = False
-                            self.om.route_logs(self.cross_validator.flush_event_logs())
-                            self.om.add_error(
-                                "Cross Validation Failure",
-                                self._get_cross_validation_failure_message(block),
-                                {
-                                    "class": self.__class__.__name__,
-                                    "function": self._cross_validate_data.__name__,
-                                },
-                            )
-                            if eager_termination:
-                                break
-        finally:
-            self.om.route_logs(self.cross_validator.flush_event_logs())
+                    except Exception:
+                        self.om.route_logs(self.cross_validator.flush_event_logs())
+                        self._report_cross_validation_failure(block)
+                        raise
+                    self.om.route_logs(self.cross_validator.flush_event_logs())
+                    if not is_cross_validation_successful:
+                        is_input_data_valid = False
+                        self._report_cross_validation_failure(block)
+                        if eager_termination:
+                            break
         return is_input_data_valid
+
+    def _report_cross_validation_failure(self, cross_validation_block: dict[str, Any]) -> None:
+        """
+        Reports a failed cross-validation block to the Output Manager as an error.
+
+        Parameters
+        ----------
+        cross_validation_block : dict[str, Any]
+            The cross-validation block that failed.
+
+        """
+        self.om.add_error(
+            "Cross Validation Failure",
+            self._get_cross_validation_failure_message(cross_validation_block),
+            {
+                "class": self.__class__.__name__,
+                "function": self._cross_validate_data.__name__,
+            },
+        )
 
     def _get_cross_validation_failure_message(self, cross_validation_block: dict[str, Any]) -> str:
         """
@@ -281,13 +295,15 @@ class InputManager:
         Returns
         -------
         str
-            The block's ``failure_message`` if it is a non-empty string, otherwise the block's ``description``.
+            ``<description>: <failure_message>`` if the block's ``failure_message`` is a non-empty string, otherwise
+            the block's ``description``.
 
         """
+        description = str(cross_validation_block.get("description", "unnamed block"))
         failure_message = cross_validation_block.get("failure_message")
         if isinstance(failure_message, str) and failure_message:
-            return failure_message
-        return str(cross_validation_block.get("description", "unnamed block"))
+            return f"{description}: {failure_message}"
+        return description
 
     def _validate_required_file_blobs(self, metadata_file_names: set[str]) -> None:
         """

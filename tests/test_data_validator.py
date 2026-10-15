@@ -2591,6 +2591,7 @@ def test_extract_input_data_by_key_list_key_error(
 def cv(mocker: MockerFixture) -> CrossValidator:
     """Fixture to create a CrossValidator with mocked methods."""
     cv = CrossValidator.__new__(CrossValidator)
+    cv._event_logs = []
     mocker.patch.object(cv, "_target_and_save")
     mocker.patch.object(cv, "_evaluate_condition_clause_array")
     mocker.patch.object(cv, "_evaluate_condition")
@@ -2633,6 +2634,7 @@ def test_evaluates_all_rules_when_eager_false_and_fails_on_any_failure(
         [mocker.call(rules[0], False), mocker.call(rules[1], False), mocker.call(rules[2], False)]
     )
     mock_evaluate_condition_clause_array.assert_called_once_with([], False)
+    assert [log["error"] for log in cv._event_logs] == ["Rule not satisfied"]
 
 
 def test_breaks_on_first_failed_rule_when_eager_true(mocker: MockerFixture, cv: CrossValidator) -> None:
@@ -2651,6 +2653,33 @@ def test_breaks_on_first_failed_rule_when_eager_true(mocker: MockerFixture, cv: 
     assert mock_evaluate_condition.call_count == 2
     mock_evaluate_condition.assert_has_calls([mocker.call(rules[0], True), mocker.call(rules[1], True)])
     mock_evaluate_condition_clause_array.assert_called_once_with([], True)
+    assert [log["error"] for log in cv._event_logs] == ["Rule not satisfied"]
+
+
+def test_cross_validate_data_logs_unsatisfied_rule_with_comparison_description() -> None:
+    """An unsatisfied rule is logged with a description naming the compared aliases and their data addresses."""
+    cv = CrossValidator()
+    block = {
+        "aliases": {"variables": {"gest": "animal.avg_gestation_len"}, "constants": {"min": 300}},
+        "rules": [
+            {
+                "left_hand": {"aggregation": {"operation": "no_op", "operands": ["gest"]}},
+                "right_hand": {"aggregation": {"operation": "no_op", "operands": ["min"]}},
+                "relationship": "greater",
+            }
+        ],
+    }
+
+    result = cv.cross_validate_data({"gest": 280, "min": 300}, block, eager_termination=False)
+
+    assert result is False
+    assert cv._event_logs == [
+        {
+            "error": "Rule not satisfied",
+            "message": "Rule not satisfied: 'gest' (animal.avg_gestation_len) greater 'min'.",
+            "info_map": {"class": "CrossValidator", "function": "cross_validate_data"},
+        }
+    ]
 
 
 @pytest.mark.parametrize(
@@ -3364,7 +3393,9 @@ def test_evaluate_condition_equal_length_branch(mocker: MockerFixture, eager_ter
     )
 
     assert result is True
-    mock_equal_length.assert_called_once_with([1, 2], [3, 4], eager_termination, comparison="{} is_equal_length {}")
+    mock_equal_length.assert_called_once_with(
+        [1, 2], [3, 4], eager_termination, comparison_description="{} is_equal_length {}"
+    )
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3407,7 +3438,7 @@ def test_evaluate_condition_equal_path(mocker: MockerFixture, eager_termination:
     valid = cv._evaluate_condition({"relationship": "equal", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_eq.assert_called_once_with("A", "B", eager_termination, comparison="{} equal {}")
+    mock_eq.assert_called_once_with("A", "B", eager_termination, comparison_description="{} equal {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3423,7 +3454,7 @@ def test_evaluate_condition_greater_or_equal_path(mocker: MockerFixture, eager_t
     )
 
     assert valid
-    mock_ge.assert_called_once_with(5, 2, eager_termination, comparison="{} greater_or_equal_to {}")
+    mock_ge.assert_called_once_with(5, 2, eager_termination, comparison_description="{} greater_or_equal_to {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3453,7 +3484,7 @@ def test_evaluate_condition_not_equal_inverts_equality(mocker: MockerFixture, ea
     valid = cv._evaluate_condition({"relationship": "not_equal", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_eq.assert_called_once_with("foo", "bar", eager_termination, comparison="{} not_equal {}")
+    mock_eq.assert_called_once_with("foo", "bar", eager_termination, comparison_description="{} not_equal {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -3467,7 +3498,7 @@ def test_evaluate_condition_is_of_type_passes_eager(mocker: MockerFixture, eager
     valid = cv._evaluate_condition({"relationship": "is_of_type", "left_hand": {}, "right_hand": {}}, eager_termination)
 
     assert valid
-    mock_is_type.assert_called_once_with("text", "string", eager_termination, comparison="{} is_of_type {}")
+    mock_is_type.assert_called_once_with("text", "string", eager_termination, comparison_description="{} is_of_type {}")
 
 
 @pytest.mark.parametrize("eager_termination", [True, False])
@@ -4430,7 +4461,9 @@ def test_evaluate_pairwise_condition_message_includes_comparison() -> None:
     """Pairwise length mismatch errors include the lengths and the comparison description."""
     cv = CrossValidator()
 
-    cv._evaluate_pairwise_condition([1, 2, 3], [1, 2], lambda a, b: a == b, False, comparison="'a' (x.a) equal 'b'")
+    cv._evaluate_pairwise_condition(
+        [1, 2, 3], [1, 2], lambda a, b: a == b, False, comparison_description="'a' (x.a) equal 'b'"
+    )
 
     message = str(cv._event_logs[0]["message"])
     assert "got lengths 3 and 2." in message
@@ -4441,7 +4474,7 @@ def test_evaluate_equal_data_length_message_includes_comparison() -> None:
     """Invalid length validation errors include the comparison description."""
     cv = CrossValidator()
 
-    cv._evaluate_equal_data_length(1, [1], False, comparison="'a' is_equal_length 'b'")
+    cv._evaluate_equal_data_length(1, [1], False, comparison_description="'a' is_equal_length 'b'")
 
     assert str(cv._event_logs[0]["message"]).endswith("Comparison: 'a' is_equal_length 'b'.")
 
@@ -4451,7 +4484,7 @@ def test_evaluate_is_type_message_includes_comparison(data_type: list[Any]) -> N
     """Type validation errors include the comparison description."""
     cv = CrossValidator()
 
-    cv._evaluate_is_type(["x"], data_type, False, comparison="'a' is_of_type 'b'")
+    cv._evaluate_is_type(["x"], data_type, False, comparison_description="'a' is_of_type 'b'")
 
     assert str(cv._event_logs[0]["message"]).endswith("Comparison: 'a' is_of_type 'b'.")
 
@@ -4476,5 +4509,7 @@ def test_evaluate_for_each_block_passes_comparison_to_relationship(mocker: Mocke
         [3],
         [1],
         False,
-        comparison="for each entry in 'pens' (animal.pen_information) (enforce): field 'stalls' greater 'min'",
+        comparison_description=(
+            "for each entry in 'pens' (animal.pen_information) (enforce): field 'stalls' greater 'min'"
+        ),
     )

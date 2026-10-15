@@ -2151,27 +2151,35 @@ class CrossValidator:
         self._alias_addresses: dict[str, str] = {}
         self._event_logs: list[dict[str, str | dict[str, str]]] = []
         self.relation_mapping: dict[str, Callable[[object, object, bool, str], bool]] = {
-            "equal": lambda left, right, eager_termination, comparison: self._evaluate_equal_condition(
-                left, right, eager_termination, comparison=comparison
+            "equal": lambda left, right, eager_termination, comparison_description: self._evaluate_equal_condition(
+                left, right, eager_termination, comparison_description=comparison_description
             ),
-            "greater": lambda left, right, eager_termination, comparison: self._evaluate_greater_condition(
-                left, right, eager_termination, comparison=comparison
+            "greater": lambda left, right, eager_termination, comparison_description: self._evaluate_greater_condition(
+                left, right, eager_termination, comparison_description=comparison_description
             ),
-            "greater_or_equal_to": lambda left, right, eager_termination, comparison: (
-                self._evaluate_greater_or_equal_condition(left, right, eager_termination, comparison=comparison)
+            "greater_or_equal_to": lambda left, right, eager_termination, comparison_description: (
+                self._evaluate_greater_or_equal_condition(
+                    left, right, eager_termination, comparison_description=comparison_description
+                )
             ),
-            "not_equal": lambda left, right, eager_termination, comparison: not self._evaluate_equal_condition(
-                left, right, eager_termination, comparison=comparison
+            "not_equal": lambda left, right, eager_termination, comparison_description: (
+                not self._evaluate_equal_condition(
+                    left, right, eager_termination, comparison_description=comparison_description
+                )
             ),
-            "is_of_type": lambda left, right, eager_termination, comparison: self._evaluate_is_type(
-                left, right, eager_termination, comparison=comparison
+            "is_of_type": lambda left, right, eager_termination, comparison_description: self._evaluate_is_type(
+                left, right, eager_termination, comparison_description=comparison_description
             ),
-            "is_null": lambda left, _right, _eager_termination, _comparison: self._evaluate_is_null(left),
-            "is_not_null": lambda left, _right, _eager_termination, _comparison: self._evaluate_is_not_null(left),
-            "is_in": lambda left, right, _eager_termination, _comparison: self._evaluate_is_in(left, right),
-            "regex": lambda left, right, _eager_termination, _comparison: self._evaluate_regex(left, right),
-            "is_equal_length": lambda left, right, eager_termination, comparison: self._evaluate_equal_data_length(
-                left, right, eager_termination, comparison=comparison
+            "is_null": lambda left, _right, _eager_termination, _comparison_description: self._evaluate_is_null(left),
+            "is_not_null": lambda left, _right, _eager_termination, _comparison_description: self._evaluate_is_not_null(
+                left
+            ),
+            "is_in": lambda left, right, _eager_termination, _comparison_description: self._evaluate_is_in(left, right),
+            "regex": lambda left, right, _eager_termination, _comparison_description: self._evaluate_regex(left, right),
+            "is_equal_length": lambda left, right, eager_termination, comparison_description: (
+                self._evaluate_equal_data_length(
+                    left, right, eager_termination, comparison_description=comparison_description
+                )
             ),
         }
 
@@ -2222,9 +2230,14 @@ class CrossValidator:
         is_cross_validation_successful = True
         validation_rules = cross_validation_block.get("rules", [])
         for rule in validation_rules:
-            is_cross_validation_successful = self._evaluate_condition(rule, eager_termination) and (
-                is_cross_validation_successful
-            )
+            is_rule_satisfied = self._evaluate_condition(rule, eager_termination)
+            if not is_rule_satisfied:
+                self._log_cross_validation_error(
+                    "Rule not satisfied",
+                    f"Rule not satisfied: {self._describe_condition_clause(rule)}.",
+                    self.cross_validate_data.__name__,
+                )
+            is_cross_validation_successful = is_rule_satisfied and is_cross_validation_successful
             if not is_cross_validation_successful and eager_termination:
                 break
         return is_cross_validation_successful
@@ -2652,13 +2665,13 @@ class CrossValidator:
         if comparand_for is None:
             return None, False
 
-        comparison = self._describe_for_each_block(iter_block)
+        comparison_description = self._describe_for_each_block(iter_block)
 
         if mode == "filter":
             filtered = [
                 entry
                 for entry in array_of_dicts
-                if compare_function([entry.get(field)], comparand_for(entry), eager_termination, comparison)
+                if compare_function([entry.get(field)], comparand_for(entry), eager_termination, comparison_description)
             ]
             if field_to_save is not None:
                 return [entry.get(field_to_save) for entry in filtered], True
@@ -2666,7 +2679,9 @@ class CrossValidator:
         else:
             return [
                 all(
-                    compare_function([entry.get(field)], comparand_for(entry), eager_termination, comparison)
+                    compare_function(
+                        [entry.get(field)], comparand_for(entry), eager_termination, comparison_description
+                    )
                     for entry in array_of_dicts
                 )
             ], True
@@ -2967,9 +2982,9 @@ class CrossValidator:
         if not (left_evaluated and right_evaluated):
             return False
 
-        comparison = self._describe_condition_clause(condition_clause)
+        comparison_description = self._describe_condition_clause(condition_clause)
         evaluation_function = self.relation_mapping[condition_clause["relationship"]]
-        return evaluation_function(left_hand, right_hand, eager_termination, comparison)
+        return evaluation_function(left_hand, right_hand, eager_termination, comparison_description)
 
     def _describe_alias(self, alias_name: Any) -> str:
         """
@@ -3064,9 +3079,30 @@ class CrossValidator:
             f"{self._describe_expression(condition_clause.get('right_hand'))}"
         )
 
-    def _append_comparison(self, message: str, comparison: str) -> str:
-        """Appends the description of the comparison being evaluated to a message, if one is given."""
-        return f"{message} Comparison: {comparison}." if comparison else message
+    def _append_comparison_error_message(self, error_message: str, comparison_description: str) -> str:
+        """
+        Appends the description of the comparison being evaluated to an error message.
+
+        Parameters
+        ----------
+        error_message : str
+            The error message explaining what went wrong during the evaluation, e.g. a list length mismatch or an
+            invalid type.
+        comparison_description : str
+            The human-readable description of the comparison that was being evaluated when the error occurred, naming
+            the compared aliases, their data addresses and the relationship, as built by
+            ``_describe_condition_clause`` or ``_describe_for_each_block``.
+
+        Returns
+        -------
+        str
+            The error message followed by ``Comparison: <comparison_description>.``, or the error message unchanged if
+            the comparison description is empty.
+
+        """
+        if not comparison_description:
+            return error_message
+        return f"{error_message} Comparison: {comparison_description}."
 
     def _validate_condition_clause(self, condition_clause: dict[str, Any], eager_termination: bool) -> bool:
         """Validates the whole condition block."""
@@ -3164,7 +3200,7 @@ class CrossValidator:
         right_hand_value: Any,
         comparison_function: Callable[[Any, Any], bool],
         eager_termination: bool,
-        comparison: str = "",
+        comparison_description: str = "",
     ) -> bool:
         """
         Evaluates a comparison for two values.
@@ -3179,7 +3215,7 @@ class CrossValidator:
             Function that evaluates the relationship between two values.
         eager_termination : bool
             Whether to raise an error immediately when pairwise list lengths differ.
-        comparison : str, default ""
+        comparison_description : str, default ""
             Human-readable description of the comparison being evaluated, used in error messages.
 
         Returns
@@ -3198,10 +3234,10 @@ class CrossValidator:
                 self._event_logs.append(
                     {
                         "error": "Unequal list lengths for pairwise comparison",
-                        "message": self._append_comparison(
+                        "message": self._append_comparison_error_message(
                             "Both lists must have equal length for pairwise comparison, got lengths "
                             f"{len(left_hand_value)} and {len(right_hand_value)}.",
-                            comparison,
+                            comparison_description,
                         ),
                         "info_map": {
                             "class": self.__class__.__name__,
@@ -3216,17 +3252,17 @@ class CrossValidator:
         return comparison_function(left_hand_value, right_hand_value)
 
     def _evaluate_equal_data_length(
-        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool, comparison: str = ""
+        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool, comparison_description: str = ""
     ) -> bool:
         """Evaluates if two lists have the same length."""
         if not (isinstance(left_hand_value, list) and isinstance(right_hand_value, list)):
             self._event_logs.append(
                 {
                     "error": "Invalid data length validation",
-                    "message": self._append_comparison(
+                    "message": self._append_comparison_error_message(
                         "Both data have to be list type to validate their length, got "
                         f"{type(left_hand_value)} and {type(right_hand_value)}.",
-                        comparison,
+                        comparison_description,
                     ),
                     "info_map": {
                         "class": self.__class__.__name__,
@@ -3240,32 +3276,56 @@ class CrossValidator:
         return len(left_hand_value) == len(right_hand_value)
 
     def _evaluate_equal_condition(
-        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool = False, comparison: str = ""
+        self,
+        left_hand_value: Any,
+        right_hand_value: Any,
+        eager_termination: bool = False,
+        comparison_description: str = "",
     ) -> bool:
         """Evaluates equal condition."""
         return bool(
             self._evaluate_pairwise_condition(
-                left_hand_value, right_hand_value, lambda left, right: left == right, eager_termination, comparison
+                left_hand_value,
+                right_hand_value,
+                lambda left, right: left == right,
+                eager_termination,
+                comparison_description,
             )
         )
 
     def _evaluate_greater_condition(
-        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool = False, comparison: str = ""
+        self,
+        left_hand_value: Any,
+        right_hand_value: Any,
+        eager_termination: bool = False,
+        comparison_description: str = "",
     ) -> bool:
         """Evaluates greater than condition"""
         return bool(
             self._evaluate_pairwise_condition(
-                left_hand_value, right_hand_value, lambda left, right: left > right, eager_termination, comparison
+                left_hand_value,
+                right_hand_value,
+                lambda left, right: left > right,
+                eager_termination,
+                comparison_description,
             )
         )
 
     def _evaluate_greater_or_equal_condition(
-        self, left_hand_value: Any, right_hand_value: Any, eager_termination: bool = False, comparison: str = ""
+        self,
+        left_hand_value: Any,
+        right_hand_value: Any,
+        eager_termination: bool = False,
+        comparison_description: str = "",
     ) -> bool:
         """Evaluates greater than or equal to condition."""
         return bool(
             self._evaluate_pairwise_condition(
-                left_hand_value, right_hand_value, lambda left, right: left >= right, eager_termination, comparison
+                left_hand_value,
+                right_hand_value,
+                lambda left, right: left >= right,
+                eager_termination,
+                comparison_description,
             )
         )
 
@@ -3278,16 +3338,16 @@ class CrossValidator:
         return bool(all(value is not None for value in left_hand_value))
 
     def _evaluate_is_type(
-        self, left_hand_value: Any, data_type: Any, eager_termination: bool, comparison: str = ""
+        self, left_hand_value: Any, data_type: Any, eager_termination: bool, comparison_description: str = ""
     ) -> bool:
         """Evaluates the if_type condition"""
         if not isinstance(data_type[0], str):
             self._event_logs.append(
                 {
                     "error": "Invalid type validation",
-                    "message": self._append_comparison(
+                    "message": self._append_comparison_error_message(
                         f"Must indicate the type to compare in string data type, got: {type(data_type[0])}.",
-                        comparison,
+                        comparison_description,
                     ),
                     "info_map": {
                         "class": self.__class__.__name__,
@@ -3312,8 +3372,8 @@ class CrossValidator:
             self._event_logs.append(
                 {
                     "error": "Invalid data type expectation.",
-                    "message": self._append_comparison(
-                        f"Unsupported data type {data_type}. Supported types: {supported}.", comparison
+                    "message": self._append_comparison_error_message(
+                        f"Unsupported data type {data_type}. Supported types: {supported}.", comparison_description
                     ),
                     "info_map": {
                         "class": self.__class__.__name__,
