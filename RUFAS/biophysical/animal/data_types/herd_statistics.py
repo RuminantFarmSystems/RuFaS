@@ -62,6 +62,8 @@ class HerdStatistics:
         Number of cows sold during the specific period, (unitless).
     born_calf_num : int
         The total amount of calf born, including stillborn, newborn and sold.
+    heiferIII_to_cow_transitions : int
+        The total number of heiferIIIs transitioning to cows on a particular day.
     calf_percent : float
         Proportion of calves in the herd expressed as a percentage, (unitless).
     heiferI_percent : float
@@ -161,6 +163,33 @@ class HerdStatistics:
         The average daily bodyweight gain for heifers in pens by pen id, (kg).
     heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
         The average daily bodyweight gain for heifers by animal type, (kg).
+    acute_sale_cows_parity_1 : int
+        Number of cows sold from parity 1 group.
+    acute_sale_cows_parity_2 : int
+        Number of cows sold from parity 2 group.
+    acute_sale_cows_parity_3_plus : int
+        Number of cows sold from parity 3+ group.
+    total_cow_removals_parity_1 : int
+        Total number of cows removed from parity 1 group.
+    total_cow_removals_parity_2 : int
+        Total number of cows removed from parity 2 group.
+    total_cow_removals_parity_3_plus : int
+        Total number of cows removed from parity 3+ group.
+    cow_deaths_parity_1 : int
+        Number of cow deaths in parity 1 group.
+    cow_deaths_parity_2 : int
+        Number of cow deaths in parity 2 group.
+    cow_deaths_parity_3_plus : int
+        Number of cow deaths in parity 3+ group.
+    sold_cow_low_production_parity_1 : int
+        Number of parity 1 cows sold due to low milk production.
+    sold_cow_low_production_parity_2 : int
+        Number of parity 2 cows sold due to low milk production.
+    sold_cow_low_production_parity_3_plus : int
+        Number of parity 3+ cows sold due to low milk production.
+    milk_production_at_removal : list[dict[str, Any]]
+        Records of cows removed from the herd, including cow ID, removal day, culling reason, and estimated daily milk
+        production at the time of removal.
     """
 
     avg_calving_to_preg_time: dict[str, float]

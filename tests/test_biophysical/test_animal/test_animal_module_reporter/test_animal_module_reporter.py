@@ -1,4 +1,4 @@
-from dataclasses import asdict, field
+from dataclasses import asdict
 from unittest.mock import MagicMock, call
 from pytest_mock import MockerFixture
 import pytest
