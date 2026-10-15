@@ -62,23 +62,23 @@ class AnimalReproductionStatistics:
 
     Attributes
     ----------
-    ED_days: int
+    ED_days : int
         The number of days the animal has been in the ED program.
-    estrus_count: int
+    estrus_count : int
         The number of estrus during the ED program.
-    GnRH_injections: int
+    GnRH_injections : int
         The number of GnRH injections.
-    PGF_injections: int
+    PGF_injections : int
         The number of PGF injections.
-    CIDR_injections: int
+    CIDR_injections : int
         The number of CIDR injections.
-    semen_number: int
+    semen_number : int
         number of straws of semen used
-    AI_times: int
+    AI_times : int
         The number of times that artificial injections are performed.
-    pregnancy_diagnoses: int
+    pregnancy_diagnoses : int
         The number of pregnancy diagnoses.
-    calving_to_pregnancy_time: int
+    calving_to_pregnancy_time : int
         The time between calving to pregnant for a call in days.
 
     """
@@ -109,22 +109,24 @@ class HerdReproductionStatistics:
 
     Attributes
     ----------
-    num_ai_performed: int
+    num_ai_performed : int
         The number of times AI was performed across all heiferIIs.
-    num_successful_conceptions: int
+    num_successful_conceptions : int
         The number of successful conceptions out of all AI performed.
-    num_ai_performed_in_ED: int
+    num_ai_performed_in_ED : int
         The number of times AI was performed in the ED protocol.
-    num_successful_conceptions_in_ED: int
+    num_successful_conceptions_in_ED : int
         The number of successful conceptions out of all AI performed in the ED.
-    num_ai_performed_in_TAI: int
+    num_ai_performed_in_TAI : int
         The number of times AI was performed in the TAI protocol.
-    num_successful_conceptions_in_TAI: int
+    num_successful_conceptions_in_TAI : int
         The number of successful conceptions out of all AI performed in the TAI.
-    num_ai_performed_in_SynchED: int
+    num_ai_performed_in_SynchED : int
         The number of times AI was performed in the SynchED protocol.
-    num_successful_conceptions_in_SynchED: int
+    num_successful_conceptions_in_SynchED : int
         The number of successful conceptions out of all AI performed in the SynchED.
+    num_do_not_breed_cows : int
+        The number of do not breed cows.
 
     """
 
@@ -148,6 +150,8 @@ class HerdReproductionStatistics:
     cow_num_successful_conceptions_in_ED: int = 0
     cow_num_successful_conceptions_in_TAI: int = 0
     cow_num_successful_conceptions_in_ED_TAI: int = 0
+
+    num_do_not_breed_cows: int = 0
 
     @property
     def overall_conception_rate(self) -> float:
