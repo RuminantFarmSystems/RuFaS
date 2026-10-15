@@ -128,6 +128,7 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3259](https://github.com/RuminantFarmSystems/RuFaS/pull/3259) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds in-vessel manure composting type option.
 - [3256](https://github.com/RuminantFarmSystems/RuFaS/pull/3256) - [minor change] [Branch Alignment] [NoInputChange] [NoOutputChange] Aligning `dev` branch with bug-fixing code from PR 3214 that was merged into `test`.
 - [3260](https://github.com/RuminantFarmSystems/RuFaS/pull/3260) - [minor change] [OutputManager] [NoInputChange] [NoOutputChange] Removes duplicative `report` naming mechanism in `OutputManager`.
+- [3288](https://github.com/RuminantFarmSystems/RuFaS/pull/3288) - [minor change] [Branch Alignment] [NoInputChange] [OutputChange] Aligning `dev` branch with the farmgrown feed emissions fix from PR 3202 that was merged into `test`.
 - [3275](https://github.com/RuminantFarmSystems/RuFaS/pull/3275) - [minor change] [E2E Testing] [NoInputChange] [NoOutputChange] Removes `deepdiff` check from the process to update e2e expected results.
 - [3285](https://github.com/RuminantFarmSystems/RuFaS/pull/3285) - [minor change] [Manure] [NoInputChange] [NoOutputChange] Adds MCF factor lookup table option for short-term storage duration `BeddedPack`.
 - [3273](https://github.com/RuminantFarmSystems/RuFaS/pull/3273) - [minor change] [E2E Testing] [NoInputChange] [NoOutputChange] Validates the end-to-end testing configuration before the simulation runs for both the comparison and the expected results update tasks.
@@ -136,3 +137,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3206](https://github.com/RuminantFarmSystems/RuFaS/pull/3206) - [minor change] [Animal] [NoInputChange] [OutputChange] Fixes the off-by-one error where cow milking history skipped DIM = 1 on calving day.
 - [3310](https://github.com/RuminantFarmSystems/RuFaS/pull/3310) - [minor change] [E2E Testing] [NoInputChange] [OutputChange] Updates expected e2e results.
 - [3318](https://github.com/RuminantFarmSystems/RuFaS/pull/3318) - [minor change] [pyproject.toml] [dependencies] [NoInputChange] [OutputChange] Updates pyproject.toml minimum deepdiff compatible version number.
+- [3241](https://github.com/RuminantFarmSystems/RuFaS/pull/3241) - [minor change] [Animal] [InputChange] [OutputChange] Replaces the per-lactation culling model with annual, parity-indexed death and acute-sale probabilities rolled daily.
