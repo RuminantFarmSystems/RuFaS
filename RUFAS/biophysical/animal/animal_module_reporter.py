@@ -168,7 +168,7 @@ class AnimalModuleReporter:
         cow_stat_info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_milk.__name__,
-            "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+            "data_origin": [("AnimalModuleReporter", "report_milk")],
             "units": MeasurementUnits.ANIMALS,
         }
         # Fresh cow number
@@ -187,13 +187,23 @@ class AnimalModuleReporter:
             om.add_variable(
                 f"average_estimated_daily_milk_produced_{parity_group}",
                 average_milk,
-                cow_stat_info_map,
+                {
+                    "class": AnimalModuleReporter.__name__,
+                    "function": AnimalModuleReporter.report_milk.__name__,
+                    "data_origin": [("AnimalModuleReporter", "report_milk")],
+                    "units": MeasurementUnits.LITERS,
+                },
             )
             # Avg DIM by parity (1, 2, 3+)
             om.add_variable(
                 f"average_days_in_milk_{parity_group}",
                 average_days_in_milk,
-                cow_stat_info_map,
+                {
+                    "class": AnimalModuleReporter.__name__,
+                    "function": AnimalModuleReporter.report_milk.__name__,
+                    "data_origin": [("AnimalModuleReporter", "report_milk")],
+                    "units": MeasurementUnits.DAYS,
+                },
             )
 
     @classmethod
@@ -927,8 +937,17 @@ class AnimalModuleReporter:
         om.add_variable(
             "num_heiferIII_to_cow_transitions",
             herd_statistics.heiferIII_to_cow_transitions,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            {
+                **info_map,
+                "units": MeasurementUnits.ANIMALS,
+                "data_origin": [("HerdManager", "execute_daily_routine")]
+            },
         )
+        sold_and_died_info_map = {
+            **info_map,
+            "units": MeasurementUnits.ANIMALS,
+            "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")]
+        }
         # Acute sale by parity
         for parity, count in (
             ("1", herd_statistics.acute_sale_cows_parity_1),
@@ -938,40 +957,40 @@ class AnimalModuleReporter:
             om.add_variable(
                 f"acute_sale_cows_parity_{parity}",
                 count,
-                dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+                sold_and_died_info_map
             )
         # Total cow removals by parity
         om.add_variable(
             "total_cow_removals_parity_1",
             herd_statistics.total_cow_removals_parity_1,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
         om.add_variable(
             "total_cow_removals_parity_2",
             herd_statistics.total_cow_removals_parity_2,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
         om.add_variable(
             "total_cow_removals_parity_3_plus",
             herd_statistics.total_cow_removals_parity_3_plus,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
 
         # Death by parity group
         om.add_variable(
             "cow_deaths_parity_1",
             herd_statistics.cow_deaths_parity_1,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
         om.add_variable(
             "cow_deaths_parity_2",
             herd_statistics.cow_deaths_parity_2,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
         om.add_variable(
             "cow_deaths_parity_3_plus",
             herd_statistics.cow_deaths_parity_3_plus,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
 
         # Milk production at removal
@@ -979,24 +998,24 @@ class AnimalModuleReporter:
             om.add_variable(
                 "milk_production_at_removal",
                 record,
-                dict(info_map, **{"units": MeasurementUnits.LITERS}),
+                sold_and_died_info_map
             )
 
         # Num oversupply/low-production by parity
         om.add_variable(
             "sold_cow_low_production_parity_1",
             herd_statistics.sold_cow_low_production_parity_1,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
         om.add_variable(
             "sold_cow_low_production_parity_2",
             herd_statistics.sold_cow_low_production_parity_2,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
         om.add_variable(
             "sold_cow_low_production_parity_3_plus",
             herd_statistics.sold_cow_low_production_parity_3_plus,
-            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+            sold_and_died_info_map,
         )
 
     @classmethod

@@ -209,22 +209,39 @@ def test_report_milk(mocker: MockerFixture) -> None:
             info_map,
         ),
     ]
+    
     cow_stat_info_map = {
         "class": AnimalModuleReporter.__name__,
         "function": AnimalModuleReporter.report_milk.__name__,
-        "data_origin": [("MilkProduction", "perform_daily_milking_update")],
-        "units": MeasurementUnits.ANIMALS,
+        "data_origin": [("AnimalModuleReporter", "report_milk")],
     }
+
     expected_add_variable_calls.extend(
         [
-            call("fresh_cow_num", 2, cow_stat_info_map),
-            call("cows_at_or_above_50_dim", 1, cow_stat_info_map),
-            call("average_estimated_daily_milk_produced_parity_1", 88.8, cow_stat_info_map),
-            call("average_days_in_milk_parity_1", 10.0, cow_stat_info_map),
-            call("average_estimated_daily_milk_produced_parity_2", 0.0, cow_stat_info_map),
-            call("average_days_in_milk_parity_2", 0.0, cow_stat_info_map),
-            call("average_estimated_daily_milk_produced_parity_3_and_above", 128.14, cow_stat_info_map),
-            call("average_days_in_milk_parity_3_and_above", 435.0, cow_stat_info_map),
+            call("fresh_cow_num", 2, {**cow_stat_info_map, "units": MeasurementUnits.ANIMALS}),
+            call("cows_at_or_above_50_dim", 1, {**cow_stat_info_map, "units": MeasurementUnits.ANIMALS}),
+            call(
+                "average_estimated_daily_milk_produced_parity_1",
+                88.8,
+                {**cow_stat_info_map, "units": MeasurementUnits.LITERS},
+            ),
+            call("average_days_in_milk_parity_1", 10.0, {**cow_stat_info_map, "units": MeasurementUnits.DAYS}),
+            call(
+                "average_estimated_daily_milk_produced_parity_2",
+                0.0,
+                {**cow_stat_info_map, "units": MeasurementUnits.LITERS},
+            ),
+            call("average_days_in_milk_parity_2", 0.0, {**cow_stat_info_map, "units": MeasurementUnits.DAYS}),
+            call(
+                "average_estimated_daily_milk_produced_parity_3_and_above",
+                128.14,
+                {**cow_stat_info_map, "units": MeasurementUnits.LITERS},
+            ),
+            call(
+                "average_days_in_milk_parity_3_and_above",
+                435.0,
+                {**cow_stat_info_map, "units": MeasurementUnits.DAYS},
+            ),
         ]
     )
 

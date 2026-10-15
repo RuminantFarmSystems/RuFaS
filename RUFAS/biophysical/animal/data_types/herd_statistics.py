@@ -457,6 +457,8 @@ class HerdStatistics:
             AnimalType.HEIFER_III: None,
         }
 
+        self.milk_production_at_removal = []
+
     def reset_parity(self) -> None:
         """Resets parity-based attributes."""
         for parity in self.num_cow_for_parity:
