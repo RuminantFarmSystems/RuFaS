@@ -2591,9 +2591,7 @@ class HerdManager:
                     }
 
     def _initialize_pregnancy_for_pregnant_animals_entering_the_herd(
-            self,
-            animals: list[Animal],
-            time: RufasTime
+        self, animals: list[Animal], time: RufasTime
     ) -> None:
         """
         Assign a random embryo sex to pregnant animals imported into the herd.
@@ -2603,6 +2601,8 @@ class HerdManager:
         animals : list[Animal]
             Pregnant animals entering the herd whose embryo sex has not yet
             been determined.
+        time : RufasTime
+            RufasTime object containing the current simulation day.
         """
         for animal in animals:
             if animal.is_pregnant:
@@ -2612,19 +2612,17 @@ class HerdManager:
                 log_message = (
                     f"Assigned semen type {SemenType.USER_DEFINED.name} and sex {animal.reproduction.embryo_sex} "
                     f"for pregnant {animal.animal_type.name} entering the herd on day {time.simulation_day} "
-                    f"based on a user-defined male calf rate of {AnimalConfig.user_defined_male_calf_rate}.")
-                om = OutputManager()
-                om.add_log(
+                    f"based on a user-defined male calf rate of {AnimalConfig.user_defined_male_calf_rate}."
+                )
+                OutputManager().add_log(
                     "Imported Pregnant Cow Assignment",
                     log_message,
                     {
                         "class": self.__class__.__name__,
-                        "function": self._initialize_pregnancy_for_pregnant_animals_entering_the_herd.__name__
+                        "function": self._initialize_pregnancy_for_pregnant_animals_entering_the_herd.__name__,
                     },
                 )
-                animal.events.add_event(
-                    animal.days_born, 0, log_message
-                )
+                animal.events.add_event(animal.days_born, time.simulation_day, log_message)
 
     def update_herd_305_day_milk_yields(self) -> None:
         """Refresh each cow's 305-day milk yield estimate (used by reporting and culling)."""

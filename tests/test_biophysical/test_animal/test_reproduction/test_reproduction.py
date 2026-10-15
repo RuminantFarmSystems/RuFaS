@@ -2672,6 +2672,41 @@ def test_assign_semen_type(
 
 
 @pytest.mark.parametrize(
+    "population_ranking_index, animal_ranking_index",
+    [
+        (None, 3.0),
+        ([1.0, 2.0, 3.0], None),
+        (None, None),
+        ([], 3.0),
+    ],
+)
+def test_assign_semen_type_falls_back_to_user_defined_without_ranking_info(
+    population_ranking_index: list[float] | None, animal_ranking_index: float | None
+) -> None:
+    """assign_semen_type falls back to user-defined semen when ranking information is unavailable."""
+    reproduction = Reproduction()
+
+    reproduction.assign_semen_type(
+        population_ranking_index=population_ranking_index,
+        animal_ranking_index=animal_ranking_index,
+        animal_type=AnimalType.LAC_COW,
+    )
+
+    assert reproduction.semen_type == SemenType.USER_DEFINED
+
+
+def test_perform_ai_raises_when_semen_type_unassigned(mocker: MockerFixture) -> None:
+    """_perform_ai raises a ValueError when no semen type was assigned."""
+    reproduction = Reproduction()
+    mocker.patch.object(AnimalConfig, "selective_repro_strategy", True)
+    mocker.patch.object(reproduction, "assign_semen_type")
+    reproduction.semen_type = None
+
+    with pytest.raises(ValueError, match="Semen type must be assigned"):
+        reproduction._perform_ai(mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW), 100)
+
+
+@pytest.mark.parametrize(
     "semen_type, male_calf_rate, random_value, expected_sex",
     [
         (SemenType.CONVENTIONAL_DAIRY, animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE, 0.0, Sex.MALE),

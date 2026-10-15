@@ -1163,7 +1163,8 @@ class Reproduction:
             )
         else:
             self.semen_type = SemenType.USER_DEFINED
-        assert self.semen_type is not None
+        if self.semen_type is None:
+            raise ValueError("Semen type must be assigned before performing AI.")
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,
             simulation_day,
@@ -2467,6 +2468,27 @@ class Reproduction:
     def assign_semen_type(
         self, population_ranking_index: list[float] | None, animal_ranking_index: float | None, animal_type: AnimalType
     ) -> None:
+        """
+        Assign the semen type used for AI based on the animal's ranking index percentile within the population.
+
+        Parameters
+        ----------
+        population_ranking_index : list[float] | None
+            Ranking indexes of all breeding-eligible animals in the population.
+        animal_ranking_index : float | None
+            Ranking index of the animal being inseminated.
+        animal_type : AnimalType
+            Type of the animal being inseminated, used to select the semen allocation proportions.
+
+        Notes
+        -----
+        If ranking information is unavailable (either ranking index is ``None`` or the population is empty), the
+        semen type falls back to ``SemenType.USER_DEFINED``.
+
+        """
+        if population_ranking_index is None or animal_ranking_index is None or len(population_ranking_index) == 0:
+            self.semen_type = SemenType.USER_DEFINED
+            return
         animal_ranking_index_percentile: float = float(
             np.mean(np.array(population_ranking_index) <= animal_ranking_index)
         )

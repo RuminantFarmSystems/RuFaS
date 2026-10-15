@@ -161,6 +161,7 @@ def test_initialize_pregnancy_for_pregnant_animals_entering_the_herd(
     assert pregnant_animal.reproduction.semen_type == SemenType.USER_DEFINED
     assert pregnant_animal.reproduction.embryo_sex == Sex.MALE
     pregnant_animal.events.add_event.assert_called_once()
+    assert pregnant_animal.events.add_event.call_args.args[:2] == (400, 42)
 
     open_animal.reproduction.repro_state_manager.enter.assert_not_called()
     open_animal.events.add_event.assert_not_called()
