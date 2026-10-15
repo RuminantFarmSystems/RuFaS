@@ -476,6 +476,7 @@ def test_cow_give_birth(is_calf_sold: bool, mock_herd_factory: HerdFactory, mock
     mock_calf_init.assert_called_once_with(
         NewBornCalfValuesTypedDict(
             sex=Sex.FEMALE,
+            bred_from_semen=None,
             id=AnimalPopulation.current_animal_id,
             breed=Breed.HO.name,
             birth_date="",
@@ -722,6 +723,7 @@ def test_cow_update_culled_false_new_born_true(
             animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
             newborn_calf_config=NewBornCalfValuesTypedDict(
                 sex=Sex.FEMALE,
+                bred_from_semen=None,
                 id=1,
                 breed=Breed.HO.name,
                 birth_date="",

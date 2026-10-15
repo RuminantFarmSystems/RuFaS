@@ -2282,6 +2282,7 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
             herd_reproduction_statistics=HerdReproductionStatistics(),
             newborn_calf_config=NewBornCalfValuesTypedDict(
                 sex=Sex.FEMALE,
+                bred_from_semen=None,
                 breed="test_breed",
                 animal_type="test_type",
                 birth_date="test_bd",
@@ -2309,6 +2310,7 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
     assert animal.nutrients.phosphorus_for_gestation_required_for_calf == 13
     assert result == NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed="test_breed",
         animal_type="test_type",
         birth_date="test_bd",
@@ -2334,6 +2336,7 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
         return_value=(
             NewBornCalfValuesTypedDict(
                 sex=Sex.FEMALE,
+                bred_from_semen=None,
                 breed="test_breed",
                 animal_type="test_type",
                 birth_date="test_bd",
@@ -2351,6 +2354,7 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
             AnimalStatus.LIFE_STAGE_CHANGED,
             NewBornCalfValuesTypedDict(
                 sex=Sex.FEMALE,
+                bred_from_semen=None,
                 breed="test_breed",
                 animal_type="test_type",
                 birth_date="test_bd",
@@ -2376,6 +2380,7 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
         animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
         newborn_calf_config=NewBornCalfValuesTypedDict(
             sex=Sex.FEMALE,
+            bred_from_semen=None,
             breed="test_breed",
             animal_type="test_type",
             birth_date="test_bd",
@@ -2402,6 +2407,7 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
         return_value=(
             mock_new_born_calf_config := NewBornCalfValuesTypedDict(
                 sex=Sex.FEMALE,
+                bred_from_semen=None,
                 breed="test_breed",
                 animal_type="test_type",
                 birth_date="test_bd",
@@ -2525,6 +2531,7 @@ def test_heiferIII_life_stage_update(
         "transition_heiferIII_to_cow",
         return_value=NewBornCalfValuesTypedDict(
             sex=Sex.FEMALE,
+            bred_from_semen=None,
             breed="test_breed",
             animal_type="test_type",
             birth_date="test_bd",
@@ -2542,6 +2549,7 @@ def test_heiferIII_life_stage_update(
         mock_transition.assert_called_once()
         assert output == NewBornCalfValuesTypedDict(
             sex=Sex.FEMALE,
+            bred_from_semen=None,
             breed="test_breed",
             animal_type="test_type",
             birth_date="test_bd",
@@ -2604,6 +2612,7 @@ def test_animal_life_stage_update_not_cow(
             AnimalStatus.LIFE_STAGE_CHANGED,
             NewBornCalfValuesTypedDict(
                 sex=Sex.FEMALE,
+                bred_from_semen=None,
                 breed="test_breed",
                 animal_type="test_type",
                 birth_date="test_bd",
@@ -2626,6 +2635,7 @@ def test_animal_life_stage_update_not_cow(
         assert status == AnimalStatus.DEAD
     assert output == NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed="test_breed",
         animal_type="test_type",
         birth_date="test_bd",
@@ -2724,6 +2734,7 @@ def test_transition_heiferIII_to_cow(mock_lactating_cow: Animal, mocker: MockerF
         return_value=(
             NewBornCalfValuesTypedDict(
                 sex=Sex.FEMALE,
+                bred_from_semen=None,
                 breed="test_breed",
                 animal_type="test_type",
                 birth_date="test_bd",
@@ -2748,6 +2759,7 @@ def test_transition_heiferIII_to_cow(mock_lactating_cow: Animal, mocker: MockerF
     mock_record_first_day.assert_called_once_with(mock_lactating_cow.days_born, mock_time)
     assert result == NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed="test_breed",
         animal_type="test_type",
         birth_date="test_bd",
@@ -3573,6 +3585,7 @@ def test_initialize_newborn_calf_genetics_with_dam_tbv(mocker: MockerFixture) ->
     animal.animal_type = AnimalType.CALF
     newborn_args: NewBornCalfValuesTypedDict = NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed="HO",
         animal_type="Calf",
         birth_date="2020-06-01",
@@ -3614,6 +3627,7 @@ def test_initialize_newborn_calf_genetics_without_dam_tbv(mocker: MockerFixture)
     animal.calves = 0
     newborn_args: NewBornCalfValuesTypedDict = NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed="HO",
         animal_type="Calf",
         birth_date="2020-06-01",
@@ -3643,6 +3657,7 @@ def test_initialize_newborn_calf_genetics_disabled(mocker: MockerFixture) -> Non
     animal.animal_type = AnimalType.CALF
     newborn_args: NewBornCalfValuesTypedDict = NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed="HO",
         animal_type="Calf",
         birth_date="2020-06-01",
@@ -3790,4 +3805,4 @@ def test_is_eligible_for_breeding(
     mock_animal.days_in_milk = days_in_milk
     mock_animal.reproduction.do_not_breed = do_not_breed
 
-    assert Animal.is_eligible_for_breeding.fget(mock_animal) is expected
+    assert Animal.is_eligible_for_breeding.fget(mock_animal) is expected  # type: ignore[attr-defined]

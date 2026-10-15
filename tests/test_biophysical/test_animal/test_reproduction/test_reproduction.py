@@ -643,6 +643,7 @@ def test_cow_reproduction_update(
         events=mock_events,
         newborn_calf_config=NewBornCalfValuesTypedDict(
             sex=Sex.FEMALE,
+            bred_from_semen=None,
             breed=Breed.HO.name,
             animal_type=AnimalType.CALF.value,
             birth_date="",

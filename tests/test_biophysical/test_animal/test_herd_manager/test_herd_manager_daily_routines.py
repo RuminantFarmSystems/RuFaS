@@ -151,6 +151,7 @@ def test_perform_daily_routines_for_animals(
                     animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
                     newborn_calf_config=NewBornCalfValuesTypedDict(
                         sex=Sex.FEMALE,
+                        bred_from_semen=None,
                         breed=Breed.HO.name,
                         animal_type=AnimalType.CALF.value,
                         birth_date="",
@@ -262,6 +263,7 @@ def test_perform_daily_routines_counts_deaths_and_handles_stillborn_newborns(
     newborn_config: NewBornCalfValuesTypedDict = {
         "breed": Breed.HO.name,
         "sex": Sex.FEMALE,
+        "bred_from_semen": None,
         "animal_type": AnimalType.CALF.value,
         "birth_date": "",
         "days_born": 0,
@@ -781,6 +783,7 @@ def test_create_newborn_calf(
     AnimalPopulation.set_current_max_animal_id(0)
     newborn_calf_config = NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed=Breed.HO.name,
         animal_type=AnimalType.CALF.value,
         birth_date="",
@@ -1200,6 +1203,7 @@ def test_create_newborn_calf_genetics_enabled(herd_manager: HerdManager, mocker:
 
     newborn_calf_config = NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed=Breed.HO.name,
         animal_type=AnimalType.CALF.value,
         birth_date="",
@@ -1233,6 +1237,7 @@ def test_create_newborn_calf_genetics_disabled(herd_manager: HerdManager, mocker
 
     newborn_calf_config = NewBornCalfValuesTypedDict(
         sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed=Breed.HO.name,
         animal_type=AnimalType.CALF.value,
         birth_date="",

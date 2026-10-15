@@ -153,7 +153,7 @@ def test_initialize_pregnancy_for_pregnant_animals_entering_the_herd(
     open_animal = MagicMock()
     open_animal.is_pregnant = False
 
-    animals = [pregnant_animal, open_animal]
+    animals: list[Animal] = [pregnant_animal, open_animal]
 
     herd_manager._initialize_pregnancy_for_pregnant_animals_entering_the_herd(animals, time)
 
