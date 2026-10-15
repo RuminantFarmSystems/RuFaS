@@ -55,6 +55,7 @@ class MeasurementUnits(Enum):
     KILOGRAMS_PER_DAY = "kg/day"
     KILOGRAMS_PER_GRAM = "kg/g"
     KILOGRAMS_PER_HECTARE = "kg/ha"
+    KILOGRAMS_PER_KILOGRAM_DRY_MATTER = "kg / kg DM"
     KILOGRAMS_PER_LITER = "kg/L"
     KILOGRAMS_PER_MEGAGRAM = "kg/Mg"
     KILOGRAMS_PER_MILLIGRAM = "kg/mg"
