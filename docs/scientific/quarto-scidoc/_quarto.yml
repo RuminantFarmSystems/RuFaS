@@ -16,6 +16,7 @@ book:
     - qmd/soil_and_crop.qmd
     - qmd/feed_storage.qmd
     - qmd/emissions.qmd
+    - qmd/economics.qmd
     - qmd/connections.qmd
     - abbrevs.qmd
 

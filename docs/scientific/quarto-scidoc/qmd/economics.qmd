@@ -2,7 +2,150 @@
 # Economics Module
 <!-- reuse code to import functions from "../scripts/": -->
 {{< include ../scripts/_import-from-scripts.qmd >}}
-plenty of text
+
 ## Introduction
+
+The Ruminant Farm Systems (RuFaS) Economics Module is designed to be a flexible and informative tool that captures key economic tradeoffs relevant to dairy farm decision-making. While the module does support the economic evaluation of individual or combined farm practices, it is not intended to perform a full whole-farm economic assessment accounting for all capital investments, operating expenses, and revenue streams. Instead, it supports targeted evaluations of specific management or investment strategies by quantifying their impact on relevant costs, revenue streams, and return metrics. These strategies reflect real-world decisions made by dairy producers—from adjustments in feed rations and land use to investments in animal infrastructure and manure handling systems. Each practice or scenario is analyzed to understand its financial tradeoffs, risks, and potential benefits under varying production and market conditions, helping users explore the economic implications of farm-level change within a defined system boundary.
+
+### Relevant Farm Practices and Target Analyses
+
+**High-Quality Feed for Increased Milk Production (feed cost vs. milk price)**
+
+This practice involves upgrading feed rations with more digestible forages, balanced nutrients, or energy-dense concentrates to improve milk output. The economics module evaluates the relationship between increased feed costs and gains in milk production, helping producers determine whether feed investments deliver sufficient returns under various herd productivity levels and milk pricing conditions.
+
+**Land Allocation for Feed Cost Reduction (land management costs vs. feed price)**
+
+Strategically selecting crops and allocating acreage to produce more homegrown feed, such as corn silage or alfalfa, can reduce reliance on purchased feed and enhance on-farm feed self-sufficiency. The analysis focuses on whether shifts in land allocation strategies improve economic performance by lowering feed procurement expenses while maintaining or enhancing feed quality. Land-use assumptions are set in the Crop & Soil module (total acres by crop and management practices, including any purchased or rented land). Using those acreage allocations, the Economics module then computes crop-specific input requirements and costs including seed, water, fuel, energy, tractor hours, and labor. 
+
+**Manure Management System Investments (capital investments vs. manure product values)**
+
+Investments in manure management infrastructure, such as anaerobic digesters, solid-liquid separators, and long-term storage systems, can unlock multiple economic and environmental benefits. These systems reduce nutrient loss and enable more efficient nutrient application, lowering fertilizer costs. Anaerobic digesters can produce renewable natural gas (RNG) or electricity through combined heat and power (CHP), generating revenue from energy sales, low-carbon fuel programs, and carbon credit markets. Additional cost savings may come from reduced hauling and off-site disposal requirements. The economics module evaluates these systems by incorporating capital and operating costs, energy and co-product revenues, and nutrient and transport savings to assess their contribution to farm profitability and sustainability.
+
+### Flexible Economic Framework
+
+The Flexible Economic Framework (FEF) serves as the core analytical structure of the RuFaS Economics Module. It uses a unified Discounted Cash Flow Rate of Return (DCFROR) model to evaluate the economic impacts of both individual practices and combined management strategies. Rather than relying on separate calculators for different analyses, the framework routes all analyses through a single model, adapting its assumptions and outputs based on the type of input data and user-defined scenario setup.
+
+The FEF supports two types of economic analysis depending on whether capital investment is included in the scenario:
+
+1.	**Partial Budget Analysis (PBA)** – used to evaluate changes in operating expenses and revenues in scenarios that do not involve capital investment.
+2.	**Discounted Cash Flow Rate of Return Analysis (DCFROR)** – used when capital expenditures are included, allowing for evaluation of long-term cash flows, depreciation, and the time value of money.
+
+Both analysis types are run through the same underlying model structure and use the same data sources and economic logic. The key difference lies in the financial assumptions and outputs: the PBA provides annual margin-based metrics, while the DCFROR generates investment metrics such as internal rate of return (IRR), payback period, and minimum product selling prices.
+
+Importantly, both the PBA and DCFROR approaches focus on the financial impact of specific practices or investment strategies. They do not represent a comprehensive whole-farm economic analysis and should not be interpreted as reflecting all capital, operating, and revenue flows on the farm. Outputs are only valid within the boundaries of the modeled scenario and are intended to inform decisions at the practice or investment level.
+
+### Economic Performance Metrics
+
+The following economic metrics are used throughout the framework to characterize the financial performance of different farm configurations:
+
+* **Internal Rate of Return (IRR)**: The discount rate at which the net present value (NPV) of all future cash flows equals zero. It reflects the expected annual rate of return on an investment and is commonly used to assess the profitability of capital-intensive projects.
+* **Return on Investment (ROI)**: The ratio of net benefit to cost, expressed as a percentage. ROI measures the efficiency of an investment or practice by comparing the gains (increased revenue or cost savings) to the additional expenses required to implement it.
+* **Payback Period**: The amount of time (usually in years) it takes for an investment to recover its initial cost from accumulated net cash flows (net cash flows are discounted to today’s dollars). Shorter payback periods generally indicate lower financial risk.
+* **Profit Margin / Net Annual Cash Flow**: The difference between annual revenues and operating expenses. This metric provides a snapshot of profitability within a single year and is particularly relevant for partial budget analyses without capital investment.
+* **Minimum Product Selling Price (MPSP)**: The minimum price at which a product (e.g., milk) must be sold for a farm practice or investment to break even over the analysis period. MPSP can be evaluated under fixed-price scenarios or using a user-defined vector of temporal price data for key commodities (e.g., energy, semen, feed). This is useful in evaluating how sensitive an investment’s viability is to market fluctuations in input costs or co-product values.
+
+### Decision Logic and Output Routing
+
+The model adjusts its internal logic depending on whether capital expenditures (CAPEX) are included and whether one or more scenarios are being compared:
+
+* **Single scenario with CAPEX**: When analyzing a single farm configuration that includes capital investment, the DCFROR model incorporates the time value of money, capital depreciation, and long-term cash flow structure. Outputs from the model include net annual cash flow (profit margin), IRR, payback period, and MPSP (e.g., the lowest milk price required to break even on the specific investment or set of practices under review — not the full farm operation). 
+* **Single scenario without CAPEX**: If the analysis does not include capital investment, the model performs a PBA. It focuses only on changes in operating expenses and revenues, without discounting or depreciation. In this case, the model reports profit margins or net annual cash flow as the primary output.
+* **Scenario comparison with CAPEX**: When comparing two scenarios that include capital investments, the model calculates the change (delta) in key financial indicators such as IRR, payback period, or MPSP. It also reports ROI between the scenarios, providing a detailed understanding of how an investment alters financial performance.
+* **Scenario comparison without CAPEX**: When comparing two farm scenarios that differ in management practices but do not involve capital investments, the DCFROR model calculates the ROI between the two. This can be done for a single year, across multiple years, or as a cumulative ROI over the entire analysis period.
+* **Scenario comparison with CAPEX in only one scenario**: When only one of the two scenarios includes a capital investment, full investment metrics cannot be directly compared. In this case, the model defaults to reporting the difference in net annual cash flow between the two configurations. This provides a valid, if limited, basis for comparing the financial impact of the scenarios while avoiding misinterpretation of incompatible metrics like IRR and ROI. However, the FEF can still provide IRR, payback period, and MPSP for the scenario that does include CAPEX.
+
+This harmonized framework allows users to conduct a wide range of economic analyses—from quick evaluations of operating tradeoffs to in-depth investment analyses—using a consistent methodology and model structure. Figure 1 illustrates the decision logic used by the FEF to determine the appropriate analysis pathway and output metrics.
+
+![Logic flow of the Flexible Economic Framework (FEF), showing how user-defined scenario configurations determine analysis routing and output metrics. The decision flow distinguishes between single vs. comparative scenarios and the inclusion or exclusion of capital investment (CAPEX), guiding whether the analysis follows a partial budget or discounted cash flow approach.](../resources/images/econ_fef.png){#fig-eco-flow-fef}
+
+
+## Required User Inputs
+
+### Variable Naming Convention
+
+### Economic Inputs
+
+**Grant Financing for Capital Projects**
+
+
+### Binary Inputs and Booleans
+
+### Biophysical Inputs
+
+
+
+## Expected Outputs
+
+
+**Partial Budget Analysis**
+
+**Example DCFROR Analysis**
+
+**Example ROI Analysis**
+
+
+
+## Methodology
+
+
+### Economics Module Inputs Manager
+
+**Historical Data, Inflation Adjustment, and Discounting**
+
+
+### Dynamic Costing Functions
+
+**Anaerobic Digestors (Crowley & Brorsen)**
+
+**Anaerobic Digestors with Biogas Upgrading (Large Scale)**
+
+**Manure Separators**
+
+**Estimation of Manure Hauling Costs and Manure Value**
+
+**Costs Associated with the Use of Tractors**
+
+
+### Return on Investment (ROI) Calculation
+
+
+### Discounted Cashflow Rate of Return (DCFROR) Analysis
+
+**Step 1: Define the Timeline**
+
+
+**Step 2: Compute Discount Factors**
+
+
+**Step 3: Determine Capital Expenditures During Construction**
+
+
+**Step 4: Calculate Annual Loan Payments and Breakdown of Annual Loan Payments**
+
+
+**Step 5: Calculate Depreciation**
+
+
+**Step 6: Determine Net Revenue and Taxable Income**
+
+
+**Step 7: Calculate Taxes and Annual Cash Income**
+
+
+**Step 8: Convert Annual Income to Present Value**
+
+
+**Step 9: Calculate Net Present Value**
+
+
+**Goal Seek Optimization**
+
+
+### RuFaS Economic Database and Default Values**
+
+**Data Retrieval Hierarchy**
+
+**Economic Data Resolution**
+
 
 ## References
