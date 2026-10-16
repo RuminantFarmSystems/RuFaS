@@ -209,6 +209,42 @@ def test_report_milk(mocker: MockerFixture) -> None:
             info_map,
         ),
     ]
+
+    cow_stat_info_map = {
+        "class": AnimalModuleReporter.__name__,
+        "function": AnimalModuleReporter.report_milk.__name__,
+        "data_origin": [("AnimalModuleReporter", "report_milk")],
+    }
+
+    expected_add_variable_calls.extend(
+        [
+            call("fresh_cow_num", 2, {**cow_stat_info_map, "units": MeasurementUnits.ANIMALS}),
+            call("cows_at_or_above_50_dim", 1, {**cow_stat_info_map, "units": MeasurementUnits.ANIMALS}),
+            call(
+                "average_estimated_daily_milk_produced_parity_1",
+                88.8,
+                {**cow_stat_info_map, "units": MeasurementUnits.LITERS},
+            ),
+            call("average_days_in_milk_parity_1", 10.0, {**cow_stat_info_map, "units": MeasurementUnits.DAYS}),
+            call(
+                "average_estimated_daily_milk_produced_parity_2",
+                0.0,
+                {**cow_stat_info_map, "units": MeasurementUnits.LITERS},
+            ),
+            call("average_days_in_milk_parity_2", 0.0, {**cow_stat_info_map, "units": MeasurementUnits.DAYS}),
+            call(
+                "average_estimated_daily_milk_produced_parity_3_and_above",
+                128.14,
+                {**cow_stat_info_map, "units": MeasurementUnits.LITERS},
+            ),
+            call(
+                "average_days_in_milk_parity_3_and_above",
+                435.0,
+                {**cow_stat_info_map, "units": MeasurementUnits.DAYS},
+            ),
+        ]
+    )
+
     AnimalModuleReporter.report_milk(milk_reports, simulation_day)
     assert mock_om_add_variable.call_args_list == expected_add_variable_calls
 
@@ -801,7 +837,7 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
     hs = HerdStatistics()
 
     # Set distinct non-zero values so each assertion catches a wrong-field mapping.
-    hs.sold_cow_oversupply_num = 1
+    hs.sold_cow_low_production_num = 1
     hs.bought_heifer_num = 2
     hs.sold_heiferII_num = 3
     hs.cow_herd_exit_num = 4
@@ -846,20 +882,32 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
         AnimalType.HEIFER_II: 0.9,
         AnimalType.HEIFER_III: 1.0,
     }
-    # heifer_average_daily_gain_by_pen left empty → no per-pen calls
+    hs.heiferIII_to_cow_transitions = 24
+    hs.acute_sale_cows_parity_1 = 25
+    hs.acute_sale_cows_parity_2 = 26
+    hs.acute_sale_cows_parity_3_plus = 27
+
+    hs.total_cow_removals_parity_1 = 28
+    hs.total_cow_removals_parity_2 = 29
+    hs.total_cow_removals_parity_3_plus = 30
+
+    hs.cow_deaths_parity_1 = 31
+    hs.cow_deaths_parity_2 = 32
+    hs.cow_deaths_parity_3_plus = 33
+
+    hs.milk_production_at_removal = []
 
     simulation_day = 42
 
     AnimalModuleReporter.report_herd_statistics_data(hs, simulation_day)
 
-    # Total calls: 57 fixed + 3 heifer-by-type + 0 per-pen = 60
-    assert mock_om_add_variable.call_count == 60
+    assert mock_om_add_variable.call_count == 75
 
     # Build lookup: variable_name → value from actual calls
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
 
     # --- event counts ---
-    assert reported["sold_cow_oversupply_num"] == 1
+    assert reported["sold_cow_low_production_num"] == 1
     assert reported["bought_heifer_num"] == 2
     assert reported["sold_heiferII_num"] == 3
     assert reported["cow_herd_exit_num"] == 4
@@ -935,6 +983,20 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
     assert reported["heiferII_average_daily_gain"] == pytest.approx(0.9)
     assert reported["heiferIII_average_daily_gain"] == pytest.approx(1.0)
 
+    assert reported["num_heiferIII_to_cow_transitions"] == 24
+
+    assert reported["acute_sale_cows_parity_1"] == 25
+    assert reported["acute_sale_cows_parity_2"] == 26
+    assert reported["acute_sale_cows_parity_3_plus"] == 27
+
+    assert reported["total_cow_removals_parity_1"] == 28
+    assert reported["total_cow_removals_parity_2"] == 29
+    assert reported["total_cow_removals_parity_3_plus"] == 30
+
+    assert reported["cow_deaths_parity_1"] == 31
+    assert reported["cow_deaths_parity_2"] == 32
+    assert reported["cow_deaths_parity_3_plus"] == 33
+
 
 def test_report_herd_statistics_data_with_pen_heifer_adg(mocker: MockerFixture) -> None:
     """Unit test for report_herd_statistics_data() when heifer ADG by pen is populated.
@@ -950,8 +1012,7 @@ def test_report_herd_statistics_data_with_pen_heifer_adg(mocker: MockerFixture) 
 
     AnimalModuleReporter.report_herd_statistics_data(hs, 1)
 
-    # 57 fixed + 3 heifer-by-type + 2 per-pen = 62
-    assert mock_om_add_variable.call_count == 62
+    assert mock_om_add_variable.call_count == 77
 
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
     assert reported["heifer_average_daily_gain_in_pen_3"] == pytest.approx(1.1)
@@ -976,7 +1037,7 @@ def test_report_daily_reproduction_statistics(mocker: MockerFixture) -> None:
         "data_origin": [("HerdManager", "daily_update")],
         "units": MeasurementUnits.CONCEPTIONS,
     }
-    assert mock_om_add_variable.call_count == 3
+    assert mock_om_add_variable.call_count == 4
     mock_om_add_variable.assert_any_call("num_successful_conceptions", 5, info_map)
     mock_om_add_variable.assert_any_call("heiferII_num_successful_conceptions", 2, info_map)
     mock_om_add_variable.assert_any_call("cow_num_successful_conceptions", 3, info_map)
@@ -1106,7 +1167,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             animal_type="LacCow",
             sold_at_day=123,
             body_weight=456.78,
-            cull_reason=animal_constants.UDDER_CULL,
+            cull_reason=animal_constants.ACUTE_SALE_CULL,
             days_in_milk=18,
             parity=2,
             genetic_history="",
@@ -1126,7 +1187,7 @@ def test_report_sold_animal_information(mocker: MockerFixture) -> None:
             animal_type="DryCow",
             sold_at_day=123,
             body_weight=456.78,
-            cull_reason=animal_constants.LAMENESS_CULL,
+            cull_reason=animal_constants.ACUTE_SALE_CULL,
             days_in_milk=0,
             parity=3,
             genetic_history="",
