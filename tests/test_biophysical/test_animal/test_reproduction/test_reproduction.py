@@ -1836,15 +1836,15 @@ def test_execute_heifer_tai_protocol(
     "days_in_milk, cow_presynch_method, ovsynch_program_start_day, presynch_program_start_day, "
     "expected_fresh_entry, expected_presynch_setup, expected_ovsynch_setup, expected_hormone_execute",
     [
-        (10, "None", 20, 15, True, False, False, True),
-        (25, "None", 20, 15, False, False, True, True),
+        (10, None, 20, 15, True, False, False, True),
+        (25, None, 20, 15, False, False, True, True),
         (10, "Double OvSynch", 20, 15, True, False, False, True),
         (20, "Double OvSynch", 20, 15, False, True, True, True),
     ],
 )
 def test_execute_cow_tai_protocol(
     days_in_milk: int,
-    cow_presynch_method: str,
+    cow_presynch_method: str | None,
     ovsynch_program_start_day: int,
     presynch_program_start_day: int,
     expected_fresh_entry: bool,
