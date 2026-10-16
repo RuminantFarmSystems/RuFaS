@@ -443,25 +443,29 @@
               "type": "string",
               "description": "The presynch program (1st breeding) for cow in the TAI protocol. Currently, this is only supported in TAI protocol. When other protocols such as ED or ED-TAI are used, this value will be ignored, and it is recommended to set it to None.",
               "default": "Double OvSynch",
-              "pattern": "^(Double OvSynch|PreSynch|G6G|None)$"
+              "pattern": "^(Double OvSynch|PreSynch|G6G|None)$",
+              "nullable": true
             },
             "presynch_program_start_day": {
               "type": "number",
               "description": "The presynch program start day is the day of the first hormone injection in a presynch program used in the TAI protocol. When a presynch program is followed by an OvSynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. The durations of the 3 options - PreSynch, Double OvSynch, and G6G, are 25, 16, and 8 days, respectively. Because the presynch program is only supported in TAI protocol, this value will be ignored when other protocols such as ED or ED-TAI are used, and it is recommended to set it to 0.",
               "default": 50,
-              "minimum": 0
+              "minimum": 0,
+              "nullable": true
             },
             "ovsynch_program": {
               "type": "string",
               "description": "The OvSynch program to be used for cows in the TAI protocol and the TAI portion of the ED-TAI protocol. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None",
               "pattern": "^(OvSynch 48|OvSynch 56|CoSynch 72|5d CoSynch|None)$",
-              "default": "OvSynch 56"
+              "default": "OvSynch 56",
+              "nullable": true
             },
             "ovsynch_program_start_day": {
               "type": "number",
               "description": "When set properly in the TAI protocol, OvSynch program start day is the day of the first GnRH injection in an OvSynch program. When the OvSynch program follows a presynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. Otherwise, the OvSynch program will be shifted to start on the last day of the presynch program. When ED-TAI protocol is used and no estrus detected between the end of the voluntary waiting period and this OvSynch program start day, then the OvSynch program will start on this day. When the ED protocol is used, this value will be ignored, and it is recommended to set it to 0.",
               "minimum": 0,
-              "default": 70
+              "default": 70,
+              "nullable": true
             },
             "ovsynch_program_conception_rate": {
               "type": "number",
@@ -474,7 +478,8 @@
               "type": "string",
               "description": "Resynch program for cow before/at/after first pregnancy check day in the TAI and ED-TAI repro protocols. When the ED protocol is used, this value will be ignored, and it is recommended to set it to None. If PGFatPD is chosen, the values for estrus detection rate and conception rate to that detected estrus following PGF are determined by estrus_detection_rate and ED_conception_rate. Anytime an insemination is performed after an ovsynch program, the conception rate will be changed to the ovsynch_program_conception_rate.",
               "default": "TAIafterPD",
-              "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
+              "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$",
+              "nullable": true
             }
           }
         },
