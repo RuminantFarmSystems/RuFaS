@@ -138,3 +138,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3310](https://github.com/RuminantFarmSystems/RuFaS/pull/3310) - [minor change] [E2E Testing] [NoInputChange] [OutputChange] Updates expected e2e results.
 - [3318](https://github.com/RuminantFarmSystems/RuFaS/pull/3318) - [minor change] [pyproject.toml] [dependencies] [NoInputChange] [OutputChange] Updates pyproject.toml minimum deepdiff compatible version number.
 - [3241](https://github.com/RuminantFarmSystems/RuFaS/pull/3241) - [minor change] [Animal] [InputChange] [OutputChange] Replaces the per-lactation culling model with annual, parity-indexed death and acute-sale probabilities rolled daily.
+- [3329](https://github.com/RuminantFarmSystems/RuFaS/pull/3329) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds high priority herd statistics outputs.
