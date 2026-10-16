@@ -1,0 +1,78 @@
+{
+  "processor_connections": [
+    {
+      "processor_name": "calf_manual_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "compost",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "growing_alley_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_growing",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "closeup_manual_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "screw_press_1",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "lac_alley_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_lac",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "parlor_cleaning_handler",
+      "destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_lac",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "slurry_storage_outdoor_lac",
+      "destinations": []
+    },
+    {
+      "processor_name": "compost",
+      "destinations": []
+    },
+    {
+      "processor_name": "slurry_storage_outdoor_growing",
+      "destinations": []
+    }
+  ],
+  "separator_connections": [
+    {
+      "processor_name": "screw_press_1",
+      "liquid_output_destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_growing",
+          "proportion": 1.0
+        }
+      ],
+      "solid_output_destinations": [
+        {
+          "receiving_processor_name": "compost",
+          "proportion": 1.0
+        }
+      ]
+    }
+  ]
+}

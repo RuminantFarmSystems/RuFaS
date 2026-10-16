@@ -1,0 +1,40 @@
+# Parametrização — Faz. Campo Dourado (Goiás)  (`GO_campo_dourado`)
+
+- **Estado**: Goiás
+- **Cenário**: conservador
+- **Descrição**: Conservador: 100 vacas, manejo base, foco em estabilidade. Alimentação: feed=northeast, padrão=NASEM, reformulação=45d, P-buffer=50%, metano=3-NOP, ordenhas/dia=3. Clima: GO (Goiás).
+- **output_prefix**: `GO_campo_dourado`
+- **Período**: 2015:1 → 2019:365
+- **Gerado em**: 2026-10-04T15:58:12
+- **Random seed**: 44
+- **Metadata**: `output/synthetic_farms/campanha_80_fazendas/GO_campo_dourado/farm_metadata.json`
+
+## Parâmetros girados (overrides)
+
+- `[arquivo] feed: input/data/feed/example_Midwest_feed.json -> input/data/feed/example_Northeast_feed.json`
+- `[arquivo] weather: input/data/weather/example_temperate_weather.csv -> input/data/weather/BR_GO_weather.csv`
+- `animal.herd_information.cow_num: 100 -> 100`
+- `animal.herd_information.herd_num: 100 -> 100`
+- `animal.herd_information.milking_cow_fraction: 0.8356 -> 0.8356`
+- `animal.animal_config.farm_level.repro.calving_interval: 400 -> 400`
+- `config.nutrient_standard: NASEM -> NASEM`
+- `animal.ration.formulation_interval: 30 -> 45`
+- `animal.ration.phosphorus_requirement_buffer: 0 -> 50`
+- `animal.methane_mitigation.methane_mitigation_method: None -> 3-NOP`
+- `animal.animal_config.management_decisions.cow_times_milked_per_day: 3 -> 3`
+- `animal.methane_mitigation.3-NOP_additive_amount: 70 -> 90`
+- `config.start_date: 2013:1 -> 2015:1`
+
+## Config resolvido
+
+```json
+{
+  "start_date": "2015:1",
+  "end_date": "2019:365",
+  "set_seed": true,
+  "simulation_type": "full_farm",
+  "nutrient_standard": "NASEM",
+  "FIPS_county_code": 55025,
+  "include_detailed_values": false
+}
+```

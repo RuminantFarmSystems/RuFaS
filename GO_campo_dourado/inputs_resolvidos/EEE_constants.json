@@ -1,0 +1,121 @@
+{
+  "constants": [
+    {
+      "ID": 585,
+      "Grouping": "",
+      "Name": "Field Speed",
+      "Description": "formerly S",
+      "Value": 10,
+      "Unit": "km/hr",
+      "Notes and remarks": "Where S can be taken as 10km/h, refer to the external link or IFSM handbook for W, and field efficiency is taken as 0.90."
+    },
+    {
+      "ID": 587,
+      "Grouping": "",
+      "Name": "Field Efficiency",
+      "Description": "",
+      "Value": 0.9,
+      "Unit": "unitless",
+      "Notes and remarks": "The proportion of time in the field that is spent conducting the work"
+    },
+    {
+      "ID": 589,
+      "Grouping": "",
+      "Name": "Small Tractor PTO",
+      "Description": "",
+      "Value": 55.93,
+      "Unit": "kW",
+      "Notes and remarks": ""
+    },
+    {
+      "ID": 590,
+      "Grouping": "",
+      "Name": "Small Tractor Power Available",
+      "Description": "",
+      "Value": 39.95,
+      "Unit": "kW",
+      "Notes and remarks": "power available is PTO/1.4"
+    },
+    {
+      "ID": 591,
+      "Grouping": "",
+      "Name": "Small Tractor Mass",
+      "Description": "",
+      "Value": 8400,
+      "Unit": "kg",
+      "Notes and remarks": ""
+    },
+    {
+      "ID": 592,
+      "Grouping": "",
+      "Name": "Medium Tractor PTO",
+      "Description": "",
+      "Value": 208.42,
+      "Unit": "kW",
+      "Notes and remarks": ""
+    },
+    {
+      "ID": 593,
+      "Grouping": "",
+      "Name": "Medium Tractor Power Available",
+      "Description": "",
+      "Value": 148.8714286,
+      "Unit": "kW",
+      "Notes and remarks": "power available is PTO/1.4"
+    },
+    {
+      "ID": 594,
+      "Grouping": "",
+      "Name": "Medium Tractor Mass",
+      "Description": "",
+      "Value": 12700,
+      "Unit": "kg",
+      "Notes and remarks": ""
+    },
+    {
+      "ID": 595,
+      "Grouping": "",
+      "Name": "Large Tractor PTO",
+      "Description": "",
+      "Value": 328.11,
+      "Unit": "kW",
+      "Notes and remarks": ""
+    },
+    {
+      "ID": 596,
+      "Grouping": "",
+      "Name": "Large Tractor Power Available",
+      "Description": "",
+      "Value": 234.3642857,
+      "Unit": "kW",
+      "Notes and remarks": "power available is PTO/1.4"
+    },
+    {
+      "ID": 597,
+      "Grouping": "",
+      "Name": "Large Tractor Mass",
+      "Description": "",
+      "Value": 20856,
+      "Unit": "kg",
+      "Notes and remarks": ""
+    },
+    {
+      "ID": 598,
+      "Grouping": "",
+      "Name": "Tractor Speed",
+      "Description": "",
+      "Value": 10,
+      "Unit": "km/hr",
+      "Notes and remarks": ""
+    },
+    {
+      "ID": 599,
+      "Grouping": "",
+      "Name": "Converstion to kWh",
+      "Description": "",
+      "Value": 0.75,
+      "Unit": "",
+      "Notes and remarks": ""
+    }
+  ]
+}

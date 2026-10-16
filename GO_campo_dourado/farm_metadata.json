@@ -1,0 +1,247 @@
+{
+  "files": {
+    "config": {
+      "title": "Config Data",
+      "description": "Configuration file for general simulation parameters.",
+      "path": "GO_campo_dourado/inputs_resolvidos/config.json",
+      "type": "json",
+      "properties": "config_properties"
+    },
+    "animal": {
+      "title": "Animal data",
+      "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
+      "path": "GO_campo_dourado/inputs_resolvidos/animal.json",
+      "type": "json",
+      "properties": "animal_properties"
+    },
+    "animal_population": {
+      "title": "Animal population data",
+      "description": "Animal objects that herd initialization draws from during the simulation. A similar file can be generated using the -I and -s command line arguments simultaneously.",
+      "path": "GO_campo_dourado/inputs_resolvidos/animal_population.json",
+      "type": "json",
+      "properties": "animal_population_properties"
+    },
+    "animal_mean_phenotype": {
+      "title": "Mean animal phenotype data by birth year",
+      "description": "The mean animal phenotype data by birth year.",
+      "path": "GO_campo_dourado/inputs_resolvidos/animal_mean_phenotype.csv",
+      "type": "csv",
+      "properties": "animal_mean_phenotype_properties"
+    },
+    "animal_top_listing_semen": {
+      "title": "Animal Top Listing Semen data",
+      "description": "The top listing semen value for new born calves.",
+      "path": "GO_campo_dourado/inputs_resolvidos/animal_top_listing_semen.csv",
+      "type": "csv",
+      "properties": "animal_top_listing_semen_properties"
+    },
+    "lactation": {
+      "title": "Lactation curve adjustment values",
+      "description": "Values for the adjustment of the three wood parameters based on farm specific data",
+      "path": "GO_campo_dourado/inputs_resolvidos/lactation.json",
+      "type": "json",
+      "properties": "lactation_properties"
+    },
+    "economy": {
+      "title": "Economy data",
+      "description": "Energy prices used in the EEE module.",
+      "path": "GO_campo_dourado/inputs_resolvidos/economy.csv",
+      "type": "csv",
+      "properties": "economic_properties"
+    },
+    "emission": {
+      "title": "Emissions data",
+      "description": "General emission values used in the EEE module.",
+      "path": "GO_campo_dourado/inputs_resolvidos/emission.csv",
+      "type": "csv",
+      "properties": "emissions_properties"
+    },
+    "purchased_feeds_emissions": {
+      "title": "Emissions from purchased feeds",
+      "description": "Purchased feeds emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
+      "path": "GO_campo_dourado/inputs_resolvidos/purchased_feeds_emissions.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
+    "purchased_feed_land_use_change_emissions": {
+      "title": "Land Use Change emissions from purchased feeds",
+      "description": "Purchased feeds land use change emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
+      "path": "GO_campo_dourado/inputs_resolvidos/purchased_feed_land_use_change_emissions.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
+    "feed": {
+      "title": "Feed data",
+      "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
+      "path": "GO_campo_dourado/inputs_resolvidos/feed.json",
+      "type": "json",
+      "properties": "feed_properties"
+    },
+    "NRC_Comp": {
+      "title": "NRC Comp data",
+      "description": "Nutritional information for each feed, following NRC (2001) guidelines.",
+      "path": "GO_campo_dourado/inputs_resolvidos/NRC_Comp.csv",
+      "type": "csv",
+      "properties": "NRC_Comp_properties"
+    },
+    "NASEM_Comp": {
+      "title": "NASEM Comp data",
+      "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
+      "path": "GO_campo_dourado/inputs_resolvidos/NASEM_Comp.csv",
+      "type": "csv",
+      "properties": "NASEM_Comp_properties"
+    },
+    "manure_management": {
+      "title": "Manure Processor Configurations",
+      "description": "Configurations of manure processors (handlers, separators, digesters, and storages) used in Manure module.",
+      "path": "GO_campo_dourado/inputs_resolvidos/manure_management.json",
+      "type": "json",
+      "properties": "manure_management_properties"
+    },
+    "manure_processor_connection": {
+      "title": "Manure Processor Connections",
+      "description": "The connection configs for all manure processors.",
+      "path": "GO_campo_dourado/inputs_resolvidos/manure_processor_connection.json",
+      "type": "json",
+      "properties": "manure_processor_connection_properties"
+    },
+    "crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "GO_campo_dourado/inputs_resolvidos/crop_configurations.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
+    },
+    "field_1": {
+      "title": "Field specification",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "GO_campo_dourado/inputs_resolvidos/field_1.json",
+      "type": "json",
+      "properties": "field_properties"
+    },
+    "soil_1": {
+      "title": "Soil data",
+      "description": "Characteristic soil information, including composition, slope, and layer details.",
+      "path": "GO_campo_dourado/inputs_resolvidos/soil_1.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "Corn-Alf-Silage": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "GO_campo_dourado/inputs_resolvidos/Corn-Alf-Silage.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "fertilizer_schedule_1": {
+      "title": "Fertilizer schedule.",
+      "description": "Fertilizer types available, and their application schedule.",
+      "path": "GO_campo_dourado/inputs_resolvidos/fertilizer_schedule_1.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "manure_schedule_1": {
+      "title": "Manure schedule.",
+      "description": "Specifies manure applications to a field.",
+      "path": "GO_campo_dourado/inputs_resolvidos/manure_schedule_1.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "tillage_schedule_1": {
+      "title": "Tillage schedule.",
+      "description": "Schedule of tillage applications for a field.",
+      "path": "GO_campo_dourado/inputs_resolvidos/tillage_schedule_1.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "field_2": {
+      "title": "Field specification",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "GO_campo_dourado/inputs_resolvidos/field_2.json",
+      "type": "json",
+      "properties": "field_properties"
+    },
+    "soil_2": {
+      "title": "Soil data",
+      "description": "Characteristic soil information, including composition, slope, and layer details.",
+      "path": "GO_campo_dourado/inputs_resolvidos/soil_2.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "CornGrain-AlfHay": {
+      "title": "Crop data",
+      "description": "Crop selection and detailed rotation schedules.",
+      "path": "GO_campo_dourado/inputs_resolvidos/CornGrain-AlfHay.json",
+      "type": "json",
+      "properties": "crop_schedule_properties"
+    },
+    "fertilizer_schedule_2": {
+      "title": "Fertilizer schedule.",
+      "description": "Fertilizer types available, and their application schedule.",
+      "path": "GO_campo_dourado/inputs_resolvidos/fertilizer_schedule_2.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "manure_schedule_2": {
+      "title": "Manure schedule.",
+      "description": "Specifies manure applications to a field.",
+      "path": "GO_campo_dourado/inputs_resolvidos/manure_schedule_2.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "tillage_schedule_2": {
+      "title": "Tillage schedule.",
+      "description": "Schedule of tillage applications for a field.",
+      "path": "GO_campo_dourado/inputs_resolvidos/tillage_schedule_2.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "weather": {
+      "title": "Weather data",
+      "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
+      "path": "GO_campo_dourado/inputs_resolvidos/weather.csv",
+      "type": "csv",
+      "properties": "weather_properties"
+    },
+    "user_feeds": {
+      "title": "User Feed",
+      "description": "Summary of feeds available for use in the simulation, including their RuFaS ID, short descriptors, and which nutrient composition file they are included in.",
+      "path": "GO_campo_dourado/inputs_resolvidos/user_feeds.csv",
+      "type": "csv",
+      "properties": "user_feeds_properties"
+    },
+    "tractor_dataset": {
+      "title": "Tractor Dataset",
+      "description": "Details agricultural machinery operations for various crops, including tractor size, operations (planting, mowing, collection, etc.), implement details, operational parameters (depth, width, mass), and throughput metrics, spanning different crop types and soil management practices.",
+      "path": "GO_campo_dourado/inputs_resolvidos/tractor_dataset.csv",
+      "type": "csv",
+      "properties": "tractor_dataset_properties"
+    },
+    "EEE_constants": {
+      "title": "EEE Constants",
+      "description": "The constants that are used in EEE module.",
+      "path": "GO_campo_dourado/inputs_resolvidos/EEE_constants.json",
+      "type": "json",
+      "properties": "EEE_constants_properties"
+    },
+    "feed_storage_configurations": {
+      "title": "Feed Management",
+      "description": "Configurations for feed storage units.",
+      "path": "GO_campo_dourado/inputs_resolvidos/feed_storage_configurations.json",
+      "type": "json",
+      "properties": "feed_storage_configurations"
+    },
+    "feed_storage_instances": {
+      "title": "Feed Storages",
+      "description": "Names of feed storage configs used in the simulation.",
+      "path": "GO_campo_dourado/inputs_resolvidos/feed_storage_instances.json",
+      "type": "json",
+      "properties": "feed_storage_instances"
+    }
+  },
+  "runtime_metadata": {
+    "EEE_econ": {
+      "path": "input/metadata/EEE/econ_metadata.json"
+    }
+  }
+}

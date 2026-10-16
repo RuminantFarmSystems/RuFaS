@@ -1,0 +1,11 @@
+{
+  "files": {
+    "tasks": {
+      "title": "Pipeline task — GO_campo_dourado",
+      "description": "Task file dedicado para a fazenda sintética compartilhada GO_campo_dourado.",
+      "path": "GO_campo_dourado/_pipeline_tasks.json",
+      "type": "json",
+      "properties": "tasks_properties"
+    }
+  }
+}
