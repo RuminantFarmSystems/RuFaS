@@ -560,4 +560,4 @@ Explanation:
   ``kg``\ *``day``/``day``*\ ``kg`` in the report title like this:
   ``Herd enteric CH4 per FPCM_hor_agg_(kg*day/day*kg)``
 
-.. |RuFaS Overview - RG| image:: https://github.com/RuminantFarmSystems/MASM/assets/70217952/214edc14-8b4c-4468-a1db-0678381555c9
+.. |RuFaS Overview - RG| image:: https://github.com/RuminantFarmSystems/RuFaS/assets/70217952/214edc14-8b4c-4468-a1db-0678381555c9

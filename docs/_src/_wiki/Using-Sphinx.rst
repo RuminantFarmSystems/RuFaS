@@ -39,7 +39,7 @@ As a rule of thumb, the reST files do not need to be updated unless
 files are added or removed from the codebase. If the docstrings in a
 file are updated, then it may be appropriate to update the HTML and/or
 Latex Documentation. See the "reStructuredText" and "HTML" sections of
-this wiki pages for instructions to regenerate the reST and HTML files,
+this pages for instructions to regenerate the reST and HTML files,
 respectively.
 
 If both reST and HTML/Latex files are being regenerated, it is important
