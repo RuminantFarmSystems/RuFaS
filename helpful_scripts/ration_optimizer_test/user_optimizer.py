@@ -9,7 +9,14 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, Nutrie
 STRATEGY_DESCRIPTION = "First test"
 
 
-class UserRationOptimizer:
+class UserRationOptimizer(RationOptimizer):
+    """Inherit the original helpers and initializer; customize the attempt below.
+
+    Use self.set_constraints(...), self._build_bounds(...), self.objective(...),
+    and other inherited methods. super().attempt_optimization(...) calls the
+    original implementation when needed.
+    """
+
     def attempt_optimization(
         self,
         nutrient_standard: NutrientStandard,
