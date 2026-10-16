@@ -171,10 +171,7 @@ class AnimalModuleReporter:
             "data_origin": [("AnimalModuleReporter", "report_milk")],
             "units": MeasurementUnits.ANIMALS,
         }
-        # Fresh cow number
         om.add_variable("fresh_cow_num", fresh_cows, cow_stat_info_map)
-
-        # Other cow number (> 50 DIM)
         om.add_variable("cows_at_or_above_50_dim", cows_at_or_above_50_dim, cow_stat_info_map)
 
         for parity_group, data in parity_data.items():
@@ -183,7 +180,6 @@ class AnimalModuleReporter:
                 sum(data["days_in_milk"]) / len(data["days_in_milk"]) if data["days_in_milk"] else 0.0
             )
 
-            # Avg daily milk by parity (1, 2, 3+)
             om.add_variable(
                 f"average_estimated_daily_milk_produced_{parity_group}",
                 average_milk,
@@ -194,7 +190,6 @@ class AnimalModuleReporter:
                     "units": MeasurementUnits.LITERS,
                 },
             )
-            # Avg DIM by parity (1, 2, 3+)
             om.add_variable(
                 f"average_days_in_milk_{parity_group}",
                 average_days_in_milk,
@@ -933,7 +928,6 @@ class AnimalModuleReporter:
             herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III],
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
-        # Primiparous calvings
         om.add_variable(
             "num_heiferIII_to_cow_transitions",
             herd_statistics.heiferIII_to_cow_transitions,
@@ -944,14 +938,12 @@ class AnimalModuleReporter:
             "units": MeasurementUnits.ANIMALS,
             "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
         }
-        # Acute sale by parity
         for parity, count in (
             ("1", herd_statistics.acute_sale_cows_parity_1),
             ("2", herd_statistics.acute_sale_cows_parity_2),
             ("3_plus", herd_statistics.acute_sale_cows_parity_3_plus),
         ):
             om.add_variable(f"acute_sale_cows_parity_{parity}", count, sold_and_died_info_map)
-        # Total cow removals by parity
         om.add_variable(
             "total_cow_removals_parity_1",
             herd_statistics.total_cow_removals_parity_1,
@@ -967,8 +959,6 @@ class AnimalModuleReporter:
             herd_statistics.total_cow_removals_parity_3_plus,
             sold_and_died_info_map,
         )
-
-        # Death by parity group
         om.add_variable(
             "cow_deaths_parity_1",
             herd_statistics.cow_deaths_parity_1,
@@ -984,8 +974,6 @@ class AnimalModuleReporter:
             herd_statistics.cow_deaths_parity_3_plus,
             sold_and_died_info_map,
         )
-
-        # Milk production at removal
         om.add_variable(
             "milk_production_at_removal_sum",
             herd_statistics.milk_production_at_removal_sum,
@@ -995,7 +983,6 @@ class AnimalModuleReporter:
                 "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
             },
         )
-
         om.add_variable(
             "milk_production_at_removal_count",
             herd_statistics.milk_production_at_removal_count,
@@ -1005,8 +992,6 @@ class AnimalModuleReporter:
                 "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
             },
         )
-
-        # Num oversupply/low-production by parity
         om.add_variable(
             "sold_cow_low_production_parity_1",
             herd_statistics.sold_cow_low_production_parity_1,
@@ -1064,7 +1049,6 @@ class AnimalModuleReporter:
             daily_herd_reproduction_statistics.cow_num_successful_conceptions,
             dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
         )
-        # number_dnb_cows_in_herd
         om.add_variable(
             "number_dnb_cows_in_herd",
             daily_herd_reproduction_statistics.num_do_not_breed_cows,

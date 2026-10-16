@@ -164,11 +164,11 @@ class HerdStatistics:
     heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
         The average daily bodyweight gain for heifers by animal type, (kg).
     acute_sale_cows_parity_1 : int
-        Number of cows sold from parity 1 group.
+        Number of cows sold from parity 1 group for acute sales.
     acute_sale_cows_parity_2 : int
-        Number of cows sold from parity 2 group.
+        Number of cows sold from parity 2 group for acute sales.
     acute_sale_cows_parity_3_plus : int
-        Number of cows sold from parity 3+ group.
+        Number of cows sold from parity 3+ group for acute sales.
     total_cow_removals_parity_1 : int
         Total number of cows removed from parity 1 group.
     total_cow_removals_parity_2 : int

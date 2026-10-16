@@ -1007,7 +1007,6 @@ class HerdManager:
             weather,
         )
 
-        # num_dnb_cows_in_herd
         self.daily_herd_reproduction_statistics.num_do_not_breed_cows = sum(
             cow.reproduction.do_not_breed for cow in self.cows
         )
@@ -2346,7 +2345,6 @@ class HerdManager:
                 [cow for cow in sold_and_died_cows if cow.cull_reason == cull_reason]
             )
 
-        # Number oversupply (low production) cows by parity
         low_production_cows = [
             cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL
         ]
@@ -2379,7 +2377,6 @@ class HerdManager:
         ]
         self.herd_statistics.sold_cow_num += len(sold_cows)
 
-        # Acute sale by parity
         acute_sale_cows = [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.ACUTE_SALE_CULL]
 
         self.herd_statistics.acute_sale_cows_parity_1 += sum(cow.reproduction.calves == 1 for cow in acute_sale_cows)
@@ -2388,7 +2385,6 @@ class HerdManager:
             cow.reproduction.calves >= 3 for cow in acute_sale_cows
         )
 
-        # Total cow removals by parity
         self.herd_statistics.total_cow_removals_parity_1 += sum(
             cow.reproduction.calves == 1 for cow in sold_and_died_cows
         )
@@ -2399,14 +2395,12 @@ class HerdManager:
             cow.reproduction.calves >= 3 for cow in sold_and_died_cows
         )
 
-        # Deaths by parity group
         dead_cows = [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DEATH_CULL]
 
         self.herd_statistics.cow_deaths_parity_1 += sum(cow.reproduction.calves == 1 for cow in dead_cows)
         self.herd_statistics.cow_deaths_parity_2 += sum(cow.reproduction.calves == 2 for cow in dead_cows)
         self.herd_statistics.cow_deaths_parity_3_plus += sum(cow.reproduction.calves >= 3 for cow in dead_cows)
 
-        # Milk production at removal
         for cow in sold_and_died_cows:
             self.herd_statistics.milk_production_at_removal_sum += cow.milk_production.daily_milk_produced
             self.herd_statistics.milk_production_at_removal_count += 1
