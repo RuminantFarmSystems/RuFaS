@@ -118,3 +118,24 @@ def test_calculate_bedding_water(
 ) -> None:
     bedding.bedding_type = bedding_type
     assert pytest.approx(bedding.calculate_bedding_water(num_animals)) == expected_result
+
+
+def test_bedding_lignin_fraction_defaults_to_zero(bedding: Bedding) -> None:
+    """Beddings constructed without a lignin fraction default to zero lignin content."""
+    assert bedding.bedding_lignin_fraction == 0.0
+
+
+def test_bedding_lignin_fraction_from_config() -> None:
+    """A configured lignin fraction is stored on the bedding."""
+    bedding = Bedding(
+        name="dummy_name",
+        bedding_mass_per_day=1.1,
+        bedding_density=2.2,
+        bedding_dry_matter_content=0.33,
+        bedding_carbon_fraction=0.44,
+        bedding_phosphorus_content=0.55,
+        bedding_type=BeddingType.STRAW,
+        bedding_lignin_fraction=0.08,
+    )
+
+    assert bedding.bedding_lignin_fraction == 0.08
