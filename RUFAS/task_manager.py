@@ -1088,6 +1088,10 @@ class TaskManager:
             Directory containing the E2E simulation outputs and where comparison outputs will be written.
         verbosity : LogVerbosity or None
             Log verbosity level for each E2E comparison.
+        is_end_to_end_test_task : bool
+            Whether the task is an e2e task.
+        is_update_end_to_end_test_task : bool
+            Whether the task is an e2e update expected results task.
 
         Returns
         -------
@@ -1170,6 +1174,10 @@ class TaskManager:
         verbosity : LogVerbosity or None
             Log verbosity level for the E2E group. If ``None``, the verbosity configured in the E2E run arguments is
             used.
+        is_end_to_end_test_task : bool
+            Whether the task is an e2e task.
+        is_update_end_to_end_test_task : bool
+            Whether the task is an e2e update expected results task.
 
         Notes
         -----
@@ -1313,7 +1321,30 @@ class TaskManager:
         produce_graphics: bool,
         should_flush_im_pool: bool,
     ) -> None:
-        """Run a simulation for E2E testing or expected results generation."""
+        """
+        Run a simulation for E2E testing or expected results generation.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
+            The arguments used to configure the simulation.
+        input_manager : InputManager
+            The input manager associated with the simulation.
+        output_manager : OutputManager
+            The output manager associated with the simulation.
+        task_id : str
+            The identifier for the E2E simulation task.
+        produce_graphics : bool
+            Whether graphics should be generated for the simulation.
+        should_flush_im_pool : bool
+            Whether the InputManager pool should be flushed during simulation processing.
+
+        Notes
+        -----
+        Logs the start and completion of the E2E simulation and delegates the simulation execution to the standard
+        simulation engine task handler. Averaging and comparison or update of E2E results are performed separately
+        after all simulations in the E2E group have completed.
+        """
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager._run_e2e_simulation.__name__,
