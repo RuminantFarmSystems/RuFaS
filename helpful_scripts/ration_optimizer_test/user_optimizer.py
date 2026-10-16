@@ -6,7 +6,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import Nutrit
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationConfig, RationOptimizer
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, NutrientStandard, RUFAS_ID
 
-STRATEGY_DESCRIPTION = "Delegates to original RuFaS; no different strategy implemented yet."
+STRATEGY_DESCRIPTION = "First test"
 
 
 class UserRationOptimizer:
@@ -30,17 +30,42 @@ class UserRationOptimizer:
         # be reused. Return (OptimizeResult(x=..., success=...), RationConfig(...)).
         # x and config.feeds_used MUST both follow ascending rufas_id order.
         # Import RationConfig from ration_optimizer, not another homonymous class.
-        return RationOptimizer().attempt_optimization(
-            nutrient_standard=nutrient_standard,
-            pen_average_body_weight=pen_average_body_weight,
-            pen_average_enteric_methane=pen_average_enteric_methane,
-            pen_average_urine_nitrogen=pen_average_urine_nitrogen,
-            requirements=requirements,
-            initial_dry_matter_requirement=initial_dry_matter_requirement,
-            initial_protein_requirement=initial_protein_requirement,
-            pen_available_feeds=pen_available_feeds,
-            animal_combination=animal_combination,
-            previous_ration=previous_ration,
-            user_defined_ration_dictionary=user_defined_ration_dictionary,
-            user_defined_ration_tolerance=user_defined_ration_tolerance,
+
+        ration_config = RationConfig(
+            nutrient_standard,
+            requirements,
+            sorted_pen_available_feeds,
+            initial_dry_matter_requirement,
+            initial_protein_requirement,
+            pen_average_body_weight,
+            pen_average_enteric_methane,
+            pen_average_urine_nitrogen,
+            animal_combination,
         )
+
+        sorted_pen_available_feeds = sorted(pen_available_feeds, key=lambda feed: feed.rufas_id)
+        
+        #Ingredientes list
+        price_list_length = len(ration_config.price_list)
+        initial_decision_vector= [1.0] + [random.random() * 10 for _ in range(price_list_length - 1)]
+        initial_decision_vector=np.array(initial_decision_vector,dtype=float)
+
+        #Bounds
+        bounds = list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
+
+
+
+        ration_config = RationConfig(
+            nutrient_standard,
+            requirements,
+            sorted_pen_available_feeds,
+            initial_dry_matter_requirement,
+            initial_protein_requirement,
+            pen_average_body_weight,
+            pen_average_enteric_methane,
+            pen_average_urine_nitrogen,
+            animal_combination
+        )
+
+        
+        return 2
