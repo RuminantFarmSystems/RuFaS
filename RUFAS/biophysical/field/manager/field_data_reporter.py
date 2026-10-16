@@ -554,8 +554,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_metabolic_active_carbon_usage",
-            layer.plant_metabolic_active_carbon_usage,
+            "residue_metabolic_active_carbon_usage",
+            layer.residue_metabolic_active_carbon_usage,
             dict(
                 info_map,
                 **{
@@ -565,8 +565,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_metabolic_active_carbon_loss",
-            layer.plant_metabolic_active_carbon_loss,
+            "residue_metabolic_active_carbon_loss",
+            layer.residue_metabolic_active_carbon_loss,
             dict(
                 info_map,
                 **{
@@ -576,8 +576,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_metabolic_active_carbon_remaining",
-            layer.plant_metabolic_active_carbon_remaining,
+            "residue_metabolic_active_carbon_remaining",
+            layer.residue_metabolic_active_carbon_remaining,
             dict(
                 info_map,
                 **{
@@ -587,8 +587,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_active_carbon_usage",
-            layer.plant_structural_active_carbon_usage,
+            "residue_structural_active_carbon_usage",
+            layer.residue_structural_active_carbon_usage,
             dict(
                 info_map,
                 **{
@@ -630,8 +630,30 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_active_carbon_remaining",
-            layer.plant_structural_active_carbon_remaining,
+            "manure_carbon_to_metabolic_amount",
+            layer.manure_carbon_to_metabolic_amount,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("ResiduePartition", "partition_manure_residue")],
+                },
+            ),
+        )
+        self.om.add_variable(
+            "manure_carbon_to_structural_amount",
+            layer.manure_carbon_to_structural_amount,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("ResiduePartition", "partition_manure_residue")],
+                },
+            ),
+        )
+        self.om.add_variable(
+            "residue_structural_active_carbon_remaining",
+            layer.residue_structural_active_carbon_remaining,
             dict(
                 info_map,
                 **{
@@ -641,8 +663,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_slow_carbon_usage",
-            layer.plant_structural_slow_carbon_usage,
+            "residue_structural_slow_carbon_usage",
+            layer.residue_structural_slow_carbon_usage,
             dict(
                 info_map,
                 **{
@@ -652,8 +674,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_slow_carbon_loss",
-            layer.plant_structural_slow_carbon_loss,
+            "residue_structural_slow_carbon_loss",
+            layer.residue_structural_slow_carbon_loss,
             dict(
                 info_map,
                 **{
@@ -663,8 +685,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_structural_slow_carbon_remaining",
-            layer.plant_structural_slow_carbon_remaining,
+            "residue_structural_slow_carbon_remaining",
+            layer.residue_structural_slow_carbon_remaining,
             dict(
                 info_map,
                 **{
@@ -928,8 +950,8 @@ class FieldDataReporter:
             ),
         )
         self.om.add_variable(
-            "plant_active_decompose_carbon",
-            layer.plant_active_decompose_carbon,
+            "residue_active_decompose_carbon",
+            layer.residue_active_decompose_carbon,
             dict(
                 info_map,
                 **{
@@ -1489,6 +1511,28 @@ class FieldDataReporter:
             "cover_type",
             field.soil.data.cover_type,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS, "data_origin": [("SoilData", "")]}),
+        )
+        self.om.add_variable(
+            "manure_lignin_nitrogen_ratio",
+            field.soil.data.manure_lignin_nitrogen_ratio,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.UNITLESS,
+                    "data_origin": [("ResiduePartition", "partition_manure_residue")],
+                },
+            ),
+        )
+        self.om.add_variable(
+            "manure_residue_metabolic_fraction",
+            field.soil.data.manure_residue_metabolic_fraction,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.FRACTION,
+                    "data_origin": [("ResiduePartition", "partition_manure_residue")],
+                },
+            ),
         )
         self.om.add_variable(
             "full_available_phosphorus_pool",
@@ -2156,6 +2200,21 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("FieldDataReporter", "send_soil_annual_variables")],
+                },
+            ),
+        )
+
+        self.om.add_variable(
+            "annual_manure_carbon_applied_total",
+            field.soil.data.annual_manure_carbon_applied_total,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [
+                        ("ManureApplication", "apply_machine_manure"),
+                        ("SoilData", "do_annual_reset"),
+                    ],
                 },
             ),
         )

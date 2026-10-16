@@ -157,6 +157,7 @@ class TillageApplication:
             "fresh_organic_nitrogen_content",
             "metabolic_litter_amount",
             "structural_litter_amount",
+            "manure_carbon_residue",
             "active_carbon_amount",
             "slow_carbon_amount",
             "passive_carbon_amount",
