@@ -4,7 +4,9 @@ from types import SimpleNamespace
 
 from RUFAS.EEE.economics import mapping as economics_mapping
 from RUFAS.EEE.economics import preprocessing
+from RUFAS.EEE.economics import data_processor
 from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -41,6 +43,8 @@ class DummyOutputManager:
 
     def add_variable(self, variable_name, value, info_map=None, **kwargs):
         self.added_variables.append((variable_name, value))
+
+    extract_numeric_values_and_info_maps = OutputManager.extract_numeric_values_and_info_maps
 
 
 class DummyInputManager:
@@ -85,6 +89,8 @@ def test_preprocess_collects_values_and_prices(monkeypatch: pytest.MonkeyPatch) 
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -127,6 +133,8 @@ def test_preprocess_selects_price_by_selector(monkeypatch: pytest.MonkeyPatch) -
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -170,6 +178,8 @@ def test_preprocess_reads_input_manager_values(monkeypatch: pytest.MonkeyPatch) 
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -210,6 +220,8 @@ def test_preprocess_handles_invalid_economics_path(monkeypatch: pytest.MonkeyPat
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -244,6 +256,8 @@ def test_preprocess_skips_pool_check_on_wildcard_path(monkeypatch: pytest.Monkey
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -287,6 +301,8 @@ def test_preprocess_skips_input_manager_on_wildcard_path(monkeypatch: pytest.Mon
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -328,6 +344,8 @@ def test_preprocess_expands_input_wildcard_from_biophysical_regex(monkeypatch: p
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -357,6 +375,8 @@ def test_preprocess_warns_when_input_wildcard_cannot_expand(monkeypatch: pytest.
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -390,6 +410,8 @@ def test_preprocess_exact_price_match_from_input_manager_values(monkeypatch: pyt
     dummy_om = DummyOutputManager({})
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -425,6 +447,8 @@ def test_preprocess_exact_price_match_from_biophysical_wildcards(monkeypatch: py
     )
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -467,6 +491,8 @@ def test_preprocess_bedding_mapping_style_wildcard_input_price_match(monkeypatch
     )
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -507,6 +533,8 @@ def test_collect_biophysical_wildcards_does_not_return_empty_groups(monkeypatch:
     )
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     preprocessor = preprocessing.EconomicPreprocessor()
     captures = preprocessor._collect_biophysical_wildcards(
         ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"]
@@ -531,6 +559,8 @@ def test_preprocess_expands_input_wildcard_with_value_map(monkeypatch: pytest.Mo
     )
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -568,6 +598,8 @@ def test_preprocess_purchased_feed_costs_derives_weighted_price(monkeypatch: pyt
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -600,7 +632,7 @@ def test_preprocess_purchased_feed_costs_derives_weighted_price(monkeypatch: pyt
     )
 
 
-def test_context_expands_interval_values_to_daily() -> None:
+def test_context_expands_interval_values_to_daily(monkeypatch: pytest.MonkeyPatch) -> None:
     dummy_im = DummyInputManager({})
     dummy_om = DummyOutputManager(
         {
@@ -615,7 +647,9 @@ def test_context_expands_interval_values_to_daily() -> None:
         time=SimpleNamespace(simulation_length_days=5),
     )
 
-    context = EconomicDataProcessor(dummy_im, dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
+    context = EconomicDataProcessor()
     values_by_scenario = context.fetch_values_by_scenario(
         ["FeedManager.purchase_feed.ration_interval_.*_cost"], expand_interval_to_daily=True
     )
@@ -623,7 +657,7 @@ def test_context_expands_interval_values_to_daily() -> None:
     assert values_by_scenario == {"baseline": [100.0, 0.0, 0.0, 200.0, 0.0]}
 
 
-def test_context_interval_expansion_skipped_without_time() -> None:
+def test_context_interval_expansion_skipped_without_time(monkeypatch: pytest.MonkeyPatch) -> None:
     dummy_im = DummyInputManager({})
     dummy_om = DummyOutputManager(
         {
@@ -637,7 +671,9 @@ def test_context_interval_expansion_skipped_without_time() -> None:
         }
     )
 
-    context = EconomicDataProcessor(dummy_im, dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
+    context = EconomicDataProcessor()
     values_by_scenario = context.fetch_values_by_scenario(
         ["FeedManager.purchase_feed.ration_interval_.*_cost"], expand_interval_to_daily=True
     )
@@ -670,6 +706,8 @@ def test_preprocess_purchased_feed_costs_uses_fallback_when_no_data(monkeypatch:
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -731,6 +769,8 @@ def test_preprocess_purchased_feed_costs_real_mapping_entry(monkeypatch: pytest.
 
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     monkeypatch.setattr(
         preprocessing,
         "ECONOMIC_MAP",
@@ -796,6 +836,8 @@ def _run_bedding(
     dummy_om = DummyOutputManager(pool)
     monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
     monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
     bedding_entry = {
         "biophysical_simulation": ["AnimalModuleReporter.report_daily_pen_total.number_of_animals_in_pen_.*"],
         "input_manager": ["animal.pen_information.*.manure_streams.0.bedding_name"],
@@ -1119,3 +1161,94 @@ def test_bedding_line_item_flows_into_framework_breakdown() -> None:
     }
     breakdown = framework._build_line_item_breakdown(preprocessed)
     assert breakdown["Animal"]["costs"]["Bedding requirements"]["total"] == pytest.approx(2900.0)
+
+
+def _patch_managers(monkeypatch: pytest.MonkeyPatch, dummy_im: DummyInputManager, dummy_om: DummyOutputManager) -> None:
+    monkeypatch.setattr(preprocessing, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(preprocessing, "OutputManager", lambda: dummy_om)
+    monkeypatch.setattr(data_processor, "InputManager", lambda: dummy_im)
+    monkeypatch.setattr(data_processor, "OutputManager", lambda: dummy_om)
+
+
+def test_unmatched_line_item_handler_emits_warning(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager({})
+    _patch_managers(monkeypatch, dummy_im, dummy_om)
+    monkeypatch.setattr(
+        preprocessing,
+        "ECONOMIC_MAP",
+        {"Section": {"Category": {"Item": {"biophysical_simulation": ["Some.variable"]}}}},
+    )
+
+    preprocessing.EconomicPreprocessor()
+
+    unmatched = [message for code, message, _ in dummy_om.warnings if code == "UnmatchedLineItemHandler"]
+    assert len(unmatched) == len(preprocessing.SPECIAL_CASE_HANDLERS)
+
+
+def test_matched_line_item_handlers_emit_no_warning(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager({})
+    _patch_managers(monkeypatch, dummy_im, dummy_om)
+
+    preprocessing.EconomicPreprocessor()
+
+    assert "UnmatchedLineItemHandler" not in [code for code, _, _ in dummy_om.warnings]
+
+
+def test_context_warns_when_fallback_values_substituted(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager({})
+    _patch_managers(monkeypatch, dummy_im, dummy_om)
+    path = "AnimalModuleReporter.report_life_cycle_manager_data.bought_heifer_num"
+
+    values_by_scenario = EconomicDataProcessor().fetch_values_by_scenario([path])
+
+    assert values_by_scenario == {"baseline": [5.0]}
+    assert "BiophysicalFallbackSubstituted" in [code for code, _, _ in dummy_om.warnings]
+
+
+def test_context_warns_when_fallback_values_substituted_for_unmatched_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager({"Other.variable": {"values": [1.0]}})
+    _patch_managers(monkeypatch, dummy_im, dummy_om)
+    fallback_path = "AnimalModuleReporter.report_life_cycle_manager_data.bought_heifer_num"
+
+    values_by_scenario = EconomicDataProcessor().fetch_values_by_scenario(["Other.variable", fallback_path])
+
+    assert values_by_scenario == {"baseline": [1.0, 5.0]}
+    assert "BiophysicalFallbackSubstituted" in [code for code, _, _ in dummy_om.warnings]
+
+
+def test_bedding_handler_warns_when_mapping_entry_missing(monkeypatch: pytest.MonkeyPatch) -> None:
+    from RUFAS.EEE.economics.handler import BeddingRequirementsHandler
+
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager({})
+    _patch_managers(monkeypatch, dummy_im, dummy_om)
+    monkeypatch.setattr(economics_mapping, "ECONOMIC_MAP", {})
+
+    details = BeddingRequirementsHandler(EconomicDataProcessor())._get_mapping_details()
+
+    assert details == {}
+    assert "MissingEconomicMapEntry" in [code for code, _, _ in dummy_om.warnings]
+
+
+def test_purchased_feed_prices_group_multi_scenario_variables_by_feed(monkeypatch: pytest.MonkeyPatch) -> None:
+    from RUFAS.EEE.economics.handler import PurchasedFeedCostHandler
+
+    dummy_im = DummyInputManager({})
+    dummy_om = DummyOutputManager(
+        {
+            "run_a.FeedManager.purchase_feed.ration_interval_1_amount_purchased": {"values": [10.0]},
+            "run_a.FeedManager.purchase_feed.ration_interval_1_cost": {"values": [20.0]},
+            "run_b.FeedManager.purchase_feed.ration_interval_1_amount_purchased": {"values": [5.0]},
+            "run_b.FeedManager.purchase_feed.ration_interval_1_cost": {"values": [10.0]},
+        }
+    )
+    _patch_managers(monkeypatch, dummy_im, dummy_om)
+    handler = PurchasedFeedCostHandler(EconomicDataProcessor())
+
+    amount_sums = handler._sum_matches_by_wildcard(handler.amount_patterns)
+
+    assert amount_sums == {"1": 15.0}

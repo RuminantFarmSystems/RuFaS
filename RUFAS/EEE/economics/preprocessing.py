@@ -13,7 +13,7 @@ validated using the ``economic_preprocessing_properties`` metadata.
 
 Line items whose preprocessing cannot be expressed by the generic
 biophysical/input/price pipeline are delegated to dedicated
-:class:`~RUFAS.EEE.economics.handler.base.SpecialCaseHandler`
+:class:`~RUFAS.EEE.economics.handler.base.LineItemHandler`
 subclasses. :class:`EconomicPreprocessor` builds a ``(section, name)``
 handler map from :data:`~RUFAS.EEE.economics.handler.SPECIAL_CASE_HANDLERS`
 and routes matching line items to them, keeping the main pipeline free of
@@ -32,7 +32,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.mapping import ECONOMIC_MAP
 from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
-from RUFAS.EEE.economics.handler import Handler, SPECIAL_CASE_HANDLERS
+from RUFAS.EEE.economics.handler import LineItemHandler, SPECIAL_CASE_HANDLERS
 from RUFAS.EEE.economics.fallback_values import (
     BIOPHYSICAL_FALLBACKS,
     ECONOMIC_PRICE_FALLBACK,
@@ -66,14 +66,24 @@ class EconomicPreprocessor:
     ) -> None:
         self.im = InputManager()
         self.om = OutputManager()
-        self.context = EconomicDataProcessor(self.im, self.om)
+        self.context = EconomicDataProcessor()
         self.mapping = self._build_mapping()
         self.special_case_handlers = self._build_special_case_handlers()
 
-    def _build_special_case_handlers(self) -> dict[tuple[str, str], Handler]:
+    def _build_special_case_handlers(self) -> dict[tuple[str, str], LineItemHandler]:
         """Instantiate registered special-case handlers keyed by ``(section, name)``."""
 
         handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
+        mapped_keys = {(item.section, item.name) for item in self.mapping}
+        info_map = {"class": self.__class__.__name__, "function": self._build_special_case_handlers.__name__}
+        for handler in handlers:
+            if handler.economic_map_key not in mapped_keys:
+                self.om.add_warning(
+                    "UnmatchedLineItemHandler",
+                    f"{handler.__class__.__name__} is keyed on {handler.economic_map_key}, which does not match "
+                    "any economic mapping line item; the handler will not be used",
+                    info_map,
+                )
         return {handler.economic_map_key: handler for handler in handlers}
 
     def _build_mapping(self) -> List[EconomicItem]:
@@ -454,7 +464,7 @@ class EconomicPreprocessor:
     def _resolve_price_aggregate(self, item: EconomicItem, price_values: List[float]) -> float | None:
         """Average commodity prices, applying flow-type fallbacks when no prices are found."""
 
-        price_aggregate = self.context.aggregate(price_values, "average")
+        price_aggregate = Aggregator.aggregate_by_description(price_values, "average")
         if price_aggregate is None:
             flow_type = self._infer_flow_type(item) or "cost"
             if flow_type in ECONOMIC_PRICE_FALLBACK:
@@ -508,7 +518,7 @@ class EconomicPreprocessor:
 
             handler = self.special_case_handlers.get((item.section, item.name))
             if handler is not None:
-                category_data[item.name] = handler.process()
+                category_data[item.name] = handler.build_preprocessing_entry()
                 continue
 
             values_by_scenario = self.context.fetch_values_by_scenario(item.biophysical_simulation)
@@ -532,7 +542,7 @@ class EconomicPreprocessor:
             for scenario_values in values_by_scenario.values():
                 biophysical_values.extend(scenario_values)
 
-            aggregated_value = self.context.aggregate(biophysical_values, item.preprocessing or "")
+            aggregated_value = Aggregator.aggregate_by_description(biophysical_values, item.preprocessing or "")
             if aggregated_value is None and biophysical_values:
                 aggregated_value = Aggregator.sum(biophysical_values)
             if not biophysical_values and not input_values:
@@ -562,7 +572,7 @@ class EconomicPreprocessor:
             price_aggregate = self._resolve_price_aggregate(item, price_values)
             aggregates_by_scenario: Dict[str, float | None] = {}
             for scenario, scenario_values in values_by_scenario.items():
-                scenario_aggregate = self.context.aggregate(scenario_values, item.preprocessing or "")
+                scenario_aggregate = Aggregator.aggregate_by_description(scenario_values, item.preprocessing or "")
                 if scenario_aggregate is None and scenario_values:
                     scenario_aggregate = Aggregator.sum(scenario_values)
                 aggregates_by_scenario[scenario] = scenario_aggregate
@@ -597,6 +607,3 @@ class EconomicPreprocessor:
             info_map,
         )
         return results
-
-
-__all__ = ["EconomicPreprocessor"]

@@ -1,7 +1,6 @@
 import math
 from typing import Any, Iterable
 
-from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import BIOPHYSICAL_FALLBACKS, ECONOMIC_PRICE_FALLBACK
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -10,19 +9,19 @@ from RUFAS.output_manager import OutputManager
 class EconomicDataProcessor:
     """Shared InputManager/OutputManager services for economics preprocessing.
 
-    Parameters
+    Attributes
     ----------
-    im : InputManager, optional
+    im : InputManager
         Input manager used to resolve economic inputs and commodity pricing.
-        Defaults to the ``InputManager`` singleton.
-    om : OutputManager, optional
+    om : OutputManager
         Output manager used to read biophysical outputs and record warnings.
-        Defaults to the ``OutputManager`` singleton.
+    available_input_keys : set[str]
+        Input keys available in the InputManager metadata.
     """
 
-    def __init__(self, im: InputManager | None = None, om: OutputManager | None = None) -> None:
-        self.im = im if im is not None else InputManager()
-        self.om = om if om is not None else OutputManager()
+    def __init__(self) -> None:
+        self.im = InputManager()
+        self.om = OutputManager()
         self.available_input_keys: set[str] = self._load_available_input_keys()
 
     def _load_available_input_keys(self) -> set[str]:
@@ -217,12 +216,18 @@ class EconomicDataProcessor:
             path: self.om.filter_variables_pool(self.build_filter_content(path, expand_interval_to_daily))
             for path in sim_paths
         }
+        info_map = {"class": self.__class__.__name__, "function": self.fetch_values_by_scenario.__name__}
         if not any(filtered_by_path.values()):
             fallback_values = self._fallback_values_by_scenario(sim_paths)
+            if fallback_values:
+                self.om.add_warning(
+                    "BiophysicalFallbackSubstituted",
+                    f"No biophysical outputs matched patterns {list(sim_paths)}; substituted fallback values",
+                    info_map,
+                )
             return fallback_values
         scenario_names = self.scenario_names()
         values_by_scenario: dict[str, list[float]] = {scenario: [] for scenario in scenario_names}
-        info_map = {"class": self.__class__.__name__, "function": self.fetch_values_by_scenario.__name__}
 
         for path in sim_paths:
             matched = False
@@ -242,6 +247,11 @@ class EconomicDataProcessor:
                     scenario_key = scenario_names[0] if scenario_names else "baseline"
                     values_by_scenario.setdefault(scenario_key, [])
                     values_by_scenario[scenario_key].extend(fallback_values)
+                    self.om.add_warning(
+                        "BiophysicalFallbackSubstituted",
+                        f"No biophysical outputs matched pattern '{path}'; substituted fallback values",
+                        info_map,
+                    )
                 else:
                     self.om.add_warning(
                         "MissingBiophysicalData",
@@ -262,27 +272,3 @@ class EconomicDataProcessor:
         if values_by_scenario["baseline"]:
             return values_by_scenario
         return {}
-
-    def aggregate(self, values: list[float], desc: str) -> float | None:
-        """Aggregate values according to a textual description."""
-        if not values:
-            return None
-        d = desc.lower() if isinstance(desc, str) else ""
-        if "average" in d or "mean" in d:
-            return Aggregator.average(values)
-        if "product" in d:
-            return Aggregator.product(values)
-        if "divide" in d or "ratio" in d:
-            result = Aggregator.division(values)
-            if result is not None:
-                return result
-        if "subtract" in d or "difference" in d:
-            result = Aggregator.subtraction(values)
-            if result is not None:
-                return result
-        if "standard deviation" in d or "std" in d:
-            return Aggregator.standard_deviation(values)
-        return Aggregator.sum(values)
-
-
-__all__ = ["EconomicDataProcessor"]

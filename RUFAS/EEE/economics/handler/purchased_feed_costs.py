@@ -3,19 +3,20 @@ from typing import Any, ClassVar
 
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_QUANTITY_FALLBACK
-from RUFAS.EEE.economics.handler.base import Handler
+from RUFAS.EEE.economics.handler.base import LineItemHandler
+from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
 
 
-class PurchasedFeedCostHandler(Handler):
+class PurchasedFeedCostHandler(LineItemHandler):
     """Owner of the preprocessing for the ``Purchased feed costs`` line item."""
 
-    section: ClassVar[str] = "Feed_storage"
-    name: ClassVar[str] = "Purchased feed costs"
+    section: ClassVar[EconomicSection] = EconomicSection.FEED_STORAGE
+    name: ClassVar[EconomicLineItem] = EconomicLineItem.PURCHASED_FEED_COSTS
 
     amount_patterns: ClassVar[list[str]] = ["FeedManager.purchase_feed.ration_interval_.*_amount_purchased"]
     cost_patterns: ClassVar[list[str]] = ["FeedManager.purchase_feed.ration_interval_.*_cost"]
 
-    def process(self) -> dict[str, Any]:
+    def build_preprocessing_entry(self) -> dict[str, Any]:
         """Build the result entry from the simulation's ration interval purchase outputs."""
 
         values_by_scenario = self.context.fetch_values_by_scenario(self.amount_patterns, expand_interval_to_daily=True)
@@ -57,9 +58,9 @@ class PurchasedFeedCostHandler(Handler):
 
         sums: dict[str, float] = {}
         for pattern in patterns:
-            capture_pattern = re.compile(f"^{pattern.replace('.*', '(.+)')}$")
+            capture_pattern = re.compile(pattern.replace(".*", "(.+?)") + "$")
             for variable_name, payload in self.context.om.filter_variables_pool({"filters": [pattern]}).items():
-                capture_match = capture_pattern.fullmatch(variable_name)
+                capture_match = capture_pattern.search(variable_name)
                 key = capture_match.group(1) if capture_match else variable_name
                 values: list[float] = []
                 self.context.append_from_payload(values, payload)
@@ -83,6 +84,3 @@ class PurchasedFeedCostHandler(Handler):
         total_cost = sum(cost_sums.values())
         price_aggregate = total_cost / total_amount if total_amount else None
         return price_values, price_aggregate
-
-
-__all__ = ["PurchasedFeedCostHandler"]

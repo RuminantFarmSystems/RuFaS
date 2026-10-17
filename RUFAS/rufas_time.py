@@ -48,8 +48,8 @@ class RufasTime:
         if not start_date or not end_date:
             config_data = self.im.get_data("config")
 
-        self.start_date: datetime = start_date or datetime.strptime(str(config_data["start_date"]), "%Y:%j")
-        self.end_date: datetime = end_date or datetime.strptime(str(config_data["end_date"]), "%Y:%j")
+        self.start_date: datetime = start_date or self.convert_config_date_to_datetime(config_data["start_date"])
+        self.end_date: datetime = end_date or self.convert_config_date_to_datetime(config_data["end_date"])
 
         self.current_date: datetime = current_date or self.start_date
         self.simulation_length_days: int = (self.end_date - self.start_date).days + 1
@@ -180,6 +180,24 @@ class RufasTime:
         """
         actual_date = self.start_date + timedelta(days=simulation_day - 1)
         return actual_date
+
+    @staticmethod
+    def convert_config_date_to_datetime(config_date: str | int) -> datetime:
+        """
+        Converts a config date in the ``YYYY:day_of_year`` format to a ``datetime`` object.
+
+        Parameters
+        ----------
+        config_date : str | int
+            The config date to convert, for example ``"2013:20"``.
+
+        Returns
+        -------
+        datetime
+            The calendar date that corresponds to the config date.
+
+        """
+        return datetime.strptime(str(config_date), "%Y:%j")
 
     @staticmethod
     def convert_year_jday_to_date(year: int, day: int) -> datetime:

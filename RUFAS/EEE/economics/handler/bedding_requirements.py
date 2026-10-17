@@ -20,18 +20,20 @@ from datetime import datetime, timedelta
 from typing import Any, ClassVar
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
-from RUFAS.util import Utility
+from RUFAS.util import Aggregator, Utility
 from RUFAS.EEE.economics import mapping
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
-from RUFAS.EEE.economics.handler.base import Handler
+from RUFAS.EEE.economics.handler.base import LineItemHandler
+from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
 
 
-class BeddingRequirementsHandler(Handler):
+class BeddingRequirementsHandler(LineItemHandler):
     """Owner of the preprocessing for the ``Bedding requirements`` line item."""
 
-    section: ClassVar[str] = "Animal"
-    name: ClassVar[str] = "Bedding requirements"
+    section: ClassVar[EconomicSection] = EconomicSection.ANIMAL
+    name: ClassVar[EconomicLineItem] = EconomicLineItem.BEDDING_REQUIREMENTS
 
     def _get_mapping_details(self) -> dict[str, Any]:
         """
@@ -47,11 +49,17 @@ class BeddingRequirementsHandler(Handler):
         -----
         The mapping module is read dynamically (rather than importing the
         ``ECONOMIC_MAP`` name directly) so the entry stays patchable in tests.
+        A warning is emitted when no entry is found.
         """
         for entries in mapping.ECONOMIC_MAP.get(self.section, {}).values():
             if isinstance(entries, dict) and self.name in entries:
                 details = entries[self.name]
                 return details if isinstance(details, dict) else {}
+        self.context.om.add_warning(
+            "MissingEconomicMapEntry",
+            f"No '{self.name}' entry found under section '{self.section}' of the economic mapping",
+            {"class": self.__class__.__name__, "function": self._get_mapping_details.__name__},
+        )
         return {}
 
     def _normalize_bedding_type(self, raw: Any) -> str:
@@ -156,75 +164,6 @@ class BeddingRequirementsHandler(Handler):
             name_to_type[str(config["name"])] = self._normalize_bedding_type(config["bedding_type"])
         return name_to_type
 
-    def _get_simulation_start_date(self) -> datetime:
-        """
-        Returns the simulation start date.
-
-        Returns
-        -------
-        datetime
-            The calendar date of the first simulation day.
-
-        Notes
-        -----
-        The start date is read from ``config.start_date`` in the ``YYYY:day_of_year``
-        format (for example ``"2013:20"``) and converted to a calendar date. The
-        start year, when needed, is available as ``.year`` on the returned date.
-
-        """
-        return datetime.strptime(str(self.context.im.get_data("config.start_date")), "%Y:%j")
-
-    def _extract_output_data(self, output_data: Any) -> tuple[list[float], list[Any]]:
-        """
-        Extracts aligned daily values and info maps from one OutputManager entry.
-
-        Parameters
-        ----------
-        output_data : Any
-            The stored output data for a single reported variable.
-
-        Returns
-        -------
-        tuple[list[float], list[Any]]
-            The numeric daily values.
-            The info map for each value, index-aligned with the values.
-
-        Notes
-        -----
-        The output data is normally a mapping of the form
-        ``{"values": [...], "info_maps": [...]}``, but a bare list or scalar is also
-        accepted. Non-numeric values are dropped with a warning, and each retained
-        value keeps its matching info map (an empty dict when none exists).
-
-        """
-
-        if isinstance(output_data, dict) and "values" in output_data:
-            raw_values = output_data.get("values", [])
-            raw_info_maps = output_data.get("info_maps", [])
-        elif isinstance(output_data, (list, tuple)):
-            raw_values, raw_info_maps = list(output_data), []
-        else:
-            raw_values, raw_info_maps = [output_data], []
-
-        values: list[float] = []
-        info_maps: list[Any] = []
-        dropped_count = 0
-        for index, value in enumerate(raw_values):
-            try:
-                numeric = float(value)
-            except (TypeError, ValueError):
-                dropped_count += 1
-                continue
-            values.append(numeric)
-            info_maps.append(raw_info_maps[index] if index < len(raw_info_maps) else {})
-        if dropped_count:
-            self.context.om.add_warning(
-                "NonNumericOutputData",
-                f"Dropped {dropped_count} non-numeric value(s) from an output data entry",
-                {"class": self.__class__.__name__, "function": self._extract_output_data.__name__},
-            )
-        return values, info_maps
-
     def _collect_pen_data(self, sim_paths: list[str]) -> dict[str, dict[str, dict[str, list[Any]]]]:
         """
         Collects each pen's daily head counts from the OutputManager, grouped by scenario.
@@ -301,7 +240,7 @@ class BeddingRequirementsHandler(Handler):
                 else:
                     candidate = variable_name.split(".", 1)[0]
                     scenario = candidate if candidate in scenario_names else "baseline"
-                values, info_maps = self._extract_output_data(output_data)
+                values, info_maps = self.context.om.extract_numeric_values_and_info_maps(output_data)
                 bucket = pen_data.setdefault(scenario, {}).setdefault(capture, {"values": [], "info_maps": []})
                 bucket["values"].extend(values)
                 bucket["info_maps"].extend(info_maps)
@@ -524,7 +463,7 @@ class BeddingRequirementsHandler(Handler):
                 pen_map[str(entry["id"])] = self._get_pen_bedding_name(entry, bedding_name_keys)
         return pen_map
 
-    def process(self) -> dict[str, Any]:
+    def build_preprocessing_entry(self) -> dict[str, Any]:
         """
         Computes bedding cost per pen, per year, then sums them (issue #3088).
 
@@ -551,7 +490,7 @@ class BeddingRequirementsHandler(Handler):
 
         """
 
-        info_map = {"class": self.__class__.__name__, "function": self.process.__name__}
+        info_map = {"class": self.__class__.__name__, "function": self.build_preprocessing_entry.__name__}
         details = self._get_mapping_details()
 
         name_to_type = self._build_bedding_name_to_type(details)
@@ -567,7 +506,7 @@ class BeddingRequirementsHandler(Handler):
             else None
         )
 
-        start_date = self._get_simulation_start_date()
+        start_date = RufasTime.convert_config_date_to_datetime(self.context.im.get_data("config.start_date"))
         fips = self.context.im.get_data("config.FIPS_county_code")
 
         sim_paths = [str(path) for path in details.get("biophysical_simulation") or []]
@@ -674,7 +613,7 @@ class BeddingRequirementsHandler(Handler):
 
         total_cost = sum(line_item_values_by_scenario.values())
         total_head_years = sum(aggregates_by_scenario.values())
-        price_aggregate = self.context.aggregate(price_values, "average")
+        price_aggregate = Aggregator.aggregate_by_description(price_values, "average")
 
         self.context.om.add_variable(
             "econ_bedding_total_cost",
@@ -704,6 +643,3 @@ class BeddingRequirementsHandler(Handler):
             "line_item_values_by_scenario": line_item_values_by_scenario,
             "flow_type": "cost",
         }
-
-
-__all__ = ["BeddingRequirementsHandler"]

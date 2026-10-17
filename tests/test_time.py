@@ -230,3 +230,12 @@ def test_convert_slice_to_simulation_day(
 
     result = mock_time.convert_slice_to_simulation_day(slice_day)
     assert result == expected_sim_day, f"Expected {expected_sim_day} but got {result} for slice_day={slice_day}"
+
+
+@pytest.mark.parametrize(
+    "config_date, expected",
+    [("2013:20", datetime(2013, 1, 20)), ("2020:366", datetime(2020, 12, 31))],
+)
+def test_convert_config_date_to_datetime(config_date: str, expected: datetime) -> None:
+    """Tests RufasTime.convert_config_date_to_datetime."""
+    assert RufasTime.convert_config_date_to_datetime(config_date) == expected

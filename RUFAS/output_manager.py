@@ -2199,6 +2199,56 @@ class OutputManager(object):
 
         return flattened
 
+    def extract_numeric_values_and_info_maps(self, output_data: Any) -> tuple[list[float], list[Any]]:
+        """
+        Extracts aligned numeric values and info maps from one variables pool entry.
+
+        Parameters
+        ----------
+        output_data : Any
+            The stored output data for a single reported variable.
+
+        Returns
+        -------
+        tuple[list[float], list[Any]]
+            The numeric values.
+            The info map for each value, index-aligned with the values.
+
+        Notes
+        -----
+        The output data is normally a mapping of the form
+        ``{"values": [...], "info_maps": [...]}``, but a bare list or scalar is also
+        accepted. Non-numeric values are dropped with a warning, and each retained
+        value keeps its matching info map (an empty dict when none exists).
+
+        """
+        if isinstance(output_data, dict) and "values" in output_data:
+            raw_values = output_data.get("values", [])
+            raw_info_maps = output_data.get("info_maps", [])
+        elif isinstance(output_data, (list, tuple)):
+            raw_values, raw_info_maps = list(output_data), []
+        else:
+            raw_values, raw_info_maps = [output_data], []
+
+        values: list[float] = []
+        info_maps: list[Any] = []
+        dropped_count = 0
+        for index, value in enumerate(raw_values):
+            try:
+                numeric = float(value)
+            except (TypeError, ValueError):
+                dropped_count += 1
+                continue
+            values.append(numeric)
+            info_maps.append(raw_info_maps[index] if index < len(raw_info_maps) else {})
+        if dropped_count:
+            self.add_warning(
+                "NonNumericOutputData",
+                f"Dropped {dropped_count} non-numeric value(s) from an output data entry",
+                {"class": self.__class__.__name__, "function": self.extract_numeric_values_and_info_maps.__name__},
+            )
+        return values, info_maps
+
     def flush_pools(self) -> None:
         """Sets each pool to an empty dictionary."""
         self._set_variables_pool({})

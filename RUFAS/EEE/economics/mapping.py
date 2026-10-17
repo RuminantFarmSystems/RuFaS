@@ -5,7 +5,26 @@ This file is generated to decouple the economics preprocessing from runtime JSON
 
 from __future__ import annotations
 
+from enum import StrEnum
 from typing import Any
+
+
+class EconomicSection(StrEnum):
+    """Top-level sections of :data:`ECONOMIC_MAP`."""
+
+    ANIMAL = "Animal"
+    FEED_STORAGE = "Feed_storage"
+    MANURE = "Manure"
+    SOIL_AND_CROP = "Soil_and_crop"
+
+
+class EconomicLineItem(StrEnum):
+    """:data:`ECONOMIC_MAP` line items owned by a dedicated line item handler."""
+
+    BEDDING_REQUIREMENTS = "Bedding requirements"
+    PURCHASED_FEED_COSTS = "Purchased feed costs"
+    SEEDS_COSTS = "Seeds costs"
+
 
 ECONOMIC_MAP: dict[str, dict[str, dict[str, dict[str, Any]]]] = {
     "Animal": {
