@@ -285,7 +285,9 @@ class CalfRationManager:
         """
         # TODO update the NASEM library to code in the milk/starter/etc options, use those and RuFaS IDs instead
         milk_options = [203, 204, 205, 206, 207]
+        # TODO change to use the Calf Liquid Feed from Fd_Category
         starter_options = [213, 214, 215, 216, 217, 218]
+        # TODO use names or other category: however missing a unique field (unlike for calf liquid feed)
         ration_per_animal = {}
 
         replacers_selected = [id for id in calf_feed_ids if id in milk_options]
