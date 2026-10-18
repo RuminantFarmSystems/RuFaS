@@ -8,3 +8,9 @@ updates:
       day: "monday"
     labels:
       - "dependencies"
+
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-patch"
+          - "version-update:semver-minor"

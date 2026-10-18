@@ -4,7 +4,8 @@
 
 # Forking guidelines (strategic + operational)
 
-Forking is a first-class collaboration mechanism in RuFaS. We encourage forks when they enable experimentation, contextual adaptation, or innovation that would be difficult to pursue directly in the main repository. At the same time, RuFaS exists as a shared scientific and software commons: forks should strengthen the ecosystem, not fragment it. 
+Forking is a first-class collaboration mechanism in RuFaS. We encourage forks when they enable experimentation, contextual adaptation, or innovation that would be difficult to pursue directly in the main repository. At the same time, RuFaS exists as a shared scientific and software commons: forks should strengthen the ecosystem, not fragment it.  
+> These forking guidelines are highly aligned with RuFaS Shared Operating Principles of **Openness > Control** and **Shared ownership > Possession** described in [Strategy.md](Strategy.md).
 
 ## 1) Strategic norms: when forking is appropriate
 Forking is encouraged when you need to:

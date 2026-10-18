@@ -748,7 +748,6 @@ def test_attempt_optimization_uses_user_defined_bounds(mocker: MockerFixture) ->
     ids=["normal_tolerance", "large_tolerance_clips_lower"],
 )
 def test_build_bounds_user_defined_ration(
-    monkeypatch: pytest.MonkeyPatch,
     user_defined_ration_dictionary: dict[int, float],
     user_defined_ration_tolerance: float,
     expected_bounds: list[tuple[float, float]],
@@ -760,7 +759,7 @@ def test_build_bounds_user_defined_ration(
     - clip lower bounds at 0
     - trim resulting bounds by feed_minimum_list and feed_maximum_list.
     """
-    monkeypatch.setattr(AnimalModuleConstants, "DMI_REQUIREMENT_BOOST", 1.0)
+    nrc_ration_config.dmi_requirement_boost = 1.0
 
     nrc_ration_config.initial_dry_matter_requirement = 20.0
     nrc_ration_config.feed_minimum_list = [0.0, 1.0]
@@ -882,3 +881,41 @@ def test_check_initial_bounds_mixed_clipping() -> None:
     result = optimizer._check_initial_bounds(bounds, vec.copy())
 
     assert np.array_equal(result, expected)
+
+
+@pytest.fixture
+def _reset_intake_options() -> Any:
+    """Restores the RationManager intake option state after a test mutates it."""
+    from RUFAS.biophysical.animal.ration.ration_manager import RationManager
+
+    yield RationManager
+    RationManager.intake_options = {}
+    RationManager.intake_values = {}
+
+
+def test_ration_config_uses_default_dmi_constants_without_intake_options(
+    mock_requirements: NutritionRequirements,
+) -> None:
+    """Without a configured DMI input option, RationConfig carries the module constants."""
+    config = RationConfig(NutrientStandard.NRC, mock_requirements, None, 1, 1, 600)
+
+    assert config.dmi_constraint_fraction == AnimalModuleConstants.DMI_CONSTRAINT_FRACTION
+    assert config.dmi_requirement_boost == AnimalModuleConstants.DMI_REQUIREMENT_BOOST
+
+
+def test_ration_config_neutralizes_dmi_constants_with_intake_option(
+    mock_requirements: NutritionRequirements, _reset_intake_options: Any
+) -> None:
+    """With a DMI input option configured, RationConfig neutralizes the DMI constraint values."""
+    RationManager = _reset_intake_options
+    from RUFAS.biophysical.animal.data_types.intake_option import IntakeOption
+
+    RationManager.intake_options = {AnimalCombination.LAC_COW: IntakeOption.SET_DMI}
+    RationManager.intake_values = {AnimalCombination.LAC_COW: 24.0}
+
+    config = RationConfig(
+        NutrientStandard.NRC, mock_requirements, None, 1, 1, 600, animal_combination=AnimalCombination.LAC_COW
+    )
+
+    assert config.dmi_constraint_fraction == 0.0
+    assert config.dmi_requirement_boost == 1.0

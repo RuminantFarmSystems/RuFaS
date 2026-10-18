@@ -4421,6 +4421,19 @@
           "type": "string",
           "description": "Animal combination for this ration."
         },
+        "intake_option": {
+          "type": "string",
+          "description": "Dry matter intake control mode used for this animal combination's ration. predict_DMI keeps the model-predicted intake (current behavior), set_DMI fixes intake at intake_value (kg/animal/day), and set_DMI_per_X multiplies intake_value by the pen's average milk yield (lac_cow) or average daily gain (growing).",
+          "pattern": "^(predict_DMI|set_DMI|set_DMI_per_X)$",
+          "default": "predict_DMI"
+        },
+        "intake_value": {
+          "type": "number",
+          "description": "Dry matter intake value used for the ration of this animal combination. Units are kg/animal/day for set_DMI, and kg dry matter intake per kg milk yield (lac_cow) or per kg average daily gain (growing) for set_DMI_per_X. Must be null when intake_option is predict_DMI.",
+          "minimum": 0,
+          "nullable": true,
+          "default": null
+        },
         "feeds": {
           "type": "array",
           "description": "Feeds available to the specified animal group.",

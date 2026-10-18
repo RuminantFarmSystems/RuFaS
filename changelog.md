@@ -23,14 +23,21 @@ This **changelog** file keeps a record of updates included in existing version r
 
 ### Current version
 
-v1.0.3
+v1.0.5
+
+### v1.0.5
+- [3242](https://github.com/RuminantFarmSystems/RuFaS/pull/3242) - [minor change] [NoInputChange] [NoOutputChange] Corrects version number
+
+
+### v1.0.4
+- [3202](https://github.com/RuminantFarmSystems/RuFaS/pull/3202) - [minor change] [EEE] [NoInputChange] [OutputChange] Corrects errors in emissions and resource allocation logic
+- [3201](https://github.com/RuminantFarmSystems/RuFaS/pull/3201) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds check to hormone delivery during animal initialization
+- [3214](https://github.com/RuminantFarmSystems/RuFaS/pull/3214) - [minor change] [SoilCrop] [NoInputChange] [OutputChange] Updates method to distribute fertilizer between soil layers
 
 ### v1.0.3
 
 - [3121](https://github.com/RuminantFarmSystems/RuFaS/pull/3121) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds separate tracking for unmitigated vs. mitigated enteric methane for cows. Similar changes made to `dev` branch on PR 3115
-
 - [3130](https://github.com/RuminantFarmSystems/RuFaS/pull/3020) - [minor change] [NoInputChange] [NoOutputChange] Fixes bug where stored Hay was projected to have negative dm.
-
 - [3141](https://github.com/RuminantFarmSystems/RuFaS/pull/3141) - [minor change] [Weather] [NoInputChange] [NoOutputChange] Excludes missing (NaN) daily temperatures from the average annual temperature and the seasonal temperature regression, so simulations with gaps in the weather data no longer crash. Similar changes made to `dev` branch on PR 3139
 
 ### v1.0.2
