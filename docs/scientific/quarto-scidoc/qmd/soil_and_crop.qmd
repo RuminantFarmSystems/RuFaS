@@ -3468,6 +3468,7 @@ crop updates are called for each crop using the `Crop` class’s `perform_daily_
 
 At the end of the `Field` class’s `manage_field()` routine, it checks for both user scheduled and optimal harvest
 events and initiates the `Crop` routine’s harvest if it is a harvest day.
+
 ### Required User Inputs
 
 When the Field class plants a new crop, it calls the `create_crop()` method of the `Crop` class to initialize a new
@@ -3485,6 +3486,7 @@ in response to weather and nutrient availability.
 
 Initial NO<sub>3</sub> levels (mg kg$^{-1}$) in the soil are set by user input. If user input is null, initial nitrate
 concentrations are generated as:
+
 ### Expected Outputs
 
 <!-- TODO -->

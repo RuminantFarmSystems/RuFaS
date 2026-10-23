@@ -17,7 +17,7 @@ annual_water_content_change.field=[FIELD_NAME],Change in total soil water conten
 accumulated_runoff.field=[FIELD_NAME],Amount of rainfall discharged as runoff on the current day,mm
 ammonium_runoff.field=[FIELD_NAME],Amount of ammonium removed from the soil surface by runoff,kg/ha
 available_phosphorus_pool.field=[FIELD_NAME],Amount of phosphorus available for soil adsorption and leaching via runoff before the first rainfall event after application,kg
-cover_type.field=[FIELD_NAME],"The cover type of the soil surface, which can be bare, residue covered, or grassed",
+cover_type.field=[FIELD_NAME],"The cover type of the soil surface, which can be bare, residue covered, or grassed",--
 current_day_snow_temperature.field=[FIELD_NAME],Snow pack temperature of the current day,degrees C
 days_since_application.field=[FIELD_NAME],Number of days since phosphorus was applied to the field via fertilizer,days
 eroded_active_organic_nitrogen.field=[FIELD_NAME],Amount of active organic nitrogen removed from the soil surface by eroded sediment,kg/ha
@@ -28,8 +28,8 @@ full_available_phosphorus_pool.field=[FIELD_NAME],Starting value of the availabl
 [grazing|machine]_inorganic_phosphorus_runoff.field=[FIELD_NAME],Amount of inorganic phosphorus from grazer-applied manure dissolved in and removed by runoff ,kg
 [grazing|machine]_manure_applied_mass.field=[FIELD_NAME],dry weight equivalent of the most recent application of manure applied by grazers or machine,kg
 [grazing|machine]_manure_dry_mass.field=[FIELD_NAME],dry weight equivalent of manure mass on the field that was applied by grazers or machine,kg
-[grazing|machine]_manure_field_coverage.field=[FIELD_NAME],Fraction of the field that is covered by machine- or grazer-applied manure,
-[grazing|machine]_manure_moisture_factor.field=[FIELD_NAME],Fraction representing the current moisture level of the machine- or grazer-applied manure on the field,
+[grazing|machine]_manure_field_coverage.field=[FIELD_NAME],Fraction of the field that is covered by machine- or grazer-applied manure,--
+[grazing|machine]_manure_moisture_factor.field=[FIELD_NAME],Fraction representing the current moisture level of the machine- or grazer-applied manure on the field,--
 [grazing|machine]_organic_phosphorus_runoff.field=[FIELD_NAME],Amount of organic phosphorus from machine- or grazer-applied manure dissolved in and removed by runoff,kg
 [grazing|machine]_stable_inorganic_phosphorus.field=[FIELD_NAME],Amount of stable inorganic phosphorus on the field that was applied by machine or grazers,kg
 [grazing|machine]_stable_organic_phosphorus.field=[FIELD_NAME],Amount of stable organic phosphorus on the field that was applied by machine or grazers,kg
@@ -44,7 +44,7 @@ profile_carbon_total.field=[FIELD_NAME],The total amount of carbon in the soil,k
 profile_fresh_organic_nitrogen_total.field=[FIELD_NAME],The total amount of fresh organic nitrogen in the soil,kg/ha
 profile_nitrates_total.field=[FIELD_NAME],The total amount of nitrates in the soil,kg/ha
 profile_stable_organic_nitrogen_total.field=[FIELD_NAME],The total amount of stable organic nitrogen in the soil,kg/ha
-rain_events_after_fertilizer_application.field=[FIELD_NAME],Number of rain events that have occurred since phosphorus was applied to the field via fertilizer,
+rain_events_after_fertilizer_application.field=[FIELD_NAME],Number of rain events that have occurred since phosphorus was applied to the field via fertilizer,--
 recalcitrant_phosphorus_pool.field=[FIELD_NAME],Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event,kg
 runoff_fertilizer_phosphorus.field=[FIELD_NAME],Amount of solubilized phosphorus that has been leached off the field by runoff,kg
 snow_content.field=[FIELD_NAME],Water content of the snow pack,mm
@@ -62,7 +62,7 @@ water_sublimated.field=[FIELD_NAME],Amount of water sublimated from the soil pro
 "active_carbon_to_slow_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon decomposed into slow carbon,kg/ha
 "active_carbon_to_slow_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active carbon lost as CO2 during decomposition into slow carbon,kg/ha
 "active_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active inorganic phosphorus content of this soil layer,kg/ha
-"active_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",The number of days that the active inorganic phosphorus pool has been greater than it would be when in equilibrium with the labile inorganic phosphorus pool.,
+"active_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",The number of days that the active inorganic phosphorus pool has been greater than it would be when in equilibrium with the labile inorganic phosphorus pool.,--
 "active_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Active organic nitrogen content of this soil layer,kg/ha
 "ammonia_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of ammonium that volatilized out of the soil layer on the current day,kg/ha
 "ammonium_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Ammonium (NH4+) content of this soil layer,kg/ha
@@ -71,8 +71,8 @@ water_sublimated.field=[FIELD_NAME],Amount of water sublimated from the soil pro
 "fresh_organic_nitrogen_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Fresh organic nitrogen content of this soil layer,kg/ha
 "fresh_organic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Fresh organic phosphorus content of this soil layer,kg/ha
 "labile_inorganic_phosphorus_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Labile inorganic phosphorus content of this soil layer,kg/ha
-"labile_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",The number of days that the labile inorganic phosphorus pool has been greater than it would be when in equilibrium with the labile inorganic phosphorus pool,
-"mean_phosphorus_sorption_parameter.field=[FIELD_NAME],layer=[SOIL_LAYER]",Parameter that determines the equilibria of the different inorganic phosphorus pools and has been adjusted so it is not sensitive to large immediate changes in the soil chemistry ,
+"labile_inorganic_unbalanced_counter.field=[FIELD_NAME],layer=[SOIL_LAYER]",The number of days that the labile inorganic phosphorus pool has been greater than it would be when in equilibrium with the labile inorganic phosphorus pool,--
+"mean_phosphorus_sorption_parameter.field=[FIELD_NAME],layer=[SOIL_LAYER]",Parameter that determines the equilibria of the different inorganic phosphorus pools and has been adjusted so it is not sensitive to large immediate changes in the soil chemistry ,--
 "metabolic_litter_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",Plant metabolic carbon amount in this layer,kg/ha
 "nitrate_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Nitrate (NO3) content of this soil layer,kg/ha
 "nitrous_oxide_emissions.[FEED_ID]field=[FIELD_NAME],layer=[SOIL_LAYER]",Amount of nitrous oxide emitted from this soil layer on the current day,kg/ha
@@ -102,7 +102,7 @@ water_sublimated.field=[FIELD_NAME],Amount of water sublimated from the soil pro
 "soil_metabolic_active_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon,kg/ha
 "soil_metabolic_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss,kg/ha
 "soil_metabolic_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil metabolic carbon decomposed into active carbon,kg/ha
-"soil_overall_carbon_fraction.field=[FIELD_NAME],layer=[SOIL_LAYER]",The total fraction of carbon in the soil,
+"soil_overall_carbon_fraction.field=[FIELD_NAME],layer=[SOIL_LAYER]",The total fraction of carbon in the soil,--
 "soil_structural_active_carbon_loss.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon being lost as carbon dioxide during decomposition into active carbon,kg/ha
 "soil_structural_active_carbon_remaining.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss,kg/ha
 "soil_structural_active_carbon_usage.field=[FIELD_NAME],layer=[SOIL_LAYER]",Soil structural carbon decomposed into active carbon,kg/ha
@@ -115,4 +115,4 @@ water_sublimated.field=[FIELD_NAME],Amount of water sublimated from the soil pro
 "temperature.field=[FIELD_NAME],layer=[SOIL_LAYER]",Current temperature of this soil layer,degrees C
 "total_soil_carbon_amount.field=[FIELD_NAME],layer=[SOIL_LAYER]",The total amount of soil carbon,kg/ha
 "water_content.field=[FIELD_NAME],layer=[SOIL_LAYER]",Water present in the layer,mm
-"water_factor.field=[FIELD_NAME],layer=[SOIL_LAYER]",Relative water saturation percent,
+"water_factor.field=[FIELD_NAME],layer=[SOIL_LAYER]",Relative water saturation percent,--
