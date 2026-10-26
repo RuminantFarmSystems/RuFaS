@@ -32,7 +32,12 @@ from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombina
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 
-from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
+#from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
+
+from RUFAS.biophysical.animal.ration.ration_optimizer import RationConfig
+from RUFAS.biophysical.animal.ration.user_optimizer import UserRationOptimizer as RationOptimizer
+
+
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
