@@ -11,7 +11,7 @@ PRIMARY RESULTS (RuFaS field names)
 
 HOW TO USE
 1. Edit values in EDIT INPUTS HERE.
-2. Run: python extended_inputs_calc.py
+2. Run: helpful_scripts\herd_inputs_calculator\herd_inputs_calculator.py
 3. Review the CALCULATED VALUES and USER INPUTS / ASSUMED DEFAULTS sections.
 4. Manually copy the labeled values into the corresponding animal input JSON fields.
 5. IMPORTANT: Set animal_config.farm_level.calf.calf_retention_method to "count"
@@ -51,7 +51,6 @@ REPRO_CULL_FRACTION = 0.05            # planning assumption; not a one-to-one JS
 BUFFER_FRACTION = 0.10                # planning assumption; no direct animal JSON field
 
 # Relative shares of the L3+ portion of the herd (automatically normalized).
-# The attached RuFaS JSON contains parity keys '1' through '5' only; '5' means 5+ here.
 L3_SHARE_OF_L3_PLUS = 0.40
 L4_SHARE_OF_L3_PLUS = 0.40
 L5_PLUS_SHARE_OF_L3_PLUS = 0.20
