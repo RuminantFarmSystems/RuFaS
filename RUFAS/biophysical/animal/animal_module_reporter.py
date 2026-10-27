@@ -112,7 +112,29 @@ class AnimalModuleReporter:
             ),
         }
 
+        parity_data: dict[str, dict[str, list[int | float]]] = {
+            "parity_1": {"milk": [], "days_in_milk": []},
+            "parity_2": {"milk": [], "days_in_milk": []},
+            "parity_3_and_above": {"milk": [], "days_in_milk": []},
+        }
+        fresh_cows: int = 0
+        cows_at_or_above_50_dim: int = 0
+
         for milk_stats in milk_reports:
+            if milk_stats.parity == 1:
+                parity_group = "parity_1"
+            elif milk_stats.parity == 2:
+                parity_group = "parity_2"
+            else:
+                parity_group = "parity_3_and_above"
+
+            parity_data[parity_group]["milk"].append(milk_stats.estimated_daily_milk_produced)
+            parity_data[parity_group]["days_in_milk"].append(milk_stats.days_in_milk)
+            if milk_stats.days_in_milk < 50:
+                fresh_cows += 1
+            else:
+                cows_at_or_above_50_dim += 1
+
             updated_milk_data: dict[str, int | float | str] = {
                 "cow_id": milk_stats.cow_id,
                 "pen_id": milk_stats.pen_id,
@@ -142,6 +164,42 @@ class AnimalModuleReporter:
                 updated_milk_data["ranking_index"] = milk_stats.ranking_index
 
             om.add_variable("milk_data_at_milk_update", updated_milk_data, info_map)
+
+        cow_stat_info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_milk.__name__,
+            "data_origin": [("AnimalModuleReporter", "report_milk")],
+            "units": MeasurementUnits.ANIMALS,
+        }
+        om.add_variable("fresh_cow_num", fresh_cows, cow_stat_info_map)
+        om.add_variable("cows_at_or_above_50_dim", cows_at_or_above_50_dim, cow_stat_info_map)
+
+        for parity_group, data in parity_data.items():
+            average_milk = sum(data["milk"]) / len(data["milk"]) if data["milk"] else 0.0
+            average_days_in_milk = (
+                sum(data["days_in_milk"]) / len(data["days_in_milk"]) if data["days_in_milk"] else 0.0
+            )
+
+            om.add_variable(
+                f"average_estimated_daily_milk_produced_{parity_group}",
+                average_milk,
+                {
+                    "class": AnimalModuleReporter.__name__,
+                    "function": AnimalModuleReporter.report_milk.__name__,
+                    "data_origin": [("AnimalModuleReporter", "report_milk")],
+                    "units": MeasurementUnits.LITERS,
+                },
+            )
+            om.add_variable(
+                f"average_days_in_milk_{parity_group}",
+                average_days_in_milk,
+                {
+                    "class": AnimalModuleReporter.__name__,
+                    "function": AnimalModuleReporter.report_milk.__name__,
+                    "data_origin": [("AnimalModuleReporter", "report_milk")],
+                    "units": MeasurementUnits.DAYS,
+                },
+            )
 
     @classmethod
     def report_average_genetics(
@@ -885,6 +943,85 @@ class AnimalModuleReporter:
             herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III],
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
         )
+        om.add_variable(
+            "num_heiferIII_to_cow_transitions",
+            herd_statistics.heiferIII_to_cow_transitions,
+            {**info_map, "units": MeasurementUnits.ANIMALS, "data_origin": [("HerdManager", "execute_daily_routines")]},
+        )
+        sold_and_died_info_map = {
+            **info_map,
+            "units": MeasurementUnits.ANIMALS,
+            "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+        }
+        for parity, count in (
+            ("1", herd_statistics.acute_sale_cows_parity_1),
+            ("2", herd_statistics.acute_sale_cows_parity_2),
+            ("3_plus", herd_statistics.acute_sale_cows_parity_3_plus),
+        ):
+            om.add_variable(f"acute_sale_cows_parity_{parity}", count, sold_and_died_info_map)
+        om.add_variable(
+            "total_cow_removals_parity_1",
+            herd_statistics.total_cow_removals_parity_1,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "total_cow_removals_parity_2",
+            herd_statistics.total_cow_removals_parity_2,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "total_cow_removals_parity_3_plus",
+            herd_statistics.total_cow_removals_parity_3_plus,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "cow_deaths_parity_1",
+            herd_statistics.cow_deaths_parity_1,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "cow_deaths_parity_2",
+            herd_statistics.cow_deaths_parity_2,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "cow_deaths_parity_3_plus",
+            herd_statistics.cow_deaths_parity_3_plus,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "milk_production_at_removal_sum",
+            herd_statistics.milk_production_at_removal_sum,
+            {
+                **info_map,
+                "units": MeasurementUnits.KILOGRAMS_PER_DAY,
+                "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+            },
+        )
+        om.add_variable(
+            "milk_production_at_removal_count",
+            herd_statistics.milk_production_at_removal_count,
+            {
+                **info_map,
+                "units": MeasurementUnits.ANIMALS,
+                "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+            },
+        )
+        om.add_variable(
+            "sold_cow_low_production_parity_1",
+            herd_statistics.sold_cow_low_production_parity_1,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "sold_cow_low_production_parity_2",
+            herd_statistics.sold_cow_low_production_parity_2,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "sold_cow_low_production_parity_3_plus",
+            herd_statistics.sold_cow_low_production_parity_3_plus,
+            sold_and_died_info_map,
+        )
 
     @classmethod
     def report_daily_reproduction_statistics(
@@ -926,6 +1063,11 @@ class AnimalModuleReporter:
             "cow_num_successful_conceptions",
             daily_herd_reproduction_statistics.cow_num_successful_conceptions,
             dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        om.add_variable(
+            "number_dnb_cows_in_herd",
+            daily_herd_reproduction_statistics.num_do_not_breed_cows,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
 
     @classmethod
