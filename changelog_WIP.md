@@ -139,3 +139,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3295](https://github.com/RuminantFarmSystems/RuFaS/pull/3295) - [minor change] [E2E testing] [NoInputChange] [OutputChange] Allows for averaging e2e expected results across one or many random seeds.
 - [3241](https://github.com/RuminantFarmSystems/RuFaS/pull/3241) - [minor change] [Animal] [InputChange] [OutputChange] Replaces the per-lactation culling model with annual, parity-indexed death and acute-sale probabilities rolled daily.
 - [3329](https://github.com/RuminantFarmSystems/RuFaS/pull/3329) - [minor change] [Animal] [NoInputChange] [OutputChange] Adds high priority herd statistics outputs.
+- [3321](https://github.com/RuminantFarmSystems/RuFaS/pull/3321) - [minor change] [E2E Testing] [InputChange] [NoOutputChange] Adds a selectable tolerance type and per-variable tolerance overrides to the end-to-end testing comparison.
