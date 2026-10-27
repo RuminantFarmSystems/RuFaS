@@ -1,0 +1,16 @@
+Variable, Value, Definition
+AMMONIA_EMISSION_COEFFICIENT_TILLED ,0.5, Ammonia emission coefficient (with mixing) 
+AMMONIA_EMISSION_COEFFICIENT_UNTILLED ,0.25, Ammonia emission coefficient (no mixing) 
+DECOMPOSITION_TEMPERATURE , 60 C, Temperature for peak microbial activity
+DEFAULT_CARBON_FRACTION_VSD ,0.5, Carbon content of degradable VS
+DEFAULT_CARBON_FRACTION_VSND ,0.35, Carbon content of non-degradable VS
+DEFAULT_DAYS_SINCE_LAST_HARROW , 1 d , Days since last harrow event
+DEFAULT_DAYS_SINCE_LAST_MIXING , 1 d , Days since last mixing for C decomposition 
+DEFAULT_LAG_TIME , 2 d , Lag time for C decomposition
+DEFAULT_LAYER_TEMPERATURE , 30 C , Default layer temperature for decomposition
+DEFAULT_MOISTURE_EFFECT ,0.65, Moisture effect on microbial decomposition 
+EFFECTIVE_MICROBIAL_DECOMP_RATE ,0.00237, Microbial decomposition rate (unitless)
+FIRST_ORDER_DECAY_COEFFICIENT ,0.01, First-order decay coefficient
+LEACHING_COEFFICIENT , -- , N leached per kg manure N/day
+NITROUS_OXIDE_EMISSION_TILLED ,0.07, N<sub>2</sub>O-N emitted per kg manure N/day (with mixing)
+NITROUS_OXIDE_EMISSION_UNTILLED ,0.01, N<sub>2</sub>O-N emitted per kg manure N/day (no mixing)

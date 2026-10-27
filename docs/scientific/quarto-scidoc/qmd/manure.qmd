@@ -2749,12 +2749,44 @@ Instance(s) of `ManureStream` for each manure stream defined by the user that re
 ## Key constants
 
 ```{python}
-#| label: tbl-mn-constants
-#| tbl-cap: Key constants for all equations in the Manure Module.
+#| label: tbl-mn-constants_gen
+#| tbl-cap: Key general Manure Module constants.
 import_table(
-  "../resources/table_data/manure/tbl-mn-constants.csv",
+  "../resources/table_data/manure/tbl-mn-constants_gen.csv",
+  colalign = ["left", "center", "left"]
+)
+```
+```{python}
+#| label: tbl-mn-constants_hdl
+#| tbl-cap: Key manure handler constants.
+import_table(
+  "../resources/table_data/manure/tbl-mn-constants_hdl.csv",
+  colalign = ["left", "center", "left"]
+)
+```
+```{python}
+#| label: tbl-mn-constants_AD
+#| tbl-cap: Key anaerobic digestion constants.
+import_table(
+  "../resources/table_data/manure/tbl-mn-constants_AD.csv",
+  colalign = ["left", "center", "left"]
+)
+```
+```{python}
+#| label: tbl-mn-constants_liqstor
+#| tbl-cap: Key liquid manure storage constants.
+import_table(
+  "../resources/table_data/manure/tbl-mn-constants_liqstor.csv",
   colalign = ["left", "center", "left"]
 )
 ```
 
+```{python}
+#| label: tbl-mn-constants_solstor
+#| tbl-cap: Key solid manure storage constants.
+import_table(
+  "../resources/table_data/manure/tbl-mn-constants_solstor.csv",
+  colalign = ["left", "center", "left"]
+)
+```
 ## References
