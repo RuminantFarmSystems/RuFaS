@@ -297,7 +297,7 @@
   },
   "ration": {
     "phosphorus_requirement_buffer": 50,
-    "user_input": false,
+    "user_input": true,
     "formulation_interval": 45,
     "maximum_ration_reformulation_attempts": 2
   },
