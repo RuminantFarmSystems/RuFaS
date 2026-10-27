@@ -1183,7 +1183,15 @@ class Reproduction:
         else:
             reproduction_data_stream = self._increment_cow_ai_counts(reproduction_data_stream)
 
-        conception_successful = Utility.compare_randomized_rate_less_than(self.conception_rate)
+        conception_rate = self.conception_rate
+        if self.semen_type == SemenType.SEXED_DAIRY:
+            conception_rate *= animal_constants.SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                f"Sexed semen conception rate adjusted from {self.conception_rate} to {conception_rate}",
+            )
+        conception_successful = Utility.compare_randomized_rate_less_than(conception_rate)
         if conception_successful:
             if reproduction_data_stream.animal_type == AnimalType.HEIFER_II:
                 reproduction_data_stream = self._handle_successful_heifer_conception(

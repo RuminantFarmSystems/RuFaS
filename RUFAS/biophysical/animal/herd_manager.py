@@ -6,7 +6,11 @@ from typing import Any
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import (
+    ANNUAL_GENETIC_GAIN_FAT,
+    ANNUAL_GENETIC_GAIN_PROTEIN,
+    Genetics,
+)
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
@@ -1254,12 +1258,23 @@ class HerdManager:
     def _update_replacement_animal_genetics(self, replacement: Animal, time: RufasTime) -> None:
         """
         Updates the genetic values of a replacement animal.
+
+        Notes
+        -----
+        The TBV means of purchased replacements follow the national genetic trend, shifted by the
+        annual genetic gain for each year the replacement was born after the simulation start year.
         """
         mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
             [animal.genetics for animal in self.heiferIIIs if animal.genetics is not None]
         )
         replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
-        replacement.genetics = Genetics(birth_year=replacement_birth_date.year, animal_type=replacement.animal_type)
+        years_of_genetic_progress = replacement_birth_date.year - time.start_date.year
+        replacement.genetics = Genetics(
+            birth_year=replacement_birth_date.year,
+            animal_type=replacement.animal_type,
+            tbv_fat_mean=years_of_genetic_progress * ANNUAL_GENETIC_GAIN_FAT,
+            tbv_protein_mean=years_of_genetic_progress * ANNUAL_GENETIC_GAIN_PROTEIN,
+        )
         replacement.genetics.calculate_ebv_and_ranking_index(
             replacement.animal_type, mean_tbv_fat, mean_tbv_protein, replacement.calves
         )

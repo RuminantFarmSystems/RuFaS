@@ -2600,7 +2600,18 @@ def test_perform_ai(
         )
 
     assert result == mock_outputs
-    mock_compare_randomized_rate.assert_called_once_with(conception_rate)
+    # Sexed semen conceives at a reduced rate relative to other semen types.
+    if assigned_semen_type == SemenType.SEXED_DAIRY:
+        expected_conception_rate = conception_rate * animal_constants.SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER
+        mock_add_event.assert_any_call(
+            mock_outputs.days_born,
+            mock_time.simulation_day,
+            f"Sexed semen conception rate adjusted from {conception_rate} to {expected_conception_rate}",
+        )
+    else:
+        expected_conception_rate = conception_rate
+    mock_compare_randomized_rate.assert_called_once_with(expected_conception_rate)
+    assert reproduction.conception_rate == conception_rate
 
 
 @pytest.mark.parametrize(
