@@ -18,6 +18,16 @@ E_TEMPORARY_PROTEIN_STD = 33.4
 E_TEMPORARY_CORRELATION = 0.78
 FAT_ACCURACY_BY_PARITY = {0: 0.75, 1: 0.80, 2: 0.85, 3: 0.90}
 PROTEIN_ACCURACY_BY_PARITY = {0: 0.75, 1: 0.80, 2: 0.85, 3: 0.90}
+ANNUAL_GENETIC_GAIN_FAT = 8.43
+"""
+Annual genetic gain in fat yield TBV (kg/year), from the slope of the 2015-2024 Holstein cow
+breeding value trend for fat published by CDCB (August 2026 evaluation).
+"""
+ANNUAL_GENETIC_GAIN_PROTEIN = 5.04
+"""
+Annual genetic gain in protein yield TBV (kg/year), from the slope of the 2015-2024 Holstein cow
+breeding value trend for protein published by CDCB (August 2026 evaluation).
+"""
 
 UNITS = {
     "TBV_fat": MeasurementUnits.KILOGRAMS,
@@ -99,6 +109,8 @@ class Genetics:
         dam_tbv_fat: float | None = None,
         dam_tbv_protein: float | None = None,
         birth_month: int | None = None,
+        tbv_fat_mean: float = 0.0,
+        tbv_protein_mean: float = 0.0,
     ) -> None:
         """Initialize genetic attributes."""
         self.om = OutputManager()
@@ -113,7 +125,7 @@ class Genetics:
                 dam_tbv_fat, dam_tbv_protein, f"{birth_year}-{birth_month:02d}"
             )
         else:
-            self.TBV_fat, self.TBV_protein = self._calculate_tbv_values()
+            self.TBV_fat, self.TBV_protein = self._calculate_tbv_values(tbv_fat_mean, tbv_protein_mean)
         self.E_permanent_fat, self.E_permanent_protein = self._calculate_ep_values()
         self.E_temporary_fat, self.E_temporary_protein = self._calculate_et_values()
         self.phenotype_fat, self.phenotype_protein = self._calculate_phenotype_values(birth_year=birth_year)
@@ -156,10 +168,10 @@ class Genetics:
             )
         self.ranking_index = self._calculate_ranking_index()
 
-    def _calculate_tbv_values(self) -> tuple[float, float]:
+    def _calculate_tbv_values(self, tbv_fat_mean: float = 0.0, tbv_protein_mean: float = 0.0) -> tuple[float, float]:
         """Calculate TBV values for an animal entering the herd."""
         tbv_fat, tbv_protein = Utility.generate_bivariate_random_numbers(
-            0.0, 0.0, TBV_FAT_STD, TBV_PROTEIN_STD, TBV_CORRELATION
+            tbv_fat_mean, tbv_protein_mean, TBV_FAT_STD, TBV_PROTEIN_STD, TBV_CORRELATION
         )
         return tbv_fat, tbv_protein
 
@@ -331,6 +343,9 @@ class Genetics:
 
     def _calculate_ranking_index(self) -> float:
         """Calculate ranking index."""
+        user_defined_weights: dict[str, float] = AnimalConfig.genetic_selection_index_weights
+        if user_defined_weights and user_defined_weights["fat"] >= 0 and user_defined_weights["protein"] >= 0:
+            return user_defined_weights["fat"] * self.EBV_fat + user_defined_weights["protein"] * self.EBV_protein
         return 0.318 * self.EBV_fat + 0.13 * self.EBV_protein
 
     @staticmethod
