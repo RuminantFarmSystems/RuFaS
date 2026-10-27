@@ -1018,7 +1018,7 @@ def test_report_herd_statistics_data_with_pen_heifer_adg(mocker: MockerFixture) 
 
     AnimalModuleReporter.report_herd_statistics_data(hs, 1)
 
-    assert mock_om_add_variable.call_count == 82
+    assert mock_om_add_variable.call_count == 80
 
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
     assert reported["heifer_average_daily_gain_in_pen_3"] == pytest.approx(1.1)

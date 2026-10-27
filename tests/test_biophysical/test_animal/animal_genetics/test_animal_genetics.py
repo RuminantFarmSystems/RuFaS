@@ -373,18 +373,39 @@ def test_calculate_ranking_index_uses_user_defined_weights(genetics: Genetics, m
 
 
 @pytest.mark.parametrize(
+    "weights, expected",
+    [
+        ({"fat": 0.0, "protein": 0.0}, 0.0),  # both zero
+        ({"fat": 0.5, "protein": 0.0}, 2.5),  # protein zero
+        ({"fat": 0.0, "protein": 0.5}, 5.0),  # fat zero
+    ],
+)
+def test_calculate_ranking_index_accepts_zero_user_weights(
+    weights: dict[str, float], expected: float, genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """Zero-valued user weights are valid and are used instead of the default weighting."""
+    mocker.patch.object(AnimalConfig, "genetic_selection_index_weights", weights)
+    genetics.EBV_fat = 5.0
+    genetics.EBV_protein = 10.0
+
+    ranking_index = genetics._calculate_ranking_index()
+
+    assert ranking_index == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
     "weights",
     [
         {},  # no weights provided
-        {"fat": 0.0, "protein": 0.0},  # both zero
-        {"fat": 0.5, "protein": 0.0},  # protein not positive
-        {"fat": 0.0, "protein": 0.5},  # fat not positive
+        {"fat": -0.5, "protein": -0.5},  # both negative
+        {"fat": 0.5, "protein": -0.5},  # protein negative
+        {"fat": -0.5, "protein": 0.5},  # fat negative
     ],
 )
 def test_calculate_ranking_index_falls_back_to_default_weights(
     weights: dict[str, float], genetics: Genetics, mocker: MockerFixture
 ) -> None:
-    """Missing, empty, or non-positive user weights fall back to the default 0.318/0.13 weighting."""
+    """Missing, empty, or negative user weights fall back to the default 0.318/0.13 weighting."""
     mocker.patch.object(AnimalConfig, "genetic_selection_index_weights", weights)
     genetics.EBV_fat = 5.0
     genetics.EBV_protein = 10.0
