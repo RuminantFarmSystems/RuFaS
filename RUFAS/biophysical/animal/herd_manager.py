@@ -2606,7 +2606,8 @@ class HerdManager:
         """
         for animal in animals:
             if animal.is_pregnant:
-                animal.reproduction.repro_state_manager.enter(ReproStateEnum.PREGNANT)
+                if not animal.reproduction.repro_state_manager.is_in(ReproStateEnum.PREGNANT):
+                    animal.reproduction.repro_state_manager.enter(ReproStateEnum.PREGNANT, keep_existing=True)
                 animal.reproduction.semen_type = SemenType.USER_DEFINED
                 animal.reproduction.embryo_sex = animal.reproduction.determine_embryo_sex()
                 log_message = (

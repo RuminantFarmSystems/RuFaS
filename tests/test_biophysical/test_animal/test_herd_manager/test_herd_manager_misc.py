@@ -149,15 +149,23 @@ def test_initialize_pregnancy_for_pregnant_animals_entering_the_herd(
     pregnant_animal.is_pregnant = True
     pregnant_animal.days_born = 400
     pregnant_animal.reproduction.determine_embryo_sex.return_value = Sex.MALE
+    pregnant_animal.reproduction.repro_state_manager.is_in.return_value = False
+
+    already_labelled_pregnant_animal = MagicMock()
+    already_labelled_pregnant_animal.is_pregnant = True
+    already_labelled_pregnant_animal.reproduction.repro_state_manager.is_in.return_value = True
 
     open_animal = MagicMock()
     open_animal.is_pregnant = False
 
-    animals: list[Animal] = [pregnant_animal, open_animal]
+    animals: list[Animal] = [pregnant_animal, already_labelled_pregnant_animal, open_animal]
 
     herd_manager._initialize_pregnancy_for_pregnant_animals_entering_the_herd(animals, time)
 
-    pregnant_animal.reproduction.repro_state_manager.enter.assert_called_once_with(ReproStateEnum.PREGNANT)
+    pregnant_animal.reproduction.repro_state_manager.enter.assert_called_once_with(
+        ReproStateEnum.PREGNANT, keep_existing=True
+    )
+    already_labelled_pregnant_animal.reproduction.repro_state_manager.enter.assert_not_called()
     assert pregnant_animal.reproduction.semen_type == SemenType.USER_DEFINED
     assert pregnant_animal.reproduction.embryo_sex == Sex.MALE
     pregnant_animal.events.add_event.assert_called_once()
