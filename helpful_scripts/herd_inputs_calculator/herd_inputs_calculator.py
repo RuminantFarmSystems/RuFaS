@@ -175,7 +175,9 @@ def calculate():
         ),
         "herd_information.heiferIII_num_springers": round_whole(
             (1 - CALF_MORTALITY_RATE - HEIFER_MORTALITY_RATE - REPRO_CULL_FRACTION - PREGNANCY_LOSS_FRACTION)
-            * annual_keep_calves * PREFRESH_DAY / 365
+            * annual_keep_calves
+            * PREFRESH_DAY
+            / 365
         ),
         "herd_information.parity_fractions": parity_fractions,
         "animal_config.farm_level.calf.male_calf_rate_conventional_semen": round_whole(male_rate * 100) / 100,
@@ -213,15 +215,23 @@ def calculate():
         "animal_config.from_literature.life_cycle.still_birth_rate": STILL_BIRTH_RATE,
     }
     required_user = {
-        "herd_information.cow_num", "herd_information.herd_num",
-        "herd_information.milking_cow_fraction", "herd_information.annual_milk_yield",
+        "herd_information.cow_num",
+        "herd_information.herd_num",
+        "herd_information.milking_cow_fraction",
+        "herd_information.annual_milk_yield",
         "animal_config.from_literature.culling.annual_death_prob",
         "animal_config.from_literature.culling.annual_sale_prob",
     }
     origins = {
-        key: ("calculated" if key in calculated_values else
-              "required setting" if key.endswith("calf_retention_method") else
-              "user input" if key in required_user else "optional/default")
+        key: (
+            "calculated"
+            if key in calculated_values
+            else (
+                "required setting"
+                if key.endswith("calf_retention_method")
+                else "user input" if key in required_user else "optional/default"
+            )
+        )
         for key in animal_json_fields
     }
 
@@ -270,7 +280,8 @@ def display_value(key, value, origin=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--save-json", action="store_true",
+        "--save-json",
+        action="store_true",
         help="Also save a reference JSON report to the OS temp folder (outside Git repo).",
     )
     args = parser.parse_args()
