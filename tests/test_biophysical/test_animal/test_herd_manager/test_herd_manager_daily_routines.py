@@ -9,11 +9,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import (
-    ANNUAL_GENETIC_GAIN_FAT,
-    ANNUAL_GENETIC_GAIN_PROTEIN,
-    Genetics,
-)
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.bedding.bedding import Bedding
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed, RemovalRiskParityGroup, Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
@@ -943,7 +939,6 @@ def test_check_if_replacement_heifers_needed(
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
     mock_time.current_date = datetime.today()
-    mock_time.start_date = datetime.today()
     AnimalConfig.average_phenotype["fat_kg"] = {mock_time.current_date.year: 10.0}
     AnimalConfig.average_phenotype["protein_kg"] = {mock_time.current_date.year: 10.0}
 
@@ -1266,19 +1261,8 @@ def test_create_newborn_calf_genetics_disabled(herd_manager: HerdManager, mocker
     mock_calculate_avg_tbv.assert_not_called()
 
 
-@pytest.mark.parametrize(
-    "start_year, expected_years_of_genetic_progress",
-    [
-        (2020, 0),  # replacement born in the simulation start year
-        (2018, 2),  # replacement born two years after the simulation start year
-        (2021, -1),  # replacement born one year before the simulation start year
-    ],
-)
-def test_update_replacement_animal_genetics(
-    start_year: int, expected_years_of_genetic_progress: int, herd_manager: HerdManager, mocker: MockerFixture
-) -> None:
-    """Replacement genetics re-initialised along the national genetic trend, EBV recalculated with heiferIII TBV
-    mean."""
+def test_update_replacement_animal_genetics(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Replacement genetics re-initialised using heiferIII TBV mean, EBV recalculated."""
     AnimalConfig.simulate_genetics = True
     AnimalConfig.average_phenotype["fat_kg"] = {2020: 10.0}
     AnimalConfig.average_phenotype["protein_kg"] = {2020: 20.0}
@@ -1298,15 +1282,12 @@ def test_update_replacement_animal_genetics(
 
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = datetime(2022, 6, 1)
-    mock_time.start_date = datetime(start_year, 1, 1)
 
     herd_manager._update_replacement_animal_genetics(replacement, mock_time)
 
     mock_genetics_cls.assert_called_once_with(
         birth_year=2020,
         animal_type=replacement.animal_type,
-        tbv_fat_mean=expected_years_of_genetic_progress * ANNUAL_GENETIC_GAIN_FAT,
-        tbv_protein_mean=expected_years_of_genetic_progress * ANNUAL_GENETIC_GAIN_PROTEIN,
     )
     assert replacement.genetics == mock_genetics_instance
     mock_genetics_instance.calculate_ebv_and_ranking_index.assert_called_once_with(

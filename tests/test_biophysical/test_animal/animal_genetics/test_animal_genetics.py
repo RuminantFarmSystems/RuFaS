@@ -97,7 +97,7 @@ def test_animal_genetics_init(
         mock_calculate_tbv_values.assert_not_called()
     else:
         mock_calculate_newborn_calf_tbv_values.assert_not_called()
-        mock_calculate_tbv_values.assert_called_once_with(0.0, 0.0)
+        mock_calculate_tbv_values.assert_called_once_with()
     mock_calculate_ep_values.assert_called_once_with()
     mock_calculate_et_values.assert_called_once_with()
     mock_calculate_phenotype_values.assert_called_once_with(birth_year=birth_year)
@@ -159,18 +159,6 @@ def test_calculate_tbv_values(genetics: Genetics, mocker: MockerFixture) -> None
     genetics._calculate_tbv_values()
     mock_generate_bivariate_random_numbers.assert_called_once_with(
         0.0, 0.0, TBV_FAT_STD, TBV_PROTEIN_STD, TBV_CORRELATION
-    )
-
-
-def test_calculate_tbv_values_with_means(genetics: Genetics, mocker: MockerFixture) -> None:
-    """TBV values are drawn around the provided fat and protein means."""
-    mock_generate_bivariate_random_numbers = mocker.patch.object(
-        Utility, "generate_bivariate_random_numbers", return_value=(10.0, 20.0)
-    )
-    result = genetics._calculate_tbv_values(16.86, 10.08)
-    assert result == (10.0, 20.0)
-    mock_generate_bivariate_random_numbers.assert_called_once_with(
-        16.86, 10.08, TBV_FAT_STD, TBV_PROTEIN_STD, TBV_CORRELATION
     )
 
 
