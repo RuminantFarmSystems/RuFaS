@@ -1,63 +1,64 @@
-from enum import Enum
+from datetime import datetime
 import logging
 from logging.handlers import RotatingFileHandler
+import sys
+from RUFAS.output_manager import LogVerbosity
 from pathlib import Path
 from typing import Any
 
 LOGGER_NAME = "RUFAS"
 
-LOG_FORMAT = "[%(asctime)s][%(levelname)s][%(rufas_name)s] %(message)s"
+LOG_FORMAT = "[%(asctime)s][%(levelname)s][%(rufas_metadata_prefix)s] %(message)s"
 DATE_FORMAT = "%d-%b-%Y_%a_%H-%M-%S"
 
 
-class LogVerbosity(Enum):
-    """
-    The different types of logs printed by ``OutputManager``. Set by the ``verbose`` gnu arg in main.py.
+class RufasContextFilter(logging.Filter):
+    """Adds simulation context to RuFaS log records."""
 
-    Attributes
-    ----------
-    NONE : str
-        Selecting ``NONE`` will tell ``OutputManager`` not to print out anything during a simulation.
-    CREDITS : str
-        Selecting ``CREDITS`` will tell ``OutputManager`` to only print out the credits.
-    ERRORS : str
-        Selecting ``ERRORS`` will tell ``OutputManager`` to print out all credits and errors added during a simulation.
-    WARNINGS : str
-        Selecting ``WARNINGS`` will tell ``OutputManager`` to print out the credits as well as warnings and errors added
-        during a simulation.
-    LOGS : str
-        Selecting ``LOGS`` will tell ``OutputManager`` to print out the credits as well as logs, warnings, and errors
-        added during a simulation.
+    def __init__(self, metadata_prefix: str = "") -> None:
+        super().__init__()
+        self.metadata_prefix = metadata_prefix
 
-    Notes
-    -----
-    ``CREDITS`` is the default setting.
-    """
+    def filter(self, record: logging.LogRecord) -> bool:
+        if not hasattr(record, "rufas_metadata_prefix"):
+            record.rufas_metadata_prefix = self.metadata_prefix
 
-    NONE = "none"
-    CREDITS = "credits"
-    ERRORS = "errors"
-    WARNINGS = "warnings"
-    LOGS = "logs"
+        return True
 
-    def __le__(self, other: "LogVerbosity") -> bool:
-        order = {
-            LogVerbosity.NONE: 0,
-            LogVerbosity.CREDITS: 1,
-            LogVerbosity.ERRORS: 2,
-            LogVerbosity.WARNINGS: 3,
-            LogVerbosity.LOGS: 4,
-        }
 
-        if other == LogVerbosity.NONE and self != LogVerbosity.NONE:
-            return False
+class RufasLogFormatter(logging.Formatter):
+    """Formats RuFaS log messages with timestamps, metadata, and optional console colors."""
 
-        return order[self] <= order[other]
+    COLORS = {
+        logging.INFO: "\033[92m",
+        logging.WARNING: "\033[93m",
+        logging.ERROR: "\033[91m",
+        logging.CRITICAL: "\033[95m",
+    }
 
-    def __str__(self) -> str:
-        if self.value == "none":
-            return "NONE"
-        return self.value[:-1].upper()
+    RESET_COLOR = "\033[0m"
+
+    def __init__(self, use_colors: bool = False) -> None:
+        super().__init__(
+            fmt=LOG_FORMAT,
+            datefmt=DATE_FORMAT,
+            defaults={"rufas_metadata_prefix": ""},
+        )
+        self.use_colors = use_colors
+
+    def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
+        timestamp = datetime.fromtimestamp(record.created)
+        return timestamp.strftime(DATE_FORMAT) + f".{timestamp.microsecond:06d}"
+
+    def format(self, record: logging.LogRecord) -> str:
+        formatted_message = super().format(record)
+
+        if self.use_colors:
+            color = self.COLORS.get(record.levelno, "")
+            if color:
+                return f"{color}{formatted_message}{self.RESET_COLOR}"
+
+        return formatted_message
 
 
 def get_log_level(verbosity: LogVerbosity) -> int:
@@ -77,6 +78,7 @@ def configure_logging(
     log_level: int = logging.INFO,
     output_prefix: str = "rufas",
     write_log_file: bool = True,
+    metadata_prefix: str = "",
 ) -> None:
     """
     Configures the RuFaS logging system.
@@ -91,21 +93,23 @@ def configure_logging(
         Prefix used for the generated log file.
     write_log_file : bool, default=True
         Indicates whether logs should be written to a file.
+    metadata_prefix : str
+        The metadata prefix.
     """
     logger = logging.getLogger(LOGGER_NAME)
-    logger.setLevel(log_level)
-    logger.handlers.clear()
+    logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
-    formatter = logging.Formatter(
-        fmt=LOG_FORMAT,
-        datefmt=DATE_FORMAT,
-        defaults={"rufas_name": ""},
-    )
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
+        handler.close()
 
-    console_handler = logging.StreamHandler()
+    context_filter = RufasContextFilter(metadata_prefix)
+
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(log_level)
-    console_handler.setFormatter(formatter)
+    console_handler.setFormatter(RufasLogFormatter(use_colors=True))
+    console_handler.addFilter(context_filter)
     logger.addHandler(console_handler)
 
     if write_log_file:
@@ -117,8 +121,8 @@ def configure_logging(
             backupCount=5,
             encoding="utf-8",
         )
-        file_handler.setLevel(log_level)
-        file_handler.setFormatter(formatter)
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(RufasLogFormatter(use_colors=False))
         logger.addHandler(file_handler)
 
 
@@ -136,6 +140,9 @@ def get_logger(name: str) -> logging.Logger:
     logging.Logger
         A child logger of the main RuFaS logger.
     """
+    if name == LOGGER_NAME or name.startswith(f"{LOGGER_NAME}."):
+        return logging.getLogger(name)
+
     return logging.getLogger(f"{LOGGER_NAME}.{name}")
 
 
