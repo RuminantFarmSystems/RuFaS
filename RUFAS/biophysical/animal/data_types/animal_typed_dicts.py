@@ -78,8 +78,8 @@ class HeiferIIValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
-    heifer_reproduction_program: str
-    heifer_reproduction_sub_protocol: str
+    heifer_reproduction_program: str | None
+    heifer_reproduction_sub_protocol: str | None
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
@@ -112,8 +112,8 @@ class HeiferIIIValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
-    heifer_reproduction_program: str
-    heifer_reproduction_sub_protocol: str
+    heifer_reproduction_program: str | None
+    heifer_reproduction_sub_protocol: str | None
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
@@ -146,8 +146,8 @@ class CowValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: float
 
-    heifer_reproduction_program: str
-    heifer_reproduction_sub_protocol: str
+    heifer_reproduction_program: str | None
+    heifer_reproduction_sub_protocol: str | None
 
     cow_reproduction_program: str
     cow_presynch_program: str
