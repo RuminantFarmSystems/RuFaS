@@ -1,5 +1,6 @@
 from collections import defaultdict
 from importlib.metadata import PackageNotFoundError, version as get_installed_version
+
 # TODO Remove before merging in
 import logging
 import multiprocessing
@@ -23,6 +24,7 @@ from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
+
 # TODO Remove before merging in
 from RUFAS.post_processing.rufas_logger import configure_logging, get_log_level
 from RUFAS.output_manager import LogVerbosity, OutputManager
