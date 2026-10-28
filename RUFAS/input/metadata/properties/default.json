@@ -402,9 +402,10 @@
             },
             "repro_sub_protocol": {
               "type": "string",
-              "description": "Heifer reproduction sub-protocol. Must be 5dCG2P or 5dCGP when heifer_repro_method is TAI, 2P or CP when it is SynchED, and N/A when it is ED (required by cross-validation).",
-              "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
-              "default": "5dCG2P"
+              "description": "Heifer reproduction sub-protocol. Must be 5dCG2P or 5dCGP when heifer_repro_method is TAI, 2P or CP when it is SynchED, and null when it is ED (required by cross-validation).",
+              "pattern": "^(5dCG2P|5dCGP|2P|CP)$",
+              "default": "5dCG2P",
+              "nullable": true
             },
             "repro_sub_properties": {
               "type": "object",
@@ -1119,7 +1120,8 @@
         },
         "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP)$",
+          "nullable": true
         },
         "estrus_count": {
           "type": "number",
@@ -1230,7 +1232,8 @@
         },
         "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP)$",
+          "nullable": true
         },
         "estrus_count": {
           "type": "number",
@@ -1337,11 +1340,15 @@
         "heifer_reproduction_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(TAI|ED|SynchED|N/A)$"
+          "pattern": "^(TAI|ED|SynchED)$",
+          "default": null,
+          "nullable": true
         },
         "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP)$",
+          "default": null,
+          "nullable": true
         },
         "cow_reproduction_program": {
           "type": "string",
@@ -1486,13 +1493,15 @@
         "heifer_reproduction_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
-          "pattern": "^(TAI|ED|SynchED|N/A)$",
-          "default": "N/A"
+          "pattern": "^(TAI|ED|SynchED)$",
+          "default": null,
+          "nullable": true
         },
         "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
-          "default": "N/A"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP)$",
+          "default": null,
+          "nullable": true
         },
         "estrus_count": {
           "type": "number",

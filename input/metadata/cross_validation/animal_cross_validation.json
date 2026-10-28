@@ -228,7 +228,7 @@
       ]
     },
     {
-      "description": "When heifer repro method is ED, repro_sub_protocol must be NA",
+      "description": "When heifer repro method is ED, repro_sub_protocol must be null",
       "aliases": {
         "variables": {
           "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
@@ -236,7 +236,7 @@
         },
         "constants": {
           "ED": "ED",
-          "NA": "N/A"
+          "true_constant": true
         }
       },
       "apply_when": [
@@ -267,10 +267,10 @@
           "right_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["NA"]
+              "operands": ["true_constant"]
             }
           },
-          "relationship": "equal"
+          "relationship": "is_null"
         }
       ]
     },

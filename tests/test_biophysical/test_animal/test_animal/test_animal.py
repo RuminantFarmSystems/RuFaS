@@ -3538,7 +3538,7 @@ def test_determine_heifer_reproduction_programs_NA(mock_lactating_cow: Animal) -
             estrus_day=1,
             events="",
             gestation_length=1,
-            heifer_reproduction_program="N/A",
+            heifer_reproduction_program=None,
             heifer_reproduction_sub_protocol="5dCG2P",
             id=1,
             mature_body_weight=10.0,
