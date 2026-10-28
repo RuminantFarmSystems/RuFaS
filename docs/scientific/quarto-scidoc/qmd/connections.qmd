@@ -466,7 +466,11 @@ Exchange of the information about the manure nutrient application request and th
 executed in the simulation engine to ensure independence of the Manure Module and the Soil and Crop Module 
 (@fig-man-sc-connect).
 
-![Flow of information between the Manure and Soile and Crop Modules for manure application](../resources/images/man_flow_nutr_req.png){#fig-man-sc-connect}
+:::{#fig-man-sc-connect .column-page}
+![](../resources/images/man_flow_nutr_req.png)
+
+Flow of information between the Manure and Soile and Crop Modules for manure application <!-- Figure caption text -->
+:::
 
 Each day, the SimulationEngine calls the `generate_daily_manure_applications()` method to check with the `FieldManager` 
 to see if there is a manure application scheduled and, when there is, pass the manure nutrient request created by the 
