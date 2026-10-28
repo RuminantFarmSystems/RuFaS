@@ -371,7 +371,7 @@
       ]
     },
     {
-      "description": "When cow repro method is ED: voluntary_waiting_period must be positive, presynch_program, presynch_program_start_day, and ovsynch_program_start_day must be null, and estrus_detection_rate and ED_conception_rate must be positive",
+      "description": "When cow repro method is ED: voluntary_waiting_period must be positive, presynch_program, presynch_program_start_day, ovsynch_program, ovsynch_program_start_day, and resynch_program must be null, and estrus_detection_rate and ED_conception_rate must be positive",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
