@@ -1,0 +1,4 @@
+Variable, Value, Definition
+DEFAULT_PH_FOR_HOUSING_AMMONIA ,7.7, Default pH for manure on housing floors
+HOUSING_SPECIFIC_CONSTANT , 260.0 s/m , Default constant for ammonia emissions from housing
+MILKING_FRESH_WATER_USE_RATE , 30 L/animal/day , Milking water use rate per animal 
