@@ -158,7 +158,7 @@ class Separator(Processor):
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
         }
-        if not self.held_manure:
+        if not self.held_manure or self.held_manure.mass <= 0.0:
             self._om.add_variable("empty_separator_output", {}, {**info_map, "units": MeasurementUnits.UNITLESS})
             return {}
         solid_manure_total_solids = self.held_manure.total_solids * self.total_solids_efficiency
