@@ -1727,7 +1727,7 @@ import_table(
 ::: {#eq-mn-met-6}
 [[**MN.MET.6**]]{.aside .content-visible when-format="html"}
 $$
-\text{methane (kg)} = \text{B}_0 \times \frac{\text{MCF}}{100} \times \text{tVS} \times \text{METHANE\_FACTOR}
+\text{methane (kg)} = \text{B}_0 \times \text{MCF} \times \text{tVS}
 $$
 :::
 
