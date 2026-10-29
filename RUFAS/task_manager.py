@@ -454,6 +454,21 @@ class TaskManager:
         parsed_multi_run_args: list[dict[str, Any]] = []
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
         tasks_from_input: list[dict[str, Any]] = task_config.get("tasks")
+        task_types = {
+            TaskType.from_string(task["task_type"])
+            for task in tasks_from_input
+        }
+        if {TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS} <= task_types:
+            self.output_manager.add_error(
+                "Task Type conflict",
+                "END_TO_END_TESTING and UPDATE_E2E_TEST_RESULTS tasks cannot be run "
+                "together in the same task configuration.",
+                info_map={"class": TaskManager.__name__, "function": self._parse_input_tasks.__name__}
+            )
+            raise ValueError(
+                "END_TO_END_TESTING and UPDATE_E2E_TEST_RESULTS cannot be run "
+                "together in the same task configuration."
+            )
         task_manager_metadata_properties = self.input_manager.get_metadata("properties")
         export_input_data_to_csv = task_config.get("export_input_data_to_csv")
         input_data_csv_export_path = Path(task_config.get("input_data_csv_export_path"))
