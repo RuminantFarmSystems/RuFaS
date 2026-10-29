@@ -854,6 +854,7 @@ def test_process_e2e_group_results(
         "update_expected_test_results",
     )
     mock_post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
 
     result = task_manager._process_e2e_group_results(
         comparison_args=comparison_args,
@@ -908,7 +909,7 @@ def test_process_e2e_group_results(
         mock_validate_comparison.assert_not_called()
         mock_compare.assert_not_called()
         mock_post_processing.assert_not_called()
-        mock_output_manager.add_log.assert_called_once_with(
+        mock_add_log.assert_called_once_with(
             "End-to-end testing",
             "Completed generation of new set of end-to-end expected test results",
             info_map={
