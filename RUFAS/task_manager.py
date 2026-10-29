@@ -257,8 +257,6 @@ class TaskManager:
                 workers=workers,
                 output_directory=output_directory,
                 verbosity=verbosity,
-                is_end_to_end_test_task=is_end_to_end_test_task,
-                is_update_end_to_end_test_task=is_update_end_to_end_test_task,
             )
 
             if is_end_to_end_test_task:
@@ -1090,8 +1088,6 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
-        is_end_to_end_test_task: bool,
-        is_update_end_to_end_test_task: bool,
     ) -> bool:
         """
         Runs all E2E result averaging and comparison tasks, in parallel if a process pool is available.
@@ -1111,10 +1107,6 @@ class TaskManager:
             Directory containing the E2E simulation outputs and where comparison outputs will be written.
         verbosity : LogVerbosity or None
             Log verbosity level for each E2E comparison.
-        is_end_to_end_test_task : bool
-            Whether the task is an e2e task.
-        is_update_end_to_end_test_task : bool
-            Whether the task is an e2e update expected results task.
 
         Returns
         -------
@@ -1135,8 +1127,6 @@ class TaskManager:
             workers=workers,
             output_directory=output_directory,
             verbosity=verbosity,
-            is_end_to_end_test_task=is_end_to_end_test_task,
-            is_update_end_to_end_test_task=is_update_end_to_end_test_task,
         )
 
         if self.pool is not None:
@@ -1175,8 +1165,6 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
-        is_end_to_end_test_task: bool,
-        is_update_end_to_end_test_task: bool,
     ) -> str | None:
         """
         Processes the completed simulation results for one E2E testing group.
@@ -1197,10 +1185,6 @@ class TaskManager:
         verbosity : LogVerbosity or None
             Log verbosity level for the E2E group. If ``None``, the verbosity configured in the E2E run arguments is
             used.
-        is_end_to_end_test_task : bool
-            Whether the task is an e2e task.
-        is_update_end_to_end_test_task : bool
-            Whether the task is an e2e update expected results task.
 
         Notes
         -----
@@ -1222,6 +1206,7 @@ class TaskManager:
 
         group_args = e2e_runs[0].copy()
         group_args["output_prefix"] = e2e_group
+        task_type = group_args["task_type"]
 
         output_manager = OutputManager()
         output_manager.run_startup_sequence(
@@ -1265,7 +1250,7 @@ class TaskManager:
 
             output_manager.is_first_post_processing = False
 
-            if is_end_to_end_test_task:
+            if task_type == TaskType.END_TO_END_TESTING:
                 must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
                     group_args["output_prefix"],
                     group_args["convert_variable_table_path"],
@@ -1290,7 +1275,7 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     save_results=True,
                 )
-            elif is_update_end_to_end_test_task:
+            elif task_type == TaskType.UPDATE_E2E_TEST_RESULTS:
                 E2ETestResultsHandler.update_expected_test_results(averaged_results_path, e2e_group)
                 output_manager.add_log(
                     "End-to-end testing",
