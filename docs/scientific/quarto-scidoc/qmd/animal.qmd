@@ -2507,8 +2507,8 @@ $$
 #### Introduction
 
 The reproduction component of the RuFaS model is designed based on reproductive program options recommended by the @dcrc_protocols and experts in the field. 
-It offers three pre-defined reproductive program options for nulliparous heifers (estrus detection [ED], timed artificial insemination [TAI], 
-and synchronized estrus detection [Synch-ED]) and three options for lactating cows (ED, TAI, and a combined ED-TAI approach). Users can select appropriate reproductive 
+It offers three pre-defined reproductive program options for nulliparous heifers (estrus detection [`ED`], timed artificial insemination [`TAI`],
+and synchronized estrus detection [`Synch-ED`]) and three options for lactating cows ([`ED`], [`TAI`], and a combined [`ED`]-[`TAI`] approach). Users can select appropriate reproductive
 protocols and specify reproductive performance variables for both nulliparous heifers and lactating cows.
 
 This reproduction component simulates key reproductive events, including estrus occurrence, estrus detection, hormone administration, 
