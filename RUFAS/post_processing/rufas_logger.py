@@ -112,19 +112,6 @@ def configure_logging(
     console_handler.addFilter(context_filter)
     logger.addHandler(console_handler)
 
-    if write_log_file:
-        log_directory.mkdir(parents=True, exist_ok=True)
-
-        file_handler = RotatingFileHandler(
-            log_directory / f"{output_prefix}.log",
-            maxBytes=10_000_000,
-            backupCount=5,
-            encoding="utf-8",
-        )
-        file_handler.setLevel(logging.INFO)
-        file_handler.setFormatter(RufasLogFormatter(use_colors=False))
-        logger.addHandler(file_handler)
-
 
 def get_logger(name: str) -> logging.Logger:
     """
