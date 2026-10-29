@@ -1,5 +1,8 @@
 from collections import defaultdict
 from importlib.metadata import PackageNotFoundError, version as get_installed_version
+
+# TODO Remove before merging in
+import logging
 import multiprocessing
 import random
 import sys
@@ -21,6 +24,9 @@ from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
+
+# TODO Remove before merging in
+from RUFAS.post_processing.rufas_logger import configure_logging, get_log_level
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.units import MeasurementUnits
@@ -176,6 +182,24 @@ class TaskManager:
             "function": TaskManager.start.__name__,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
+
+        # TODO Remove before merging in
+        configure_logging(
+            log_directory=Path("logs"),
+            log_level=get_log_level(LogVerbosity.ERRORS if verbosity is None else verbosity),
+            output_prefix="test_logging",
+            metadata_prefix="freestall",
+            write_log_file=True,
+        )
+
+        logger = logging.getLogger("RUFAS.task_manager")
+
+        logger.info("Testing informational message.")
+        logger.warning("Testing warning message.")
+        logger.error("Testing error message.")
+        logger.critical("CRITICAL!!!!!")
+        # TODO remove everything to previous TODO before merging in
+
         is_data_valid = self.input_manager.start_data_processing(
             metadata_path=metadata_path, input_root=Path(""), task_id="TASK MANAGER", cross_validation_file_paths=None
         )
