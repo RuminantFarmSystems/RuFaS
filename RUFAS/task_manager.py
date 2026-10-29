@@ -452,10 +452,7 @@ class TaskManager:
         parsed_multi_run_args: list[dict[str, Any]] = []
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
         tasks_from_input: list[dict[str, Any]] = task_config.get("tasks")
-        task_types = {
-            TaskType.from_string(task["task_type"])
-            for task in tasks_from_input
-        }
+        task_types = {TaskType.from_string(task["task_type"]) for task in tasks_from_input}
         exclusive_task_types = {
             TaskType.END_TO_END_TESTING,
             TaskType.UPDATE_E2E_TEST_RESULTS,
@@ -463,8 +460,7 @@ class TaskManager:
         for task_type in exclusive_task_types:
             if task_type in task_types and len(task_types) > 1:
                 error_message = (
-                    f"{task_type.name} tasks cannot be run with other task types "
-                    "in the same task configuration."
+                    f"{task_type.name} tasks cannot be run with other task types " "in the same task configuration."
                 )
                 self.output_manager.add_error(
                     "Task Type Conflict",
