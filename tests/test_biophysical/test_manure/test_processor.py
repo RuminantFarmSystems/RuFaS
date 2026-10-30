@@ -296,6 +296,7 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: RufasT
         "methane_production_potential": 0.24,
         "pen_manure_data": None,
         "bedding_non_degradable_volatile_solids": 23,
+        "lignin": 3.0,
     }
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
     mock_separator._report_manure_stream(manure_dict, "test_stream", time.simulation_day)
