@@ -6,6 +6,7 @@ class Breed(Enum):
 
     HO = "Holstein"
     JE = "Jersey"
+    BOD = "Beef_On_Dairy"
 
 
 class Sex(Enum):
