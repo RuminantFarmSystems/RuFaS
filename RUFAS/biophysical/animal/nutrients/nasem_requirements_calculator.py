@@ -25,6 +25,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         body_condition_score_5: float,
         days_in_milk: int | None,
         average_daily_gain_heifer: float | None,
+        tissue_weight_gain: float,
         animal_type: AnimalType,
         parity: int,
         calving_interval: int | None,
@@ -57,6 +58,8 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             Days in milk. None if the animal is not milking.
         average_daily_gain_heifer : float
             Average daily gain (g).
+        tissue_weight_gain : float
+            Daily body weight change due to body reserve (tissue) gain or loss (kg).
         animal_type : AnimalType
             A type or subtype of animal specified in AnimalType enum.
         parity : int
@@ -112,6 +115,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             lactating,
             body_weight,
             frame_weight_gain,
+            tissue_weight_gain,
             gravid_uterine_weight_gain,
             dry_matter_intake,
             milk_true_protein,
@@ -295,7 +299,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         FatADG = (0.067 + 0.375 * (body_weight / mature_body_weight)) * EBG / average_daily_gain
         ProtADG = (0.201 - 0.081 * (body_weight / mature_body_weight)) * EBG / average_daily_gain
         frame_weight_gain = FatADG + ProtADG
-        REFADG = (9.4 * FatADG + 5.55 * ProtADG) * average_daily_gain
+        REFADG = 9.4 * FatADG + 5.55 * ProtADG
         net_energy_growth = REFADG / 0.61
         return net_energy_growth, average_daily_gain, frame_weight_gain
 
@@ -366,6 +370,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         lactating: bool,
         body_weight: float,
         frame_weight_gain: float,
+        tissue_weight_gain: float,
         gravid_uterine_weight_gain: float,
         dry_matter_intake_estimate: float,
         milk_true_protein: float,
@@ -383,6 +388,8 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             Body weight (kg)
         frame_weight_gain : float
             Frame weight gain refers to the accretion of both fat and protein in carcass (g)
+        tissue_weight_gain : float
+            Daily body weight change due to body reserve (tissue) gain or loss (kg)
         gravid_uterine_weight_gain : float
             Daily energy requirement associated with increased gain of reproductive tissues as pregnancy advances (Mcal)
         dry_matter_intake_estimate : float
@@ -411,6 +418,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         - metabolic_fecal_crude_protein_req: Crude protein in metabolic fecal protein, g
         - net_metabolic_fecal_crude_protein_req: Net protein requirement for metabolic fecal protein, g
         - frame_growth_net_req: Net protein requirement for body frame weight gain, g
+        - tissue_growth_net_req: Net protein requirement for body reserve (tissue) weight change, g
         - gestation_net_protein_req: Net protein requirement for pregnancy, g
         - milk_net_protein_req: Net protein in milk, or milk true protein yield, g
         - target_efficiencies_metabolic_protein: Proposed target efficiencies of converting metabolizable protein to
@@ -429,6 +437,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         metabolic_fecal_crude_protein_req: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         net_metabolic_fecal_crude_protein_req: float = metabolic_fecal_crude_protein_req * 0.73
         frame_growth_net_req: float = frame_weight_gain * 0.11 * 0.86
+        tissue_growth_net_req: float = tissue_weight_gain * 0.08 * 0.86
         gestation_net_protein_req: float = gravid_uterine_weight_gain * 125
         milk_net_protein_req: float = (
             milk_true_protein * GeneralConstants.PERCENTAGE_TO_FRACTION * milk_production * GeneralConstants.KG_TO_GRAMS
@@ -441,11 +450,12 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
                 + net_metabolic_fecal_crude_protein_req
                 + milk_net_protein_req
                 + frame_growth_net_req
+                + tissue_growth_net_req
             ) / target_efficiencies_metabolic_protein
         else:
             metabolizable_protein_requirement = (
                 scurf_net_protein_req + net_metabolic_fecal_crude_protein_req
-            ) / target_efficiencies_metabolic_protein + (frame_growth_net_req / 0.40)
+            ) / target_efficiencies_metabolic_protein + ((frame_growth_net_req + tissue_growth_net_req) / 0.40)
         gestation_denominator = 0.33 if gestation_net_protein_req > 0.0 else 1.0
         metabolizable_protein_requirement += (
             gestation_net_protein_req / gestation_denominator
