@@ -229,8 +229,7 @@ class OutputManager:
                     f"Generating report for file: {filter_file}",
                     info_map | {"filter file": filter_file},
                 )
-            cross_ref_reports: list[str] = []
-            limited_significant_digits_reports: list[str] = []
+            report_contents: list[dict[str, Any]] = []
             for filter_content in filter_contents:
                 if not self._is_valid_filter_content(filter_content, filter_file):
                     continue
@@ -242,13 +241,10 @@ class OutputManager:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if is_report:
-                    report_name = str(filter_content.get("name", input_path.stem))
                     self._generate_report(
                         report_generator, filter_content, filtered_pool, graphics_dir, produce_graphics
                     )
-                    self._track_report_options(
-                        report_name, filter_content, cross_ref_reports, limited_significant_digits_reports
-                    )
+                    report_contents.append(filter_content)
                 else:
                     self._route_save_functions(
                         filter_file,
@@ -266,8 +262,8 @@ class OutputManager:
                     report_dir,
                     filter_file,
                     direction,
-                    cross_ref_reports,
-                    limited_significant_digits_reports,
+                    self._get_report_names_with_option(report_contents, "cross_references", input_path.stem),
+                    self._get_report_names_with_option(report_contents, "data_significant_digits", input_path.stem),
                 )
 
     def _is_valid_filter_content(self, filter_content: Any, filter_file: str) -> bool:
@@ -315,8 +311,9 @@ class OutputManager:
         report_generator : ReportGenerator
             The report generator collecting the reports for the current report filter file.
         filter_content : dict[str, Any]
-            The report filter content. If it contains ``graph_details``, the graphics settings of the current run are
-            added to it so that the report can be graphed.
+            The report filter content. If it contains ``graph_details``, a copy with the graphics settings of the
+            current run added to its ``graph_details`` is passed to the report generator so that the report can be
+            graphed. ``filter_content`` itself is not modified.
         filtered_pool : dict[str, POOL_ELEMENT_TYPE]
             The pool of filtered data to generate the report from.
         graphics_dir : Path
@@ -325,37 +322,41 @@ class OutputManager:
             Flag for whether the user wants to produce graphs.
         """
         if filter_content.get("graph_details"):
-            filter_content["graph_details"]["graphics_dir"] = graphics_dir
-            filter_content["graph_details"]["produce_graphics"] = produce_graphics
-            filter_content["graph_details"]["metadata_prefix"] = self.__metadata_prefix
+            filter_content = filter_content | {
+                "graph_details": filter_content["graph_details"]
+                | {
+                    "graphics_dir": graphics_dir,
+                    "produce_graphics": produce_graphics,
+                    "metadata_prefix": self.__metadata_prefix,
+                }
+            }
             self.file_manager.create_directory(graphics_dir)
         report_generator.generate_report(filter_content, filtered_pool)
 
-    def _track_report_options(
+    def _get_report_names_with_option(
         self,
-        report_name: str,
-        filter_content: dict[str, Any],
-        cross_ref_reports: list[str],
-        limited_significant_digits_reports: list[str],
-    ) -> None:
+        report_contents: list[dict[str, Any]],
+        option: str,
+        default_name: str,
+    ) -> list[str]:
         """
-        Records whether a report uses cross references or limits data significant digits.
+        Returns the names of the reports whose filter content contains the given option.
 
         Parameters
         ----------
-        report_name : str
-            The name of the report.
-        filter_content : dict[str, Any]
-            The report filter content.
-        cross_ref_reports : list[str]
-            Names of the reports that use cross references, appended to in place.
-        limited_significant_digits_reports : list[str]
-            Names of the reports that limit data significant digits, appended to in place.
+        report_contents : list[dict[str, Any]]
+            The report filter contents that were used to generate reports.
+        option : str
+            The filter content key to look for, e.g. ``"cross_references"`` or ``"data_significant_digits"``.
+        default_name : str
+            The name used for a report whose filter content has no ``name`` entry.
+
+        Returns
+        -------
+        list[str]
+            Names of the reports whose filter content contains ``option``, in the order they were generated.
         """
-        if "cross_references" in filter_content:
-            cross_ref_reports.append(report_name)
-        if "data_significant_digits" in filter_content:
-            limited_significant_digits_reports.append(report_name)
+        return [str(content.get("name", default_name)) for content in report_contents if option in content]
 
     def _save_reports(
         self,
@@ -862,11 +863,11 @@ class OutputManager:
             filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
             for filtered_key, filtered_value in filtered_data.items():
                 combined_key = f"{key}.{filtered_key}"
-                if combined_key in results:
-                    results[combined_key].get("info_maps", []).extend(info_maps)
-                    results[combined_key]["values"].extend(filtered_value)
-                else:
-                    results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": filtered_value}
+                existing = results.get(combined_key, {})
+                merged_info_maps = existing.get("info_maps", []) + info_maps
+                results[combined_key] = ({"info_maps": merged_info_maps} if merged_info_maps else {}) | {
+                    "values": existing.get("values", []) + filtered_value
+                }
                 usage_counter.update([combined_key])
         return results
 
