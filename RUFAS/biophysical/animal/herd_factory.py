@@ -152,7 +152,9 @@ class HerdFactory:
 
         return daily_routines_output
 
-    def _heiferII_update(self, animal: Animal) -> DailyRoutinesOutput:
+    def _heiferII_update(
+        self, animal: Animal, population_ranking_indexes: list[float] | None = None
+    ) -> DailyRoutinesOutput:
         """
         Updates the daily routines for heiferII.
 
@@ -160,6 +162,8 @@ class HerdFactory:
         ----------
         animal: Animal
             The animal instance to update. Must be of type AnimalType.HEIFER_II.
+        population_ranking_indexes : list[float] | None, default=None
+            Ranking indexes of the breeding-eligible heiferIIs, used to allocate semen types.
 
         Returns
         -------
@@ -184,7 +188,7 @@ class HerdFactory:
         animal.days_born += 1
 
         animal.daily_growth_update(self.time)
-        animal.daily_reproduction_update(self.time)
+        animal.daily_reproduction_update(self.time, population_ranking_indexes)
 
         daily_routines_output.animal_status, _ = animal.animal_life_stage_update(self.time)
         return daily_routines_output
@@ -229,7 +233,7 @@ class HerdFactory:
                 animal.days_in_pregnancy += 1
         return daily_routines_output
 
-    def _cow_update(self, animal: Animal) -> DailyRoutinesOutput:
+    def _cow_update(self, animal: Animal, population_ranking_indexes: list[float] | None = None) -> DailyRoutinesOutput:
         """
         Updates the daily routines of a cow.
 
@@ -237,6 +241,8 @@ class HerdFactory:
         ----------
         animal : Animal
             An instance of the Animal class representing the cow to be updated.
+        population_ranking_indexes : list[float] | None, default=None
+            Ranking indexes of the breeding-eligible cows, used to allocate semen types.
 
         Returns
         -------
@@ -263,7 +269,9 @@ class HerdFactory:
 
         animal.daily_milking_update(self.time)
         animal.daily_growth_update(self.time)
-        daily_routines_output.newborn_calf_config, _ = animal.daily_reproduction_update(self.time)
+        daily_routines_output.newborn_calf_config, _ = animal.daily_reproduction_update(
+            self.time, population_ranking_indexes
+        )
 
         daily_routines_output.animal_status, _ = animal.animal_life_stage_update(self.time)
 
@@ -300,8 +308,11 @@ class HerdFactory:
     def _heiferIIs_update(self) -> None:
         """HeiferIIs update for generating herd simulation"""
         remaining_heiferIIs: list[Animal] = []
+        population_ranking_indexes = self._get_population_ranking_indexes(self.pre_animal_population.heiferIIs)
         for heiferII in self.pre_animal_population.heiferIIs:
-            heiferII_daily_routines_output: DailyRoutinesOutput = self._heiferII_update(heiferII)
+            heiferII_daily_routines_output: DailyRoutinesOutput = self._heiferII_update(
+                heiferII, population_ranking_indexes
+            )
             if heiferII_daily_routines_output.animal_status == AnimalStatus.SOLD:
                 continue
             elif (
@@ -313,7 +324,7 @@ class HerdFactory:
                 remaining_heiferIIs.append(heiferII)
         self.pre_animal_population.heiferIIs = remaining_heiferIIs
 
-    def _cow_give_birth(self, cow: Animal) -> None:
+    def _cow_give_birth(self, cow: Animal, newborn_calf_config: NewBornCalfValuesTypedDict | None = None) -> None:
         """
         Handles the birth process of a calf when a cow gives birth.
 
@@ -321,19 +332,37 @@ class HerdFactory:
         ----------
         cow : Animal
             The cow that is giving birth.
+        newborn_calf_config : NewBornCalfValuesTypedDict | None, default=None
+            The newborn calf configuration produced by the cow's reproduction update.
+
+        Notes
+        -----
+        When semen allocation is enabled and a newborn calf configuration is provided, the calf's sex, breed, semen
+        type, and dam TBVs are taken from that configuration, the calf's EBVs and ranking index are calculated, and the
+        dam's genetic values are recalculated for the new lactation. Otherwise, the calf is created as a dairy calf of
+        the herd breed with its sex drawn from the conventional dairy male calf rate.
 
         """
-        args = NewBornCalfValuesTypedDict(
-            id=self.pre_animal_population.next_id(),
-            breed=self.breed.name,
-            sex=Sex.MALE if random.random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE,
-            bred_from_semen=None,
-            birth_date="",
-            days_born=0,
-            initial_phosphorus=cow.nutrients.phosphorus_for_gestation_required_for_calf,
-            birth_weight=cow.reproduction.calf_birth_weight,
-            animal_type=AnimalType.CALF.value,
-        )
+        use_newborn_calf_config = self._is_semen_allocation_enabled() and newborn_calf_config is not None
+        if use_newborn_calf_config:
+            assert newborn_calf_config is not None
+            args = NewBornCalfValuesTypedDict(
+                **newborn_calf_config,
+                id=self.pre_animal_population.next_id(),
+            )
+            self._update_genetic_values_at_lactation_start(cow)
+        else:
+            args = NewBornCalfValuesTypedDict(
+                id=self.pre_animal_population.next_id(),
+                breed=self.breed.name,
+                sex=Sex.MALE if random.random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE,
+                bred_from_semen=None,
+                birth_date="",
+                days_born=0,
+                initial_phosphorus=cow.nutrients.phosphorus_for_gestation_required_for_calf,
+                birth_weight=cow.reproduction.calf_birth_weight,
+                animal_type=AnimalType.CALF.value,
+            )
         cow.nutrients.total_phosphorus_in_animal = (
             cow.nutrients.total_phosphorus_in_animal
             - cow.nutrients.phosphorus_for_gestation_required_for_calf
@@ -346,6 +375,8 @@ class HerdFactory:
         calf = Animal(args, self.time)
         CalfRetentionPolicy.apply_rate_based_retention(calf, self.time.simulation_day)
         if not calf.sold:
+            if use_newborn_calf_config:
+                self._update_newborn_calf_genetic_values(calf)
             self.pre_animal_population.calves.append(calf)
 
     def _heiferIIIs_update(self, day: int) -> None:
@@ -366,9 +397,9 @@ class HerdFactory:
                 if day >= animal_constants.DAYS_TO_START_REPLACEMENT_HERD:
                     self.pre_animal_population.replacement.append(copy.deepcopy(heiferIII))
 
-                heiferIII.transition_heiferIII_to_cow(self.time)
+                newborn_calf_config = heiferIII.transition_heiferIII_to_cow(self.time)
                 self.pre_animal_population.cows.append(heiferIII)
-                self._cow_give_birth(heiferIII)
+                self._cow_give_birth(heiferIII, newborn_calf_config)
             else:
                 remaining_heiferIIIs.append(heiferIII)
 
@@ -377,8 +408,9 @@ class HerdFactory:
     def _cows_update(self) -> None:
         """Cows update for generating herd simulation"""
         remaining_cows: list[Animal] = []
+        population_ranking_indexes = self._get_population_ranking_indexes(self.pre_animal_population.cows)
         for cow in self.pre_animal_population.cows:
-            cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
+            cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow, population_ranking_indexes)
             if (
                 cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD]
                 or cow.reproduction.calves > 5
@@ -387,7 +419,7 @@ class HerdFactory:
             else:
                 remaining_cows.append(cow)
             if cow_daily_routines_output.newborn_calf_config:
-                self._cow_give_birth(cow)
+                self._cow_give_birth(cow, cow_daily_routines_output.newborn_calf_config)
         self.pre_animal_population.cows = remaining_cows
 
     def _generate_animals(self) -> AnimalPopulation:
@@ -412,6 +444,9 @@ class HerdFactory:
             CalfRetentionPolicy.apply_rate_based_retention(calf, self.time.simulation_day)
             if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
+
+        if self._is_semen_allocation_enabled():
+            self._update_genetic_values(self.pre_animal_population.calves)
 
         for day in tqdm(range(self.simulation_days)):
             self._cows_update()
@@ -499,6 +534,79 @@ class HerdFactory:
             cows=cows,
             replacement=replacement,
             current_animal_id=self.pre_animal_population.current_animal_id,
+        )
+
+    @staticmethod
+    def _is_semen_allocation_enabled() -> bool:
+        """Return whether semen types are allocated by genetic ranking during herd generation."""
+        return (
+            AnimalConfig.simulate_genetics
+            and AnimalConfig.selective_repro_strategy
+            and AnimalConfig.ranking_method == "genetic"
+        )
+
+    def _get_population_ranking_indexes(self, animals: list[Animal]) -> list[float] | None:
+        """
+        Collect the ranking indexes of the breeding-eligible animals in a group.
+
+        Parameters
+        ----------
+        animals : list[Animal]
+            The group of animals (heiferIIs or cows) whose ranking indexes are collected.
+
+        Returns
+        -------
+        list[float] | None
+            Ranking indexes of the breeding-eligible animals with genetics, or None if semen allocation is disabled.
+
+        """
+        if not self._is_semen_allocation_enabled():
+            return None
+        return [
+            animal.genetics.ranking_index
+            for animal in animals
+            if animal.is_eligible_for_breeding and animal.genetics is not None
+        ]
+
+    def _update_newborn_calf_genetic_values(self, calf: Animal) -> None:
+        """
+        Calculate the EBVs and ranking index of a newborn calf using the TBV mean of the current calves.
+
+        Parameters
+        ----------
+        calf : Animal
+            The newborn calf whose genetic values are calculated.
+
+        """
+        if calf.genetics is None:
+            return
+        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
+            [animal.genetics for animal in self.pre_animal_population.calves if animal.genetics is not None]
+        )
+        calf.genetics.calculate_ebv_and_ranking_index(calf.animal_type, mean_tbv_fat, mean_tbv_protein, calf.calves)
+
+    def _update_genetic_values_at_lactation_start(self, cow: Animal) -> None:
+        """
+        Recalculate the genetic values of a cow at the start of a new lactation using the TBV mean of the cows.
+
+        Parameters
+        ----------
+        cow : Animal
+            The cow starting a new lactation.
+
+        """
+        if cow.genetics is None:
+            return
+        birth_year = Utility.back_track_birth_date(cow.days_born, self.time.current_date).year
+        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
+            [animal.genetics for animal in self.pre_animal_population.cows if animal.genetics is not None]
+        )
+        cow.genetics.recalculate_values_at_lactation_start(
+            birth_year=birth_year,
+            animal_type=cow.animal_type,
+            parity=cow.calves,
+            group_specific_TBV_fat_mean=mean_tbv_fat,
+            group_specific_TBV_protein_mean=mean_tbv_protein,
         )
 
     def _update_genetic_values(
