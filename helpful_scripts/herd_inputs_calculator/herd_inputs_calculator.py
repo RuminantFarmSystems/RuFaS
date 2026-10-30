@@ -20,7 +20,7 @@ IMPORTANT:  calf_retention_method must be "count" for the calculated
 
 To save a reference report, specify the location:
     python herd_inputs_calculator.py --output "C:/Users/you/Documents/herd_results.json"
-You can also supply an existing folder to --output; the default filename is used.   
+You can also supply an existing folder to --output; the default filename is used.
 
 
 Counts and milk yield are rounded to integers; fractions to whole percentages.
@@ -55,8 +55,12 @@ CALF_MORTALITY_RATE = 0.05  # animal_config.management_decisions.calf_mortality_
 HEIFER_MORTALITY_RATE = 0.03  # animal_config.management_decisions.heifer_mortality_rate
 PREGNANCY_LOSS_FRACTION = 0.02  # planning assumption; not a one-to-one JSON field
 REPRO_CULL_FRACTION = 0.05  # planning assumption; not a one-to-one JSON field
-REPLACEMENT_CALF_BUFFER_FRACTION = 0.10  # percent extra retained replacements (dairy female calves) above estimated need
-MALE_CALF_RATE_BUFFER_FRACTION = 0.75  # percent extra male calf rate above estimated need; does NOT change count of number of calves to retain
+REPLACEMENT_CALF_BUFFER_FRACTION = (
+    0.10  # percent extra retained replacements (dairy female calves) above estimated need
+)
+MALE_CALF_RATE_BUFFER_FRACTION = (
+    0.75  # percent extra male calf rate above estimated need; does NOT change count of number of calves to retain
+)
 # Both are assumptions, not direct RuFaS animal JSON fields.
 
 # Relative shares of the L3+ portion of the herd (automatically normalized).
@@ -147,10 +151,10 @@ def calculate():
 
     cows_leaving = (ANNUAL_SALE_PROB + ANNUAL_DEATH_PROB) * COW_NUM
     annual_keep_calves = (
-            (1 + REPLACEMENT_CALF_BUFFER_FRACTION)
-            * cows_leaving
-            / (1 - PREGNANCY_LOSS_FRACTION - REPRO_CULL_FRACTION - HEIFER_MORTALITY_RATE - CALF_MORTALITY_RATE)
-        )
+        (1 + REPLACEMENT_CALF_BUFFER_FRACTION)
+        * cows_leaving
+        / (1 - PREGNANCY_LOSS_FRACTION - REPRO_CULL_FRACTION - HEIFER_MORTALITY_RATE - CALF_MORTALITY_RATE)
+    )
     other_calvings = (COW_NUM - cows_leaving) * 365 / CALVING_INTERVAL
     live_calves = (1 - STILL_BIRTH_RATE) * (cows_leaving + other_calvings)
     if live_calves <= 0:
@@ -286,8 +290,10 @@ def display_value(key, value, origin=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--output", type=Path, metavar="PATH",
-            help="Save the reference JSON to this file or existing folder.",
+        "--output",
+        type=Path,
+        metavar="PATH",
+        help="Save the reference JSON to this file or existing folder.",
     )
     args = parser.parse_args()
     results = calculate()
