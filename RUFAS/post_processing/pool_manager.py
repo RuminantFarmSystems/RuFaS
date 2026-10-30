@@ -2,7 +2,7 @@ import collections
 from pathlib import Path
 
 from numpy import inf
-from shared_data_types import POOL_ELEMENT_TYPE
+from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
 from typing import Any, Counter, Sequence, Union
 
 from RUFAS.post_processing.file_manager import FileManager
