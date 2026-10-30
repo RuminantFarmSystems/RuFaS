@@ -855,6 +855,9 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
     hs.sold_calf_num = 16
     hs.born_calf_num = 17
     hs.stillborn_calf_num = 18
+    hs.dairy_male_sold_calf_num = 24
+    hs.dairy_female_sold_calf_num = 25
+    hs.beef_sold_calf_num = 26
     hs.daily_milk_production = 100.0
     hs.herd_milk_fat_percent = 3.5
     hs.herd_milk_fat_kg = 3.6
@@ -901,7 +904,7 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_herd_statistics_data(hs, simulation_day)
 
-    assert mock_om_add_variable.call_count == 75
+    assert mock_om_add_variable.call_count == 78
 
     # Build lookup: variable_name → value from actual calls
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
@@ -925,6 +928,9 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
     assert reported["sold_calf_num"] == 16
     assert reported["born_calf_num"] == 17
     assert reported["stillborn_calf_num"] == 18
+    assert reported["dairy_male_sold_calf_num"] == 24
+    assert reported["dairy_female_sold_calf_num"] == 25
+    assert reported["beef_sold_calf_num"] == 26
 
     # --- milk ---
     assert reported["daily_milk_production"] == pytest.approx(100.0)
@@ -1012,7 +1018,7 @@ def test_report_herd_statistics_data_with_pen_heifer_adg(mocker: MockerFixture) 
 
     AnimalModuleReporter.report_herd_statistics_data(hs, 1)
 
-    assert mock_om_add_variable.call_count == 77
+    assert mock_om_add_variable.call_count == 80
 
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
     assert reported["heifer_average_daily_gain_in_pen_3"] == pytest.approx(1.1)
