@@ -14,14 +14,22 @@ from RUFAS.biophysical.animal.calf_retention_policy import (
     UNFULFILLED_TAG_ERROR_FRACTION,
 )
 from RUFAS.biophysical.animal.data_types.animal_enums import Sex
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.rufas_time import RufasTime
 
 RANDOM_PATH = "RUFAS.biophysical.animal.calf_retention_policy.random"
 
 
-def _calf(sex: Sex = Sex.FEMALE, stillborn: bool = False) -> Animal:
+def _calf(
+    sex: Sex = Sex.FEMALE,
+    stillborn: bool = False,
+    bred_from_semen: SemenType = SemenType.CONVENTIONAL_DAIRY,
+) -> Animal:
     """A minimal stand-in for an Animal carrying only the attributes the policy touches."""
-    return cast(Animal, SimpleNamespace(sex=sex, stillborn=stillborn, sold_at_day=None))
+    return cast(
+        Animal,
+        SimpleNamespace(sex=sex, stillborn=stillborn, sold_at_day=None, bred_from_semen=bred_from_semen),
+    )
 
 
 def _time(
@@ -52,20 +60,20 @@ def restore_retention_config() -> Generator[None, None, None]:
     saved = (
         AnimalConfig.calf_retention_method,
         AnimalConfig.annual_keep_female_calf_num,
-        AnimalConfig.keep_female_calf_rate,
+        AnimalConfig.keep_dairy_female_rate,
     )
     yield
     (
         AnimalConfig.calf_retention_method,
         AnimalConfig.annual_keep_female_calf_num,
-        AnimalConfig.keep_female_calf_rate,
+        AnimalConfig.keep_dairy_female_rate,
     ) = saved
 
 
 def test_rate_method_keeps_female_when_draw_at_or_below_rate(mocker: MockerFixture) -> None:
     """Rate method keeps a live female calf when the random draw is at or below the retention rate."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
-    AnimalConfig.keep_female_calf_rate = 0.5
+    AnimalConfig.keep_dairy_female_rate = 0.5
     mocker.patch(RANDOM_PATH, return_value=0.3)
     policy = CalfRetentionPolicy()
 
@@ -78,7 +86,7 @@ def test_rate_method_keeps_female_when_draw_at_or_below_rate(mocker: MockerFixtu
 def test_rate_method_sells_female_when_draw_above_rate(mocker: MockerFixture) -> None:
     """Rate method sells a female calf when the random draw exceeds the retention rate."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
-    AnimalConfig.keep_female_calf_rate = 0.5
+    AnimalConfig.keep_dairy_female_rate = 0.5
     mocker.patch(RANDOM_PATH, return_value=0.7)
     policy = CalfRetentionPolicy()
 
@@ -91,7 +99,7 @@ def test_rate_method_sells_female_when_draw_above_rate(mocker: MockerFixture) ->
 def test_rate_method_always_sells_males_without_drawing(mocker: MockerFixture) -> None:
     """Rate method sells every male calf without consuming a random draw."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_RATE
-    AnimalConfig.keep_female_calf_rate = 1.0
+    AnimalConfig.keep_dairy_female_rate = 1.0
     mock_random = mocker.patch(RANDOM_PATH)
     policy = CalfRetentionPolicy()
 
@@ -105,14 +113,14 @@ def test_rate_method_always_sells_males_without_drawing(mocker: MockerFixture) -
 def test_apply_rate_based_retention_classmethod(mocker: MockerFixture) -> None:
     """apply_rate_based_retention keeps or sells by rate regardless of the configured method."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
-    AnimalConfig.keep_female_calf_rate = 1.0
+    AnimalConfig.keep_dairy_female_rate = 1.0
     mocker.patch(RANDOM_PATH, return_value=0.99)
 
     kept = _calf(sex=Sex.FEMALE)
     CalfRetentionPolicy.apply_rate_based_retention(kept, simulation_day=3)
     assert kept.sold_at_day is None
 
-    AnimalConfig.keep_female_calf_rate = 0.0
+    AnimalConfig.keep_dairy_female_rate = 0.0
     sold = _calf(sex=Sex.FEMALE)
     CalfRetentionPolicy.apply_rate_based_retention(sold, simulation_day=3)
     assert sold.sold_at_day == 3
