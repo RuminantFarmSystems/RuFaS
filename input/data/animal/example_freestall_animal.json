@@ -30,7 +30,7 @@
     "management_decisions": {
       "breeding_start_day_h": 380,
       "heifer_repro_method": "SynchED",
-      "cow_repro_method": "TAI",
+      "cow_repro_method": "ED",
       "semen_type": "conventional",
       "days_in_preg_when_dry": 218,
       "heifer_repro_cull_time": 500,
@@ -56,7 +56,7 @@
         "milk_type": "whole"
       },
       "repro": {
-        "voluntary_waiting_period": 0,
+        "voluntary_waiting_period": 50,
         "conception_rate_decrease": 0.026,
         "decrease_conception_rate_in_rebreeding": false,
         "decrease_conception_rate_by_parity": false,
@@ -76,12 +76,12 @@
         "cows": {
             "estrus_detection_rate": 0.6,
             "ED_conception_rate": 0.5,
-            "presynch_program": "Double OvSynch",
-            "presynch_program_start_day": 50,
-            "ovsynch_program": "OvSynch 56",
-            "ovsynch_program_start_day": 64,
+            "presynch_program": null,
+            "presynch_program_start_day": null,
+            "ovsynch_program": null,
+            "ovsynch_program_start_day": null,
             "ovsynch_program_conception_rate": 0.6,
-            "resynch_program": "TAIafterPD"
+            "resynch_program": null
         }
 			},
 			"bodyweight": {

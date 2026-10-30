@@ -1415,7 +1415,7 @@ class Animal:
         heifer_reproduction_sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol | None = None
         heifer_reproduction_program: HeiferReproductionProtocol | None = (
             None
-            if heifer_reproduction_program_string == "N/A"
+            if heifer_reproduction_program_string is None
             else HeiferReproductionProtocol(heifer_reproduction_program_string)
         )
         if heifer_reproduction_program == HeiferReproductionProtocol.TAI:
