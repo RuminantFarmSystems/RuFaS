@@ -1,0 +1,4 @@
+{
+    "description": "Tolerance overrides by variable name, each with a 'tolerance' and an optional 'tolerance_type' (percent, absolute, or significant_digits). A listed variable is compared with its own tolerance instead of the domain's.",
+    "variable_tolerances": {}
+}
