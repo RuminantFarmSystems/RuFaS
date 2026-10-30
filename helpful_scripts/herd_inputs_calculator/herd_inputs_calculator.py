@@ -18,20 +18,22 @@ HOW TO USE
 IMPORTANT:  calf_retention_method must be "count" for the calculated
    annual_keep_female_calf_num to be used.
 
-Running normally creates NO output files.
-Optional: python herd_inputs_calculator.py --save-json
-saves a reference report in your OS temporary directory, outside the repo.
+To save a reference report, specify the location:
+    python herd_inputs_calculator.py --output "C:/Users/you/Documents/herd_results.json"
+You can also supply an existing folder to --output; the default filename is used.   
+
 
 Counts and milk yield are rounded to integers; fractions to whole percentages.
-Parity rounding allocates exactly 100 percentage points and protects against
-strict Python sum(parity_fractions.values()) == 1.0 validation.
+Separate buffers control replacement-calf retention and the additional female
+calf production targeted through the male calf rate. Increasing the latter
+lowers the male calf rate without changing the number of calves retained.
+Parity rounding allocates exactly 100 percentage points.
 
 """
 
 import argparse
 import json
 import math
-import tempfile
 from pathlib import Path
 
 # ======================= EDIT INPUTS HERE =======================
@@ -53,7 +55,9 @@ CALF_MORTALITY_RATE = 0.05  # animal_config.management_decisions.calf_mortality_
 HEIFER_MORTALITY_RATE = 0.03  # animal_config.management_decisions.heifer_mortality_rate
 PREGNANCY_LOSS_FRACTION = 0.02  # planning assumption; not a one-to-one JSON field
 REPRO_CULL_FRACTION = 0.05  # planning assumption; not a one-to-one JSON field
-BUFFER_FRACTION = 0.10  # planning assumption; no direct animal JSON field
+REPLACEMENT_CALF_BUFFER_FRACTION = 0.10  # percent extra retained replacements (dairy female calves) above estimated need
+MALE_CALF_RATE_BUFFER_FRACTION = 0.75  # percent extra male calf rate above estimated need; does NOT change count of number of calves to retain
+# Both are assumptions, not direct RuFaS animal JSON fields.
 
 # Relative shares of the L3+ portion of the herd (automatically normalized).
 L3_SHARE_OF_L3_PLUS = 0.40
@@ -88,9 +92,6 @@ def round_parities_to_percentages(fractions):
     # pass even a strict Python float comparison: sum(values) == 1.0.
     values = [point / 100 for point in points]
     if sum(values) != 1.0:
-        # Usually adjusting only the final value by one floating-point step
-        # suffices. Try a nearby representable value for a preceding fraction
-        # as well for cases where the final percentage is zero.
         original = values[:]
         for pivot in range(len(values) - 1, -1, -1):
             for direction in (0, -1, 1, -2, 2, -3, 3):
@@ -120,7 +121,8 @@ def calculate():
         "heifer_mortality_rate": HEIFER_MORTALITY_RATE,
         "pregnancy_loss_fraction": PREGNANCY_LOSS_FRACTION,
         "repro_cull_fraction": REPRO_CULL_FRACTION,
-        "buffer_fraction": BUFFER_FRACTION,
+        "replacement_calf_buffer_fraction": REPLACEMENT_CALF_BUFFER_FRACTION,
+        "male_calf_rate_buffer_fraction": MALE_CALF_RATE_BUFFER_FRACTION,
     }
     for name, value in fractions.items():
         if not 0 <= value <= 1:
@@ -145,15 +147,18 @@ def calculate():
 
     cows_leaving = (ANNUAL_SALE_PROB + ANNUAL_DEATH_PROB) * COW_NUM
     annual_keep_calves = (
-        (1 + BUFFER_FRACTION)
-        * cows_leaving
-        / (1 - PREGNANCY_LOSS_FRACTION - REPRO_CULL_FRACTION - HEIFER_MORTALITY_RATE - CALF_MORTALITY_RATE)
-    )
+            (1 + REPLACEMENT_CALF_BUFFER_FRACTION)
+            * cows_leaving
+            / (1 - PREGNANCY_LOSS_FRACTION - REPRO_CULL_FRACTION - HEIFER_MORTALITY_RATE - CALF_MORTALITY_RATE)
+        )
     other_calvings = (COW_NUM - cows_leaving) * 365 / CALVING_INTERVAL
     live_calves = (1 - STILL_BIRTH_RATE) * (cows_leaving + other_calvings)
     if live_calves <= 0:
         raise ValueError("Calculated live calves per year must be positive")
-    male_rate = 1 - annual_keep_calves / live_calves * (1 + BUFFER_FRACTION)
+    # The MCR buffer acts ONLY on the female-calf production target.
+    # A larger buffer lowers the male calf rate (more female calves born),
+    # but leaves annual_keep_calves and initial calf/heifer counts unchanged.
+    male_rate = 1 - (annual_keep_calves / live_calves) * (1 + MALE_CALF_RATE_BUFFER_FRACTION)
     if not 0 <= male_rate <= 1:
         raise ValueError("Calculated male calf rate is outside 0–1; check herd inputs")
 
@@ -240,7 +245,8 @@ def calculate():
         "age_first_calving_days": AGE_FIRST_CALVING_DAYS,
         "pregnancy_loss_fraction": PREGNANCY_LOSS_FRACTION,
         "repro_cull_fraction": REPRO_CULL_FRACTION,
-        "buffer_fraction": BUFFER_FRACTION,
+        "replacement_calf_buffer_fraction": REPLACEMENT_CALF_BUFFER_FRACTION,
+        "male_calf_rate_buffer_fraction": MALE_CALF_RATE_BUFFER_FRACTION,
         "L3_share_of_L3_plus": L3_SHARE_OF_L3_PLUS,
         "L4_share_of_L3_plus": L4_SHARE_OF_L3_PLUS,
         "L5_plus_share_of_L3_plus": L5_PLUS_SHARE_OF_L3_PLUS,
@@ -280,9 +286,8 @@ def display_value(key, value, origin=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--save-json",
-        action="store_true",
-        help="Also save a reference JSON report to the OS temp folder (outside Git repo).",
+        "--output", type=Path, metavar="PATH",
+            help="Save the reference JSON to this file or existing folder.",
     )
     args = parser.parse_args()
     results = calculate()
@@ -311,12 +316,19 @@ def main():
     for key, value in results["other_inputs_and_assumptions"].items():
         display_value(key, value)
 
-    if args.save_json:
-        # Temporary directory is outside the repository, preventing Git changes.
-        path = Path(tempfile.gettempdir()) / "rufas_herd_inputs_reference.json"
+    if args.output is not None:
+        default_name = "rufas_herd_inputs_reference.json"
+        path = args.output
+        if path.is_dir():
+            path = path / default_name
+        if path.suffix.lower() != ".json":
+            parser.error("--output must specify a .json filename or an existing directory")
+        if not path.parent.is_dir():
+            parser.error(f"Output directory does not exist: {path.parent}")
         export = {key: value for key, value in results.items() if key != "field_origins"}
         path.write_text(json.dumps(export, indent=2) + "\n", encoding="utf-8")
-        print(f"\nReference report saved outside your Git repository: {path}")
+        print(f"\nReference report saved to: {path.resolve()}")
+        print("Note: Saving within your Git repo may produce an untracked or modified file.")
     else:
         print("\nNo output files created; results are displayed above for manual entry.")
 
