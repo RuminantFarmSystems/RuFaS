@@ -1,6 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from shared_data_types import POOL_ELEMENT_TYPE
+from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
 from typing import Any, Union
 
 import pandas as pd
@@ -502,6 +502,7 @@ class FileManager:
         """
         pass
 
+    @staticmethod
     def _normalize_module_header(json_key: str) -> str:
         """Normalizes the module header from a JSON key."""
         pass
