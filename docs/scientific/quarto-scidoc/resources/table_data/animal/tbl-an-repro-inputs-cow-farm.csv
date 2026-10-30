@@ -1,6 +1,6 @@
 ﻿Variable , Definition , Default ,Min,Max,Values
 voluntary_waiting_period,`ED` and `ED-TAI`: The numer of days after calving when estrus detection begin .`TAI`: this value will be ignored: set to 0.,50,0, --, --
-estrus_detection_rate,The fraction of estrous cows that would be detected in the `ED` and `ED-TAI` protocols. `TAI` protocol : set to 0.,0.6,0,1,"Double OvSynch, PreSynch, G6G, None"
+estrus_detection_rate,The fraction of estrous cows that would be detected in the `ED` and `ED-TAI` protocols. `TAI` protocol : set to 0.,0.6,0,1, --
 ED_conception_rate,The proportion (%) of cows conceiving after estrus is detected in  `ED` and `ED-TAI`. `TAI` protocol: set to 0.,0.6,0,1, --
 presynch_program,`TAI` : Presynchronization program used before first breeding cows. `ED` or `ED-TAI`: set to `None`. ,Double OvSynch, --, --,"Double OvSynch, PreSynch, G6G, None"
 presynch_program_start_day,`TAI` :Day after calving when the first hormone treatment of the presynch program occurs. `ED` or `ED-TAI` set to 0.,50,0, --,See (@fig-ani-repro-cow-presynch) for details.
