@@ -92,10 +92,10 @@
             "ovsynch_program_conception_rate": 0.6,
             "resynch_program": "TAIafterPD",
             "semen_allocation_proportions": {
-				"sexed_dairy": 0.2,
-				"conventional_dairy": 0.5,
-				"beef": 0.3
-			}
+              "sexed_dairy": 0.2,
+              "conventional_dairy": 0.5,
+              "beef": 0.3
+            }
         }
 			},
 			"bodyweight": {
