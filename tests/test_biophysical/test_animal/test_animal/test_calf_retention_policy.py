@@ -126,6 +126,18 @@ def test_apply_rate_based_retention_classmethod(mocker: MockerFixture) -> None:
     assert sold.sold_at_day == 3
 
 
+def test_apply_rate_based_retention_sells_beef_calves(mocker: MockerFixture) -> None:
+    """apply_rate_based_retention always sells calves bred from beef semen, without drawing a random number."""
+    AnimalConfig.keep_dairy_female_rate = 1.0
+    mock_random = mocker.patch(RANDOM_PATH, return_value=0.0)
+
+    beef_calf = _calf(sex=Sex.FEMALE, bred_from_semen=SemenType.BEEF)
+    CalfRetentionPolicy.apply_rate_based_retention(beef_calf, simulation_day=3)
+
+    assert beef_calf.sold_at_day == 3
+    mock_random.assert_not_called()
+
+
 def test_count_method_fulfills_tags_then_sells(mocker: MockerFixture) -> None:
     """Count method keeps female calves while tags remain, then sells once tags are exhausted."""
     AnimalConfig.calf_retention_method = RETENTION_METHOD_COUNT
