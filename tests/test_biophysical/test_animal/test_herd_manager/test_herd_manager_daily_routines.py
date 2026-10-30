@@ -11,7 +11,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.bedding.bedding import Bedding
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed, RemovalRiskParityGroup
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed, RemovalRiskParityGroup, Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
@@ -150,6 +150,8 @@ def test_perform_daily_routines_for_animals(
                 return_value=DailyRoutinesOutput(
                     animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
                     newborn_calf_config=NewBornCalfValuesTypedDict(
+                        sex=Sex.FEMALE,
+                        bred_from_semen=None,
                         breed=Breed.HO.name,
                         animal_type=AnimalType.CALF.value,
                         birth_date="",
@@ -260,6 +262,8 @@ def test_perform_daily_routines_counts_deaths_and_handles_stillborn_newborns(
 
     newborn_config: NewBornCalfValuesTypedDict = {
         "breed": Breed.HO.name,
+        "sex": Sex.FEMALE,
+        "bred_from_semen": None,
         "animal_type": AnimalType.CALF.value,
         "birth_date": "",
         "days_born": 0,
@@ -582,7 +586,7 @@ def test_warn_when_lactating_cows_have_no_milk(herd_manager: HerdManager, mocker
 
     mock_add_warning.assert_called_once_with(
         "Warning: Lactating cows with no production.",
-        "There are 1 lactating cows with no milking production on simulation day 15.",
+        "There are 1/2 lactating cows with no milking production on simulation day 15.",
         info_map={
             "class": herd_manager.__class__.__name__,
             "function": herd_manager.execute_daily_routines.__name__,
@@ -778,6 +782,8 @@ def test_create_newborn_calf(
     """Unit test for _create_newborn_calf()"""
     AnimalPopulation.set_current_max_animal_id(0)
     newborn_calf_config = NewBornCalfValuesTypedDict(
+        sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed=Breed.HO.name,
         animal_type=AnimalType.CALF.value,
         birth_date="",
@@ -1196,6 +1202,8 @@ def test_create_newborn_calf_genetics_enabled(herd_manager: HerdManager, mocker:
     AnimalPopulation.set_current_max_animal_id(0)
 
     newborn_calf_config = NewBornCalfValuesTypedDict(
+        sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed=Breed.HO.name,
         animal_type=AnimalType.CALF.value,
         birth_date="",
@@ -1228,6 +1236,8 @@ def test_create_newborn_calf_genetics_disabled(herd_manager: HerdManager, mocker
     AnimalPopulation.set_current_max_animal_id(0)
 
     newborn_calf_config = NewBornCalfValuesTypedDict(
+        sex=Sex.FEMALE,
+        bred_from_semen=None,
         breed=Breed.HO.name,
         animal_type=AnimalType.CALF.value,
         birth_date="",
