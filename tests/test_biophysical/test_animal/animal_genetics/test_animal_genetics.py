@@ -9,13 +9,13 @@ from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import (
     Genetics,
     TBV_CORRELATION,
-    TBV_FAT_STD,
-    TBV_PROTEIN_STD,
-    E_PERMANENT_FAT_STD,
-    E_PERMANENT_PROTEIN_STD,
+    TBV_FAT_VARIANCE,
+    TBV_PROTEIN_VARIANCE,
+    E_PERMANENT_FAT_VARIANCE,
+    E_PERMANENT_PROTEIN_VARIANCE,
     E_PERMANENT_CORRELATION,
-    E_TEMPORARY_FAT_STD,
-    E_TEMPORARY_PROTEIN_STD,
+    E_TEMPORARY_FAT_VARIANCE,
+    E_TEMPORARY_PROTEIN_VARIANCE,
     E_TEMPORARY_CORRELATION,
 )
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -158,7 +158,7 @@ def test_calculate_tbv_values(genetics: Genetics, mocker: MockerFixture) -> None
     )
     genetics._calculate_tbv_values()
     mock_generate_bivariate_random_numbers.assert_called_once_with(
-        0.0, 0.0, TBV_FAT_STD, TBV_PROTEIN_STD, TBV_CORRELATION
+        0.0, 0.0, numpy.sqrt(TBV_FAT_VARIANCE), numpy.sqrt(TBV_PROTEIN_VARIANCE), TBV_CORRELATION
     )
 
 
@@ -166,9 +166,9 @@ def test_calculate_tbv_values(genetics: Genetics, mocker: MockerFixture) -> None
     "dam_tbv_fat, dam_tbv_protein, birth_year_month, top_listing_semen_fat, top_listing_semen_protein,"
     "expected_mean_tbv_fat, expected_mean_tbv_protein, expected_std_tbv_fat, expected_std_tbv_protein",
     [
-        (10.0, 20.0, "2020-01", 13.0, 18.0, 11.5, 19.0, 18.243354954612926, 9.475230867899738),
-        (15.0, 25.0, "2021-01", 15.0, 25.0, 15.0, 25.0, 18.243354954612926, 9.475230867899738),
-        (20.0, 30.0, "2022-01", 128.0, 64.0, 74.0, 47.0, 18.243354954612926, 9.475230867899738),
+        (10.0, 20.0, "2020-01", 13.0, 18.0, 11.5, 19.0, 3.591656999213594, 2.588435821108957),
+        (15.0, 25.0, "2021-01", 15.0, 25.0, 15.0, 25.0, 3.591656999213594, 2.588435821108957),
+        (20.0, 30.0, "2022-01", 128.0, 64.0, 74.0, 47.0, 3.591656999213594, 2.588435821108957),
     ],
 )
 def test_calculate_newborn_calf_tbv_values(
@@ -237,7 +237,11 @@ def test_calculate_ep_values(genetics: Genetics, mocker: MockerFixture) -> None:
     )
     genetics._calculate_ep_values()
     mock_generate_bivariate_random_numbers.assert_called_once_with(
-        0.0, 0.0, E_PERMANENT_FAT_STD, E_PERMANENT_PROTEIN_STD, E_PERMANENT_CORRELATION
+        0.0,
+        0.0,
+        numpy.sqrt(E_PERMANENT_FAT_VARIANCE),
+        numpy.sqrt(E_PERMANENT_PROTEIN_VARIANCE),
+        E_PERMANENT_CORRELATION,
     )
 
 
@@ -248,7 +252,11 @@ def test_calculate_et_values(genetics: Genetics, mocker: MockerFixture) -> None:
     )
     genetics._calculate_et_values()
     mock_generate_bivariate_random_numbers.assert_called_once_with(
-        0.0, 0.0, E_TEMPORARY_FAT_STD, E_TEMPORARY_PROTEIN_STD, E_TEMPORARY_CORRELATION
+        0.0,
+        0.0,
+        numpy.sqrt(E_TEMPORARY_FAT_VARIANCE),
+        numpy.sqrt(E_TEMPORARY_PROTEIN_VARIANCE),
+        E_TEMPORARY_CORRELATION,
     )
 
 
@@ -296,23 +304,23 @@ def test_calculate_phenotype_values(
     "animal_type, parity, tbv_fat, tbv_protein,"
     "expected_std_ebv_fat, expected_std_ebv_protein, expected_ebv_fat, expected_ebv_protein",
     [
-        (AnimalType.CALF, None, 10.0, 20.0, 2.519765614099851, 1.8159450019204877, 6.20625, 12.3125),
-        (AnimalType.HEIFER_I, None, 10.0, 20.0, 2.519765614099851, 1.8159450019204877, 6.20625, 12.3125),
-        (AnimalType.HEIFER_II, None, 10.0, 20.0, 2.519765614099851, 1.8159450019204877, 6.20625, 12.3125),
-        (AnimalType.HEIFER_III, None, 10.0, 20.0, 2.519765614099851, 1.8159450019204877, 6.20625, 12.3125),
-        (AnimalType.LAC_COW, 1, 15.0, 25.0, 2.4380976190464563, 1.75708850090142, 10.096, 16.892),
+        (AnimalType.CALF, None, 10.0, 20.0, 2.1994317447922773, 1.585086748414736, 7.875, 15.65),
+        (AnimalType.HEIFER_I, None, 10.0, 20.0, 2.1994317447922773, 1.585086748414736, 7.875, 15.65),
+        (AnimalType.HEIFER_II, None, 10.0, 20.0, 2.1994317447922773, 1.585086748414736, 7.875, 15.65),
+        (AnimalType.HEIFER_III, None, 10.0, 20.0, 2.1994317447922773, 1.585086748414736, 7.875, 15.65),
+        (AnimalType.LAC_COW, 1, 15.0, 25.0, 2.0317480158720467, 1.46424041741785, 12.32, 20.54),
         (
             AnimalType.DRY_COW,
             2,
             15.0,
             25.0,
-            2.274365570879053,
-            1.6390900676899975,
-            11.24275,
-            18.773,
+            1.8136978800230208,
+            1.3070960178961606,
+            13.015,
+            21.68,
         ),
-        (AnimalType.LAC_COW, 3, 15.0, 25.0, 1.992641462983243, 1.4360571019287496, 12.459, 20.768),
-        (AnimalType.DRY_COW, 4, 15.0, 25.0, 1.992641462983243, 1.4360571019287496, 12.459, 20.768),
+        (AnimalType.LAC_COW, 3, 15.0, 25.0, 1.5238110119040351, 1.0981803130633876, 13.71, 22.82),
+        (AnimalType.DRY_COW, 4, 15.0, 25.0, 1.5238110119040351, 1.0981803130633876, 13.71, 22.82),
     ],
 )
 def test_calculate_ebv_values(
@@ -358,6 +366,62 @@ def test_calculate_ranking_index(
     genetics.EBV_protein = ebv_protein
     ranking_index = genetics._calculate_ranking_index()
     assert ranking_index == pytest.approx(expected_ranking_index)
+
+
+def test_calculate_ranking_index_uses_user_defined_weights(genetics: Genetics, mocker: MockerFixture) -> None:
+    """When both user-defined selection index weights are positive, they override the default weights."""
+    mocker.patch.object(AnimalConfig, "genetic_selection_index_weights", {"fat": 0.4, "protein": 0.2})
+    genetics.EBV_fat = 5.0
+    genetics.EBV_protein = 10.0
+
+    ranking_index = genetics._calculate_ranking_index()
+
+    # 0.4 * 5.0 + 0.2 * 10.0 = 4.0 (default 0.318/0.13 weights would give 2.89).
+    assert ranking_index == pytest.approx(4.0)
+
+
+@pytest.mark.parametrize(
+    "weights, expected",
+    [
+        ({"fat": 0.0, "protein": 0.0}, 0.0),  # both zero
+        ({"fat": 0.5, "protein": 0.0}, 2.5),  # protein zero
+        ({"fat": 0.0, "protein": 0.5}, 5.0),  # fat zero
+    ],
+)
+def test_calculate_ranking_index_accepts_zero_user_weights(
+    weights: dict[str, float], expected: float, genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """Zero-valued user weights are valid and are used instead of the default weighting."""
+    mocker.patch.object(AnimalConfig, "genetic_selection_index_weights", weights)
+    genetics.EBV_fat = 5.0
+    genetics.EBV_protein = 10.0
+
+    ranking_index = genetics._calculate_ranking_index()
+
+    assert ranking_index == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "weights",
+    [
+        {},  # no weights provided
+        {"fat": -0.5, "protein": -0.5},  # both negative
+        {"fat": 0.5, "protein": -0.5},  # protein negative
+        {"fat": -0.5, "protein": 0.5},  # fat negative
+    ],
+)
+def test_calculate_ranking_index_falls_back_to_default_weights(
+    weights: dict[str, float], genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """Missing, empty, or negative user weights fall back to the default 0.318/0.13 weighting."""
+    mocker.patch.object(AnimalConfig, "genetic_selection_index_weights", weights)
+    genetics.EBV_fat = 5.0
+    genetics.EBV_protein = 10.0
+
+    ranking_index = genetics._calculate_ranking_index()
+
+    # 0.318 * 5.0 + 0.13 * 10.0 = 2.89
+    assert ranking_index == pytest.approx(2.89)
 
 
 def test_calculate_ebv_and_ranking_index(genetics: Genetics, mocker: MockerFixture) -> None:
@@ -502,8 +566,8 @@ def test_calculate_newborn_calf_tbv_values_too_early(genetics: Genetics, mocker:
     mock_generate.assert_called_once_with(
         expected_mean_fat,
         expected_mean_protein,
-        pytest.approx(18.243354954612926),
-        pytest.approx(9.475230867899738),
+        pytest.approx(3.591656999213594),
+        pytest.approx(2.588435821108957),
         TBV_CORRELATION,
     )
     mock_add_warning.assert_called_once()
@@ -524,8 +588,8 @@ def test_calculate_newborn_calf_tbv_values_too_late(genetics: Genetics, mocker: 
     mock_generate.assert_called_once_with(
         expected_mean_fat,
         expected_mean_protein,
-        pytest.approx(18.243354954612926),
-        pytest.approx(9.475230867899738),
+        pytest.approx(3.591656999213594),
+        pytest.approx(2.588435821108957),
         TBV_CORRELATION,
     )
     mock_add_warning.assert_called_once()
