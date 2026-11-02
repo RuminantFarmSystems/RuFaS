@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import re
-from typing import Any, ClassVar
+from typing import Any, ClassVar,  TYPE_CHECKING
 
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_QUANTITY_FALLBACK
 from RUFAS.EEE.economics.handler.base import LineItemHandler
 from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
+
+if TYPE_CHECKING:
+    from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
 class PurchasedFeedCostHandler(LineItemHandler):
@@ -16,7 +21,7 @@ class PurchasedFeedCostHandler(LineItemHandler):
     amount_patterns: ClassVar[list[str]] = ["FeedManager.purchase_feed.ration_interval_.*_amount_purchased"]
     cost_patterns: ClassVar[list[str]] = ["FeedManager.purchase_feed.ration_interval_.*_cost"]
 
-    def build_preprocessing_entry(self) -> dict[str, Any]:
+    def build_preprocessing_entry(self, item: EconomicItem | None = None) -> dict[str, Any]:
         """Build the result entry from the simulation's ration interval purchase outputs."""
 
         values_by_scenario = self.context.fetch_values_by_scenario(self.amount_patterns, expand_interval_to_daily=True)

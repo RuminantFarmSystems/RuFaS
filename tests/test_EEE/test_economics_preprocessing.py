@@ -1183,7 +1183,11 @@ def test_unmatched_line_item_handler_emits_warning(monkeypatch: pytest.MonkeyPat
     preprocessing.EconomicPreprocessor()
 
     unmatched = [message for code, message, _ in dummy_om.warnings if code == "UnmatchedLineItemHandler"]
-    assert len(unmatched) == len(preprocessing.SPECIAL_CASE_HANDLERS)
+    expected_keys = sum(
+        len(handler_cls(EconomicDataProcessor()).economic_map_keys)
+        for handler_cls in preprocessing.SPECIAL_CASE_HANDLERS
+    )
+    assert len(unmatched) == expected_keys
 
 
 def test_matched_line_item_handlers_emit_no_warning(monkeypatch: pytest.MonkeyPatch) -> None:

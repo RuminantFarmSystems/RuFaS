@@ -2043,6 +2043,20 @@ class DataValidator:
                 formatted_path_elems.append(f"{raw_path_elem}")
         return ".".join(formatted_path_elems)
 
+    @staticmethod
+    def _is_valid_list_index(key: str | int, length: int) -> bool:
+        """Return whether ``key`` is an in-range integer index for a list of ``length``.
+
+        A non-numeric key (e.g. a field name applied to a list) is not a valid index and
+        yields ``False`` rather than raising, so callers extracting values by path receive a
+        clean ``KeyError`` (and, in turn, a ``None`` result) instead of a ``ValueError``.
+        """
+        try:
+            index = int(key)
+        except (TypeError, ValueError):
+            return False
+        return 0 <= index < length
+
     def extract_value_by_key_list(
         self, data: list[Any] | dict[str | int, Any], variable_path: Sequence[str | int], input_path: Path | None = None
     ) -> Any:
@@ -2105,7 +2119,7 @@ class DataValidator:
 
         """
         for key in variable_path:
-            if isinstance(data, list) and 0 <= int(key) < len(data):
+            if isinstance(data, list) and self._is_valid_list_index(key, len(data)):
                 data = data[int(key)]
             elif isinstance(data, dict) and isinstance(key, str) and key in data:
                 data = data[key]

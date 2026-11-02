@@ -17,7 +17,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TYPE_CHECKING
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
@@ -27,6 +27,9 @@ from RUFAS.EEE.economics import mapping
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
 from RUFAS.EEE.economics.handler.base import LineItemHandler
 from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
+
+if TYPE_CHECKING:
+    from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
 class BeddingRequirementsHandler(LineItemHandler):
@@ -463,7 +466,7 @@ class BeddingRequirementsHandler(LineItemHandler):
                 pen_map[str(entry["id"])] = self._get_pen_bedding_name(entry, bedding_name_keys)
         return pen_map
 
-    def build_preprocessing_entry(self) -> dict[str, Any]:
+    def build_preprocessing_entry(self, item: EconomicItem | None = None) -> dict[str, Any]:
         """
         Computes bedding cost per pen, per year, then sums them (issue #3088).
 

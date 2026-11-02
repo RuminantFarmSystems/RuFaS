@@ -8,6 +8,7 @@ from RUFAS.EEE.economics.framework import EconomicFramework
 from RUFAS.EEE.economics.dcfror import DCFRORCalculator
 from RUFAS.EEE.economics.metrics import EconomicMetrics
 from RUFAS.EEE.economics.digester_costs import (
+    BiogasEnergyConversion,
     DigesterCostCalculator,
 )
 from RUFAS.EEE.economics.equations import EconomicEquations
@@ -197,6 +198,51 @@ def test_estimate_digester_costs_linear_equations() -> None:
     assert pytest.approx(estimates["salvage_value_fraction"]) == 0.15
     assert pytest.approx(estimates["biogas_yield_ft3_per_cow_day"]) == 72.0
     assert pytest.approx(estimates["methane_content_fraction"]) == 0.6
+
+
+def test_estimate_biogas_electricity() -> None:
+    biogas_volume = 1000.0
+    result = DigesterCostCalculator.estimate_biogas_electricity(biogas_volume)
+
+    methane_volume = biogas_volume * 0.60
+    methane_mass = methane_volume * 0.68
+    energy_input = methane_mass * 13.89
+
+    assert pytest.approx(result["methane_volume_m3"]) == methane_volume
+    assert pytest.approx(result["methane_mass_kg"]) == methane_mass
+    assert pytest.approx(result["energy_input_kwh"]) == energy_input
+    assert pytest.approx(result["electricity_output_kwh"]) == energy_input * 0.33
+    assert pytest.approx(result["heat_output_kwh"]) == energy_input * 0.43
+
+
+def test_estimate_biogas_rng() -> None:
+    biogas_volume = 1000.0
+    result = DigesterCostCalculator.estimate_biogas_rng(biogas_volume)
+
+    methane_volume = biogas_volume * 0.60
+    retained_fraction = 1 - 0.02 - 0.03
+    rng_volume = methane_volume * retained_fraction
+    rng_mass = rng_volume * 0.68
+
+    assert pytest.approx(result["methane_volume_m3"]) == methane_volume
+    assert pytest.approx(result["rng_volume_m3"]) == rng_volume
+    assert pytest.approx(result["rng_mass_kg"]) == rng_mass
+    assert pytest.approx(result["rng_energy_kwh"]) == rng_mass * 13.10
+
+
+def test_biogas_energy_conversion_overrides() -> None:
+    conversion = BiogasEnergyConversion(methane_content_fraction=0.5, chp_electrical_efficiency=0.4)
+    result = DigesterCostCalculator.estimate_biogas_electricity(100.0, conversion)
+
+    energy_input = 100.0 * 0.5 * 0.68 * 13.89
+    assert pytest.approx(result["electricity_output_kwh"]) == energy_input * 0.4
+
+
+def test_estimate_biogas_energy_rejects_negative_volume() -> None:
+    with pytest.raises(ValueError):
+        DigesterCostCalculator.estimate_biogas_electricity(-1.0)
+    with pytest.raises(ValueError):
+        DigesterCostCalculator.estimate_biogas_rng(-1.0)
 
 
 def test_get_digester_cost_profile_normalizes_names() -> None:

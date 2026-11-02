@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TYPE_CHECKING
 
 from RUFAS.EEE.economics.mapping import CROP_TO_SEED_KEY
 from RUFAS.biophysical.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, HarvestOperation
@@ -11,6 +13,9 @@ from RUFAS.util import Aggregator, Utility
 from RUFAS.EEE.economics.fallback_values import BIOPHYSICAL_FALLBACKS
 from RUFAS.EEE.economics.handler.base import LineItemHandler
 from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
+
+if TYPE_CHECKING:
+    from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
 class SeedCostHandler(LineItemHandler):
@@ -334,7 +339,7 @@ class SeedCostHandler(LineItemHandler):
                 daily_seed_price.append(price_by_year[(start_date + timedelta(days=i)).year])
         return daily_seed_price
 
-    def build_preprocessing_entry(self) -> dict[str, Any]:
+    def build_preprocessing_entry(self, item: EconomicItem | None = None) -> dict[str, Any]:
         """
         Build the full preprocessing result entry for the Seeds costs line item.
 

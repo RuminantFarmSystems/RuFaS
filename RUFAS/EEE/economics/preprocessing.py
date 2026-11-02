@@ -76,15 +76,18 @@ class EconomicPreprocessor:
         handlers = [handler_cls(self.context) for handler_cls in SPECIAL_CASE_HANDLERS]
         mapped_keys = {(item.section, item.name) for item in self.mapping}
         info_map = {"class": self.__class__.__name__, "function": self._build_special_case_handlers.__name__}
+        handlers_by_key: dict[tuple[str, str], LineItemHandler] = {}
         for handler in handlers:
-            if handler.economic_map_key not in mapped_keys:
-                self.om.add_warning(
-                    "UnmatchedLineItemHandler",
-                    f"{handler.__class__.__name__} is keyed on {handler.economic_map_key}, which does not match "
-                    "any economic mapping line item; the handler will not be used",
-                    info_map,
-                )
-        return {handler.economic_map_key: handler for handler in handlers}
+            for key in handler.economic_map_keys:
+                if key not in mapped_keys:
+                    self.om.add_warning(
+                        "UnmatchedLineItemHandler",
+                        f"{handler.__class__.__name__} is keyed on {key}, which does not match "
+                        "any economic mapping line item; the handler will not be used",
+                        info_map,
+                    )
+                handlers_by_key[key] = handler
+        return handlers_by_key
 
     def _build_mapping(self) -> List[EconomicItem]:
         """Convert the hardcoded mapping into structured entries."""
@@ -518,7 +521,7 @@ class EconomicPreprocessor:
 
             handler = self.special_case_handlers.get((item.section, item.name))
             if handler is not None:
-                category_data[item.name] = handler.build_preprocessing_entry()
+                category_data.update(handler.build_preprocessing_entries(item))
                 continue
 
             values_by_scenario = self.context.fetch_values_by_scenario(item.biophysical_simulation)
