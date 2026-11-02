@@ -1,19 +1,21 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
-from RUFAS.EEE.economics.handler.base import Handler
+from RUFAS.EEE.economics.handler.base import LineItemHandler
+from RUFAS.EEE.economics.mapping import EconomicSection
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.util import Aggregator
 
 if TYPE_CHECKING:
     from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
-class SlurryStorageCostHandler(Handler):
+class SlurryStorageCostHandler(LineItemHandler):
     """Compute per-slurry-store operational costs from a ``list[dict]`` input."""
 
-    section = "Manure"
+    section: ClassVar[EconomicSection] = EconomicSection.MANURE
     _SLURRY_STORAGE_PATH = "economic_inputs.Manure.slurry_storage"
     _NAMES = (
         "Slurry storage operational costs - Diesel consumption",
@@ -30,11 +32,11 @@ class SlurryStorageCostHandler(Handler):
         """Own every slurry-storage operational-cost line item under ``Manure``/``Costs``."""
         return tuple((self.section, name) for name in self._NAMES)
 
-    def process(self, item: EconomicItem) -> dict[str, Any]:
+    def build_preprocessing_entry(self, item: EconomicItem) -> dict[str, Any]:
         """Compute cost for one slurry-processor field across every processor."""
         im = InputManager()
         om = OutputManager()
-        info_map = {"class": self.__class__.__name__, "function": "process"}
+        info_map = {"class": self.__class__.__name__, "function": self.build_preprocessing_entry.__name__}
 
         field = item.input_manager[0].rsplit(".", 1)[-1] if item.input_manager else ""
 
@@ -46,7 +48,7 @@ class SlurryStorageCostHandler(Handler):
 
         price_data = self.context.fetch_prices(item.economics_files)
         price_values = self.context.extract_price_values(price_data)
-        price_aggregate = self.context.aggregate(price_values, "average")
+        price_aggregate = Aggregator.aggregate_by_description(price_values, "average")
         if price_aggregate is None:
             price_aggregate = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
 

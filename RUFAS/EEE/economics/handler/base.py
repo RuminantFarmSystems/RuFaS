@@ -4,12 +4,14 @@ from abc import ABC, abstractmethod
 from typing import Any, ClassVar, TYPE_CHECKING
 
 from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
+from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
+
 if TYPE_CHECKING:
     from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
-class Handler(ABC):
-    """Owner of the preprocessing for a single special-case line item.
+class LineItemHandler(ABC):
+    """Owner of the preprocessing for a single economic line item.
 
     Parameters
     ----------
@@ -19,15 +21,16 @@ class Handler(ABC):
 
     Attributes
     ----------
-    section : str
-        ``ECONOMIC_MAP`` section owning this line item (e.g. ``"Soil_and_crop"``).
-    name : str
-        ``ECONOMIC_MAP`` line-item name owning this special case (e.g.
-        ``"Seeds costs"``).
+    section : EconomicSection
+        ``ECONOMIC_MAP`` section owning this line item (e.g.
+        ``EconomicSection.SOIL_AND_CROP``).
+    name : EconomicLineItem
+        ``ECONOMIC_MAP`` line-item name owned by this handler (e.g.
+        ``EconomicLineItem.SEEDS_COSTS``).
     """
 
-    section: ClassVar[str]
-    name: ClassVar[str]
+    section: ClassVar[EconomicSection]
+    name: ClassVar[EconomicLineItem]
 
     def __init__(self, context: EconomicDataProcessor) -> None:
         self.context = context
@@ -40,17 +43,20 @@ class Handler(ABC):
         return ()
 
     @abstractmethod
-    def process(self, item: EconomicItem | None = None) -> dict[str, Any]:
-        """Build the preprocessing result entry for this line item.
+    def build_preprocessing_entry(self, item: EconomicItem | None = None) -> dict[str, Any]:
+        """Build the economic preprocessing result entry for this line item.
+
+        Parameters
+        ----------
+        item : EconomicItem, optional
+            The mapping line item being processed, for handlers that own more
+            than one ``(section, name)`` key.
 
         Returns
         -------
-        dict
+        dict[str, Any]
             The result entry stored under
             ``results[section][category][name]`` by the main preprocessor,
             using the same schema as the generic pipeline.
         """
         raise NotImplementedError
-
-
-__all__ = ["Handler"]

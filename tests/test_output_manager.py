@@ -5118,3 +5118,35 @@ def test_validate_csv_filters_unknown_key(mocker: MockerFixture) -> None:
     mock_validate_direction.assert_called_once()
     calls = [c for c in mock_add_error.call_args_list if "Unknown key in csv filter" in c[0][0]]
     assert len(calls) == 1
+
+
+@pytest.mark.parametrize(
+    "output_data, expected_values, expected_info_maps, expect_warning",
+    [
+        (
+            {"values": [1, "x", 3.5], "info_maps": [{"day": 0}, {"day": 1}, {"day": 2}]},
+            [1.0, 3.5],
+            [{"day": 0}, {"day": 2}],
+            True,
+        ),
+        ({"values": [1, 2], "info_maps": [{"day": 0}]}, [1.0, 2.0], [{"day": 0}, {}], False),
+        ([4, None], [4.0], [{}], True),
+        (7, [7.0], [{}], False),
+    ],
+)
+def test_extract_numeric_values_and_info_maps(
+    mock_output_manager: OutputManager,
+    mocker: MockerFixture,
+    output_data: Any,
+    expected_values: list[float],
+    expected_info_maps: list[Any],
+    expect_warning: bool,
+) -> None:
+    """Tests OutputManager.extract_numeric_values_and_info_maps."""
+    mock_add_warning = mocker.patch.object(mock_output_manager, "add_warning")
+
+    values, info_maps = mock_output_manager.extract_numeric_values_and_info_maps(output_data)
+
+    assert values == expected_values
+    assert info_maps == expected_info_maps
+    assert mock_add_warning.called is expect_warning

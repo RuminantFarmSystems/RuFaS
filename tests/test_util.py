@@ -1495,3 +1495,28 @@ def test_subtraction_aggregator() -> None:
     assert Aggregator.subtraction([10, -2, -3]) == 15
     assert Aggregator.subtraction([]) is None
     assert Aggregator.subtraction([10]) is None
+
+
+@pytest.mark.parametrize(
+    "data, description, expected",
+    [
+        ([], "sum", None),
+        ([1.0, 2.0, 3.0], "Average daily value", 2.0),
+        ([1.0, 2.0, 3.0], "mean", 2.0),
+        ([2.0, 3.0], "product", 6.0),
+        ([6.0, 3.0], "ratio of values", 2.0),
+        ([6.0, 0.0], "divide", 6.0),
+        ([5.0, 2.0], "difference", 3.0),
+        ([1.0, 2.0, 3.0], "", 6.0),
+        ([1.0, 2.0, 3.0], None, 6.0),
+    ],
+)
+def test_aggregate_by_description(data: list[float], description: str, expected: float | None) -> None:
+    """Tests Aggregator.aggregate_by_description dispatches on the description keyword."""
+    assert Aggregator.aggregate_by_description(data, description) == expected
+
+
+def test_aggregate_by_description_standard_deviation() -> None:
+    """Tests Aggregator.aggregate_by_description for standard deviation descriptions."""
+    data = [1.0, 2.0, 3.0]
+    assert Aggregator.aggregate_by_description(data, "std") == Aggregator.standard_deviation(data)

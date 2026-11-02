@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Any, TYPE_CHECKING
+from typing import Any, ClassVar, TYPE_CHECKING
 
 from RUFAS.EEE.economics.mapping import CROP_TO_SEED_KEY
 from RUFAS.biophysical.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, HarvestOperation
@@ -9,18 +9,19 @@ from RUFAS.biophysical.field.manager.schedule import Schedule
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.util import Utility
+from RUFAS.util import Aggregator, Utility
 from RUFAS.EEE.economics.fallback_values import BIOPHYSICAL_FALLBACKS
-from RUFAS.EEE.economics.handler.base import Handler
+from RUFAS.EEE.economics.handler.base import LineItemHandler
+from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
 
 if TYPE_CHECKING:
     from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
-class SeedCostHandler(Handler):
+class SeedCostHandler(LineItemHandler):
     """Build the ``Seeds costs`` preprocessing entry from field crop schedules."""
-    section = "Soil_and_crop"
-    name = "Seeds costs"
+    section: ClassVar[EconomicSection] = EconomicSection.SOIL_AND_CROP
+    name: ClassVar[EconomicLineItem] = EconomicLineItem.SEEDS_COSTS
 
     def _gather_growing_periods(self, schedule: dict[str, Any]) -> list[tuple[datetime, datetime]]:
         """
@@ -338,7 +339,7 @@ class SeedCostHandler(Handler):
                 daily_seed_price.append(price_by_year[(start_date + timedelta(days=i)).year])
         return daily_seed_price
 
-    def process(self, item: EconomicItem | None = None) -> dict[str, Any]:
+    def build_preprocessing_entry(self, item: EconomicItem | None = None) -> dict[str, Any]:
         """
         Build the full preprocessing result entry for the Seeds costs line item.
 
@@ -418,7 +419,7 @@ class SeedCostHandler(Handler):
                 price_values[seed_key] = extracted_prices
                 bio_total[seed_key] = sum(biophysical_values[seed_key])
                 price_data[seed_key] = raw_price
-                price_aggregate[seed_key] = self.context.aggregate(extracted_prices, "average")
+                price_aggregate[seed_key] = Aggregator.aggregate_by_description(extracted_prices, "average")
                 total_seed_cost += sum(daily_price_per_area)
 
             biophysical_values_by_scenario[scenario_name] = biophysical_values
@@ -443,6 +444,3 @@ class SeedCostHandler(Handler):
             "line_item_values_by_scenario": line_item_values_by_scenario,
             "flow_type": "cost",
         }
-
-
-__all__ = ["SeedCostHandler"]

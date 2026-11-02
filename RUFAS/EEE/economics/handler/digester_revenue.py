@@ -3,13 +3,14 @@ from __future__ import annotations
 import json
 import re
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
-from RUFAS.EEE.economics.handler.base import Handler
+from RUFAS.EEE.economics.handler.base import LineItemHandler
+from RUFAS.EEE.economics.mapping import EconomicSection
 
 if TYPE_CHECKING:
     from RUFAS.EEE.economics.preprocessing import EconomicItem
@@ -17,10 +18,10 @@ if TYPE_CHECKING:
 _DIGESTER_NAME_PATTERN = re.compile(r"energy\.(.+?)\.[^.]+$")
 
 
-class DigesterRevenueHandler(Handler):
+class DigesterRevenueHandler(LineItemHandler):
     """Aggregate per-digester daily energy production into per-year revenue."""
 
-    section = "Manure"
+    section: ClassVar[EconomicSection] = EconomicSection.MANURE
     _NAMES = (
         "Electricity production from anaerobic digester",
         "Renewable natural gas (RNG) production",
@@ -31,11 +32,11 @@ class DigesterRevenueHandler(Handler):
         """Own both digester energy-product line items under ``Manure``/``Revenue``."""
         return tuple((self.section, name) for name in self._NAMES)
 
-    def process(self, item: EconomicItem | None = None) -> dict[str, Any]:
+    def build_preprocessing_entry(self, item: EconomicItem | None = None) -> dict[str, Any]:
         """Compute revenue for a per-digester daily series priced by year."""
         im = InputManager()
         om = OutputManager()
-        info_map = {"class": self.__class__.__name__, "function": "process"}
+        info_map = {"class": self.__class__.__name__, "function": self.build_preprocessing_entry.__name__}
 
         start_date_str = im.get_data("config.start_date")
         end_date_str = im.get_data("config.end_date")
