@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
-from RUFAS.EEE.economics.handler.base import LineItemHandler
+from RUFAS.EEE.economics.handler.base import ProcessorLineItemHandler
 from RUFAS.EEE.economics.mapping import EconomicSection
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from RUFAS.EEE.economics.preprocessing import EconomicItem
 
 
-class SlurryStorageCostHandler(LineItemHandler):
+class SlurryStorageCostHandler(ProcessorLineItemHandler):
     """Compute per-slurry-store operational costs from a ``list[dict]`` input."""
 
     section: ClassVar[EconomicSection] = EconomicSection.MANURE
@@ -32,11 +32,11 @@ class SlurryStorageCostHandler(LineItemHandler):
         """Own every slurry-storage operational-cost line item under ``Manure``/``Costs``."""
         return tuple((self.section, name) for name in self._NAMES)
 
-    def build_preprocessing_entry(self, item: EconomicItem) -> dict[str, Any]:
-        """Compute cost for one slurry-processor field across every processor."""
+    def build_processor_entries(self, item: EconomicItem) -> dict[str, dict[str, Any]]:
+        """Compute cost for one slurry-storage field, with one entry per slurry storage."""
         im = InputManager()
         om = OutputManager()
-        info_map = {"class": self.__class__.__name__, "function": self.build_preprocessing_entry.__name__}
+        info_map = {"class": self.__class__.__name__, "function": self.build_processor_entries.__name__}
 
         field = item.input_manager[0].rsplit(".", 1)[-1] if item.input_manager else ""
 
@@ -52,11 +52,6 @@ class SlurryStorageCostHandler(LineItemHandler):
         if price_aggregate is None:
             price_aggregate = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
 
-        quantity_by_processor: dict[str, list[float]] = {}
-        quantity_aggregate_by_processor: dict[str, float] = {}
-        cost_by_processor: dict[str, float] = {}
-        total_cost = 0.0
-
         if not slurry_storage_data:
             om.add_warning(
                 "MissingEconomicInput",
@@ -64,6 +59,7 @@ class SlurryStorageCostHandler(LineItemHandler):
                 info_map,
             )
 
+        entries: dict[str, dict[str, Any]] = {}
         for index, processor in enumerate(slurry_storage_data):
             if not isinstance(processor, dict):
                 continue
@@ -77,24 +73,18 @@ class SlurryStorageCostHandler(LineItemHandler):
                     info_map,
                 )
                 continue
-            cost = quantity * price_aggregate
-            quantity_by_processor[name] = [quantity]
-            quantity_aggregate_by_processor[name] = quantity
-            cost_by_processor[name] = cost
-            total_cost += cost
-
-        return {
-            "biophysical_values": quantity_by_processor,
-            "biophysical_aggregate": quantity_aggregate_by_processor,
-            "biophysical_values_by_scenario": {"baseline": quantity_by_processor},
-            "biophysical_aggregate_by_scenario": {"baseline": quantity_aggregate_by_processor},
-            "price_data": price_data,
-            "price_values": price_values,
-            "price_aggregate": price_aggregate,
-            "line_item_values_by_scenario": {"baseline": total_cost},
-            "cost_by_processor": cost_by_processor,
-            "flow_type": "cost",
-        }
+            entries[name] = {
+                "biophysical_values": [quantity],
+                "biophysical_aggregate": quantity,
+                "biophysical_values_by_scenario": {"baseline": [quantity]},
+                "biophysical_aggregate_by_scenario": {"baseline": quantity},
+                "price_data": price_data,
+                "price_values": price_values,
+                "price_aggregate": price_aggregate,
+                "line_item_values_by_scenario": {"baseline": quantity * price_aggregate},
+                "flow_type": "cost",
+            }
+        return entries
 
 
 __all__ = ["SlurryStorageCostHandler"]

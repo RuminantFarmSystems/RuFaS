@@ -521,7 +521,7 @@ class EconomicPreprocessor:
 
             handler = self.special_case_handlers.get((item.section, item.name))
             if handler is not None:
-                category_data[item.name] = handler.build_preprocessing_entry(item)
+                category_data.update(handler.build_preprocessing_entries(item))
                 continue
 
             values_by_scenario = self.context.fetch_values_by_scenario(item.biophysical_simulation)

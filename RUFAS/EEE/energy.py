@@ -1,5 +1,6 @@
 import json
 import re
+from dataclasses import dataclass
 from typing import Any
 
 from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
@@ -13,7 +14,6 @@ from RUFAS.util import Utility
 
 from RUFAS.EEE.tractor import Tractor
 from RUFAS.EEE.tractor_implement import TractorImplement
-from RUFAS.EEE.economics.digester_costs import BiogasEnergyConversion, DigesterCostCalculator
 
 # 1 kWh equals 3.6 MJ; used to price RNG energy (reported in kWh by the conversion) against the
 # natural-gas commodity price, which is expressed in dollars per megajoule.
@@ -132,6 +132,41 @@ im = InputManager()
 om = OutputManager()
 
 
+@dataclass(frozen=True)
+class BiogasEnergyConversion:
+    """Conversion factors for turning captured biogas into usable energy.
+
+    Parameters
+    ----------
+    methane_content_fraction : float
+        Fraction of the total biogas volume that is methane (unitless).
+    methane_density_kg_per_m3 : float
+        Density used to convert methane volume to mass (kg CH4 / m^3 CH4).
+    methane_energy_content_kwh_per_kg : float
+        Energy content of methane fed into a combined heat and power unit (kWh / kg CH4).
+    chp_electrical_efficiency : float
+        Fraction of the methane energy input converted to electricity by the combined heat and power unit (unitless).
+    chp_thermal_efficiency : float
+        Fraction of the methane energy input recovered as heat by the combined heat and power unit (unitless).
+    rng_leakage_loss_fraction : float
+        Fraction of methane lost to leakage during renewable natural gas upgrading (unitless).
+    rng_process_heat_loss_fraction : float
+        Fraction of methane combusted to supply process heat for renewable natural gas upgrading (unitless).
+    rng_energy_yield_kwh_per_kg : float
+        Energy content of the upgraded renewable natural gas (kWh / kg RNG).
+
+    """
+
+    methane_content_fraction: float = 0.60
+    methane_density_kg_per_m3: float = 0.68
+    methane_energy_content_kwh_per_kg: float = 13.89
+    chp_electrical_efficiency: float = 0.33
+    chp_thermal_efficiency: float = 0.43
+    rng_leakage_loss_fraction: float = 0.02
+    rng_process_heat_loss_fraction: float = 0.03
+    rng_energy_yield_kwh_per_kg: float = 13.10
+
+
 class EnergyEstimator:
     """Estimates energy consumption for the various field operations on the farm."""
 
@@ -192,8 +227,8 @@ class EnergyEstimator:
         For every digester configured under ``economic_inputs.Manure.digester``, the daily captured biogas volume
         reported by the biophysical manure module is split between an RNG stream and an electricity stream according
         to the digester's ``rng_ratio``. The split volumes are converted into delivered energy using
-        :meth:`~RUFAS.EEE.economics.digester_costs.DigesterCostCalculator.estimate_biogas_electricity` and
-        :meth:`~RUFAS.EEE.economics.digester_costs.DigesterCostCalculator.estimate_biogas_rng`. The per-day
+        :meth:`estimate_biogas_electricity` and
+        :meth:`estimate_biogas_rng`. The per-day
         electricity (kWh) and RNG (MJ) values are reported back to the :class:`~RUFAS.output_manager.OutputManager`
         under a per-digester prefix so the economics module can aggregate them by year.
         """
@@ -273,6 +308,81 @@ class EnergyEstimator:
         # A digester name is unique across processors, so at most one key is expected to match.
         return next(iter(filtered_pool.values()))
 
+    @staticmethod
+    def estimate_biogas_electricity(
+        biogas_volume_m3: float,
+        conversion: BiogasEnergyConversion = BiogasEnergyConversion(),
+    ) -> dict[str, float]:
+        """Estimate electricity and heat produced from biogas by a combined heat and power unit.
+
+        Parameters
+        ----------
+        biogas_volume_m3 : float
+            Volume of captured biogas routed to the combined heat and power unit (m^3).
+        conversion : BiogasEnergyConversion
+            Conversion factors governing the methane content, energy content, and combined heat and power
+            efficiencies.
+
+        Returns
+        -------
+        dict[str, float]
+            Mapping with the methane volume (m^3), methane mass (kg), methane energy input (kWh), electricity
+            output (kWh), and heat output (kWh).
+
+        """
+
+        if biogas_volume_m3 < 0:
+            raise ValueError("biogas_volume_m3 must be non-negative")
+
+        methane_volume = biogas_volume_m3 * conversion.methane_content_fraction
+        methane_mass = methane_volume * conversion.methane_density_kg_per_m3
+        energy_input = methane_mass * conversion.methane_energy_content_kwh_per_kg
+        return {
+            "methane_volume_m3": methane_volume,
+            "methane_mass_kg": methane_mass,
+            "energy_input_kwh": energy_input,
+            "electricity_output_kwh": energy_input * conversion.chp_electrical_efficiency,
+            "heat_output_kwh": energy_input * conversion.chp_thermal_efficiency,
+        }
+
+    @staticmethod
+    def estimate_biogas_rng(
+        biogas_volume_m3: float,
+        conversion: BiogasEnergyConversion = BiogasEnergyConversion(),
+    ) -> dict[str, float]:
+        """Estimate renewable natural gas produced from biogas after upgrading.
+
+        Parameters
+        ----------
+        biogas_volume_m3 : float
+            Volume of captured biogas routed to renewable natural gas upgrading (m^3).
+        conversion : BiogasEnergyConversion
+            Conversion factors governing the methane content, upgrading losses, and renewable natural gas energy
+            yield.
+
+        Returns
+        -------
+        dict[str, float]
+            Mapping with the methane volume before upgrading (m^3), the renewable natural gas volume (m^3), the
+            renewable natural gas mass (kg), and the renewable natural gas energy yield (kWh).
+
+        """
+
+        if biogas_volume_m3 < 0:
+            raise ValueError("biogas_volume_m3 must be non-negative")
+
+        methane_volume = biogas_volume_m3 * conversion.methane_content_fraction
+        methane_mass = methane_volume * conversion.methane_density_kg_per_m3
+        retained_fraction = 1 - conversion.rng_leakage_loss_fraction - conversion.rng_process_heat_loss_fraction
+        rng_volume = methane_volume * retained_fraction
+        rng_mass = methane_mass * retained_fraction
+        return {
+            "methane_volume_m3": methane_volume,
+            "rng_volume_m3": rng_volume,
+            "rng_mass_kg": rng_mass,
+            "rng_energy_kwh": rng_mass * conversion.rng_energy_yield_kwh_per_kg,
+        }
+
     def calculate_digester_energy_production(
         self,
         captured_biogas_volume: float,
@@ -290,8 +400,8 @@ class EnergyEstimator:
             Fraction of the captured biogas routed to RNG; the remainder ``(1 - rng_ratio)`` is routed to
             electricity generation (unitless).
         conversion : BiogasEnergyConversion | None
-            Conversion factors passed through to the digester cost calculator. Defaults to
-            :class:`~RUFAS.EEE.economics.digester_costs.BiogasEnergyConversion`.
+            Conversion factors passed through to the biogas energy estimators. Defaults to
+            :class:`BiogasEnergyConversion`.
 
         Returns
         -------
@@ -301,7 +411,7 @@ class EnergyEstimator:
         Notes
         -----
         The captured biogas is split by ``rng_ratio`` into an RNG stream and a combined-heat-and-power (CHP)
-        electricity stream. Each stream is converted by the shared digester-cost calculator methods. The RNG energy,
+        electricity stream. Each stream is converted by the biogas energy estimators. The RNG energy,
         returned in kilowatt-hours, is converted to megajoules to match the natural-gas commodity price basis.
         """
         if conversion is None:
@@ -310,8 +420,8 @@ class EnergyEstimator:
         biogas_to_rng = captured_biogas_volume * rng_ratio
         biogas_to_electricity = captured_biogas_volume * (1 - rng_ratio)
 
-        electricity_result = DigesterCostCalculator.estimate_biogas_electricity(biogas_to_electricity, conversion)
-        rng_result = DigesterCostCalculator.estimate_biogas_rng(biogas_to_rng, conversion)
+        electricity_result = EnergyEstimator.estimate_biogas_electricity(biogas_to_electricity, conversion)
+        rng_result = EnergyEstimator.estimate_biogas_rng(biogas_to_rng, conversion)
 
         electricity_kwh = electricity_result["electricity_output_kwh"]
         rng_megajoules = rng_result["rng_energy_kwh"] * KILOWATT_HOURS_TO_MEGAJOULES

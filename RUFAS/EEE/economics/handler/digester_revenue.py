@@ -9,7 +9,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
-from RUFAS.EEE.economics.handler.base import LineItemHandler
+from RUFAS.EEE.economics.handler.base import ProcessorLineItemHandler
 from RUFAS.EEE.economics.mapping import EconomicSection
 
 if TYPE_CHECKING:
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 _DIGESTER_NAME_PATTERN = re.compile(r"energy\.(.+?)\.[^.]+$")
 
 
-class DigesterRevenueHandler(LineItemHandler):
+class DigesterRevenueHandler(ProcessorLineItemHandler):
     """Aggregate per-digester daily energy production into per-year revenue."""
 
     section: ClassVar[EconomicSection] = EconomicSection.MANURE
@@ -32,11 +32,11 @@ class DigesterRevenueHandler(LineItemHandler):
         """Own both digester energy-product line items under ``Manure``/``Revenue``."""
         return tuple((self.section, name) for name in self._NAMES)
 
-    def build_preprocessing_entry(self, item: EconomicItem | None = None) -> dict[str, Any]:
-        """Compute revenue for a per-digester daily series priced by year."""
+    def build_processor_entries(self, item: EconomicItem) -> dict[str, dict[str, Any]]:
+        """Compute revenue for a per-digester daily series priced by year, with one entry per digester."""
         im = InputManager()
         om = OutputManager()
-        info_map = {"class": self.__class__.__name__, "function": self.build_preprocessing_entry.__name__}
+        info_map = {"class": self.__class__.__name__, "function": self.build_processor_entries.__name__}
 
         start_date_str = im.get_data("config.start_date")
         end_date_str = im.get_data("config.end_date")
@@ -96,21 +96,6 @@ class DigesterRevenueHandler(LineItemHandler):
                         year = (start_date + timedelta(days=int(simulation_day))).year
                     bio_values_by_digester_by_year[digester_name][year].append(numeric_value)
 
-        revenue_by_year: dict[str, dict[int, list[float]]] = {}
-        price_data_by_day: list[float] = []
-        total_revenue = 0.0
-        for digester_name, year_quantities in bio_values_by_digester_by_year.items():
-            if digester_name not in revenue_by_year:
-                revenue_by_year[digester_name] = {}
-            for year, quantity in year_quantities.items():
-                if year not in revenue_by_year[digester_name]:
-                    revenue_by_year[digester_name][year] = []
-                price = price_by_year.get(year, fallback_price)
-                year_revenue: list[float] = [daily_quantity * price for daily_quantity in quantity]
-                revenue_by_year[digester_name][year] = year_revenue
-                price_data_by_day.extend([price] * len(year_revenue))
-                total_revenue += sum(year_revenue)
-
         if not bio_values_by_digester_by_year:
             om.add_warning(
                 "MissingDigesterEnergyOutputs",
@@ -118,35 +103,34 @@ class DigesterRevenueHandler(LineItemHandler):
                 info_map,
             )
 
-        bio_aggregate = {
-            digester_name: sum(bio_values) for digester_name, bio_values in bio_values_by_digester.items()
-        }
-        with open(f"econ_{item.biophysical_simulation[0].split(".")[-1]}.json", "w") as f:
-            output = {
-                "biophysical_values": bio_values_by_digester,
+        entries: dict[str, dict[str, Any]] = {}
+        for digester_name, year_quantities in bio_values_by_digester_by_year.items():
+            revenue_by_year: dict[int, list[float]] = {}
+            price_data_by_day: list[float] = []
+            for year, quantity in year_quantities.items():
+                price = price_by_year.get(year, fallback_price)
+                revenue_by_year[year] = [daily_quantity * price for daily_quantity in quantity]
+                price_data_by_day.extend([price] * len(quantity))
+            bio_values = bio_values_by_digester[digester_name]
+            bio_aggregate = sum(bio_values)
+            entries[digester_name] = {
+                "biophysical_values": bio_values,
                 "biophysical_aggregate": bio_aggregate,
-                "biophysical_values_by_scenario": {"baseline": bio_values_by_digester},
+                "biophysical_values_by_scenario": {"baseline": bio_values},
                 "biophysical_aggregate_by_scenario": {"baseline": bio_aggregate},
                 "price_data": price_data,
                 "price_values": price_by_year,
                 "price_aggregate": Aggregator.average(price_data_by_day) if price_data_by_day else None,
-                "line_item_values_by_scenario": {"baseline": total_revenue},
+                "line_item_values_by_scenario": {
+                    "baseline": sum(sum(year_revenue) for year_revenue in revenue_by_year.values())
+                },
                 "revenue_by_year": revenue_by_year,
                 "flow_type": "revenue",
             }
-            json.dump(output, f, indent=4)
-        return {
-            "biophysical_values": bio_values_by_digester,
-            "biophysical_aggregate": bio_aggregate,
-            "biophysical_values_by_scenario": {"baseline": bio_values_by_digester},
-            "biophysical_aggregate_by_scenario": {"baseline": bio_aggregate},
-            "price_data": price_data,
-            "price_values": price_by_year,
-            "price_aggregate": Aggregator.average(price_data_by_day) if price_data_by_day else None,
-            "line_item_values_by_scenario": {"baseline": total_revenue},
-            "revenue_by_year": revenue_by_year,
-            "flow_type": "revenue",
-        }
+
+        with open(f"econ_{item.biophysical_simulation[0].split(".")[-1]}.json", "w") as f:
+            json.dump(entries, f, indent=4)
+        return entries
 
 
 __all__ = ["DigesterRevenueHandler"]
