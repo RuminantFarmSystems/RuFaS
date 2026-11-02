@@ -6,18 +6,7 @@ from RUFAS.util import Utility
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_genetics.animal_genetics import (
-    Genetics,
-    TBV_CORRELATION,
-    TBV_FAT_VARIANCE,
-    TBV_PROTEIN_VARIANCE,
-    E_PERMANENT_FAT_VARIANCE,
-    E_PERMANENT_PROTEIN_VARIANCE,
-    E_PERMANENT_CORRELATION,
-    E_TEMPORARY_FAT_VARIANCE,
-    E_TEMPORARY_PROTEIN_VARIANCE,
-    E_TEMPORARY_CORRELATION,
-)
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
@@ -151,14 +140,31 @@ def test_recalculate_values_at_lactation_start(
     mock_calculate_ranking_index.assert_called_once_with()
 
 
-def test_calculate_tbv_values(genetics: Genetics, mocker: MockerFixture) -> None:
-    """Unit test for _calculate_tbv_values()"""
+@pytest.mark.parametrize(
+    "tbv_fat_variance, tbv_protein_variance, tbv_correlation",
+    [
+        (25.8, 13.4, 0.59),
+        (10.0, 5.0, 0.25),
+    ],
+    ids=["cdcb_national_average", "farm_specific"],
+)
+def test_calculate_tbv_values(
+    tbv_fat_variance: float,
+    tbv_protein_variance: float,
+    tbv_correlation: float,
+    genetics: Genetics,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for _calculate_tbv_values(): the TBV distribution comes from the AnimalConfig inputs."""
+    mocker.patch.object(AnimalConfig, "tbv_fat_variance", tbv_fat_variance)
+    mocker.patch.object(AnimalConfig, "tbv_protein_variance", tbv_protein_variance)
+    mocker.patch.object(AnimalConfig, "tbv_correlation", tbv_correlation)
     mock_generate_bivariate_random_numbers = mocker.patch.object(
         Utility, "generate_bivariate_random_numbers", return_value=(10.0, 20.0)
     )
     genetics._calculate_tbv_values()
     mock_generate_bivariate_random_numbers.assert_called_once_with(
-        0.0, 0.0, numpy.sqrt(TBV_FAT_VARIANCE), numpy.sqrt(TBV_PROTEIN_VARIANCE), TBV_CORRELATION
+        0.0, 0.0, numpy.sqrt(tbv_fat_variance), numpy.sqrt(tbv_protein_variance), tbv_correlation
     )
 
 
@@ -198,7 +204,31 @@ def test_calculate_newborn_calf_tbv_values(
         expected_mean_tbv_protein,
         expected_std_tbv_fat,
         expected_std_tbv_protein,
-        TBV_CORRELATION,
+        AnimalConfig.tbv_correlation,
+    )
+
+
+def test_calculate_newborn_calf_tbv_values_uses_farm_specific_tbv_inputs(
+    genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """The newborn calf TBV spread is half of the user-input TBV variances."""
+    AnimalConfig.top_listing_semen["estimated_fat"] = {"2020-01": 13.0}
+    AnimalConfig.top_listing_semen["estimated_protein"] = {"2020-01": 18.0}
+    mocker.patch.object(AnimalConfig, "tbv_fat_variance", 100.0)
+    mocker.patch.object(AnimalConfig, "tbv_protein_variance", 25.0)
+    mocker.patch.object(AnimalConfig, "tbv_correlation", 0.25)
+    mock_generate_bivariate_random_numbers = mocker.patch.object(
+        Utility, "generate_bivariate_random_numbers", return_value=(10.0, 20.0)
+    )
+
+    genetics._calculate_newborn_calf_tbv_values(10.0, 20.0, "2020-01")
+
+    mock_generate_bivariate_random_numbers.assert_called_once_with(
+        11.5,
+        19.0,
+        pytest.approx(7.0710678118654755),
+        pytest.approx(3.5355339059327378),
+        0.25,
     )
 
 
@@ -230,33 +260,51 @@ def test_calculate_newborn_calf_tbv_values_key_error(genetics: Genetics, mocker:
     mock_generate.assert_not_called()
 
 
-def test_calculate_ep_values(genetics: Genetics, mocker: MockerFixture) -> None:
-    """Unit test for _calculate_ep_values()"""
+@pytest.mark.parametrize(
+    "fat_variance, protein_variance, correlation",
+    [
+        (38.8, 20.1, 0.95),
+        (12.0, 6.0, 0.5),
+    ],
+    ids=["cdcb_national_average", "farm_specific"],
+)
+def test_calculate_ep_values(
+    fat_variance: float, protein_variance: float, correlation: float, genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """Unit test for _calculate_ep_values(): the E_permanent distribution comes from the AnimalConfig inputs."""
+    mocker.patch.object(AnimalConfig, "permanent_environment_fat_variance", fat_variance)
+    mocker.patch.object(AnimalConfig, "permanent_environment_protein_variance", protein_variance)
+    mocker.patch.object(AnimalConfig, "permanent_environment_correlation", correlation)
     mock_generate_bivariate_random_numbers = mocker.patch.object(
         Utility, "generate_bivariate_random_numbers", return_value=(10.0, 20.0)
     )
     genetics._calculate_ep_values()
     mock_generate_bivariate_random_numbers.assert_called_once_with(
-        0.0,
-        0.0,
-        numpy.sqrt(E_PERMANENT_FAT_VARIANCE),
-        numpy.sqrt(E_PERMANENT_PROTEIN_VARIANCE),
-        E_PERMANENT_CORRELATION,
+        0.0, 0.0, numpy.sqrt(fat_variance), numpy.sqrt(protein_variance), correlation
     )
 
 
-def test_calculate_et_values(genetics: Genetics, mocker: MockerFixture) -> None:
-    """Unit test for _calculate_et_values()"""
+@pytest.mark.parametrize(
+    "fat_variance, protein_variance, correlation",
+    [
+        (64.5, 33.4, 0.78),
+        (20.0, 10.0, 0.4),
+    ],
+    ids=["cdcb_national_average", "farm_specific"],
+)
+def test_calculate_et_values(
+    fat_variance: float, protein_variance: float, correlation: float, genetics: Genetics, mocker: MockerFixture
+) -> None:
+    """Unit test for _calculate_et_values(): the E_temporary distribution comes from the AnimalConfig inputs."""
+    mocker.patch.object(AnimalConfig, "temporary_environment_fat_variance", fat_variance)
+    mocker.patch.object(AnimalConfig, "temporary_environment_protein_variance", protein_variance)
+    mocker.patch.object(AnimalConfig, "temporary_environment_correlation", correlation)
     mock_generate_bivariate_random_numbers = mocker.patch.object(
         Utility, "generate_bivariate_random_numbers", return_value=(10.0, 20.0)
     )
     genetics._calculate_et_values()
     mock_generate_bivariate_random_numbers.assert_called_once_with(
-        0.0,
-        0.0,
-        numpy.sqrt(E_TEMPORARY_FAT_VARIANCE),
-        numpy.sqrt(E_TEMPORARY_PROTEIN_VARIANCE),
-        E_TEMPORARY_CORRELATION,
+        0.0, 0.0, numpy.sqrt(fat_variance), numpy.sqrt(protein_variance), correlation
     )
 
 
@@ -349,6 +397,24 @@ def test_calculate_ebv_values(
     ]
     assert ebv_fat == pytest.approx(expected_ebv_fat)
     assert ebv_protein == pytest.approx(expected_ebv_protein)
+
+
+def test_calculate_ebv_values_uses_farm_specific_tbv_inputs(genetics: Genetics, mocker: MockerFixture) -> None:
+    """The EBV estimation noise is scaled by the user-input TBV variances."""
+    genetics.TBV_fat = 10.0
+    genetics.TBV_protein = 20.0
+    mocker.patch.object(AnimalConfig, "tbv_fat_variance", 100.0)
+    mocker.patch.object(AnimalConfig, "tbv_protein_variance", 50.0)
+    mock_np_random_normal = mocker.patch.object(numpy.random, "normal", side_effect=[0.0, 0.0])
+
+    genetics._calculate_ebv_values(
+        animal_type=AnimalType.CALF, parity=None, group_specific_TBV_fat_mean=1.1, group_specific_TBV_protein_mean=2.2
+    )
+
+    assert mock_np_random_normal.call_args_list == [
+        call(0.0, pytest.approx(4.330127018922194)),
+        call(0.0, pytest.approx(3.0618621784789726)),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -568,7 +634,7 @@ def test_calculate_newborn_calf_tbv_values_too_early(genetics: Genetics, mocker:
         expected_mean_protein,
         pytest.approx(3.591656999213594),
         pytest.approx(2.588435821108957),
-        TBV_CORRELATION,
+        AnimalConfig.tbv_correlation,
     )
     mock_add_warning.assert_called_once()
 
@@ -590,7 +656,7 @@ def test_calculate_newborn_calf_tbv_values_too_late(genetics: Genetics, mocker: 
         expected_mean_protein,
         pytest.approx(3.591656999213594),
         pytest.approx(2.588435821108957),
-        TBV_CORRELATION,
+        AnimalConfig.tbv_correlation,
     )
     mock_add_warning.assert_called_once()
 
