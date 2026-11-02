@@ -259,7 +259,6 @@ class GraphGenerator:
                 "Error plotting '%s' data set.",
                 graph_details.get("title"),
                 extra={"rufas_log_name": "Graphing Exception"},
-                
             )
 
     def _set_graph_legend(

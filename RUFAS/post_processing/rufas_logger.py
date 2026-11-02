@@ -7,10 +7,7 @@ from typing import Any
 
 LOGGER_NAME = "RUFAS"
 
-LOG_FORMAT = (
-    "[%(asctime)s][%(levelname)s][%(rufas_metadata_prefix)s] "
-    "%(rufas_log_name)s: %(message)s"
-)
+LOG_FORMAT = "[%(asctime)s][%(levelname)s][%(rufas_metadata_prefix)s] " "%(rufas_log_name)s: %(message)s"
 DATE_FORMAT = "%d-%b-%Y_%a_%H-%M-%S"
 
 
