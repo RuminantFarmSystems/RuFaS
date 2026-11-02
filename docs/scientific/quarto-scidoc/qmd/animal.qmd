@@ -1980,10 +1980,15 @@ Heifer IIIs are not sold as a mechanism for controlling excess herd size. Instea
 
  More details of this method are described in the [Culling](#sec-an-cull) section of Animal-level processes and management. 
 
-#### Herd Size Management: Heifer III Sales
+#### Heifer III Purchases
 
-If the number of the heifers is more than the herd needs, heifers in the Heifer III group are sold. If the number of Heifer III is less than the herd needs, 
-a replacement is bought from the market. This is evaluated daily by comparing the number of (cows + Heifer III) to the `herd_num` specified by the user. 
+RuFaS manages the cow population (dry and lactating cows) by comparing the current number of cows with user-defined buying and selling thresholds at intervals specified by `herd_size_adjustment_interval`.
+
+When the cow population falls below the buying threshold, replacement Heifer IIIs (springers) are purchased from the replacement market. Purchased Heifer IIIs enter the herd as springers and subsequently join the cow population at first calving.
+
+When the cow population exceeds the selling threshold, eligible cows are removed through oversupply culling. Cows are ranked according to the user-selected production criterion, and the lowest-ranking eligible cows are sold until the selling threshold condition is addressed.
+
+When the cow population is within the user-defined thresholds, no herd-size adjustment is initiated. Heifer IIIs are not sold to regulate excess herd size.
 
 **User Inputs and Constants**
 
@@ -1991,6 +1996,17 @@ a replacement is bought from the market. This is evaluated daily by comparing th
 * `herd_size_sell_threshold`: threshold relative to the target herd size above which eligible cows may be sold for herd oversupply.
 * `herd_size_buy_threshold`: threshold relative to the target herd size below which replacement Heifer IIIs may be purchased.
 * `herd_size_adjustment_interval`: Number of simulation days between evaluations of the cow population for herd-size adjustment.
+
+**Parameters and Equations**
+
+* `HerdManager._check_if_replacement_heifers_needed()` Determines whether additional Heifer IIIs need to be added to the herd based on the
+current cow population, purchase thresholds, and the availability of heifers in the replacement market.
+  * Called by `HerdManager.daily_routines()` and returns a list of Heifer IIIs purchased
+  * Logic 
+	    * Compare the current number of cows with `herd_num` × `herd_size_buy_threshold`.
+      * If the cow population is below the buying threshold, purchase replacement Heifer IIIs
+      * Purchased animals are added to the herd and recorded as purchased replacements.
+      * Continue purchasing replacement Heifer IIIs as needed until the herd-size buying condition is satisfied or the replacement market is exhausted.
 
 #### Oversupply Culling (Low Production culls)
 At each herd-size check, `HerdManager` evaluates the current number of cows relative to the user-defined buying and selling thresholds.
@@ -2017,50 +2033,32 @@ Oversupply culling replaces the previous production-related culling mechanism in
 **Parameters and Equations**
 
 * `HerdManager._check_if_cows_need_to_be_sold()` evaluates whether the current cow population exceeds the user-defined selling threshold and coordinates the removal of cows when herd size exceeds that threshold via `cull_ranking_criteria`.
-  * Called by `HerdManager.daily_routines()`
-  * Returns a list of cows removed
+  * Called by `HerdManager.daily_routines()` and returns a list of cows removed
   * Logic 
-	* Compare the current number of cows with herd_num × herd_size_sell_threshold.
+	    * Compare the current number of cows with `herd_num` × `herd_size_sell_threshold`.
       * If the cow population exceeds the selling threshold, identify cows to remove. 
       * Rank eligible cows according to `cull_ranking_criteria`.
       * Removes cows until the herd-size selling condition has been addressed.
-      *  Record removed animals and update cow oversupply sale statistics.
+      * Record removed animals and update cow oversupply sale statistics.
 
 * `HerdManager._get_cow_removal_index()` identifies the lowest-ranking cow that is eligible for an oversupply cull.
       * Cow eligibility is determined using `cull_eligibility_minimum_days_in_milk` and `cull_eligibility_maximum_days_carried_calf`.
       * Eligible cows are ranked according to the user-defined `cull_ranking_criteria`.
       * Returns the index of the eligible cow selected for removal.
 
-#### Replacement Purchases 
-
-If the cow population is below the buying threshold, replacement Heifer IIIs are purchased from the replacement market. Purchased Heifer IIIs enter the herd as springers and subsequently enter the cow population at first calving.
-
-If the cow population is within the user-defined herd-size limits, no herd-size adjustment is made.
-
-If the cow population exceeds the selling threshold, RuFaS initiates oversupply culling of low producing cows as described above.
-
-**Parameters and Equations**
-
-* `HerdManager._check_if_replacement_heifers_needed()` Determines whether additional Heifer IIIs need to be added to the herd based on the
-current cow population, purchase thresholds, and the availability of heifers in the replacement market.
-  * Called by `HerdManager.daily_routines()`
-  * Returns a list of Heifer IIIs purchased
-  * Logic 
-	* Compare the current number of cows with `herd_num` × `herd_size_buy_threshold`.
-      * If the cow population is below the buying threshold, purchase replacement Heifer IIIs from the replacement_market  
-      * Purchased animals are added to the herd and recorded as purchased replacements.
-      * Continue purchasing replacement Heifer IIIs as needed until the herd-size buying condition is satisfied or the replacement market is exhausted.
-
 #### Cow Removals
 
-Cows can leave the RuFaS herd through several removal pathways. Cow mortality and acute sales are stochastic removal processes based on parity and stage of lactation, whereas oversupply culling is a management-driven process used to regulate herd size.
-For mortality and acute sales, RuFaS assigns annual removal probabilities according to cow parity. These annual probabilities are converted to daily risks and adjusted according to whether a cow is fresh (DIM < 50) or not fresh (DIM ≥ 50). Fresh cows are assigned 2.55 times the daily mortality and acute-sale risk of non-fresh cows. The risks are weighted according to the proportion of fresh and non-fresh cows in the herd so that the average daily risk remains consistent with the parity-specific annual probability.
-Mortality and acute-sale risks are evaluated daily. Acute-sale risk is evaluated before mortality risk. If a cow is selected for acute sale, she is removed from further mortality assessment on that day.
+Cows can leave the RuFaS herd through three primary removal pathways: acute sales, mortality, and oversupply culling. Acute sales and mortality are stochastic processes based on cow parity and stage of lactation, while oversupply culling is a management-driven process used to regulate herd size.
+
+Acute-sale and mortality risks are evaluated daily using separate parity-specific annual removal probabilities. These probabilities are converted to daily risks and adjusted according to whether a cow is classified as fresh (DIM < 50) or non-fresh (DIM ≥ 50). Fresh cows have 2.55 times the daily removal risk of non-fresh cows. This adjustment accounts for the elevated risk of removal during early lactation while maintaining the overall parity-specific removal probability.
+
+Acute-sale risk is evaluated before mortality risk. If a cow is selected for acute sale, she is removed from further mortality assessment on that day.
 
 **Acute Sales**
 
 An acute sale represents an involuntary sale of a cow, rather than mortality or a management-driven oversupply cull.
 As with mortality, acute-sale risk is determined using a parity-specific annual probability. The annual probability is converted to an average daily risk and redistributed between fresh and non-fresh cows. Fresh cows have 2.55 times the daily acute-sale risk of non-fresh cows.
+
 Acute-sale and mortality probabilities are separate. A cow can therefore have different annual probabilities for the two removal pathways even though the same parity and fresh-cow adjustment framework is used for both.
 Acute-sale risk is evaluated before mortality risk during the daily removal assessment. If a cow is selected for acute sale, she is marked as sold and is not subsequently evaluated for mortality on that day.
 
@@ -2068,7 +2066,9 @@ Acute-sale risk is evaluated before mortality risk during the daily removal asse
 
 Cow mortality represents removal of a cow from the herd because of death.
 Each cow is assigned an annual mortality probability according to her parity. Parities 1, 2, and 3 use their corresponding probability, while cows in parity 4 or greater use the parity-4+ probability.
+
 The annual mortality probability is converted to an average daily mortality risk. RuFaS then adjusts this risk according to stage of lactation. Cows with fewer than 50 DIM are classified as fresh and receive 2.55 times the daily mortality risk assigned to non-fresh cows.
+
 The proportion of fresh cows is calculated from the current cow population. Therefore, the fresh-cow adjustment redistributes the parity-specific mortality risk between fresh and non-fresh cows rather than simply multiplying the annual mortality probability by 2.55.
 Each eligible cow receives a daily stochastic mortality assessment. A cow selected for mortality is recorded as a death and removed from the herd.
 
@@ -2078,12 +2078,13 @@ Oversupply culling is handled separately through herd-size management. It is not
 
 **User Inputs and Constants**
 
-
-
-
-
+* `parity_death_probability`: Parity-specific annual probabilities of cow mortality.
+* `parity_cull_probability`: Parity-specific annual probabilities of acute sale. The exact configuration key should be confirmed against the current implementation.
+* Fresh-cow threshold: 50 days in milk (DIM).
+* Fresh-cow risk multiplier: 2.55.
 
 **Parameters and Equations**
+
 The average daily mortality risk for a cow's parity is calculated as: 
 * `HerdManager._assess_removal_risk()` determines the proportion of the cow herd that is currently fresh and initiates the individual removal-risk assessment.
 * Fresh cows are identified as cows with DIM < 50.
