@@ -1401,3 +1401,42 @@ class Aggregator:
             The input data if it is not None, otherwise ``None``.
         """
         return data if data else None
+
+    @staticmethod
+    def aggregate_by_description(data: list[float], description: str) -> float | None:
+        """
+        Aggregates a list of numbers using the operation named in a textual description.
+
+        Parameters
+        ----------
+        data : list[float]
+            A list of numbers to aggregate.
+        description : str
+            Free-text description of the aggregation; matched case-insensitively
+            against keywords such as ``"average"``, ``"product"``, ``"ratio"``,
+            ``"difference"``, and ``"standard deviation"``.
+
+        Returns
+        -------
+        float | None
+            The aggregated value, or ``None`` if ``data`` is empty. Falls back to the
+            sum when no keyword matches or a division/subtraction cannot be computed.
+        """
+        if not data:
+            return None
+        lowered = description.lower() if isinstance(description, str) else ""
+        if "average" in lowered or "mean" in lowered:
+            return Aggregator.average(data)
+        if "product" in lowered:
+            return Aggregator.product(data)
+        if "divide" in lowered or "ratio" in lowered:
+            result = Aggregator.division(data)
+            if result is not None:
+                return result
+        if "subtract" in lowered or "difference" in lowered:
+            result = Aggregator.subtraction(data)
+            if result is not None:
+                return result
+        if "standard deviation" in lowered or "std" in lowered:
+            return Aggregator.standard_deviation(data)
+        return Aggregator.sum(data)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Iterator
 
 import numpy as np
 import pandas as pd
@@ -15,6 +15,16 @@ from RUFAS.EEE.economics.metrics import EconomicMetrics
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
+
+LINE_ITEM_BREAKDOWN_UNITS: dict[str, MeasurementUnits] = {
+    "module": MeasurementUnits.UNITLESS,
+    "flow_type": MeasurementUnits.UNITLESS,
+    "item": MeasurementUnits.UNITLESS,
+    "scenario": MeasurementUnits.UNITLESS,
+    "biophysical_aggregate": MeasurementUnits.UNITLESS,
+    "price_aggregate": MeasurementUnits.UNITLESS,
+    "line_item_value": MeasurementUnits.DOLLARS,
+}
 
 
 class PartialBudget:
@@ -51,9 +61,52 @@ class PartialBudget:
             "reduced_revenue": zero.copy(),
         }
 
-    # Supporting multi-year scenarios will require accumulating results across
-    # scenarios as outlined in `Documentation of Economic Data and Analytical
-    # Methods (2).pdf`.
+    @staticmethod
+    def _iter_line_items(
+        preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None,
+    ) -> Iterator[tuple[str, str, str, Dict[str, Any], Dict[str, Any]]]:
+        """Yield ``(section, item_name, flow_type, item, line_items)`` for each priced line item.
+
+        Items without a ``line_item_values_by_scenario`` dictionary are skipped and a missing
+        ``flow_type`` defaults to ``"cost"``, matching the partial budget aggregation rules.
+        """
+
+        if not preprocessed_data:
+            return
+        for section, section_data in preprocessed_data.items():
+            if not isinstance(section_data, dict):
+                continue
+            for category_data in section_data.values():
+                if not isinstance(category_data, dict):
+                    continue
+                for item_name, item in category_data.items():
+                    if not isinstance(item, dict):
+                        continue
+                    line_items = item.get("line_item_values_by_scenario")
+                    if not isinstance(line_items, dict):
+                        continue
+                    yield section, item_name, item.get("flow_type") or "cost", item, line_items
+
+    @staticmethod
+    def _to_finite_float(value: Any) -> float:
+        """Coerce a line item value to ``float``, treating unparsable or non-finite values as zero."""
+
+        try:
+            result = float(value)
+        except (TypeError, ValueError):
+            return 0.0
+        return result if math.isfinite(result) else 0.0
+
+    @staticmethod
+    def _to_optional_float(value: Any) -> float | None:
+        """Coerce an aggregate to ``float`` when possible, otherwise return ``None``."""
+
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
 
     def _calculate_from_preprocessed(
         self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None
@@ -64,21 +117,10 @@ class PartialBudget:
             return None
 
         scenario_names: set[str] = set()
-        items: list[tuple[str | None, Dict[str, Any], Dict[str, float]]] = []
-        for section_data in preprocessed_data.values():
-            if not isinstance(section_data, dict):
-                continue
-            for category_data in section_data.values():
-                if not isinstance(category_data, dict):
-                    continue
-                for _, item in category_data.items():
-                    if not isinstance(item, dict):
-                        continue
-                    line_items = item.get("line_item_values_by_scenario")
-                    if not isinstance(line_items, dict):
-                        continue
-                    scenario_names.update(line_items.keys())
-                    items.append((item.get("flow_type"), item, line_items))
+        items: list[tuple[str, Dict[str, Any], Dict[str, float]]] = []
+        for _section, _item_name, flow_type, item, line_items in self._iter_line_items(preprocessed_data):
+            scenario_names.update(line_items.keys())
+            items.append((flow_type, item, line_items))
 
         if len(scenario_names) == 1:
             scenario = next(iter(scenario_names))
@@ -87,19 +129,10 @@ class PartialBudget:
             cost_total = 0.0
 
             for flow_type, item, line_items in items:
-                flow_type = flow_type or "cost"
                 if flow_type not in {"revenue", "cost"}:
                     continue
 
-                raw = line_items.get(scenario, 0.0)
-
-                try:
-                    value = float(raw)
-                except (TypeError, ValueError):
-                    value = 0.0
-
-                if not math.isfinite(value):
-                    value = 0.0
+                value = self._to_finite_float(line_items.get(scenario, 0.0))
 
                 if flow_type == "revenue":
                     revenue_total += value
@@ -141,7 +174,6 @@ class PartialBudget:
         reduced_costs = 0.0
 
         for flow_type, item, line_items in items:
-            flow_type = flow_type or "cost"
             if flow_type not in {"revenue", "cost"}:
                 continue
             if baseline not in line_items or alternative not in line_items:
@@ -177,6 +209,59 @@ class PartialBudget:
             "additional_costs": additional_costs,
             "reduced_costs": reduced_costs,
         }
+
+    def build_line_item_breakdown(
+        self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None
+    ) -> list[Dict[str, Any]]:
+        """Flatten the preprocessed economics data into one row per line item and scenario.
+
+        Each row reports the biophysical module (the ``ECONOMIC_MAP`` section), whether the item is
+        a cost or a revenue, the item name, the scenario, the aggregated biophysical quantity, the
+        aggregated price, and the resulting line item value that feeds the partial budget totals.
+        Rows follow the same rules as the totals, so summing ``line_item_value`` by ``flow_type``
+        and ``scenario`` reproduces ``econ_pba_cost_total`` and ``econ_pba_revenue_total``.
+        """
+
+        rows: list[Dict[str, Any]] = []
+        for section, item_name, flow_type, item, line_items in self._iter_line_items(preprocessed_data):
+            if flow_type not in {"revenue", "cost"}:
+                continue
+            aggregates_by_scenario = item.get("biophysical_aggregate_by_scenario")
+            if not isinstance(aggregates_by_scenario, dict):
+                aggregates_by_scenario = {}
+            for scenario, raw_value in line_items.items():
+                biophysical_aggregate = aggregates_by_scenario.get(scenario, item.get("biophysical_aggregate"))
+                rows.append(
+                    {
+                        "module": section,
+                        "flow_type": flow_type,
+                        "item": item_name,
+                        "scenario": scenario,
+                        "biophysical_aggregate": self._to_optional_float(biophysical_aggregate),
+                        "price_aggregate": self._to_optional_float(item.get("price_aggregate")),
+                        "line_item_value": self._to_finite_float(raw_value),
+                    }
+                )
+        return rows
+
+    def export_line_item_breakdown(
+        self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None
+    ) -> list[Dict[str, Any]]:
+        """Record the line item breakdown in the OutputManager as ``econ_pba_breakdown``.
+
+        One entry is added per row so the variable renders as a table: a JSON output lists the row
+        dictionaries and a CSV output gets one column per row field.
+        """
+
+        info_map = {
+            "class": __name__,
+            "function": self.export_line_item_breakdown.__name__,
+            "units": LINE_ITEM_BREAKDOWN_UNITS,
+        }
+        rows = self.build_line_item_breakdown(preprocessed_data)
+        for row in rows:
+            self.om.add_variable("econ_pba_breakdown", row, info_map)
+        return rows
 
     def calculate_partial_budget(self, preprocessed_data: Dict[str, Dict[str, Dict[str, Any]]] | None = None) -> None:
         """Perform a partial budget analysis and export multi-year net changes."""
@@ -253,13 +338,12 @@ class PartialBudget:
             if should_calculate_roi:
                 revenue = float(revenue_total.item())
                 costs = float(cost_total.item())
-                comparison_roi_data: list[dict[str, str]] = \
-                    self.im.get_data("economic_inputs.roi.roi_comparison_data")
+                comparison_roi_data: list[dict[str, str]] = self.im.get_data("economic_inputs.roi.roi_comparison_data")
                 if comparison_roi_data is None:
                     self.om.add_warning(
                         "ROI calculation warning",
                         "No comparison ROI data found, please check roi comparison data filter.",
-                        info_map
+                        info_map,
                     )
                 for comparison in comparison_roi_data:
                     self._calculate_roi(comparison, revenue, costs)
@@ -301,10 +385,7 @@ class PartialBudget:
         self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
 
     def _calculate_roi(
-        self,
-        comparison_roi_data: dict[str, str],
-        current_simulation_revenue: float,
-        current_simulation_costs: float
+        self, comparison_roi_data: dict[str, str], current_simulation_revenue: float, current_simulation_costs: float
     ) -> None:
         """
         Compare a previous simulation ROI with the current simulation ROI.
@@ -327,7 +408,7 @@ class PartialBudget:
         info_map = {
             "class": self.__class__.__name__,
             "function": self._calculate_roi.__name__,
-            "units": MeasurementUnits.DOLLARS
+            "units": MeasurementUnits.DOLLARS,
         }
 
         comparison_path = Path(comparison_roi_data["address"])
@@ -344,11 +425,7 @@ class PartialBudget:
 
         if len(comparison_revenues) != len(comparison_costs):
             error_message = "Comparison revenue and cost data must contain the same number of values."
-            self.om.add_error(
-                "ROI comparison error",
-                error_message,
-                info_map
-            )
+            self.om.add_error("ROI comparison error", error_message, info_map)
             raise ValueError(error_message)
 
         comparison_roi_name = comparison_roi_data["name"]
@@ -400,11 +477,7 @@ class PartialBudget:
             If there are multiple columns of matched data where we're only expecting one.
 
         """
-        matching_columns = [
-            column_name
-            for column_name in data
-            if re.search(column_pattern, column_name)
-        ]
+        matching_columns = [column_name for column_name in data if re.search(column_pattern, column_name)]
 
         if len(matching_columns) != 1:
             error_message = (
@@ -414,10 +487,7 @@ class PartialBudget:
             self.om.add_error(
                 "ROI comparison error",
                 error_message,
-                {
-                    "class": self.__class__.__name__,
-                    "function": self._extract_numeric_values.__name__
-                }
+                {"class": self.__class__.__name__, "function": self._extract_numeric_values.__name__},
             )
             raise ValueError(error_message)
 
