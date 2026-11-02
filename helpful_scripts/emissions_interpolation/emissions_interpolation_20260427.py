@@ -6,11 +6,10 @@ from math import radians, sin, cos, sqrt, atan2
 #################
 # User settings #
 #################
-# Dataset to modify: # NOTE # this has to be run twice, reordering the below, if algorithm should be used on both.
-EEEname = "feed_emissions_rufas202604_total"
-EEEname = "feed_emissions_rufas202604_luc"
+# Datasets to modify
+EEEnames = ["feed_emissions_total_20260512", "feed_emissions_luc_20260512"]
 
-# start distance for beighbor search.
+# start distance for neighbor search.
 km_radius_start = 50
 # User should select if they want to run this algorithm on specific subsets of feed data.
 # This value should map to one of the options in the feed_source file
@@ -28,7 +27,7 @@ zip_to_latlong_sheet = pd.read_csv(r"helpful_scripts\emissions_interpolation\geo
 fips_to_county_sheet = pd.read_csv(r"helpful_scripts\emissions_interpolation\COUNTY_ZIP_032010.csv")
 
 feed_source = pd.read_csv(
-    "helpful_scripts\emissions_interpolation\Feed Emissions Source RuFaS_Feed_Library_Combined_Final.csv"
+    r"helpful_scripts\emissions_interpolation\Feed Emissions Source RuFaS_Feed_Library_Combined_Final.csv"
 )
 
 fips_to_region = pd.read_csv(r"helpful_scripts\emissions_interpolation\fips_to_region.csv")
@@ -122,178 +121,178 @@ def get_neighbors(fips_code: int, fips_code_list: list[int]) -> list[int]:
 #######################
 
 # loading in the dataset of interest
-# NOTE # User will need to do this for both the LUC and base file
-emissions_doc_location = f"input\\data\\EEE\\{EEEname}.csv"
-emissions_doc = pd.read_csv(emissions_doc_location)
+for EEEname in EEEnames:
+    emissions_doc_location = f"input\\data\\EEE\\{EEEname}.csv"
+    emissions_doc = pd.read_csv(emissions_doc_location)
 
-emissions_doc["county_code"]
-# checking mid maturity corn silage
-emissions_doc["51"][emissions_doc["51"] == 0]
-# prep column name lists
-feed_columns = list(emissions_doc.columns)
-feed_columns.remove("county_code")
-print(feed_columns)
+    emissions_doc["county_code"]
+    # checking mid maturity corn silage
+    emissions_doc["51"][emissions_doc["51"] == 0]
+    # prep column name lists
+    feed_columns = list(emissions_doc.columns)
+    feed_columns.remove("county_code")
+    print(feed_columns)
 
-county_codes = list(emissions_doc["county_code"])
+    county_codes = list(emissions_doc["county_code"])
 
-#######################################
-## Create regional averages for wheat #
-#######################################
+    #######################################
+    ## Create regional averages for wheat #
+    #######################################
 
-if use_wheat_regional_average:
-    target_cols = [c for c in ["193"] if c in emissions_doc.columns]
-    print(target_cols)
-    merged = emissions_doc.merge(fips_to_region[["FIPS", "Region"]], left_on="county_code", right_on="FIPS", how="left")
-    print(merged)
+    if use_wheat_regional_average:
+        target_cols = [c for c in ["193"] if c in emissions_doc.columns]
+        print(target_cols)
+        merged = emissions_doc.merge(fips_to_region[["FIPS", "Region"]], left_on="county_code", right_on="FIPS", how="left")
+        print(merged)
 
-    merged[target_cols] = merged[target_cols].apply(pd.to_numeric, errors="coerce")
+        merged[target_cols] = merged[target_cols].apply(pd.to_numeric, errors="coerce")
 
-    print("Target cols:", target_cols)
-    print("Non-null count per col:")
-    print(merged[target_cols].notna().sum())
-    print("Dtypes:")
-    print(merged[target_cols].dtypes)
+        print("Target cols:", target_cols)
+        print("Non-null count per col:")
+        print(merged[target_cols].notna().sum())
+        print("Dtypes:")
+        print(merged[target_cols].dtypes)
 
-    region_means = merged.groupby("Region")[target_cols].mean()
-    print(region_means)
-    region_means.to_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
-
-
-regional_sheet = pd.read_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
+        region_means = merged.groupby("Region")[target_cols].mean()
+        print(region_means)
+        region_means.to_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
 
 
-#####################
-# GPS for each FIPS #
-#####################
+    regional_sheet = pd.read_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
 
-fips_gps_map = []
-for fips_code in county_codes:
-    zipcodes = []
-    statecode = get_statecode(fips_code)
-    while not zipcodes and get_statecode(fips_code) == statecode:
-        if fips_code == 9001:
-            print("9001")
-        if fips_code == 9007:
-            print("9007")
-        zipcodes = get_zips_from_fips(fips_to_county_sheet, fips_code)
-        if not zipcodes:
-            print(fips_code)
-            fips_code += 1
-            print("beep")
-    averagelatlong, latlongs = get_latlong_from_zip(zip_to_latlong_sheet, zipcodes)
-    fips_gps_map.append(averagelatlong)
 
-# print(fips_gps_map)
-assert len(fips_gps_map) == len(county_codes)
+    #####################
+    # GPS for each FIPS #
+    #####################
 
-###########################
-# Neighbors for each FIPS #
-###########################
-feed_ids_to_check = feed_source[feed_source["EF_Source"] == feed_source_choice]["RuFaS ID"].tolist()
+    fips_gps_map = []
+    for fips_code in county_codes:
+        zipcodes = []
+        statecode = get_statecode(fips_code)
+        while not zipcodes and get_statecode(fips_code) == statecode:
+            if fips_code == 9001:
+                print("9001")
+            if fips_code == 9007:
+                print("9007")
+            zipcodes = get_zips_from_fips(fips_to_county_sheet, fips_code)
+            if not zipcodes:
+                print(fips_code)
+                fips_code += 1
+                print("beep")
+        averagelatlong, latlongs = get_latlong_from_zip(zip_to_latlong_sheet, zipcodes)
+        fips_gps_map.append(averagelatlong)
 
-emissions_copy = emissions_doc.copy()
-emissions_neighbors_detailed = []
+    # print(fips_gps_map)
+    assert len(fips_gps_map) == len(county_codes)
 
-for idx_county_code, county_code in enumerate(county_codes):  # noqa: C901
-    statecode = get_statecode(county_code)
-    gps_county = fips_gps_map[idx_county_code]
+    ###########################
+    # Neighbors for each FIPS #
+    ###########################
+    feed_ids_to_check = feed_source[feed_source["EF_Source"] == feed_source_choice]["RuFaS ID"].tolist()
 
-    county_codes_without_self = county_codes.copy()
-    county_codes_without_self.remove(county_code)
-    tempmap = fips_gps_map.copy()
-    tempmap.remove(gps_county)
-    if len(tempmap) != len(county_codes_without_self):
-        raise ValueError("temp map and county codes don't match")
-    gps_points_in_state = [x for x, y in zip(tempmap, county_codes_without_self) if get_statecode(y) == statecode]
-    for idx_feed, feed_id in enumerate(feed_columns):
-        if feed_id == "1" and statecode == "09":
-            print("catchit")
-        if emissions_doc[feed_id][idx_county_code] == 0.0 and float(feed_id) in feed_ids_to_check:
-            neighbor_values: list[float] = []
-            neighbor_distances = []
-            km_radius = km_radius_start
+    emissions_copy = emissions_doc.copy()
+    emissions_neighbors_detailed = []
 
-            neighbors_gps_list, neighbors_distance_list = points_within_radius(
-                gps_county, gps_points_in_state, km_radius
-            )
+    for idx_county_code, county_code in enumerate(county_codes):  # noqa: C901
+        statecode = get_statecode(county_code)
+        gps_county = fips_gps_map[idx_county_code]
 
-            while not neighbors_distance_list or not neighbor_values:
-                kmmax = 5000
-                if km_radius > kmmax:
-                    break
-                for idx, gps in enumerate(neighbors_gps_list):
-                    if neighbors_distance_list[idx] == 0.0:
-                        pass
-                    else:
-                        neighbor_idx = fips_gps_map.index(gps)
-                        neighbor_value = emissions_doc[feed_id][neighbor_idx]
-                        if neighbor_value > 0.0:
-                            neighbor_values.append(neighbor_value)
-                            neighbor_distances.append(neighbors_distance_list[idx])
-                            neighbor_county_code = county_codes[neighbor_idx]
-                km_radius += 50
+        county_codes_without_self = county_codes.copy()
+        county_codes_without_self.remove(county_code)
+        tempmap = fips_gps_map.copy()
+        tempmap.remove(gps_county)
+        if len(tempmap) != len(county_codes_without_self):
+            raise ValueError("temp map and county codes don't match")
+        gps_points_in_state = [x for x, y in zip(tempmap, county_codes_without_self) if get_statecode(y) == statecode]
+        for idx_feed, feed_id in enumerate(feed_columns):
+            if feed_id == "1" and statecode == "09":
+                print("catchit")
+            if emissions_doc[feed_id][idx_county_code] == 0.0 and float(feed_id) in feed_ids_to_check:
+                neighbor_values: list[float] = []
+                neighbor_distances = []
+                km_radius = km_radius_start
+
                 neighbors_gps_list, neighbors_distance_list = points_within_radius(
                     gps_county, gps_points_in_state, km_radius
                 )
 
-            if not neighbor_values:
-                emissions_neighbors_detailed.append(
-                    [county_code, gps_county, feed_id, "could not find neighbor within state", km_radius]
-                )
-            else:
-                neighborly_average_value = np.mean(neighbor_values)
-                emissions_copy.loc[idx_county_code, feed_id] = neighborly_average_value
-                emissions_neighbors_detailed.append(
-                    [county_code, gps_county, feed_id, neighbor_values, neighbor_distances]
-                )
+                while not neighbors_distance_list or not neighbor_values:
+                    kmmax = 5000
+                    if km_radius > kmmax:
+                        break
+                    for idx, gps in enumerate(neighbors_gps_list):
+                        if neighbors_distance_list[idx] == 0.0:
+                            pass
+                        else:
+                            neighbor_idx = fips_gps_map.index(gps)
+                            neighbor_value = emissions_doc[feed_id][neighbor_idx]
+                            if neighbor_value > 0.0:
+                                neighbor_values.append(neighbor_value)
+                                neighbor_distances.append(neighbors_distance_list[idx])
+                                neighbor_county_code = county_codes[neighbor_idx]
+                    km_radius += 50
+                    neighbors_gps_list, neighbors_distance_list = points_within_radius(
+                        gps_county, gps_points_in_state, km_radius
+                    )
+
+                if not neighbor_values:
+                    emissions_neighbors_detailed.append(
+                        [county_code, gps_county, feed_id, "could not find neighbor within state", km_radius]
+                    )
+                else:
+                    neighborly_average_value = np.mean(neighbor_values)
+                    emissions_copy.loc[idx_county_code, feed_id] = neighborly_average_value
+                    emissions_neighbors_detailed.append(
+                        [county_code, gps_county, feed_id, neighbor_values, neighbor_distances]
+                    )
 
 
-#################################################################
-# Final step to fill in missing state vals for some wheat items #
-#################################################################
+    #################################################################
+    # Final step to fill in missing state vals for some wheat items #
+    #################################################################
 
-if use_wheat_regional_average:
-    for idx_county_code, county_code in enumerate(county_codes):
-        for feed_id in ["193", "197"]:
-            if emissions_copy[feed_id][idx_county_code] == 0.0:
-                region_found = str(fips_to_region[fips_to_region["FIPS"] == county_code]["Region"].values[0])
-                if region_found in ["New.England", "Great.Lakes"]:
-                    region_found = "Northeast"
-                if region_found in ["Upper.Midwest"]:
-                    region_found = "Northern.Plains"
-                regional_average = float(regional_sheet[regional_sheet["Region"] == region_found]["193"].values[0])
-                emissions_copy.loc[idx_county_code, feed_id] = regional_average
+    if use_wheat_regional_average:
+        for idx_county_code, county_code in enumerate(county_codes):
+            for feed_id in ["193", "197"]:
+                if emissions_copy[feed_id][idx_county_code] == 0.0:
+                    region_found = str(fips_to_region[fips_to_region["FIPS"] == county_code]["Region"].values[0])
+                    if region_found in ["New.England", "Great.Lakes"]:
+                        region_found = "Northeast"
+                    if region_found in ["Upper.Midwest"]:
+                        region_found = "Northern.Plains"
+                    regional_average = float(regional_sheet[regional_sheet["Region"] == region_found]["193"].values[0])
+                    emissions_copy.loc[idx_county_code, feed_id] = regional_average
 
-    emissions_copy.to_csv(
-        f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_regional_average.csv", index=False
-    )
+        emissions_copy.to_csv(
+            f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_regional_average.csv", index=False
+        )
 
-    emissions_neighbors_detailed_pd = pd.DataFrame(emissions_neighbors_detailed)
-    # emissions_neighbors_detailed_pd.to_csv("emissions_nozeroes_detailed.csv", index=False)
+        emissions_neighbors_detailed_pd = pd.DataFrame(emissions_neighbors_detailed)
+        # emissions_neighbors_detailed_pd.to_csv("emissions_nozeroes_detailed.csv", index=False)
 
-    emissions_neighbors_detailed_pd.columns = [
-        "county_code",
-        "gps_county",
-        "feed_id",
-        "neighbor_values",
-        "neighbor_distances",
-    ]
-    emissions_neighbors_detailed_pd.to_csv(
-        f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_regionalavg_detailed.csv", index=False
-    )
-else:
-    emissions_copy.to_csv(f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated.csv", index=False)
+        emissions_neighbors_detailed_pd.columns = [
+            "county_code",
+            "gps_county",
+            "feed_id",
+            "neighbor_values",
+            "neighbor_distances",
+        ]
+        emissions_neighbors_detailed_pd.to_csv(
+            f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_regionalavg_detailed.csv", index=False
+        )
+    else:
+        emissions_copy.to_csv(f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated.csv", index=False)
 
-    emissions_neighbors_detailed_pd = pd.DataFrame(emissions_neighbors_detailed)
-    # emissions_neighbors_detailed_pd.to_csv("emissions_nozeroes_detailed.csv", index=False)
+        emissions_neighbors_detailed_pd = pd.DataFrame(emissions_neighbors_detailed)
+        # emissions_neighbors_detailed_pd.to_csv("emissions_nozeroes_detailed.csv", index=False)
 
-    emissions_neighbors_detailed_pd.columns = [
-        "county_code",
-        "gps_county",
-        "feed_id",
-        "neighbor_values",
-        "neighbor_distances",
-    ]
-    emissions_neighbors_detailed_pd.to_csv(
-        f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_detailed.csv", index=False
-    )
+        emissions_neighbors_detailed_pd.columns = [
+            "county_code",
+            "gps_county",
+            "feed_id",
+            "neighbor_values",
+            "neighbor_distances",
+        ]
+        emissions_neighbors_detailed_pd.to_csv(
+            f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_detailed.csv", index=False
+        )
