@@ -25,6 +25,7 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.util import Aggregator, Utility
 from RUFAS.EEE.economics import mapping
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_PRICE_FALLBACK
+from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
 from RUFAS.EEE.economics.handler.base import LineItemHandler
 from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
 
@@ -55,7 +56,7 @@ class BeddingRequirementsHandler(LineItemHandler):
             if isinstance(entries, dict) and self.name in entries:
                 details = entries[self.name]
                 return details if isinstance(details, dict) else {}
-        self.context.om.add_warning(
+        self.om.add_warning(
             "MissingEconomicMapEntry",
             f"No '{self.name}' entry found under section '{self.section}' of the economic mapping",
             {"class": self.__class__.__name__, "function": self._get_mapping_details.__name__},
@@ -144,10 +145,10 @@ class BeddingRequirementsHandler(LineItemHandler):
 
         info_map = {"class": self.__class__.__name__, "function": self._build_bedding_name_to_type.__name__}
         path = details.get("bedding_configs_path") or "animal.bedding_configs"
-        configs = self.context.im.get_data(path)
+        configs = self.im.get_data(path)
         name_to_type: dict[str, str] = {}
         if not isinstance(configs, (list, tuple)):
-            self.context.om.add_warning(
+            self.om.add_warning(
                 "InvalidBeddingConfigs",
                 f"Bedding configs at '{path}' are missing or not a list; no bedding names can be resolved",
                 info_map,
@@ -155,7 +156,7 @@ class BeddingRequirementsHandler(LineItemHandler):
             return name_to_type
         for config in configs:
             if not isinstance(config, dict) or "name" not in config or "bedding_type" not in config:
-                self.context.om.add_warning(
+                self.om.add_warning(
                     "InvalidBeddingConfigEntry",
                     f"Skipping malformed bedding config entry (missing 'name' or 'bedding_type'): {config!r}",
                     info_map,
@@ -215,7 +216,7 @@ class BeddingRequirementsHandler(LineItemHandler):
 
         """
 
-        pool = getattr(self.context.om, "variables_pool", {})
+        pool = getattr(self.om, "variables_pool", {})
         baseline_mode = True
         scenario_names: set[str] = set()
         if isinstance(pool, dict) and pool:
@@ -226,7 +227,7 @@ class BeddingRequirementsHandler(LineItemHandler):
         pen_data: dict[str, dict[str, dict[str, list[Any]]]] = {}
         for path in sim_paths:
             capture_pattern = re.compile(path.replace(".*", "(.+?)") + "$")
-            filtered_pool = self.context.om.filter_variables_pool({"filters": [path]})
+            filtered_pool = self.om.filter_variables_pool({"filters": [path]})
             for variable_name, output_data in filtered_pool.items():
                 match = capture_pattern.search(variable_name)
                 if match is None:
@@ -240,7 +241,7 @@ class BeddingRequirementsHandler(LineItemHandler):
                 else:
                     candidate = variable_name.split(".", 1)[0]
                     scenario = candidate if candidate in scenario_names else "baseline"
-                values, info_maps = self.context.om.extract_numeric_values_and_info_maps(output_data)
+                values, info_maps = self.om.extract_numeric_values_and_info_maps(output_data)
                 bucket = pen_data.setdefault(scenario, {}).setdefault(capture, {"values": [], "info_maps": []})
                 bucket["values"].extend(values)
                 bucket["info_maps"].extend(info_maps)
@@ -332,7 +333,7 @@ class BeddingRequirementsHandler(LineItemHandler):
             warn_key, warning_name, message = warning
             if warn_key not in warned_years:
                 warned_years.add(warn_key)
-                self.context.om.add_warning(warning_name, message, info_map)
+                self.om.add_warning(warning_name, message, info_map)
         return price
 
     @staticmethod
@@ -470,11 +471,11 @@ class BeddingRequirementsHandler(LineItemHandler):
             return {}
 
         prefix, _, suffix = template.partition(".*.")
-        pens = self.context.im.get_data(prefix)
+        pens = self.im.get_data(prefix)
 
         pen_map: dict[str, Any] = {}
         if not isinstance(pens, (list, tuple)):
-            self.context.om.add_warning(
+            self.om.add_warning(
                 "InvalidPenInformation",
                 f"Pen information at '{prefix}' is missing or not a list; no bedding can be billed",
                 info_map,
@@ -566,12 +567,12 @@ class BeddingRequirementsHandler(LineItemHandler):
 
         bedding_name = pen_id_to_bedding_name.get(pen_id)
         if bedding_name is None:
-            self.context.om.add_warning("MissingBeddingName", f"No bedding_name for pen '{pen_id}'", info_map)
+            self.om.add_warning("MissingBeddingName", f"No bedding_name for pen '{pen_id}'", info_map)
             return None
 
         bedding_type = name_to_type.get(str(bedding_name))
         if bedding_type is None:
-            self.context.om.add_warning(
+            self.om.add_warning(
                 "UnknownBeddingConfig",
                 f"Bedding '{bedding_name}' (pen '{pen_id}') is not in bedding_configs; no cost applied",
                 info_map,
@@ -597,17 +598,17 @@ class BeddingRequirementsHandler(LineItemHandler):
 
         """
 
-        self.context.om.add_variable(
+        self.om.add_variable(
             "econ_bedding_total_cost",
             total_cost,
             dict(info_map, units=MeasurementUnits.DOLLARS),
         )
-        self.context.om.add_variable(
+        self.om.add_variable(
             "econ_bedding_billed_head_years",
             total_head_years,
             dict(info_map, units=MeasurementUnits.ANIMALS),
         )
-        self.context.om.add_variable(
+        self.om.add_variable(
             "econ_bedding_avg_price_per_head_year",
             price_aggregate if price_aggregate is not None else 0.0,
             dict(info_map, units=MeasurementUnits.DOLLARS),
@@ -640,7 +641,7 @@ class BeddingRequirementsHandler(LineItemHandler):
 
         if file_key in price_cache:
             return price_cache
-        return {**price_cache, file_key: self.context.get_data_with_handling(economics_file, info_map)}
+        return {**price_cache, file_key: EconomicDataProcessor.get_data_with_handling(economics_file, info_map)}
 
     def build_preprocessing_entry(self) -> dict[str, Any]:
         """
@@ -680,8 +681,8 @@ class BeddingRequirementsHandler(LineItemHandler):
         economics_files = economics_files_details if isinstance(economics_files_details, dict) else {}
         billable_combinations = self._get_billable_combinations(details)
 
-        start_date = RufasTime.convert_config_date_to_datetime(self.context.im.get_data("config.start_date"))
-        fips = self.context.im.get_data("config.FIPS_county_code")
+        start_date = RufasTime.convert_config_date_to_datetime(self.im.get_data("config.start_date"))
+        fips = self.im.get_data("config.FIPS_county_code")
 
         sim_paths = [str(path) for path in details.get("biophysical_simulation") or []]
         pen_data_by_scenario = self._collect_pen_data(sim_paths)
@@ -719,7 +720,7 @@ class BeddingRequirementsHandler(LineItemHandler):
                 file_key = normalized_type_to_key.get(normalized_type)
                 economics_file = economics_files.get(file_key)
                 if file_key is None or economics_file is None:
-                    self.context.om.add_warning(
+                    self.om.add_warning(
                         "UnmappedBeddingType",
                         f"Bedding type '{bedding_type}' (pen '{pen_id}') has no economics price file; "
                         "no cost applied",
@@ -730,7 +731,7 @@ class BeddingRequirementsHandler(LineItemHandler):
                 price_cache = self._load_price_file(price_cache, file_key, economics_file, info_map)
                 pen_price_dict = price_cache[file_key]
                 if pen_price_dict is None:
-                    self.context.om.add_warning(
+                    self.om.add_warning(
                         "MissingBeddingPriceFile",
                         f"Bedding type '{bedding_type}' (pen '{pen_id}') maps to '{economics_file}' "
                         "which could not be loaded; no cost applied",
@@ -761,7 +762,7 @@ class BeddingRequirementsHandler(LineItemHandler):
 
         price_data = {file_key: fetched for file_key, fetched in price_cache.items() if fetched is not None}
         if details.get("economics_files") and not price_data:
-            self.context.om.add_warning(
+            self.om.add_warning(
                 "MissingEconomicsFile",
                 f"No commodity pricing retrieved for '{self.name}'",
                 info_map,

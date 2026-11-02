@@ -5,10 +5,9 @@ from RUFAS.EEE.economics.mapping import CROP_TO_SEED_KEY
 from RUFAS.biophysical.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, HarvestOperation
 from RUFAS.biophysical.field.manager.schedule import Schedule
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager
 from RUFAS.util import Aggregator, Utility
 from RUFAS.EEE.economics.fallback_values import BIOPHYSICAL_FALLBACKS
+from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
 from RUFAS.EEE.economics.handler.base import LineItemHandler
 from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
 
@@ -108,14 +107,12 @@ class SeedCostHandler(LineItemHandler):
             inclusive day count between the configured start and end dates.
             ``None`` if either date cannot be parsed (a warning is recorded).
         """
-        im = InputManager()
         try:
-            config_data = im.get_data("config")
+            config_data = self.im.get_data("config")
             start_date = datetime.strptime(str(config_data["start_date"]), "%Y:%j")
             end_date = datetime.strptime(str(config_data["end_date"]), "%Y:%j")
         except Exception:
-            om = OutputManager()
-            om.add_warning(
+            self.om.add_warning(
                 "MissingConfigDates",
                 "Could not parse simulation start/end dates for seed cost preprocessing",
                 {"class": self.__class__.__name__, "function": "_parse_simulation_window"},
@@ -214,8 +211,6 @@ class SeedCostHandler(LineItemHandler):
         to the field area. Shares are accumulated per simulation day, keyed by
         seed commodity, so overlapping fields and periods add together.
         """
-        im = InputManager()
-        om = OutputManager()
         info_map = {"class": self.__class__.__name__, "function": "_preprocess_seed_costs"}
 
         simulation_window = self._parse_simulation_window()
@@ -224,9 +219,9 @@ class SeedCostHandler(LineItemHandler):
         start_date, total_simulation_days = simulation_window
 
         try:
-            field_keys = im.get_data_keys_by_properties("field_properties")
+            field_keys = self.im.get_data_keys_by_properties("field_properties")
         except Exception:
-            om.add_warning(
+            self.om.add_warning(
                 "MissingFieldData",
                 "Could not retrieve field keys for seed cost preprocessing",
                 info_map,
@@ -236,7 +231,7 @@ class SeedCostHandler(LineItemHandler):
         daily_area_by_seed: dict[str, list[float]] = {}
 
         for field_key in field_keys:
-            field_data = im.get_data(field_key)
+            field_data = self.im.get_data(field_key)
             if not isinstance(field_data, dict):
                 continue
             crop_spec = field_data.get("crop_specification")
@@ -244,9 +239,9 @@ class SeedCostHandler(LineItemHandler):
             if crop_spec is None or field_size_m2 is None:
                 continue
 
-            crop_schedules = im.get_data(f"{crop_spec}.crop_schedules")
+            crop_schedules = self.im.get_data(f"{crop_spec}.crop_schedules")
             if not isinstance(crop_schedules, list) or not crop_schedules:
-                om.add_warning(
+                self.om.add_warning(
                     "MissingCropSchedule",
                     f"No crop schedules found for '{crop_spec}' in field '{field_key}'",
                     info_map,
@@ -327,14 +322,12 @@ class SeedCostHandler(LineItemHandler):
             One price per simulation day, matching the length of the daily
             area series produced by ``_preprocess_seed_costs``.
         """
-        im = InputManager()
-        om = OutputManager()
         info_map = {"class": self.__class__.__name__, "function": self._extract_daily_seed_price.__name__}
-        start_date = datetime.strptime(str(im.get_data("config.start_date")), "%Y:%j")
-        end_date = datetime.strptime(str(im.get_data("config.end_date")), "%Y:%j")
+        start_date = datetime.strptime(str(self.im.get_data("config.start_date")), "%Y:%j")
+        end_date = datetime.strptime(str(self.im.get_data("config.end_date")), "%Y:%j")
         start_year: int = start_date.year
         end_year: int = end_date.year
-        fips_code: int = int(im.get_data("config.FIPS_county_code"))
+        fips_code: int = int(self.im.get_data("config.FIPS_county_code"))
         days_count = (end_date - start_date).days + 1
 
         daily_seed_price: list[float] = []
@@ -345,13 +338,13 @@ class SeedCostHandler(LineItemHandler):
                 daily_seed_price = BIOPHYSICAL_FALLBACKS["seed_cost"] * days_count
                 break
             if not isinstance(value, dict) or "fips" not in value or not isinstance(value["fips"], list):
-                om.add_warning(
+                self.om.add_warning(
                     "MissingPriceData",
                     f"Price data missing for key: {key}, FIPS: '{fips_code}' is not in expected format."
                     "Using fallback price.",
                     info_map,
                 )
-                fallback_prices = self.context.get_fallback_price(start_year, end_year, key)
+                fallback_prices = EconomicDataProcessor.get_fallback_price(start_year, end_year, key)
                 price_by_year = {start_year + i: price for i, price in enumerate(fallback_prices)}
             else:
                 fips_idx = value["fips"].index(fips_code)
@@ -359,14 +352,14 @@ class SeedCostHandler(LineItemHandler):
                     try:
                         price_by_year[year] = value[f"{year}"][fips_idx]
                     except (KeyError, IndexError):
-                        om.add_warning(
+                        self.om.add_warning(
                             "MissingPriceData",
                             f"Price data missing for year '{year}' and FIPS '{fips_code}' in '{key}'."
                             "Using fallback price.",
                             info_map,
                         )
                         if fallback_prices is None:
-                            fallback_prices = self.context.get_fallback_price(start_year, end_year, key)
+                            fallback_prices = EconomicDataProcessor.get_fallback_price(start_year, end_year, key)
                         price_by_year[year] = fallback_prices[year - start_year]
             for i in range(days_count):
                 daily_seed_price.append(price_by_year[(start_date + timedelta(days=i)).year])
@@ -413,11 +406,9 @@ class SeedCostHandler(LineItemHandler):
         scenario. Missing price data triggers a fallback price and a warning,
         while an empty field schedule triggers a separate warning.
         """
-
-        om = OutputManager()
         info_map = {"class": self.__class__.__name__, "function": "process"}
 
-        scenario_names = self.context.scenario_names()
+        scenario_names = EconomicDataProcessor.scenario_names()
 
         biophysical_values_by_scenario: dict[str, dict[str, list[float]]] = {}
         biophysical_aggregate_by_scenario: dict[str, dict[str, float]] = {}
@@ -433,9 +424,9 @@ class SeedCostHandler(LineItemHandler):
             price_aggregate: dict[str, float] = {}
             total_seed_cost = 0.0
             for seed_key, daily_area in daily_area_by_seed.items():
-                raw_price = self.context.get_data_with_handling(seed_key, info_map)
+                raw_price = EconomicDataProcessor.get_data_with_handling(seed_key, info_map)
                 if raw_price is None:
-                    om.add_warning(
+                    self.om.add_warning(
                         "MissingEconomicsFile",
                         f"Seed commodity pricing '{seed_key}' not found in InputManager, using fallback price.",
                         info_map,
@@ -458,7 +449,7 @@ class SeedCostHandler(LineItemHandler):
             line_item_values_by_scenario[scenario_name] = total_seed_cost
 
             if not daily_area_by_seed:
-                om.add_warning(
+                self.om.add_warning(
                     "MissingBiophysicalData",
                     "No field data found for seed cost preprocessing",
                     info_map,

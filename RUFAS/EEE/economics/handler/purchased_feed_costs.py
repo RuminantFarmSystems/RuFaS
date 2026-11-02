@@ -3,6 +3,7 @@ from typing import Any, ClassVar
 
 from RUFAS.util import Aggregator
 from RUFAS.EEE.economics.fallback_values import ECONOMIC_QUANTITY_FALLBACK
+from RUFAS.EEE.economics.data_processor import EconomicDataProcessor
 from RUFAS.EEE.economics.handler.base import LineItemHandler
 from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
 
@@ -19,7 +20,9 @@ class PurchasedFeedCostHandler(LineItemHandler):
     def build_preprocessing_entry(self) -> dict[str, Any]:
         """Build the result entry from the simulation's ration interval purchase outputs."""
 
-        values_by_scenario = self.context.fetch_values_by_scenario(self.amount_patterns, expand_interval_to_daily=True)
+        values_by_scenario = EconomicDataProcessor.fetch_values_by_scenario(
+            self.amount_patterns, expand_interval_to_daily=True
+        )
         if not values_by_scenario:
             values_by_scenario = {"baseline": [ECONOMIC_QUANTITY_FALLBACK]}
 
@@ -32,7 +35,7 @@ class PurchasedFeedCostHandler(LineItemHandler):
             for scenario, scenario_values in values_by_scenario.items()
         }
 
-        cost_values_by_scenario = self.context.fetch_values_by_scenario(self.cost_patterns)
+        cost_values_by_scenario = EconomicDataProcessor.fetch_values_by_scenario(self.cost_patterns)
         line_item_values_by_scenario = {
             scenario: Aggregator.sum(scenario_values)
             for scenario, scenario_values in cost_values_by_scenario.items()
@@ -59,11 +62,11 @@ class PurchasedFeedCostHandler(LineItemHandler):
         sums: dict[str, float] = {}
         for pattern in patterns:
             capture_pattern = re.compile(pattern.replace(".*", "(.+?)") + "$")
-            for variable_name, payload in self.context.om.filter_variables_pool({"filters": [pattern]}).items():
+            for variable_name, payload in self.om.filter_variables_pool({"filters": [pattern]}).items():
                 capture_match = capture_pattern.search(variable_name)
                 key = capture_match.group(1) if capture_match else variable_name
                 values: list[float] = []
-                self.context.append_from_payload(values, payload)
+                EconomicDataProcessor.append_from_payload(values, payload)
                 sums[key] = sums.get(key, 0.0) + sum(values)
         return sums
 
