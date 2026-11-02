@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Iterator
 
 import numpy as np
 import pandas as pd
@@ -338,13 +338,12 @@ class PartialBudget:
             if should_calculate_roi:
                 revenue = float(revenue_total.item())
                 costs = float(cost_total.item())
-                comparison_roi_data: list[dict[str, str]] = \
-                    self.im.get_data("economic_inputs.roi.roi_comparison_data")
+                comparison_roi_data: list[dict[str, str]] = self.im.get_data("economic_inputs.roi.roi_comparison_data")
                 if comparison_roi_data is None:
                     self.om.add_warning(
                         "ROI calculation warning",
                         "No comparison ROI data found, please check roi comparison data filter.",
-                        info_map
+                        info_map,
                     )
                 for comparison in comparison_roi_data:
                     self._calculate_roi(comparison, revenue, costs)
@@ -386,10 +385,7 @@ class PartialBudget:
         self.om.add_log("PartialBudget", "Partial budget analysis completed.", info_map)
 
     def _calculate_roi(
-        self,
-        comparison_roi_data: dict[str, str],
-        current_simulation_revenue: float,
-        current_simulation_costs: float
+        self, comparison_roi_data: dict[str, str], current_simulation_revenue: float, current_simulation_costs: float
     ) -> None:
         """
         Compare a previous simulation ROI with the current simulation ROI.
@@ -412,7 +408,7 @@ class PartialBudget:
         info_map = {
             "class": self.__class__.__name__,
             "function": self._calculate_roi.__name__,
-            "units": MeasurementUnits.DOLLARS
+            "units": MeasurementUnits.DOLLARS,
         }
 
         comparison_path = Path(comparison_roi_data["address"])
@@ -429,11 +425,7 @@ class PartialBudget:
 
         if len(comparison_revenues) != len(comparison_costs):
             error_message = "Comparison revenue and cost data must contain the same number of values."
-            self.om.add_error(
-                "ROI comparison error",
-                error_message,
-                info_map
-            )
+            self.om.add_error("ROI comparison error", error_message, info_map)
             raise ValueError(error_message)
 
         comparison_roi_name = comparison_roi_data["name"]
@@ -485,11 +477,7 @@ class PartialBudget:
             If there are multiple columns of matched data where we're only expecting one.
 
         """
-        matching_columns = [
-            column_name
-            for column_name in data
-            if re.search(column_pattern, column_name)
-        ]
+        matching_columns = [column_name for column_name in data if re.search(column_pattern, column_name)]
 
         if len(matching_columns) != 1:
             error_message = (
@@ -499,10 +487,7 @@ class PartialBudget:
             self.om.add_error(
                 "ROI comparison error",
                 error_message,
-                {
-                    "class": self.__class__.__name__,
-                    "function": self._extract_numeric_values.__name__
-                }
+                {"class": self.__class__.__name__, "function": self._extract_numeric_values.__name__},
             )
             raise ValueError(error_message)
 

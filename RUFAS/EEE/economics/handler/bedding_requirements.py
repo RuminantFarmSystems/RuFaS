@@ -327,50 +327,73 @@ class BeddingRequirementsHandler(LineItemHandler):
 
         """
 
-        fallback = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
-        if not isinstance(price_dict, dict) or not isinstance(price_dict.get("fips"), list):
-            warn_key = f"{file_key}:malformed"
+        price, warning = self._lookup_annual_bedding_price(price_dict, year, fips, file_key)
+        if warning is not None:
+            warn_key, warning_name, message = warning
             if warn_key not in warned_years:
                 warned_years.add(warn_key)
-                self.context.om.add_warning(
-                    "MissingPriceData",
-                    f"Bedding price data for '{file_key}' is missing or malformed; "
-                    f"using fallback cost ${fallback}/head.",
-                    info_map,
-                )
-            return fallback
+                self.context.om.add_warning(warning_name, message, info_map)
+        return price
+
+    @staticmethod
+    def _lookup_annual_bedding_price(
+        price_dict: dict[str, list[float | str]], year: int, fips: Any, file_key: str
+    ) -> tuple[float, tuple[str, str, str] | None]:
+        """
+        Resolves the dollar-per-head bedding price for a year without emitting warnings.
+
+        Parameters
+        ----------
+        price_dict : dict[str, list[float | str]]
+            The loaded price table, expected as ``{"fips": [...], "<year>": [...], ...}``.
+        year : int
+            The calendar year to price.
+        fips : Any
+            The simulation's FIPS county code.
+        file_key : str
+            The price-file key, used in warning keys and messages.
+
+        Returns
+        -------
+        tuple[float, tuple[str, str, str] | None]
+            The resolved price (or the fallback cost), and the warning to emit as
+            ``(warning key, warning name, message)``, or None when no warning applies.
+
+        """
+
+        fallback = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
+        if not isinstance(price_dict, dict) or not isinstance(price_dict.get("fips"), list):
+            return fallback, (
+                f"{file_key}:malformed",
+                "MissingPriceData",
+                f"Bedding price data for '{file_key}' is missing or malformed; using fallback cost ${fallback}/head.",
+            )
         try:
             fips_idx = price_dict["fips"].index(fips)
         except ValueError:
-            warn_key = f"{file_key}:fips:{fips}"
-            if warn_key not in warned_years:
-                warned_years.add(warn_key)
-                self.context.om.add_warning(
-                    "MissingPriceData",
-                    f"FIPS county '{fips}' not found in bedding price file '{file_key}'; "
-                    f"using fallback cost ${fallback}/head.",
-                    info_map,
-                )
-            return fallback
+            return fallback, (
+                f"{file_key}:fips:{fips}",
+                "MissingPriceData",
+                f"FIPS county '{fips}' not found in bedding price file '{file_key}'; "
+                f"using fallback cost ${fallback}/head.",
+            )
 
         year_columns = sorted(int(key) for key in price_dict if str(key).isdigit())
         if not year_columns:
-            return fallback
+            return fallback, None
 
         use_year = year if year in year_columns else min(year_columns, key=lambda candidate: abs(candidate - year))
+        warning = None
         if use_year != year:
-            warn_key = f"{file_key}:{year}"
-            if warn_key not in warned_years:
-                warned_years.add(warn_key)
-                self.context.om.add_warning(
-                    "MissingPriceYear",
-                    f"No bedding price column for year {year} in '{file_key}'; using nearest year {use_year}.",
-                    info_map,
-                )
+            warning = (
+                f"{file_key}:{year}",
+                "MissingPriceYear",
+                f"No bedding price column for year {year} in '{file_key}'; using nearest year {use_year}.",
+            )
         try:
-            return float(price_dict[str(use_year)][fips_idx])
+            return float(price_dict[str(use_year)][fips_idx]), warning
         except (KeyError, IndexError, TypeError, ValueError):
-            return fallback
+            return fallback, warning
 
     def _get_pen_bedding_name(self, pen_entry: Any, bedding_name_keys: list[str]) -> Any:
         """
@@ -463,6 +486,162 @@ class BeddingRequirementsHandler(LineItemHandler):
                 pen_map[str(entry["id"])] = self._get_pen_bedding_name(entry, bedding_name_keys)
         return pen_map
 
+    @staticmethod
+    def _get_billable_combinations(details: dict[str, Any]) -> set[str] | None:
+        """
+        Gets the normalized animal combinations whose pens are billed for bedding.
+
+        Parameters
+        ----------
+        details : dict[str, Any]
+            The ``Bedding requirements`` mapping entry.
+
+        Returns
+        -------
+        set[str] | None
+            The upper-cased billable combinations, or None when every pen is billable.
+
+        """
+
+        billable_pen_combinations = details.get("billable_pen_combinations")
+        if not billable_pen_combinations:
+            return None
+        return {str(combination).strip().upper() for combination in billable_pen_combinations}
+
+    @staticmethod
+    def _average_head_by_year(counts_by_year: dict[int, list[float]]) -> dict[int, float]:
+        """
+        Converts daily head counts grouped by calendar year into average head present per year.
+
+        Parameters
+        ----------
+        counts_by_year : dict[int, list[float]]
+            Daily head counts keyed by calendar year.
+
+        Returns
+        -------
+        dict[int, float]
+            The summed daily head counts divided by the year's length, for each year with data.
+
+        """
+
+        average_head: dict[int, float] = {}
+        for year, daily in counts_by_year.items():
+            if not daily:
+                continue
+            days_in_year = (
+                GeneralConstants.LEAP_YEAR_LENGTH if Utility.is_leap_year(year) else GeneralConstants.YEAR_LENGTH
+            )
+            average_head[year] = sum(daily) / days_in_year
+        return average_head
+
+    def _resolve_pen_bedding_type(
+        self,
+        pen_id: str,
+        pen_id_to_bedding_name: dict[str, Any],
+        name_to_type: dict[str, Any],
+        info_map: dict[str, str],
+    ) -> Any:
+        """
+        Resolves a pen's bedding name to its canonical bedding type, warning when either is unknown.
+
+        Parameters
+        ----------
+        pen_id : str
+            The pen identifier.
+        pen_id_to_bedding_name : dict[str, Any]
+            Bedding names keyed by pen identifier.
+        name_to_type : dict[str, Any]
+            Canonical bedding types keyed by bedding config name.
+        info_map : dict[str, str]
+            Contextual information attached to any emitted warning.
+
+        Returns
+        -------
+        Any
+            The pen's bedding type, or None when the pen has no bedding name or the name is
+            not in ``bedding_configs``.
+
+        """
+
+        bedding_name = pen_id_to_bedding_name.get(pen_id)
+        if bedding_name is None:
+            self.context.om.add_warning("MissingBeddingName", f"No bedding_name for pen '{pen_id}'", info_map)
+            return None
+
+        bedding_type = name_to_type.get(str(bedding_name))
+        if bedding_type is None:
+            self.context.om.add_warning(
+                "UnknownBeddingConfig",
+                f"Bedding '{bedding_name}' (pen '{pen_id}') is not in bedding_configs; no cost applied",
+                info_map,
+            )
+        return bedding_type
+
+    def _add_reporting_variables(
+        self, total_cost: float, total_head_years: float, price_aggregate: float | None, info_map: dict[str, str]
+    ) -> None:
+        """
+        Emits the headline bedding results as standalone output variables for report filters.
+
+        Parameters
+        ----------
+        total_cost : float
+            The total bedding cost across scenarios.
+        total_head_years : float
+            The total billed head-years across scenarios.
+        price_aggregate : float | None
+            The average dollar-per-head-year price, or None when no prices were resolved.
+        info_map : dict[str, str]
+            Contextual information attached to the output variables.
+
+        """
+
+        self.context.om.add_variable(
+            "econ_bedding_total_cost",
+            total_cost,
+            dict(info_map, units=MeasurementUnits.DOLLARS),
+        )
+        self.context.om.add_variable(
+            "econ_bedding_billed_head_years",
+            total_head_years,
+            dict(info_map, units=MeasurementUnits.ANIMALS),
+        )
+        self.context.om.add_variable(
+            "econ_bedding_avg_price_per_head_year",
+            price_aggregate if price_aggregate is not None else 0.0,
+            dict(info_map, units=MeasurementUnits.DOLLARS),
+        )
+
+    def _load_price_file(
+        self, price_cache: dict[str, Any], file_key: str, economics_file: Any, info_map: dict[str, str]
+    ) -> dict[str, Any]:
+        """
+        Returns the price cache with the price file for ``file_key`` loaded, fetching it only once.
+
+        Parameters
+        ----------
+        price_cache : dict[str, Any]
+            Loaded price tables keyed by price-file key (None for files that failed to load).
+        file_key : str
+            The price-file key to load.
+        economics_file : Any
+            The InputManager path of the price file.
+        info_map : dict[str, str]
+            Contextual information attached to any emitted warning.
+
+        Returns
+        -------
+        dict[str, Any]
+            The cache unchanged when ``file_key`` is already loaded, otherwise a new cache that
+            also holds the fetched table.
+
+        """
+
+        if file_key in price_cache:
+            return price_cache
+        return {**price_cache, file_key: self.context.get_data_with_handling(economics_file, info_map)}
+
     def build_preprocessing_entry(self) -> dict[str, Any]:
         """
         Computes bedding cost per pen, per year, then sums them (issue #3088).
@@ -499,12 +678,7 @@ class BeddingRequirementsHandler(LineItemHandler):
         normalized_type_to_key = {str(key).strip().lower(): value for key, value in type_to_key.items()}
         economics_files_details = details.get("economics_files")
         economics_files = economics_files_details if isinstance(economics_files_details, dict) else {}
-        billable_pen_combinations = details.get("billable_pen_combinations")
-        billable_combinations = (
-            {str(combination).strip().upper() for combination in billable_pen_combinations}
-            if billable_pen_combinations
-            else None
-        )
+        billable_combinations = self._get_billable_combinations(details)
 
         start_date = RufasTime.convert_config_date_to_datetime(self.context.im.get_data("config.start_date"))
         fips = self.context.im.get_data("config.FIPS_county_code")
@@ -515,7 +689,6 @@ class BeddingRequirementsHandler(LineItemHandler):
             pen_data_by_scenario = {"baseline": {}}
 
         price_cache: dict[str, Any] = {}
-        price_data: dict[str, Any] = {}
         warned_years: set[str] = set()
         price_values: list[float] = []
 
@@ -528,25 +701,14 @@ class BeddingRequirementsHandler(LineItemHandler):
             scenario_head_years = 0.0
             scenario_values: list[float] = []
             for capture, daily_data in pens.items():
-                pen_id = capture.split("_", 1)[0]
-                pen_combination = capture.split("_", 1)[1] if "_" in capture else ""
+                pen_id, _, pen_combination = capture.partition("_")
 
                 if billable_combinations is not None and pen_combination.strip().upper() not in billable_combinations:
                     scenario_values.extend(daily_data.get("values", []))
                     continue
 
-                bedding_name = pen_id_to_bedding_name.get(pen_id)
-                if bedding_name is None:
-                    self.context.om.add_warning("MissingBeddingName", f"No bedding_name for pen '{pen_id}'", info_map)
-                    continue
-
-                bedding_type = name_to_type.get(str(bedding_name))
+                bedding_type = self._resolve_pen_bedding_type(pen_id, pen_id_to_bedding_name, name_to_type, info_map)
                 if bedding_type is None:
-                    self.context.om.add_warning(
-                        "UnknownBeddingConfig",
-                        f"Bedding '{bedding_name}' (pen '{pen_id}') is not in bedding_configs; no cost applied",
-                        info_map,
-                    )
                     continue
 
                 normalized_type = str(bedding_type).strip().lower()
@@ -555,7 +717,7 @@ class BeddingRequirementsHandler(LineItemHandler):
                     continue
 
                 file_key = normalized_type_to_key.get(normalized_type)
-                economics_file = economics_files.get(file_key) if file_key else None
+                economics_file = economics_files.get(file_key)
                 if file_key is None or economics_file is None:
                     self.context.om.add_warning(
                         "UnmappedBeddingType",
@@ -565,11 +727,7 @@ class BeddingRequirementsHandler(LineItemHandler):
                     )
                     continue
 
-                if file_key not in price_cache:
-                    fetched = self.context.get_data_with_handling(economics_file, info_map)
-                    price_cache[file_key] = fetched
-                    if fetched is not None:
-                        price_data[file_key] = fetched
+                price_cache = self._load_price_file(price_cache, file_key, economics_file, info_map)
                 pen_price_dict = price_cache[file_key]
                 if pen_price_dict is None:
                     self.context.om.add_warning(
@@ -586,24 +744,22 @@ class BeddingRequirementsHandler(LineItemHandler):
                 scenario_values.extend(daily_values)
 
                 counts_by_year = self._group_daily_counts_by_year(daily_values, daily_info_maps, start_date)
-                for year, daily in counts_by_year.items():
-                    if not daily:
-                        continue
-                    days_in_year = (
-                        GeneralConstants.LEAP_YEAR_LENGTH
-                        if Utility.is_leap_year(year)
-                        else GeneralConstants.YEAR_LENGTH
-                    )
-                    average_head = sum(daily) / days_in_year
-                    price = self._get_annual_bedding_price(pen_price_dict, year, fips, file_key, warned_years, info_map)
-                    price_values.append(price)
-                    scenario_head_years += average_head
-                    scenario_cost += average_head * price
+                average_head_by_year = self._average_head_by_year(counts_by_year)
+                yearly_prices = [
+                    self._get_annual_bedding_price(pen_price_dict, year, fips, file_key, warned_years, info_map)
+                    for year in average_head_by_year
+                ]
+                price_values.extend(yearly_prices)
+                scenario_head_years += sum(average_head_by_year.values())
+                scenario_cost += sum(
+                    average_head * price for average_head, price in zip(average_head_by_year.values(), yearly_prices)
+                )
 
             line_item_values_by_scenario[scenario] = scenario_cost
             values_by_scenario[scenario] = scenario_values
             aggregates_by_scenario[scenario] = scenario_head_years
 
+        price_data = {file_key: fetched for file_key, fetched in price_cache.items() if fetched is not None}
         if details.get("economics_files") and not price_data:
             self.context.om.add_warning(
                 "MissingEconomicsFile",
@@ -615,21 +771,7 @@ class BeddingRequirementsHandler(LineItemHandler):
         total_head_years = sum(aggregates_by_scenario.values())
         price_aggregate = Aggregator.aggregate_by_description(price_values, "average")
 
-        self.context.om.add_variable(
-            "econ_bedding_total_cost",
-            total_cost,
-            dict(info_map, units=MeasurementUnits.DOLLARS),
-        )
-        self.context.om.add_variable(
-            "econ_bedding_billed_head_years",
-            total_head_years,
-            dict(info_map, units=MeasurementUnits.ANIMALS),
-        )
-        self.context.om.add_variable(
-            "econ_bedding_avg_price_per_head_year",
-            price_aggregate if price_aggregate is not None else 0.0,
-            dict(info_map, units=MeasurementUnits.DOLLARS),
-        )
+        self._add_reporting_variables(total_cost, total_head_years, price_aggregate, info_map)
 
         biophysical_values = [value for scenario_values in values_by_scenario.values() for value in scenario_values]
         return {

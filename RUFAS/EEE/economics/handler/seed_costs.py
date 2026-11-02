@@ -15,6 +15,7 @@ from RUFAS.EEE.economics.mapping import EconomicLineItem, EconomicSection
 
 class SeedCostHandler(LineItemHandler):
     """Build the ``Seeds costs`` preprocessing entry from field crop schedules."""
+
     section: ClassVar[EconomicSection] = EconomicSection.SOIL_AND_CROP
     name: ClassVar[EconomicLineItem] = EconomicLineItem.SEEDS_COSTS
 
@@ -64,9 +65,9 @@ class SeedCostHandler(LineItemHandler):
         planting_skip = int(schedule.get("planting_skip") or 0)
         harvesting_skip = int(schedule.get("harvesting_skip") or 0)
 
-        raw_planting_years: list[int] = list(schedule.get("planting_years") or [])
+        raw_planting_years: list[int | float] = list(schedule.get("planting_years") or [])
         raw_planting_days: list[int] = list(schedule.get("planting_days") or [])
-        raw_harvest_years: list[int] = list(schedule.get("harvest_years") or [])
+        raw_harvest_years: list[int | float] = list(schedule.get("harvest_years") or [])
         raw_harvest_days: list[int] = list(schedule.get("harvest_days") or [])
         raw_harvest_operations: list[str] = list(schedule.get("harvest_operations") or [])
 
@@ -252,22 +253,59 @@ class SeedCostHandler(LineItemHandler):
                 )
                 continue
 
-            for schedule in crop_schedules:
-                if not isinstance(schedule, dict):
-                    continue
-                crop_species = schedule.get("crop_species")
-                if not isinstance(crop_species, str):
-                    continue
-                seed_key = CROP_TO_SEED_KEY.get(crop_species, f"fallback_{crop_species}")
-                daily_area = daily_area_by_seed.setdefault(seed_key, [0.0] * total_simulation_days)
-
-                for plant_date, kill_date in self._gather_growing_periods(schedule):
-                    daily_area = self._accumulate_growing_period(
-                        daily_area, field_size_m2, plant_date, kill_date, start_date, total_simulation_days
-                    )
-                daily_area_by_seed[seed_key] = daily_area
+            daily_area_by_seed = self._accumulate_crop_schedules(
+                daily_area_by_seed, crop_schedules, field_size_m2, start_date, total_simulation_days
+            )
 
         return daily_area_by_seed
+
+    def _accumulate_crop_schedules(
+        self,
+        daily_area_by_seed: dict[str, list[float]],
+        crop_schedules: list[Any],
+        field_size_m2: float,
+        start_date: datetime,
+        total_simulation_days: int,
+    ) -> dict[str, list[float]]:
+        """
+        Add one field's growing-period area shares for each of its crop schedules.
+
+        Parameters
+        ----------
+        daily_area_by_seed : dict[str, list[float]]
+            Per-seed daily allocated area accumulated so far.
+        crop_schedules : list[Any]
+            The field's crop schedule entries; entries that are not dicts or lack a
+            string ``crop_species`` are skipped.
+        field_size_m2 : float
+            The field area in m².
+        start_date : datetime
+            The simulation start date.
+        total_simulation_days : int
+            The number of days in the simulation.
+
+        Returns
+        -------
+        dict[str, list[float]]
+            A new mapping equal to ``daily_area_by_seed`` with this field's shares added.
+            The input mapping is not modified.
+        """
+        updated_area_by_seed = dict(daily_area_by_seed)
+        for schedule in crop_schedules:
+            if not isinstance(schedule, dict):
+                continue
+            crop_species = schedule.get("crop_species")
+            if not isinstance(crop_species, str):
+                continue
+            seed_key = CROP_TO_SEED_KEY.get(crop_species, f"fallback_{crop_species}")
+            daily_area = updated_area_by_seed.get(seed_key, [0.0] * total_simulation_days)
+
+            for plant_date, kill_date in self._gather_growing_periods(schedule):
+                daily_area = self._accumulate_growing_period(
+                    daily_area, field_size_m2, plant_date, kill_date, start_date, total_simulation_days
+                )
+            updated_area_by_seed[seed_key] = daily_area
+        return updated_area_by_seed
 
     def _extract_daily_seed_price(self, price_data: Any) -> list[float]:
         """
@@ -407,14 +445,12 @@ class SeedCostHandler(LineItemHandler):
                 if not extracted_prices:
                     continue
 
-                daily_price_per_area = [
-                    seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area)
-                ]
+                daily_price_per_area = [seed_cost * area_m2 for seed_cost, area_m2 in zip(extracted_prices, daily_area)]
                 biophysical_values[seed_key] = daily_area_by_seed[seed_key]
                 price_values[seed_key] = extracted_prices
                 bio_total[seed_key] = sum(biophysical_values[seed_key])
                 price_data[seed_key] = raw_price
-                price_aggregate[seed_key] = Aggregator.aggregate_by_description(extracted_prices, "average")
+                price_aggregate[seed_key] = Aggregator.average(extracted_prices)
                 total_seed_cost += sum(daily_price_per_area)
 
             biophysical_values_by_scenario[scenario_name] = biophysical_values

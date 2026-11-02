@@ -6,8 +6,13 @@ from RUFAS.EEE.economics.handler.seed_costs import SeedCostHandler
 SPECIAL_CASE_HANDLERS: list[type[LineItemHandler]] = [
     BeddingRequirementsHandler,
     PurchasedFeedCostHandler,
-    SeedCostHandler
+    SeedCostHandler,
 ]
 
-__all__ = ["SPECIAL_CASE_HANDLERS", "LineItemHandler", "BeddingRequirementsHandler", "PurchasedFeedCostHandler",
-           "SeedCostHandler"]
+__all__ = [
+    "SPECIAL_CASE_HANDLERS",
+    "LineItemHandler",
+    "BeddingRequirementsHandler",
+    "PurchasedFeedCostHandler",
+    "SeedCostHandler",
+]

@@ -43,6 +43,7 @@ from RUFAS.EEE.economics.fallback_values import (
 # from an input file; used only in InputManager validation messages.
 COMPUTED_PREPROCESSING_INPUT_PATH = Path("<computed: EconomicPreprocessor.preprocess>")
 
+
 @dataclass(frozen=True)
 class EconomicItem:
     """Definition of a single economic preprocessing item."""
@@ -530,8 +531,8 @@ class EconomicPreprocessor:
             )
 
             if values_by_scenario:
-                for scenario, biophysical_values in values_by_scenario.items():
-                    if not biophysical_values and input_values:
+                for scenario, scenario_values in values_by_scenario.items():
+                    if not scenario_values and input_values:
                         values_by_scenario[scenario] = list(input_values)
             elif input_values:
                 values_by_scenario = {"baseline": list(input_values)}

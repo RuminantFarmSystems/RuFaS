@@ -79,19 +79,9 @@ class EconomicDataProcessor:
                 )
                 continue
 
-            if hasattr(self.im, "check_property_exists_in_pool"):
-                try:
-                    if not self.im.check_property_exists_in_pool(candidate):
-                        continue
-                except ValueError as exc:
-                    last_error = exc
-                    continue
-            try:
-                data = self.im.get_data(candidate)
-            except ValueError as exc:
-                last_error = exc
-                continue
-
+            data, error = self._fetch_candidate(candidate)
+            if error is not None:
+                last_error = error
             if data is not None:
                 return data
 
@@ -105,6 +95,18 @@ class EconomicDataProcessor:
 
         return None
 
+    def _fetch_candidate(self, candidate: str) -> tuple[Any, ValueError | None]:
+        """Fetch one candidate path from the InputManager, returning the data and any lookup error."""
+
+        try:
+            if hasattr(self.im, "check_property_exists_in_pool") and not self.im.check_property_exists_in_pool(
+                candidate
+            ):
+                return None, None
+            return self.im.get_data(candidate), None
+        except ValueError as exc:
+            return None, exc
+
     def get_fallback_price(self, start_year: int, end_year: int, commodity: str) -> list[float]:
         """Get a fallback price for a commodity."""
         info_map = {"class": self.__class__.__name__, "function": self.get_fallback_price.__name__}
@@ -117,29 +119,33 @@ class EconomicDataProcessor:
                 info_map,
             )
             return [ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)] * (end_year - start_year + 1)
-        commodity_idx = defaults["commodity"].index(commodity)
+        years = range(start_year, end_year + 1)
+        primary_prices = self._read_yearly_prices(defaults, commodity, years)
+        if primary_prices is not None and not any(math.isnan(price) for price in primary_prices):
+            return primary_prices
+        fallback_prices = self._read_yearly_prices(defaults_fallback, commodity, years) or [math.nan] * len(years)
         values: list[float] = []
-        use_fallback = False
-        for year in range(start_year, end_year + 1):
-            price = defaults[f"{year}"][commodity_idx]
+        for year, price in zip(years, fallback_prices):
             if math.isnan(price):
-                use_fallback = True
-                break
+                self.om.add_warning(
+                    "MissingFallbackPrice",
+                    f"No fallback price found for commodity: {commodity} in year: {year}",
+                    info_map,
+                )
+                price = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
             values.append(price)
-        if use_fallback:
-            commodity_idx = defaults_fallback["commodity"].index(commodity)
-            values = []
-            for year in range(start_year, end_year + 1):
-                price = defaults_fallback[f"{year}"][commodity_idx]
-                if math.isnan(price):
-                    self.om.add_warning(
-                        "MissingFallbackPrice",
-                        f"No fallback price found for commodity: {commodity} in year: {year}",
-                        info_map,
-                    )
-                    price = ECONOMIC_PRICE_FALLBACK.get("cost", 1.0)
-                values.append(price)
         return values
+
+    @staticmethod
+    def _read_yearly_prices(
+        table: dict[str, list[float | str]], commodity: str, years: Iterable[int]
+    ) -> list[float] | None:
+        """Read a commodity's per-year prices from a defaults table, or None when the commodity is absent."""
+
+        if commodity not in table["commodity"]:
+            return None
+        commodity_idx = table["commodity"].index(commodity)
+        return [float(table[f"{year}"][commodity_idx]) for year in years]
 
     def scenario_names(self) -> list[str]:
         """Determine scenario names from the OutputManager variables pool.
@@ -218,14 +224,14 @@ class EconomicDataProcessor:
         }
         info_map = {"class": self.__class__.__name__, "function": self.fetch_values_by_scenario.__name__}
         if not any(filtered_by_path.values()):
-            fallback_values = self._fallback_values_by_scenario(sim_paths)
-            if fallback_values:
+            fallback_by_scenario = self._fallback_values_by_scenario(sim_paths)
+            if fallback_by_scenario:
                 self.om.add_warning(
                     "BiophysicalFallbackSubstituted",
                     f"No biophysical outputs matched patterns {list(sim_paths)}; substituted fallback values",
                     info_map,
                 )
-            return fallback_values
+            return fallback_by_scenario
         scenario_names = self.scenario_names()
         values_by_scenario: dict[str, list[float]] = {scenario: [] for scenario in scenario_names}
 

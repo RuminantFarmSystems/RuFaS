@@ -298,7 +298,9 @@ def test_equation_helpers() -> None:
     assert ci.tolist() == [1.5, 3.0]
 
     npv_ci = EconomicEquations.npv_capital_plus_interest(cap, ci, 0.1, np.array([-1, 0]))
-    expected_npv = (cap + ci) * np.array([EconomicEquations.discount_factor(0.1, -1), EconomicEquations.discount_factor(0.1, 0)])
+    expected_npv = (cap + ci) * np.array(
+        [EconomicEquations.discount_factor(0.1, -1), EconomicEquations.discount_factor(0.1, 0)]
+    )
     assert np.allclose(npv_ci, expected_npv)
 
     payment = EconomicEquations.annual_loan_payment(1000.0, 0.05, 5, 0.8)
