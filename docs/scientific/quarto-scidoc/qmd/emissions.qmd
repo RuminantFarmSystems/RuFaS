@@ -19,6 +19,7 @@ The emissions and resource used associated with feeds are calculated by the `Emi
 
 Purchased feed emissions are calculated multiplying the emission factor associated with feed $i$ ($\text{EF}_{i}$) by the total dry matter mass of the feed fed to the herd each day ($\text{DM_Fed}_{i}$). 
 
+
 :::{#eq-em-pfe-1}
 
 [[**EM.PFE.1**]]{.aside .content-visible when-format="html"}    
@@ -48,7 +49,7 @@ import_table(
 )
 ```
 
-The first data processing step is to convert all emission factors into the common unit of $\text{kg CO}_\text{2}\text{e}/\text{kg}$ DM. Regional emission factors, originally reported on a tonne basis, are first converted to a kilogram basis:
+The first data processing step is to convert all emission factors into the common unit of $\text{kg CO}_\text{2}\text{-eq}/\text{kg}$ DM. Regional emission factors, originally reported on a tonne basis, are first converted to a kilogram basis:
 
 :::{#eq-em-pfe-2}
 [[**EM.PFE.2**]]{.aside .content-visible when-format="html"}    
