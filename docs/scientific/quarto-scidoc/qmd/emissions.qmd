@@ -144,6 +144,231 @@ To translate the data into a format easily used within RuFaS, the geographically
 
 ## Homegrown Feed Emissions
 
+<!-- DRAFT: Homegrown (farmgrown) feed emissions and resource use allocation. Source: "Update Method for Calculating Emissions Associated with Farmgrown Feeds" design doc (Reed & Tomlinson, 2025; refactor notes Aug 2026) and RUFAS/EEE/emissions.py (EmissionsEstimator). -->
+
+Feeds grown on a RuFaS farm carry the direct soil emissions and the nutrient inputs used to produce them. These emissions and inputs occur in the field during crop growth, but the feed is fed to animals later, sometimes many months after harvest and often mixed in storage with feed from other fields and harvests. The Homegrown Feed Emissions methodology connects these two points in time. It allocates the emissions and resources simulated by the Soil and Crop Module to each harvest of a farmgrown feed. It expresses them per kilogram of harvested dry matter (DM), and then reports them in proportion to the amount of each farmgrown feed fed to the herd each day.
+
+For each farmgrown feed fed to animals, the following quantities are reported daily:
+
+* Direct soil nitrous oxide (N<sub>2</sub>O) emissions
+* Soil ammonia (NH<sub>3</sub>) emissions
+* Synthetic nitrogen (N), phosphorus (P), and potassium (K) fertilizer applied
+* Manure N applied
+
+As a reference value, RuFaS also reports a life cycle assessment (LCA) based estimate of the carbon footprint and land use change emissions for the same feed. This estimate uses the emission factors described in the Purchased Feed Emissions section.
+
+::: {.callout-note}
+Soil carbon stock change was identified in the original design as a quantity to allocate to farmgrown feeds. It is not yet included in the current implementation.
+:::
+
+### Overview of the Allocation Approach
+
+The homegrown feed emissions are estimated by the `EmissionsEstimator.estimate_farmgrown_feed_emissions()` method in `emissions.py`. This method runs as a post-processing step called by the `EEEManager` after the daily simulation loop is complete, and only when fields are simulated. It reads the daily and event-based outputs recorded during the simulation by the Soil and Crop and Feed Storage Modules and applies the following steps:
+
+1. **Aggregate field emissions and inputs.** Daily soil N<sub>2</sub>O and NH<sub>3</sub> emissions are summed across soil layers and scaled to a whole-field mass. Fertilizer and manure application events are organized by field and simulation day.
+2. **Link harvests to feeds.** Each harvest is associated with a RuFaS Feed ID based on the field and crop that delivered the harvested crop to feed storage.
+3. **Allocate field emissions and inputs to each harvest.** In chronological order, the emissions and inputs in each harvested field between its previous harvest and the current harvest are assigned to the feed produced by the current harvest.
+4. **Calculate the emission and resource intensity of each feed.** The running total of emissions and inputs allocated to a feed is divided by the running total of DM harvested for that feed to give an intensity (kg per kg harvested DM). This intensity applies from the harvest day until the next harvest of the same feed.
+5. **Scale intensities by the feed fed.** The daily intensity of each feed is multiplied by the DM mass of that feed deducted from farmgrown feed storage to feed the herd on that day.
+6. **Estimate the LCA reference values.** The daily DM mass of each farmgrown feed fed is multiplied by the county-level emission factors from the purchased feed emission factor database.
+
+The data used in these steps are summarized in @tbl-emis-hfe-inputs.
+
+```{python}
+#| label: tbl-emis-hfe-inputs
+#| tbl-cap: Simulation outputs used to estimate homegrown feed emissions and resource use.
+import_table(
+  "../resources/table_data/emissions/tbl-emis-hfe-inputs.csv",
+  colalign = ["left", "left", "left", "left"]
+)
+```
+
+### Field-Level Emissions and Resource Use
+
+The Soil and Crop Module reports N<sub>2</sub>O and NH<sub>3</sub> emissions for each soil layer on a per-hectare, nitrogen-mass basis (kg N ha<sup>-1</sup> d<sup>-1</sup>). For each field $f$ and simulation day $d$, the emissions from all soil layers are summed and multiplied by the field area to give the total daily emission from the field:
+
+:::{#eq-em-hfe-1}
+[[**EM.HFE.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{E}_{x,f,d} = \text{Area}_{f} \times \sum_{l=1}^{L_{f}} \text{e}_{x,f,l,d}
+$$
+:::
+
+* E<sub>x,f,d</sub>: total emission of type x (N<sub>2</sub>O-N or NH<sub>3</sub>-N) from field f on simulation day d (kg N)
+* Area<sub>f</sub>: area of field f (ha)
+* e<sub>x,f,l,d</sub>: emission of type x from soil layer l of field f on simulation day d (kg N/ha)
+* L<sub>f</sub>: number of soil layers in field f
+
+Synthetic fertilizer applications are recorded by the Soil and Crop Module as the total mass of N, P, and K applied to the field (kg) on the day of application. Manure applications are recorded as the total mass of manure N applied (kg). These event values are used directly as daily values for the application day, with a value of zero on days with no application. The six emission and resource variables tracked for each field and day, $\text{X}_{x,f,d}$, are therefore:
+
+* N<sub>2</sub>O-N emissions (kg N<sub>2</sub>O-N)
+* NH<sub>3</sub>-N emissions (kg NH<sub>3</sub>-N)
+* Synthetic fertilizer N applied (kg N)
+* Synthetic fertilizer P applied (kg P)
+* Synthetic fertilizer K applied (kg K)
+* Manure N applied (kg N)
+
+Emissions are only collected for fields that have at least one recorded harvest. Emissions from fields that are never harvested cannot be associated with a farmgrown feed and are not allocated.
+
+### Linking Harvests to Farmgrown Feeds
+
+The Soil and Crop Module records each harvest event with the crop name, field name, harvest type, and DM yield per hectare. The DM mass harvested in each event is:
+
+:::{#eq-em-hfe-2}
+[[**EM.HFE.2**]]{.aside .content-visible when-format="html"}
+$$
+\text{Y}_{f,h} = \text{y}_{f,h} \times \text{Area}_{f}
+$$
+:::
+
+* Y<sub>f,h</sub>: DM mass of crop harvested from field f in harvest h (kg DM)
+* y<sub>f,h</sub>: DM yield of crop harvested from field f in harvest h (kg DM/ha)
+* Area<sub>f</sub>: area of field f (ha)
+
+When a harvested crop is received into feed storage, the Feed Storage Module records the field name, crop name, and RuFaS Feed ID of the stored feed. RuFaS uses these records to build a lookup from each (field, crop) pair to a single Feed ID. The first Feed ID recorded for a pair is used. Each harvest is then assigned the Feed ID of its field and crop. Harvests that are not received into a farmgrown feed storage, such as cover crops that are terminated and not harvested for feed, have no Feed ID.
+
+### Allocating Field Emissions and Resources to Each Harvest
+
+The emissions and resources allocated to a harvest are those that occurred in the harvested field during the *accumulation window* of that harvest. The accumulation window starts on the day after the window-closing harvest that came before it in the same field, and ends on the day of the current harvest (inclusive). For the first harvest in a field, the window starts on the first day of the simulation.
+
+:::{#eq-em-hfe-3}
+[[**EM.HFE.3**]]{.aside .content-visible when-format="html"}
+$$
+\text{A}_{x,f,h} = \sum_{d = t_{f,h-1}+1}^{t_{f,h}} \text{X}_{x,f,d}
+$$
+:::
+
+* A<sub>x,f,h</sub>: emission or resource x allocated to harvest h in field f (kg)
+* X<sub>x,f,d</sub>: emission or resource x of field f on simulation day d (kg), from [EM.HFE.1](#eq-em-hfe-1) or the fertilizer and manure application records
+* t<sub>f,h</sub>: simulation day of harvest h in field f
+* t<sub>f,h-1</sub>: simulation day of the most recent window-closing harvest event in field f before harvest h (equal to -1 for the first harvest in the field, so the window starts on simulation day 0)
+
+How each harvest event affects the accumulation window depends on whether it produces a farmgrown feed and on the harvest type:
+
+* **Harvest with a Feed ID** (`harvest_only` or `harvest_kill`): the emissions and resources in the window are allocated to that feed, and the window for the field is closed. The next window starts the following day. With multiple cuttings of a perennial forage, such as alfalfa hay, each cutting is allocated the emissions and resources since the previous cutting.
+* **Harvest without a Feed ID** (`harvest_only` or `harvest_kill`): no allocation is made, but the window is still closed. The emissions and resources in that period are not allocated to any farmgrown feed.
+* **Kill without harvest** (`kill_only`) **without a Feed ID**: the window is not closed. Emissions and resources from that period, for example a cover crop terminated in place, carry forward and are allocated to the next harvest of a farmgrown feed in the same field.
+
+Harvest events are processed in chronological order across all fields. This keeps the allocation correct when the same feed is harvested from more than one field in different years.
+
+### Emission and Resource Intensity of Farmgrown Feeds
+
+The same farmgrown feed can be harvested several times and from several fields over a simulation. Each time feed $j$ is harvested, the emissions and resources allocated to that harvest ([EM.HFE.3](#eq-em-hfe-3)) and the DM harvested ([EM.HFE.2](#eq-em-hfe-2)) are added to running totals for the feed:
+
+:::{#eq-em-hfe-4}
+[[**EM.HFE.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{T}_{x,j}(t) = \sum_{(f,h) \in H_{j}(t)} \text{A}_{x,f,h}
+$$
+:::
+
+:::{#eq-em-hfe-5}
+[[**EM.HFE.5**]]{.aside .content-visible when-format="html"}
+$$
+\text{Y}_{j}(t) = \sum_{(f,h) \in H_{j}(t)} \text{Y}_{f,h}
+$$
+:::
+
+* T<sub>x,j</sub>(t): cumulative emission or resource x allocated to feed j through simulation day t (kg)
+* Y<sub>j</sub>(t): cumulative DM harvested of feed j through simulation day t (kg DM)
+* H<sub>j</sub>(t): the set of all harvests, in any field, that produced feed j on or before simulation day t
+* A<sub>x,f,h</sub>: emission or resource x allocated to harvest h in field f (kg), from [EM.HFE.3](#eq-em-hfe-3)
+* Y<sub>f,h</sub>: DM mass harvested from field f in harvest h (kg DM), from [EM.HFE.2](#eq-em-hfe-2)
+
+The emission or resource intensity of feed $j$ is the ratio of the running totals. It is updated on each harvest day of feed $j$:
+
+:::{#eq-em-hfe-6}
+[[**EM.HFE.6**]]{.aside .content-visible when-format="html"}
+$$
+\text{I}_{x,j,d} = \frac{\text{T}_{x,j}(t_{j,k})}{\text{Y}_{j}(t_{j,k})}, \quad t_{j,k} \le d \le t_{j,k+1}
+$$
+:::
+
+* I<sub>x,j,d</sub>: intensity of emission or resource x for feed j on simulation day d (kg per kg harvested DM; for example, kg N<sub>2</sub>O-N/kg DM)
+* t<sub>j,k</sub>: simulation day of the k<sup>th</sup> harvest of feed j (in any field)
+* t<sub>j,k+1</sub>: simulation day of the next harvest of feed j, or the last day of the simulation if there are no further harvests of feed j
+
+The intensity is held constant from a harvest of feed $j$ through the day of its next harvest, when it is recalculated with the new harvest included. On days before the first harvest of feed $j$, the intensity is set to zero. When feeds from different harvests and fields share storage, the intensity is a DM-weighted average of all harvests of that feed up to that day. Larger harvests therefore have more influence on the intensity of the feed than smaller ones.
+
+### Emissions and Resource Use of Farmgrown Feed Fed
+
+Each day, the Feed Storage Module records the DM mass of each farmgrown feed deducted from storage to meet the herd's ration. The emissions and resources associated with the farmgrown feed fed on that day are:
+
+:::{#eq-em-hfe-7}
+[[**EM.HFE.7**]]{.aside .content-visible when-format="html"}
+$$
+\text{HomegrownFeed}_{x,j,d} = \text{I}_{x,j,d} \times \text{DM_Fed}_{j,d}
+$$
+:::
+
+* HomegrownFeed<sub>x,j,d</sub>: emission or resource x associated with the farmgrown feed j fed on simulation day d (kg)
+* I<sub>x,j,d</sub>: intensity of emission or resource x for feed j on simulation day d (kg/kg DM), from [EM.HFE.6](#eq-em-hfe-6)
+* DM_Fed<sub>j,d</sub>: DM mass of farmgrown feed j deducted from storage and fed to the herd on simulation day d (kg DM)
+
+Only farmgrown feeds that have both a harvest record and a feed deduction record get these values. On days when no feed $j$ is fed, all values for feed $j$ are zero.
+
+### LCA Reference Estimates for Farmgrown Feeds
+
+To give a point of comparison for the process-based estimates above, RuFaS also estimates the carbon footprint and land use change emissions of each farmgrown feed fed. These estimates use the same county-level emission factor database and method as the Purchased Feed Emissions ([EM.PFE.1](#eq-em-pfe-1)), applied to the daily DM mass of farmgrown feed fed:
+
+:::{#eq-em-hfe-8}
+[[**EM.HFE.8**]]{.aside .content-visible when-format="html"}
+$$
+\text{LCA}_{j,d} = \text{EF}_{j} \times \text{DM_Fed}_{j,d}
+$$
+:::
+
+:::{#eq-em-hfe-9}
+[[**EM.HFE.9**]]{.aside .content-visible when-format="html"}
+$$
+\text{LUC}_{j,d} = \text{EF}^{\text{LUC}}_{j} \times \text{DM_Fed}_{j,d}
+$$
+:::
+
+* LCA<sub>j,d</sub>: LCA-based carbon footprint of farmgrown feed j fed on simulation day d (kg CO<sub>2</sub>-eq)
+* LUC<sub>j,d</sub>: LCA-based land use change emissions of farmgrown feed j fed on simulation day d (kg CO<sub>2</sub>-eq)
+* EF<sub>j</sub>: total emission factor for feed j in the simulation's FIPS county (kg CO<sub>2</sub>-eq/kg DM)
+* EF<sup>LUC</sup><sub>j</sub>: land use change emission factor for feed j in the simulation's FIPS county (kg CO<sub>2</sub>-eq/kg DM)
+* DM_Fed<sub>j,d</sub>: DM mass of farmgrown feed j fed on simulation day d (kg DM)
+
+Feeds with no emission factor in the database are omitted from these estimates. The LCA estimates are not added to the process-based estimates. They are reported separately, as an independent reference for the same feed.
+
+### Reported Outputs
+
+@tbl-emis-hfe-outputs lists the daily outputs reported for each farmgrown feed. In each variable name, `[ID]` is the RuFaS Feed ID. The per-kg DM intensities ([EM.HFE.6](#eq-em-hfe-6)) and the totals for the feed fed ([EM.HFE.7](#eq-em-hfe-7)) have the same variable names. They are told apart by the reporting function recorded with each variable in the output: `_report_daily_farmgrown_feed_emissions_and_resource_intensity` for the intensities and `_report_daily_farmgrown_feed_fed_emissions_and_resources` for the totals.
+
+```{python}
+#| label: tbl-emis-hfe-outputs
+#| tbl-cap: Daily homegrown feed emissions and resource use outputs reported for each farmgrown feed.
+import_table(
+  "../resources/table_data/emissions/tbl-emis-hfe-outputs.csv",
+  colalign = ["left", "left", "left"]
+)
+```
+
+### Illustrative Example
+
+Consider corn silage (one Feed ID) grown in two fields:
+
+* Field 1 (40 ha) is harvested on simulation day 250 and yields 600,000 kg DM. Over its accumulation window (days 0–250), the field emits 120 kg N<sub>2</sub>O-N and receives 6,000 kg of synthetic fertilizer N.
+* Field 2 (20 ha) is harvested on day 260 and yields 280,000 kg DM. Over days 0–260, it emits 70 kg N<sub>2</sub>O-N and receives 3,600 kg of fertilizer N.
+
+From day 250 to day 260, the corn silage N<sub>2</sub>O intensity is 120 / 600,000 = 2.0 × 10<sup>-4</sup> kg N<sub>2</sub>O-N/kg DM. On day 260, the Field 2 harvest is added, and the intensity becomes (120 + 70) / (600,000 + 280,000) = 2.16 × 10<sup>-4</sup> kg N<sub>2</sub>O-N/kg DM. This value applies until the next corn silage harvest. If the herd is fed 1,500 kg DM of corn silage on day 300, the N<sub>2</sub>O allocated to that feed is 2.16 × 10<sup>-4</sup> × 1,500 = 0.32 kg N<sub>2</sub>O-N. The fertilizer N allocated is (6,000 + 3,600) / 880,000 × 1,500 = 16.4 kg N.
+
+### Assumptions and Limitations
+
+* **Running average over the simulation.** The totals in [EM.HFE.4](#eq-em-hfe-4) and [EM.HFE.5](#eq-em-hfe-5) build up from the start of the simulation and are not reset. The intensity of a feed is therefore the average across all harvests to date, rather than the intensity of the specific harvest currently in storage. The original design proposed resetting storage-level totals when a storage unit was emptied. This approach is not implemented, because RuFaS does not yet represent crop rotations explicitly.
+* **Timing of intensity updates.** A new harvest updates the feed intensity on the harvest day, even though feed from earlier harvests may still be in storage and being fed.
+* **Length of the accumulation window.** The window covers the whole period since the previous window-closing harvest in the field, with no maximum length. A 365-day cap was considered during design but is not applied.
+* **Unallocated emissions.** Emissions and resources are not allocated in three cases: (a) in fields never harvested, (b) after the last harvest in a field, and (c) in windows closed by a harvest with no Feed ID.
+* **Nitrogen basis.** N<sub>2</sub>O and NH<sub>3</sub> emissions are reported as N mass (kg N<sub>2</sub>O-N and kg NH<sub>3</sub>-N). They are not converted to CO<sub>2</sub>-eq in this method.
+* **Upstream emissions.** Fertilizer and manure applications are reported as resources used. The upstream emissions from fertilizer manufacture and from fuel used in field operations are not included in these values.
+* **One feed per field and crop.** Each (field, crop) pair is assumed to map to a single Feed ID. Simultaneous multiple crops in a field are not split between feeds.
+* **Initial inventory.** Farmgrown feed fed before the first simulated harvest of that feed (for example, from initial storage inventory) gets zero intensity, so no emissions or resources are allocated to it.
+
+### Previous Method
+
+Earlier versions of RuFaS reported homegrown feed emissions for the last 365 days of the simulation only. The emissions and resource use of each field over that year were summed and divided among the crops grown in the field according to the share of the year each crop occupied the field. For example, a crop planted on Julian day 100 and harvested on Julian day 300 got 200/365 = 0.55 of the field's annual total. The current method replaces this approach. It ties emissions and resource use to individual harvests and reports them daily in proportion to the feed actually fed, for any simulation length.
 
 
 ## References
