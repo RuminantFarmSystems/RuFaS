@@ -104,6 +104,7 @@ class OutputManager:
         message: str,
         info_map: dict[str, Any],
     ) -> None:
+        """Logs an informational message using the RuFaS logger."""
         log(
             logger=self._logger,
             level=logging.INFO,
@@ -118,6 +119,7 @@ class OutputManager:
         message: str,
         info_map: dict[str, Any],
     ) -> None:
+        """Logs a warning message using the RuFaS logger."""
         log(
             logger=self._logger,
             level=logging.WARNING,
@@ -132,6 +134,7 @@ class OutputManager:
         message: str,
         info_map: dict[str, Any],
     ) -> None:
+        """Logs an error message using the RuFaS logger."""
         log(
             logger=self._logger,
             level=logging.ERROR,

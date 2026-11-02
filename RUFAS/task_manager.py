@@ -194,10 +194,10 @@ class TaskManager:
 
         logger = logging.getLogger("RUFAS.task_manager")
 
-        logger.info("Testing informational message.")
-        logger.warning("Testing warning message.")
-        logger.error("Testing error message.")
-        logger.critical("CRITICAL!!!!!")
+        logger.info("Testing informational message.", extra={"rufas_log_name": "First Logging Test Data"},)
+        logger.warning("Testing warning message.", extra={"rufas_log_name": "First Logging Test Warning"},)
+        logger.error("Testing error message.", extra={"rufas_log_name": "First Logging Test Error"},)
+        logger.critical("CRITICAL!!!!!", extra={"rufas_log_name": "First Logging Test CRITICALLLLLL"},)
         # TODO remove everything to previous TODO before merging in
 
         is_data_valid = self.input_manager.start_data_processing(
