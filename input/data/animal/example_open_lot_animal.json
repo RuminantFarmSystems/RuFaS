@@ -23,14 +23,14 @@
     "simulate_genetics": false
   },
   "genetics": {
-    "tbv_fat_std": 25.8,
-    "tbv_protein_std": 13.4,
+    "tbv_fat_variance": 25.8,
+    "tbv_protein_variance": 13.4,
     "tbv_correlation": 0.59,
-    "permanent_environment_fat_std": 38.8,
-    "permanent_environment_protein_std": 20.1,
+    "permanent_environment_fat_variance": 38.8,
+    "permanent_environment_protein_variance": 20.1,
     "permanent_environment_correlation": 0.95,
-    "temporary_environment_fat_std": 64.5,
-    "temporary_environment_protein_std": 33.4,
+    "temporary_environment_fat_variance": 64.5,
+    "temporary_environment_protein_variance": 33.4,
     "temporary_environment_correlation": 0.78
   },
   "herd_initialization": {
@@ -42,7 +42,6 @@
       "breeding_start_day_h": 380,
       "heifer_repro_method": "ED",
       "cow_repro_method": "ED-TAI",
-      "semen_type": "conventional",
       "days_in_preg_when_dry": 218,
       "heifer_repro_cull_time": 500,
       "calf_mortality_rate": 0.0,
@@ -52,14 +51,13 @@
       "cull_eligibility_maximum_days_carried_calf": 180,
       "cull_ranking_criteria": "milk",
       "cow_times_milked_per_day": 3,
-	    "milk_fat_percent": 4,
-	    "milk_protein_percent": 3.2
+      "milk_fat_percent": 4,
+      "milk_protein_percent": 3.2
     },
     "farm_level": {
       "calf": {
-        "male_calf_rate_sexed_semen": 0.1,
-        "male_calf_rate_conventional_semen": 0.53,
-        "keep_female_calf_rate": 1,
+        "user_defined_male_calf_rate": 0.53,
+        "keep_dairy_female_rate": 1,
         "calf_retention_method": "rate",
         "annual_keep_female_calf_num": 0,
         "wean_day": 60,
@@ -75,14 +73,25 @@
         "std_gestation_len": 6,
         "prefresh_day": 21,
         "calving_interval": 400,
+        "selective_repro_strategy": false,
+        "ranking_method": null,
+        "genetic_selection_index_weights": {
+			"fat": 0.318,
+			"protein": 0.13
+		},
         "heifers": {
             "estrus_detection_rate": 0.9,
             "estrus_conception_rate": 0.6,
-            "repro_sub_protocol": "N/A",
+            "repro_sub_protocol": null,
             "repro_sub_properties": {
                 "conception_rate": 0.6,
                 "estrus_detection_rate": 0.9
-            }
+            },
+            "semen_allocation_proportions": {
+				"sexed_dairy": 0.5,
+				"conventional_dairy": 0.5,
+				"beef": 0.0
+			}
         },
         "cows": {
             "estrus_detection_rate": 0.6,
@@ -92,7 +101,12 @@
             "ovsynch_program": "OvSynch 56",
             "ovsynch_program_start_day": 64,
             "ovsynch_program_conception_rate": 0.6,
-            "resynch_program": "TAIafterPD"
+            "resynch_program": "TAIafterPD",
+            "semen_allocation_proportions": {
+				"sexed_dairy": 0.2,
+				"conventional_dairy": 0.5,
+				"beef": 0.3
+			}
         }
 			},
 			"bodyweight": {

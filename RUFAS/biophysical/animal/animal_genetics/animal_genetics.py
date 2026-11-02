@@ -7,8 +7,8 @@ from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.util import Utility
 
-FAT_ACCURACY_BY_PARITY = {0: 0.75, 1: 0.80, 2: 0.85, 3: 0.90}
-PROTEIN_ACCURACY_BY_PARITY = {0: 0.75, 1: 0.80, 2: 0.85, 3: 0.90}
+FAT_RELIABILITY_BY_PARITY = {0: 0.75, 1: 0.80, 2: 0.85, 3: 0.90}
+PROTEIN_RELIABILITY_BY_PARITY = {0: 0.75, 1: 0.80, 2: 0.85, 3: 0.90}
 
 UNITS = {
     "TBV_fat": MeasurementUnits.KILOGRAMS,
@@ -29,9 +29,9 @@ class Genetics:
     """
     Genetic attributes of an animal.
 
-    The standard deviations and correlations of the true breeding value, permanent environmental effect, and
-    temporary environmental effect distributions are read from ``AnimalConfig``, where they are user inputs in
-    the ``genetics`` section of the animal input that default to the CDCB national averages.
+    The variances and correlations of the true breeding value, permanent environmental effect, and temporary
+    environmental effect distributions are read from ``AnimalConfig``, where they are user inputs in the
+    ``genetics`` section of the animal input that default to the CDCB national averages.
 
     Attributes
     ----------
@@ -154,7 +154,11 @@ class Genetics:
     def _calculate_tbv_values(self) -> tuple[float, float]:
         """Calculate TBV values for an animal entering the herd using the herd-level TBV distribution."""
         tbv_fat, tbv_protein = Utility.generate_bivariate_random_numbers(
-            0.0, 0.0, AnimalConfig.tbv_fat_std, AnimalConfig.tbv_protein_std, AnimalConfig.tbv_correlation
+            0.0,
+            0.0,
+            np.sqrt(AnimalConfig.tbv_fat_variance),
+            np.sqrt(AnimalConfig.tbv_protein_variance),
+            AnimalConfig.tbv_correlation,
         )
         return tbv_fat, tbv_protein
 
@@ -203,8 +207,8 @@ class Genetics:
         mean_tbv_fat = (tbv_fat_top_semen + dam_tbv_fat) / 2
         mean_tbv_protein = (tbv_protein_top_semen + dam_tbv_protein) / 2
 
-        std_tbv_fat = np.sqrt(AnimalConfig.tbv_fat_std**2 / 2)
-        std_tbv_protein = np.sqrt(AnimalConfig.tbv_protein_std**2 / 2)
+        std_tbv_fat = np.sqrt(AnimalConfig.tbv_fat_variance / 2)
+        std_tbv_protein = np.sqrt(AnimalConfig.tbv_protein_variance / 2)
 
         tbv_fat, tbv_protein = Utility.generate_bivariate_random_numbers(
             mean_tbv_fat, mean_tbv_protein, std_tbv_fat, std_tbv_protein, AnimalConfig.tbv_correlation
@@ -217,8 +221,8 @@ class Genetics:
         ep_fat, ep_protein = Utility.generate_bivariate_random_numbers(
             0.0,
             0.0,
-            AnimalConfig.permanent_environment_fat_std,
-            AnimalConfig.permanent_environment_protein_std,
+            np.sqrt(AnimalConfig.permanent_environment_fat_variance),
+            np.sqrt(AnimalConfig.permanent_environment_protein_variance),
             AnimalConfig.permanent_environment_correlation,
         )
         return ep_fat, ep_protein
@@ -228,8 +232,8 @@ class Genetics:
         et_fat, et_protein = Utility.generate_bivariate_random_numbers(
             0.0,
             0.0,
-            AnimalConfig.temporary_environment_fat_std,
-            AnimalConfig.temporary_environment_protein_std,
+            np.sqrt(AnimalConfig.temporary_environment_fat_variance),
+            np.sqrt(AnimalConfig.temporary_environment_protein_variance),
             AnimalConfig.temporary_environment_correlation,
         )
         return et_fat, et_protein
@@ -288,21 +292,21 @@ class Genetics:
         Calculates estimated breeding values (EBV) for fat and protein.
 
         Mean EBV for each trait is derived from the group mean TBV and the animal's
-        own TBV, weighted by the squared accuracy for the given parity. Gaussian
+        own TBV, weighted by the reliability for the given parity. Gaussian
         noise scaled by the EBV standard deviation is added to reflect estimation
         uncertainty.
 
         Parameters
         ----------
         animal_type : AnimalType
-            Type of the animal, used to determine whether parity-based accuracy
+            Type of the animal, used to determine whether parity-based reliability
             lookup applies.
         group_specific_TBV_fat_mean : float
             Mean true breeding value for fat across the animal's group.
         group_specific_TBV_protein_mean : float
             Mean true breeding value for protein across the animal's group.
         parity : int or None
-            Parity of the animal. Used to select accuracy values for cows.
+            Parity of the animal. Used to select reliability values for cows.
             Ignored for non-cow animal types.
 
         Returns
@@ -313,15 +317,16 @@ class Genetics:
 
         """
         parity_index = min(parity, 3) if animal_type.is_cow and parity is not None else 0
-        fat_accuracy, protein_accuracy = FAT_ACCURACY_BY_PARITY[parity_index], PROTEIN_ACCURACY_BY_PARITY[parity_index]
+        fat_reliability = FAT_RELIABILITY_BY_PARITY[parity_index]
+        protein_reliability = PROTEIN_RELIABILITY_BY_PARITY[parity_index]
 
-        mean_ebv_fat = group_specific_TBV_fat_mean + (self.TBV_fat - group_specific_TBV_fat_mean) * (fat_accuracy**2)
-        mean_ebv_protein = group_specific_TBV_protein_mean + (self.TBV_protein - group_specific_TBV_protein_mean) * (
-            protein_accuracy**2
+        mean_ebv_fat = group_specific_TBV_fat_mean + (self.TBV_fat - group_specific_TBV_fat_mean) * fat_reliability
+        mean_ebv_protein = (
+            group_specific_TBV_protein_mean + (self.TBV_protein - group_specific_TBV_protein_mean) * protein_reliability
         )
 
-        std_ebv_fat = np.sqrt((1 - fat_accuracy**2) * (fat_accuracy**2) * AnimalConfig.tbv_fat_std)
-        std_ebv_protein = np.sqrt((1 - protein_accuracy**2) * (protein_accuracy**2) * AnimalConfig.tbv_protein_std)
+        std_ebv_fat = np.sqrt((1 - fat_reliability) * fat_reliability * AnimalConfig.tbv_fat_variance)
+        std_ebv_protein = np.sqrt((1 - protein_reliability) * protein_reliability * AnimalConfig.tbv_protein_variance)
 
         noise_ebv_fat = np.random.normal(0.0, std_ebv_fat)
         noise_ebv_protein = np.random.normal(0.0, std_ebv_protein)
@@ -332,6 +337,9 @@ class Genetics:
 
     def _calculate_ranking_index(self) -> float:
         """Calculate ranking index."""
+        user_defined_weights: dict[str, float] = AnimalConfig.genetic_selection_index_weights
+        if user_defined_weights and user_defined_weights["fat"] >= 0 and user_defined_weights["protein"] >= 0:
+            return user_defined_weights["fat"] * self.EBV_fat + user_defined_weights["protein"] * self.EBV_protein
         return 0.318 * self.EBV_fat + 0.13 * self.EBV_protein
 
     @staticmethod
