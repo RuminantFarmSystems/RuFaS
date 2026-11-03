@@ -18,9 +18,9 @@ HOW TO USE
 IMPORTANT:  calf_retention_method must be "count" for the calculated
    annual_keep_female_calf_num to be used.
 
-To save a reference report, specify the location:
-    python herd_inputs_calculator.py --output "C:/Users/you/Documents/herd_results.json"
+To save a reference report, specify the location: --output "C:/Users/you/Documents/herd_results.json"
 You can also supply an existing folder to --output; the default filename is used.
+Note that this is a report of the calculated outputs and values to enter into the animal JSON; it is not a pre-filled copy of the animal_inputs.JSON file itself. 
 
 
 Counts and milk yield are rounded to integers; fractions to whole percentages.
@@ -59,11 +59,11 @@ REPLACEMENT_CALF_BUFFER_FRACTION = (
     0.10  # percent extra retained replacements (dairy female calves) above estimated need
 )
 MALE_CALF_RATE_BUFFER_FRACTION = (
-    0.75  # percent extra male calf rate above estimated need; does NOT change count of number of calves to retain
+    0.10  # percent extra male calf rate above estimated need; does NOT change count of number of calves to retain
 )
 # Both are assumptions, not direct RuFaS animal JSON fields.
 
-# Relative shares of the L3+ portion of the herd (automatically normalized).
+# Relative shares of the L3+ portion of the herd (percent of animal in L3+ who belong to L3, L4, and L5+. These values should sum to 1.0.)
 L3_SHARE_OF_L3_PLUS = 0.40
 L4_SHARE_OF_L3_PLUS = 0.40
 L5_PLUS_SHARE_OF_L3_PLUS = 0.20
