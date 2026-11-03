@@ -1,5 +1,4 @@
 from math import exp
-from typing import Optional
 
 from RUFAS.biophysical.field.crop.crop_data import CropData
 
@@ -11,16 +10,16 @@ class BiomassAllocation:
 
     Parameters
     ----------
-    crop_data : Optional[CropData]
+    crop_data : CropData, optional
         The data object used for biomass calculation. Stores information
         about the plant's growth and environmental factors.
     light_extinction : float, default 0.65
         Light extinction coefficient (unitless).
-    usable_light : Optional[float], default None
+    usable_light : float, optional
         Solar radiation captured for photosynthesis (MJ/m^2).
-    biomass_growth : Optional[float], default None
+    biomass_growth : float, optional
         Biomass accumulated during the day (kg/ha).
-    previous_biomass : Optional[float], default None
+    previous_biomass : float, optional
         Biomass accumulated on the previous day (kg/ha).
 
     Attributes
@@ -30,11 +29,11 @@ class BiomassAllocation:
         about the plant's growth and environmental factors.
     light_extinction : float
         Light extinction coefficient (unitless).
-    usable_light : Optional[float]
+    usable_light : float | None
         Solar radiation captured for photosynthesis (MJ/m^2).
-    biomass_growth : Optional[float]
+    biomass_growth : float | None
         Biomass accumulated during the day (kg/ha).
-    previous_biomass : Optional[float]
+    previous_biomass : float | None
         Biomass accumulated on the previous day (kg/ha).
 
     Methods
@@ -59,11 +58,11 @@ class BiomassAllocation:
 
     def __init__(
         self,
-        crop_data: Optional[CropData] = None,
+        crop_data: CropData | None = None,
         light_extinction: float = 0.65,
-        usable_light: Optional[float] = None,
-        biomass_growth: Optional[float] = None,
-        previous_biomass: Optional[float] = None,
+        usable_light: float | None = None,
+        biomass_growth: float | None = None,
+        previous_biomass: float | None = None,
     ) -> None:
         self.data = crop_data or CropData()
         self.light_extinction = light_extinction
@@ -80,9 +79,6 @@ class BiomassAllocation:
         light : float
             light radiation energy (MJ/m).
 
-        Returns
-        -------
-        None
         """
         self.photosynthesize(light)
         self.partition_biomass()
@@ -95,11 +91,10 @@ class BiomassAllocation:
         ----------
         light : float
             light radiation energy (MJ/m).
+
         """
 
-        # intercept light
         self.usable_light = self._intercept_radiation(light, self.light_extinction, self.data.leaf_area_index)
-        # accumulate biomass
         self.data.biomass_growth_max = self._determine_max_accumulation(
             self.usable_light, self.data.light_use_efficiency
         )
@@ -110,10 +105,6 @@ class BiomassAllocation:
     def partition_biomass(self) -> None:
         """
         Partition the accumulated biomass into above ground and below ground portions.
-
-        Returns
-        -------
-        None
         """
         self.data.above_ground_biomass = self._determine_above_ground_biomass(
             self.data.root_fraction, self.data.biomass
@@ -138,6 +129,7 @@ class BiomassAllocation:
         -------
         float
             Intercepted radiation energy (MJ/m^2).
+
         """
         intercepted_radiation = 0.5 * radiation * (1 - exp(-1 * extinction * lai))
         return intercepted_radiation
@@ -158,6 +150,7 @@ class BiomassAllocation:
         -------
         float
             The maximum biomass that can be accumulated in a day (kg/ha).
+
         """
         return energy * efficiency
 
@@ -177,6 +170,7 @@ class BiomassAllocation:
         -------
         float
             Biomass accumulated in a day (kg/ha).
+
         """
         growth = max_growth * growth_factor
         return growth
@@ -201,6 +195,7 @@ class BiomassAllocation:
         References
         ----------
         SWAT 5:2.4.4
+
         """
         return (1 - root_frac) * biomass
 
@@ -220,5 +215,6 @@ class BiomassAllocation:
         -------
         float
             Below ground biomass (kg/ha).
+
         """
         return root_frac * biomass

@@ -1,5 +1,4 @@
 from math import exp, log
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
@@ -45,7 +44,7 @@ class LeachingRunoffErosion:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def leach_runoff_and_erode_nitrogen(self, field_size: float) -> None:
@@ -54,7 +53,7 @@ class LeachingRunoffErosion:
         Parameters
         ----------
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Notes
         -----
@@ -161,9 +160,9 @@ class LeachingRunoffErosion:
         -----
         This method determines how much nitrogen will be leached out of each layer without being influenced at all by
         the amount of nitrogen leaching into that layer. It achieves this by calculating the amounts leached out of each
-        layer, storing those amounts in a dictionary, appending that dictionary to a list (`percolated_nitrogen`), then
-        iterating through the soil profile a second time and adding the leached nitrogen into the appropriate layer. The
-        bottom soil layer leaches into the vadose zone.
+        layer, storing those amounts in a dictionary, appending that dictionary to a list (``percolated_nitrogen``),
+        then iterating through the soil profile a second time and adding the leached nitrogen into the appropriate
+        layer. The bottom soil layer leaches into the vadose zone.
 
         """
         percolated_nitrogen = []

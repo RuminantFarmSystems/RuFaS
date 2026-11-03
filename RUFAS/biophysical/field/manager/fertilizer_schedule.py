@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import Any
 
 from RUFAS.data_structures.events import FertilizerEvent
 from RUFAS.biophysical.field.manager.schedule import Schedule
@@ -17,43 +17,43 @@ class FertilizerSchedule(Schedule):
         The name of the fertilizer application schedule.
     mix_names : List[str]
         The names of the specific fertilizer mixes included in the schedule.
-    years : List[int]
+    years : list[int]
         The years in which the fertilizer will be applied.
-    days : List[int]
+    days : list[int]
         The Julian days on which the fertilizer will be applied within the specified years.
-    nitrogen_masses : List[float]
+    nitrogen_masses : list[float]
         The minimum masses of nitrogen to be applied in each fertilizer application (kg).
-    phosphorus_masses : List[float]
+    phosphorus_masses : list[float]
         The minimum masses of phosphorus to be applied in each fertilizer application (kg).
-    potassium_masses : List[float]
+    potassium_masses : list[float]
         The minimum masses of potassium to be applied in each fertilizer application (kg).
-    application_depths : List[float], optional, default None
+    application_depths : list[float], optional
         The depths at which the fertilizer is to be injected into the soil for each application (mm).
-    surface_remainder_fractions : List[float], optional, default None
+    surface_remainder_fractions : list[float], optional
         The fractions of each fertilizer application that remain on the soil surface (unitless).
-    pattern_skip : int, optional, default 0.0
+    pattern_skip : int, default 0.0
         The number of years to skip between repetitions of the fertilizer application pattern.
-    pattern_repeat : int, optional, default 0.0
+    pattern_repeat : int, default 0.0
         The number of times the specified fertilizer application pattern should be repeated.
 
     Attributes
     ----------
-    mix_names : List[str]
+    mix_names : list[str]
         Elongated list of mix names to match the length of the years list, ensuring a mix name for each application
         year.
-    nitrogen_masses : List[float]
+    nitrogen_masses : list[float]
         Elongated list of nitrogen masses to match the length of the years list, ensuring a nitrogen mass for each
         application year.
-    phosphorus_masses : List[float]
+    phosphorus_masses : list[float]
         Elongated list of phosphorus masses to match the length of the years list, ensuring a phosphorus mass for each
         application year.
-    potassium_masses : List[float]
+    potassium_masses : list[float]
         Elongated list of potassium masses to match the length of the years list, ensuring a potassium mass for each
         application year.
-    application_depths : List[float]
+    application_depths : list[float]
         Elongated list or default value [0.0] for application depths, ensuring an application depth for each application
         year.
-    surface_remainder_fractions : List[float]
+    surface_remainder_fractions : list[float]
         Elongated list or default value [1.0] for surface remainder fractions, ensuring a fraction for each application
         year.
 
@@ -67,14 +67,14 @@ class FertilizerSchedule(Schedule):
     def __init__(
         self,
         name: str,
-        mix_names: List[str],
-        years: List[int],
-        days: List[int],
-        nitrogen_masses: List[float],
-        phosphorus_masses: List[float],
-        potassium_masses: List[float],
-        application_depths: List[float] | None = None,
-        surface_remainder_fractions: List[float] | None = None,
+        mix_names: list[str],
+        years: list[int],
+        days: list[int],
+        nitrogen_masses: list[float],
+        phosphorus_masses: list[float],
+        potassium_masses: list[float],
+        application_depths: list[float] | None = None,
+        surface_remainder_fractions: list[float] | None = None,
         pattern_skip: int = 0,
         pattern_repeat: int = 0,
     ):
@@ -98,18 +98,6 @@ class FertilizerSchedule(Schedule):
     def _validate_fertilizer_parameters(self) -> None:
         """
         Checks that all fields defining a fertilizer application schedule are valid, raises errors if not.
-
-        Raises
-        ------
-        ValueError
-            If not all fertilizer application years are valid.
-            If not all fertilizer application days are valid.
-            If not all fertilizer nitrogen masses are valid.
-            If not all fertilizer phosphorus masses are valid.
-            If not all fertilizer potassium masses are valid.
-            If not all fertilizer application depths are valid.
-            If not all fertilizer surface retention fractions are valid.
-            If not all fertilizer application parameters have the same length.
 
         """
         error_header = f"'{self.name}': "
@@ -137,13 +125,13 @@ class FertilizerSchedule(Schedule):
             surface_remainder_fractions=self.surface_remainder_fractions,
         )
 
-    def generate_fertilizer_events(self) -> List[FertilizerEvent]:
+    def generate_fertilizer_events(self) -> list[FertilizerEvent]:
         """
         Creates a list of all fertilizer application events that will occur as dictated by this fertilizer schedule.
 
         Returns
         -------
-        List[FertilizerEvent]
+        list[FertilizerEvent]
             List of all fertilizer events that occur over the course of this fertilizer schedule.
 
         """

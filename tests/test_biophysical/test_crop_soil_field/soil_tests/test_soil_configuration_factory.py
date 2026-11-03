@@ -3,6 +3,7 @@ from math import inf
 from typing import Dict
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_config_factory import SoilConfigFactory, SoilConfiguration
@@ -28,7 +29,7 @@ def test_soil_config_enum(config: str, expected: SoilConfiguration) -> None:
         "indoor floor",
     ],
 )
-def test_invalid_soil_config_enum(invalid_config: str) -> None:
+def test_invalid_soil_config_enum(invalid_config: str, mocker: MockerFixture) -> None:
     """Tests that SoilConfiguration raises an error correctly when an invalid configuration name is passed"""
     with pytest.raises(ValueError) as e:
         SoilConfiguration(invalid_config)

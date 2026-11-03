@@ -87,9 +87,6 @@ class RationConfig:
         Actual dietary total digestible nutrient for each feed (kg)
     dCa_list : list
         Calcium digesibility of feed (proportion of Ca)
-    Methods
-    -------
-    None.
 
     """
 
@@ -191,9 +188,6 @@ class RationConfig:
         DMIest__requirement : float, default []
             Dry matter intake estimation (kg).
 
-        Returns
-        -------
-        None
         """
 
         self.price_list = price__list

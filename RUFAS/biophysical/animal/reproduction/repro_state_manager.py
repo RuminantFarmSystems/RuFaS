@@ -1,15 +1,10 @@
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import ReproStateEnum
+from RUFAS.output_manager import OutputManager
 
 
 class ReproStateManager:
     """
     A class that manages the reproductive states of an animal.
-
-    Notes
-    -----
-    This class provides methods to enter and exit reproductive states and check if a specific state is active.
-    It is designed to handle cases where typically only one state is active, but it works the same
-    if multiple active states coexist.
 
     Parameters
     ----------
@@ -35,16 +30,18 @@ class ReproStateManager:
         Clear all current states and revert the state manager to having only the NONE state.
     is_in_empty_state() -> bool
         Check if the current state is in the empty state (NONE).
+
+    Notes
+    -----
+    This class provides methods to enter and exit reproductive states and check if a specific state is active.
+    It is designed to handle cases where typically only one state is active, but it works the same
+    if multiple active states coexist.
+
     """
 
     def __init__(self, initial_states: set[ReproStateEnum] | None = None) -> None:
         """
         Initialize the ReproStateManager with the given initial states.
-
-        Parameters
-        ----------
-        initial_states : set[ReproStateEnum] | None, optional
-            A set of initial reproductive states to start with. If None, initializes with {ReproStateEnum.NONE}.
         """
 
         self._states: set[ReproStateEnum] = initial_states if initial_states is not None else {ReproStateEnum.NONE}
@@ -52,11 +49,6 @@ class ReproStateManager:
     def enter(self, state: ReproStateEnum, keep_existing: bool = False) -> None:
         """
         Enter a reproductive state.
-
-        Notes
-        -----
-        If `keep_existing` is False or the only current state is NONE, clears existing states before adding the new one.
-        If entering NONE, it clears all other states.
 
         Parameters
         ----------
@@ -69,6 +61,12 @@ class ReproStateManager:
         ------
         ValueError
             If attempting to re-enter the same state that is already active.
+
+        Notes
+        -----
+        If `keep_existing` is False or the only current state is NONE, clears existing states before adding the new one.
+        If entering NONE, it clears all other states.
+
         """
 
         if state is ReproStateEnum.NONE:
@@ -78,16 +76,17 @@ class ReproStateManager:
         if not keep_existing or self._states == {ReproStateEnum.NONE}:
             self._states.clear()
         if state in self._states:
+            OutputManager().add_error(
+                "ReproStateManager Error",
+                f"Attempting to re-enter the same state: {state} during entering process.",
+                info_map={"class": self.__class__.__name__, "function": self.enter.__name__},
+            )
             raise ValueError(f"Attempting to re-enter the same state: {state}")
         self._states.add(state)
 
     def exit(self, state: ReproStateEnum) -> None:
         """
         Exit a reproductive state.
-
-        Notes
-        -----
-        If the state to exit is NONE or the only current state is NONE, it performs no action.
 
         Parameters
         ----------
@@ -98,11 +97,21 @@ class ReproStateManager:
         ------
         ValueError
             If attempting to exit a state that is not currently active.
+
+        Notes
+        -----
+        If the state to exit is NONE or the only current state is NONE, it performs no action.
+
         """
 
         if state is ReproStateEnum.NONE or self._states == {ReproStateEnum.NONE}:
             return
         if state not in self._states:
+            OutputManager().add_error(
+                "ReproStateManager Error",
+                f"Attempting to exit a state that is not entered: {state}.",
+                info_map={"class": self.__class__.__name__, "function": self.exit.__name__},
+            )
             raise ValueError(f"Attempting to exit a state that is not entered: {state}")
         self._states.remove(state)
         if not self._states:
@@ -121,6 +130,7 @@ class ReproStateManager:
         -------
         bool
             True if the specified state is active, False otherwise.
+
         """
 
         return state in self._states
@@ -138,6 +148,7 @@ class ReproStateManager:
         -------
         bool
             True if any of the specified states are active, False otherwise.
+
         """
 
         return bool(self._states & states)
@@ -157,6 +168,7 @@ class ReproStateManager:
         -------
         bool
             True if the current state is NONE, False otherwise.
+
         """
 
         return self._states == {ReproStateEnum.NONE}
@@ -169,6 +181,7 @@ class ReproStateManager:
         -------
         str
             A string representation of the current reproductive states.
+
         """
 
         return ", ".join([state.value for state in self._states])

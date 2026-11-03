@@ -1,5 +1,4 @@
 from math import exp, log
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -20,7 +19,7 @@ class SoilTemp:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_soil_temperature_update(
@@ -41,17 +40,17 @@ class SoilTemp:
         solar_radiation : float
             Solar radiation reaching the ground on the current day (MJ per square meter per day).
         avg_temp : float
-            Average temperature of the current day (degrees C).
+            Average temperature of the current day (Celsius).
         min_temp : float
-            Minimum temperature of the current day (degrees C).
+            Minimum temperature of the current day (Celsius).
         max_temp : float
-            Maximum temperature of the current day (degrees C).
+            Maximum temperature of the current day (Celsius).
         plant_cover : float
-            Total aboveground plant biomass and residue on the current day (kg per hectare).
+            Total above ground plant biomass and residue on the current day (kg per hectare).
         snow_cover : float
             Water content of the snow cover on the current day (mm).
         avg_annual_air_temp : float
-            Average annual air temperature (degrees C).
+            Average annual air temperature (Celsius).
 
         Notes
         -----
@@ -296,14 +295,14 @@ class SoilTemp:
         cover_weighting_factor : float
             Weighting factor for soil cover impacts (unitless).
         previous_top_soil_layer_temp : float
-            Temperature of the first layer of soil on the previous day (degrees C).
+            Temperature of the first layer of soil on the previous day (Celsius).
         bare_soil_surface_temp : float
-            Temperature of the bare soil surface (degrees C).
+            Temperature of the bare soil surface (Celsius).
 
         Returns
         -------
         float
-            Soil surface temperature for the current day (degrees C).
+            Soil surface temperature for the current day (Celsius).
 
         References
         ----------
@@ -332,18 +331,18 @@ class SoilTemp:
             Coefficient that controls the influence of the previous day's temperature on the current day's temperature
             (unitless).
         previous_day_soil_temp : float
-            Soil temperature in the layer from the previous day (degrees C).
+            Soil temperature in the layer from the previous day (Celsius).
         depth_factor : float
             Factor that quantifies the influence of depth below the surface on soil temperature (unitless).
         avg_annual_air_temp : float
-            Average annual air temperature (degrees C).
+            Average annual air temperature (Celsius).
         soil_surface_temp : float
-            Soil surface temperature on the current day (degrees C).
+            Soil surface temperature on the current day (Celsius).
 
         Returns
         -------
         float
-            Soil temperature at the given depth on the current day (degrees C).
+            Soil temperature at the given depth on the current day (Celsius).
 
         References
         ----------

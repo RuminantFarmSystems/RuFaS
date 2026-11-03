@@ -1,5 +1,4 @@
 from math import exp
-from typing import Optional
 
 from RUFAS.biophysical.field.crop.crop_data import CropData
 
@@ -9,34 +8,34 @@ class GrowthConstraints:
     A class pertaining to growth constraints of crops.
 
     This class is focused on managing and applying growth constraints to crop processes, as described in the Growth
-    Constraints section of the SWAT model (5:3.1). It uses data from the `CropData` class to assess and apply these
+    Constraints section of the SWAT model (5:3.1). It uses data from the ``CropData`` class to assess and apply these
     constraints.
 
     Parameters
     ----------
-    crop_data : Optional[CropData], optional
-        A `CropData` object containing crop specifications and tracked attributes. If not provided,
-        a default `CropData` object is initialized with default values.
+    crop_data : CropData, optional
+        A ``CropData`` object containing crop specifications and tracked attributes. If not provided,
+        a default ``CropData`` object is initialized with default values.
     water_stress : float, default 0.0
         Water stress for the day (unitless).
-    temp_stress : Optional[float], default None
+    temp_stress : float, optional
         Temperature stress for the day (unitless).
-    nitrogen_stress : Optional[float], default None
+    nitrogen_stress : float, optional
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : Optional[float], default None
+    phosphorus_stress : float, optional
         Phosphorus stress for the day (unitless).
 
     Attributes
     ----------
     data : CropData
-        A reference to the `crop_data` object on which the growth constraint operations are conducted.
+        A reference to the ``crop_data`` object on which the growth constraint operations are conducted.
     water_stress : float
         Water stress for the day (unitless).
-    temp_stress : Optional[float]
+    temp_stress : float | None
         Temperature stress for the day (unitless).
-    nitrogen_stress : Optional[float]
+    nitrogen_stress : float | None
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : Optional[float]
+    phosphorus_stress : float, optional
         Phosphorus stress for the day (unitless).
 
     Methods
@@ -64,11 +63,11 @@ class GrowthConstraints:
 
     def __init__(
         self,
-        crop_data: Optional[CropData] = None,
+        crop_data: CropData | None = None,
         water_stress: float = 0.0,
-        temp_stress: Optional[float] = None,
-        nitrogen_stress: Optional[float] = None,
-        phosphorus_stress: Optional[float] = None,
+        temp_stress: float | None = None,
+        nitrogen_stress: float | None = None,
+        phosphorus_stress: float | None = None,
     ) -> None:
         self.data = crop_data or CropData()
 
@@ -91,9 +90,9 @@ class GrowthConstraints:
 
         Parameters
         ----------
-        max_transpiration : float | None
+        max_transpiration : float, optional
             The maximum amount of transpiration possible (in mm) on this day, determined by soil conditions.
-        temperature : float | None
+        temperature : float, optional
             The current air temperature in degrees Celsius.
         simulate_water_stress : bool
             Whether water stress should affect growth of all crops grown in the field.

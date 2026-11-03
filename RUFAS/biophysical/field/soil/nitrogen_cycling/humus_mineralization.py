@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 from RUFAS.user_constants import UserConstants
 
@@ -15,7 +13,7 @@ class HumusMineralization:
         The SoilData object used by this module for tracking the mineralization of organic nitrogen in the soil. If not
         provided, a new SoilData object will be instantiated.
     field_size : float, optional
-        The size of the field in hectares (ha), used to initialize a SoilData object if one is not directly provided.
+        The size of the field in hectares used to initialize a SoilData object if one is not directly provided (ha).
 
     Attributes
     ----------
@@ -29,7 +27,7 @@ class HumusMineralization:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_organic_nitrogen(self) -> None:

@@ -2,6 +2,7 @@ from math import exp, log
 from unittest.mock import MagicMock, call, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
@@ -40,12 +41,12 @@ def test_determine_enrichment_ratio(daily_soil_lost: float) -> None:
     ],
 )
 def test_calculate_eroded_organic_nitrogen(
-    nitrogen: float, density: float, depth: float, area: float, sediment: float
+    nitrogen: float, density: float, depth: float, area: float, sediment: float, mocker: MockerFixture
 ) -> None:
     """Tests that the amount of organic nitrogen lost to eroded sediment is calculated correctly."""
-    LayerData.determine_soil_nutrient_concentration = MagicMock(return_value=26)
-    LeachingRunoffErosion._determine_enrichment_ratio = MagicMock(return_value=2.5)
-    LeachingRunoffErosion._determine_erosion_nitrogen_loss_content = MagicMock(return_value=33)
+    mocker.patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=26)
+    mocker.patch.object(LeachingRunoffErosion, "_determine_enrichment_ratio", return_value=2.5)
+    mocker.patch.object(LeachingRunoffErosion, "_determine_erosion_nitrogen_loss_content", return_value=33)
 
     observed = LeachingRunoffErosion._calculate_eroded_organic_nitrogen(nitrogen, density, depth, area, sediment)
     expected_sediment_per_ha = sediment / area

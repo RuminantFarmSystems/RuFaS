@@ -1,6 +1,6 @@
 from random import randint, uniform
-from typing import Any
-from unittest.mock import call
+from typing import Any, cast
+from unittest.mock import MagicMock, call
 
 import pytest
 from pytest_mock import MockerFixture
@@ -66,6 +66,21 @@ def test_collect_daily_feed_request(herd_manager: HerdManager) -> None:
     assert result == expected_total_requested_feed
 
 
+def test_update_herd_305_day_milk_yields(herd_manager: HerdManager) -> None:
+    """Unit test for update_herd_305_day_milk_yields()."""
+    cows = [
+        mock_animal(AnimalType.LAC_COW, id=1),
+        mock_animal(AnimalType.LAC_COW, id=2),
+        mock_animal(AnimalType.DRY_COW, id=3),
+    ]
+    herd_manager.cows = cows
+
+    herd_manager.update_herd_305_day_milk_yields()
+
+    for cow in cows:
+        cast(MagicMock, cow.update_305_day_milk_yield).assert_called_once_with()
+
+
 def test_print_herd_snapshot(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for print_herd_snapshot()"""
     mock_print = mocker.patch("builtins.print")
@@ -78,60 +93,6 @@ def test_print_herd_snapshot(herd_manager: HerdManager, mocker: MockerFixture) -
         f"heiferIIIs: {len(herd_manager.heiferIIIs)}\t"
         f"cows: {len(herd_manager.cows)}\t"
     )
-
-
-@pytest.mark.parametrize(
-    "herd_data, simulate_animals",
-    [
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 1, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 2, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 3, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 4, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 5}, False),
-        ({"calf_num": 8, "heiferI_num": 10, "heiferII_num": 5, "heiferIII_num_springers": 9, "cow_num": 5}, True),
-        ({"calf_num": 5, "heiferI_num": 8, "heiferII_num": 3, "heiferIII_num_springers": 0, "cow_num": 0}, False),
-        ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 2, "heiferIII_num_springers": 4, "cow_num": 0}, False),
-        ({"calf_num": 8, "heiferI_num": 8, "heiferII_num": 8, "heiferIII_num_springers": 5, "cow_num": 5}, False),
-        ({"calf_num": 5, "heiferI_num": 8, "heiferII_num": 8, "heiferIII_num_springers": 8, "cow_num": 0}, False),
-    ],
-)
-def test_print_animal_num_warnings(
-    herd_data: dict[str, int], simulate_animals: bool, herd_manager: HerdManager, mocker: MockerFixture
-) -> None:
-    """Unit test for _print_animal_num_warnings()"""
-    herd_manager.simulate_animals = simulate_animals
-
-    mock_om_add_log = mocker.patch.object(herd_manager.om, "add_log")
-    mock_om_add_warning = mocker.patch.object(herd_manager.om, "add_warning")
-
-    animal_keys = {
-        "calf_num",
-        "heiferI_num",
-        "heiferII_num",
-        "heiferIII_num_springers",
-        "cow_num",
-    }
-    info_map = {
-        "class": herd_manager.__class__.__name__,
-        "function": HerdManager._print_animal_num_warnings.__name__,
-        "simulate_animals": simulate_animals,
-        "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys},
-    }
-
-    herd_manager._print_animal_num_warnings(herd_data)
-
-    if simulate_animals:
-        mock_om_add_log.assert_called_once_with("simulate_animals_flag", "simulate_animals is true", info_map)
-        mock_om_add_warning.assert_not_called()
-    else:
-        expected_add_warning_counts = len([value for value in herd_data.values() if value > 0])
-        assert mock_om_add_warning.call_count == expected_add_warning_counts
-        mock_om_add_log.assert_called_once_with(
-            "num_warnings_associated_with_simulate_animals",
-            f"{expected_add_warning_counts} warnings were associated with simulate_animals",
-            info_map,
-        )
 
 
 @pytest.mark.parametrize(
@@ -164,3 +125,51 @@ def test_set_animal_grouping_scenario(
 
     HerdManager.set_animal_grouping_scenario(new_grouping_scenario)
     assert HerdManager.ANIMAL_GROUPING_SCENARIO == new_grouping_scenario
+
+
+def test_initialize_pregnancy_for_pregnant_animals_entering_the_herd(
+    herd_manager: HerdManager, mocker: MockerFixture
+) -> None:
+    """
+    Pregnant animals imported into the herd (initial herd load or replacement purchases) have no
+    recorded conception event, so on import they enter the pregnant state and are assigned a
+    user-defined semen type plus an embryo sex drawn via their own reproduction model. Open animals
+    are left untouched.
+    """
+    from RUFAS.biophysical.animal.data_types.animal_enums import Sex
+    from RUFAS.biophysical.animal.data_types.semen_type import SemenType
+    from RUFAS.biophysical.animal.data_types.repro_protocol_enums import ReproStateEnum
+
+    mocker.patch("RUFAS.biophysical.animal.herd_manager.OutputManager")
+
+    time = MagicMock()
+    time.simulation_day = 42
+
+    pregnant_animal = MagicMock()
+    pregnant_animal.is_pregnant = True
+    pregnant_animal.days_born = 400
+    pregnant_animal.reproduction.determine_embryo_sex.return_value = Sex.MALE
+    pregnant_animal.reproduction.repro_state_manager.is_in.return_value = False
+
+    already_labelled_pregnant_animal = MagicMock()
+    already_labelled_pregnant_animal.is_pregnant = True
+    already_labelled_pregnant_animal.reproduction.repro_state_manager.is_in.return_value = True
+
+    open_animal = MagicMock()
+    open_animal.is_pregnant = False
+
+    animals: list[Animal] = [pregnant_animal, already_labelled_pregnant_animal, open_animal]
+
+    herd_manager._initialize_pregnancy_for_pregnant_animals_entering_the_herd(animals, time)
+
+    pregnant_animal.reproduction.repro_state_manager.enter.assert_called_once_with(
+        ReproStateEnum.PREGNANT, keep_existing=True
+    )
+    already_labelled_pregnant_animal.reproduction.repro_state_manager.enter.assert_not_called()
+    assert pregnant_animal.reproduction.semen_type == SemenType.USER_DEFINED
+    assert pregnant_animal.reproduction.embryo_sex == Sex.MALE
+    pregnant_animal.events.add_event.assert_called_once()
+    assert pregnant_animal.events.add_event.call_args.args[:2] == (400, 42)
+
+    open_animal.reproduction.repro_state_manager.enter.assert_not_called()
+    open_animal.events.add_event.assert_not_called()

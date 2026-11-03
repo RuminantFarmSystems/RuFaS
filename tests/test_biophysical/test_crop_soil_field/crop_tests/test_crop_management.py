@@ -235,6 +235,72 @@ def test_manage_harvest(
 
 
 @pytest.mark.parametrize(
+    "harvest_op,expect_kill",
+    [
+        (HarvestOperation.HARVEST_ONLY, False),
+        (HarvestOperation.HARVEST_KILL, True),
+    ],
+)
+def test_manage_harvest_uses_crop_harvest_efficiency(
+    mocker: MockerFixture,
+    crop_manager: CropManagement,
+    mock_time: RufasTime,
+    harvest_op: HarvestOperation,
+    expect_kill: bool,
+) -> None:
+    """The crop's own harvest efficiency is what decides how much of the cut biomass a harvest collects, so a partially
+    utilized forage such as a pasture leaves the rest of each cut in the field."""
+    crop_manager.data.harvest_efficiency = 0.5
+    field_size = 3.0
+    soil_data = SoilData(field_size=field_size)
+
+    mocker.patch.object(crop_manager, "determine_harvest_index")
+    cut_crop = mocker.patch.object(crop_manager, "cut_crop")
+    get_crop = mocker.patch.object(crop_manager, "_get_harvested_crop")
+    kill = mocker.patch.object(crop_manager, "kill", wraps=crop_manager.kill)
+    record_yield = mocker.patch.object(crop_manager, "_record_yield")
+    transfer_residue = mocker.patch.object(crop_manager, "_transfer_residue")
+
+    crop_manager.manage_harvest(harvest_op, "pasture_field", field_size, mock_time, soil_data)
+
+    cut_crop.assert_called_once_with(collected_fraction=0.5)
+    get_crop.assert_called_once()
+
+    kill.assert_called_once() if expect_kill else kill.assert_not_called()
+    record_yield.assert_called_once()
+    transfer_residue.assert_called_once_with(soil_data, expect_kill)
+
+
+def test_manage_harvest_partial_efficiency_splits_yield_and_residue(
+    mocker: MockerFixture, mock_crop_data: CropData, mock_time: RufasTime
+) -> None:
+    """End-to-end check that a harvest efficiency below 1.0 collects that share of the cut biomass and deposits the
+    remainder into the field's surface soil layer as residue."""
+    efficiency = 0.5
+    mock_crop_data.harvest_efficiency = efficiency
+    mock_crop_data.biomass = 5000.0
+    mock_crop_data.above_ground_biomass = 4000.0
+    mock_crop_data.root_biomass = 1000.0
+    mock_crop_data.leaf_area_index = 3.0
+    crop_manager = CropManagement(crop_data=mock_crop_data)
+
+    field_size = 2.0
+    soil_data = SoilData(field_size=field_size)
+    assert soil_data.soil_layers is not None
+    surface_layer = soil_data.soil_layers[0]
+    surface_layer.plant_residue = 0.0
+
+    mocker.patch.object(crop_manager, "_record_yield")
+
+    crop_manager.manage_harvest(HarvestOperation.HARVEST_ONLY, "pasture_field", field_size, mock_time, soil_data)
+
+    cut_biomass = crop_manager.cut_biomass
+    assert cut_biomass is not None and cut_biomass > 0.0
+    assert crop_manager.dry_matter_yield_collected == pytest.approx(cut_biomass * efficiency)
+    assert surface_layer.plant_residue == pytest.approx(cut_biomass * (1 - efficiency))
+
+
+@pytest.mark.parametrize(
     "efficiency,harvest,override,should_fail",
     [
         (0, 0, False, False),  # no harvest and not collection
@@ -248,7 +314,12 @@ def test_manage_harvest(
     ],
 )
 def test_cut_crop(
-    mock_crop_data: CropData, efficiency: float, harvest: float, override: bool, should_fail: bool
+    mock_crop_data: CropData,
+    efficiency: float,
+    harvest: float,
+    override: bool,
+    should_fail: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Ensure that the crop cutting routines are properly executed and that errors are raised properly."""
     # setup
@@ -264,7 +335,7 @@ def test_cut_crop(
         mock_crop_data.user_harvest_index = harvest
     crop = CropManagement(mock_crop_data, harvest_index=harvest)
     crop._recalculate_biomass_distribution = MagicMock()
-
+    mock_add_error = mocker.patch.object(crop.om, "add_error")
     # act
     if should_fail:
         try:
@@ -272,6 +343,7 @@ def test_cut_crop(
         except ValueError as e:
             assert str(e) == f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{efficiency}'."
         crop._recalculate_biomass_distribution.assert_not_called()
+        mock_add_error.assert_called_once()
     else:
         crop.cut_crop(efficiency)
         if harvest > 1:
@@ -301,6 +373,7 @@ def test_cut_crop(
             assert crop.yield_phosphorus == collected_dry_matter_yield * 0.0092
             assert crop.residue_nitrogen == residue * 0.12
             assert crop.residue_phosphorus == residue * 0.0092
+        mock_add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(

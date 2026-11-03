@@ -3,16 +3,16 @@ from typing import TypedDict
 
 class PregnancyCheckConfig(TypedDict, total=False):
     """
-    List of expected keys for preg check configuration dictionary,
+    List of expected keys for preg check configuration dictionary;
     used in daily pregnancy check routine for HeiferII and Cow classes.
 
     Attributes
     ----------
     day : int
-        The number of days from the artificial insemination day when the pregnancy
-        check should occur, (simulation days).
+        The number of days from the artificial insemination day when the pregnancy check
+        should occur.
     loss_rate : float
-        The probability of pregnancy loss at this check, (unitless).
+        The probability of pregnancy loss at this check.
     on_preg_loss : str
         The event message to log if pregnancy loss occurs at this check.
     on_preg : str

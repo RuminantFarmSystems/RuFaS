@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.soil.nitrogen_cycling.denitrification import Denitrification
 from RUFAS.biophysical.field.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
 from RUFAS.biophysical.field.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
@@ -18,8 +16,8 @@ class NitrogenCycling:
         The SoilData object used by this module to track and manage nitrogen cycling in the soil. If not provided,
         a new SoilData object will be created.
     field_size : float, optional
-        The size of the field in hectares (ha), utilized to initialize a SoilData object if one is not directly
-        supplied.
+        The size of the field in hectares utilized to initialize a SoilData object if one is not directly
+        supplied (ha).
 
     Attributes
     ----------
@@ -38,7 +36,7 @@ class NitrogenCycling:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
         self.leaching_runoff_erode = LeachingRunoffErosion(self.data)

@@ -6,6 +6,8 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import Nutrit
 
 @dataclass
 class DigestiveSystemInputs:
+    """The inputs needed for the ``DigestiveSystem`` class."""
+
     animal_type: AnimalType
     body_weight: float
     nutrients: NutritionSupply

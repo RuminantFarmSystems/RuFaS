@@ -49,7 +49,7 @@ def stored_manure() -> ManureStream:
         volume=100.12,
         pen_manure_data=None,
         methane_production_potential=0.24,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -69,7 +69,7 @@ def received_manure() -> ManureStream:
         volume=10.12,
         pen_manure_data=None,
         methane_production_potential=0.24,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -316,9 +316,11 @@ def test_nitrous_oxide_emission(
     assert result == pytest.approx(expected, rel=1e-6)
 
 
-def test_nitrous_oxide_negative_input(bedded_pack: BeddedPack) -> None:
+def test_nitrous_oxide_negative_input(bedded_pack: BeddedPack, mocker: MockerFixture) -> None:
+    mock_add_error = mocker.patch.object(bedded_pack._om, "add_error")
     with pytest.raises(ValueError, match="Daily nitrogen input mass must be non-negative: -1.0"):
         bedded_pack._calculate_bedded_pack_nitrous_oxide_emission(-1.0, True)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -333,9 +335,11 @@ def test_ammonia_emission(bedded_pack: BeddedPack, received_nitrogen: float, is_
     assert result == pytest.approx(expected, rel=1e-6)
 
 
-def test_ammonia_negative_input(bedded_pack: BeddedPack) -> None:
+def test_ammonia_negative_input(bedded_pack: BeddedPack, mocker: MockerFixture) -> None:
+    mock_add_error = mocker.patch.object(bedded_pack._om, "add_error")
     with pytest.raises(ValueError, match="Daily nitrogen input mass must be non-negative: -1.0"):
         bedded_pack._calculate_bedded_pack_ammonia_emission(-1.0, False)
+    mock_add_error.assert_called_once()
 
 
 def test_calculate_bedded_pack_methane_emission(bedded_pack: BeddedPack, mocker: MockerFixture) -> None:
@@ -348,33 +352,42 @@ def test_calculate_bedded_pack_methane_emission(bedded_pack: BeddedPack, mocker:
     manure_volatile_solids = 1000.0
     expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
 
-    actual = bedded_pack.calculate_bedded_pack_methane_emission(True, manure_volatile_solids, 1.0, 0.24)
+    actual = bedded_pack.calculate_bedded_pack_methane_emission(True, manure_volatile_solids, 1.0, 0.24, 31)
 
-    mock_conversion_factor.assert_called_once_with(True, 1.0)
+    mock_conversion_factor.assert_called_once_with(True, 1.0, 31)
     assert actual == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(
-    "is_mixed, manure_temperature, expected_mcf",
+    "is_mixed, manure_temperature, expected_mcf, storage_duration",
     [
         # mixed
-        (True, -10.0, 0.5),  # Falls in (-inf, 4.6]
-        (True, 0.0, 0.5),  # “
-        (True, 4.6, 0.5),  # upper bound bin 1
-        (True, 4.7, 0.5),  # lower bound bin 2
-        (True, 5.8, 0.5),  # upper bound bin 2 (first match)
-        (True, 10.0, 1.0),  # middle bin 3
-        (True, 14.0, 1.0),  # lower bound bin 4
-        (True, 25.2, 1.5),  # lower bound bin 5
-        # unmixed
-        (False, -10.0, 21.0),
-        (False, 0.0, 21.0),
-        (False, 4.6, 21.0),
-        (False, 4.7, 26.0),
-        (False, 5.8, 26.0),
-        (False, 10.0, 37.0),
-        (False, 14.0, 41.0),
-        (False, 25.2, 74.0),
+        (True, -10.0, 0.5, 30),  # Falls in (-inf, 4.6]
+        (True, 0.0, 0.5, 30),  # “
+        (True, 4.6, 0.5, 30),  # upper bound bin 1
+        (True, 4.7, 0.5, 30),  # lower bound bin 2
+        (True, 5.8, 0.5, 30),  # upper bound bin 2 (first match)
+        (True, 10.0, 0.5, 30),  # middle bin 3
+        (True, 14.0, 1.0, 30),  # lower bound bin 4
+        (True, 25.2, 1.5, 30),  # lower bound bin 5
+        # unmixed, long storage duration
+        (False, -10.0, 14.0, 31),
+        (False, 0.0, 14.0, 31),
+        (False, 4.6, 21.0, 31),
+        (False, 4.7, 21.0, 31),
+        (False, 5.8, 21.0, None),
+        (False, 10.0, 21.0, None),
+        (False, 14.0, 37.0, None),
+        (False, 25.2, 73.0, None),
+        # unmixed, short storage duration
+        (False, -10.0, 2.75, 29),
+        (False, 0.0, 2.75, 29),
+        (False, 4.6, 2.75, 29),
+        (False, 4.7, 2.75, 29),
+        (False, 5.8, 2.75, 29),
+        (False, 10.0, 2.75, 29),
+        (False, 14.0, 6.5, 29),
+        (False, 25.2, 18.0, 29),
     ],
 )
 def test_calculate_bedded_pack_mcf_returns_expected(
@@ -382,15 +395,18 @@ def test_calculate_bedded_pack_mcf_returns_expected(
     is_mixed: bool,
     manure_temperature: float,
     expected_mcf: float,
+    storage_duration: int | None,
 ) -> None:
     """Tests calculate_bedded_pack_mcf_returns_expected()."""
-    result = bedded_pack.calculate_bedded_pack_methane_conversion_factor(is_mixed, manure_temperature)
+    result = bedded_pack.calculate_bedded_pack_methane_conversion_factor(is_mixed, manure_temperature, storage_duration)
     assert result == expected_mcf
 
 
-def test_calculate_bedded_pack_mcf_raises_for_temperature_gap(bedded_pack: BeddedPack) -> None:
+def test_calculate_bedded_pack_mcf_raises_for_temperature_gap(bedded_pack: BeddedPack, mocker: MockerFixture) -> None:
     """Tests calculate_bedded_pack_mcf_returns_expected() for fall back cases."""
+    mock_add_error = mocker.patch.object(bedded_pack._om, "add_error")
     with pytest.raises(ValueError) as excinfo:
-        bedded_pack.calculate_bedded_pack_methane_conversion_factor(True, math.nan)
+        bedded_pack.calculate_bedded_pack_methane_conversion_factor(True, math.nan, 30)
 
     assert "out of any defined bin" in str(excinfo.value)
+    mock_add_error.assert_called_once()

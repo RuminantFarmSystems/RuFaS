@@ -139,33 +139,86 @@ def test_project_degradations(
     project_degradations.assert_called_once_with(crops_with_moisture_loss, weather, time)
 
 
-@pytest.mark.parametrize("stored_day,current_day,expect_loss", [(1, 1, False), (1, 10, True)])
-def test_calculate_dry_matter_loss_to_gas(
+def test_calculate_dry_matter_loss_to_gas_caps_loss_and_warns(
     hay: Hay,
     harvested_crop: HarvestedCrop,
     time: RufasTime,
     mocker: MockerFixture,
-    stored_day: int,
-    current_day: int,
-    expect_loss: bool,
 ) -> None:
-    """Tests calculate_dry_matter_loss_to_gas in Hay."""
-    harvested_crop.storage_time = date(2024, 6, stored_day)
-    time.current_date = datetime(2024, 6, current_day)
-    mock_initial_loss = mocker.patch.object(hay, "_calculate_initial_dry_matter_loss_to_gas", side_effect=[10.0, 20.0])
-    mock_subsequent_loss = mocker.patch.object(
-        hay, "_calculate_subsequent_dry_matter_loss_to_gas", side_effect=[5.0, 10.0]
-    )
-    mock_additional_loss = mocker.patch.object(hay, "_calculate_additional_dry_matter_loss", return_value=3.0)
-    expected_loss = 18.0 if expect_loss else 0.0
-    expected_call_count = 2 if expect_loss else 0
+    """Tests that hay dry matter loss is capped and a warning is logged when raw loss exceeds available dry matter."""
+    harvested_crop.storage_time = date(2024, 6, 1)
+    harvested_crop.last_time_degraded = date(2024, 6, 1)
+    harvested_crop.dry_matter_mass = 12.0
+    harvested_crop.config_name = "test_hay"
+    harvested_crop.field_name = "test_field"
+    time.current_date = datetime(2024, 6, 10)
+
+    mocker.patch.object(hay, "_calculate_initial_dry_matter_loss_to_gas", side_effect=[0.0, 20.0])
+    mocker.patch.object(hay, "_calculate_subsequent_dry_matter_loss_to_gas", side_effect=[0.0, 10.0])
+    mocker.patch.object(hay, "_calculate_additional_dry_matter_loss", return_value=5.0)
+    mock_add_warning = mocker.patch.object(hay.om, "add_warning")
 
     actual = hay.calculate_dry_matter_loss_to_gas(harvested_crop, [], time)
 
-    assert actual == expected_loss
-    assert mock_initial_loss.call_count == expected_call_count
-    assert mock_subsequent_loss.call_count == expected_call_count
-    assert mock_additional_loss.call_count == (1 if expect_loss else 0)
+    assert actual == 12.0
+    mock_add_warning.assert_called_once_with(
+        "Hay dry matter loss capped",
+        (
+            "Calculated dry matter loss (35.00 kg) exceeded the remaining dry matter "
+            "(12.00 kg) for crop 'test_hay' in field "
+            "'test_field'. Capping loss to the remaining dry matter."
+        ),
+        info_map={
+            "class": hay.__class__.__name__,
+            "function": hay.calculate_dry_matter_loss_to_gas.__name__,
+        },
+    )
+
+
+def test_calculate_dry_matter_loss_to_gas_floors_negative_loss(
+    hay: Hay,
+    harvested_crop: HarvestedCrop,
+    time: RufasTime,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that negative calculated hay dry matter loss is floored at zero."""
+    harvested_crop.storage_time = date(2024, 6, 1)
+    harvested_crop.last_time_degraded = date(2024, 6, 1)
+    harvested_crop.dry_matter_mass = 100.0
+    time.current_date = datetime(2024, 6, 10)
+
+    mocker.patch.object(hay, "_calculate_initial_dry_matter_loss_to_gas", side_effect=[20.0, 5.0])
+    mocker.patch.object(hay, "_calculate_subsequent_dry_matter_loss_to_gas", side_effect=[10.0, 2.0])
+    mocker.patch.object(hay, "_calculate_additional_dry_matter_loss", return_value=0.0)
+    mock_add_warning = mocker.patch.object(hay.om, "add_warning")
+
+    actual = hay.calculate_dry_matter_loss_to_gas(harvested_crop, [], time)
+    assert actual == 0.0
+    mock_add_warning.assert_not_called()
+
+
+def test_calculate_dry_matter_loss_to_gas_returns_zero_when_stored_today(
+    hay: Hay,
+    harvested_crop: HarvestedCrop,
+    time: RufasTime,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that no dry matter loss is calculated on the crop storage date."""
+    harvested_crop.storage_time = date(2024, 6, 1)
+    time.current_date = datetime(2024, 6, 1)
+
+    mock_initial_loss = mocker.patch.object(hay, "_calculate_initial_dry_matter_loss_to_gas")
+    mock_subsequent_loss = mocker.patch.object(hay, "_calculate_subsequent_dry_matter_loss_to_gas")
+    mock_additional_loss = mocker.patch.object(hay, "_calculate_additional_dry_matter_loss")
+    mock_add_warning = mocker.patch.object(hay.om, "add_warning")
+
+    actual = hay.calculate_dry_matter_loss_to_gas(harvested_crop, [], time)
+
+    assert actual == 0.0
+    mock_initial_loss.assert_not_called()
+    mock_subsequent_loss.assert_not_called()
+    mock_additional_loss.assert_not_called()
+    mock_add_warning.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -181,7 +234,7 @@ def test_calculate_dry_matter_loss_to_gas(
     ],
 )
 def test_calculate_initial_dry_matter_loss(
-    hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float
+    hay: Hay, harvested_crop: HarvestedCrop, days: int, expected: float
 ) -> None:
     """Tests _calculate_initial_dry_matter_loss in Hay."""
     harvested_crop.storage_time = (storage_date := date(2024, 6, 1))
@@ -193,6 +246,24 @@ def test_calculate_initial_dry_matter_loss(
     actual = hay._calculate_initial_dry_matter_loss_to_gas(harvested_crop, current_date)
 
     assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("initial_dry_matter_percentage", [0.0, -1.0])
+def test_calculate_initial_dry_matter_loss_zero_or_negative_denominator(
+    hay: Hay,
+    harvested_crop: HarvestedCrop,
+    initial_dry_matter_percentage: float,
+) -> None:
+    """Tests that initial dry matter loss is zero when the denominator is not positive."""
+    harvested_crop.storage_time = date(2024, 6, 1)
+    harvested_crop.initial_dry_matter_percentage = initial_dry_matter_percentage
+    harvested_crop.initial_dry_matter_mass = 1_000.0
+    harvested_crop.total_sensible_heat_generated = 500.0
+    current_date = harvested_crop.storage_time + timedelta(days=10)
+
+    actual = hay._calculate_initial_dry_matter_loss_to_gas(harvested_crop, current_date)
+
+    assert actual == 0.0
 
 
 @pytest.mark.parametrize("days,expected", [(15, 0.0), (30, 0.0), (31, 0.0001), (35, 0.0005), (130, 0.01)])

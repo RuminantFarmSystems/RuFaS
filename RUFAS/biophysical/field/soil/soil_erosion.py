@@ -1,8 +1,8 @@
 from math import atan, exp, log, sin
-from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 """
 This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1.1 of SWAT.
@@ -17,7 +17,7 @@ class SoilErosion:
     ----------
     soil_data : SoilData, optional
         The SoilData object used by this module to track and simulate erosion.
-    field_size : float, optional, default=None
+    field_size : float, optional
         The size of the field (ha).
 
     Attributes
@@ -27,7 +27,7 @@ class SoilErosion:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -54,13 +54,18 @@ class SoilErosion:
         Parameters
         ----------
         field_size : float
-            Size of the field that contains this Soil object (hectares).
+            Size of the field that contains this Soil object (ha).
         minimum_cover_management_factor : float
             Minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless).
         surface_residue : float
-            Amount of residue on the soil surface (kg per hectare).
+            Amount of residue on the soil surface (kg / ha).
         rainfall : float
             Amount of rain that fell on the field on the current day (mm).
+
+        Raises
+        ------
+        TypeError
+            If SoilData accumulated_runoff is NoneType.
 
         Notes
         -----
@@ -92,6 +97,11 @@ class SoilErosion:
         )
 
         if self.data.accumulated_runoff is None:
+            OutputManager().add_error(
+                "NoneType accumulated runoff",
+                "SoilData accumulated_runoff cannot be NoneType",
+                info_map={"class": SoilErosion.__name__, "function": SoilErosion.erode.__name__},
+            )
             raise TypeError("SoilData accumulated_runoff cannot be NoneType")
         self.data.surface_runoff_volume = self.data.accumulated_runoff / field_size
         sediment_yield = self._determine_sediment_yield(
@@ -299,12 +309,26 @@ class SoilErosion:
         float
             The cover and management factor (unitless).
 
+        Raises
+        ------
+        ValueError
+            If minimum cover and management is <= 0.
+
         References
         ----------
         SWAT Theoretical documentation eqn. 4:1.1.10
 
         """
         if minimum_cover_management_factor <= 0:
+            OutputManager().add_error(
+                "Invalid minimum cover",
+                "Minimum cover and management cannot be less than or equal to 0 and "
+                f"got {minimum_cover_management_factor}",
+                info_map={
+                    "class": SoilErosion.__name__,
+                    "function": SoilErosion._determine_cover_management_factor.__name__,
+                },
+            )
             raise ValueError("Minimum cover and management cannot be less than or equal to 0")
         first_multiplicative_term = log(0.8) - log(minimum_cover_management_factor)
         second_multiplicative_term = exp(-0.00115 * surface_residue)
@@ -313,8 +337,21 @@ class SoilErosion:
 
     @staticmethod
     def _determine_support_practice_factor() -> float:
-        """SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
-        stripcropping, and/or terracing)"""
+        """
+        Determine the support practice factor (only applies to fields that are doing contour tillage/planting,
+        stripcropping, and/or terracing).
+
+        Returns
+        -------
+        float
+            The support practice factor (unitless).
+
+        References
+        ----------
+        SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
+        stripcropping, and/or terracing)
+
+        """
         return 1
 
     @staticmethod
@@ -525,7 +562,7 @@ class SoilErosion:
         return rain_during_time_of_concentration / time_of_concentration
 
     @staticmethod
-    def _determine_time_of_concentration(slope_length: float, manning: float, average_subbasin_slope) -> float:
+    def _determine_time_of_concentration(slope_length: float, manning: float, average_subbasin_slope: float) -> float:
         """
         Calculates the time of concentration for the subbasin.
 

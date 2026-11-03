@@ -3,10 +3,12 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from pytest import approx
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.field.manure_application import ManureApplication
 from RUFAS.biophysical.field.soil.manure_pool import ManurePool
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 # ---- Static method tests
@@ -46,18 +48,20 @@ def test_determine_moisture_factor(dry_fraction: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "mass,dry_fraction",
+    "dry_fraction",
     [
-        (500, 0),
-        (400, -0.5),
-        (600, 1.1),
+        0,
+        -0.5,
+        1.1,
     ],
 )
-def test_error_determine_moisture_factor(mass: float, dry_fraction: float) -> None:
+def test_error_determine_moisture_factor(dry_fraction: float, mocker: MockerFixture) -> None:
     """Tests that correct error is raised when invalid argument is passed."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as e:
         ManureApplication._determine_moisture_factor(dry_fraction)
     assert str(e.value) == f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_fraction}'."
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -113,12 +117,14 @@ def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(ani
 
 @pytest.mark.parametrize("animal_type", ["CaTTLE", "PORK", "fish"])
 def test_error_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(
-    animal_type: str,
+    animal_type: str, mocker: MockerFixture
 ) -> None:
     """Tests that errors caused by unsupported animal types are handled appropriately."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as e:
         ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type)
     assert str(e.value) == f'Expected "CATTLE", "SWINE", or "POULTRY", received \'{animal_type}\'.'
+    mock_add_error.assert_called_once()
 
 
 # ---- Helper function tests
@@ -421,11 +427,20 @@ def test_apply_subsurface_manure(
 ) -> None:
     """Tests that nutrients from injection manure applications are correctly distributed between soil layers."""
     manure_app = ManureApplication(field_size=area)
+
+    top_depths = [0.0, 20.0, 50.0, 200.0]
+    bottom_depths = [20.0, 50.0, 200.0, 400.0]
+
+    def get_layer_attribute(attribute: str) -> list[float]:
+        if attribute == "top_depth":
+            return top_depths
+        return bottom_depths
+
     with (
         patch(
             "RUFAS.biophysical.field.soil.soil_data.SoilData.get_vectorized_layer_attribute",
             new_callable=MagicMock,
-            return_value=[20.0, 50.0, 200.0, 400.0],
+            side_effect=get_layer_attribute,
         ) as layer,
         patch(
             "RUFAS.biophysical.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
@@ -460,8 +475,20 @@ def test_apply_subsurface_manure(
             area,
         )
 
-        layer.assert_called_once_with("bottom_depth")
-        depth_factors.assert_called_once_with(depth, [20.0, 50.0, 200.0, 400.0])
+        layer.assert_has_calls(
+            [
+                call("top_depth"),
+                call("bottom_depth"),
+            ]
+        )
+        assert layer.call_count == 2
+
+        depth_factors.assert_called_once_with(
+            depth,
+            top_depths,
+            bottom_depths,
+        )
+
         labile.assert_has_calls(expected_labile_calls)
         active.assert_has_calls(expected_active_calls)
         nitrogen.assert_has_calls(expected_nitrogen_calls)
@@ -588,11 +615,12 @@ def test_apply_machine_manure(
     weiP_frac: float | None,
     source_animal: str,
     should_fail: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
     data = SoilData(field_size=area)
     incorp = ManureApplication(data)
-
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
         with pytest.raises(ValueError) as e:
             incorp.apply_machine_manure(
@@ -613,6 +641,7 @@ def test_apply_machine_manure(
             str(e.value) == f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95],"
             f" received '{weiP_frac}'."
         )
+        mock_add_error.assert_called_once()
     else:
         incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)
         incorp.apply_machine_manure(
@@ -641,3 +670,4 @@ def test_apply_machine_manure(
         assert incorp.data.machine_manure.water_extractable_organic_phosphorus > 0
         assert incorp.data.machine_manure.stable_inorganic_phosphorus > 0
         assert incorp.data.machine_manure.stable_organic_phosphorus > 0
+        mock_add_error.assert_not_called()

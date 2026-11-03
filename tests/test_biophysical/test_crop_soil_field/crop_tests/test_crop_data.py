@@ -12,6 +12,11 @@ def mock_crop_data() -> CropData:
     return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
+def test_harvest_efficiency_defaults_to_full_collection(mock_crop_data: CropData) -> None:
+    """Harvest efficiency defaults to 1.0 so a crop that does not specify one collects all of its cut biomass."""
+    assert mock_crop_data.harvest_efficiency == 1.0
+
+
 @pytest.mark.parametrize("frac,expect", [(0, False), (0.5, False), (1, True), (1.5, True)])
 def test_is_mature_property(mock_crop_data: CropData, frac: float, expect: bool) -> None:
     """Check that the is_mature property is properly assigning maturity by heat fraction."""

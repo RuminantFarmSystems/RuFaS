@@ -2,6 +2,7 @@ from math import exp, inf
 from unittest.mock import MagicMock, call
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.nitrogen_cycling.mineralization_decomp import MineralizationDecomposition
@@ -30,28 +31,36 @@ def test_calculate_nutrient_term_for_residue_composition_factor(ratio: float, co
 
 
 @pytest.mark.parametrize(
-    "nitrogen_ratio,phosphorus_ratio,nutrient_term",
+    "nitrogen_ratio,phosphorus_ratio,nitrogen_term,phosphorus_term,expected",
     [
-        (1.92324, 1.84928, 1.9),
-        (0.8859, 0.8879, 0.55),
-        (1.2235, 1.1224, 0.999),
-        (0.662, 0.88583, 1.0013),
+        (1.92324, 1.84928, 1.9, 2.4, 1),
+        (0.8859, 0.8879, 0.55, 0.62, 0.55),
+        (1.2235, 1.1224, 1.05, 0.999, 0.999),
+        (0.662, 0.88583, 1.0013, 1.3, 1),
+        (48.31, 361.7, 1e-6, 5e-7, 1e-5),
     ],
 )
 def test_calculate_nutrient_cycling_residue_composition_factor(
-    nitrogen_ratio: float, phosphorus_ratio: float, nutrient_term: float
+    mocker: MockerFixture,
+    nitrogen_ratio: float,
+    phosphorus_ratio: float,
+    nitrogen_term: float,
+    phosphorus_term: float,
+    expected: float,
 ) -> None:
-    """Tests that the nutrient cycling residue composition factor is calculated correctly."""
-    MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor = MagicMock(
-        return_value=nutrient_term
+    """Tests that the nutrient cycling residue composition factor is the smallest of the nitrogen term, the
+    phosphorus term, and 1, with a minimum value of 1e-5."""
+    mock_nutrient_term = mocker.patch.object(
+        MineralizationDecomposition,
+        "_calculate_nutrient_term_for_residue_composition_factor",
+        side_effect=[nitrogen_term, phosphorus_term],
     )
     observed = MineralizationDecomposition._calculate_nutrient_cycling_residue_composition_factor(
         nitrogen_ratio, phosphorus_ratio
     )
-    expected = 1
 
     calls = [call(nitrogen_ratio, 25), call(phosphorus_ratio, 200)]
-    MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor.assert_has_calls(calls)
+    mock_nutrient_term.assert_has_calls(calls)
     assert observed == expected
 
 

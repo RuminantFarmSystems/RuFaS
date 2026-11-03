@@ -43,7 +43,7 @@ def stored_manure() -> ManureStream:
         volume=100.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -63,7 +63,7 @@ def received_manure() -> ManureStream:
         volume=10.12,
         methane_production_potential=0.24,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=10
+        bedding_non_degradable_volatile_solids=10,
     )
 
 
@@ -147,12 +147,18 @@ def test_process_manure_runs_expected_steps(
     ],
 )
 def test_calculate_open_lot_ammonia_emissions(
-    daily_nitrogen_input: float, expected_output: float, expect_exception: bool, open_lot: OpenLot
+    daily_nitrogen_input: float,
+    expected_output: float,
+    expect_exception: bool,
+    open_lot: OpenLot,
+    mocker: MockerFixture,
 ) -> None:
     """Test the method calculate_nitrogen_loss_in_open_lots_from_ammonia_emission()."""
     if expect_exception:
+        mock_add_error = mocker.patch.object(open_lot._om, "add_error")
         with pytest.raises(ValueError):
             open_lot._calculate_open_lot_ammonia_emissions(daily_nitrogen_input)
+        mock_add_error.assert_called_once()
     else:
         assert open_lot._calculate_open_lot_ammonia_emissions(daily_nitrogen_input) == expected_output
 

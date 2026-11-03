@@ -1,8 +1,8 @@
 from math import exp
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 class Percolation:
@@ -13,10 +13,10 @@ class Percolation:
 
     Parameters
     ----------
-    soil_data : Optional[SoilData]
+    soil_data : SoilData, optional
         The SoilData object used by this module to track percolation. A new SoilData object is created if one is not
         provided.
-    field_size : Optional[float], default=None
+    field_size : float, optional
         The size of the field (ha).
 
     Attributes
@@ -26,7 +26,7 @@ class Percolation:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def percolate(self, has_seasonal_high_water_table: bool) -> None:
@@ -36,13 +36,13 @@ class Percolation:
         Parameters
         ----------
         has_seasonal_high_water_table : bool
-            A flag indicating whether the HRU has a seasonal high water table (True/False).
+            A flag indicating whether the HRU has a seasonal high water table.
 
         Notes
         -----
         RuFaS allows percolation even when the temperature of the soil layer is below zero degrees Celsius.
 
-        This routine calls the subroutine `_percolate_infiltrated_water` to handle percolating water from infiltration
+        This routine calls the subroutine ``_percolate_infiltrated_water`` to handle percolating water from infiltration
         into the soil profile. If that routine percolates water out of any soil layers (which is the case when there are
         high or sustained amounts of infiltration), this routine will only percolate water out of the soil layers which
         have not had water percolated out of them on the current day.
@@ -137,12 +137,26 @@ class Percolation:
         float
             Travel time for percolation (hours).
 
+        Raises
+        ------
+        ValueError
+            If saturated hydraulic conductivity is <= 0.
+
         References
         ----------
         SWAT 2:3.2.4
 
         """
         if saturated_hydraulic_conductivity <= 0:
+            OutputManager().add_error(
+                "Percolation travel time error",
+                "Saturated hydraulic conductivity must be greater than 0 "
+                f"and got {saturated_hydraulic_conductivity}",
+                info_map={
+                    "class": Percolation.__name__,
+                    "function": Percolation._determine_percolation_travel_time.__name__,
+                },
+            )
             raise ValueError("Saturated hydraulic conductivity must be greater than 0")
         return (saturation - field_capacity_content) / saturated_hydraulic_conductivity
 
@@ -193,7 +207,7 @@ class Percolation:
         saturated_capacity_content : float
             Water content of the given soil layer when completely saturated (mm).
         is_seasonal_high_water_table : bool
-            Boolean indicating if HRU has a seasonal high water table (True/False).
+            Boolean indicating if HRU has a seasonal high water table.
 
         Returns
         -------
@@ -251,9 +265,7 @@ class Percolation:
             amount_to_percolate = Percolation._determine_percolation_to_next_layer(
                 water_to_percolate, time_step, percolation_time
             )
-            #  Limit the maximum amount of water allowed to percolate so that lower layer cannot become overly saturated
             if amount_to_percolate > lower_layer.acceptable_percolation_amount:
                 amount_to_percolate = lower_layer.acceptable_percolation_amount
 
-            # move water from upper layer to lower layer
             return max(0, amount_to_percolate)

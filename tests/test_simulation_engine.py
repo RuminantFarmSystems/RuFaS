@@ -1,8 +1,7 @@
 from datetime import date, datetime, timedelta
-from typing import cast
 
 from RUFAS.EEE.emissions import EmissionsEstimator
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import DailyManureSupplier, ManureStream
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 import pytest
 from unittest.mock import MagicMock, PropertyMock, call
@@ -17,7 +16,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
-    TotalInventory,
+    IdealFeeds,
     RequestedFeed,
     NutrientStandard,
 )
@@ -32,7 +31,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.field.field import Field
 from RUFAS.biophysical.field.manager.field_manager import FieldManager
 from RUFAS.biophysical.manure.manure_manager import ManureManager
-from RUFAS.simulation_engine import SimulationEngine, SimulationType
+from RUFAS.simulation_engine import DEFAULT_FEED_DEGRADATIONS_PROCESSING_INTERVAL, SimulationEngine, SimulationType
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
@@ -41,6 +40,10 @@ def test_simulation_type_enum_values() -> None:
     """Unit test for SimulationType enum values."""
     assert SimulationType.FULL_FARM.value == "full_farm"
     assert SimulationType.FIELD_AND_FEED.value == "field_and_feed"
+    assert SimulationType.FIELD_ONLY.value == "field_only"
+    assert SimulationType.ANIMALS_ONLY.value == "animals_only"
+    assert SimulationType.MANURE_ONLY.value == "manure_only"
+    assert SimulationType.FEED_ONLY.value == "feed_only"
 
 
 @pytest.mark.parametrize(
@@ -48,6 +51,10 @@ def test_simulation_type_enum_values() -> None:
     [
         (SimulationType.FULL_FARM, True),
         (SimulationType.FIELD_AND_FEED, False),
+        (SimulationType.FIELD_ONLY, False),
+        (SimulationType.ANIMALS_ONLY, True),
+        (SimulationType.MANURE_ONLY, False),
+        (SimulationType.FEED_ONLY, False),
     ],
 )
 def test_simulate_animals(
@@ -58,33 +65,48 @@ def test_simulate_animals(
     assert simulation_type.simulate_animals is expected_result
 
 
-def test_non_animal_simulation_types() -> None:
-    """Unit test for SimulationType._non_animal_simulation_types."""
-    assert SimulationType._non_animal_simulation_types() == {SimulationType.FIELD_AND_FEED}
+def test_animal_simulation_types() -> None:
+    """Unit test for SimulationType._animal_simulation_types."""
+    assert SimulationType._animal_simulation_types() == {SimulationType.FULL_FARM, SimulationType.ANIMALS_ONLY}
 
 
-@pytest.mark.parametrize(
-    "simulation_type_str, expected_result",
-    [
-        ("full_farm", SimulationType.FULL_FARM),
-        ("field_and_feed", SimulationType.FIELD_AND_FEED),
-    ],
-)
-def test_get_simulation_type_valid(
-    simulation_type_str: str,
-    expected_result: SimulationType,
-) -> None:
+def test_field_simulation_types() -> None:
+    """Unit test for SimulationType._fields_simulation_types."""
+    assert SimulationType._fields_simulation_types() == {
+        SimulationType.FULL_FARM,
+        SimulationType.FIELD_AND_FEED,
+        SimulationType.FIELD_ONLY,
+    }
+
+
+def test_manure_simulation_types() -> None:
+    """Unit test for SimulationType._manure_simulation_types."""
+    assert SimulationType._manure_simulation_types() == {SimulationType.FULL_FARM, SimulationType.MANURE_ONLY}
+
+
+def test_feed_simulation_types() -> None:
+    """Unit test for SimulationType._feed_simulation_types."""
+    assert SimulationType._feed_simulation_types() == {
+        SimulationType.FULL_FARM,
+        SimulationType.FIELD_AND_FEED,
+        SimulationType.FEED_ONLY,
+    }
+
+
+@pytest.mark.parametrize("simulation_type", list(SimulationType))
+def test_get_simulation_type_valid(simulation_type: SimulationType) -> None:
     """Unit test for SimulationType.get_simulation_type with valid values."""
-    assert SimulationType.get_simulation_type(simulation_type_str) is expected_result
+    assert SimulationType.get_simulation_type(simulation_type.value) is simulation_type
 
 
 def test_get_simulation_type_invalid() -> None:
     """Unit test for SimulationType.get_simulation_type with an invalid value."""
     invalid_simulation_type = "not_a_real_simulation"
+    valid_simulation_types = ", ".join(simulation_type.value for simulation_type in SimulationType)
 
     with pytest.raises(
         ValueError,
-        match=("Unknown simulation type: not_a_real_simulation. " "Expected one of: full_farm, field_and_feed."),
+        match=(f"Unknown simulation type: {invalid_simulation_type}. " f"Expected one of: {valid_simulation_types}."),
     ):
         SimulationType.get_simulation_type(invalid_simulation_type)
 
@@ -92,7 +114,7 @@ def test_get_simulation_type_invalid() -> None:
 @pytest.fixture
 def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     mocker.patch("RUFAS.simulation_engine.RufasTime")
-    mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
+    mocker.patch("RUFAS.simulation_engine.SimulationEngine._setup_simulation_modules")
     mock_simulation_type = SimulationType("full_farm")
 
     simulation_engine = SimulationEngine(mock_simulation_type)
@@ -112,7 +134,7 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
     """
 
     # Arrange
-    mock_initialize_simulation = mocker.patch.object(SimulationEngine, "_initialize_simulation")
+    mock_setup_simulation_modules = mocker.patch.object(SimulationEngine, "_setup_simulation_modules")
     mock_time = mocker.MagicMock(auto_spec=RufasTime)
     mocker.patch("RUFAS.simulation_engine.RufasTime", return_value=mock_time)
     mock_simulation_type = SimulationType("full_farm")
@@ -121,7 +143,7 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
     simulation_engine = SimulationEngine(mock_simulation_type)
 
     # Assert
-    mock_initialize_simulation.assert_called_once()
+    mock_setup_simulation_modules.assert_called_once()
     assert simulation_engine.time == mock_time
 
 
@@ -133,48 +155,128 @@ def test_simulate(
     end_time: int,
 ) -> None:
     """
-    Unit test for function simulate() in file RUFAS/simulation_engine.py
+    Unit test for function simulate() in simulation_engine.py
     """
     # Arrange
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
-    mock_estimate_emissions = mocker.patch.object(EEEManager, "estimate_all")
     mock_run_simulation_main_loop = mocker.patch.object(simulation_engine, "_run_simulation_main_loop")
-    mock_report_end_of_simulation = mocker.patch(
-        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter" ".report_end_of_simulation"
-    )
-    mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
-    mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-
-    mock_time = MagicMock(auto_spec=RufasTime)
-    mock_time.simulation_day = 100
-    simulation_engine.time = mock_time
+    mock_post_loop_processing = mocker.patch.object(simulation_engine, "_post_simulation_processing")
+    mock_post_loop_reporting = mocker.patch.object(simulation_engine, "_post_simulation_reporting")
+    mock_post_loop_logging = mocker.patch.object(simulation_engine, "_post_simulation_logging")
 
     info_map = {
         "class": simulation_engine.__class__.__name__,
         "function": simulation_engine.simulate.__name__,
     }
     expected_simulation_time = end_time - start_time
-    expected_log_message = f"Total simulation time is: {expected_simulation_time}"
 
     # Act
     simulation_engine.simulate()
 
     # Assert
-    mock_run_simulation_main_loop.assert_called_once()
-    assert mock_om_add_log.call_args_list == [
-        call("Simulation complete", "Simulation Completed.", info_map),
-        call("total_simulation_time", expected_log_message, info_map),
-    ]
-    mock_report_end_of_simulation.assert_called_once_with(
-        simulation_engine.herd_manager.herd_statistics,
-        simulation_engine.herd_manager.herd_reproduction_statistics,
-        simulation_engine.time,
-        simulation_engine.herd_manager.heiferII_events_by_id,
-        simulation_engine.herd_manager.cow_events_by_id,
-        simulation_engine.herd_manager.animal_genetic_history_by_id,
+    mock_run_simulation_main_loop.assert_called_once_with()
+    mock_post_loop_processing.assert_called_once_with()
+    mock_post_loop_reporting.assert_called_once_with()
+    mock_post_loop_logging.assert_called_once_with(expected_simulation_time, info_map)
+
+
+def test_post_loop_processing(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _post_loop_processing in simulation_engine.py
+    """
+    # Arrange
+    mock_estimate_all = mocker.patch.object(EEEManager, "estimate_all")
+
+    # Act
+    simulation_engine._post_simulation_processing()
+
+    # Assert
+    mock_estimate_all.assert_called_once_with(True, True, True, True)
+
+
+@pytest.mark.parametrize(
+    "simulate_animals, expect_report_call",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_post_loop_reporting(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_animals: bool,
+    expect_report_call: bool,
+) -> None:
+    """
+    Unit test for function _post_loop_reporting in simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.simulate_animals = simulate_animals
+
+    mock_report_end_of_simulation = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation"
     )
 
-    mock_estimate_emissions.assert_called_once()
+    # Act
+    simulation_engine._post_simulation_reporting()
+
+    # Assert
+    if expect_report_call:
+        mock_report_end_of_simulation.assert_called_once_with(
+            simulation_engine.herd_manager.herd_statistics,
+            simulation_engine.herd_manager.herd_reproduction_statistics,
+            simulation_engine.time,
+            simulation_engine.herd_manager.heiferII_events_by_id,
+            simulation_engine.herd_manager.cow_events_by_id,
+            simulation_engine.herd_manager.animal_genetic_history_by_id,
+        )
+    else:
+        mock_report_end_of_simulation.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "simulate_manure, expect_dmi_summary_call",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_post_loop_logging(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_manure: bool,
+    expect_dmi_summary_call: bool,
+) -> None:
+    """
+    Unit test for function _post_loop_logging in simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.simulate_manure = simulate_manure
+    total_simulation_time = 42.5
+    info_map = {"class": "SimulationEngine", "function": "simulate"}
+
+    mock_emit_dmi_summary = mocker.patch(
+        "RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator"
+        ".ManureExcretionCalculator.emit_dmi_below_min_summary"
+    )
+    mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    # Act
+    simulation_engine._post_simulation_logging(total_simulation_time, info_map)
+
+    # Assert
+    if expect_dmi_summary_call:
+        mock_emit_dmi_summary.assert_called_once_with(info_map)
+    else:
+        mock_emit_dmi_summary.assert_not_called()
+
+    assert mock_om_add_log.call_args_list == [
+        call("Simulation complete", "Simulation Completed.", info_map),
+        call("total_simulation_time", f"Total simulation time is: {total_simulation_time}", info_map),
+    ]
 
 
 def test_execute_full_farm_daily_simulation(
@@ -182,7 +284,8 @@ def test_execute_full_farm_daily_simulation(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _execute_full_farm_daily_simulation in file RUFAS/simulation_engine.py
+    Unit test for function _execute_full_farm_daily_simulation in file
+    RUFAS/simulation_engine.py
     """
     # Arrange
     daily_harvested_crops = [{"crop": "corn"}]
@@ -195,13 +298,23 @@ def test_execute_full_farm_daily_simulation(
         "_execute_daily_field_operations",
         return_value=daily_harvested_crops,
     )
+    mock_receive_daily_harvested_crops = mocker.patch.object(
+        simulation_engine,
+        "_receive_daily_harvested_crops",
+    )
     mock_build_harvest_schedule = mocker.patch.object(
         simulation_engine,
         "_build_harvest_schedule",
         return_value=harvest_schedule,
     )
-    mock_execute_feed_planning = mocker.patch.object(simulation_engine, "_execute_feed_planning")
-    mock_execute_ration_planning = mocker.patch.object(simulation_engine, "_execute_ration_planning")
+    mock_execute_feed_planning = mocker.patch.object(
+        simulation_engine,
+        "_execute_feed_planning",
+    )
+    mock_execute_ration_planning = mocker.patch.object(
+        simulation_engine,
+        "_execute_ration_planning",
+    )
     mock_execute_daily_animal_operations = mocker.patch.object(
         simulation_engine,
         "_execute_daily_animal_operations",
@@ -211,14 +324,21 @@ def test_execute_full_farm_daily_simulation(
         simulation_engine,
         "_execute_daily_manure_operations",
     )
-    mock_report_daily_records = mocker.patch.object(simulation_engine, "_report_daily_records")
-    mock_advance_time = mocker.patch.object(simulation_engine, "_advance_time")
+    mock_report_daily_records = mocker.patch.object(
+        simulation_engine,
+        "_report_daily_records",
+    )
+    mock_advance_time = mocker.patch.object(
+        simulation_engine,
+        "_advance_time",
+    )
 
     # Act
     simulation_engine._execute_full_farm_daily_simulation()
 
     # Assert
     mock_execute_daily_field_operations.assert_called_once_with()
+    mock_receive_daily_harvested_crops.assert_called_once_with(daily_harvested_crops)
     mock_build_harvest_schedule.assert_called_once_with(daily_harvested_crops)
     mock_execute_feed_planning.assert_called_once_with(harvest_schedule)
     mock_execute_ration_planning.assert_called_once_with()
@@ -233,7 +353,8 @@ def test_execute_field_and_feed_daily_simulation(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _execute_field_and_feed_daily_simulation in file RUFAS/simulation_engine.py
+    Unit test for function _execute_field_and_feed_daily_simulation in file
+    RUFAS/simulation_engine.py
     """
     # Arrange
     daily_harvested_crops = [{"crop": "corn"}]
@@ -252,6 +373,13 @@ def test_execute_field_and_feed_daily_simulation(
     parent.attach_mock(
         mocker.patch.object(
             simulation_engine,
+            "_receive_daily_harvested_crops",
+        ),
+        "receive_daily_harvested_crops",
+    )
+    parent.attach_mock(
+        mocker.patch.object(
+            simulation_engine,
             "_build_harvest_schedule",
             return_value=harvest_schedule,
         ),
@@ -262,10 +390,6 @@ def test_execute_field_and_feed_daily_simulation(
         "execute_feed_planning",
     )
     parent.attach_mock(
-        mocker.patch.object(simulation_engine, "_execute_ration_planning"),
-        "execute_ration_planning",
-    )
-    parent.attach_mock(
         mocker.patch.object(simulation_engine, "_report_daily_records"),
         "report_daily_records",
     )
@@ -274,6 +398,10 @@ def test_execute_field_and_feed_daily_simulation(
         "advance_time",
     )
 
+    mock_execute_ration_planning = mocker.patch.object(
+        simulation_engine,
+        "_execute_ration_planning",
+    )
     mock_execute_daily_animal_operations = mocker.patch.object(
         simulation_engine,
         "_execute_daily_animal_operations",
@@ -289,15 +417,236 @@ def test_execute_field_and_feed_daily_simulation(
     # Assert
     assert parent.mock_calls == [
         call.execute_daily_field_operations(),
+        call.receive_daily_harvested_crops(daily_harvested_crops),
         call.build_harvest_schedule(daily_harvested_crops),
         call.execute_feed_planning(harvest_schedule),
-        call.execute_ration_planning(),
         call.report_daily_records(),
         call.advance_time(),
     ]
 
+    mock_execute_ration_planning.assert_not_called()
     mock_execute_daily_animal_operations.assert_not_called()
     mock_execute_daily_manure_operations.assert_not_called()
+
+
+def test_execute_feed_only_daily_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_feed_only_daily_simulation in file
+    RUFAS/simulation_engine.py
+    """
+    # Arrange
+    parent = MagicMock()
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_execute_feed_storage_operations"),
+        "execute_feed_storage_operations",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_report_daily_records"),
+        "report_daily_records",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_advance_time"),
+        "advance_time",
+    )
+
+    mock_execute_daily_field_operations = mocker.patch.object(simulation_engine, "_execute_daily_field_operations")
+    mock_receive_daily_harvested_crops = mocker.patch.object(simulation_engine, "_receive_daily_harvested_crops")
+    mock_execute_feed_planning = mocker.patch.object(simulation_engine, "_execute_feed_planning")
+    mock_execute_ration_planning = mocker.patch.object(simulation_engine, "_execute_ration_planning")
+    mock_execute_daily_animal_operations = mocker.patch.object(simulation_engine, "_execute_daily_animal_operations")
+    mock_execute_daily_manure_operations = mocker.patch.object(simulation_engine, "_execute_daily_manure_operations")
+
+    # Act
+    simulation_engine._execute_feed_only_daily_simulation()
+
+    # Assert
+    assert parent.mock_calls == [
+        call.execute_feed_storage_operations(),
+        call.report_daily_records(),
+        call.advance_time(),
+    ]
+
+    mock_execute_daily_field_operations.assert_not_called()
+    mock_receive_daily_harvested_crops.assert_not_called()
+    mock_execute_feed_planning.assert_not_called()
+    mock_execute_ration_planning.assert_not_called()
+    mock_execute_daily_animal_operations.assert_not_called()
+    mock_execute_daily_manure_operations.assert_not_called()
+
+
+@pytest.mark.parametrize("is_time_to_process_degradations", [True, False])
+def test_execute_feed_storage_operations(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    is_time_to_process_degradations: bool,
+) -> None:
+    """
+    Unit test for function _execute_feed_storage_operations in file RUFAS/simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
+    mock_time.simulation_day = 42
+    simulation_engine.weather = MagicMock(auto_spec=Weather)
+    simulation_engine.feed_manager = MagicMock()
+    simulation_engine.feed_degradations_interval_length = timedelta(days=30)
+    mocker.patch.object(
+        SimulationEngine,
+        "_is_time_to_process_feed_degradations",
+        new_callable=mocker.PropertyMock,
+        return_value=is_time_to_process_degradations,
+    )
+
+    # Act
+    simulation_engine._execute_feed_storage_operations()
+
+    # Assert
+    simulation_engine.feed_manager.report_feed_storage_levels.assert_called_once_with(42, "daily_storage_levels")
+    simulation_engine.feed_manager.report_cumulative_purchased_feeds.assert_called_once_with(42)
+    if is_time_to_process_degradations:
+        simulation_engine.feed_manager.process_degradations.assert_called_once_with(
+            simulation_engine.weather, mock_time
+        )
+        assert (
+            simulation_engine.next_degradations_processing
+            == (mock_time.current_date + simulation_engine.feed_degradations_interval_length).date()
+        )
+    else:
+        simulation_engine.feed_manager.process_degradations.assert_not_called()
+
+
+def test_gather_initial_feed_storage_inventory(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
+    """
+    Unit test for function _gather_initial_feed_storage_inventory in file RUFAS/simulation_engine.py
+    """
+    # Arrange
+    first_inventory = {
+        "initial_inventory": [
+            {"storage_name": "corn_silage_storage_1", "dry_matter_mass": 200000.0, "dry_matter_percentage": 35.0},
+            {"storage_name": "corn_silage_storage_1", "dry_matter_mass": 1.0, "dry_matter_percentage": 1.0},
+        ]
+    }
+    second_inventory = {
+        "initial_inventory": [
+            {"storage_name": "alfalfa_hay_storage_2", "dry_matter_mass": 30000.0, "dry_matter_percentage": 88.0},
+        ]
+    }
+    simulation_engine.im = MagicMock(auto_spec=InputManager)
+    simulation_engine.im.get_data_keys_by_properties.return_value = ["initial_inventory_1", "initial_inventory_2"]
+    simulation_engine.im.get_data.side_effect = [first_inventory, second_inventory]
+    mock_add_warning = mocker.patch.object(simulation_engine.om, "add_warning")
+
+    # Act
+    initial_inventory_by_storage_name = simulation_engine._gather_initial_feed_storage_inventory()
+
+    # Assert
+    assert initial_inventory_by_storage_name == {
+        "corn_silage_storage_1": {"dry_matter_mass": 200000.0, "dry_matter_percentage": 35.0},
+        "alfalfa_hay_storage_2": {"dry_matter_mass": 30000.0, "dry_matter_percentage": 88.0},
+    }
+    mock_add_warning.assert_called_once()
+    assert "corn_silage_storage_1" in mock_add_warning.call_args.args[1]
+
+
+@pytest.mark.parametrize("simulate_fields, expected_warning_count", [(False, 1), (True, 0)])
+def test_gather_initial_feed_storage_inventory_no_input_files(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_fields: bool,
+    expected_warning_count: int,
+) -> None:
+    """
+    Unit test for function _gather_initial_feed_storage_inventory in file RUFAS/simulation_engine.py when no initial
+    inventory input files are provided.
+    """
+    # Arrange
+    simulation_engine.simulate_fields = simulate_fields
+    simulation_engine.im = MagicMock(auto_spec=InputManager)
+    simulation_engine.im.get_data_keys_by_properties.return_value = []
+    mock_add_warning = mocker.patch.object(simulation_engine.om, "add_warning")
+
+    # Act
+    initial_inventory_by_storage_name = simulation_engine._gather_initial_feed_storage_inventory()
+
+    # Assert
+    assert initial_inventory_by_storage_name == {}
+    assert mock_add_warning.call_count == expected_warning_count
+
+
+def test_execute_animals_only_daily_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_animals_only_daily_simulation in file
+    RUFAS/simulation_engine.py
+    """
+    # Arrange
+    daily_manure_data = {"manure": "data"}
+    daily_purchased_feeds_fed = {"feed_1": 12.5}
+    mock_execute_ration_planning = mocker.patch.object(
+        simulation_engine,
+        "_execute_ration_planning",
+    )
+    mock_execute_daily_animal_operations = mocker.patch.object(
+        simulation_engine,
+        "_execute_daily_animal_operations",
+        return_value=(daily_manure_data, daily_purchased_feeds_fed),
+    )
+    mock_report_daily_records = mocker.patch.object(
+        simulation_engine,
+        "_report_daily_records",
+    )
+    mock_advance_time = mocker.patch.object(
+        simulation_engine,
+        "_advance_time",
+    )
+
+    # Act
+    simulation_engine._execute_animals_only_daily_simulation()
+
+    # Assert
+    mock_execute_ration_planning.assert_called_once_with()
+    mock_execute_daily_animal_operations.assert_called_once_with()
+    mock_report_daily_records.assert_called_once_with(daily_purchased_feeds_fed)
+    mock_advance_time.assert_called_once_with()
+
+
+def test_execute_manure_only_daily_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_manure_only_daily_simulation in file
+    RUFAS/simulation_engine.py
+    """
+    # Arrange
+    daily_manure_data = {"manure": "data"}
+    simulation_engine.daily_manure_supplier = MagicMock(auto_spec=DailyManureSupplier)
+    simulation_engine.daily_manure_supplier.get_daily_manure_streams.return_value = daily_manure_data
+    mock_execute_daily_manure_operations = mocker.patch.object(
+        simulation_engine,
+        "_execute_daily_manure_operations",
+    )
+    mock_report_daily_records = mocker.patch.object(
+        simulation_engine,
+        "_report_daily_records",
+    )
+    mock_advance_time = mocker.patch.object(
+        simulation_engine,
+        "_advance_time",
+    )
+
+    # Act
+    simulation_engine._execute_manure_only_daily_simulation()
+
+    # Assert
+    simulation_engine.daily_manure_supplier.get_daily_manure_streams.assert_called_once_with()
+    mock_execute_daily_manure_operations.assert_called_once_with(daily_manure_data)
+    mock_report_daily_records.assert_called_once_with()
+    mock_advance_time.assert_called_once_with()
 
 
 def test_execute_daily_field_operations(
@@ -305,27 +654,24 @@ def test_execute_daily_field_operations(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _execute_daily_field_operations in file RUFAS/simulation_engine.py
+    Unit test for function _execute_daily_field_operations in file
+    RUFAS/simulation_engine.py
     """
     # Arrange
     manure_applications = [MagicMock(), MagicMock()]
     harvested_crops = [MagicMock(), MagicMock()]
-    simulation_day = 123
 
     mock_generate_daily_manure_applications = mocker.patch.object(
         simulation_engine,
-        "generate_daily_manure_applications",
+        "_generate_daily_manure_applications",
         return_value=manure_applications,
     )
 
     simulation_engine.weather = MagicMock()
     simulation_engine.time = MagicMock()
-    simulation_engine.time.simulation_day = simulation_day
 
     simulation_engine.field_manager = MagicMock()
     simulation_engine.field_manager.daily_update_routine.return_value = harvested_crops
-
-    simulation_engine.feed_manager = MagicMock()
 
     # Act
     result = simulation_engine._execute_daily_field_operations()
@@ -337,10 +683,6 @@ def test_execute_daily_field_operations(
         simulation_engine.time,
         manure_applications,
     )
-    assert simulation_engine.feed_manager.receive_crop.call_args_list == [
-        call(harvested_crops[0], simulation_day),
-        call(harvested_crops[1], simulation_day),
-    ]
     assert result == harvested_crops
 
 
@@ -350,7 +692,7 @@ def test_execute_daily_field_operations_no_harvested_crops(
 ) -> None:
     """
     Unit test for function _execute_daily_field_operations with no harvested crops
-    in file RUFAS/simulation_engine.py
+    in simulation_engine.py
     """
     # Arrange
     manure_applications = [MagicMock()]
@@ -358,7 +700,7 @@ def test_execute_daily_field_operations_no_harvested_crops(
 
     mock_generate_daily_manure_applications = mocker.patch.object(
         simulation_engine,
-        "generate_daily_manure_applications",
+        "_generate_daily_manure_applications",
         return_value=manure_applications,
     )
 
@@ -385,13 +727,45 @@ def test_execute_daily_field_operations_no_harvested_crops(
     assert result == harvested_crops
 
 
+def test_execute_field_only_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_field_only_simulation
+    in file RUFAS/simulation_engine.py
+    """
+    parent = MagicMock()
+
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_execute_daily_field_operations"),
+        "execute_daily_field_operations",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_report_daily_records"),
+        "report_daily_records",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_advance_time"),
+        "advance_time",
+    )
+
+    simulation_engine._execute_field_only_simulation()
+
+    assert parent.mock_calls == [
+        call.execute_daily_field_operations(),
+        call.report_daily_records(),
+        call.advance_time(),
+    ]
+
+
 def test_build_harvest_schedule_no_feed_recalculation(
     simulation_engine: SimulationEngine,
     mocker: MockerFixture,
 ) -> None:
     """
     Unit test for function _build_harvest_schedule when feed planning recalculation
-    is not needed in file RUFAS/simulation_engine.py
+    is not needed in simulation_engine.py
     """
     # Arrange
     harvested_crop_1 = MagicMock()
@@ -444,7 +818,7 @@ def test_should_recalculate_feed_planning(
 ) -> None:
     """
     Unit test for property _should_recalculate_feed_planning
-    in file RUFAS/simulation_engine.py
+    in simulation_engine.py
     """
     # Arrange
     current_date = datetime(2026, 3, 11)
@@ -462,7 +836,7 @@ def test_execute_feed_planning_empty_schedule(
 ) -> None:
     """
     Unit test for function _execute_feed_planning with empty harvest schedule
-    in file RUFAS/simulation_engine.py
+    in simulation_engine.py
     """
     # Arrange
     mock_get_total_projected_inventory = mocker.patch.object(
@@ -497,17 +871,27 @@ def test_execute_feed_planning(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _execute_feed_planning in file RUFAS/simulation_engine.py
+    Unit test for function _execute_feed_planning in simulation_engine.py
     """
     # Arrange
     harvest_schedule: dict[str, date | None] = {"corn_silage": None}
 
-    projected_inventory = {"feed_1": 100}
+    projected_inventory = {1: 100}
     harvest_dates_with_ids = {12: None}
-    ideal_feeds = {"feed_1": 50}
+    ideal_feeds = IdealFeeds({1: 50})
+    simulation_day = 123
 
+    simulation_engine.simulate_animals = True
     simulation_engine.time.current_date = datetime(2026, 3, 11)
+    mocker.patch.object(simulation_engine.time, "simulation_day", simulation_day, create=True)
     simulation_engine.weather = MagicMock()
+
+    mocker.patch.object(
+        type(simulation_engine),
+        "_is_time_to_process_feed_degradations",
+        new_callable=PropertyMock,
+        return_value=False,
+    )
 
     mock_get_total_projected_inventory = mocker.patch.object(
         simulation_engine.feed_manager,
@@ -520,13 +904,25 @@ def test_execute_feed_planning(
         return_value=harvest_dates_with_ids,
     )
     mock_update_all_max_daily_feeds = mocker.patch.object(
-        simulation_engine.herd_manager,
-        "update_all_max_daily_feeds",
+        simulation_engine,
+        "_update_all_max_daily_feeds",
         return_value=ideal_feeds,
     )
     mock_manage_planning_cycle_purchases = mocker.patch.object(
         simulation_engine.feed_manager,
         "manage_planning_cycle_purchases",
+    )
+    mock_report_feed_storage_levels = mocker.patch.object(
+        simulation_engine.feed_manager,
+        "report_feed_storage_levels",
+    )
+    mock_report_cumulative_purchased_feeds = mocker.patch.object(
+        simulation_engine.feed_manager,
+        "report_cumulative_purchased_feeds",
+    )
+    mock_process_degradations = mocker.patch.object(
+        simulation_engine.feed_manager,
+        "process_degradations",
     )
 
     # Act
@@ -538,58 +934,51 @@ def test_execute_feed_planning(
         simulation_engine.weather,
         simulation_engine.time,
     )
-
     mock_translate_crop_config_name_to_rufas_id.assert_called_once_with(harvest_schedule)
-
     mock_update_all_max_daily_feeds.assert_called_once_with(
         projected_inventory,
         harvest_dates_with_ids,
-        simulation_engine.time,
     )
-
     mock_manage_planning_cycle_purchases.assert_called_once_with(
         ideal_feeds,
         simulation_engine.time,
     )
+    mock_report_feed_storage_levels.assert_called_once_with(
+        simulation_day,
+        "daily_storage_levels",
+    )
+    mock_report_cumulative_purchased_feeds.assert_called_once_with(simulation_day)
+    mock_process_degradations.assert_not_called()
 
 
-def test_build_harvest_schedule_with_feed_recalculation(
+def test_build_harvest_schedule(
     simulation_engine: SimulationEngine,
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _build_harvest_schedule when feed planning recalculation
-    is needed in file RUFAS/simulation_engine.py
+    Unit test for function _build_harvest_schedule in file
+    RUFAS/simulation_engine.py
     """
     # Arrange
-    harvested_crop = MagicMock()
-    harvested_crop.config_name = "corn_silage"
-    harvested_crops: list[HarvestedCrop] = [harvested_crop]
+    harvested_crop_1 = MagicMock()
+    harvested_crop_1.config_name = "corn_silage"
 
-    simulation_engine.feed_manager.crop_to_rufas_id = {
-        "corn_silage": 1,
-        "alfalfa": 2,
-        "grass_hay": 3,
-    }
+    harvested_crop_2 = MagicMock()
+    harvested_crop_2.config_name = "alfalfa"
 
-    simulation_engine.time = MagicMock()
-    simulation_engine.time.current_date = datetime(2026, 3, 11)
-    simulation_engine.max_daily_feed_recalculation_interval = timedelta(days=30)
+    harvested_crop_3 = MagicMock()
+    harvested_crop_3.config_name = "corn_silage"
 
-    expected_next_recalculation_date = datetime(2026, 4, 10)
+    harvested_crops: list[HarvestedCrop] = [
+        harvested_crop_1,
+        harvested_crop_2,
+        harvested_crop_3,
+    ]
 
     expected_schedule = {
         "corn_silage": datetime(2026, 6, 1).date(),
         "alfalfa": datetime(2026, 6, 15).date(),
-        "grass_hay": None,
     }
-
-    mocker.patch.object(
-        SimulationEngine,
-        "_should_recalculate_feed_planning",
-        new_callable=mocker.PropertyMock,
-        return_value=True,
-    )
 
     mock_get_next_harvest_dates = mocker.patch.object(
         simulation_engine.field_manager,
@@ -603,17 +992,14 @@ def test_build_harvest_schedule_with_feed_recalculation(
     # Assert
     mock_get_next_harvest_dates.assert_called_once()
     called_crop_names = mock_get_next_harvest_dates.call_args.args[0]
-    assert set(called_crop_names) == {"corn_silage", "alfalfa", "grass_hay"}
-
-    assert simulation_engine.next_max_daily_feed_recalculation == expected_next_recalculation_date
+    assert set(called_crop_names) == {"corn_silage", "alfalfa"}
     assert result == expected_schedule
 
 
 @pytest.mark.parametrize(
-    "is_time_to_reformulate, expected_call_count",
+    "is_time_to_reformulate, expected_call_count, expected_next_reformulation",
     [
-        (True, 1),
-        (False, 0),
+        (True, 1, datetime(2026, 4, 10).date()),
     ],
 )
 def test_execute_ration_planning(
@@ -621,9 +1007,10 @@ def test_execute_ration_planning(
     mocker: MockerFixture,
     is_time_to_reformulate: bool,
     expected_call_count: int,
+    expected_next_reformulation: date,
 ) -> None:
     """
-    Unit test for function _execute_ration_planning in file RUFAS/simulation_engine.py
+    Unit test for function _execute_ration_planning in simulation_engine.py
     """
     # Arrange
     mocker.patch.object(
@@ -632,6 +1019,10 @@ def test_execute_ration_planning(
         new_callable=PropertyMock,
         return_value=is_time_to_reformulate,
     )
+
+    simulation_engine.time.current_date = datetime(2026, 3, 11)
+    simulation_engine.ration_formulation_interval_length = timedelta(days=30)
+    simulation_engine.next_ration_reformulation = datetime(2026, 3, 11).date()
 
     mock_formulate_ration = mocker.patch.object(
         simulation_engine,
@@ -643,6 +1034,7 @@ def test_execute_ration_planning(
 
     # Assert
     assert mock_formulate_ration.call_count == expected_call_count
+    assert simulation_engine.next_ration_reformulation == expected_next_reformulation
 
 
 @pytest.mark.parametrize(
@@ -661,7 +1053,7 @@ def test_is_time_to_reformulate_ration(
 ) -> None:
     """
     Unit test for property _is_time_to_reformulate_ration
-    in file RUFAS/simulation_engine.py
+    in simulation_engine.py
     """
     # Arrange
     simulation_engine.time.current_date = datetime.combine(current_date, datetime.min.time())
@@ -697,38 +1089,26 @@ def test_execute_daily_animal_operations(
     expect_formulate_ration: bool,
 ) -> None:
     """
-    Unit test for function _execute_daily_animal_operations in file RUFAS/simulation_engine.py
+    Unit test for function _execute_daily_animal_operations in simulation_engine.py
     """
     # Arrange
-    mock_time = cast(MagicMock, simulation_engine.time)
-    mock_time.current_date = datetime(2026, 3, 11)
-    mock_time.simulation_day = 123
+    simulation_engine.simulate_feed = True
+    simulation_engine.time = MagicMock()
     simulation_engine.weather = MagicMock()
     simulation_engine.om = MagicMock()
 
     requested_feed = MagicMock()
-    daily_feeds_fed = {
-        "purchased": expected_purchased_feeds,
-        "stored": {12: 50.0},
-    }
-    total_inventory = {"feed_1": 100.0}
+    daily_feeds_fed = MagicMock()
+    daily_feeds_fed.purchased = expected_purchased_feeds
+
     all_manure_data = {"pen_1": MagicMock(), "pen_2": MagicMock()}
     available_feeds: list[Feed] = [MagicMock(rufas_id=12), MagicMock(rufas_id=7)]
-    mock_feed_manager = cast(MagicMock, simulation_engine.feed_manager)
-    mock_feed_manager.available_feeds = available_feeds
+    simulation_engine.available_feeds = available_feeds
 
     mock_collect_daily_feed_request = mocker.patch.object(
         simulation_engine.herd_manager,
         "collect_daily_feed_request",
         return_value=requested_feed,
-    )
-    mock_report_feed_storage_levels = mocker.patch.object(
-        simulation_engine.feed_manager,
-        "report_feed_storage_levels",
-    )
-    mock_report_cumulative_purchased_feeds = mocker.patch.object(
-        simulation_engine.feed_manager,
-        "report_cumulative_purchased_feeds",
     )
     mock_manage_daily_feed_request = mocker.patch.object(
         simulation_engine.feed_manager,
@@ -739,55 +1119,57 @@ def test_execute_daily_animal_operations(
         simulation_engine,
         "_formulate_ration",
     )
-    mock_get_total_projected_inventory = mocker.patch.object(
-        simulation_engine.feed_manager,
-        "get_total_projected_inventory",
-        return_value=total_inventory,
-    )
     mock_daily_routines = mocker.patch.object(
         simulation_engine.herd_manager,
         "execute_daily_routines",
         return_value=all_manure_data,
     )
 
+    call_tracker = MagicMock()
+    call_tracker.attach_mock(mock_daily_routines, "execute_daily_routines")
+    call_tracker.attach_mock(mock_collect_daily_feed_request, "collect_daily_feed_request")
+    call_tracker.attach_mock(mock_manage_daily_feed_request, "manage_daily_feed_request")
+    call_tracker.attach_mock(simulation_engine.om.add_warning, "add_warning")
+    call_tracker.attach_mock(mock_formulate_ration, "formulate_ration")
+
     # Act
     result_manure_data, result_purchased_feeds = simulation_engine._execute_daily_animal_operations()
 
     # Assert
-    mock_collect_daily_feed_request.assert_called_once_with()
-    mock_report_feed_storage_levels.assert_called_once_with(123, "daily_storage_levels")
-    mock_report_cumulative_purchased_feeds.assert_called_once_with(123)
-    mock_manage_daily_feed_request.assert_called_once_with(requested_feed, simulation_engine.time)
+    expected_calls = [
+        call.execute_daily_routines(
+            available_feeds,
+            simulation_engine.time,
+            simulation_engine.weather,
+        ),
+        call.collect_daily_feed_request(),
+        call.manage_daily_feed_request(
+            requested_feed,
+            simulation_engine.time,
+        ),
+    ]
 
     if expect_warning:
-        simulation_engine.om.add_warning.assert_called_once_with(
-            "Value: not enough feed for the herd",
-            "Reformulating ration for all pens",
-            {
-                "class": "SimulationEngine",
-                "function": "_execute_daily_animal_operations",
-            },
+        expected_calls.extend(
+            [
+                call.add_warning(
+                    "Value: not enough feed for the herd",
+                    "Reformulating ration for all pens",
+                    {
+                        "class": "SimulationEngine",
+                        "function": "_execute_daily_animal_operations",
+                    },
+                ),
+                call.formulate_ration(),
+            ]
         )
-    else:
-        simulation_engine.om.add_warning.assert_not_called()
 
     if expect_formulate_ration:
         mock_formulate_ration.assert_called_once_with()
     else:
         mock_formulate_ration.assert_not_called()
 
-    mock_get_total_projected_inventory.assert_called_once_with(
-        simulation_engine.time.current_date.date(),
-        simulation_engine.weather,
-        simulation_engine.time,
-    )
-    mock_daily_routines.assert_called_once_with(
-        available_feeds,
-        simulation_engine.time,
-        simulation_engine.weather,
-        total_inventory,
-    )
-
+    assert call_tracker.mock_calls == expected_calls
     assert result_manure_data == all_manure_data
     assert result_purchased_feeds == expected_purchased_feeds
 
@@ -807,7 +1189,7 @@ def test_execute_daily_manure_operations(
 ) -> None:
     """
     Unit test for function _execute_daily_manure_operations
-    in file RUFAS/simulation_engine.py
+    in simulation_engine.py
     """
     # Arrange
     simulation_engine.time = MagicMock()
@@ -856,7 +1238,7 @@ def test_report_daily_records(
     expect_emissions_call: bool,
 ) -> None:
     """
-    Unit test for function _report_daily_records in file RUFAS/simulation_engine.py
+    Unit test for function _report_daily_records in simulation_engine.py
     """
     # Arrange
     mock_weather = MagicMock(auto_spec=Weather)
@@ -904,24 +1286,17 @@ def test_formulate_ration(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _formulate_ration() in file RUFAS/simulation_engine.py
+    Unit test for function _formulate_ration() in simulation_engine.py
     """
+    # Arrange
+    simulation_engine.simulate_feed = True
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     simulation_engine.weather = (mock_weather := MagicMock(auto_spec=Weather))
     simulation_engine.herd_manager.all_pens = [MagicMock(auto_spec=Pen) for _ in range(number_of_pens)]
+    simulation_engine.available_feeds = [MagicMock(), MagicMock()]
 
-    mock_time.current_date = datetime.today()
-    simulation_engine.ration_formulation_interval_length = timedelta(days=ration_formulation_interval_length)
-    expected_next_ration_formulation_date = (
-        datetime.today() + timedelta(days=ration_formulation_interval_length)
-    ).date()
+    mock_time.simulation_day = 123
 
-    mock_feed_process_degradations = mocker.patch.object(simulation_engine.feed_manager, "process_degradations")
-    mock_feed_get_total_inventory = mocker.patch.object(
-        simulation_engine.feed_manager,
-        "get_total_projected_inventory",
-        return_value=(mock_total_inventory := MagicMock(auto_spec=TotalInventory)),
-    )
     mock_weather_get_current_day_conditions = mocker.patch.object(
         mock_weather,
         "get_current_day_conditions",
@@ -933,29 +1308,34 @@ def test_formulate_ration(
         return_value=(mock_requested_feed := MagicMock(auto_spec=RequestedFeed)),
     )
     mock_feed_manage_ration_interval_purchases = mocker.patch.object(
-        simulation_engine.feed_manager, "manage_ration_interval_purchases"
+        simulation_engine.feed_manager,
+        "manage_ration_interval_purchases",
+    )
+    mock_report_feed_manager_balance = mocker.patch.object(
+        simulation_engine.feed_manager,
+        "report_feed_manager_balance",
     )
     mock_report_ration_interval_data = mocker.patch.object(
-        simulation_engine.herd_manager, "report_ration_interval_data"
+        simulation_engine.herd_manager,
+        "report_ration_interval_data",
     )
 
+    simulation_engine.ration_formulation_interval_length = timedelta(days=ration_formulation_interval_length)
+
+    # Act
     simulation_engine._formulate_ration()
 
-    mock_feed_process_degradations.assert_called_once_with(mock_weather, mock_time)
-    assert simulation_engine.next_ration_reformulation == expected_next_ration_formulation_date
-    mock_feed_get_total_inventory.assert_called_once_with(
-        simulation_engine.next_ration_reformulation, mock_weather, mock_time
-    )
+    # Assert
     mock_weather_get_current_day_conditions.assert_called_once_with(time=mock_time)
     mock_herd_formulate_rations.assert_called_once_with(
-        simulation_engine.feed_manager.available_feeds,
+        simulation_engine.available_feeds,
         mock_current_day_conditions.mean_air_temperature,
         ration_formulation_interval_length,
-        mock_total_inventory,
-        simulation_engine.time.simulation_day,
+        mock_time.simulation_day,
     )
     mock_feed_manage_ration_interval_purchases.assert_called_once_with(mock_requested_feed, mock_time)
-    mock_report_ration_interval_data.assert_called_once()
+    mock_report_feed_manager_balance.assert_called_once_with(mock_time.simulation_day)
+    mock_report_ration_interval_data.assert_called_once_with(mock_time.simulation_day)
 
 
 def test_generate_daily_manure_applications(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
@@ -994,7 +1374,7 @@ def test_generate_daily_manure_applications(simulation_engine: SimulationEngine,
         simulation_engine.manure_manager, "request_nutrients", return_value=mock_nutrient_request_result
     )
 
-    result = simulation_engine.generate_daily_manure_applications()
+    result = simulation_engine._generate_daily_manure_applications()
 
     assert result == [
         ManureEventNutrientRequestResults("Field 1", mock_event_1, mock_nutrient_request_result),
@@ -1005,37 +1385,41 @@ def test_generate_daily_manure_applications(simulation_engine: SimulationEngine,
     mock_request_nutrients.assert_called_once()
 
 
-def test_initialize_simulation(mocker: MockerFixture) -> None:
+def test_setup_simulation_modules(mocker: MockerFixture) -> None:
     """
-    Unit test for function _initialize_simulation in file RUFAS/simulation_engine.py
+    Unit test for function _setup_simulation_modules in simulation_engine.py
     """
     # Arrange
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
-    mock_simulation_type = SimulationType("full_farm")
-    simulation_engine = SimulationEngine(mock_simulation_type)
+    simulation_engine = SimulationEngine(SimulationType.FULL_FARM)
 
     simulation_engine.time = (mock_time := MagicMock(autospec=RufasTime))
     mock_time.current_date = datetime.today()
 
     mock_input_manager = MagicMock(autospec=InputManager)
     mock_output_manager = MagicMock(autospec=OutputManager)
-    simulation_engine.im, simulation_engine.om = mock_input_manager, mock_output_manager
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    simulation_engine.simulate_fields = True
+    simulation_engine.simulate_feed = True
+    simulation_engine.simulate_animals = True
+    simulation_engine.simulate_manure = True
 
     mock_max_daily_feed_recalculations_per_year = 4
     mock_weather_data = {"dummy": "weather data"}
-    mock_config_nutrient_standard = "NASEM"
     mock_feed_config = {
         "dummy": "feed config",
-        "max_daily_feed_recalculations_per_year": mock_max_daily_feed_recalculations_per_year,
+        "ration_formulation_parameters": {
+            "max_daily_feed_recalculations_per_year": mock_max_daily_feed_recalculations_per_year,
+        },
     }
+    mock_config_nutrient_standard = "NASEM"
     mock_feed_storage_configs = {"dummy": "storage configs"}
     mock_feed_storage_instances = {"dummy": "storage instances"}
 
-    expected_simulate_animals = True
-
     mock_ration_interval_length = 30
     mock_is_ration_defined_by_user = True
-
     mock_ration_config = {
         "formulation_interval": mock_ration_interval_length,
         "user_input": mock_is_ration_defined_by_user,
@@ -1046,97 +1430,136 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
         "get_data",
         side_effect=[
             mock_weather_data,
-            mock_config_nutrient_standard,
             mock_feed_config,
+            mock_config_nutrient_standard,
             mock_feed_storage_configs,
             mock_feed_storage_instances,
             mock_ration_config,
-            mock_max_daily_feed_recalculations_per_year,
         ],
     )
 
     mock_weather = MagicMock(autospec=Weather)
-    mock_weather_init = mocker.patch("RUFAS.simulation_engine.Weather", return_value=mock_weather)
+    mock_weather_init = mocker.patch(
+        "RUFAS.simulation_engine.Weather",
+        return_value=mock_weather,
+    )
+
+    mock_field_data = {"field_1": {"dummy": "field config"}}
+    mocker.patch.object(
+        SimulationEngine,
+        "_gather_field_data",
+        return_value=mock_field_data,
+    )
 
     mock_field_manager = MagicMock(autospec=FieldManager)
-    mock_field_manager_init = mocker.patch("RUFAS.simulation_engine.FieldManager", return_value=mock_field_manager)
+    mock_field_manager_init = mocker.patch(
+        "RUFAS.simulation_engine.FieldManager",
+        return_value=mock_field_manager,
+    )
 
     mock_nutrient_standard = MagicMock(autospec=NutrientStandard)
     mock_nutrient_standard_init = mocker.patch(
-        "RUFAS.simulation_engine.NutrientStandard", return_value=mock_nutrient_standard
+        "RUFAS.simulation_engine.NutrientStandard",
+        return_value=mock_nutrient_standard,
+    )
+
+    mock_available_feeds = [MagicMock(rufas_id=12), MagicMock(rufas_id=7)]
+    mock_setup_available_feeds = mocker.patch(
+        "RUFAS.simulation_engine.AvailableFeedsBuilder.setup_available_feeds",
+        return_value=mock_available_feeds,
     )
 
     mock_feed_manager = MagicMock(autospec=FeedManager)
-    # Ensure available_feeds behaves like a list of feed objects w/ rufas_id
-    mock_feed_manager.available_feeds = [MagicMock(rufas_id=12), MagicMock(rufas_id=7)]
-    mock_feed_manager_init = mocker.patch("RUFAS.simulation_engine.FeedManager", return_value=mock_feed_manager)
+    mock_feed_manager_init = mocker.patch(
+        "RUFAS.simulation_engine.FeedManager",
+        return_value=mock_feed_manager,
+    )
 
     mock_herd_manager = MagicMock(autospec=HerdManager)
-    mock_herd_manager_init = mocker.patch("RUFAS.simulation_engine.HerdManager", return_value=mock_herd_manager)
+    mock_herd_manager_init = mocker.patch(
+        "RUFAS.simulation_engine.HerdManager",
+        return_value=mock_herd_manager,
+    )
 
     mock_manure_manager = MagicMock(autospec=ManureManager)
-    mock_manure_manager_init = mocker.patch("RUFAS.simulation_engine.ManureManager", return_value=mock_manure_manager)
+    mock_manure_manager_init = mocker.patch(
+        "RUFAS.simulation_engine.ManureManager",
+        return_value=mock_manure_manager,
+    )
 
     mock_emissions_estimator = MagicMock(autospec=EmissionsEstimator)
     mock_emissions_estimator_init = mocker.patch(
-        "RUFAS.simulation_engine.EmissionsEstimator", return_value=mock_emissions_estimator
+        "RUFAS.simulation_engine.EmissionsEstimator",
+        return_value=mock_emissions_estimator,
     )
-    simulation_engine.simulation_type = mock_simulation_type
-    simulation_engine.simulate_animals = True
 
     # Act
-    simulation_engine._initialize_simulation()
+    simulation_engine._setup_simulation_modules()
 
-    # Assert:
+    # Assert
     assert mock_im_get_data.call_args_list == [
         call("weather"),
-        call("config.nutrient_standard"),
         call("feed"),
+        call("config.nutrient_standard"),
         call("feed_storage_configurations"),
         call("feed_storage_instances"),
         call("animal.ration"),
     ]
 
     assert simulation_engine.om.time == mock_time
+
     mock_weather_init.assert_called_once_with(mock_weather_data, mock_time)
     assert simulation_engine.weather == mock_weather
 
-    assert simulation_engine.simulate_animals is expected_simulate_animals
+    mock_emissions_estimator_init.assert_called_once_with(
+        simulate_animals=True, simulate_feed=True, simulate_fields=True, simulate_manure=True
+    )
+    assert simulation_engine.emissions_estimator == mock_emissions_estimator
 
-    mock_field_manager_init.assert_called_once_with()
+    mock_field_manager_init.assert_called_once_with(mock_field_data)
     assert simulation_engine.field_manager == mock_field_manager
 
     mock_nutrient_standard_init.assert_called_once_with(mock_config_nutrient_standard)
+    mock_setup_available_feeds.assert_called_once_with(
+        mock_feed_config,
+        mock_nutrient_standard,
+    )
+    assert simulation_engine.available_feeds == mock_available_feeds
 
     mock_feed_manager_init.assert_called_once_with(
-        mock_feed_config, mock_nutrient_standard, mock_feed_storage_configs, mock_feed_storage_instances
+        mock_feed_config,
+        mock_available_feeds,
+        mock_feed_storage_configs,
+        mock_feed_storage_instances,
     )
     assert simulation_engine.feed_manager == mock_feed_manager
+
+    expected_interval = timedelta(days=round(365 / mock_max_daily_feed_recalculations_per_year))
+    assert simulation_engine.max_daily_feed_recalculation_interval == expected_interval
+    assert simulation_engine.next_max_daily_feed_recalculation == mock_time.current_date + expected_interval
+    assert simulation_engine.feed_degradations_interval_length == timedelta(
+        days=DEFAULT_FEED_DEGRADATIONS_PROCESSING_INTERVAL
+    )
+    assert simulation_engine.next_degradations_processing == mock_time.current_date.date()
 
     assert simulation_engine.ration_formulation_interval_length == timedelta(days=mock_ration_interval_length)
     assert simulation_engine.next_ration_reformulation == mock_time.current_date.date()
     assert simulation_engine.is_ration_defined_by_user == mock_is_ration_defined_by_user
 
-    expected_interval = timedelta(days=round(365 / mock_max_daily_feed_recalculations_per_year))
-    assert simulation_engine.max_daily_feed_recalculation_interval == expected_interval
-    assert simulation_engine.next_max_daily_feed_recalculation == mock_time.current_date + expected_interval
-
     mock_herd_manager_init.assert_called_once_with(
         mock_weather,
         mock_time,
-        is_ration_defined_by_user=True,
-        available_feeds=mock_feed_manager.available_feeds,
-        simulate_animals=True,
+        is_ration_defined_by_user=mock_is_ration_defined_by_user,
+        available_feeds=mock_available_feeds,
     )
     assert simulation_engine.herd_manager == mock_herd_manager
 
     mock_manure_manager_init.assert_called_once_with(
-        mock_weather.intercept_mean_temp, mock_weather.phase_shift, mock_weather.amplitude
+        mock_weather.intercept_mean_temp,
+        mock_weather.phase_shift,
+        mock_weather.amplitude,
     )
     assert simulation_engine.manure_manager == mock_manure_manager
-
-    mock_emissions_estimator_init.assert_called_once_with()
-    assert simulation_engine.emissions_estimator == mock_emissions_estimator
 
     mock_emissions_estimator.check_available_purchased_feed_data.assert_called_once_with([12, 7])
 
@@ -1157,7 +1580,7 @@ def test_annual_simulation(
     mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for function _annual_simulation in file RUFAS/simulation_engine.py
+    Unit test for function _annual_simulation in simulation_engine.py
     """
     # Arrange
     mock_daily_simulation = mocker.MagicMock(name="daily_simulation")
@@ -1183,7 +1606,7 @@ def test_annual_simulation(
 
 def test_annual_reset(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """
-    Unit test for function annual_reset() in file RUFAS/simulation_engine.py
+    Unit test for function annual_reset() in simulation_engine.py
     """
     mock_field_annual_update_routine = mocker.patch.object(simulation_engine.field_manager, "annual_update_routine")
 
@@ -1194,14 +1617,14 @@ def test_annual_reset(simulation_engine: SimulationEngine, mocker: MockerFixture
 
 def test_annual_mass_balance(simulation_engine: SimulationEngine) -> None:
     """
-    Unit test for function annual_mass_balance() in file RUFAS/simulation_engine.py
+    Unit test for function annual_mass_balance() in simulation_engine.py
     """
     simulation_engine.annual_mass_balance(MagicMock(auto_spec=RufasTime))
 
 
 def test_run_post_annual_routines(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """
-    Unit test for function _run_post_annual_routines in file RUFAS/simulation_engine.py
+    Unit test for function _run_post_annual_routines in simulation_engine.py
     """
 
     # Arrange
@@ -1220,7 +1643,7 @@ def test_run_post_annual_routines(simulation_engine: SimulationEngine, mocker: M
 
 def test_advance_time(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """
-    Unit test for function _advance_time in file RUFAS/simulation_engine.py
+    Unit test for function _advance_time in simulation_engine.py
     """
 
     # Arrange
@@ -1249,7 +1672,7 @@ def test_run_simulation_main_loop(
     expected_iterations: int, simulation_engine: SimulationEngine, mocker: MockerFixture
 ) -> None:
     """
-    Unit test for function _run_simulation_main_loop in file RUFAS/simulation_engine.py
+    Unit test for function _run_simulation_main_loop in simulation_engine.py
     """
 
     # Arrange
@@ -1263,3 +1686,128 @@ def test_run_simulation_main_loop(
 
     # Assert
     assert mock_annual_simulation.call_count == expected_iterations
+
+
+def test_gather_field_data_with_fields(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_field_data in simulation_engine.py when fields are present.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.FULL_FARM)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    field_names = ["field_1", "field_2"]
+    field_1_config = {"field_size": 10.0, "absolute_latitude": 42.5}
+    field_2_config = {"field_size": 20.0, "absolute_latitude": 43.0}
+
+    mock_input_manager.get_data_keys_by_properties.return_value = field_names
+    mock_input_manager.get_data.side_effect = [field_1_config, field_2_config]
+
+    # Act
+    result = simulation_engine._gather_field_data()
+
+    # Assert
+    assert result == {"field_1": field_1_config, "field_2": field_2_config}
+    mock_input_manager.get_data_keys_by_properties.assert_called_once_with("field_properties")
+    mock_input_manager.get_data.assert_any_call("field_1")
+    mock_input_manager.get_data.assert_any_call("field_2")
+    mock_output_manager.add_warning.assert_not_called()
+
+
+def test_gather_field_data_no_fields(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_field_data in simulation_engine.py when no fields are found.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.FULL_FARM)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    mock_input_manager.get_data_keys_by_properties.return_value = []
+
+    # Act
+    result = simulation_engine._gather_field_data()
+
+    # Assert
+    assert result == {}
+    mock_input_manager.get_data.assert_not_called()
+    mock_output_manager.add_warning.assert_called_once_with(
+        "No field input files.",
+        "No fields will be simulated.",
+        {"class": "SimulationEngine", "function": "_gather_field_data"},
+    )
+
+
+def test_gather_daily_manure_supply_with_supply_inputs(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_daily_manure_supply in simulation_engine.py when daily manure supply inputs are present.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.MANURE_ONLY)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    supply_names = ["daily_manure_supply_1", "daily_manure_supply_2"]
+    stream_config_1 = {"stream_name": "lac_pen", "first_processor": "lac_alley_scraper"}
+    stream_config_2 = {"stream_name": "calf_pen", "first_processor": "calf_manual_scraper"}
+    stream_config_3 = {"stream_name": "grow_pen", "first_processor": "growing_alley_scraper"}
+
+    mock_input_manager.get_data_keys_by_properties.return_value = supply_names
+    mock_input_manager.get_data.side_effect = [
+        {"daily_manure_streams": [stream_config_1, stream_config_2]},
+        {"daily_manure_streams": [stream_config_3]},
+    ]
+
+    # Act
+    result = simulation_engine._gather_daily_manure_supply()
+
+    # Assert
+    assert result == [stream_config_1, stream_config_2, stream_config_3]
+    mock_input_manager.get_data_keys_by_properties.assert_called_once_with("daily_manure_supply_properties")
+    mock_input_manager.get_data.assert_any_call("daily_manure_supply_1")
+    mock_input_manager.get_data.assert_any_call("daily_manure_supply_2")
+    mock_output_manager.add_warning.assert_not_called()
+
+
+def test_gather_daily_manure_supply_no_supply_inputs(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_daily_manure_supply in simulation_engine.py when no daily manure supply inputs are found.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.MANURE_ONLY)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    mock_input_manager.get_data_keys_by_properties.return_value = []
+
+    # Act / Assert
+    with pytest.raises(
+        ValueError, match="A simulation without animals requires at least one daily manure supply input file."
+    ):
+        simulation_engine._gather_daily_manure_supply()
+
+    mock_input_manager.get_data.assert_not_called()
+    mock_output_manager.add_error.assert_called_once_with(
+        "No daily manure supply input files.",
+        "There are no animals to produce manure, so a daily manure supply input is required for manure to "
+        "enter the manure system.",
+        {"class": "SimulationEngine", "function": "_gather_daily_manure_supply"},
+    )
+    mock_output_manager.add_warning.assert_not_called()

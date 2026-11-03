@@ -1,0 +1,134 @@
+flowchart TD
+    START([start_data_processing]) --> CV[_cross_validate_data]
+
+    subgraph FILE_LOAD ["File Loading"]
+        CV --> LP[load_cross_validation_file_paths]
+        LP --> NULL{file_paths is None?}
+        NULL -- Yes --> SKIP_ALL([Skip CV, return None])
+        NULL -- No --> FCHECK{File exists &\nvalid JSON?}
+        FCHECK -- No --> ERR([Raise FileNotFoundError\nor JSONDecodeError])
+        FCHECK -- Yes --> LOADED[Load list of rulesets]
+    end
+
+    LOADED --> RULESET_LOOP[For each ruleset]
+
+    subgraph ALIAS_SETUP ["Alias Setup"]
+        RULESET_LOOP --> CV_LOOP[For each cross_validation block]
+        CV_LOOP --> HAS_ALIASES{aliases\nblock exists?}
+        HAS_ALIASES -- No --> SKIP_BLOCK[Skip block]
+        HAS_ALIASES -- Yes --> EXTRACT[_extract_target_and_save_block]
+        EXTRACT --> CHECK_KEYS[check_target_and_save_block\nReject unknown section keys]
+        CHECK_KEYS --> SEC_TYPE{Section type?}
+        SEC_TYPE -- variables --> VAR_RESOLVE[Get data from\nInputManager pool\nvia dot_path]
+        SEC_TYPE -- constants --> CONST_RESOLVE[Use literal\nconstant value]
+        VAR_RESOLVE --> ALIAS_POOL[(Populate alias pool)]
+        CONST_RESOLVE --> ALIAS_POOL
+    end
+
+    ALIAS_POOL --> CROSS_VAL[cross_validate_data]
+
+    subgraph APPLY_WHEN ["Apply-When Guard"]
+        CROSS_VAL --> HAS_AW{apply_when\npresent?}
+        HAS_AW -- Yes --> EVAL_AW[_evaluate_condition_clause_array\nfor apply_when]
+        EVAL_AW --> AW_PASS{All conditions\nsatisfied?}
+        AW_PASS -- No --> SKIP_VAL([Skip validation,\nreturn True])
+        AW_PASS -- Yes --> RULES_EVAL
+        HAS_AW -- No --> RULES_EVAL[Evaluate rules array]
+    end
+
+    subgraph RULES_LOOP ["Rules Evaluation Loop"]
+        RULES_EVAL --> EACH_RULE[For each rule in rules]
+        EACH_RULE --> VALIDATE_CLAUSE[_validate_condition_clause\nCheck left_hand, right_hand,\nrelationship present & valid]
+        VALIDATE_CLAUSE --> CLAUSE_OK{Valid?}
+        CLAUSE_OK -- No --> RULE_FALSE([Return False])
+        CLAUSE_OK -- Yes --> EVAL_LHS
+
+        subgraph EXPRESSION ["_evaluate_expression  ·  called for LHS then RHS"]
+            EVAL_LHS[Evaluate left_hand\nexpression] --> EXPR_TYPE_L{block type?}
+
+            EXPR_TYPE_L -- for_each --> FOR_EACH_L[_evaluate_for_each_block]
+            EXPR_TYPE_L -- aggregation --> AGG_L[_evaluate_aggregation_block]
+            EXPR_TYPE_L -- neither --> EXPR_ERR_L([Log error,\nreturn None, False])
+
+            subgraph FOR_EACH_BLOCK ["for_each block"]
+                FOR_EACH_L --> FE_RESOLVE[Resolve source alias\nfrom alias pool]
+                FE_RESOLVE --> FE_SRC_OK{list of dicts?}
+                FE_SRC_OK -- No --> FE_ERR([Log error,\nreturn None, False])
+                FE_SRC_OK -- Yes --> FE_COMP{comparand source?}
+                FE_COMP -- value_to_compare --> FE_SCALAR[Resolve once\nfrom alias pool]
+                FE_COMP -- field_to_compare --> FE_FIELD[Read field from\neach entry at call time]
+                FE_SCALAR --> FE_MODE{mode?}
+                FE_FIELD --> FE_MODE
+                FE_MODE -- filter --> FE_FILTER[Return matching\nsubset of entries]
+                FE_MODE -- enforce --> FE_ENFORCE[True if all entries match,\nFalse if any fail]
+            end
+
+            subgraph AGG_BLOCK ["aggregation block"]
+                AGG_L --> AGG_RESOLVE[Resolve all operands\nfrom alias pool]
+                AGG_RESOLVE --> AGG_COMPLEX{Any operand\nis list or dict?}
+                AGG_COMPLEX -- Yes --> AGG_VALIDATE[Validate:\n≤1 complex operand\nmode key required]
+                AGG_VALIDATE --> AGG_VALID{Valid?}
+                AGG_VALID -- No --> AGG_ERR([Log error,\nreturn None, False])
+                AGG_VALID -- Yes --> AGG_MODE{mode?}
+                AGG_MODE -- element_wise --> AGG_EW[Return values as-is\none result per element]
+                AGG_MODE -- aggregate --> AGG_COLL[Apply operation to list,\nreturn single result]
+                AGG_COMPLEX -- No --> AGG_OP{operation?}
+                AGG_OP -- no_op --> AGG_NOOP[Return operand\nvalues as-is]
+                AGG_OP -- sum / division / etc. --> AGG_SCALAR[Apply operation,\nreturn single result]
+            end
+
+            FE_FILTER --> SAVE_AS_L{save_as\npresent?}
+            FE_ENFORCE --> SAVE_AS_L
+            AGG_EW --> SAVE_AS_L
+            AGG_COLL --> SAVE_AS_L
+            AGG_NOOP --> SAVE_AS_L
+            AGG_SCALAR --> SAVE_AS_L
+
+            SAVE_AS_L -- Yes --> STORE_L[Save result\nto alias pool]
+            SAVE_AS_L -- No --> LHS_DONE([Return result, evaluated])
+            STORE_L --> LHS_DONE
+        end
+
+        LHS_DONE --> EVAL_RHS[Evaluate right_hand\nexpression\n same logic as LHS]
+        EVAL_RHS --> BOTH_OK{Both sides\nevaluated?}
+        BOTH_OK -- No --> RULE_FALSE2([Return False])
+        BOTH_OK -- Yes --> APPLY_REL[Apply relationship function\nto left_hand, right_hand]
+
+        APPLY_REL --> OPERATOR{relationship?}
+        OPERATOR -- equal --> OP_EQ[_evaluate_equal_condition\npairwise if both are lists]
+        OPERATOR -- not_equal --> OP_NEQ[Negate equal result]
+        OPERATOR -- greater --> OP_GT[_evaluate_greater_condition\npairwise if both are lists]
+        OPERATOR -- greater_or_equal_to --> OP_GTE[_evaluate_greater_or_equal_condition\npairwise if both are lists]
+        OPERATOR -- is_of_type --> OP_TYPE[_evaluate_is_type\ncheck all values match type string]
+        OPERATOR -- is_null --> OP_NULL[_evaluate_is_null\nall left-hand values are None?]
+        OPERATOR -- regex --> OP_RE[_evaluate_regex\nre.fullmatch pattern]
+        OPERATOR -- is_equal_length --> OP_LEN[_evaluate_equal_data_length\nboth lists, same length?]
+
+        OP_EQ --> RULE_RESULT{Rule passed?}
+        OP_NEQ --> RULE_RESULT
+        OP_GT --> RULE_RESULT
+        OP_GTE --> RULE_RESULT
+        OP_TYPE --> RULE_RESULT
+        OP_NULL --> RULE_RESULT
+        OP_RE --> RULE_RESULT
+        OP_LEN --> RULE_RESULT
+        RULE_FALSE --> RULE_RESULT
+        RULE_FALSE2 --> RULE_RESULT
+
+        RULE_RESULT -- No, eager_termination --> BREAK([Break loop,\nreturn False])
+        RULE_RESULT -- No, not eager --> TRACK[Track failure,\ncontinue remaining rules]
+        RULE_RESULT -- Yes, more rules --> EACH_RULE
+        RULE_RESULT -- Yes, all done --> RETURN_TRUE([Return True])
+        TRACK --> MORE_RULES{More rules?}
+        MORE_RULES -- Yes --> EACH_RULE
+        MORE_RULES -- No --> RETURN_LAST([Return False\nlast rule failed])
+    end
+
+    BREAK --> MORE_BLOCKS{More blocks?}
+    RETURN_TRUE --> MORE_BLOCKS
+    RETURN_LAST --> MORE_BLOCKS
+    SKIP_BLOCK --> MORE_BLOCKS
+    MORE_BLOCKS -- Yes --> CV_LOOP
+    MORE_BLOCKS -- No --> FINAL{Any blocks\nfailed?}
+    FINAL -- Yes --> FAIL([Log failing block descriptions,\nreturn False])
+    FINAL -- No --> PASS([Return True])

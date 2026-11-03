@@ -1,5 +1,4 @@
 from math import exp, inf
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 
@@ -23,7 +22,7 @@ class MineralizationDecomposition:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_and_decompose_nitrogen(self) -> None:
@@ -172,6 +171,7 @@ class MineralizationDecomposition:
         Notes
         -----
         The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.
+        A minimum value of 1e-5 is used to truncate the C:N objective function at a practical upper limit (SME #2990).
 
         """
         nitrogen_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
@@ -180,10 +180,8 @@ class MineralizationDecomposition:
         phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
             carbon_phosphorus_ratio, 200
         )
-        assert nitrogen_term is not None and phosphorus_term is not None
-        # temporary fix to replace the process based method for the effect of the soil C, N, and P on the decomposition
-        # rate factor
-        return 1
+        composition_factor = min([nitrogen_term, phosphorus_term, 1])
+        return max(composition_factor, 1e-5)
 
     @staticmethod
     def _calculate_decay_rate_constant(

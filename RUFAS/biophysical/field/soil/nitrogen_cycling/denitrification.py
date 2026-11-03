@@ -1,5 +1,4 @@
 from math import atan, e, exp, pi
-from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.soil.layer_data import LayerData
@@ -30,7 +29,7 @@ class Denitrification:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None) -> None:
+    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None) -> None:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def denitrify(self, field_size: float) -> None:
@@ -120,7 +119,7 @@ class Denitrification:
         Returns
         -------
         float
-            The amount of nitrate that is denitrified in this soil layer (kg / ha)
+            The amount of nitrate that is denitrified in this soil layer (kg / ha).
 
         References
         ----------

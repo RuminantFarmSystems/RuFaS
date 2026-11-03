@@ -1,12 +1,12 @@
 import sys
 from dataclasses import asdict
-from typing import Any
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as genetics_units
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
@@ -28,66 +28,7 @@ om = OutputManager()
 
 
 class AnimalModuleReporter:
-
-    @classmethod
-    def data_padder(
-        cls,
-        reference_variable: str,
-        full_variable_to_add: str,
-        thing_to_add: Any,
-        simulation_day: int,
-        info_map: dict[str, Any],
-        first_info_map_only: bool,
-        units: dict[str, MeasurementUnits] | MeasurementUnits,
-    ) -> None:
-        """
-        Pads a variable in OutputManager for entries that it "missed" relative to another variable.
-
-        This is meant to be used prior to the addition of a variable to OutputManager, only in the cases where there
-        may be a mismatch in variable lengths.
-        A common case would be when a variable is stored in OutputManager by pen, and additional pens are created
-        during the simulation.
-
-        This method checks the length of a reference variable (in the previous example, Pen 0) in OutputManager and the
-        variable of interest (in the previous example, a newly created Pen 15), and if there is a
-        mismatch greater than one, it makes the number of calls to OutputManager necessary to ensure the length of the
-        variable to add is one less than the reference variable using "blank" data.
-
-        Parameters
-        ----------
-        reference_variable : str
-            The "reference" variable name as found in om.variables_pool. In the case of a pen, this should be pen 0 (as
-            it will always be instantiated at the start of the simulation).
-        full_variable_to_add: str
-            The variable name as found in om.variables_pool.
-        thing_to_add : Any
-            The variable data to pad the om.variables_pool with.
-        simulation_day: int
-            The day of the simulation.
-        info_map: Dict[str, Any]
-            The info_map to use when padding.
-        first_info_map_only: bool
-            Whether to only add the info_map for the first padding entry, or to add it for all entries.
-        units: Dict[str, str] | str
-            Units for the variable being added, in the format provided in the main call to add_variable,
-            (e.g., the one following the call of data_padder).
-
-        """
-        if simulation_day > 0 and reference_variable in om.variables_pool:
-            if full_variable_to_add in om.variables_pool:
-                current_output_length = len(list(om.variables_pool[full_variable_to_add].values())[0])
-            else:
-                current_output_length = 0
-            length_difference = len(list(om.variables_pool[reference_variable].values())[0]) - current_output_length
-            if length_difference > 1:
-                short_variable_to_add = full_variable_to_add[full_variable_to_add.rfind(".") + 1 :]
-                for _ in range(0, length_difference - 1):
-                    om.add_variable(
-                        short_variable_to_add,
-                        thing_to_add,
-                        info_map=dict(info_map, **{"units": units}),
-                        first_info_map_only=first_info_map_only,
-                    )
+    """The reporting class for the Animal module."""
 
     @classmethod
     def report_daily_animal_population(cls, herd_statistics: HerdStatistics, simulation_day: int) -> None:
@@ -106,6 +47,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_animal_population.__name__,
             "data_origin": [("AnimalManager", "daily_updates")],
+            "is_daily_variable": True,
         }
         om.add_variable("sim_day", simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable(
@@ -162,6 +104,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_milk.__name__,
             "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+            "is_daily_variable": True,
             "units": (
                 (MilkProductionStatistics.UNITS | MilkProductionStatistics.GENETIC_UNITS)
                 if AnimalConfig.simulate_genetics
@@ -169,7 +112,29 @@ class AnimalModuleReporter:
             ),
         }
 
+        parity_data: dict[str, dict[str, list[int | float]]] = {
+            "parity_1": {"milk": [], "days_in_milk": []},
+            "parity_2": {"milk": [], "days_in_milk": []},
+            "parity_3_and_above": {"milk": [], "days_in_milk": []},
+        }
+        fresh_cows: int = 0
+        cows_at_or_above_50_dim: int = 0
+
         for milk_stats in milk_reports:
+            if milk_stats.parity == 1:
+                parity_group = "parity_1"
+            elif milk_stats.parity == 2:
+                parity_group = "parity_2"
+            else:
+                parity_group = "parity_3_and_above"
+
+            parity_data[parity_group]["milk"].append(milk_stats.estimated_daily_milk_produced)
+            parity_data[parity_group]["days_in_milk"].append(milk_stats.days_in_milk)
+            if milk_stats.days_in_milk < 50:
+                fresh_cows += 1
+            else:
+                cows_at_or_above_50_dim += 1
+
             updated_milk_data: dict[str, int | float | str] = {
                 "cow_id": milk_stats.cow_id,
                 "pen_id": milk_stats.pen_id,
@@ -200,14 +165,48 @@ class AnimalModuleReporter:
 
             om.add_variable("milk_data_at_milk_update", updated_milk_data, info_map)
 
+        cow_stat_info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_milk.__name__,
+            "data_origin": [("AnimalModuleReporter", "report_milk")],
+            "units": MeasurementUnits.ANIMALS,
+        }
+        om.add_variable("fresh_cow_num", fresh_cows, cow_stat_info_map)
+        om.add_variable("cows_at_or_above_50_dim", cows_at_or_above_50_dim, cow_stat_info_map)
+
+        for parity_group, data in parity_data.items():
+            average_milk = sum(data["milk"]) / len(data["milk"]) if data["milk"] else 0.0
+            average_days_in_milk = (
+                sum(data["days_in_milk"]) / len(data["days_in_milk"]) if data["days_in_milk"] else 0.0
+            )
+
+            om.add_variable(
+                f"average_estimated_daily_milk_produced_{parity_group}",
+                average_milk,
+                {
+                    "class": AnimalModuleReporter.__name__,
+                    "function": AnimalModuleReporter.report_milk.__name__,
+                    "data_origin": [("AnimalModuleReporter", "report_milk")],
+                    "units": MeasurementUnits.LITERS,
+                },
+            )
+            om.add_variable(
+                f"average_days_in_milk_{parity_group}",
+                average_days_in_milk,
+                {
+                    "class": AnimalModuleReporter.__name__,
+                    "function": AnimalModuleReporter.report_milk.__name__,
+                    "data_origin": [("AnimalModuleReporter", "report_milk")],
+                    "units": MeasurementUnits.DAYS,
+                },
+            )
+
     @classmethod
     def report_average_genetics(
         cls, average_genetics: dict[str, float | None], variable_name_prefix: str, simulation_day: int
     ) -> None:
         """
-        Reports the average genetics data with associated simulation metadata. The
-        method adds the given genetics data to a managed output variable, using
-        a specific variable name prefix and simulation day.
+        Reports the average genetics data with associated simulation metadata.
 
         Parameters
         ----------
@@ -221,15 +220,13 @@ class AnimalModuleReporter:
             The specific day in the simulation timeline, used to annotate the
             reported data for temporal tracking.
 
-        Returns
-        -------
-        None
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_average_genetics.__name__,
             "units": genetics_units,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         om.add_variable(f"{variable_name_prefix}_average_genetics", average_genetics, info_map)
 
@@ -264,6 +261,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_ration_per_animal.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "number_animals_in_pen": num_animals,
         }
 
@@ -284,6 +282,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_nutrient_amounts.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": NutritionSupply.UNITS,
             "number_animals_in_pen": num_animals,
         }
@@ -350,6 +349,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_average_nutrient_requirements.__name__,
             "number_animals_in_pen": num_animals,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": NutritionRequirements.UNITS,
         }
 
@@ -387,11 +387,13 @@ class AnimalModuleReporter:
             such as energy, protein, and minerals.
         simulation_day : int
             Represents the simulation day for which the nutrient evaluation report is generated.
+
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_average_nutrient_evaluation_results.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
 
         nutrient_evaluation_results = {
@@ -444,6 +446,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_me_diet.__name__,
             "number_animals_in_pen": num_animals,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": units,
         }
 
@@ -464,12 +467,14 @@ class AnimalModuleReporter:
             The total ration of the herd.
         simulation_day : int
             The day of simulation.
+
         """
         units = {key: MeasurementUnits.KILOGRAMS for key in herd_total_ration.keys()}
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_herd_total_ration.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": units,
         }
         om.add_variable("ration_daily_feed_total_across_pens", herd_total_ration, info_map)
@@ -491,12 +496,14 @@ class AnimalModuleReporter:
             Dictionary of feed types and total amounts fed to animals in the pen.
         simulation_day : int
             Day of simulation.
+
         """
         units = {key: MeasurementUnits.KILOGRAMS for key in pen_ration.keys()}
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_ration_per_pen.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": units,
         }
 
@@ -509,6 +516,7 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_enteric_methane_emission.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
+            "is_daily_variable": True,
         }
         for pen_id_combination, enteric_methane_emission in enteric_methane_emission_by_pen.items():
             om.add_variable(
@@ -536,6 +544,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_manure_streams.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         MANURE_STREAM_UNITS = {
             "total_bedding_mass": MeasurementUnits.KILOGRAMS,
@@ -549,6 +558,11 @@ class AnimalModuleReporter:
                 manure_stream_dict["total_volatile_solids"] = manure_stream.total_volatile_solids
                 manure_stream_dict["mass"] = manure_stream.mass
                 if manure_stream.pen_manure_data is None:
+                    om.add_error(
+                        "Missing PenManureData for manure stream.",
+                        f"No PenManureData for {stream_name}: pen_manure_data must be present.",
+                        info_map=info_map,
+                    )
                     raise ValueError(f"No PenManureData for {stream_name}: pen_manure_data must be present.")
                 manure_stream_dict["total_bedding_mass"] = manure_stream.pen_manure_data.total_bedding_mass
                 manure_stream_dict["total_bedding_volume"] = manure_stream.pen_manure_data.total_bedding_volume
@@ -601,34 +615,19 @@ class AnimalModuleReporter:
             "total_solids": MeasurementUnits.KILOGRAMS,
             "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
             "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-            "inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
-            "organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
-            "non_water_inorganic_phosphorus_fraction": MeasurementUnits.UNITLESS,
-            "non_water_organic_phosphorus_fraction": MeasurementUnits.UNITLESS,
             "phosphorus": MeasurementUnits.GRAMS,
             "phosphorus_fraction": MeasurementUnits.UNITLESS,
             "potassium": MeasurementUnits.GRAMS,
         }
         info_map = {
-            "class": (class_name := AnimalModuleReporter.__name__),
-            "function": (function_name := AnimalModuleReporter.report_manure_excretions.__name__),
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_manure_excretions.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         for base_name, manure_excretion in manure_excretions.items():
             for manure_property, manure_value in asdict(manure_excretion).items():
-                reference_base = list(manure_excretions.keys())[0]
-                reference_variable = f"{class_name}.{function_name}.{reference_base}_{str(manure_property)}"
-                variable_to_add = f"{class_name}.{function_name}.{base_name}_{str(manure_property)}"
-                AnimalModuleReporter.data_padder(
-                    reference_variable,
-                    variable_to_add,
-                    0,
-                    simulation_day,
-                    info_map=info_map,
-                    first_info_map_only=True,
-                    units=pen_manure_data_units[manure_property],
-                )
                 om.add_variable(
                     f"{base_name}_{str(manure_property)}",
                     manure_value,
@@ -646,15 +645,17 @@ class AnimalModuleReporter:
             The HerdStatistics object containing the daily herd statistics data.
         simulation_day : int
             Day of simulation.
+
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_herd_statistics_data.__name__,
             "data_origin": [("HerdManager", "daily_update")],
+            "is_daily_variable": True,
         }
         om.add_variable(
-            "sold_cow_oversupply_num",
-            herd_statistics.sold_cow_oversupply_num,
+            "sold_cow_low_production_num",
+            herd_statistics.sold_cow_low_production_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
@@ -728,6 +729,21 @@ class AnimalModuleReporter:
         om.add_variable(
             "sold_calf_num",
             herd_statistics.sold_calf_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+        )
+        om.add_variable(
+            "dairy_male_sold_calf_num",
+            herd_statistics.dairy_male_sold_calf_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+        )
+        om.add_variable(
+            "dairy_female_sold_calf_num",
+            herd_statistics.dairy_female_sold_calf_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+        )
+        om.add_variable(
+            "beef_sold_calf_num",
+            herd_statistics.beef_sold_calf_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
@@ -898,18 +914,160 @@ class AnimalModuleReporter:
         )
         cull_reason_stats_units = {
             animal_constants.DEATH_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.OVERSUPPLY_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.LAMENESS_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.INJURY_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.MASTITIS_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.DISEASE_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.UDDER_CULL: MeasurementUnits.UNITLESS,
-            animal_constants.UNKNOWN_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.LOW_PRODUCTION_CULL: MeasurementUnits.UNITLESS,
+            animal_constants.ACUTE_SALE_CULL: MeasurementUnits.UNITLESS,
         }
         om.add_variable(
             "cull_reason_stats",
             herd_statistics.cull_reason_stats,
             dict(info_map, **{"units": cull_reason_stats_units}),
+        )
+        for pen_id_str, heifer_adg in herd_statistics.heifer_average_daily_gain_by_pen.items():
+            om.add_variable(
+                f"heifer_average_daily_gain_in_pen_{pen_id_str}",
+                heifer_adg,
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+            )
+        om.add_variable(
+            "heiferI_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_I],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "heiferII_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_II],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "heiferIII_average_daily_gain",
+            herd_statistics.heifer_average_daily_gain_by_animal_type[AnimalType.HEIFER_III],
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_DAY}),
+        )
+        om.add_variable(
+            "num_heiferIII_to_cow_transitions",
+            herd_statistics.heiferIII_to_cow_transitions,
+            {**info_map, "units": MeasurementUnits.ANIMALS, "data_origin": [("HerdManager", "execute_daily_routines")]},
+        )
+        sold_and_died_info_map = {
+            **info_map,
+            "units": MeasurementUnits.ANIMALS,
+            "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+        }
+        for parity, count in (
+            ("1", herd_statistics.acute_sale_cows_parity_1),
+            ("2", herd_statistics.acute_sale_cows_parity_2),
+            ("3_plus", herd_statistics.acute_sale_cows_parity_3_plus),
+        ):
+            om.add_variable(f"acute_sale_cows_parity_{parity}", count, sold_and_died_info_map)
+        om.add_variable(
+            "total_cow_removals_parity_1",
+            herd_statistics.total_cow_removals_parity_1,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "total_cow_removals_parity_2",
+            herd_statistics.total_cow_removals_parity_2,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "total_cow_removals_parity_3_plus",
+            herd_statistics.total_cow_removals_parity_3_plus,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "cow_deaths_parity_1",
+            herd_statistics.cow_deaths_parity_1,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "cow_deaths_parity_2",
+            herd_statistics.cow_deaths_parity_2,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "cow_deaths_parity_3_plus",
+            herd_statistics.cow_deaths_parity_3_plus,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "milk_production_at_removal_sum",
+            herd_statistics.milk_production_at_removal_sum,
+            {
+                **info_map,
+                "units": MeasurementUnits.KILOGRAMS_PER_DAY,
+                "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+            },
+        )
+        om.add_variable(
+            "milk_production_at_removal_count",
+            herd_statistics.milk_production_at_removal_count,
+            {
+                **info_map,
+                "units": MeasurementUnits.ANIMALS,
+                "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+            },
+        )
+        om.add_variable(
+            "sold_cow_low_production_parity_1",
+            herd_statistics.sold_cow_low_production_parity_1,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "sold_cow_low_production_parity_2",
+            herd_statistics.sold_cow_low_production_parity_2,
+            sold_and_died_info_map,
+        )
+        om.add_variable(
+            "sold_cow_low_production_parity_3_plus",
+            herd_statistics.sold_cow_low_production_parity_3_plus,
+            sold_and_died_info_map,
+        )
+
+    @classmethod
+    def report_daily_reproduction_statistics(
+        cls, daily_herd_reproduction_statistics: HerdReproductionStatistics, simulation_day: int
+    ) -> None:
+        """
+        Adds daily herd reproduction statistics to OutputManager.
+
+        Reports the number of successful conceptions that occurred on the simulation day, at the
+        herd, heifer, and cow level. These daily values form a time series that can be summed over
+        any window (e.g. annually) for downstream analyses such as the economic layer. The
+        whole-simulation totals and conception rates are reported separately at end-of-simulation
+        (see ``report_end_of_simulation``).
+
+        Parameters
+        ----------
+        daily_herd_reproduction_statistics : HerdReproductionStatistics
+            Reproduction statistics accumulated over the current simulation day only.
+        simulation_day : int
+            Day of simulation.
+
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_reproduction_statistics.__name__,
+            "data_origin": [("HerdManager", "daily_update")],
+        }
+        om.add_variable(
+            "num_successful_conceptions",
+            daily_herd_reproduction_statistics.total_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions",
+            daily_herd_reproduction_statistics.heifer_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        om.add_variable(
+            "cow_num_successful_conceptions",
+            daily_herd_reproduction_statistics.cow_num_successful_conceptions,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        om.add_variable(
+            "number_dnb_cows_in_herd",
+            daily_herd_reproduction_statistics.num_do_not_breed_cows,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
 
     @classmethod
@@ -929,12 +1087,14 @@ class AnimalModuleReporter:
             The number of animals in the pen.
         simulation_day : int
             The current simulation day.
+
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_daily_pen_total.__name__,
             "units": MeasurementUnits.ANIMALS,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         om.add_variable(
             f"number_of_animals_in_pen_{pen_id}_{pen_animal_name}",
@@ -1004,7 +1164,9 @@ class AnimalModuleReporter:
         report_name : str
             The string to be appended to the variable being reported to the OM.
         total_days : int
-            The total number of days in the simulation
+            The total number of days in the simulation.
+
+
         """
 
         info_map = {
@@ -1072,7 +1234,8 @@ class AnimalModuleReporter:
         report_name : str
             The string to be appended to the variable being reported to the OM.
         total_days : int
-            The total number of days in the simulation
+            The total number of days in the simulation.
+
         """
 
         info_map = {
@@ -1124,25 +1287,52 @@ class AnimalModuleReporter:
                 )
 
     @classmethod
-    def report_305d_milk(cls, average_herd_305_days_milk_production: float) -> None:
+    def report_305_day_milk_yield(
+        cls,
+        herd_mean: float,
+        l1_mean: float,
+        l2_mean: float,
+        l3_plus_mean: float,
+    ) -> None:
         """
-        Adds herd mean of latest_milk_production_305days to the output manager,
-        though only for lactating cows with nonzero values.
+        Adds herd-level average 305-day milk yield outputs to the output manager.
 
         Parameters
         ----------
-        average_herd_305_days_milk_production : float
-            The herd average total past 305-day milk production.
+        herd_mean : float
+            The whole-herd average 305-day milk yield across adult cows.
+        l1_mean : float
+            The average 305-day milk yield for lactation 1 cows.
+        l2_mean : float
+            The average 305-day milk yield for lactation 2 cows.
+        l3_plus_mean : float
+            The average 305-day milk yield for lactation 3+ cows.
 
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_305d_milk.__name__,
+            "function": AnimalModuleReporter.report_305_day_milk_yield.__name__,
             "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+            "is_daily_variable": True,
         }
         om.add_variable(
-            "milk_production_305days_herd_mean",
-            average_herd_305_days_milk_production,
+            "milk_305_day_yield_herd_mean",
+            herd_mean,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        om.add_variable(
+            "milk_305_day_yield_l1_mean",
+            l1_mean,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        om.add_variable(
+            "milk_305_day_yield_l2_mean",
+            l2_mean,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        om.add_variable(
+            "milk_305_day_yield_l3plus_mean",
+            l3_plus_mean,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
         )
 
@@ -1173,6 +1363,7 @@ class AnimalModuleReporter:
             The dictionary of Cow events.
         all_animals_genetic_history : dict[int, str]
             The dict of genetic histories for all animals in the herd by their IDs.
+
         """
         empty_sold_animals: list[SoldAnimalTypedDict] = [
             {
@@ -1288,9 +1479,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def _record_heiferIIs_conception_rate(cls, herd_reproduction_statistics: HerdReproductionStatistics) -> None:
-        """
-        Record the conception rate of heiferIIs.
-        """
+        """Record the conception rate of heiferIIs."""
 
         info_map = {
             "class": AnimalModuleReporter.__name__,

@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
@@ -30,21 +31,21 @@ class PenManureData:
     Attributes
     ----------
     num_animals : int
-        The number of animals in this pen that created the manure.
+        The number of animals in this pen that created the manure (animals).
     manure_deposition_surface_area : float
         The surface area of the manure deposition area in the pen (m^2).
     animal_combination : AnimalCombination
-        The combination of animals in the pen.
+        The combination of animals in the pen (unitless).
     pen_type : str | None
-        The type of pen.
+        The type of pen (unitless).
     manure_urine_mass : float
         The overall mass of urine in the manure stream (kg).
     manure_urine_nitrogen : float
         The mass of nitrogen in the urine in the manure stream (kg).
     stream_type : StreamType
-        The type of manure stream in the pen.
+        The type of manure stream in the pen (unitless).
     first_processor : str
-        The name of the first processor to handle the manure stream.
+        The name of the first processor to handle the manure stream (unitless).
     total_bedding_mass: float
         The total mass of the bedding applied to the manure stream (kg).
     total_bedding_volume: float
@@ -80,9 +81,11 @@ class PenManureData:
             raise ValueError("Manure from a non-lactating pen assigned to parlor manure stream.")
 
     def set_first_processor(self, processor_name: str) -> None:
+        """First-processor setter method."""
         self.first_processor = processor_name
 
     def set_bedding_mass_and_volume(self, bedding_mass: float, bedding_volume: float) -> None:
+        """Setter method for total_bedding_mass and total_bedding_volume."""
         self.total_bedding_mass = bedding_mass
         self.total_bedding_volume = bedding_volume
 
@@ -103,7 +106,9 @@ class PenManureData:
         Raises
         ------
         ValueError
-            If the stream type is ManureStreamType.GENERAL or if the animal combinations do not match.
+            - If the stream type is ManureStreamType.GENERAL.
+            - If the animal combinations do not match.
+            - If the first processors are different.
 
         """
         if self.stream_type == StreamType.GENERAL or other.stream_type == StreamType.GENERAL:
@@ -147,10 +152,12 @@ class ManureStream:
         Mass of potassium in the manure stream (kg).
     ash : float
         Mass of ash in the manure stream (kg).
-    non_degradable_volatile_solids : float
-        Mass of non-degradable volatile solids in the manure stream (kg).
     degradable_volatile_solids : float
         Mass of degradable volatile solids in the manure stream (kg).
+    non_degradable_volatile_solids : float
+        Mass of non-degradable volatile solids in the manure stream (kg).
+    bedding_non_degradable_volatile_solids : float
+        Amount of bedding non-degradable volatile solids (kg).
     total_solids : float
         Mass of total solids in the manure stream (kg).
     volume : float
@@ -158,9 +165,7 @@ class ManureStream:
     methane_production_potential : float
         Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).
     pen_manure_data : PenManureData | None
-       Optional, more specific information about the manure and the pen or pens that produced it.
-    bedding_non_degradable_volatile_solids : float
-        Amount of bedding non-degradable volatile solids (kg).
+       Optional, more specific information about the manure and the pen or pens that produced it (unitless).
 
     Class Attributes
     ----------------
@@ -287,7 +292,7 @@ class ManureStream:
 
     @classmethod
     def make_empty_manure_stream(cls) -> "ManureStream":
-        """Factory method for making empty ManureStreams."""
+        """Factory method for making an empty ManureStream."""
         return ManureStream(
             water=0.0,
             ammoniacal_nitrogen=0.0,
@@ -375,3 +380,167 @@ class ManureStream:
             pen_manure_data=split_pen_manure_data,
             bedding_non_degradable_volatile_solids=self.bedding_non_degradable_volatile_solids * split_ratio,
         )
+
+
+class DailyManureSupplier:
+    """
+    Supplies the manure module with user-defined daily manure streams when the animal module is not simulated.
+
+    Each stream configuration describes the manure that one group of animals would deposit at one location on every
+    simulation day. The supplier builds a fresh ManureStream, with attached PenManureData, from each configuration
+    every day, taking the place of the streams that the animal module's pens would otherwise produce.
+
+    Parameters
+    ----------
+    daily_manure_stream_configs : list[dict[str, Any]]
+        The configurations of the daily manure streams, one per stream.
+
+    Attributes
+    ----------
+    _om : OutputManager
+        An instance of OutputManager for logging errors and warnings.
+    _daily_manure_stream_configs : dict[str, dict[str, Any]]
+        The validated configurations of the daily manure streams, keyed by stream name.
+
+    """
+
+    def __init__(self, daily_manure_stream_configs: list[dict[str, Any]]) -> None:
+        self._om = OutputManager()
+        self._daily_manure_stream_configs = self._validate_stream_configs(daily_manure_stream_configs)
+
+    def _validate_stream_configs(self, daily_manure_stream_configs: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+        """
+        Validates the daily manure stream configurations at initialization.
+
+        Parameters
+        ----------
+        daily_manure_stream_configs : list[dict[str, Any]]
+            The configurations of the daily manure streams, one per stream.
+
+        Returns
+        -------
+        dict[str, dict[str, Any]]
+            The validated stream configurations, keyed by stream name.
+
+        Raises
+        ------
+        ValueError
+            - If more than one stream is configured with the same name.
+            - If a stream's configuration is rejected by ``PenManureData``, such as a parlor stream configured for
+              an animal combination other than lactating cows.
+            - If a stream's total solids mass is greater than its total manure mass.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._validate_stream_configs.__name__}
+        stream_configs_by_name: dict[str, dict[str, Any]] = {}
+        for stream_config in daily_manure_stream_configs:
+            stream_name = str(stream_config["stream_name"])
+            if stream_name in stream_configs_by_name:
+                self._om.add_error(
+                    "Duplicate daily manure stream name",
+                    f"The stream name '{stream_name}' is used by more than one daily manure stream. "
+                    "Each daily manure stream must have a unique name because stream names are used to "
+                    "label manure module outputs.",
+                    info_map,
+                )
+                raise ValueError(f"The stream name '{stream_name}' is used by more than one daily manure stream.")
+
+            try:
+                self._build_pen_manure_data(stream_config)
+            except (ValueError, KeyError) as invalid_stream:
+                self._om.add_error(
+                    "Invalid daily manure stream",
+                    f"The daily manure stream '{stream_name}' is not a valid manure stream: {invalid_stream}",
+                    info_map,
+                )
+                raise ValueError(
+                    f"Daily manure stream '{stream_name}' is not a valid manure stream: {invalid_stream}"
+                ) from invalid_stream
+
+            total_manure_mass = float(stream_config["total_manure_mass"])
+            total_solids = float(stream_config["total_solids"])
+            if total_solids > total_manure_mass:
+                self._om.add_error(
+                    "Invalid daily manure stream composition",
+                    f"The daily manure stream '{stream_name}' has a total solids mass ({total_solids} kg) greater "
+                    f"than its total manure mass ({total_manure_mass} kg).",
+                    info_map,
+                )
+                raise ValueError(
+                    f"Daily manure stream '{stream_name}' 'total_solids' cannot exceed its 'total_manure_mass'."
+                )
+
+            stream_configs_by_name[stream_name] = stream_config
+        return stream_configs_by_name
+
+    def _build_pen_manure_data(self, stream_config: dict[str, Any]) -> PenManureData:
+        """
+        Builds the pen manure data described by one daily manure stream configuration.
+
+        Parameters
+        ----------
+        stream_config : dict[str, Any]
+            The configuration of a single daily manure stream.
+
+        Returns
+        -------
+        PenManureData
+            The pen manure data described by the stream configuration.
+
+        Notes
+        -----
+        ``PenManureData`` validates itself on construction, so building it here is also what enforces the manure
+        stream rules shared with animal-produced manure, such as a parlor stream only being valid for lactating cows.
+
+        """
+        return PenManureData(
+            num_animals=int(stream_config["num_animals"]),
+            manure_deposition_surface_area=float(stream_config["manure_deposition_surface_area"]),
+            animal_combination=AnimalCombination[str(stream_config["animal_combination"])],
+            pen_type=None,
+            manure_urine_mass=float(stream_config["urine_mass"]),
+            manure_urine_nitrogen=float(stream_config["urine_nitrogen"]),
+            stream_type=StreamType[str(stream_config["stream_type"])],
+            first_processor=str(stream_config["first_processor"]),
+        )
+
+    def get_daily_manure_streams(self) -> dict[str, ManureStream]:
+        """
+        Builds the manure streams that enter the manure module on the current simulation day.
+
+        Returns
+        -------
+        dict[str, ManureStream]
+            A dictionary mapping stream names to their corresponding ManureStream objects.
+
+        Notes
+        -----
+        New ManureStream and PenManureData instances are constructed on every call because the manure module's
+        processors consume and mutate the streams they receive.
+
+        The water mass of each stream is the difference between its total manure mass and its total solids mass,
+        and the stream volume is derived from the total manure mass using the density of slurry manure, matching
+        how the animal module constructs the streams a pen produces.
+
+        """
+        daily_manure_streams: dict[str, ManureStream] = {}
+        for stream_name, stream_config in self._daily_manure_stream_configs.items():
+            total_manure_mass = float(stream_config["total_manure_mass"])
+            total_solids = float(stream_config["total_solids"])
+            pen_manure_data = self._build_pen_manure_data(stream_config)
+            daily_manure_streams[stream_name] = ManureStream(
+                water=total_manure_mass - total_solids,
+                ammoniacal_nitrogen=float(stream_config["ammoniacal_nitrogen"]),
+                nitrogen=float(stream_config["nitrogen"]),
+                phosphorus=float(stream_config["phosphorus"]),
+                potassium=float(stream_config["potassium"]),
+                ash=float(stream_config["ash"]),
+                degradable_volatile_solids=float(stream_config["degradable_volatile_solids"]),
+                non_degradable_volatile_solids=float(stream_config["non_degradable_volatile_solids"]),
+                bedding_non_degradable_volatile_solids=float(stream_config["bedding_non_degradable_volatile_solids"]),
+                total_solids=total_solids,
+                volume=total_manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
+                methane_production_potential=float(stream_config["methane_production_potential"]),
+                pen_manure_data=pen_manure_data,
+            )
+        return daily_manure_streams

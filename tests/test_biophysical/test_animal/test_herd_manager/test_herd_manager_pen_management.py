@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any
 from unittest.mock import call, MagicMock
 
@@ -9,7 +8,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, TotalInventory, Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.biophysical.animal.data_types.animal_combination import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.rufas_time import RufasTime
@@ -170,6 +169,7 @@ def test_execute_allocation_plan(
     animal_type_to_allocate: AnimalType,
     value_error_expected: bool,
     herd_manager: HerdManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _execute_allocation_plan()"""
     animals: list[Animal] = []
@@ -184,8 +184,10 @@ def test_execute_allocation_plan(
         ]
 
     if value_error_expected:
+        mock_add_error = mocker.patch.object(herd_manager.om, "add_error")
         with pytest.raises(ValueError):
             herd_manager._execute_allocation_plan(allocation_plan, animals, pens)
+        mock_add_error.assert_called_once()
     else:
         expected_animals_in_pen_by_id: dict[int, dict[int, Animal]] = {}
         current_i = 0
@@ -246,9 +248,7 @@ def test_add_animal_to_pen_and_id_map(
 
     mock_feed = MagicMock(auto_spec=Feed)
     for animal in animals:
-        herd_manager._add_animal_to_pen_and_id_map(
-            animal, mock_feed, mock_current_day_conditions, TotalInventory({}, datetime.today().date()), 15
-        )
+        herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, mock_current_day_conditions, 15)
         mock_pen_update_animals.assert_called_with(
             [animal],
             herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal),
@@ -279,7 +279,6 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
     herd_manager.animal_to_pen_id_map = {}
 
     mock_feed = MagicMock(auto_spec=Feed)
-    total_inventory = TotalInventory({}, datetime.today().date())
 
     for animal in animals:
         herd_manager.animal_to_pen_id_map = {}
@@ -304,7 +303,7 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         mock_pen_avail_feeds = mocker.MagicMock()
         mocker.patch.object(herd_manager, "_find_pen_available_feeds", return_value=mock_pen_avail_feeds)
 
-        herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, mock_current_day_conditions, total_inventory, 15)
+        herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, mock_current_day_conditions, 15)
 
         mock_pen_insert_animal_into_animals_in_pen_map.assert_called_with(animal)
         mock_pen_set_animal_nutritional_requirements.assert_called_with(
@@ -314,7 +313,6 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
             pen=pen_with_min_stocking_density,
             pen_available_feeds=mock_pen_avail_feeds,
             current_temperature=mock_current_day_conditions.mean_air_temperature,
-            total_inventory=total_inventory,
             simulation_day=15,
         )
         assert animal.id in herd_manager.animal_to_pen_id_map
@@ -332,7 +330,6 @@ def test_add_animal_to_pen_and_id_map_uses_default_ration_feeds_when_not_user_de
     herd_manager.is_ration_defined_by_user = False
     mock_feed = MagicMock(auto_spec=Feed)
     available_feeds: list[Feed] = [mock_feed]
-    total_inventory = TotalInventory({}, datetime.today().date())
 
     animal_combination = herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
     pen_with_min_stocking_density: Pen = min(
@@ -357,7 +354,6 @@ def test_add_animal_to_pen_and_id_map_uses_default_ration_feeds_when_not_user_de
         animal=animal,
         available_feeds=available_feeds,
         current_day_conditions=mock_current_day_conditions,
-        total_inventory=total_inventory,
         simulation_day=15,
     )
 
@@ -367,7 +363,6 @@ def test_add_animal_to_pen_and_id_map_uses_default_ration_feeds_when_not_user_de
         pen=pen_with_min_stocking_density,
         pen_available_feeds=mock_pen_avail_feeds,
         current_temperature=mock_current_day_conditions.mean_air_temperature,
-        total_inventory=total_inventory,
         simulation_day=15,
     )
 
@@ -391,11 +386,14 @@ def test_calculate_max_animal_spaces_per_pen(
     expected: int | None,
     raise_value_error: bool,
     herd_manager: HerdManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _calculate_max_animal_spaces_per_pen()"""
     if raise_value_error:
+        mock_add_error = mocker.patch.object(herd_manager.om, "add_error")
         with pytest.raises(ValueError):
             herd_manager._calculate_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+        mock_add_error.assert_called_once()
     else:
         result = herd_manager._calculate_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
         assert result == expected

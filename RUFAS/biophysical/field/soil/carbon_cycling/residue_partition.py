@@ -1,7 +1,7 @@
 import math
-from typing import Optional
 
 from RUFAS.biophysical.field.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 
 class ResiduePartition:
@@ -16,7 +16,7 @@ class ResiduePartition:
         provided.
     field_size : float, optional
         Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-        not provided (ha)
+        not provided (ha).
 
     Attributes
     ----------
@@ -29,7 +29,7 @@ class ResiduePartition:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
     def add_residue_to_pools(self, rainfall: float) -> None:
@@ -189,7 +189,7 @@ class ResiduePartition:
     def _set_soil_structural_litter_decomposition_rate(self) -> None:
         """
         Sets the soil structural litter decomposition rate using the same methodology as the
-        `_determine_plant_structural_to_slow_or_active_rate`.
+        ``_determine_plant_structural_to_slow_or_active_rate``.
 
         """
         structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - self.data.plant_residue_metabolic_fraction)
@@ -245,6 +245,11 @@ class ResiduePartition:
         float
             Plant lignin to nitrogen ratio (unitless).
 
+        Raises
+        ------
+        ValueError
+            If nitrogen_fraction_plant_residue not between 0.0 and 1.0.
+
         References
         ----------
         pseudocode_soil S.6.B.I.2
@@ -258,6 +263,15 @@ class ResiduePartition:
         elif nitrogen_fraction_plant_residue == 0:
             return 0
         else:
+            OutputManager().add_error(
+                "Invalid nitrogen fraction plant residue",
+                "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
+                + str(nitrogen_fraction_plant_residue),
+                info_map={
+                    "class": ResiduePartition.__name__,
+                    "function": ResiduePartition._determine_plant_lignin_nitrogen_fraction.__name__,
+                },
+            )
             raise ValueError(
                 "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
                 + str(nitrogen_fraction_plant_residue)
@@ -532,7 +546,7 @@ class ResiduePartition:
 
         Notes
         -----
-        The referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
+        The referenced soil (below ground) biomass calculation was not found in the pseudocode_crop, neither is any
         mention of biomass unit.
 
         """
@@ -572,7 +586,7 @@ class ResiduePartition:
         plant_lignin_nitrogen_ratio: float,
         weighted_residue_dry_matter_lignin_fraction: float,
         soil_residue_lignin_fraction: float,
-        nitrogen_fraction_plant_residue=0.4,
+        nitrogen_fraction_plant_residue: float = 0.4,
     ) -> float:
         """
         This method calculates the soil lignin to nitrogen fraction.
@@ -593,6 +607,11 @@ class ResiduePartition:
         float
             Soil lignin to nitrogen fraction(unitless).
 
+        Raises
+        ------
+        ValueError
+            If nitrogen_fraction_plant_residue is not between 0.0-1.0.
+
         References
         ----------
         pseudocode_soil S.6.B.II.4
@@ -605,6 +624,15 @@ class ResiduePartition:
         elif nitrogen_fraction_plant_residue == 0:
             return 0
         else:
+            OutputManager().add_error(
+                "Invalid nitrogen fraction plant residue",
+                "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
+                + str(nitrogen_fraction_plant_residue),
+                info_map={
+                    "class": ResiduePartition.__name__,
+                    "function": ResiduePartition._determine_soil_lignin_to_nitrogen_fraction.__name__,
+                },
+            )
             raise ValueError(
                 "Expected nitrogen_fraction_plant_residue to be between 0.0-1.0, received "
                 + str(nitrogen_fraction_plant_residue)

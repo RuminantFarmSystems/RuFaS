@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.biophysical.field.crop.crop_data import CropData
 from RUFAS.biophysical.field.crop.non_water_uptake import NonWaterUptake
 from RUFAS.biophysical.field.soil.soil_data import SoilData
@@ -16,25 +14,25 @@ class PhosphorusUptake(NonWaterUptake):
     Parameters
     ----------
     crop_data : CropData, optional
-        An instance of `CropData` containing crop specifications and attributes. If not provided, a default
-        `CropData` instance is initialized with default values.
+        An instance of ``CropData`` containing crop specifications and attributes. If not provided, a default
+        ``CropData`` instance is initialized with default values.
     nutrient_distro_param : float, default 10
         Phosphorus uptake distribution parameter (unitless).
-    nutrient_shapes : Optional[List[float]], default None
+    nutrient_shapes : list[float], optional
         First and second shape coefficients for the nitrogen uptake equations (unitless).
-    previous_nutrient : Optional[float], default None
+    previous_nutrient : float, optional
         Phosphorus value on the previous day (kg/ha).
-    total_nutrient_uptake : Optional[float], default None
+    total_nutrient_uptake : float, optional
         Total amount of phosphorus taken up by the plant (kg/ha).
-    potential_nutrient_uptake : Optional[float], default None
+    potential_nutrient_uptake : float, optional
         Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
-    actual_nutrient_uptakes : Optional[List[float]], default None
+    actual_nutrient_uptakes : list[float], optional
         Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
-    layer_nutrient_potentials : Optional[float], default None
+    layer_nutrient_potentials : float, optional
         Potential phosphorus uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : Optional[float], default None
+    unmet_nutrient_demands : float, optional
         Unmet phosphorus demands by overlaying soil layers (kg/ha).
-    nutrient_requests : Optional[float], default None
+    nutrient_requests : float, optional
         Phosphorus requested from each soil layer (kg/ha).
 
 
@@ -46,16 +44,16 @@ class PhosphorusUptake(NonWaterUptake):
 
     def __init__(
         self,
-        crop_data: Optional[CropData] = None,
+        crop_data: CropData | None = None,
         nutrient_distro_param: float = 10.0,
-        nutrient_shapes: Optional[list[float]] = None,
-        previous_nutrient: Optional[float] = None,
-        potential_nutrient_uptake: Optional[float] = None,
-        layer_nutrient_potentials: Optional[float] = None,
-        unmet_nutrient_demands: Optional[float] = None,
-        nutrient_requests: Optional[float] = None,
-        actual_nutrient_uptakes: Optional[list[float]] = None,
-        total_nutrient_uptake: Optional[float] = None,
+        nutrient_shapes: list[float] | None = None,
+        previous_nutrient: float | None = None,
+        potential_nutrient_uptake: float | None = None,
+        layer_nutrient_potentials: float | None = None,
+        unmet_nutrient_demands: float | None = None,
+        nutrient_requests: float | None = None,
+        actual_nutrient_uptakes: list[float] | None = None,
+        total_nutrient_uptake: float | None = None,
     ):
         super().__init__(
             crop_data,

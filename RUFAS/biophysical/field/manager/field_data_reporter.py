@@ -1,5 +1,3 @@
-from typing import List
-
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.crop.crop import Crop
 from RUFAS.biophysical.field.field.field import Field
@@ -14,17 +12,17 @@ class FieldDataReporter:
 
     Parameters
     ----------
-    fields : List[Field]
+    fields : list[Field]
         A list of Field instances.
 
     Attributes
     ----------
-    fields : List[Field]
+    fields : list[Field]
         A list of Field instances.
 
     """
 
-    def __init__(self, fields: List[Field]):
+    def __init__(self, fields: list[Field]):
         self.om = OutputManager()
         self.fields = fields
 
@@ -60,6 +58,7 @@ class FieldDataReporter:
             "suffix": f"field='{field_name}',crop='{crop.data.name}',"
             f"planted={crop.data.planting_day},{crop.data.planting_year}",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
         self.om.add_variable(
             "root_depth",
@@ -491,6 +490,7 @@ class FieldDataReporter:
             "function": self.send_soil_layer_daily_variables.__name__,
             "suffix": "field='" + field_name + "',layer='" + str(index) + "'",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
         self.om.add_variable(
             "temperature",
@@ -1257,6 +1257,7 @@ class FieldDataReporter:
             "function": self.send_vadose_zone_layer_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "',vadose_zone_layer",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
         self.om.add_variable(
             "active_organic_nitrogen_content",
@@ -1435,6 +1436,7 @@ class FieldDataReporter:
             "function": self.send_soil_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "'",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
 
         self.om.add_variable(
@@ -2018,6 +2020,7 @@ class FieldDataReporter:
             "function": self.send_field_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "'",
             "simulation_day": time.simulation_day,
+            "is_daily_variable": True,
         }
 
         self.om.add_variable(
