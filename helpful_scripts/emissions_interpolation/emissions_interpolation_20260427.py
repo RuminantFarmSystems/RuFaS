@@ -169,9 +169,9 @@ for EEEname in EEEnames:
 
         region_means = merged.groupby("Region")[target_cols].mean()
         print(region_means)
-        region_means.to_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
+        region_means.to_csv(f"helpful_scripts\emissions_interpolation\{EEEname}_wheat_regional_averages.csv")
 
-    regional_sheet = pd.read_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
+    regional_sheet = pd.read_csv(f"helpful_scripts\emissions_interpolation\{EEEname}_wheat_regional_averages.csv")
 
     #####################
     # GPS for each FIPS #
