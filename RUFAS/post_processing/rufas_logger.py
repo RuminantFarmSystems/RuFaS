@@ -1,6 +1,5 @@
 from datetime import datetime
 import logging
-from logging.handlers import RotatingFileHandler
 import sys
 from RUFAS.output_manager import LogVerbosity
 from pathlib import Path
@@ -8,7 +7,7 @@ from typing import Any
 
 LOGGER_NAME = "RUFAS"
 
-LOG_FORMAT = "[%(asctime)s][%(levelname)s][%(rufas_metadata_prefix)s] %(message)s"
+LOG_FORMAT = "[%(asctime)s][%(levelname)s][%(rufas_metadata_prefix)s] " "%(rufas_log_name)s: %(message)s"
 DATE_FORMAT = "%d-%b-%Y_%a_%H-%M-%S"
 
 
@@ -20,8 +19,23 @@ class RufasContextFilter(logging.Filter):
         self.metadata_prefix = metadata_prefix
 
     def filter(self, record: logging.LogRecord) -> bool:
-        if not hasattr(record, "rufas_metadata_prefix"):
-            record.rufas_metadata_prefix = self.metadata_prefix
+        """
+        Validates the descriptive name associated with a RuFaS log record.
+
+        Raises
+        ------
+        ValueError
+            If the log record does not contain a non-empty ``rufas_log_name``.
+        """
+        log_name = getattr(record, "rufas_log_name", None)
+
+        if not isinstance(log_name, str) or not log_name.strip():
+            raise ValueError(
+                f"Missing or invalid 'rufas_log_name' for logger '{record.name}' "
+                f"at {record.pathname}:{record.lineno}. "
+                "Every RuFaS log record must provide a non-empty descriptive log name. "
+                "Pass it using extra={'rufas_log_name': 'Descriptive Log Name'}."
+            )
 
         return True
 
@@ -47,10 +61,12 @@ class RufasLogFormatter(logging.Formatter):
         self.use_colors = use_colors
 
     def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
+        """Log timestamp formatting helper function."""
         timestamp = datetime.fromtimestamp(record.created)
         return timestamp.strftime(DATE_FORMAT) + f".{timestamp.microsecond:06d}"
 
     def format(self, record: logging.LogRecord) -> str:
+        """Log formatting helper function."""
         formatted_message = super().format(record)
 
         if self.use_colors:
@@ -62,6 +78,21 @@ class RufasLogFormatter(logging.Formatter):
 
 
 def get_log_level(verbosity: LogVerbosity) -> int:
+    """
+    Maps a RuFaS log verbosity setting to the corresponding Python logging level.
+
+    Parameters
+    ----------
+    verbosity : LogVerbosity
+        The RuFaS verbosity setting used to determine the minimum logging level.
+        NONE and CREDITS suppress all standard logging levels.
+
+    Returns
+    -------
+    int
+        The corresponding Python logging level. Returns a value above CRITICAL
+        for NONE and CREDITS to suppress standard log messages.
+    """
     log_levels = {
         LogVerbosity.NONE: logging.CRITICAL + 1,
         LogVerbosity.CREDITS: logging.CRITICAL + 1,

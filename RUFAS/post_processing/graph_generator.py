@@ -1,5 +1,4 @@
 import datetime
-import logging
 import os
 import re
 from pathlib import Path
@@ -12,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from matplotlib.figure import Figure
 
+from RUFAS.post_processing.rufas_logger import get_logger
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 """
 Agg rendering to a Tk canvas (requires TkInter). This backend can be activated in IPython with %matplotlib tk.
@@ -147,7 +147,7 @@ class GraphGenerator:
 
     """
 
-    def __init__(self, time: RufasTime, metadata_prefix: str = "") -> None:
+    def __init__(self, time: RufasTime | None = None, metadata_prefix: str = "") -> None:
         self.metadata_prefix = metadata_prefix
         self.time = time
 
@@ -180,6 +180,7 @@ class GraphGenerator:
             logger.error(
                 "Can't plot %s data set: 'produce_graphics' set to False, no graphs will be produced.",
                 graph_details.get("title"),
+                extra={"rufas_log_name": "Graphing Setup Error"},
             )
             return
         if graph_details.get("type") in UNSUPPORTED_GRAPH_FUNCTIONS:
@@ -187,6 +188,7 @@ class GraphGenerator:
                 "Can't plot %s data set: graph type '%s' not supported at this time.",
                 graph_details.get("title"),
                 graph_details.get("type"),
+                extra={"rufas_log_name": "Graphing Setup Error"},
             )
             return
 
@@ -225,6 +227,7 @@ class GraphGenerator:
                     "Variable mapping for %s: %s",
                     graph_details.get("title"),
                     {legend_mapping[key]: key for key in sorted_keys},
+                    extra={"rufas_log_name": "Graph Variable Mapping"},
                 )
                 sanitized_data = {key: sanitized_data[key] for key in sorted_keys}
             else:
@@ -232,6 +235,7 @@ class GraphGenerator:
                     "Variable mapping for %s: %s",
                     graph_details.get("title"),
                     {key: key for key in prepared_data},
+                    extra={"rufas_log_name": "Graph Variable Mapping"},
                 )
                 graph_details = self._set_graph_legend(graph_details, sanitized_data)
             self._draw_graph(
@@ -254,8 +258,8 @@ class GraphGenerator:
             logger.exception(
                 "Error plotting '%s' data set.",
                 graph_details.get("title"),
+                extra={"rufas_log_name": "Graphing Exception"},
             )
-            raise ValueError("Error plotting '%s' data set.")
 
     def _set_graph_legend(
         self,
@@ -317,6 +321,7 @@ class GraphGenerator:
                 "Can't add units to variables for graphing %s: "
                 "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
                 graph_title,
+                extra={"rufas_log_name": "Graphing Details Warning"},
             )
             return filtered_pool
         for var_name, details in filtered_pool.items():
@@ -328,6 +333,7 @@ class GraphGenerator:
                         "Missing unit information: unit for '%s' not found in units dictionary. "
                         "Using default 'not available'.",
                         var_name,
+                        extra={"rufas_log_name": "Graphing Units Warning"},
                     )
             else:
                 unit = unit_info
@@ -450,6 +456,7 @@ class GraphGenerator:
                         key,
                         bad_types,
                         ", ".join(bad_locations),
+                        extra={"rufas_log_name": "Graphing Bad Data Warning"},
                     )
 
             elif not isinstance(values, (int, float)):
@@ -459,6 +466,7 @@ class GraphGenerator:
                     title,
                     key,
                     type(values),
+                    extra={"rufas_log_name": "Graphing Bad Data Warning"},
                 )
 
     def _draw_graph(
@@ -519,7 +527,7 @@ class GraphGenerator:
         else:
             dates_in_data_range = [self.time.start_date + datetime.timedelta(days=i) for i in range(max_data_length)]
 
-        get_x_values: Callable[[int], list[datetime.datetime]] = lambda values_length: (
+        get_x_values: Callable[[int], list[int] | list[datetime.datetime]] = lambda values_length: (
             dates_in_data_range[:values_length] if use_calendar_dates else list(range(values_length))
         )
 
