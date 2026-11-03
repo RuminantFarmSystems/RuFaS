@@ -191,7 +191,7 @@ def log(
         level,
         message,
         extra={
-            "rufas_name": name,
+            "rufas_log_name": name,
             "rufas_info_map": info_map or {},
         },
     )
