@@ -20,7 +20,7 @@ IMPORTANT:  calf_retention_method must be "count" for the calculated
 
 To save a reference report, specify the location: --output "C:/Users/you/Documents/herd_results.json"
 You can also supply an existing folder to --output; the default filename is used.
-Note that this is a report of the calculated outputs and values to enter into the animal JSON; it is not a pre-filled copy of the animal_inputs.JSON file itself. 
+Note that this is a report of the calculated outputs and values to enter into the animal JSON; it is not a pre-filled copy of the animal_inputs.JSON file itself.
 
 
 Counts and milk yield are rounded to integers; fractions to whole percentages.
