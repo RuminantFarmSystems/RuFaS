@@ -183,6 +183,8 @@ class ResiduePartition:
         existing decomposition framework routes the metabolic fraction to the active carbon pool and the
         structural fraction to the slow carbon pool.
 
+        Notes
+        -----
         The fraction of the manure carbon residue that is metabolic is determined from the lignin to nitrogen
         ratio of the applied manure, in the same way as for plant residue. The lignin and nitrogen accumulated
         from manure applications since the previous partitioning define that ratio and are reset afterwards.

@@ -156,11 +156,9 @@ class SoilData:
     crop_yield_nitrogen : float, default 0
         Nitrogen contained in the harvested yield (kg/ha).
     manure_residue_lignin : float, default 0.0
-        Lignin in applied manure that is awaiting partitioning into the litter pools (kg/ha). Accumulated at
-        each manure application and reset when the manure carbon residue pools are partitioned.
+        Lignin in applied manure that is awaiting partitioning into the litter pools (kg/ha).
     manure_residue_nitrogen : float, default 0.0
-        Nitrogen in applied manure that is awaiting partitioning into the litter pools (kg/ha). Accumulated at
-        each manure application and reset when the manure carbon residue pools are partitioned.
+        Nitrogen in applied manure that is awaiting partitioning into the litter pools (kg/ha).
     manure_lignin_nitrogen_ratio : float, default 0.0
         Manure lignin to nitrogen ratio of the most recently partitioned manure carbon residue (unitless).
     manure_residue_metabolic_fraction : float, default 0.0
@@ -171,6 +169,11 @@ class SoilData:
         A ManurePool instance holding data for machine-applied manure.
     grazing_manure : ManurePool
         A ManurePool instance holding data for grazing-applied manure
+
+    Notes
+    -----
+    ``manure_residue_lignin`` and ``manure_residue_nitrogen`` are accumulated at each manure application and
+    reset when the manure carbon residue pools are partitioned.
     """
 
     # ID variables

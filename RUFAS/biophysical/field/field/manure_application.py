@@ -164,14 +164,11 @@ class ManureApplication:
         source_animal : str, optional
             Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless).
         carbon_mass : float, default 0.0
-            Mass of organic carbon in this application of manure (kg). Added to the manure carbon residue pools
-            of the soil layers, distributed the same way as manure nitrogen.
+            Mass of organic carbon in this application of manure (kg).
         lignin_mass : float, default 0.0
-            Mass of lignin in this application of manure (kg). Accumulated so the manure carbon residue can be
-            partitioned between the metabolic and structural litter pools by its lignin to nitrogen ratio.
+            Mass of lignin in this application of manure (kg).
         total_nitrogen_mass : float, default 0.0
-            Total mass of nitrogen in this application of manure (kg). Accumulated alongside ``lignin_mass``
-            for the lignin to nitrogen ratio of the manure carbon residue.
+            Total mass of nitrogen in this application of manure (kg).
 
         Raises
         ------
@@ -183,6 +180,11 @@ class ManureApplication:
         When manure is applied that contains 15% or less solid matter, the slurry immediately infiltrates the soil. The
         SurPhos theoretical documentation states that "the model assumes slurry liquid immediately infiltrates into soil
         and adds 60% of all manure P to corresponding soil P pools".
+
+        The manure organic carbon is added to the manure carbon residue pools of the soil layers, distributed the
+        same way as manure nitrogen. The lignin and total nitrogen of the application are accumulated so the manure
+        carbon residue can be partitioned between the metabolic and structural litter pools by its lignin to
+        nitrogen ratio.
 
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
