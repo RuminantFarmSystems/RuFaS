@@ -137,10 +137,8 @@ import_table(
 
 To translate the data into a format easily used within RuFaS, the geographically broad data are expanded to the most granular scale used by the model: county-level factors. National and Regional emission factors are extrapolated to the county level using a cross-reference table that links Region $\rightarrow$ State $\rightarrow$ County/FIPS.
 
-
-
-
-
+#### Handling Missing Feed Emission Factors
+Missing emissions factors were estimated using values from geographically nearby counties within the same state. For each missing value, we began with a 50-km search radius around the county and identified neighboring counties with nonzero values for the same feed ingredient. If no suitable neighbor was found, we expanded the search radius in 50-km increments until one or more valid neighboring values were identified. The missing value was then estimated from the available values within the first successful search radius. For wheat bran and middlings, we used a regional average as a fallback for cases where a suitable value could not be obtained from nearby counties within the same state. An example script is included in the `helpful_scripts` folder of the RuFaS repository.
 
 ## Homegrown Feed Emissions
 
