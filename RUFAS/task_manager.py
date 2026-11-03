@@ -26,7 +26,10 @@ from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
+"""The file path to the pyproject.toml file with project-level information and settings."""
 PYPROJECT_FILE_PATH = Path("pyproject.toml")
+
+"""The current minimum python version allowed for RuFaS compatibility."""
 MINIMUM_PYTHON_VERSION = Version("3.12")
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
@@ -95,6 +98,16 @@ class TaskType(Enum):
             TaskType.END_TO_END_TESTING,
             TaskType.UPDATE_E2E_TEST_RESULTS,
         ]
+
+
+"""
+List of ``TaskTypes`` that are exclusive meaning other tasks are not allowed to be run
+concurrently with either of these tasks.
+"""
+EXCLUSIVE_TASK_TYPES = [
+    TaskType.END_TO_END_TESTING,
+    TaskType.UPDATE_E2E_TEST_RESULTS,
+]
 
 
 class TaskManager:
@@ -451,13 +464,20 @@ class TaskManager:
         parsed_single_run_args: list[dict[str, Any]] = []
         parsed_multi_run_args: list[dict[str, Any]] = []
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
-        tasks_from_input: list[dict[str, Any]] = task_config.get("tasks")
+        tasks_from_input = task_config.get("tasks")
+        if not tasks_from_input:
+            self.output_manager.add_error(
+                "TaskManager Task Config Error",
+                "No tasks found in task input config.",
+                info_map={
+                    "class": TaskManager.__name__,
+                    "function": self._parse_input_tasks.__name__,
+                }
+            )
+            raise KeyError("No tasks found in task input config.")
         task_types = {TaskType.from_string(task["task_type"]) for task in tasks_from_input}
-        exclusive_task_types = {
-            TaskType.END_TO_END_TESTING,
-            TaskType.UPDATE_E2E_TEST_RESULTS,
-        }
-        for task_type in exclusive_task_types:
+
+        for task_type in EXCLUSIVE_TASK_TYPES:
             if task_type in task_types and len(task_types) > 1:
                 error_message = (
                     f"{task_type.name} tasks cannot be run with other task types " "in the same task configuration."
