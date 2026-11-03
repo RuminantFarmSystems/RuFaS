@@ -26,6 +26,19 @@ zip_to_latlong_sheet = pd.read_csv(r"helpful_scripts\emissions_interpolation\geo
 
 fips_to_county_sheet = pd.read_csv(r"helpful_scripts\emissions_interpolation\COUNTY_ZIP_032010.csv")
 
+county_gps = pd.read_csv(
+    r"helpful_scripts\emissions_interpolation\2025_Gaz_counties_national.txt",
+    sep="\t",
+    dtype={"GEOID": str},
+)
+
+# Census files sometimes contain whitespace in column names
+county_gps.columns = county_gps.columns.str.strip()
+
+county_gps["GEOID"] = county_gps["GEOID"].str.zfill(5)
+
+
+
 feed_source = pd.read_csv(
     r"helpful_scripts\emissions_interpolation\Feed Emissions Source RuFaS_Feed_Library_Combined_Final.csv"
 )
@@ -176,9 +189,9 @@ for EEEname in EEEnames:
                 print("9007")
             zipcodes = get_zips_from_fips(fips_to_county_sheet, fips_code)
             if not zipcodes:
-                print(fips_code)
-                fips_code += 1
-                print("beep")
+                print(f"No ZIPs available for county {fips_code}")
+                fips_gps_map.append(None)
+                continue
         averagelatlong, latlongs = get_latlong_from_zip(zip_to_latlong_sheet, zipcodes)
         fips_gps_map.append(averagelatlong)
 
