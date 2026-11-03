@@ -155,10 +155,10 @@ class CalfRetentionPolicy:
         Used during herd initialization (spin-up). The spin-up clock does not advance, so the
         count-based annual schedule cannot be built there; the initial herd is instead stocked
         with the historical rate-based behavior, and the count-based target then governs intake
-        once the main simulation begins.
+        once the main simulation begins. Calves bred from beef semen are always sold.
 
         """
-        if cls._is_sold_rate_based(calf):
+        if calf.bred_from_semen == SemenType.BEEF or cls._is_sold_rate_based(calf):
             calf.sold_at_day = simulation_day
 
     @staticmethod

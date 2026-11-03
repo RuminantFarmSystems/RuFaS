@@ -15,6 +15,7 @@ from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.animal import Animal
@@ -56,7 +57,7 @@ def mock_animals(animal_type: AnimalType, number_of_animals: int, mocker: Mocker
     return [mock_animal(animal_type=animal_type, animal_id=i, mocker=mocker) for i in range(number_of_animals)]
 
 
-def animal_update_side_effect(animal: Animal) -> DailyRoutinesOutput:
+def animal_update_side_effect(animal: Animal, *_: Any) -> DailyRoutinesOutput:
     next_life_stage_by_animal_type: dict[AnimalType, AnimalType] = {
         AnimalType.CALF: AnimalType.HEIFER_I,
         AnimalType.HEIFER_I: AnimalType.HEIFER_II,
@@ -526,7 +527,7 @@ def test_heiferIII_update_cow_stage_true(
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
         "_cow_give_birth",
-        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW),
+        side_effect=lambda animal, *_: setattr(animal, "animal_type", AnimalType.LAC_COW),
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -574,7 +575,7 @@ def test_heiferIII_update_cow_stage_false(
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
         "_cow_give_birth",
-        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW),
+        side_effect=lambda animal, *_: setattr(animal, "animal_type", AnimalType.LAC_COW),
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -618,7 +619,7 @@ def test_cow_update_culled_false_new_born_false(
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
         "_cow_give_birth",
-        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW),
+        side_effect=lambda animal, *_: setattr(animal, "animal_type", AnimalType.LAC_COW),
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -654,7 +655,7 @@ def test_cow_update_culled_true(
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
         "_cow_give_birth",
-        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW),
+        side_effect=lambda animal, *_: setattr(animal, "animal_type", AnimalType.LAC_COW),
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -690,7 +691,7 @@ def test_cow_update_culled_false_more_than_5_calves(
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
         "_cow_give_birth",
-        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW),
+        side_effect=lambda animal, *_: setattr(animal, "animal_type", AnimalType.LAC_COW),
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -738,7 +739,7 @@ def test_cow_update_culled_false_new_born_true(
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
         "_cow_give_birth",
-        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW),
+        side_effect=lambda animal, *_: setattr(animal, "animal_type", AnimalType.LAC_COW),
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -1526,3 +1527,233 @@ def test_update_genetic_values_enabled(mock_herd_factory: HerdFactory, mocker: M
 
     for mock_calculate_ebv_and_ranking_index in mock_calculate_ebv_and_ranking_index_calls:
         mock_calculate_ebv_and_ranking_index.assert_called_once_with(AnimalType.LAC_COW, 10.0, 20.0, 2)
+
+
+@pytest.mark.parametrize(
+    "simulate_genetics, selective_repro_strategy, ranking_method, expected",
+    [
+        (True, True, "genetic", True),
+        (False, True, "genetic", False),
+        (True, False, "genetic", False),
+        (True, True, None, False),
+    ],
+)
+def test_is_semen_allocation_enabled(
+    simulate_genetics: bool,
+    selective_repro_strategy: bool,
+    ranking_method: str | None,
+    expected: bool,
+    mocker: MockerFixture,
+) -> None:
+    """Semen allocation is enabled only when genetics, selective repro strategy and genetic ranking are all on."""
+    mocker.patch.object(AnimalConfig, "simulate_genetics", simulate_genetics)
+    mocker.patch.object(AnimalConfig, "selective_repro_strategy", selective_repro_strategy)
+    mocker.patch.object(AnimalConfig, "ranking_method", ranking_method)
+
+    assert HerdFactory._is_semen_allocation_enabled() is expected
+
+
+@pytest.mark.parametrize("is_semen_allocation_enabled", [True, False])
+def test_get_population_ranking_indexes(
+    is_semen_allocation_enabled: bool, mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """Ranking indexes are collected only from breeding-eligible animals with genetics when allocation is on."""
+    mocker.patch.object(HerdFactory, "_is_semen_allocation_enabled", return_value=is_semen_allocation_enabled)
+    eligible = mock_animal(AnimalType.LAC_COW, 1, mocker)
+    eligible.is_eligible_for_breeding = True
+    eligible.genetics.ranking_index = 3.0
+    not_eligible = mock_animal(AnimalType.LAC_COW, 2, mocker)
+    not_eligible.is_eligible_for_breeding = False
+    not_eligible.genetics.ranking_index = 5.0
+    without_genetics = mock_animal(AnimalType.LAC_COW, 3, mocker)
+    without_genetics.is_eligible_for_breeding = True
+    without_genetics.genetics = None
+
+    result = mock_herd_factory._get_population_ranking_indexes([eligible, not_eligible, without_genetics])
+
+    assert result == ([3.0] if is_semen_allocation_enabled else None)
+
+
+def test_heiferIIs_and_cows_update_pass_population_ranking_indexes(
+    mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """HeiferII and cow updates receive the ranking indexes of their own group."""
+    heiferIIs = mock_animals(AnimalType.HEIFER_II, 2, mocker)
+    cows = mock_animals(AnimalType.LAC_COW, 2, mocker)
+    for cow in cows:
+        cow.reproduction.calves = 1
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[], heiferIs=[], heiferIIs=heiferIIs, heiferIIIs=[], cows=cows, replacement=[]
+    )
+    mock_get_population_ranking_indexes = mocker.patch.object(
+        mock_herd_factory, "_get_population_ranking_indexes", side_effect=[[1.0], [2.0]]
+    )
+    remain = DailyRoutinesOutput(
+        animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics()
+    )
+    mock_heiferII_update = mocker.patch.object(mock_herd_factory, "_heiferII_update", return_value=remain)
+    mock_cow_update = mocker.patch.object(mock_herd_factory, "_cow_update", return_value=remain)
+
+    mock_herd_factory._heiferIIs_update()
+    mock_herd_factory._cows_update()
+
+    assert mock_get_population_ranking_indexes.call_args_list == [call(heiferIIs), call(cows)]
+    assert mock_heiferII_update.call_args_list == [call(heiferII, [1.0]) for heiferII in heiferIIs]
+    assert mock_cow_update.call_args_list == [call(cow, [2.0]) for cow in cows]
+
+
+def test_heiferIII_update_passes_newborn_calf_config_to_cow_give_birth(
+    mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """The calf configuration produced at a heiferIII's first calving is used for the newborn calf."""
+    heiferIII = mock_animal(AnimalType.HEIFER_III, 1, mocker)
+    newborn_calf_config = MagicMock()
+    heiferIII.transition_heiferIII_to_cow.return_value = newborn_calf_config
+    mocker.patch.object(
+        mock_herd_factory,
+        "_heiferIII_update",
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.LIFE_STAGE_CHANGED, herd_reproduction_statistics=HerdReproductionStatistics()
+        ),
+    )
+    mock_cow_give_birth = mocker.patch.object(mock_herd_factory, "_cow_give_birth")
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[heiferIII], cows=[], replacement=[]
+    )
+
+    mock_herd_factory._heiferIIIs_update(0)
+
+    mock_cow_give_birth.assert_called_once_with(heiferIII, newborn_calf_config)
+
+
+@pytest.mark.parametrize("is_calf_sold", [True, False])
+def test_cow_give_birth_with_semen_allocation(
+    is_calf_sold: bool, mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """With semen allocation on, the calf is built from the reproduction calf configuration and genetics updated."""
+    mocker.patch.object(HerdFactory, "_is_semen_allocation_enabled", return_value=True)
+    dam_cow = mock_animal(AnimalType.LAC_COW, 6, mocker)
+    dam_cow.nutrients.total_phosphorus_in_animal = 88.8
+    dam_cow.nutrients.phosphorus_for_growth = 66.6
+    dam_cow.nutrients.phosphorus_reserves = 23.3
+    dam_cow.nutrients.phosphorus_for_gestation_required_for_calf = 8.8
+
+    newborn_calf_config = NewBornCalfValuesTypedDict(
+        breed=Breed.BOD.name,
+        bred_from_semen=SemenType.BEEF,
+        sex=Sex.MALE,
+        animal_type=AnimalType.CALF.value,
+        birth_date="2026-01-01",
+        days_born=0,
+        birth_weight=40.0,
+        initial_phosphorus=8.8,
+        dam_tbv_fat=1.5,
+        dam_tbv_protein=2.5,
+    )
+    mock_calf = MagicMock(auto_spec=Animal)
+    mock_calf.sold = is_calf_sold
+    mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
+    mock_random = mocker.patch("RUFAS.biophysical.animal.herd_factory.random.random")
+    mock_update_at_lactation_start = mocker.patch.object(mock_herd_factory, "_update_genetic_values_at_lactation_start")
+    mock_update_newborn_calf = mocker.patch.object(mock_herd_factory, "_update_newborn_calf_genetic_values")
+    mock_herd_factory.time = MagicMock(auto_spec=RufasTime)
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[], current_animal_id=0
+    )
+
+    mock_herd_factory._cow_give_birth(dam_cow, newborn_calf_config)
+
+    mock_calf_init.assert_called_once_with(
+        NewBornCalfValuesTypedDict(**newborn_calf_config, id=AnimalPopulation.current_animal_id),
+        mock_herd_factory.time,
+    )
+    mock_random.assert_not_called()
+    mock_update_at_lactation_start.assert_called_once_with(dam_cow)
+    assert dam_cow.nutrients.total_phosphorus_in_animal == pytest.approx(169.9)
+    if is_calf_sold:
+        mock_update_newborn_calf.assert_not_called()
+        assert mock_herd_factory.pre_animal_population.calves == []
+    else:
+        mock_update_newborn_calf.assert_called_once_with(mock_calf)
+        assert mock_herd_factory.pre_animal_population.calves == [mock_calf]
+
+
+def test_cow_give_birth_ignores_calf_config_without_semen_allocation(
+    mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """With semen allocation off, the calf configuration is ignored and a dairy calf of the herd breed is created."""
+    mocker.patch.object(HerdFactory, "_is_semen_allocation_enabled", return_value=False)
+    dam_cow = mock_animal(AnimalType.LAC_COW, 6, mocker)
+    dam_cow.nutrients.phosphorus_for_gestation_required_for_calf = 8.8
+    dam_cow.reproduction.calf_birth_weight = 18.8
+    mock_calf = MagicMock(auto_spec=Animal)
+    mock_calf.sold = False
+    mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
+    mocker.patch("RUFAS.biophysical.animal.herd_factory.random.random", return_value=0.99)
+    mock_update_at_lactation_start = mocker.patch.object(mock_herd_factory, "_update_genetic_values_at_lactation_start")
+    mock_herd_factory.time = MagicMock(auto_spec=RufasTime)
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[], current_animal_id=0
+    )
+
+    mock_herd_factory._cow_give_birth(dam_cow, MagicMock())
+
+    args = mock_calf_init.call_args.args[0]
+    assert args["breed"] == Breed.HO.name
+    assert args["sex"] == Sex.FEMALE
+    assert args["bred_from_semen"] is None
+    mock_update_at_lactation_start.assert_not_called()
+
+
+def test_update_newborn_calf_genetic_values(mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
+    """A newborn calf's EBVs are calculated against the TBV mean of the current calves."""
+    calves = mock_animals(AnimalType.CALF, 2, mocker)
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=calves, heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[]
+    )
+    mock_calculate_average_tbv = mocker.patch.object(Genetics, "calculate_average_tbv", return_value=(1.0, 2.0))
+    newborn_calf = mock_animal(AnimalType.CALF, 9, mocker)
+    newborn_calf.calves = 0
+
+    mock_herd_factory._update_newborn_calf_genetic_values(newborn_calf)
+
+    mock_calculate_average_tbv.assert_called_once_with([calf.genetics for calf in calves])
+    newborn_calf.genetics.calculate_ebv_and_ranking_index.assert_called_once_with(AnimalType.CALF, 1.0, 2.0, 0)
+
+
+def test_update_genetic_values_at_lactation_start(mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
+    """A cow's genetic values are recalculated at lactation start against the TBV mean of the cows."""
+    cows = mock_animals(AnimalType.LAC_COW, 2, mocker)
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=cows, replacement=[]
+    )
+    mock_herd_factory.time = MagicMock(auto_spec=RufasTime)
+    mock_herd_factory.time.current_date = datetime(2026, 6, 1)
+    mocker.patch.object(Genetics, "calculate_average_tbv", return_value=(1.0, 2.0))
+    cow = cows[0]
+    cow.days_born = 800
+    cow.calves = 1
+
+    mock_herd_factory._update_genetic_values_at_lactation_start(cow)
+
+    cow.genetics.recalculate_values_at_lactation_start.assert_called_once_with(
+        birth_year=2024,
+        animal_type=AnimalType.LAC_COW,
+        parity=1,
+        group_specific_TBV_fat_mean=1.0,
+        group_specific_TBV_protein_mean=2.0,
+    )
+
+
+def test_update_genetic_values_skip_animals_without_genetics(
+    mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """Newborn calf and lactation-start genetic updates do nothing for animals without genetics."""
+    mock_calculate_average_tbv = mocker.patch.object(Genetics, "calculate_average_tbv")
+    animal = mock_animal(AnimalType.LAC_COW, 1, mocker)
+    animal.genetics = None
+
+    mock_herd_factory._update_newborn_calf_genetic_values(animal)
+    mock_herd_factory._update_genetic_values_at_lactation_start(animal)
+
+    mock_calculate_average_tbv.assert_not_called()
