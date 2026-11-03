@@ -15,7 +15,7 @@ from RUFAS.post_processing.graph_generator import GraphGenerator
 from RUFAS.post_processing.output_config_validator import OutputConfigValidator
 from RUFAS.post_processing.pool_manager import PoolManager
 from RUFAS.post_processing.report_generator import ReportGenerator, ReportGeneratorConfig
-from RUFAS.post_processing.rufas_logger import configure_logging, get_log_level, get_logger, log
+from RUFAS.post_processing.rufas_logger import configure_logging, get_log_level, get_logger
 from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
@@ -496,13 +496,6 @@ class OutputManager:
         if not produce_graphics:
             self.add_warning("No Graphics", f"Graphic generation is disabled, skipping {filter_file=}", info_map)
             return
-        if self.time is None:
-            self.add_error(
-                "graph generation exception",
-                f"Cannot graph {filter_file=} because OutputManager's 'time' attribute is not initialized.",
-                info_map,
-            )
-            return
         try:
             graph_generator = GraphGenerator(self.time, self.__metadata_prefix)
             graph_generator.generate_graph(filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics)
@@ -802,13 +795,7 @@ class OutputManager:
                     self._info_map(self._log_event_pool.__name__),
                 )
                 continue
-            log(
-                logger=self._logger,
-                level=levels[event_type],
-                name=str(event[event_type]),
-                message=str(event.get("message", "")),
-                info_map=event.get("info_map"),
-            )
+            self._log(levels[event_type], str(event[event_type]), str(event.get("message", "")), event.get("info_map"))
 
     def _parse_filtered_variables(
         self,
@@ -920,13 +907,7 @@ class OutputManager:
         info_map: dict[str, Any],
     ) -> None:
         """Logs an informational message using the RuFaS logger."""
-        log(
-            logger=self._logger,
-            level=logging.INFO,
-            name=name,
-            message=message,
-            info_map=info_map,
-        )
+        self._log(logging.INFO, name, message, info_map)
 
     def add_warning(
         self,
@@ -935,13 +916,7 @@ class OutputManager:
         info_map: dict[str, Any],
     ) -> None:
         """Logs a warning message using the RuFaS logger."""
-        log(
-            logger=self._logger,
-            level=logging.WARNING,
-            name=name,
-            message=message,
-            info_map=info_map,
-        )
+        self._log(logging.WARNING, name, message, info_map)
 
     def add_error(
         self,
@@ -950,10 +925,29 @@ class OutputManager:
         info_map: dict[str, Any],
     ) -> None:
         """Logs an error message using the RuFaS logger."""
-        log(
-            logger=self._logger,
-            level=logging.ERROR,
-            name=name,
-            message=message,
-            info_map=info_map,
+        self._log(logging.ERROR, name, message, info_map)
+
+    def _log(self, level: int, name: str, message: str, info_map: dict[str, Any] | None) -> None:
+        """
+        Emits a record through the RuFaS logger with the metadata expected by its filter and formatter.
+
+        Parameters
+        ----------
+        level : int
+            The Python logging level of the message.
+        name : str
+            The descriptive name of the logged event, passed as ``rufas_log_name``.
+        message : str
+            The message to be logged.
+        info_map : dict[str, Any] | None
+            Additional context associated with the message.
+        """
+        self._logger.log(
+            level,
+            message,
+            extra={
+                "rufas_log_name": name,
+                "rufas_info_map": info_map or {},
+                "rufas_metadata_prefix": self.__metadata_prefix,
+            },
         )
