@@ -515,17 +515,27 @@ class GraphGenerator:
             raise ValueError(f"Graph Generation error: Unsupported graph type: {graph_type}")
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         max_data_length = max(len(v) for v in data.values())
-        if slice_start is not None:
-            slice_start_sim_day = self.time.convert_slice_to_simulation_day(slice_start)
-            if slice_end is None:
-                slice_end_sim_day = self.time.simulation_length_days
+        if self.time is not None:
+            if slice_start is not None:
+                slice_start_sim_day = self.time.convert_slice_to_simulation_day(slice_start)
+                if slice_end is None:
+                    slice_end_sim_day = self.time.simulation_length_days
+                else:
+                    slice_end_sim_day = self.time.convert_slice_to_simulation_day(slice_end)
+                dates_in_data_range = [
+                    self.time.convert_simulation_day_to_date(i) for i in range(slice_start_sim_day, slice_end_sim_day)
+                ]
             else:
-                slice_end_sim_day = self.time.convert_slice_to_simulation_day(slice_end)
-            dates_in_data_range = [
-                self.time.convert_simulation_day_to_date(i) for i in range(slice_start_sim_day, slice_end_sim_day)
-            ]
+                dates_in_data_range = [
+                    self.time.start_date + datetime.timedelta(days=i) for i in range(max_data_length)
+                ]
         else:
-            dates_in_data_range = [self.time.start_date + datetime.timedelta(days=i) for i in range(max_data_length)]
+            logger.error(
+                "Can't plot %s data set: 'produce_graphics' set to False, no graphs will be produced.",
+                data.get("title"),
+                extra={"rufas_log_name": "Graph Generator Time Error"},
+            )
+            return
 
         get_x_values: Callable[[int], list[int] | list[datetime.datetime]] = lambda values_length: (
             dates_in_data_range[:values_length] if use_calendar_dates else list(range(values_length))
