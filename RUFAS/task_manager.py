@@ -475,7 +475,7 @@ class TaskManager:
                 info_map={
                     "class": TaskManager.__name__,
                     "function": self._parse_input_tasks.__name__,
-                }
+                },
             )
             raise KeyError("No tasks found in task input config.")
         task_types = {TaskType.from_string(task["task_type"]) for task in tasks_from_input}
