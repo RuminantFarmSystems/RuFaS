@@ -1,7 +1,6 @@
 import pandas as pd
 
 
-
 def raw_compare_csvs(file_a, file_b):
     df_a = pd.read_csv(file_a)
     df_b = pd.read_csv(file_b)
@@ -28,10 +27,7 @@ def raw_compare_csvs(file_a, file_b):
     df_b = df_b.apply(pd.to_numeric, errors="coerce")
 
     # Drop columns entirely NaN in BOTH files
-    non_empty_cols = [
-        col for col in common_cols
-        if not (df_a[col].isna().all() and df_b[col].isna().all())
-    ]
+    non_empty_cols = [col for col in common_cols if not (df_a[col].isna().all() and df_b[col].isna().all())]
     df_a = df_a[non_empty_cols]
     df_b = df_b[non_empty_cols]
 
@@ -85,7 +81,9 @@ FILE_B = rf"input\data\EEE\feed_emissions_total_{newfilename}_interpolated_regio
 dfa, dfb = raw_compare_csvs(FILE_A, FILE_B)
 percent_diff = percent_compare_csvs(dfa, dfb)
 print(percent_diff)
-percent_diff.to_csv(rf"helpful_scripts\emissions_interpolation\feed_emissions_total_{newfilename}_percent_comparison.csv")
+percent_diff.to_csv(
+    rf"helpful_scripts\emissions_interpolation\feed_emissions_total_{newfilename}_percent_comparison.csv"
+)
 
 diff_diff = diff_compare_csvs(dfa, dfb)
 print(diff_diff)

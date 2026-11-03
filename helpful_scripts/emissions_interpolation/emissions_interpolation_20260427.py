@@ -38,7 +38,6 @@ county_gps.columns = county_gps.columns.str.strip()
 county_gps["GEOID"] = county_gps["GEOID"].str.zfill(5)
 
 
-
 feed_source = pd.read_csv(
     r"helpful_scripts\emissions_interpolation\Feed Emissions Source RuFaS_Feed_Library_Combined_Final.csv"
 )
@@ -155,7 +154,9 @@ for EEEname in EEEnames:
     if use_wheat_regional_average:
         target_cols = [c for c in ["193"] if c in emissions_doc.columns]
         print(target_cols)
-        merged = emissions_doc.merge(fips_to_region[["FIPS", "Region"]], left_on="county_code", right_on="FIPS", how="left")
+        merged = emissions_doc.merge(
+            fips_to_region[["FIPS", "Region"]], left_on="county_code", right_on="FIPS", how="left"
+        )
         print(merged)
 
         merged[target_cols] = merged[target_cols].apply(pd.to_numeric, errors="coerce")
@@ -170,9 +171,7 @@ for EEEname in EEEnames:
         print(region_means)
         region_means.to_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
 
-
     regional_sheet = pd.read_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
-
 
     #####################
     # GPS for each FIPS #
@@ -258,7 +257,6 @@ for EEEname in EEEnames:
                     emissions_neighbors_detailed.append(
                         [county_code, gps_county, feed_id, neighbor_values, neighbor_distances]
                     )
-
 
     #################################################################
     # Final step to fill in missing state vals for some wheat items #
