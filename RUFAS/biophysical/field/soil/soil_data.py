@@ -155,6 +155,18 @@ class SoilData:
         Plant residue fraction that is metabolic (unitless).
     crop_yield_nitrogen : float, default 0
         Nitrogen contained in the harvested yield (kg/ha).
+    manure_residue_lignin : float, default 0.0
+        Lignin in applied manure that is awaiting partitioning into the litter pools (kg/ha). Accumulated at
+        each manure application and reset when the manure carbon residue pools are partitioned.
+    manure_residue_nitrogen : float, default 0.0
+        Nitrogen in applied manure that is awaiting partitioning into the litter pools (kg/ha). Accumulated at
+        each manure application and reset when the manure carbon residue pools are partitioned.
+    manure_lignin_nitrogen_ratio : float, default 0.0
+        Manure lignin to nitrogen ratio of the most recently partitioned manure carbon residue (unitless).
+    manure_residue_metabolic_fraction : float, default 0.0
+        Fraction of the most recently partitioned manure carbon residue that is metabolic (unitless).
+    annual_manure_carbon_applied_total : float, default 0.0
+        Cumulative total of manure carbon added to the soil profile by manure applications this year (kg/ha).
     machine_manure : ManurePool
         A ManurePool instance holding data for machine-applied manure.
     grazing_manure : ManurePool
@@ -259,6 +271,13 @@ class SoilData:
     plant_lignin_nitrogen_ratio: float = 0
     plant_residue_metabolic_fraction: float = 0
     crop_yield_nitrogen: float = 0
+
+    # ---- Manure carbon residue partition (Carbon Cycling)
+    manure_residue_lignin: float = 0.0
+    manure_residue_nitrogen: float = 0.0
+    manure_lignin_nitrogen_ratio: float = 0.0
+    manure_residue_metabolic_fraction: float = 0.0
+    annual_manure_carbon_applied_total: float = 0.0
 
     @property
     def total_residue(self) -> float:
@@ -452,6 +471,8 @@ class SoilData:
         self.annual_eroded_fresh_organic_nitrogen_total = 0
         self.annual_eroded_stable_organic_nitrogen_total = 0
         self.annual_eroded_active_organic_nitrogen_total = 0
+
+        self.annual_manure_carbon_applied_total = 0.0
 
         # Reset carbon cycle
         for layer in self.soil_layers:
