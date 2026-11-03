@@ -1,7 +1,6 @@
 import pandas as pd
 
 
-
 def raw_compare_csvs(file_a, file_b):
     df_a = pd.read_csv(file_a)
     df_b = pd.read_csv(file_b)
@@ -72,7 +71,7 @@ percent_diff.to_csv(rf"helpful_scripts\emissions_interpolation\feed_emissions_lu
 
 
 dfa, dfb = raw_compare_csvs(FILE_A, FILE_B)
-percent_diff = diff_compare_csvs(dfa, dfb)
+diff_diff = diff_compare_csvs(dfa, dfb)
 print(diff_diff)
 diff_diff.to_csv(rf"helpful_scripts\emissions_interpolation\feed_emissions_luc_{newfilename}_comparison.csv")
 
@@ -89,4 +88,4 @@ percent_diff.to_csv(rf"helpful_scripts\emissions_interpolation\feed_emissions_to
 
 diff_diff = diff_compare_csvs(dfa, dfb)
 print(diff_diff)
-diff_diff.to_csv(rf"helpful_scripts\emissions_interpolation\feed_emissions_total_{filename}_comparison.csv")
+diff_diff.to_csv(rf"helpful_scripts\emissions_interpolation\feed_emissions_total_{newfilename}_comparison.csv")
