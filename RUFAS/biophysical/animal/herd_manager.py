@@ -2370,6 +2370,36 @@ class HerdManager:
             cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL
         ]
 
+        low_production_cow_count = len(low_production_cows)
+        total_low_production_cow_count = self.herd_statistics.sold_cow_low_production_num
+
+        if low_production_cow_count > 0:
+            previous_count = total_low_production_cow_count - low_production_cow_count
+
+            for attribute, values in (
+                (
+                    "milk_production_at_low_production_sale_avg",
+                    [cow.milk_production.daily_milk_produced for cow in low_production_cows],
+                ),
+                (
+                    "days_in_milk_at_low_production_sale_avg",
+                    [cow.days_in_milk for cow in low_production_cows],
+                ),
+                (
+                    "parity_at_low_production_sale_avg",
+                    [cow.reproduction.calves for cow in low_production_cows],
+                ),
+                (
+                    "days_pregnant_at_low_production_sale_avg",
+                    [cow.days_in_pregnancy for cow in low_production_cows],
+                ),
+            ):
+                previous_average = getattr(self.herd_statistics, attribute)
+                new_average = (
+                    previous_average * previous_count + sum(values)
+                ) / total_low_production_cow_count
+                setattr(self.herd_statistics, attribute, new_average)
+
         self.herd_statistics.sold_cow_low_production_num += len(low_production_cows)
 
         self.herd_statistics.sold_cow_low_production_parity_1 += sum(
