@@ -23,12 +23,15 @@ class Growth:
         The body weight change of the animal (kg).
     tissue_changed: float
         Body weight change due to tissue mobilization (kg).
+    daily_tissue_change: float
+        The daily body weight change due to body reserve (tissue) gain or loss (kg).
     body_weight_history : list[BodyWeightHistory]
         A list of animal ``BodyWeightHistory`` objects.
     """
 
     daily_growth: float = 0.0
     tissue_changed: float = 0.0
+    daily_tissue_change: float = 0.0
     body_weight_history: list[BodyWeightHistory] = []
 
     def __init__(
@@ -39,6 +42,7 @@ class Growth:
     ) -> None:
         self.daily_growth = daily_growth if daily_growth else 0.0
         self.tissue_changed = tissue_changed if tissue_changed else 0.0
+        self.daily_tissue_change = 0.0
         self.body_weight_history = body_weight_history if body_weight_history else []
 
     def evaluate_body_weight_change(
@@ -278,6 +282,7 @@ class Growth:
         target_adg_cow = self._calculate_cow_target_daily_growth(growth_inputs)
 
         body_weight_tissue, self.tissue_changed = self._calculate_cow_body_weight_tissue_change(growth_inputs)
+        self.daily_tissue_change = body_weight_tissue
 
         return (
             target_adg_cow + conceptus_growth + body_weight_tissue,

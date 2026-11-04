@@ -20,6 +20,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     body_condition_score_5: int = 3
     days_in_milk: Optional[int] = 100
     average_daily_gain_heifer: Optional[float] = 0.8
+    tissue_weight_gain: float = 0.25
     animal_type: AnimalType = AnimalType.LAC_COW
     parity: int = 2
     calving_interval: Optional[int] = 365
@@ -86,6 +87,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         body_condition_score_5,
         days_in_milk,
         average_daily_gain_heifer,
+        tissue_weight_gain,
         animal_type,
         parity,
         calving_interval,
@@ -117,7 +119,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         body_weight, mature_body_weight, days_in_milk, lactating, 20.0, parity, body_condition_score_5, ndf_percentage
     )
     mock_calculate_protein_requirement.assert_called_once_with(
-        lactating, body_weight, 1.5, 1.2, 18.0, milk_true_protein, milk_production, ndf_percentage
+        lactating, body_weight, 1.5, tissue_weight_gain, 1.2, 18.0, milk_true_protein, milk_production, ndf_percentage
     )
     mock_calculate_calcium_requirement.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, 0.7, 18.0, milk_true_protein, milk_production, parity
@@ -191,13 +193,13 @@ def test_calculate_maintenance_energy_requirements(
     "expected_energy, expected_avg_daily_gain, expected_frame_weight_gain",
     [
         # Test case 1: Lactating cow, first parity, calving interval 400 days
-        (600.0, 650.0, None, AnimalType.LAC_COW, 1, 400, 0.9965, 0.156, 0.4585),
+        (600.0, 650.0, None, AnimalType.LAC_COW, 1, 400, 6.3879, 0.156, 0.4585),
         # Test case 2: Heifer I with specified average daily gain
-        (500.0, 700.0, 900.0, AnimalType.HEIFER_I, 0, None, 4943.7811, 900.0, 0.4063),
+        (500.0, 700.0, 900.0, AnimalType.HEIFER_I, 0, None, 5.4931, 900.0, 0.4063),
         # Test case 3: Heifer II with specified average daily gain
-        (550.0, 680.0, 850.0, AnimalType.HEIFER_II, 0, None, 5013.4942, 850.0, 0.4299),
+        (550.0, 680.0, 850.0, AnimalType.HEIFER_II, 0, None, 5.8982, 850.0, 0.4299),
         # Test case 4: Lactating cow, second parity, valid calving interval (parity == 2 branch)
-        (600.0, 650.0, None, AnimalType.LAC_COW, 2, 450, 0.7086, 0.1109, 0.4585),
+        (600.0, 650.0, None, AnimalType.LAC_COW, 2, 450, 6.3879, 0.1109, 0.4585),
         # Test case 5: Lactating cow, second parity, zero calving interval (parity == 2 but calving_interval == 0)
         (600.0, 650.0, None, AnimalType.LAC_COW, 2, 0, 0.0, 0.00001, 0.0),
         # Test case 6: Animal type not in specified categories, should result in avg_daily_gain = 0.0
@@ -252,16 +254,22 @@ def test_calculate_pregnancy_energy_requirements(
 
 
 @pytest.mark.parametrize(
-    "lact, weight, frame_gain, gravid_gain, dmi, true_protein, milk, ndf, expected",
+    "lact, weight, frame_gain, tissue_gain, gravid_gain, dmi, true_protein, milk, ndf, expected",
     [
-        (True, 490.0, 100.0, 500.0, 45.0, 1.2, 25.0, 50.0, 190887.068472),
-        (False, 490.0, 100.0, 500.0, 45.0, 0.0, 0.0, 50.0, 190462.225718),
+        (True, 490.0, 100.0, 0.0, 500.0, 45.0, 1.2, 25.0, 50.0, 190887.068472),
+        (False, 490.0, 100.0, 0.0, 500.0, 45.0, 0.0, 0.0, 50.0, 190462.225718),
+        # Tissue gain adds to the growth protein requirement
+        (True, 490.0, 100.0, 50.0, 500.0, 45.0, 1.2, 25.0, 50.0, 190892.053979),
+        (False, 490.0, 100.0, 50.0, 500.0, 45.0, 0.0, 0.0, 50.0, 190470.825718),
+        # Tissue loss lowers the growth protein requirement
+        (True, 490.0, 100.0, -50.0, 500.0, 45.0, 1.2, 25.0, 50.0, 190882.082965),
     ],
 )
 def test_calculate_protein_requirement(
     lact: bool,
     weight: float,
     frame_gain: float,
+    tissue_gain: float,
     gravid_gain: float,
     dmi: float,
     true_protein: float,
@@ -271,7 +279,7 @@ def test_calculate_protein_requirement(
 ) -> None:
     """Test that the protein requirement is calculated correctly."""
     actual = NASEMRequirementsCalculator._calculate_protein_requirement(
-        lact, weight, frame_gain, gravid_gain, dmi, true_protein, milk, ndf
+        lact, weight, frame_gain, tissue_gain, gravid_gain, dmi, true_protein, milk, ndf
     )
 
     assert pytest.approx(actual) == expected
