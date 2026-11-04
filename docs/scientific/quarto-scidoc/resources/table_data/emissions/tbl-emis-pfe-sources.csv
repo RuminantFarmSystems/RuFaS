@@ -1,0 +1,4 @@
+Source,Scope,Feed Count,Original Units,Intensity Types
+FoodS3,County/FIPS,7 feeds,kg CO2e/kg As Fed,Total & land use change
+Regional,Regional,22 feeds (17 unique from FoodS3),kg CO2e/tonne As Fed,Total & land use change
+National,National,86 feeds,kg CO2e/kg As Fed,Total (no land use change)
