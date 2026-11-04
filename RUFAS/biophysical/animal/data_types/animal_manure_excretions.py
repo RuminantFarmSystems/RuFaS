@@ -34,6 +34,9 @@ class AnimalManureExcretions:
         Amount of potassium in manure (g).
     enteric_methane_g: float
         The amount of enteric methane (g).
+    manure_lignin: float
+        Amount of lignin excreted in manure (kg). Lignin is assumed to be indigestible, so the amount excreted
+        equals the amount of lignin ingested in the ration.
 
     """
 
@@ -49,6 +52,7 @@ class AnimalManureExcretions:
     phosphorus: float = 0.0
     phosphorus_fraction: float = 0.0
     potassium: float = 0.0
+    manure_lignin: float = 0.0
 
     def __add__(self, other: "AnimalManureExcretions") -> "AnimalManureExcretions":
         return AnimalManureExcretions(
@@ -64,4 +68,5 @@ class AnimalManureExcretions:
             self.phosphorus + other.phosphorus + other.phosphorus_fraction,
             self.phosphorus_fraction + other.phosphorus_fraction,  # how to handle fraction for addition
             self.potassium + other.potassium,
+            self.manure_lignin + other.manure_lignin,
         )
