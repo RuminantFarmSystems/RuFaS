@@ -165,6 +165,33 @@ class AnimalConfig:
         Semen sire information used for genetic simulations and breeding selection.
     simulate_genetics : bool
         Whether genetic simulation functionality is enabled.
+    tbv_fat_variance : float
+        Variance of the true breeding value (TBV) for fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    tbv_protein_variance : float
+        Variance of the true breeding value (TBV) for protein yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    tbv_correlation : float
+        Correlation between the fat and protein true breeding values, (unitless). Defaults to the CDCB
+        national average.
+    permanent_environment_fat_variance : float
+        Variance of the permanent environmental effect on fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    permanent_environment_protein_variance : float
+        Variance of the permanent environmental effect on protein yield in the herd, (kg^2). Defaults to the
+        CDCB national average.
+    permanent_environment_correlation : float
+        Correlation between the fat and protein permanent environmental effects, (unitless). Defaults to the
+        CDCB national average.
+    temporary_environment_fat_variance : float
+        Variance of the temporary environmental effect on fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    temporary_environment_protein_variance : float
+        Variance of the temporary environmental effect on protein yield in the herd, (kg^2). Defaults to the
+        CDCB national average.
+    temporary_environment_correlation : float
+        Correlation between the fat and protein temporary environmental effects, (unitless). Defaults to the
+        CDCB national average.
 
     """
 
@@ -291,6 +318,15 @@ class AnimalConfig:
     average_phenotype: dict[str, dict[int, float]] = {}
     top_listing_semen: dict[str, dict[str, float]] = {}
     simulate_genetics: bool = False
+    tbv_fat_variance: float = 25.8
+    tbv_protein_variance: float = 13.4
+    tbv_correlation: float = 0.59
+    permanent_environment_fat_variance: float = 38.8
+    permanent_environment_protein_variance: float = 20.1
+    permanent_environment_correlation: float = 0.95
+    temporary_environment_fat_variance: float = 64.5
+    temporary_environment_protein_variance: float = 33.4
+    temporary_environment_correlation: float = 0.78
 
     @classmethod
     def initialize_animal_config(cls) -> None:
@@ -484,3 +520,14 @@ class AnimalConfig:
             if trait != "year_month"
         }
         cls.simulate_genetics = animal_data["herd_information"]["simulate_genetics"]
+
+        genetics_data = animal_data["genetics"]
+        cls.tbv_fat_variance = genetics_data["tbv_fat_variance"]
+        cls.tbv_protein_variance = genetics_data["tbv_protein_variance"]
+        cls.tbv_correlation = genetics_data["tbv_correlation"]
+        cls.permanent_environment_fat_variance = genetics_data["permanent_environment_fat_variance"]
+        cls.permanent_environment_protein_variance = genetics_data["permanent_environment_protein_variance"]
+        cls.permanent_environment_correlation = genetics_data["permanent_environment_correlation"]
+        cls.temporary_environment_fat_variance = genetics_data["temporary_environment_fat_variance"]
+        cls.temporary_environment_protein_variance = genetics_data["temporary_environment_protein_variance"]
+        cls.temporary_environment_correlation = genetics_data["temporary_environment_correlation"]

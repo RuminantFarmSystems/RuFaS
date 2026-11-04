@@ -60,7 +60,7 @@ def test_log(level: int, report_generator: ReportGenerator, mocker: MockerFixtur
         level,
         "log message",
         extra={
-            "rufas_name": "log_name",
+            "rufas_log_name": "log_name",
             "rufas_info_map": {
                 "class": "ReportGenerator",
                 "function": "function_name",
@@ -585,13 +585,11 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
         "produce_graphics": False,
     }
     filter_content = {"name": "example_report", "filters": ["filter1", "filter2"], "graph_details": dict(graph_details)}
-    mock_graph_generator_config = mocker.patch("RUFAS.post_processing.report_generator.GraphGeneratorConfig")
     mock_graph_generator = mocker.patch("RUFAS.post_processing.report_generator.GraphGenerator")
 
     report_generator._prepare_report_data_to_be_graphed(graph_data, filter_content, "test_report")
 
-    mock_graph_generator_config.assert_called_once_with(metadata_prefix="prefix", time=mock_time)
-    mock_graph_generator.assert_called_once_with(mock_graph_generator_config.return_value)
+    mock_graph_generator.assert_called_once_with(time=mock_time, metadata_prefix="prefix")
     mock_graph_generator.return_value.generate_graph.assert_called_once_with(
         graph_data,
         {
@@ -617,13 +615,11 @@ def test_prepare_report_data_to_be_graphed_defaults(report_generator: ReportGene
         "filters": ["filter1"],
         "graph_details": {"metadata_prefix": "prefix", "type": "plot"},
     }
-    mock_graph_generator_config = mocker.patch("RUFAS.post_processing.report_generator.GraphGeneratorConfig")
     mock_graph_generator = mocker.patch("RUFAS.post_processing.report_generator.GraphGenerator")
 
     report_generator._prepare_report_data_to_be_graphed(graph_data, filter_content, "test_report")
 
-    mock_graph_generator_config.assert_called_once_with(metadata_prefix="prefix", time=None)
-    mock_graph_generator.assert_called_once_with(mock_graph_generator_config.return_value)
+    mock_graph_generator.assert_called_once_with(time=None, metadata_prefix="prefix")
     mock_graph_generator.return_value.generate_graph.assert_called_once_with(
         graph_data,
         {
@@ -651,7 +647,6 @@ def test_prepare_report_data_to_be_graphed_missing_details(
     filter_content: dict[str, Any], report_generator: ReportGenerator, mocker: MockerFixture
 ) -> None:
     """Unit test for the _prepare_report_data_to_be_graphed method of ReportGenerator with missing details."""
-    mocker.patch("RUFAS.post_processing.report_generator.GraphGeneratorConfig")
     mock_graph_generator = mocker.patch("RUFAS.post_processing.report_generator.GraphGenerator")
 
     with pytest.raises(KeyError):

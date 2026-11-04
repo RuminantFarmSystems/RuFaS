@@ -38,7 +38,7 @@ def test_log(level: int, unit_handler: UnitHandler, mocker: MockerFixture) -> No
         level,
         "log message",
         extra={
-            "rufas_name": "log_name",
+            "rufas_log_name": "log_name",
             "rufas_info_map": {
                 "class": "UnitHandler",
                 "function": "function_name",

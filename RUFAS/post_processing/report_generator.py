@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Callable
 
 import numpy as np
 
-from RUFAS.post_processing.graph_generator import GraphGenerator, GraphGeneratorConfig
+from RUFAS.post_processing.graph_generator import GraphGenerator
 from RUFAS.post_processing.rufas_logger import get_logger, log
 from RUFAS.post_processing.unit_handler import UnitHandler
 from RUFAS.util import Aggregator, Utility
@@ -316,9 +316,8 @@ class ReportGenerator:
             The name of the report to be graphed.
         """
 
-        # TODO GraphGeneratorConfig's fields and generate_graph() are set up with the overhauled GraphGenerator (#3190)
         graph_generator = GraphGenerator(
-            GraphGeneratorConfig(metadata_prefix=filter_content["graph_details"]["metadata_prefix"], time=self.time)
+            time=self.time, metadata_prefix=filter_content["graph_details"]["metadata_prefix"]
         )
         graph_details = {
             **filter_content["graph_details"],
