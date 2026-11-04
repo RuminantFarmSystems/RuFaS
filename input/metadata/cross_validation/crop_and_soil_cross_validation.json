@@ -375,6 +375,426 @@
           "relationship": "equal"
         }
       ]
+    },
+    {
+      "description": "field_1 tractor_size must not be null when fields are simulated without animals.",
+      "aliases": {
+        "variables": {
+          "simulation_type": "config.simulation_type",
+          "tractor_size": "field_1.tractor_size"
+        },
+        "constants": {
+          "field_only": "field_only",
+          "field_and_feed": "field_and_feed",
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["simulation_type"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["field_only", "field_and_feed"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["tractor_size"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        }
+      ]
+    },
+    {
+      "description": "field_2 tractor_size must not be null when fields are simulated without animals.",
+      "aliases": {
+        "variables": {
+          "simulation_type": "config.simulation_type",
+          "tractor_size": "field_2.tractor_size"
+        },
+        "constants": {
+          "field_only": "field_only",
+          "field_and_feed": "field_and_feed",
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["simulation_type"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["field_only", "field_and_feed"]
+            }
+          },
+          "relationship": "is_in"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["tractor_size"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        }
+      ]
+    },
+    {
+      "description": "manure_schedule_1 daily spreading requires at least one DailySpread manure storage",
+      "aliases": {
+        "variables": {
+          "is_daily_spreading": "manure_schedule_1.daily_spread.is_daily_spreading",
+          "manure_storages": "manure_management.storage"
+        },
+        "constants": {
+          "true_constant": true,
+          "daily_spread_processor_type": "DailySpread"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["is_daily_spreading"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["daily_spread_processor_type"]
+            }
+          },
+          "right_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "manure_storages",
+              "field": "processor_type",
+              "value_to_compare": "daily_spread_processor_type",
+              "relationship": "equal",
+              "field_to_save": "processor_type"
+            }
+          },
+          "relationship": "is_in"
+        }
+      ]
+    },
+    {
+      "description": "manure_schedule_1 spread_all_available_manure requires is_daily_spreading to be true",
+      "aliases": {
+        "variables": {
+          "is_daily_spreading": "manure_schedule_1.daily_spread.is_daily_spreading",
+          "spread_all_available_manure": "manure_schedule_1.daily_spread.spread_all_available_manure"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["spread_all_available_manure"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["is_daily_spreading"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "manure_schedule_1 daily spread nitrogen or phosphorus spread amount must be greater than zero when spread_all_available_manure is false",
+      "aliases": {
+        "variables": {
+          "is_daily_spreading": "manure_schedule_1.daily_spread.is_daily_spreading",
+          "spread_all_available_manure": "manure_schedule_1.daily_spread.spread_all_available_manure",
+          "nitrogen_spread_amount": "manure_schedule_1.daily_spread.nitrogen_spread_amount",
+          "phosphorus_spread_amount": "manure_schedule_1.daily_spread.phosphorus_spread_amount"
+        },
+        "constants": {
+          "true_constant": true,
+          "false_constant": false,
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["is_daily_spreading"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["spread_all_available_manure"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["false_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "operands": ["nitrogen_spread_amount", "phosphorus_spread_amount"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
+    },
+    {
+      "description": "manure_schedule_2 daily spreading requires at least one DailySpread manure storage",
+      "aliases": {
+        "variables": {
+          "is_daily_spreading": "manure_schedule_2.daily_spread.is_daily_spreading",
+          "manure_storages": "manure_management.storage"
+        },
+        "constants": {
+          "true_constant": true,
+          "daily_spread_processor_type": "DailySpread"
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["is_daily_spreading"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["daily_spread_processor_type"]
+            }
+          },
+          "right_hand": {
+            "for_each": {
+              "mode": "filter",
+              "in": "manure_storages",
+              "field": "processor_type",
+              "value_to_compare": "daily_spread_processor_type",
+              "relationship": "equal",
+              "field_to_save": "processor_type"
+            }
+          },
+          "relationship": "is_in"
+        }
+      ]
+    },
+    {
+      "description": "manure_schedule_2 spread_all_available_manure requires is_daily_spreading to be true",
+      "aliases": {
+        "variables": {
+          "is_daily_spreading": "manure_schedule_2.daily_spread.is_daily_spreading",
+          "spread_all_available_manure": "manure_schedule_2.daily_spread.spread_all_available_manure"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["spread_all_available_manure"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["is_daily_spreading"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "manure_schedule_2 daily spread nitrogen or phosphorus spread amount must be greater than zero when spread_all_available_manure is false",
+      "aliases": {
+        "variables": {
+          "is_daily_spreading": "manure_schedule_2.daily_spread.is_daily_spreading",
+          "spread_all_available_manure": "manure_schedule_2.daily_spread.spread_all_available_manure",
+          "nitrogen_spread_amount": "manure_schedule_2.daily_spread.nitrogen_spread_amount",
+          "phosphorus_spread_amount": "manure_schedule_2.daily_spread.phosphorus_spread_amount"
+        },
+        "constants": {
+          "true_constant": true,
+          "false_constant": false,
+          "zero": 0
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["is_daily_spreading"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["spread_all_available_manure"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["false_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "operands": ["nitrogen_spread_amount", "phosphorus_spread_amount"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["zero"]
+            }
+          },
+          "relationship": "greater"
+        }
+      ]
     }
   ]
 }

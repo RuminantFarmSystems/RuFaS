@@ -55,5 +55,8 @@
   ],
   "supplement_manure_nutrient_deficiencies": ["synthetic fertilizer and manure", "manure", "manure", "manure"],
   "pattern_repeat": 1,
-  "pattern_skip": 4
+  "pattern_skip": 4,
+  "daily_spread": {
+        "is_daily_spreading": false
+  }
 }

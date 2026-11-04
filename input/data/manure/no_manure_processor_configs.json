@@ -1,6 +1,3 @@
 {
-    "anaerobic_digester": [],
-    "handler": [],
-    "separator": [],
-    "storage": []
+    "exclude_from_pool": true
 }

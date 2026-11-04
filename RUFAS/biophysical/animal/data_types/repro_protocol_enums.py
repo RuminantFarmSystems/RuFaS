@@ -35,8 +35,6 @@ class HeiferTAISubProtocol(Enum):
 
     TAI_5dCG2P = "5dCG2P"
     TAI_5dCGP = "5dCGP"
-    SynchED_CP = "CP"
-    SynchED_2P = "2P"
 
 
 class HeiferSynchEDSubProtocol(Enum):
@@ -104,7 +102,7 @@ class CowPreSynchSubProtocol(Enum):
     Presynch_PreSynch = "PreSynch"
     Presynch_DoubleOvSynch = "Double OvSynch"
     Presynch_G6G = "G6G"
-    NONE = "None"
+    NONE = None
 
 
 class CowTAISubProtocol(Enum):
@@ -130,7 +128,7 @@ class CowTAISubProtocol(Enum):
     TAI_OvSynch_56 = "OvSynch 56"
     TAI_CoSynch_72 = "CoSynch 72"
     TAI_5d_CoSynch = "5d CoSynch"
-    NONE = "None"
+    NONE = None
 
 
 class CowReSynchSubProtocol(Enum):
@@ -153,7 +151,7 @@ class CowReSynchSubProtocol(Enum):
     Resynch_TAIbeforePD = "TAIbeforePD"
     Resynch_TAIafterPD = "TAIafterPD"
     Resynch_PGFatPD = "PGFatPD"
-    NONE = "None"
+    NONE = None
 
 
 class BeefReproductionProtocol(Enum):

@@ -338,10 +338,8 @@ class GraphGenerator:
         Returns
         -------
         tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]
-            1. dict[str, dict[str, list[Any]]]
-                The updated data with units added.
-            2. list[dict[str, str | dict[str, str]]]
-                Logs if ``info_maps`` aren't found to get units.
+            - The updated data with units added.
+            - Logs if ``info_maps`` aren't found to get units.
         """
         updated_data = {}
         info_map = {
@@ -565,7 +563,10 @@ class GraphGenerator:
         max_data_length = max(len(v) for v in data.values())
         if slice_start is not None:
             slice_start_sim_day = self.time.convert_slice_to_simulation_day(slice_start)
-            slice_end_sim_day = self.time.convert_slice_to_simulation_day(slice_end)
+            if slice_end is None:
+                slice_end_sim_day = self.time.simulation_length_days
+            else:
+                slice_end_sim_day = self.time.convert_slice_to_simulation_day(slice_end)
             dates_in_data_range = [
                 self.time.convert_simulation_day_to_date(i) for i in range(slice_start_sim_day, slice_end_sim_day)
             ]
@@ -608,10 +609,9 @@ class GraphGenerator:
         Returns
         -------
         tuple[NDArray[Any], NDArray[np.float32]]
-            1. ``NDArray[Any]``
-                The indices of the masked data.
-            2. ``NDArray[np.float32]``
-                The actual masked data.
+            - The indices of the masked data.
+            - The actual masked data.
+
         """
         np_values = np.array(values)
         mask = ~np.isnan(np_values)

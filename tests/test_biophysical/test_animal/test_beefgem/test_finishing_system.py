@@ -352,8 +352,8 @@ def test_grain_fed_gross_energy_constant_value() -> None:
 
 @pytest.mark.unit
 def test_grain_fed_methane_energy_constant_value() -> None:
-    """The grain-fed chain converts with the shared MJ_CH4_TO_G_CH4 of 0.05565 MJ/g (55.65 MJ/kg)."""
-    assert GeneralConstants.MJ_CH4_TO_G_CH4 == pytest.approx(0.05565)
+    """The grain-fed chain converts with the shared G_CH4_TO_MJ_CH4 of 0.05565 MJ/g (55.65 MJ/kg)."""
+    assert GeneralConstants.G_CH4_TO_MJ_CH4 == pytest.approx(0.05565)
 
 
 @pytest.mark.nrc2016
@@ -363,7 +363,7 @@ def test_grain_fed_ch4_at_dmi_nine_matches_ipcc_tier_two() -> None:
         _GRAIN_FED_DMI
         * AnimalModuleConstants.BEEF_GROSS_ENERGY_MJ_PER_KG_DM
         * AnimalModuleConstants.BEEF_CH4_YM_FRACTION
-    ) / GeneralConstants.MJ_CH4_TO_G_CH4
+    ) / GeneralConstants.G_CH4_TO_MJ_CH4
     result = EntericMethaneCalculator.calculate_beef_grain_fed_methane(_GRAIN_FED_DMI)
     assert result == pytest.approx(expected)
 

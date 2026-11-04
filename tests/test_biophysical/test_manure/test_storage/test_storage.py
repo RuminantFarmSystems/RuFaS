@@ -180,14 +180,13 @@ def test_receive_manure_error(
     manure_stream = ManureStream.make_empty_manure_stream()
     manure_stream.pen_manure_data = pen_manure_data
 
-    mock_om = mocker.patch.object(storage, "_om")
-    mock_om.add_error = MagicMock()
+    mock_add_error = mocker.patch.object(storage._om, "add_error")
 
     with pytest.raises(ValueError, match=expected_msg):
         storage.receive_manure(manure_stream)
 
-    mock_om.add_error.assert_called_once()
-    assert expected_msg in str(mock_om.add_error.call_args[0][1])
+    mock_add_error.assert_called_once()
+    assert expected_msg in str(mock_add_error.call_args[0][1])
 
 
 @pytest.mark.parametrize(
@@ -317,10 +316,12 @@ def test_calculate_arrhenius_exponent(temp: float, expected: float) -> None:
 
 
 @pytest.mark.parametrize("temp", [-45.0, 61.0])
-def test_calculate_arrhenius_exponent_error(temp: float) -> None:
+def test_calculate_arrhenius_exponent_error(temp: float, mocker: MockerFixture) -> None:
     """Test that Arrhenius exponent equation raises an error when passed an invalid temperature."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError):
         Storage._calculate_arrhenius_exponent(temp)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize("loss, expected_burned, expected_loss", [(100.0, 81.0, 19.0), (0.0, 0.0, 0.0)])
@@ -373,7 +374,7 @@ def test_determine_outdoor_storage_temperature(storage: Storage, day: int, expec
     assert actual == expected
 
 
-def test_determine_outdoor_storage_temperature_missing_factors_error(storage: Storage) -> None:
+def test_determine_outdoor_storage_temperature_missing_factors_error(storage: Storage, mocker: MockerFixture) -> None:
     """
     Tests that a ValueError is raised when all required attributes (amplitude,
     intercept, and phase_shift) are missing from the instance.
@@ -382,7 +383,9 @@ def test_determine_outdoor_storage_temperature_missing_factors_error(storage: St
     storage.intercept_mean_temp = None
     storage.phase_shift = None
 
+    mock_add_error = mocker.patch.object(storage._om, "add_error")
     with pytest.raises(ValueError) as e:
         storage._determine_outdoor_storage_temperature(1, -20.0)
 
+    mock_add_error.assert_called_once()
     assert str(e.value) == "No data for outdoor storage temperature calculations."

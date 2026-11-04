@@ -7,6 +7,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.soil.layer_data import LayerData
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.fixture
@@ -64,6 +65,72 @@ def test_water_filled_pore_space(
 
 
 @pytest.mark.parametrize(
+    "field_size, expected_error_type, expected_message",
+    [
+        (
+            None,
+            TypeError,
+            "'field_size' attribute is NoneType, must be given value when LayerData is initialized.",
+        ),
+        (
+            0,
+            ValueError,
+            "Expected field_size to be greater than 0, received '0'.",
+        ),
+        (
+            -1.5,
+            ValueError,
+            "Expected field_size to be greater than 0, received '-1.5'.",
+        ),
+    ],
+)
+def test_post_init_invalid_field_size(
+    field_size: float | None,
+    expected_error_type: type[Exception],
+    expected_message: str,
+) -> None:
+    """Test that __post_init__ logs and raises when field_size is invalid."""
+    with (
+        patch.object(OutputManager, "add_error") as add_error,
+        patch(
+            "RUFAS.biophysical.field.soil.layer_data.LayerData.calculate_phosphorus_sorption_parameter",
+            new_callable=MagicMock,
+            return_value=0.5,
+        ) as calc_psp,
+        patch(
+            "RUFAS.biophysical.field.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
+            new_callable=MagicMock,
+            return_value=22,
+        ) as determine_nutrient_density,
+        patch(
+            "RUFAS.biophysical.field.soil.layer_data.LayerData._initialize_nitrogen_pools",
+            new_callable=MagicMock,
+        ) as init_nitrogen_pools,
+        patch(
+            "RUFAS.biophysical.field.soil.layer_data.LayerData._initialize_carbon_pools",
+            new_callable=MagicMock,
+        ) as init_carbon_pools,
+    ):
+        with pytest.raises(expected_error_type, match=expected_message.replace("[", r"\[").replace("]", r"\]")):
+            LayerData(
+                top_depth=40,
+                bottom_depth=106.39,
+                soil_water_concentration=0.36,
+                field_size=field_size,
+            )
+
+        add_error.assert_called_once_with(
+            "Invalid field_size",
+            expected_message,
+            info_map={"class": LayerData.__name__, "function": LayerData.__post_init__.__name__},
+        )
+        calc_psp.assert_not_called()
+        determine_nutrient_density.assert_not_called()
+        init_nitrogen_pools.assert_not_called()
+        init_carbon_pools.assert_not_called()
+
+
+@pytest.mark.parametrize(
     "top,bottom",
     [
         (0, 39),
@@ -87,14 +154,16 @@ def test_layer_thickness(top: float, bottom: float) -> None:
         (76, 43),  # Bottom depth is above top depth
     ],
 )
-def test_layer_thickness_error(top: float, bottom: float) -> None:
+def test_layer_thickness_error(top: float, bottom: float, mocker: MockerFixture) -> None:
     """Test that layer_thickness() in LayerData throws errors when given invalid data"""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(ValueError) as e:
         LayerData(top_depth=top, bottom_depth=bottom, field_size=1.75)
     assert (
         str(e.value) == f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
         f"received top: '{top}', bottom: '{bottom}'."
     )
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

@@ -1,7 +1,7 @@
 import math
 import sys
 from datetime import timedelta
-from random import random
+from random import random, randint
 from typing import Any, Callable, cast
 
 from scipy.stats import truncnorm
@@ -15,6 +15,7 @@ from RUFAS.biophysical.animal.data_types.animal_enums import (
     AnimalStatus,
     BeefPostWeaningDestination,
     Breed,
+    RemovalRiskParityGroup,
     Sex,
     StockerDietSystem,
 )
@@ -38,6 +39,7 @@ from RUFAS.biophysical.animal.data_types.reproduction import (
     HerdReproductionStatistics,
     AnimalReproductionStatistics,
 )
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
@@ -106,6 +108,8 @@ class Animal:
         The unique identifier of the animal, (unitless).
     breed: Breed
         The breed of the animal.
+    bred_from_semen: SemenType | None
+        The type of semen used to breed the animal, if applicable.
     animal_type: AnimalType
         The current life stage of the animal.
     days_born: int
@@ -212,6 +216,7 @@ class Animal:
         }
         self.id = args.get("id", 0)
         self.breed: Breed = Breed(Breed[args.get("breed")])
+        self.bred_from_semen: SemenType | None = None
         self.animal_type = AnimalType(args.get("animal_type"))
         self.days_born = int(args.get("days_born"))
         # birth_weight is unused for feedlot, beef cow-calf, and stocker animals (factory-managed)
@@ -246,6 +251,7 @@ class Animal:
         self._days_in_pregnancy: int = 0
         self._future_cull_date: int | None = None
         self._future_death_date: int | None = None
+        self._future_death_reason: str = animal_constants.DEATH_CULL
         self._daily_horizontal_distance: float = 0.0
         self._daily_vertical_distance: float = 0.0
         self._daily_distance: float = 0.0
@@ -510,14 +516,15 @@ class Animal:
         """
         Returns the future death date of the animal.
 
+        A future death date may be scheduled for any life stage: youngstock through the
+        calf/heifer mortality mechanism, and cows through parity-based death probability.
+
         Returns
         -------
         int
-            The future death date of the animal in integer form (sys.maxsize for non-cow animals).
+            The scheduled future death date, or sys.maxsize if no death is scheduled.
 
         """
-        if not self.animal_type.is_cow:
-            return sys.maxsize
         return self._future_death_date if self._future_death_date is not None else sys.maxsize
 
     @future_death_date.setter
@@ -530,19 +537,7 @@ class Animal:
         future_death_date : int
             The future death date to assign to the animal.
 
-        Raises
-        ------
-        TypeError
-            If the animal is not of type 'cow'.
-
         """
-        if not self.animal_type.is_cow:
-            self.om.add_error(
-                "Future death date setter error",
-                "The animal attempting to be assigned a future death date must be a cow.",
-                info_map={"class": self.__class__.__name__, "function": "future_death_date.setter"},
-            )
-            raise TypeError("The animal attempting to be assigned a future death date is not a cow.")
         self._future_death_date = future_death_date
 
     @property
@@ -1353,28 +1348,27 @@ class Animal:
                 animal_type=self.animal_type,
             )
 
-    def _assign_sex_to_newborn_calf(self) -> None:
-        """
-        Assign a sex to a newborn calf based on the semen type and male calf rate.
+    @property
+    def enteric_methane(self) -> float:
+        """Returns unmitigated enteric methane for cows and mitigated enteric methane for non-cows."""
+        return (
+            self.digestive_system.enteric_methane_for_energy
+            if self.animal_type.is_cow
+            else self.digestive_system.enteric_methane_emission
+        )
 
-        Raises
-        ------
-        ValueError
-            If `AnimalConfig.semen_type` is not "conventional" or "sexed".
-
+    @property
+    def is_calving_today(self) -> bool:
         """
-        if AnimalConfig.semen_type == "conventional":
-            male_calf_rate = AnimalConfig.male_calf_rate_conventional_semen
-        elif AnimalConfig.semen_type == "sexed":
-            male_calf_rate = AnimalConfig.male_calf_rate_sexed_semen
-        else:
-            self.om.add_error(
-                "Unexpected semen type",
-                f"Unexpected semen type: {AnimalConfig.semen_type}",
-                {"class": self.__class__.__name__, "function": self._assign_sex_to_newborn_calf.__name__},
-            )
-            raise ValueError(f"Unexpected semen type: {AnimalConfig.semen_type}")
-        self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
+        Determines whether a currently dry cow calves during today's daily routine.
+
+        Returns
+        -------
+        bool
+            True if the cow is dry (``days_in_milk == 0``) and reaches the end of gestation today,
+            meaning the reproduction update will start a new lactation later in the routine.
+        """
+        return self.days_in_milk == 0 and self.is_pregnant and self.days_in_pregnancy == self.gestation_length
 
     def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict, simulation_day: int) -> None:
         """
@@ -1389,18 +1383,12 @@ class Animal:
             The current day in the simulation, used for event logging and status evaluation.
 
         """
-        self._assign_sex_to_newborn_calf()
+        self.sex = args["sex"]
+        self.bred_from_semen = args["bred_from_semen"]
 
         if random() < AnimalConfig.still_birth_rate:
             self.stillborn_day = simulation_day
             self.events.add_event(0, simulation_day, animal_constants.STILL_BIRTH)
-
-        is_sold = (
-            True
-            if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate or self.sold_at_day)
-            else False
-        )
-        self.sold_at_day = simulation_day if is_sold else None
 
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("birth_weight", 0.0)
@@ -1414,6 +1402,8 @@ class Animal:
             )
         )
         self.nutrients.total_phosphorus_in_animal = args.get("initial_phosphorus")
+
+        self._setup_calf_mortality()
 
     def _initialize_feedlot_animal(self, args: Any) -> None:
         """
@@ -1486,7 +1476,13 @@ class Animal:
         self.body_weight = float(args.get("body_weight", args.get("birth_weight", 0.0)))
         self.mature_body_weight = float(args.get("mature_body_weight", AnimalConfig.beef_mature_cow_weight_kg))
         self.wean_weight = 0.0
-        self.sex = Sex[args["sex"]] if "sex" in args else (Sex.MALE if random() < 0.5 else Sex.FEMALE)
+        raw_sex = args.get("sex")
+        if isinstance(raw_sex, Sex):
+            self.sex = raw_sex
+        elif raw_sex is not None:
+            self.sex = Sex[raw_sex]
+        else:
+            self.sex = Sex.MALE if random() < animal_constants.BEEF_MALE_CALF_RATE else Sex.FEMALE
         self.times_calved = int(args.get("times_calved", 0))
         self.is_open = bool(args.get("is_open", True))
         self.days_since_calving = int(args.get("days_since_calving", 0))
@@ -1517,6 +1513,11 @@ class Animal:
         self.mature_body_weight = args.get("mature_body_weight")
         self.events.init_from_string(args.get("events"))
 
+        if self.animal_type == AnimalType.CALF:
+            self._setup_calf_mortality()
+        elif self.animal_type == AnimalType.HEIFER_I:
+            self._setup_heifer_mortality()
+
     def _determine_heifer_reproduction_programs(
         self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
     ) -> tuple[HeiferReproductionProtocol | None, HeiferTAISubProtocol | HeiferSynchEDSubProtocol | None]:
@@ -1530,9 +1531,9 @@ class Animal:
 
         Returns
         -------
-        tuple (HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol)
-            A tuple where the first element is the determined heifer reproduction program and
-            the second element is the corresponding sub-program for the specified reproduction program.
+        tuple[HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol]
+            - The determined heifer reproduction program.
+            - The corresponding sub-program for the specified reproduction program.
 
         """
         heifer_reproduction_program_string = args.get("heifer_reproduction_program")
@@ -1540,7 +1541,7 @@ class Animal:
         heifer_reproduction_sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol | None = None
         heifer_reproduction_program: HeiferReproductionProtocol | None = (
             None
-            if heifer_reproduction_program_string == "N/A"
+            if heifer_reproduction_program_string is None
             else HeiferReproductionProtocol(heifer_reproduction_program_string)
         )
         if heifer_reproduction_program == HeiferReproductionProtocol.TAI:
@@ -1731,6 +1732,7 @@ class Animal:
             days_in_milk=self.days_in_milk,
             days_born=self.days_born,
             days_in_pregnancy=self.days_in_pregnancy,
+            just_calved=self.is_calving_today,
         )
         milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
             milk_production_inputs, time
@@ -1862,7 +1864,9 @@ class Animal:
             raise ValueError(f"Unexpected days in milk value: {self.days_in_milk}")
 
     def daily_reproduction_update(
-        self, time: RufasTime
+        self,
+        time: RufasTime,
+        population_ranking_indexes: list[float] | None = None,
     ) -> tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]:
         """
         Handles the daily reproduction state update for an animal.
@@ -1874,11 +1878,10 @@ class Animal:
 
         Returns
         -------
-        NewBornCalfValuesTypedDict | None
-            A dictionary containing details related to a newly born calf if a calf is born during this update;
+        tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]
+            - A dictionary containing details related to a newly born calf if a calf is born during this update;
             otherwise, None.
-        HerdReproductionStatistics
-            A collection of statistical properties related to the animal's reproduction lifecycle.
+            - A collection of statistical properties related to the animal's reproduction lifecycle.
 
         """
         if self.animal_type.is_beef_cow_calf:
@@ -1899,6 +1902,8 @@ class Animal:
                 dam_tbv_fat=self.genetics.TBV_fat,
                 dam_tbv_protein=self.genetics.TBV_protein,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+                population_ranking_indexes=population_ranking_indexes,
+                animal_ranking_index=self.genetics.ranking_index,
             )
         else:
             reproduction_inputs = ReproductionInputs(
@@ -1909,6 +1914,8 @@ class Animal:
                 days_in_pregnancy=self.days_in_pregnancy,
                 days_in_milk=self.days_in_milk,
                 phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+                population_ranking_indexes=None,
+                animal_ranking_index=None,
             )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
 
@@ -1933,14 +1940,12 @@ class Animal:
                 self.milk_production.set_wood_parameters(
                     wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
                 )
-                self.future_death_date = self.determine_future_death_date()
-                self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
         self.events += reproduction_outputs.events
 
         return newborn_calf_config, reproduction_outputs.herd_reproduction_statistics
 
-    def daily_routines(self, time: RufasTime) -> DailyRoutinesOutput:
+    def daily_routines(self, time: RufasTime, population_ranking_indexes: list[float] | None) -> DailyRoutinesOutput:
         """
         Perform daily routines for the animal, updating its status and outputs.
 
@@ -1976,7 +1981,9 @@ class Animal:
 
         self.daily_growth_update(time)
 
-        newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
+        newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(
+            time, population_ranking_indexes
+        )
 
         daily_routines_output.animal_status, daily_routines_output.newborn_calf_config = self.animal_life_stage_update(
             time
@@ -2194,9 +2201,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, None]
-            A tuple where the first value indicates whether the life stage was changed
-            (AnimalStatus.LIFE_STAGE_CHANGED) or remains the same (AnimalStatus.REMAIN).
-            The second value is always None.
+            - Whether the life stage was changed.
+            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
 
         Notes
         -----
@@ -2220,8 +2226,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, None]
-            AnimalStatus.LIFE_STAGE_CHANGED, None: If the heiferI transitions to the heifer II life stage.
-            AnimalStatus.REMAIN, None: If the heiferI remains in the current life stage.
+            - The updated status on whether the animal remains in the same life stage or transitions.
+            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
 
         Notes
         -----
@@ -2246,8 +2252,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, None]
-            A tuple containing the status of the animal (whether it is sold, its life stage
-            has changed, or it remains in the current state) and None.
+            - Whether it is sold, its life stage has changed, or it remains in the current state).
+            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
 
         Notes
         -----
@@ -2280,12 +2286,9 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
-            A tuple containing the animal status and optional newborn calf data.
+            - The animal status and optional newborn calf data.
+            - Optional newborn calf data.
 
-            * `AnimalStatus.LIFE_STAGE_CHANGED` and newborn calf configuration
-            if the animal transitions to Cow.
-            * `AnimalStatus.REMAIN` and `None` if the animal remains in the
-            HeiferIII stage.
         """
         if self.evaluate_heiferIII_for_cow():
             newborn_calf_config = self.transition_heiferIII_to_cow(time)
@@ -2305,8 +2308,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, None]
-            A tuple where the first element indicates whether the life stage has changed or remains the same,
-            and the second element is always None.
+            - Whether the life stage has changed or remains the same.
+            - Always None to align with the ``ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP`` mapping format.
 
         """
         if self.animal_type == AnimalType.LAC_COW and self.is_milking is False:
@@ -2331,7 +2334,8 @@ class Animal:
         Returns
         -------
         tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
-            A tuple containing the updated animal status and, if applicable, configuration for a newborn calf.
+            - The updated animal status and, if applicable, configuration for a newborn calf.
+            - Optional newborn calf data.
 
         """
         ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP: dict[
@@ -2359,7 +2363,7 @@ class Animal:
             animal_status = AnimalStatus.SOLD
         if self.days_born == self.future_death_date:
             self.dead_at_day = time.simulation_day
-            self.cull_reason = animal_constants.DEATH_CULL
+            self.cull_reason = self._future_death_reason
             animal_status = AnimalStatus.DEAD
 
         return animal_status, newborn_calf_config
@@ -2508,6 +2512,8 @@ class Animal:
             "id": 0,
             "animal_type": AnimalType.BEEF_CALF.value,
             "breed": self.breed.name,
+            "bred_from_semen": None,
+            "sex": Sex.MALE if random() < animal_constants.BEEF_MALE_CALF_RATE else Sex.FEMALE,
             "days_born": 0,
             "birth_weight": float(
                 AnimalModuleConstants.BREED_CBW_KG.get(
@@ -2871,6 +2877,99 @@ class Animal:
 
         """
         self.animal_type = AnimalType.HEIFER_I
+        self._setup_heifer_mortality()
+
+    def _setup_calf_mortality(self) -> None:
+        """
+        Roll for pre-wean mortality and schedule a death day if the calf is fated to die.
+
+        Notes
+        -----
+        The cumulative probability of pre-wean death is :attr:`AnimalConfig.calf_mortality_rate`
+        (e.g. 0.05 means 5% of live-born calves die before weaning); a value of 0 disables the
+        feature. Stillborn calves and calves removed from the herd at birth (male calves and
+        culled female calves) never enter the live-calf population and are not eligible.
+
+        When a calf is fated to die, the death day is sampled uniformly across the pre-wean
+        window ``[1, wean_day - 1]``. The lower bound excludes the birth day (``days_born`` is 0
+        at birth) and the upper bound excludes the wean day itself, which triggers the
+        calf-to-HeiferI transition, so the death stays strictly inside the pre-wean stage. For a
+        calf loaded from the initial herd at a non-zero age, a drawn day that has already passed
+        means the calf survived that window and no death is scheduled; for newborns
+        (``days_born`` of 0) the drawn day is always in the future.
+        """
+        if self.stillborn_day is not None or self.sold_at_day is not None:
+            return
+
+        calf_mortality_rate = AnimalConfig.calf_mortality_rate
+        if calf_mortality_rate <= 0:
+            return
+
+        survived_past_wean_day = random() >= calf_mortality_rate
+        if survived_past_wean_day:
+            return
+
+        if AnimalConfig.wean_day <= 1:
+            return
+
+        death_day = randint(1, AnimalConfig.wean_day - 1)
+        if death_day > self.days_born:
+            self.future_death_date = death_day
+            self._future_death_reason = animal_constants.CALF_MORTALITY_LOSS
+
+    def _setup_heifer_mortality(self) -> None:
+        """
+        Roll for post-wean mortality and schedule a death day if the heifer is fated to die.
+
+        Notes
+        -----
+        The cumulative probability of post-wean death is
+        :attr:`AnimalConfig.heifer_mortality_rate` (e.g. 0.05 means 5% of post-wean heifers die
+        before calving); a value of 0 disables the feature. When a heifer is fated to die, the
+        life stage of the death is chosen using
+        :attr:`AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION`: per SME guidance, 2/3 of
+        deaths fall in HeiferI and the remaining 1/3 in HeiferII. HeiferIII (springer) is
+        intentionally excluded, as those losses belong with prefresh / fresh-cow mortality rather
+        than youngstock mortality.
+
+        The death day is sampled uniformly within the selected stage's window: the HeiferI window
+        is ``[wean_day + 1, heifer_breed_start_day - 1]`` and the HeiferII window is
+        ``[heifer_breed_start_day + 1, heifer_breed_start_day + average_gestation_length -
+        heifer_prefresh_day]``. The HeiferII upper bound is the day a heifer of average gestation
+        length bred on ``heifer_breed_start_day`` would transition into HeiferIII, keeping
+        pre-springer deaths inside the youngstock window; the prefresh buffer absorbs most
+        gestation-length variation. A rare outlier that has already calved into the cow stage by
+        the drawn day falls through to the cow-stage death/cull logic. For a heifer loaded from
+        the initial herd mid-stage, a drawn day that has already passed means the heifer survived
+        that window and no death is scheduled.
+        """
+        heifer_mortality_rate = AnimalConfig.heifer_mortality_rate
+        if heifer_mortality_rate <= 0:
+            return
+
+        survived_to_calving = random() >= heifer_mortality_rate
+        if survived_to_calving:
+            return
+
+        dies_in_heiferI_stage = random() < AnimalModuleConstants.HEIFER_MORTALITY_HEIFERI_FRACTION
+        if dies_in_heiferI_stage:
+            lower = AnimalConfig.wean_day + 1
+            upper = AnimalConfig.heifer_breed_start_day - 1
+        else:
+            lower = AnimalConfig.heifer_breed_start_day + 1
+            upper = (
+                AnimalConfig.heifer_breed_start_day
+                + AnimalConfig.average_gestation_length
+                - AnimalConfig.heifer_prefresh_day
+            )
+
+        if upper < lower:
+            return
+
+        death_day = randint(lower, upper)
+        if death_day > self.days_born:
+            self.future_death_date = death_day
+            self._future_death_reason = animal_constants.HEIFER_MORTALITY_LOSS
 
     def _transition_heiferI_to_heiferII(self, time: RufasTime) -> None:
         """
@@ -2938,6 +3037,7 @@ class Animal:
 
         wood_parameters = LactationCurve.get_wood_parameters(self.calves)
         self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
+        self.milk_production.record_first_day_in_milk(self.days_born, time)
         return newborn_calf_config
 
     def get_animal_values(
@@ -3168,109 +3268,91 @@ class Animal:
             events=str(self.events),
         )
 
-    def determine_future_death_date(self) -> int:
+    def assess_and_schedule_removal(
+        self,
+        percent_fresh: float,
+        annual_death_risk_by_parity: dict[RemovalRiskParityGroup, float],
+        annual_acute_sale_risk_by_parity: dict[RemovalRiskParityGroup, float],
+        time: RufasTime,
+    ) -> None:
         """
-        Determine the future death date of the animal based on its parity.
+        Randomly determine whether the cow dies or is acutely sold today and schedule any resulting removal.
+
+        Parameters
+        ----------
+        percent_fresh : float
+            Fraction of the herd currently fresh, used to scale the daily death and
+            acute-sale selection probabilities.
+        annual_death_risk_by_parity : dict[RemovalRiskParityGroup, float]
+            Annual death risk for each parity group, keyed by :class:`RemovalRiskParityGroup`, (unitless).
+        annual_acute_sale_risk_by_parity : dict[RemovalRiskParityGroup, float]
+            Annual acute-sale risk for each parity group, keyed by :class:`RemovalRiskParityGroup`, (unitless).
+        time : RufasTime
+            Current simulation time, used to record the day of death or sale.
+
+        Notes
+        -----
+        Acute sale is checked before death. If the cow is selected for acute sale, death is not
+        checked on that day, so a cow is never both sold and dead on the same day.
+        """
+        if self.future_cull_date == sys.maxsize:
+            if self.is_selected_for_removal(annual_acute_sale_risk_by_parity[self.parity_index], percent_fresh):
+                self.future_cull_date = self.days_born
+                self.cull_reason = animal_constants.ACUTE_SALE_CULL
+                self.sold_at_day = time.simulation_day
+                return
+        if self.future_death_date == sys.maxsize:
+            if self.is_selected_for_removal(annual_death_risk_by_parity[self.parity_index], percent_fresh):
+                self.future_death_date = self.days_born
+                self.cull_reason = self._future_death_reason = animal_constants.DEATH_CULL
+                self.dead_at_day = time.simulation_day
+
+    @property
+    def parity_index(self) -> RemovalRiskParityGroup:
+        """
+        The parity group of the animal.
 
         Returns
         -------
-        int
-            Calculated future death date in simulation days.
-
-        Notes
-        -------
-        [AN.ANM.1]
-
+        RemovalRiskParityGroup
+            ``RemovalRiskParityGroup.ONE`` or ``RemovalRiskParityGroup.TWO`` for cows in their 1st or
+            2nd lactation, ``RemovalRiskParityGroup.THREE_PLUS`` for cows in any later lactation, and
+            ``RemovalRiskParityGroup.NONE`` for animals that are not cows.
         """
-        if self.calves >= 4:
-            death_rate = AnimalConfig.parity_death_probability[3]
-        else:
-            death_rate = AnimalConfig.parity_death_probability[self.calves - 1]
-        death_rand = random()
-        if death_rand <= death_rate:
-            death_probability_upper_limit = death_probability_lower_limit = 0.0
-            death_time_upper_limit = death_time_lower_limit = 0.0
-            death_date_random = random()
-            for i in range(len(AnimalConfig.death_day_probability) - 1):
-                if (
-                    AnimalConfig.death_day_probability[i]
-                    <= death_date_random
-                    < AnimalConfig.death_day_probability[i + 1]
-                ):
-                    death_probability_lower_limit = AnimalConfig.death_day_probability[i]
-                    death_probability_upper_limit = AnimalConfig.death_day_probability[i + 1]
-                    death_time_lower_limit = AnimalConfig.cull_day_count[i]
-                    death_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
-            n = (death_time_upper_limit - death_time_lower_limit) / (
-                death_probability_upper_limit - death_probability_lower_limit
-            )
-            return round(
-                death_time_lower_limit + n * (death_date_random - death_probability_lower_limit) + self.days_born
-            )
-        return sys.maxsize
-
-    def determine_future_cull_date(self) -> tuple[int, str]:
-        """
-        Determine the future cull date and reason for the animal based on parity-specific probabilities.
-
-        Returns
-        -------
-        tuple[int, str]
-            Future cull date in simulation days and reason for culling.
-
-        Notes
-        -------
-        [AN.ANM.2]
-
-        """
-        cull_reason = ""
-        future_cull_date = sys.maxsize
-        if self.calves >= 4:
-            inv_cull_rate = AnimalConfig.parity_cull_probability[3]
-        else:
-            inv_cull_rate = AnimalConfig.parity_cull_probability[self.calves - 1]
-        cull_rand = random()
-        if cull_rand <= inv_cull_rate:
-            cull_reason_rand = random()
-            cull_prob = 0.0
-            if cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.feet_leg_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.feet_leg_cull_day_probability
-                cull_reason = animal_constants.LAMENESS_CULL
-
-            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.injury_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.injury_cull_day_probability
-                cull_reason = animal_constants.INJURY_CULL
-
-            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.mastitis_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.mastitis_cull_day_probability
-                cull_reason = animal_constants.MASTITIS_CULL
-
-            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.disease_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.disease_cull_day_probability
-                cull_reason = animal_constants.DISEASE_CULL
-
-            elif cull_reason_rand <= (cull_prob + AnimalConfig.udder_cull_probability):
-                cull_reason_cull_prob = AnimalConfig.udder_cull_day_probability
-                cull_reason = animal_constants.UDDER_CULL
-
+        if self.animal_type.is_cow:
+            if self.calves == 1:
+                return RemovalRiskParityGroup.ONE
+            elif self.calves == 2:
+                return RemovalRiskParityGroup.TWO
             else:
-                cull_reason_cull_prob = AnimalConfig.unknown_cull_day_probability
-                cull_reason = animal_constants.UNKNOWN_CULL
+                return RemovalRiskParityGroup.THREE_PLUS
+        return RemovalRiskParityGroup.NONE
 
-            cull_time_rand = random()
-            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0.0
-            for i in range(len(cull_reason_cull_prob) - 1):
-                if cull_reason_cull_prob[i] <= cull_time_rand < cull_reason_cull_prob[i + 1]:
-                    cull_reason_lower_limit = cull_reason_cull_prob[i]
-                    cull_reason_upper_limit = cull_reason_cull_prob[i + 1]
-                    cull_time_lower_limit = AnimalConfig.cull_day_count[i]
-                    cull_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
-            x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
-            future_cull_date = round(
-                cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + self.days_born
-            )
+    def is_selected_for_removal(self, annual_risk: float, percent_fresh: float) -> bool:
+        """
+        Randomly determine whether the cow is selected for daily removal (death or acute sale).
 
-        return future_cull_date, cull_reason
+        Parameters
+        ----------
+        annual_risk : float
+            Annual removal risk for the cow's parity group, (unitless).
+        percent_fresh : float
+            Fraction of the herd currently fresh, used to scale the daily risk so that fresh
+            cows carry a higher risk than the rest of the herd.
+
+        Returns
+        -------
+        bool
+            ``True`` if the cow is selected for removal, ``False`` otherwise.
+        """
+        average_daily_risk = annual_risk / 365
+        percent_other = 1 - percent_fresh
+
+        daily_risk_other = average_daily_risk / (2.55 * percent_fresh + percent_other)
+        daily_risk_fresh = 2.55 * daily_risk_other
+
+        daily_risk = daily_risk_fresh if self.days_in_milk < 50 else daily_risk_other
+        return random() <= daily_risk
 
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """
@@ -3568,3 +3650,16 @@ class Animal:
                 self.genetic_history[-1]["end_day"] = simulation_day
         else:
             return
+
+    @property
+    def is_eligible_for_breeding(self) -> bool:
+        if self.animal_type is AnimalType.HEIFER_II:
+            return not self.is_pregnant
+        elif self.animal_type.is_cow:
+            return (
+                not self.is_pregnant
+                and self.days_in_milk > AnimalConfig.voluntary_waiting_period
+                and not self.reproduction.do_not_breed
+            )
+        else:
+            return False

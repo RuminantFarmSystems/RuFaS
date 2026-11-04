@@ -30,6 +30,7 @@ from RUFAS.biophysical.animal.data_types.animal_enums import BeefPostWeaningDest
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
+from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.herd_manager import HerdManager
@@ -176,6 +177,8 @@ def _make_herd_manager(
     hm.beef_stocker_heifers = []
     hm.herd_statistics = HerdStatistics()
     hm.herd_reproduction_statistics = HerdReproductionStatistics()
+    hm.daily_herd_reproduction_statistics = HerdReproductionStatistics()
+    hm.calf_retention_policy = CalfRetentionPolicy()
     return hm
 
 

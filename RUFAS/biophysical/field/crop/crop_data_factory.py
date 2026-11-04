@@ -17,6 +17,7 @@ class CropConfiguration(TypedDict):
     name: str
     plant_category: PlantCategory
     is_nitrogen_fixer: bool
+    harvest_efficiency: float
     minimum_temperature: float
     optimal_temperature: float
     potential_heat_units: float

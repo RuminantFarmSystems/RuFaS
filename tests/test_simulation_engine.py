@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from typing import cast
 
 from RUFAS.EEE.emissions import EmissionsEstimator
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import DailyManureSupplier, ManureStream
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 import pytest
 from unittest.mock import MagicMock, PropertyMock, call
@@ -49,6 +49,8 @@ def test_simulation_type_enum_values() -> None:
     assert SimulationType.FIELD_AND_FEED.value == "field_and_feed"
     assert SimulationType.FIELD_ONLY.value == "field_only"
     assert SimulationType.ANIMALS_ONLY.value == "animals_only"
+    assert SimulationType.MANURE_ONLY.value == "manure_only"
+    assert SimulationType.FEED_ONLY.value == "feed_only"
 
 
 @pytest.mark.parametrize(
@@ -58,6 +60,8 @@ def test_simulation_type_enum_values() -> None:
         (SimulationType.FIELD_AND_FEED, False),
         (SimulationType.FIELD_ONLY, False),
         (SimulationType.ANIMALS_ONLY, True),
+        (SimulationType.MANURE_ONLY, False),
+        (SimulationType.FEED_ONLY, False),
     ],
 )
 def test_simulate_animals(
@@ -84,7 +88,7 @@ def test_field_simulation_types() -> None:
 
 def test_manure_simulation_types() -> None:
     """Unit test for SimulationType._manure_simulation_types."""
-    assert SimulationType._manure_simulation_types() == {SimulationType.FULL_FARM}
+    assert SimulationType._manure_simulation_types() == {SimulationType.FULL_FARM, SimulationType.MANURE_ONLY}
 
 
 def test_feed_simulation_types() -> None:
@@ -92,6 +96,7 @@ def test_feed_simulation_types() -> None:
     assert SimulationType._feed_simulation_types() == {
         SimulationType.FULL_FARM,
         SimulationType.FIELD_AND_FEED,
+        SimulationType.FEED_ONLY,
     }
 
 
@@ -161,51 +166,124 @@ def test_simulate(
     """
     # Arrange
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
-    mock_estimate_emissions = mocker.patch.object(EEEManager, "estimate_all")
     mock_run_simulation_main_loop = mocker.patch.object(simulation_engine, "_run_simulation_main_loop")
-    mock_report_end_of_simulation = mocker.patch(
-        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter" ".report_end_of_simulation"
-    )
-    mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
-    mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-
-    mock_time = MagicMock(auto_spec=RufasTime)
-    mock_time.simulation_day = 100
-    simulation_engine.time = mock_time
+    mock_post_loop_processing = mocker.patch.object(simulation_engine, "_post_simulation_processing")
+    mock_post_loop_reporting = mocker.patch.object(simulation_engine, "_post_simulation_reporting")
+    mock_post_loop_logging = mocker.patch.object(simulation_engine, "_post_simulation_logging")
 
     info_map = {
         "class": simulation_engine.__class__.__name__,
         "function": simulation_engine.simulate.__name__,
     }
     expected_simulation_time = end_time - start_time
-    expected_log_message = f"Total simulation time is: {expected_simulation_time}"
 
     # Act
     simulation_engine.simulate()
 
     # Assert
-    mock_run_simulation_main_loop.assert_called_once()
-    # OutputManager.add_log (and sibling loggers) mutate the passed info_map by
-    # adding a non-deterministic "timestamp" key. Strip it before comparing so the
-    # assertion is robust and does not depend on which logger ran first.
-    actual_add_log_calls = [
-        call(name, msg, {key: value for key, value in extra.items() if key != "timestamp"})
-        for name, msg, extra in (logged_call.args for logged_call in mock_om_add_log.call_args_list)
-    ]
-    assert actual_add_log_calls == [
-        call("Simulation complete", "Simulation Completed.", info_map),
-        call("total_simulation_time", expected_log_message, info_map),
-    ]
-    mock_report_end_of_simulation.assert_called_once_with(
-        simulation_engine.herd_manager.herd_statistics,
-        simulation_engine.herd_manager.herd_reproduction_statistics,
-        simulation_engine.time,
-        simulation_engine.herd_manager.heiferII_events_by_id,
-        simulation_engine.herd_manager.cow_events_by_id,
-        simulation_engine.herd_manager.animal_genetic_history_by_id,
+    mock_run_simulation_main_loop.assert_called_once_with()
+    mock_post_loop_processing.assert_called_once_with()
+    mock_post_loop_reporting.assert_called_once_with()
+    mock_post_loop_logging.assert_called_once_with(expected_simulation_time, info_map)
+
+
+def test_post_loop_processing(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _post_loop_processing in simulation_engine.py
+    """
+    # Arrange
+    mock_estimate_all = mocker.patch.object(EEEManager, "estimate_all")
+
+    # Act
+    simulation_engine._post_simulation_processing()
+
+    # Assert
+    mock_estimate_all.assert_called_once_with(True, True, True, True)
+
+
+@pytest.mark.parametrize(
+    "simulate_animals, expect_report_call",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_post_loop_reporting(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_animals: bool,
+    expect_report_call: bool,
+) -> None:
+    """
+    Unit test for function _post_loop_reporting in simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.simulate_animals = simulate_animals
+
+    mock_report_end_of_simulation = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_end_of_simulation"
     )
 
-    mock_estimate_emissions.assert_called_once()
+    # Act
+    simulation_engine._post_simulation_reporting()
+
+    # Assert
+    if expect_report_call:
+        mock_report_end_of_simulation.assert_called_once_with(
+            simulation_engine.herd_manager.herd_statistics,
+            simulation_engine.herd_manager.herd_reproduction_statistics,
+            simulation_engine.time,
+            simulation_engine.herd_manager.heiferII_events_by_id,
+            simulation_engine.herd_manager.cow_events_by_id,
+            simulation_engine.herd_manager.animal_genetic_history_by_id,
+        )
+    else:
+        mock_report_end_of_simulation.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "simulate_manure, expect_dmi_summary_call",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_post_loop_logging(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_manure: bool,
+    expect_dmi_summary_call: bool,
+) -> None:
+    """
+    Unit test for function _post_loop_logging in simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.simulate_manure = simulate_manure
+    total_simulation_time = 42.5
+    info_map = {"class": "SimulationEngine", "function": "simulate"}
+
+    mock_emit_dmi_summary = mocker.patch(
+        "RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator"
+        ".ManureExcretionCalculator.emit_dmi_below_min_summary"
+    )
+    mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    # Act
+    simulation_engine._post_simulation_logging(total_simulation_time, info_map)
+
+    # Assert
+    if expect_dmi_summary_call:
+        mock_emit_dmi_summary.assert_called_once_with(info_map)
+    else:
+        mock_emit_dmi_summary.assert_not_called()
+
+    assert mock_om_add_log.call_args_list == [
+        call("Simulation complete", "Simulation Completed.", info_map),
+        call("total_simulation_time", f"Total simulation time is: {total_simulation_time}", info_map),
+    ]
 
 
 def test_simulate_reports_crops_still_curing_at_end_of_simulation(
@@ -378,6 +456,152 @@ def test_execute_field_and_feed_daily_simulation(
     mock_execute_daily_manure_operations.assert_not_called()
 
 
+def test_execute_feed_only_daily_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_feed_only_daily_simulation in file
+    RUFAS/simulation_engine.py
+    """
+    # Arrange
+    parent = MagicMock()
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_execute_feed_storage_operations"),
+        "execute_feed_storage_operations",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_report_daily_records"),
+        "report_daily_records",
+    )
+    parent.attach_mock(
+        mocker.patch.object(simulation_engine, "_advance_time"),
+        "advance_time",
+    )
+
+    mock_execute_daily_field_operations = mocker.patch.object(simulation_engine, "_execute_daily_field_operations")
+    mock_receive_daily_harvested_crops = mocker.patch.object(simulation_engine, "_receive_daily_harvested_crops")
+    mock_execute_feed_planning = mocker.patch.object(simulation_engine, "_execute_feed_planning")
+    mock_execute_ration_planning = mocker.patch.object(simulation_engine, "_execute_ration_planning")
+    mock_execute_daily_animal_operations = mocker.patch.object(simulation_engine, "_execute_daily_animal_operations")
+    mock_execute_daily_manure_operations = mocker.patch.object(simulation_engine, "_execute_daily_manure_operations")
+
+    # Act
+    simulation_engine._execute_feed_only_daily_simulation()
+
+    # Assert
+    assert parent.mock_calls == [
+        call.execute_feed_storage_operations(),
+        call.report_daily_records(),
+        call.advance_time(),
+    ]
+
+    mock_execute_daily_field_operations.assert_not_called()
+    mock_receive_daily_harvested_crops.assert_not_called()
+    mock_execute_feed_planning.assert_not_called()
+    mock_execute_ration_planning.assert_not_called()
+    mock_execute_daily_animal_operations.assert_not_called()
+    mock_execute_daily_manure_operations.assert_not_called()
+
+
+@pytest.mark.parametrize("is_time_to_process_degradations", [True, False])
+def test_execute_feed_storage_operations(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    is_time_to_process_degradations: bool,
+) -> None:
+    """
+    Unit test for function _execute_feed_storage_operations in file RUFAS/simulation_engine.py
+    """
+    # Arrange
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
+    mock_time.simulation_day = 42
+    simulation_engine.weather = MagicMock(auto_spec=Weather)
+    simulation_engine.feed_manager = MagicMock()
+    simulation_engine.feed_degradations_interval_length = timedelta(days=30)
+    mocker.patch.object(
+        SimulationEngine,
+        "_is_time_to_process_feed_degradations",
+        new_callable=mocker.PropertyMock,
+        return_value=is_time_to_process_degradations,
+    )
+
+    # Act
+    simulation_engine._execute_feed_storage_operations()
+
+    # Assert
+    simulation_engine.feed_manager.report_feed_storage_levels.assert_called_once_with(42, "daily_storage_levels")
+    simulation_engine.feed_manager.report_cumulative_purchased_feeds.assert_called_once_with(42)
+    if is_time_to_process_degradations:
+        simulation_engine.feed_manager.process_degradations.assert_called_once_with(
+            simulation_engine.weather, mock_time
+        )
+        assert (
+            simulation_engine.next_degradations_processing
+            == (mock_time.current_date + simulation_engine.feed_degradations_interval_length).date()
+        )
+    else:
+        simulation_engine.feed_manager.process_degradations.assert_not_called()
+
+
+def test_gather_initial_feed_storage_inventory(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
+    """
+    Unit test for function _gather_initial_feed_storage_inventory in file RUFAS/simulation_engine.py
+    """
+    # Arrange
+    first_inventory = {
+        "initial_inventory": [
+            {"storage_name": "corn_silage_storage_1", "dry_matter_mass": 200000.0, "dry_matter_percentage": 35.0},
+            {"storage_name": "corn_silage_storage_1", "dry_matter_mass": 1.0, "dry_matter_percentage": 1.0},
+        ]
+    }
+    second_inventory = {
+        "initial_inventory": [
+            {"storage_name": "alfalfa_hay_storage_2", "dry_matter_mass": 30000.0, "dry_matter_percentage": 88.0},
+        ]
+    }
+    simulation_engine.im = MagicMock(auto_spec=InputManager)
+    simulation_engine.im.get_data_keys_by_properties.return_value = ["initial_inventory_1", "initial_inventory_2"]
+    simulation_engine.im.get_data.side_effect = [first_inventory, second_inventory]
+    mock_add_warning = mocker.patch.object(simulation_engine.om, "add_warning")
+
+    # Act
+    initial_inventory_by_storage_name = simulation_engine._gather_initial_feed_storage_inventory()
+
+    # Assert
+    assert initial_inventory_by_storage_name == {
+        "corn_silage_storage_1": {"dry_matter_mass": 200000.0, "dry_matter_percentage": 35.0},
+        "alfalfa_hay_storage_2": {"dry_matter_mass": 30000.0, "dry_matter_percentage": 88.0},
+    }
+    mock_add_warning.assert_called_once()
+    assert "corn_silage_storage_1" in mock_add_warning.call_args.args[1]
+
+
+@pytest.mark.parametrize("simulate_fields, expected_warning_count", [(False, 1), (True, 0)])
+def test_gather_initial_feed_storage_inventory_no_input_files(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+    simulate_fields: bool,
+    expected_warning_count: int,
+) -> None:
+    """
+    Unit test for function _gather_initial_feed_storage_inventory in file RUFAS/simulation_engine.py when no initial
+    inventory input files are provided.
+    """
+    # Arrange
+    simulation_engine.simulate_fields = simulate_fields
+    simulation_engine.im = MagicMock(auto_spec=InputManager)
+    simulation_engine.im.get_data_keys_by_properties.return_value = []
+    mock_add_warning = mocker.patch.object(simulation_engine.om, "add_warning")
+
+    # Act
+    initial_inventory_by_storage_name = simulation_engine._gather_initial_feed_storage_inventory()
+
+    # Assert
+    assert initial_inventory_by_storage_name == {}
+    assert mock_add_warning.call_count == expected_warning_count
+
+
 def test_execute_animals_only_daily_simulation(
     simulation_engine: SimulationEngine,
     mocker: MockerFixture,
@@ -414,6 +638,41 @@ def test_execute_animals_only_daily_simulation(
     mock_execute_ration_planning.assert_called_once_with()
     mock_execute_daily_animal_operations.assert_called_once_with()
     mock_report_daily_records.assert_called_once_with(daily_purchased_feeds_fed)
+    mock_advance_time.assert_called_once_with()
+
+
+def test_execute_manure_only_daily_simulation(
+    simulation_engine: SimulationEngine,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for function _execute_manure_only_daily_simulation in file
+    RUFAS/simulation_engine.py
+    """
+    # Arrange
+    daily_manure_data = {"manure": "data"}
+    simulation_engine.daily_manure_supplier = MagicMock(auto_spec=DailyManureSupplier)
+    simulation_engine.daily_manure_supplier.get_daily_manure_streams.return_value = daily_manure_data
+    mock_execute_daily_manure_operations = mocker.patch.object(
+        simulation_engine,
+        "_execute_daily_manure_operations",
+    )
+    mock_report_daily_records = mocker.patch.object(
+        simulation_engine,
+        "_report_daily_records",
+    )
+    mock_advance_time = mocker.patch.object(
+        simulation_engine,
+        "_advance_time",
+    )
+
+    # Act
+    simulation_engine._execute_manure_only_daily_simulation()
+
+    # Assert
+    simulation_engine.daily_manure_supplier.get_daily_manure_streams.assert_called_once_with()
+    mock_execute_daily_manure_operations.assert_called_once_with(daily_manure_data)
+    mock_report_daily_records.assert_called_once_with()
     mock_advance_time.assert_called_once_with()
 
 
@@ -1307,7 +1566,9 @@ def test_setup_simulation_modules(mocker: MockerFixture) -> None:
     mock_weather_init.assert_called_once_with(mock_weather_data, mock_time)
     assert simulation_engine.weather == mock_weather
 
-    mock_emissions_estimator_init.assert_called_once_with()
+    mock_emissions_estimator_init.assert_called_once_with(
+        simulate_animals=True, simulate_feed=True, simulate_fields=True, simulate_manure=True
+    )
     assert simulation_engine.emissions_estimator == mock_emissions_estimator
 
     mock_field_manager_init.assert_called_once_with(mock_field_data)
@@ -1552,7 +1813,7 @@ def _build_curing_scenario(
     start = datetime(2024, 6, 1)
     simulation_engine.time = RufasTime(start, start + timedelta(days=30), start)
     weather = Weather.__new__(Weather)
-    weather.mean_annual_temperature = 10.0
+    weather.long_term_average_annual_temperature = 10.0
     weather.weather_data = {
         start
         + timedelta(days=offset): CurrentDayConditions(
@@ -1650,3 +1911,69 @@ def test_curing_crop_still_in_transit_at_end_of_simulation_is_reported_not_dropp
     assert hay.stored == []
     add_warning.assert_called_once()
     assert str(harvested_crop.dry_matter_mass) in add_warning.call_args.args[1]
+
+
+def test_gather_daily_manure_supply_with_supply_inputs(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_daily_manure_supply in simulation_engine.py when daily manure supply inputs are present.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.MANURE_ONLY)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    supply_names = ["daily_manure_supply_1", "daily_manure_supply_2"]
+    stream_config_1 = {"stream_name": "lac_pen", "first_processor": "lac_alley_scraper"}
+    stream_config_2 = {"stream_name": "calf_pen", "first_processor": "calf_manual_scraper"}
+    stream_config_3 = {"stream_name": "grow_pen", "first_processor": "growing_alley_scraper"}
+
+    mock_input_manager.get_data_keys_by_properties.return_value = supply_names
+    mock_input_manager.get_data.side_effect = [
+        {"daily_manure_streams": [stream_config_1, stream_config_2]},
+        {"daily_manure_streams": [stream_config_3]},
+    ]
+
+    # Act
+    result = simulation_engine._gather_daily_manure_supply()
+
+    # Assert
+    assert result == [stream_config_1, stream_config_2, stream_config_3]
+    mock_input_manager.get_data_keys_by_properties.assert_called_once_with("daily_manure_supply_properties")
+    mock_input_manager.get_data.assert_any_call("daily_manure_supply_1")
+    mock_input_manager.get_data.assert_any_call("daily_manure_supply_2")
+    mock_output_manager.add_warning.assert_not_called()
+
+
+def test_gather_daily_manure_supply_no_supply_inputs(mocker: MockerFixture) -> None:
+    """
+    Unit test for _gather_daily_manure_supply in simulation_engine.py when no daily manure supply inputs are found.
+    """
+    # Arrange
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine(SimulationType.MANURE_ONLY)
+
+    mock_input_manager = MagicMock(autospec=InputManager)
+    mock_output_manager = MagicMock(autospec=OutputManager)
+    simulation_engine.im = mock_input_manager
+    simulation_engine.om = mock_output_manager
+
+    mock_input_manager.get_data_keys_by_properties.return_value = []
+
+    # Act / Assert
+    with pytest.raises(
+        ValueError, match="A simulation without animals requires at least one daily manure supply input file."
+    ):
+        simulation_engine._gather_daily_manure_supply()
+
+    mock_input_manager.get_data.assert_not_called()
+    mock_output_manager.add_error.assert_called_once_with(
+        "No daily manure supply input files.",
+        "There are no animals to produce manure, so a daily manure supply input is required for manure to "
+        "enter the manure system.",
+        {"class": "SimulationEngine", "function": "_gather_daily_manure_supply"},
+    )
+    mock_output_manager.add_warning.assert_not_called()

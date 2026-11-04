@@ -51,11 +51,13 @@ INJECT_PGF = "inject PGF"
 # heifer repro
 INJECT_CIDR = "inject CIDR"
 
-# herd size management
-MIN_DIM_FOR_REMOVAL = 60
-"""Minimum days in milk required for a cow to be eligible for removal."""
-MAX_DAYS_IN_PREG_FOR_REMOVAL = 180
-"""Maximum pregnancy duration for a cow to be eligible for removal."""
+# low production cull ranking criteria
+CULL_RANKING_CRITERIA_MILK = "milk"
+"""Cull ranking criterion that ranks eligible cows by their daily milk production."""
+CULL_RANKING_CRITERIA_305_DAY_MILK = "305_day_milk"
+"""Cull ranking criterion that ranks eligible cows by their 305-day milk yield."""
+CULL_RANKING_CRITERIA_OPTIONS = (CULL_RANKING_CRITERIA_MILK, CULL_RANKING_CRITERIA_305_DAY_MILK)
+"""All valid options for the ``cull_ranking_criteria`` user input."""
 
 # presynch protocols
 PRESYNCH_PERIOD_START = "Presynch period started"
@@ -99,14 +101,15 @@ DRY = "dry"
 
 # culling
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
-OVERSUPPLY_CULL = "culled for herd resize"
+LOW_PRODUCTION_CULL = "culled for low production"
 DEATH_CULL = "culled for death"
-LAMENESS_CULL = "culled for lameness"
-INJURY_CULL = "culled for injury"
-MASTITIS_CULL = "culled for mastitis"
-DISEASE_CULL = "culled for disease"
-UDDER_CULL = "culled for udder"
-UNKNOWN_CULL = "culled for unknown"
+ACUTE_SALE_CULL = "culled for acute sale"
+ACUTE_SALE_FRACTION = 0.3
+"""Fraction of all annual cow sales that are acute (forced / involuntary) sales, (unitless)."""
+
+# youngstock mortality (a loss from death, not a cull)
+CALF_MORTALITY_LOSS = "died from pre-wean mortality"
+HEIFER_MORTALITY_LOSS = "died from post-wean mortality"
 
 # STATS
 STDI = 2
@@ -181,3 +184,12 @@ STOCKER_ARRIVAL = "stocker_arrival"
 STOCKER_EXIT_WEIGHT = "stocker_exit_weight_reached"
 STOCKER_MAX_DAYS = "stocker_max_days_reached"
 STOCKER_TO_FEEDLOT = "stocker_transferred_to_feedlot"
+# male calf rates
+CONVENTIONAL_DAIRY_MALE_CALF_RATE = 0.5
+SEXED_DAIRY_MALE_CALF_RATE = 0.1
+BEEF_MALE_CALF_RATE = 0.5
+
+SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER = 0.85
+"""
+Conception rate of sexed dairy semen relative to conventional semen, (unitless).
+"""

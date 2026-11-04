@@ -13,6 +13,7 @@ from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed, Sex
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
@@ -329,6 +330,8 @@ class HerdFactory:
         args = NewBornCalfValuesTypedDict(
             id=self.pre_animal_population.next_id(),
             breed=self.breed.name,
+            sex=Sex.MALE if random.random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE,
+            bred_from_semen=None,
             birth_date="",
             days_born=0,
             initial_phosphorus=cow.nutrients.phosphorus_for_gestation_required_for_calf,
@@ -345,6 +348,7 @@ class HerdFactory:
         cow.reproduction.calf_birth_weight = 0.0
 
         calf = Animal(args, self.time)
+        CalfRetentionPolicy.apply_rate_based_retention(calf, self.time.simulation_day)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
 
@@ -400,6 +404,8 @@ class HerdFactory:
             args = NewBornCalfValuesTypedDict(
                 id=self.pre_animal_population.next_id(),
                 breed=self.breed.name,
+                sex=Sex.MALE if random.random() < animal_constants.CONVENTIONAL_DAIRY_MALE_CALF_RATE else Sex.FEMALE,
+                bred_from_semen=None,
                 birth_date=self.time.current_date.strftime("%Y-%m-%d"),
                 days_born=0,
                 initial_phosphorus=0,
@@ -407,6 +413,7 @@ class HerdFactory:
                 animal_type=AnimalType.CALF.value,
             )
             calf = Animal(args, self.time)
+            CalfRetentionPolicy.apply_rate_based_retention(calf, self.time.simulation_day)
             if not (calf.sold or calf.stillborn):
                 self.pre_animal_population.calves.append(calf)
 
@@ -912,7 +919,11 @@ class HerdFactory:
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
         if self.init_herd:
-            if AnimalConfig.semen_type == "sexed":
+            uses_sexed_semen = AnimalConfig.selective_repro_strategy and (
+                AnimalConfig.heiferII_semen_allocation_proportions["sexed_dairy"] > 0
+                or AnimalConfig.cow_semen_allocation_proportions["sexed_dairy"] > 0
+            )
+            if uses_sexed_semen:
                 om.add_warning(
                     "Longer herd generation runtime",
                     "Herd initialized with sexed semen will result in significantly longer runtime.",

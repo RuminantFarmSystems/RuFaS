@@ -199,7 +199,9 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         Returns
         -------
         tuple[float, float, float]
-            Net energy requirement for maintenance (Mcal), gravid uterine weight (kg), and uterine weight (kg).
+            - Net energy requirement for maintenance (Mcal).
+            - Gravid uterine weight (kg).
+            - Uterine weight (kg).
 
         Notes
         -----
@@ -264,8 +266,9 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         Returns
         -------
         tuple[float, float, float]
-            Net energy requirement for frame growth (Mcal), average daily gain (g), and accretion of both fat and
-            protein in carcass (g)
+            - Net energy requirement for frame growth (Mcal).
+            - Average daily gain (g).
+            - Accretion of both fat and protein in carcass (g).
 
         Notes
         -----
@@ -334,8 +337,9 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         Returns
         -------
         tuple[float, float]
-            Net energy requirement for pregnancy (Mcal) and daily energy requirement associated to increased gain of
-            reproductive tissues as pregnancy advances (Mcal)
+            - Net energy requirement for pregnancy (Mcal).
+            - Daily energy requirement associated to increased gain of reproductive tissues as pregnancy advances
+            (Mcal).
 
         Notes
         -----

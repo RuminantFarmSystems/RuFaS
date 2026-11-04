@@ -260,6 +260,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_feed_manager_balance.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.KILOGRAMS,
         }
         for rufas_id, amount in self._cumulative_feed_requests.items():
@@ -369,6 +370,40 @@ class FeedManager:
                 return storage
         return None
 
+    def stock_initial_storage_inventory(
+        self, initial_inventory_by_storage_name: dict[str, dict[str, float]], time: RufasTime
+    ) -> None:
+        """
+        Stocks storages with the initial inventory specified for them, if any.
+
+        Parameters
+        ----------
+        initial_inventory_by_storage_name : dict[str, dict[str, float]]
+            The dry matter mass and composition each storage holds when the simulation starts, keyed by storage
+            instance name. Storages that are not named start empty.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation. This should be called at the start of
+            the simulation, before any daily routines run.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.stock_initial_storage_inventory.__name__,
+        }
+        storage_time = time.current_date.date()
+        for storage_name, initial_inventory in initial_inventory_by_storage_name.items():
+            if storage_name not in self.active_storages:
+                self._om.add_warning(
+                    "Unknown storage in initial feed storage inventory",
+                    f"Storage '{storage_name}' has initial inventory specified, but no active storage with that name "
+                    "exists. This inventory will not be stocked.",
+                    info_map,
+                )
+                continue
+            self.active_storages[storage_name].stock_initial_inventory(
+                initial_inventory, storage_time, time.simulation_day
+            )
+
     def receive_crop(
         self,
         harvested_crop: HarvestedCrop,
@@ -446,6 +481,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_cumulative_purchased_feeds.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.KILOGRAMS,
         }
         for rufas_id, amount in self._cumulative_purchased_feeds.items():
@@ -481,6 +517,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.report_stored_farmgrown_feeds.__name__,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "suffix": reporting_suffix,
         }
@@ -518,9 +555,9 @@ class FeedManager:
         Returns
         -------
         tuple[bool, FeedFulfillmentResults]
-            A tuple where the first element is ``True`` if the feed request can be fulfilled (``False`` otherwise), and
-            the second element is a ``FeedFulfillmentResults`` object containing the amounts of feed deducted from
-            purchased and farm-grown sources.
+            - ``True`` if the feed request can be fulfilled (``False`` otherwise).
+            - A ``FeedFulfillmentResults`` object containing the amounts of feed deducted from purchased and farm-grown
+            sources.
 
         """
         current_feed_totals = self._query_available_feed_totals(list(requested_feed.requested_feed.keys()))
@@ -544,6 +581,7 @@ class FeedManager:
                     "function": self.manage_daily_feed_request.__name__,
                     "units": MeasurementUnits.DRY_KILOGRAMS,
                     "simulation_day": time.simulation_day,
+                    "is_daily_variable": True,
                 },
             )
             self._cumulative_feed_requests[feed_id] += amount_requested
@@ -555,6 +593,7 @@ class FeedManager:
                     "function": self.manage_daily_feed_request.__name__,
                     "units": MeasurementUnits.DRY_KILOGRAMS,
                     "simulation_day": time.simulation_day,
+                    "is_daily_variable": True,
                 },
             )
             feeds_to_remove_from_inventory[feed_id] = amount_requested
@@ -925,6 +964,7 @@ class FeedManager:
             "function": self._log_feed_deductions.__name__,
             "units": MeasurementUnits.DRY_KILOGRAMS,
             "simulation_day": simulation_day,
+            "is_daily_variable": True,
         }
         for feed_id, amount in total_purchased.items():
             self._om.add_variable(
@@ -1032,7 +1072,6 @@ class FeedManager:
         Returns
         -------
         tuple[dict[RUFAS_ID, list[HarvestedCrop]], dict[RUFAS_ID, list[PurchasedFeed]]]
-            A tuple of:
             - ``farmgrown_by_id``: ``{feed_id: [HarvestedCrop]}``, sorted by ``storage_time`` oldest to newest.
             - ``purchased_by_id``: ``{feed_id: [PurchasedFeed]}``, storage time not considered.
 

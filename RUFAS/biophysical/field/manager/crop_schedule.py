@@ -1,4 +1,10 @@
-from RUFAS.biophysical.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, HarvestOperation
+from typing import Any
+
+from RUFAS.biophysical.field.crop.harvest_operations import (
+    FINAL_HARVEST_OPERATIONS,
+    VALID_HARVEST_OPERATIONS,
+    HarvestOperation,
+)
 from RUFAS.data_structures.events import HarvestEvent, PlantingEvent
 from RUFAS.biophysical.field.manager.schedule import Schedule
 from RUFAS.output_manager import OutputManager
@@ -191,3 +197,88 @@ class CropSchedule(Schedule):
             all_events[:] = [harvest for harvest in all_events if harvest[0] in FINAL_HARVEST_OPERATIONS]
         result = [HarvestEvent(self.crop_reference, *event) for event in all_events]
         return result
+
+    @staticmethod
+    def validate_crop_schedule_event_order(rotation: dict[str, Any], schedule_name: str) -> None:
+        """
+        Validates that planting, harvest, and kill events occur in a biologically valid order.
+
+        Parameters
+        ----------
+        rotation : dict[str, Any]
+            Crop schedule definition from the crop rotation input file. Must contain the planting and harvest year/day
+            information required to construct a chronological event sequence.
+        schedule_name : str
+            Name of the crop schedule being validated. Used for error reporting.
+
+        Raises
+        ------
+        ValueError
+            If a harvest or kill operation occurs before planting, or if one occurs after the crop has already been
+            terminated and before another planting.
+
+        Notes
+        -----
+        A crop must be planted before any harvest or kill operation can occur. Once an operation in
+        ``FINAL_HARVEST_OPERATIONS`` occurs, including ``harvest_kill`` or ``kill_only``, no additional harvest or kill
+        events are permitted until another planting event re-establishes the crop. These rules are evaluated
+        chronologically across the entire schedule and are not reset at calendar year boundaries, allowing support for
+        perennial and overwintering crops.
+
+        """
+        events: list[tuple[int, int, str | HarvestOperation]] = []
+        om = OutputManager()
+        info_map = {
+            "class": CropSchedule.__name__,
+            "function": CropSchedule.validate_crop_schedule_event_order.__name__,
+        }
+        for year, day in zip(rotation["planting_years"], rotation["planting_days"]):
+            events.append((year, day, "planting"))
+
+        for year, day, operation in zip(
+            rotation["harvest_years"],
+            rotation["harvest_days"],
+            rotation["harvest_operations"],
+        ):
+            try:
+                harvest_operation = HarvestOperation(operation)
+            except ValueError as e:
+                valid_operations = [operation.value for operation in VALID_HARVEST_OPERATIONS]
+                err_msg = (
+                    f"Invalid crop schedule '{schedule_name}': harvest operation '{operation}' "
+                    f"on year {year}, day {day} is not supported. "
+                    f"Valid harvest operations are: {valid_operations}."
+                )
+                om.add_error("Invalid crop schedule harvest operation.", err_msg, info_map)
+                raise ValueError(err_msg) from e
+            events.append((year, day, harvest_operation))
+
+        event_order = {
+            "planting": 0,
+            HarvestOperation.HARVEST_ONLY: 1,
+            HarvestOperation.HARVEST_KILL: 1,
+            HarvestOperation.KILL_ONLY: 1,
+        }
+        events.sort(key=lambda event: (event[0], event[1], event_order.get(event[2], 99)))
+
+        has_live_crop = False
+
+        for year, day, event_type in events:
+            if event_type == "planting":
+                has_live_crop = True
+                continue
+
+            if event_type in VALID_HARVEST_OPERATIONS:
+                if not has_live_crop:
+                    err_msg = (
+                        f"Invalid crop schedule '{schedule_name}': {event_type.value} on "
+                        f"year {year}, day {day} occurs before an active planting event. "
+                        "A crop must be planted before any harvest or kill operation, and "
+                        "after a terminating operation another planting must occur before "
+                        "additional harvest or kill operations."
+                    )
+                    om.add_error("Invalid crop schedule event order.", err_msg, info_map)
+                    raise ValueError(err_msg)
+
+                if event_type in FINAL_HARVEST_OPERATIONS:
+                    has_live_crop = False

@@ -10,6 +10,7 @@ from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManag
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize(
@@ -282,6 +283,7 @@ def test_calculate_projected_manure_mass_exceptions(
     nutrient_composition: float,
     expected_exception: type[Exception],
     expected_error_msg: str,
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the method _calculate_projected_manure_mass() of the ManureNutrientManager class in the
@@ -292,8 +294,10 @@ def test_calculate_projected_manure_mass_exceptions(
 
     """
     # Act & Assert
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(expected_exception, match=re.escape(expected_error_msg)):
         ManureNutrientManager.calculate_projected_manure_mass(request_nutrient, nutrient_composition)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -338,6 +342,7 @@ def test_select_projected_manure_mass_exceptions(
     projected_manure_masses: list[float],
     expected_exception: type[Exception],
     expected_error_msg: str,
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the method _select_projected_manure_mass() of the ManureNutrientManager class in the
@@ -348,8 +353,10 @@ def test_select_projected_manure_mass_exceptions(
 
     """
     # Act & Assert
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(expected_exception, match=expected_error_msg):
         ManureNutrientManager._select_projected_manure_mass(projected_manure_masses)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -470,6 +477,7 @@ def test_create_nutrient_request_results_exceptions(
     projected_manure_mass: float,
     expected_exception: type[Exception],
     expected_error_msg: str,
+    mocker: MockerFixture,
 ) -> None:
     """
     Test the _create_nutrient_request_results() method of the ManureNutrientManager class for expected
@@ -483,8 +491,10 @@ def test_create_nutrient_request_results_exceptions(
     manager = ManureNutrientManager()
 
     # Act & Assert
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(expected_exception, match=expected_error_msg):
         manager._create_nutrient_request_results(projected_manure_mass, manure_type=ManureType.LIQUID)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

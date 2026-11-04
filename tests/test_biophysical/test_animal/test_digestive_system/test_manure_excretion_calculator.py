@@ -19,7 +19,7 @@ def test_calculate_calf_manure(mocker: MockerFixture) -> None:
     mock_nutrition.dry_matter = 10.0
     mock_nutrition.crude_protein_percentage = 15.0
 
-    mock_phosphorus_values = (5.0, 0.2, 0.3, 4.5, 0.5)
+    mock_phosphorus_values = (5.0, 4.5, 0.5)
 
     mock_phosphorus_excretion = mocker.patch.object(
         ManureExcretionCalculator, "_calculate_phosphorus_excretion_values", return_value=mock_phosphorus_values
@@ -67,7 +67,7 @@ def test_calculate_heifer_manure(
     mock_nutrition.crude_protein_percentage = crude_protein
     mock_nutrition.potassium_percentage = potassium
 
-    mock_phosphorus_values = (expected_phosphorus, 0.2, 0.3, 4.5, 0.5)
+    mock_phosphorus_values = (expected_phosphorus, 4.5, 0.5)
 
     mock_phosphorus_excretion = mocker.patch.object(
         ManureExcretionCalculator, "_calculate_phosphorus_excretion_values", return_value=mock_phosphorus_values
@@ -179,7 +179,7 @@ def test_calculate_lactating_cow_manure(
     mock_nutrition.potassium_percentage = potassium
     mock_nutrition.ash_supply = ash_supply
 
-    mock_phosphorus_values = (expected_phosphorus, 0.2, 0.3, 4.5, 0.5)
+    mock_phosphorus_values = (expected_phosphorus, 4.5, 0.5)
 
     mock_phosphorus_excretion = mocker.patch.object(
         ManureExcretionCalculator, "_calculate_phosphorus_excretion_values", return_value=mock_phosphorus_values
@@ -238,7 +238,7 @@ def test_calculate_dry_cow_manure(
     mock_nutrition.ash_percentage = ash_percentage
     mock_nutrition.ndf_percentage = 1.0
 
-    mock_phosphorus_values = (expected_phosphorus, 0.2, 0.3, 4.5, 0.5)
+    mock_phosphorus_values = (expected_phosphorus, 4.5, 0.5)
 
     mock_phosphorus_excretion = mocker.patch.object(
         ManureExcretionCalculator, "_calculate_phosphorus_excretion_values", return_value=mock_phosphorus_values
@@ -280,14 +280,12 @@ def test_calculate_dry_cow_manure(
             3.0,
             (
                 32.5,
-                pytest.approx(0.0001375, abs=1.4e-07),
-                pytest.approx(1.37500000000e-05, abs=1.4e-08),
                 5.5,
                 pytest.approx(0.000275, abs=2.8e-07),
             ),
         ),
-        (0.0, 15.0, 2.0, 2.5, (4.5, 0.00015, 0.000015, 4.5, pytest.approx(0.0003, abs=3.0e-07))),
-        (25.0, 0.0, 2.0, 3.0, (pytest.approx(27.5, abs=2.8e-02), 0.0, 0.0, 5.0, 0.0)),
+        (0.0, 15.0, 2.0, 2.5, (4.5, 4.5, pytest.approx(0.0003, abs=3.0e-07))),
+        (25.0, 0.0, 2.0, 3.0, (pytest.approx(27.5, abs=2.8e-02), 5.0, 0.0)),
     ],
 )
 def test_calculate_phosphorus_excretion_values(
@@ -308,7 +306,7 @@ def test_calculate_phosphorus_excretion_values(
     )
 
     assert isinstance(result, tuple)
-    assert len(result) == 5
+    assert len(result) == 3
 
     for res, expected in zip(result, expected_values):
         assert pytest.approx(res, rel=1e-3) == expected

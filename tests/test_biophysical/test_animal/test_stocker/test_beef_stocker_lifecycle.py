@@ -94,6 +94,7 @@ def _make_stocker_animal(
     # general attrs required by animal_life_stage_update / event system
     animal.events = AnimalEvents()
     animal.sold_at_day = None
+    animal._future_death_date = None
     animal.cull_reason = ""
     animal.om = MagicMock()
     animal.growth = MagicMock()
@@ -502,7 +503,7 @@ def test_stocker_daily_routines_dispatched_from_daily_routines(mocker: MockerFix
     mocker.patch.object(animal, "animal_life_stage_update", return_value=(AnimalStatus.REMAIN, None))
     spy = mocker.spy(animal, "_stocker_daily_routines")
     t = _mock_time()
-    animal.daily_routines(t)
+    animal.daily_routines(t, None)
     spy.assert_called_once_with(t)
 
 

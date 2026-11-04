@@ -282,7 +282,7 @@ def test_combined_state_dispatch_reaches_calculator_without_error(mocker: Mocker
     animal.calf_at_side = mocker.MagicMock()
     animal.lactation_day = 60
 
-    result = animal.daily_routines(time)
+    result = animal.daily_routines(time, None)
 
     assert isinstance(
         result, DailyRoutinesOutput

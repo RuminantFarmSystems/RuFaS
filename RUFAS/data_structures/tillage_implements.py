@@ -16,9 +16,9 @@ class TillageImplement(EnumWithStrOverride):
 
 
 class TractorSize(EnumWithStrOverride):
-    SMALL = "Small"
-    MEDIUM = "Medium"
-    LARGE = "Large"
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
 
 
 class OperationType(EnumWithStrOverride):

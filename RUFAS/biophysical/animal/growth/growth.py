@@ -20,7 +20,7 @@ class Growth:
     Attributes
     ----------
     daily_growth: float
-        The body weight of the animal (kg).
+        The body weight change of the animal (kg).
     tissue_changed: float
         Body weight change due to tissue mobilization (kg).
     body_weight_history : list[BodyWeightHistory]
@@ -63,8 +63,9 @@ class Growth:
         Returns
         -------
         tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]
-            The updated animal growth properties, reproduction properties, and the general properties of the animal
-            after the growth-related routines for the current day.
+            - The updated animal growth properties after the growth-related routines for the current day.
+            - The updated reproduction properties after the growth-related routines for the current day.
+            - The updated general properties of the animal after the growth-related routines for the current day.
 
         Raises
         ------
@@ -230,7 +231,8 @@ class Growth:
         Returns
         -------
         tuple[float, float]
-            The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).
+            - The daily body weight growth for pregnant heifers (kg).
+            - The updated conceptus weight (kg).
 
         References
         ----------
@@ -259,8 +261,9 @@ class Growth:
         Returns
         -------
         tuple[float, float, float]
-            The daily body weight growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
-            tissue changed (kg).
+            - The daily body weight growth for pregnant heifers (kg).
+            - The updated conceptus weight (kg).
+            - The updated tissue changed (kg).
 
         References
         ----------
@@ -294,7 +297,8 @@ class Growth:
         Returns
         -------
         tuple[float, float]
-            The conceptus growth for pregnant heifers (kg), and the updated conceptus weight (kg).
+            - The conceptus growth for pregnant heifers (kg).
+            - The updated conceptus weight (kg).
 
         References
         ----------
@@ -330,8 +334,9 @@ class Growth:
         Returns
         -------
         tuple[float, float, float]
-            The conceptus growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
-            tissue changed (kg).
+            - The conceptus growth for pregnant heifers (kg).
+            - The updated conceptus weight (kg).
+            - The updated tissue changed (kg).
 
         Referemces
         ----------
@@ -371,7 +376,10 @@ class Growth:
         divisor = abs(growth_inputs.gestation_length - growth_inputs.days_in_pregnancy)
         if divisor == 0:
             divisor = 1
-        return (0.82 * 0.96 * growth_inputs.mature_body_weight - 0.96 * growth_inputs.body_weight) / divisor
+        return max(
+            (0.82 * 0.96 * growth_inputs.mature_body_weight - 0.96 * growth_inputs.body_weight) / divisor,
+            AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE,
+        )
 
     def _calculate_cow_target_daily_growth(self, growth_inputs: GrowthInputs) -> float:
         """
@@ -427,7 +435,8 @@ class Growth:
         Returns
         -------
         tuple[float, float]
-            The body weight tissue growth for cows (kg), and the updated tissue changed (kg).
+            - The body weight tissue growth for cows (kg).
+            - The updated tissue changed (kg).
 
         References
         ----------

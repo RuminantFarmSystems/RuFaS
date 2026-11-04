@@ -6,11 +6,13 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_enums import RemovalRiskParityGroup, Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -65,7 +67,12 @@ def animal_json() -> dict[str, Any]:
                 "semen_type": "conventional",
                 "days_in_preg_when_dry": 218,
                 "heifer_repro_cull_time": 500,
+                "calf_mortality_rate": 0,
+                "heifer_mortality_rate": 0,
                 "do_not_breed_time": 185,
+                "cull_eligibility_minimum_days_in_milk": 60,
+                "cull_eligibility_maximum_days_carried_calf": 180,
+                "cull_ranking_criteria": "milk",
                 "cull_milk_production": 30,
                 "cow_times_milked_per_day": 3,
                 "milk_fat_percent": 4,
@@ -75,7 +82,9 @@ def animal_json() -> dict[str, Any]:
                 "calf": {
                     "male_calf_rate_sexed_semen": 0.1,
                     "male_calf_rate_conventional_semen": 0.53,
-                    "keep_female_calf_rate": 1,
+                    "keep_dairy_female_rate": 1,
+                    "calf_retention_method": "rate",
+                    "annual_keep_female_calf_num": 0,
                     "wean_day": 60,
                     "wean_length": 7,
                     "milk_type": "whole",
@@ -134,41 +143,16 @@ def animal_json() -> dict[str, Any]:
                     "std_estrus_cycle_after_pgf": 2,
                 },
                 "culling": {
-                    "cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],
-                    "feet_leg_cull": {
-                        "probability": 0.1633,
-                        "cull_day_prob": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1],
-                    },
-                    "injury_cull": {
-                        "probability": 0.2883,
-                        "cull_day_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
-                    },
-                    "mastitis_cull": {
-                        "probability": 0.2439,
-                        "cull_day_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1],
-                    },
-                    "disease_cull": {
-                        "probability": 0.1391,
-                        "cull_day_prob": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1],
-                    },
-                    "udder_cull": {
-                        "probability": 0.0645,
-                        "cull_day_prob": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1],
-                    },
-                    "unknown_cull": {
-                        "probability": 0.1009,
-                        "cull_day_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
-                    },
-                    "parity_death_prob": [0.039, 0.056, 0.085, 0.117],
-                    "parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
-                    "death_day_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
+                    "annual_death_prob": 0.05,
+                    "parity_death_dist": [0.2, 0.3, 0.5],
+                    "annual_sale_prob": 0.32,
+                    "parity_sale_dist": [0.2, 0.3, 0.5],
                 },
                 "life_cycle": {"still_birth_rate": 0.065},
             },
         },
         "methane_mitigation": {
             "methane_mitigation_method": "None",
-            "methane_mitigation_additive_amount": 0,
             "3-NOP_additive_amount": 70,
             "monensin_additive_amount": 24,
             "essential_oils_additive_amount": 0,
@@ -567,6 +551,8 @@ def mock_animal(
     dead_at_day: int | None = None,
     stillborn_day: int | None = None,
     cull_reason: str = "",
+    sex: Sex = Sex.FEMALE,
+    bred_from_semen: SemenType | None = None,
 ) -> Animal:
     animal = MagicMock(auto_spec=Animal)
     animal.id = id
@@ -584,11 +570,19 @@ def mock_animal(
     animal.sold = sold
     animal.stillborn = stillborn
     animal.calves = calves
+    if animal_type.is_cow:
+        animal.parity_index = {1: RemovalRiskParityGroup.ONE, 2: RemovalRiskParityGroup.TWO}.get(
+            calves, RemovalRiskParityGroup.THREE_PLUS
+        )
+    else:
+        animal.parity_index = RemovalRiskParityGroup.NONE
     animal.calving_interval = calving_interval
     animal.sold_at_day = sold_at_day
     animal.stillborn_day = stillborn_day
     animal.dead_at_day = dead_at_day
     animal.cull_reason = cull_reason
+    animal.sex = sex
+    animal.bred_from_semen = bred_from_semen
 
     animal.events = AnimalEvents()
     animal.events.add_event(most_recent_new_birth_age, 0, animal_constants.NEW_BIRTH)
@@ -612,6 +606,7 @@ def mock_animal(
     animal.milk_production.daily_milk_produced = daily_milk_produced
     animal.milk_production.fat_content = milk_fat_content
     animal.milk_production.true_protein_content = milk_protein_content
+    animal.milk_production.milk_production_reduction = 0.0
     animal.milk_production.milk_305_day_yield = (
         daily_milk_produced if milk_305_day_yield is None else milk_305_day_yield
     )

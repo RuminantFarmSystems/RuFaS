@@ -10,35 +10,35 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/example_freestall_animal.json",
+      "path": "input/data/animal/no_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
     "animal_population": {
       "title": "Animal population data",
       "description": "Animal objects that herd initialization draws from during the simulation. A similar file can be generated using the -I and -s command line arguments simultaneously.",
-      "path": "input/data/animal/animal_population.json",
+      "path": "input/data/animal/no_animal.json",
       "type": "json",
       "properties": "animal_population_properties"
     },
     "animal_mean_phenotype": {
       "title": "Mean animal phenotype data by birth year",
       "description": "The mean animal phenotype data by birth year.",
-      "path": "input/data/animal_genetics/mean_phenotype.csv",
+      "path": "input/data/animal_genetics/no_genetics.csv",
       "type": "csv",
       "properties": "animal_mean_phenotype_properties"
     },
     "animal_top_listing_semen": {
       "title": "Animal Top Listing Semen data",
       "description": "The top listing semen value for new born calves.",
-      "path": "input/data/animal_genetics/TopListingSemen_HO.csv",
+      "path": "input/data/animal_genetics/no_genetics.csv",
       "type": "csv",
       "properties": "animal_top_listing_semen_properties"
     },
     "lactation": {
       "title": "Lactation curve adjustment values",
       "description": "Values for the adjustment of the three wood parameters based on farm specific data",
-      "path": "input/data/animal/lactation_curve_adjustment_inputs.json",
+      "path": "input/data/animal/no_animal.json",
       "type": "json",
       "properties": "lactation_properties"
     },
@@ -73,22 +73,22 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/example_Midwest_feed.json",
+      "path": "input/data/feed/no_feed.json",
       "type": "json",
       "properties": "feed_properties"
     },
     "NRC_Comp": {
       "title": "NRC Comp data",
       "description": "Nutritional information for each feed, following NRC (2001) guidelines.",
-      "path": "input/data/feed/NRC_comp.csv",
-      "type": "csv",
+      "path": "input/data/feed/no_feed.json",
+      "type": "json",
       "properties": "NRC_Comp_properties"
     },
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
-      "path": "input/data/feed/NASEM_Comp_with_TDN_urea.csv",
-      "type": "csv",
+      "path": "input/data/feed/no_feed.json",
+      "type": "json",
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
@@ -206,8 +206,8 @@
     "user_feeds": {
       "title": "User Feed",
       "description": "Summary of feeds available for use in the simulation, including their RuFaS ID, short descriptors, and which nutrient composition file they are included in.",
-      "path": "input/data/feed/user_feeds.csv",
-      "type": "csv",
+      "path": "input/data/feed/no_feed.json",
+      "type": "json",
       "properties": "user_feeds_properties"
     },
     "tractor_dataset": {
