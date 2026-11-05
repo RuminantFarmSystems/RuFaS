@@ -462,19 +462,20 @@ class ReportGenerator:
                 "Report Generator error: One or more columns in the report data are empty, "
                 "cannot perform aggregations."
             )
-        self._add_constants_to_report_data(report_data, filter_content)
 
-        if not report_data:
+        report_data_with_constants = self._add_constants_to_report_data(report_data, filter_content)
+
+        if not report_data_with_constants:
             raise ValueError(
                 f"Report Generator error: filter {filter_content.get('filters')} in {filter_content.get('name')} "
                 "led to empty report data."
             )
 
         if not horizontal_agg_key and not vertical_agg_key:
-            return report_data, False
+            return report_data_with_constants, False
 
         aggregate_report = self._route_aggregator_functions(
-            report_data, filter_content, horizontal_agg_key, vertical_agg_key
+            report_data_with_constants, filter_content, horizontal_agg_key, vertical_agg_key
         )
 
         return aggregate_report, True
@@ -880,7 +881,9 @@ class ReportGenerator:
 
         return aggregated_data
 
-    def _add_constants_to_report_data(self, report_data: dict[str, list[Any]], filter_content: dict[str, Any]) -> None:
+    def _add_constants_to_report_data(
+        self, report_data: dict[str, list[Any]], filter_content: dict[str, Any]
+    ) -> dict[str, list[Any]]:
         """
         Adds constants to the report data.
 
@@ -890,6 +893,11 @@ class ReportGenerator:
             The data to which constants need to be added.
         filter_content : dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
+
+        Returns
+        -------
+        dict[str, list[Any]]
+            The report data with the constants added. ``report_data`` itself is not modified.
 
         Raises
         ------
@@ -909,7 +917,7 @@ class ReportGenerator:
         """
         constants_config = filter_content.get("constants")
         if not constants_config:
-            return
+            return report_data
 
         self._validate_constants(report_data, constants_config)
 
@@ -917,8 +925,11 @@ class ReportGenerator:
             constants_config = self.unit_handler.add_units_to_constants(constants_config)
 
         max_length = max([len(lst) for lst in report_data.values()])
+        report_data_with_constants = report_data.copy()
         for name, value in constants_config.items():
-            report_data[name] = [value] * max_length
+            report_data_with_constants[name] = [value] * max_length
+
+        return report_data_with_constants
 
     def _validate_constants(
         self,

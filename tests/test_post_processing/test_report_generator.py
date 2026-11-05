@@ -1570,10 +1570,12 @@ def test_add_constants_to_report_data(
 ) -> None:
     """Unit test for the _add_constants_to_report_data method of ReportGenerator."""
     mock_add_units_to_constants = mocker.patch.object(report_generator.unit_handler, "add_units_to_constants")
+    original_report_data = dict(report_data)
 
-    report_generator._add_constants_to_report_data(report_data, filter_content)
+    result = report_generator._add_constants_to_report_data(report_data, filter_content)
 
-    assert report_data == expected_report_data
+    assert result == expected_report_data
+    assert report_data == original_report_data
     mock_add_units_to_constants.assert_not_called()
 
 
@@ -1585,9 +1587,12 @@ def test_add_constants_to_report_data_with_units(report_generator: ReportGenerat
         report_generator.unit_handler, "add_units_to_constants", return_value={"Constant1_(units)": 10}
     )
 
-    report_generator._add_constants_to_report_data(report_data, {"constants": constants_config, "display_units": True})
+    result = report_generator._add_constants_to_report_data(
+        report_data, {"constants": constants_config, "display_units": True}
+    )
 
-    assert report_data == {"existing_data (kg)": [1, 2, 3], "Constant1_(units)": [10, 10, 10]}
+    assert result == {"existing_data (kg)": [1, 2, 3], "Constant1_(units)": [10, 10, 10]}
+    assert report_data == {"existing_data (kg)": [1, 2, 3]}
     mock_add_units_to_constants.assert_called_once_with(constants_config)
 
 
