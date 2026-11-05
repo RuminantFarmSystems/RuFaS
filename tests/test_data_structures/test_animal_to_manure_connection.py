@@ -396,6 +396,44 @@ def test_split_stream_without_pen_manure_data() -> None:
     assert split.methane_production_potential == stream.methane_production_potential
 
 
+def test_lignin_defaults_to_zero(manure_stream_1: ManureStream) -> None:
+    """Checks that a stream constructed without lignin defaults to zero lignin."""
+    assert manure_stream_1.lignin == 0.0
+
+
+def test_add_manure_streams_combines_lignin() -> None:
+    """Checks that adding two manure streams sums their lignin masses."""
+    stream_a = ManureStream.make_empty_manure_stream()
+    stream_a.lignin = 4.0
+    stream_b = ManureStream.make_empty_manure_stream()
+    stream_b.lignin = 6.0
+
+    combined = stream_a + stream_b
+
+    assert combined.lignin == 10.0
+
+
+def test_split_stream_splits_lignin() -> None:
+    """Checks that splitting a manure stream splits its lignin by the split ratio."""
+    stream = ManureStream.make_empty_manure_stream()
+    stream.water = 100.0
+    stream.lignin = 8.0
+
+    split = stream.split_stream(0.25)
+
+    assert split.lignin == 2.0
+
+
+def test_is_empty_false_when_only_lignin_present() -> None:
+    """Checks that a stream holding only lignin is not considered empty."""
+    stream = ManureStream.make_empty_manure_stream()
+    assert stream.is_empty
+
+    stream.lignin = 1.0
+
+    assert not stream.is_empty
+
+
 def make_daily_manure_stream_config(**overrides: object) -> dict[str, object]:
     """Builds a valid daily manure stream configuration, with optional field overrides."""
     stream_config: dict[str, object] = {
