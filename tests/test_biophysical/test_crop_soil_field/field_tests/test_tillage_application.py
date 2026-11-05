@@ -319,6 +319,7 @@ def test_till_soil(
         call("fresh_organic_nitrogen_content", expected_till_depth, mix_frac, False),
         call("metabolic_litter_amount", expected_till_depth, mix_frac, False),
         call("structural_litter_amount", expected_till_depth, mix_frac, False),
+        call("manure_carbon_residue", expected_till_depth, mix_frac, False),
         call("active_carbon_amount", expected_till_depth, mix_frac, False),
         call("slow_carbon_amount", expected_till_depth, mix_frac, False),
         call("passive_carbon_amount", expected_till_depth, mix_frac, True),
