@@ -59,6 +59,10 @@ class FeedManager:
         Represents the allowances for feeds purchased at the beginning of a ration interval.
     crop_to_rufas_id : dict[str, RUFAS_ID]
         Maps crop configurations to their corresponding RuFaS IDs for harvested crops.
+    _crops_in_transit : list[HarvestedCrop]
+        Harvested crops whose ``storage_time`` (set by field curing) is still in the future. They are held here,
+        counted in the projected inventory, and moved into storage by ``release_crops_in_transit`` once their storage
+        date is reached.
 
     """
 
@@ -72,6 +76,7 @@ class FeedManager:
         self._om = OutputManager()
         self._available_feeds = available_feeds
         self.active_storages: dict[str, Storage] = {}
+        self._crops_in_transit: list[HarvestedCrop] = []
 
         self._create_all_storages(feed_storage_configs, feed_storage_instances)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage(self._available_feeds)
@@ -300,6 +305,71 @@ class FeedManager:
                 next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
         return next_harvest_dates_rufas_ids
 
+    def hold_crop_until_storage_date(self, harvested_crop: HarvestedCrop) -> None:
+        """
+        Holds a harvested crop that is still curing in the field until its storage date.
+
+        Parameters
+        ----------
+        harvested_crop : HarvestedCrop
+            The harvested crop whose ``storage_time`` is after today.
+
+        Notes
+        -----
+        A crop that went through field curing has a ``storage_time`` after its ``harvest_time``. Until that date it is
+        kept in ``_crops_in_transit`` rather than in a storage, so storage degradation math never sees a crop with a
+        negative time in storage. ``release_crops_in_transit`` hands it to ``receive_crop`` on its storage date.
+
+        """
+        self._crops_in_transit.append(harvested_crop)
+
+    def release_crops_in_transit(self, time: RufasTime) -> None:
+        """
+        Moves every in-transit crop whose storage date has been reached into its storage.
+
+        Parameters
+        ----------
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
+
+        """
+        today = time.current_date.date()
+        due_crops = [crop for crop in self._crops_in_transit if crop.storage_time <= today]
+        self._crops_in_transit = [crop for crop in self._crops_in_transit if crop.storage_time > today]
+        for crop in due_crops:
+            self.receive_crop(crop, time.simulation_day)
+
+    def report_undelivered_crops(self, time: RufasTime) -> None:
+        """
+        Warns about crops still in transit, which will never be delivered because the simulation is ending.
+
+        Parameters
+        ----------
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
+
+        """
+        if not self._crops_in_transit:
+            return
+        total_dry_matter_mass = sum(crop.dry_matter_mass for crop in self._crops_in_transit)
+        self._om.add_warning(
+            "Crops undelivered at end of simulation",
+            f"{len(self._crops_in_transit)} harvested crop(s) holding {total_dry_matter_mass} kg of dry matter were "
+            "still curing in the field when the simulation ended and were never delivered to storage.",
+            {
+                "class": self.__class__.__name__,
+                "function": self.report_undelivered_crops.__name__,
+                "simulation_day": time.simulation_day,
+            },
+        )
+
+    def _find_storage_for_crop(self, harvested_crop: HarvestedCrop) -> Storage | None:
+        """Returns the storage that receives this crop (matching crop name and source field), or None."""
+        for storage in self.active_storages.values():
+            if storage.crop_name == harvested_crop.config_name and harvested_crop.field_name in storage.field_names:
+                return storage
+        return None
+
     def stock_initial_storage_inventory(
         self, initial_inventory_by_storage_name: dict[str, dict[str, float]], time: RufasTime
     ) -> None:
@@ -350,23 +420,22 @@ class FeedManager:
             The current simulation day, used for tracking storage time.
 
         """
+        storage = self._find_storage_for_crop(harvested_crop)
+        if storage is not None:
+            storage.receive_crop(harvested_crop, simulation_day)
+            return
         crop_name = harvested_crop.config_name
         field_name = harvested_crop.field_name
-        for storage in self.active_storages.values():
-            if storage.crop_name == crop_name and field_name in storage.field_names:
-                storage.receive_crop(harvested_crop, simulation_day)
-                return
-        else:
-            info_map = {
-                "class": self.__class__.__name__,
-                "function": self.receive_crop.__name__,
-                "simulation_day": simulation_day,
-            }
-            self._om.add_warning(
-                "No matching storage for crop",
-                f"No storage found for crop '{crop_name}' from field '{field_name}'. Crop will be exported",
-                info_map,
-            )
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.receive_crop.__name__,
+            "simulation_day": simulation_day,
+        }
+        self._om.add_warning(
+            "No matching storage for crop",
+            f"No storage found for crop '{crop_name}' from field '{field_name}'. Crop will be exported",
+            info_map,
+        )
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
@@ -556,6 +625,12 @@ class FeedManager:
         TotalInventory
             Total inventory of feeds projected to be held at the current date.
 
+        Notes
+        -----
+        Crops still in transit (harvested but curing in the field) are counted in full. They are already harvested and
+        will reach storage within their wilt window, ahead of the next harvest that planning looks forward to, so
+        leaving them out would plan purchases as if the harvest had not happened.
+
         Raises
         ------
         ValueError
@@ -587,11 +662,23 @@ class FeedManager:
 
         available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids, projected_crops)
 
+        in_transit_totals = self._total_crops_in_transit_by_feed_id()
         inventory: dict[RUFAS_ID, float] = {}
         for feed in self._available_feeds:
-            inventory[feed.rufas_id] = available_feed_totals.get(feed.rufas_id, 0.0)
+            inventory[feed.rufas_id] = available_feed_totals.get(feed.rufas_id, 0.0) + in_transit_totals.get(
+                feed.rufas_id, 0.0
+            )
 
         return TotalInventory(available_feeds=inventory, inventory_date=inventory_date)
+
+    def _total_crops_in_transit_by_feed_id(self) -> dict[RUFAS_ID, float]:
+        """Sums the dry matter of in-transit crops (kg) by the feed ID of the storage each will be delivered to."""
+        totals: dict[RUFAS_ID, float] = {}
+        for crop in self._crops_in_transit:
+            storage = self._find_storage_for_crop(crop)
+            if storage is not None:
+                totals[storage.rufas_feed_id] = totals.get(storage.rufas_feed_id, 0.0) + crop.dry_matter_mass
+        return totals
 
     def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds, time: RufasTime) -> None:
         """

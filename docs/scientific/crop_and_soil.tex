@@ -5481,6 +5481,94 @@ This method relies on two crop-specific, empirically fitted parameters estimated
 
 
 
+\textbf{Pre-Harvest Field Curing}
+\vspace{0.2cm}
+
+An opt-in field-curing phase (\texttt{field\_curing.py}) estimates dry-matter loss and quality change between cutting and storage, when a crop config specifies \texttt{wilt\_days} $>0$. It is a two-part model: a swath drying-rate/moisture curve from \cite{rotzchen1985}, and respiration/rain-loss/quality-shift terms from the DAFOSYM model of \cite{rotzblackmertensbuckmaster1989}.
+
+The drying-rate constant is computed daily from that day's weather (dry-bulb-temperature form, chosen because RuFaS tracks no humidity/vapor-pressure-deficit input):
+   \vspace{0.2cm}
+
+    \begin{center}
+        \(drying\_rate= \frac{solar\_insolation\_w\_m2 \cdot (1+9.30 \cdot chemical\_application\_rate) + 5.42 \cdot dry\_bulb\_temp\_c}{66.4 \cdot soil\_moisture\_at\_mowing + swath\_density \cdot (2.06-0.97 \cdot DAY) \cdot (1.55+21.9 \cdot chemical\_application\_rate) + 3037}\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[SC.CRP.79]}\par}
+            \vspace{0.5cm}
+
+where $DAY=1$ on the mowing day and $0$ on every subsequent day \citep{rotzchen1985}. The drying curve of \cite{rotzchen1985} is written in dry-basis moisture ($M_{db}=M_{wb}/(1-M_{wb})$) with a zero equilibrium moisture, so the wet-basis swath moisture content after an elapsed time is:
+   \vspace{0.2cm}
+
+    \begin{center}
+        \(M_{db}= \frac{initial\_moisture\_fraction}{1-initial\_moisture\_fraction} \cdot e^{-drying\_rate \cdot elapsed\_hours}\)\
+        \(swath\_moisture\_content= \max\left(\frac{M_{db}}{1+M_{db}},\ \min(initial\_moisture\_fraction,\ 0.20)\right)\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[SC.CRP.80]}\par}
+            \vspace{0.5cm}
+
+The 0.20 floor is the lower end of the 80--20\% wet-basis range in which \cite{rotzchen1985} fitted and validated the curve; drying is not extended below it. The drying rate is applied at its daily-mean solar insolation, which is consistent with the time-averaged drying rate the paper describes, but it also credits night-time hours with drying that the paper did not calibrate (its early-morning and dew-wetted cases were excluded).
+
+Respiration dry-matter loss for one 12-hour period is estimated from the DAFOSYM model, and is zero below a wet-basis moisture threshold of 0.27:
+   \vspace{0.2cm}
+
+    \begin{center}
+        \(respiration\_dm\_loss\_fraction= 0.00239 \cdot (avg\_moisture\_wet\_basis\_fraction-0.27) \cdot e^{0.038 \cdot avg\_temp\_f}\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[SC.CRP.81]}\par}
+            \vspace{0.5cm}
+
+Rain-induced leaf dry-matter loss on a rainy day, capped cumulatively across the whole wilt window at 15\% of plant dry matter:
+   \vspace{0.2cm}
+
+    \begin{center}
+        \(rain\_leaf\_loss\_fraction= 0.094 \cdot rainfall\_in\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[SC.CRP.82]}\par}
+            \vspace{0.5cm}
+
+Rain leaching loss on a rainy day, clamped below 1.0 as a numerical guard against the quality-shift equation's division singularity:
+   \vspace{0.2cm}
+
+    \begin{center}
+        \(rain\_leaching\_loss\_fraction= (1-ndf\_pct \cdot 0.01) \cdot (1-e^{-0.28 \cdot rainfall\_in})\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[SC.CRP.83]}\par}
+            \vspace{0.5cm}
+
+Crude protein and neutral detergent fibre concentrations shift as leaching removes dry matter preferentially:
+   \vspace{0.2cm}
+
+    \begin{center}
+        \(new\_cp\_pct= \frac{crude\_protein\_pct \cdot (1-1.2 \cdot leaching\_loss\_fraction)}{1-leaching\_loss\_fraction}\)\\
+        \(new\_ndf\_pct= \frac{ndf\_pct}{1-leaching\_loss\_fraction}\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[SC.CRP.84]}\par}
+            \vspace{0.5cm}
+
+The full field-curing simulation (\texttt{FieldCuring.simulate\_field\_curing}) iterates \textbf{[SC.CRP.79]}--\textbf{[SC.CRP.84]} once per day of the wilt window, compounding each day's combined respiration and rain losses multiplicatively against that day's starting dry-matter mass, rather than summing fractions against the original mass:
+   \vspace{0.2cm}
+
+    \begin{center}
+        \(current\_mass_{update}=current\_mass_{previous} - current\_mass_{previous} \cdot daily\_loss\_fraction\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[SC.CRP.85]}\par}
+            \vspace{0.5cm}
+
+Documented limitations (all stated in \texttt{field\_curing.py}'s module docstring): day/night respiration periods are approximated using RuFaS's daily maximum/minimum temperature rather than true 12-hour period averages; quality (crude protein/NDF) concentration is only modeled under leaching, not under respiration alone, since DAFOSYM's respiration-driven quality equation is out of scope for this phase; and microbial-activity, tedding, and mechanical/machine-operation losses are out of scope for this phase entirely.
+
 \phantomsection
 \begin{refsection}
 \label{sec:references-crop-and-soil-module}

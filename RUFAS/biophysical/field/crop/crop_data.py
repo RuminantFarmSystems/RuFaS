@@ -219,6 +219,17 @@ class CropData:
         Fraction of biomass the crop loses when it goes dormant (unitless). Fraction of biomass the crop loses when it
         goes dormant. Default 0.1 for perennials, 0.3 for trees.
         Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description
+    wilt_days : int, default 0
+        Number of days between cutting and storage for field curing (opt-in). 0 (default) means no field-curing loss
+        is simulated -- harvest_time == storage_time, matching current behavior exactly.
+    swath_density : float, default 700.0
+        Swath density for the field-curing drying-rate calculation (g/m2). Default is Rotz & Chen (1985)'s own
+        reported "typical" value (Table 2). Only used when wilt_days > 0.
+    soil_moisture_at_mowing : float, default 17.0
+        Soil moisture at mowing for the field-curing drying-rate calculation (% dry basis). Default is Rotz & Chen
+        (1985)'s own "typical" value (Table 2). Only used when wilt_days > 0. Not yet sourced from RuFaS's own soil
+        subsystem (soil_data.py/layer_data.py) -- a direct input for now; wiring the real per-field soil-moisture
+        state is flagged as separate follow-up work.
 
     The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
 
@@ -333,6 +344,11 @@ class CropData:
 
     # ---- dormancy
     dormancy_loss_fraction: float | None = None
+
+    # ---- field curing (opt-in)
+    wilt_days: int = 0
+    swath_density: float = 700.0
+    soil_moisture_at_mowing: float = 17.0
 
     def __post_init__(self) -> None:
         """

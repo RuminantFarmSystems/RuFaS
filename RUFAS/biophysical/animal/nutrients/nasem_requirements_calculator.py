@@ -86,6 +86,16 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             NutritionRequirements instance containing all the required amounts of energy and nutrition.
 
         """
+        if animal_type.is_beef_cow_calf:
+            raise NotImplementedError(
+                f"NASEMRequirementsCalculator is dairy-only. "
+                f"Use BeefCowCalfRequirementsCalculator for {animal_type.value}."
+            )
+        if animal_type.is_feedlot:
+            raise NotImplementedError(
+                f"NASEMRequirementsCalculator is dairy-only. "
+                f"Use BeefNRCRequirementsCalculator for {animal_type.value}."
+            )
         maintenance_requirement, gravid_uterine_weight, uterine_weight = cls._calculate_maintenance_energy_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
         )

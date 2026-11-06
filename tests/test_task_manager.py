@@ -151,32 +151,10 @@ def test_task_manager_start(
         "handle_post_processing",
     )
 
-    mock_run_startup_sequence = mocker.patch.object(
-        mock_output_manager,
-        "run_startup_sequence",
-    )
-    mock_print_credits = mocker.patch.object(
-        mock_output_manager,
-        "print_credits",
-    )
-    mock_add_log = mocker.patch.object(
-        mock_output_manager,
-        "add_log",
-    )
-
-    mocker.patch.object(
-        tm,
-        "get_rufas_version",
-        return_value="1.0.0",
-    )
-    mock_check_dependencies = mocker.patch.object(
-        tm,
-        "check_dependencies",
-    )
-    mock_check_python_version = mocker.patch.object(
-        tm,
-        "check_python_version",
-    )
+    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
+    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mocker.patch("RUFAS.task_manager.get_installed_version", return_value="1.0.0")
 
     if is_end_to_end_test_task:
         e2e_task = {
@@ -423,11 +401,7 @@ def test_task_manager_start(
             " JSON.\n"
         )
 
-    mock_print_credits.assert_called_once_with(
-        "1.0.0",
-    )
-    mock_check_dependencies.assert_called_once()
-    mock_check_python_version.assert_called_once()
+    mock_print_credits.assert_called_once_with("1.0.0")
 
     mock_handle_post_processing.assert_called_once_with(
         args={
@@ -528,8 +502,10 @@ def test_task_manager_start_invalid_data(
         should_flush_im_pool=True,
     )
 
-    mock_check_dependencies.assert_called_once()
-    mock_check_python_version.assert_called_once()
+    # This fork disables the dependency and Python-version checks in TaskManager.start()
+    # so RuFaS can be used as a library dependency (see README, "Dependency").
+    mock_check_dependencies.assert_not_called()
+    mock_check_python_version.assert_not_called()
 
 
 def test_set_random_seed(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
@@ -2616,57 +2592,3 @@ def test_check_python_version(
         else:
             task_manager.check_python_version()
             mock_log_error.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "pyproject_data, open_side_effect, load_side_effect, expected_version, expected_log_error",
-    [
-        # Valid case: RUFAS version is successfully read
-        ({"project": {"version": "1.2.3"}}, None, None, "1.2.3", None),
-        # pyproject.toml file not found
-        (None, FileNotFoundError, None, "Unknown", "Unable to read RUFAS version from pyproject.toml file."),
-        # Missing 'version' field in pyproject.toml
-        ({"project": {}}, None, None, "Unknown", "Unable to read RUFAS version from pyproject.toml file."),
-        # Unexpected error during file read or parsing
-        (
-            None,
-            None,
-            RuntimeError("Unexpected error"),
-            "Unknown",
-            "Unable to read RUFAS version from pyproject.toml file.",
-        ),
-    ],
-)
-def test_get_rufas_version(
-    mocker: MockerFixture,
-    pyproject_data: dict[str, Any] | None,
-    open_side_effect: Exception | None,
-    load_side_effect: Exception | None,
-    expected_version: str,
-    expected_log_error: str | None,
-) -> None:
-    """Test the get_rufas_version method of TaskManager."""
-    task_manager = TaskManager()
-    mock_tomllib_load = mocker.patch("tomllib.load")
-    mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
-    mock_log_error = mocker.patch.object(task_manager.output_manager, "add_error")
-
-    if open_side_effect:
-        mock_open.side_effect = open_side_effect
-    if load_side_effect:
-        mock_tomllib_load.side_effect = load_side_effect
-    if pyproject_data:
-        mock_tomllib_load.return_value = pyproject_data
-
-    version = task_manager.get_rufas_version()
-
-    assert version == expected_version
-
-    if expected_log_error:
-        mock_log_error.assert_called_once_with(
-            "Error reading RUFAS version",
-            mocker.ANY,
-            {"class": TaskManager.__name__, "function": "get_rufas_version"},
-        )
-    else:
-        mock_log_error.assert_not_called()

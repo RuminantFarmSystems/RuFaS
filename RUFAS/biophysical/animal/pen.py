@@ -70,6 +70,9 @@ class Pen:
         Name of the parlor stream.
     manure_streams : list[dict[str, str | float]]
         List of dictionaries containing manure stream information.
+    forage_quality_factor : float, optional
+        Scalar multiplier on forage quality (default 1.0). A value < 1.0 represents
+        reduced forage quality (e.g. drought stress); > 1.0 represents superior quality.
 
     Attributes
     ----------
@@ -99,6 +102,8 @@ class Pen:
         Name of the parlor stream.
     manure_streams : list[dict[str, str | float]]
         List of dictionaries containing manure stream information.
+    forage_quality_factor : float
+        Scalar multiplier on forage quality (1.0 = baseline, read from pen config).
     animals_in_pen : dict[int, Animal]
         Dictionary mapping animal IDs to `Animal` objects housed in the pen.
     ration : dict[RUFAS_ID, float]
@@ -140,6 +145,7 @@ class Pen:
         first_parlor_processor: str | None,
         parlor_stream_name: str | None,
         manure_streams: list[dict[str, str | float]],
+        forage_quality_factor: float = 1.0,
     ) -> None:
         self.id = pen_id
         self.pen_name = pen_name
@@ -154,6 +160,14 @@ class Pen:
         self.first_parlor_processor = first_parlor_processor
         self.parlor_stream_name = parlor_stream_name
         self.manure_streams = manure_streams
+        if not math.isfinite(forage_quality_factor) or forage_quality_factor < 0.0:
+            raise ValueError(f"forage_quality_factor must be a non-negative finite value, got {forage_quality_factor}")
+        self.forage_quality_factor: float = forage_quality_factor
+        self.mud_condition: str = (
+            AnimalConfig.feedlot_mud_condition
+            if self.animal_combination is AnimalCombination.FEEDLOT_FINISHING
+            else "none"
+        )
 
         self.beddings: dict[str, Bedding] = {}
         self._initialize_beddings()
@@ -567,7 +581,8 @@ class Pen:
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
-        Sets the pen's animal combination to animal_combination
+        Sets the pen's animal combination to animal_combination and refreshes
+        mud_condition so a reused pen does not retain stale mud state.
 
         Parameters
         ----------
@@ -576,6 +591,9 @@ class Pen:
 
         """
         self.animal_combination = animal_combination
+        self.mud_condition = (
+            AnimalConfig.feedlot_mud_condition if animal_combination is AnimalCombination.FEEDLOT_FINISHING else "none"
+        )
 
     def update_daily_walking_distance(self) -> None:
         """

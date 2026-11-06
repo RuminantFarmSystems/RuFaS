@@ -21,6 +21,7 @@ from RUFAS.biophysical.field.field.field_data import FieldData
 from RUFAS.biophysical.field.soil.soil import Soil
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 from RUFAS.rufas_time import RufasTime
+from RUFAS.weather import Weather
 
 
 class Crop:
@@ -233,6 +234,7 @@ class Crop:
         field_size: float,
         time: RufasTime,
         soil_data: SoilData,
+        weather: Weather,
     ) -> HarvestedCrop | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
 
@@ -248,6 +250,8 @@ class Crop:
             RufasTime instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
+        weather : Weather
+            Weather instance used for the opt-in field-curing calculation during harvest.
 
         Returns
         -------
@@ -256,7 +260,7 @@ class Crop:
             or a crop configured to deposit all residue into the field).
 
         """
-        return self._crop_management.manage_harvest(harvest_operation, field_name, field_size, time, soil_data)
+        return self._crop_management.manage_harvest(harvest_operation, field_name, field_size, time, soil_data, weather)
 
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
         """Wrapper method for setting the max transpiration for a crop."""

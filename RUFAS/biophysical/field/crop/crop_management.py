@@ -1,14 +1,18 @@
+from datetime import date, timedelta
 from math import exp
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
+from RUFAS.biophysical.field.crop.field_curing import FieldCuring
 from RUFAS.biophysical.field.crop.harvest_operations import HarvestOperation
 from RUFAS.biophysical.field.soil.layer_data import LayerData
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.weather import Weather
 
 
 class CropManagement:
@@ -110,6 +114,7 @@ class CropManagement:
         field_size: float,
         time: RufasTime,
         soil_data: SoilData,
+        weather: Weather,
     ) -> HarvestedCrop | None:
         """
         Executes the harvest operation passed on the crop that contains this module.
@@ -126,6 +131,9 @@ class CropManagement:
             RufasTime instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
+        weather : Weather
+            Weather instance used to fetch the daily conditions for the opt-in field-curing calculation
+            (``CropData.wilt_days > 0``).
 
         Returns
         -------
@@ -145,7 +153,7 @@ class CropManagement:
         harvested_crop = None
         if harvest_operation in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
-            harvested_crop = self._get_harvested_crop(time, field_size, field_name)
+            harvested_crop = self._get_harvested_crop(time, field_size, field_name, weather)
 
         if harvest_operation in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
@@ -318,7 +326,9 @@ class CropManagement:
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
 
-    def _get_harvested_crop(self, time: RufasTime, field_size: float, field_name: str) -> HarvestedCrop:
+    def _get_harvested_crop(
+        self, time: RufasTime, field_size: float, field_name: str, weather: Weather
+    ) -> HarvestedCrop:
         """
         Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.
 
@@ -328,8 +338,11 @@ class CropManagement:
             RufasTime instance containing the current time of the simulation.
         field_size: float
             Size of the field from which this crop was harvested (ha).
-        feed_manager: FeedManager
-            Instance of the FeedManager which will receive the harvested crop.
+        field_name : str
+            The name of the field that contains this crop.
+        weather : Weather
+            Weather instance used to fetch the daily conditions over the wilt window for the opt-in
+            field-curing calculation (``self.data.wilt_days > 0``).
 
         Returns
         -------
@@ -341,24 +354,113 @@ class CropManagement:
         It is assumed that the wet yield is recorded in kg / ha for crops, but stored in the FeedManager as kg.
 
         """
+        dm_mass, dm_pct, cp_pct, ndf_pct, storage_date = self._determine_harvest_composition(
+            time, field_size, field_name, weather
+        )
+
         harvested_crop = HarvestedCrop(
             config_name=self.data.name,
             field_name=field_name,
             harvest_time=time.current_date.date(),
-            storage_time=time.current_date.date(),
-            dry_matter_percentage=self.data.dry_matter_percentage,
+            storage_time=storage_date,
+            dry_matter_percentage=dm_pct,
             dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
-            crude_protein_percent=self.data.crude_protein_percent_at_harvest,
+            crude_protein_percent=cp_pct,
             non_protein_nitrogen=self.data.non_protein_nitrogen_at_harvest,
             starch=self.data.starch_at_harvest,
             adf=self.data.adf_at_harvest,
-            ndf=self.data.ndf_at_harvest,
+            ndf=ndf_pct,
             sugar=self.data.sugar_at_harvest,
             lignin=self.data.lignin_dry_matter_percentage,
             ash=self.data.ash_at_harvest,
-            dry_matter_mass=self.dry_matter_yield_collected * field_size,
+            dry_matter_mass=dm_mass,
         )
         return harvested_crop
+
+    def _determine_harvest_composition(
+        self, time: RufasTime, field_size: float, field_name: str, weather: Weather
+    ) -> tuple[float, float, float, float, date]:
+        """
+        Determines a harvest's DM mass/percentage, CP, NDF, and storage date, applying the opt-in
+        pre-harvest field-curing calculation (respiration + rain loss/leaching, DAFOSYM/Rotz & Chen 1985)
+        when ``self.data.wilt_days > 0``.
+
+        Parameters
+        ----------
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
+        field_size : float
+            Size of the field from which this crop was harvested (ha).
+        field_name : str
+            The name of the field that contains this crop.
+        weather : Weather
+            Weather instance used to fetch the daily conditions over the wilt window.
+
+        Returns
+        -------
+        tuple[float, float, float, float, date]
+            ``(dry_matter_mass_kg, dry_matter_percentage, crude_protein_percent, ndf_percent,
+            storage_date)``.
+
+        Notes
+        -----
+        If ``self.data.wilt_days`` extends past the simulation's available weather data, the
+        ``KeyError`` raised by ``Weather.get_conditions_series`` is caught and logged, and this harvest
+        falls back to the ``wilt_days == 0`` behavior rather than crashing the run.
+
+        """
+        # Defaults for wilt_days<=0 and the KeyError fallback below -- computed once so the
+        # two paths that both reduce to "no field curing applied" cannot silently diverge
+        # from one another.
+        dm_mass = self.dry_matter_yield_collected * field_size
+        dm_pct = self.data.dry_matter_percentage
+        cp_pct = self.data.crude_protein_percent_at_harvest
+        ndf_pct = self.data.ndf_at_harvest
+        storage_date = time.current_date.date()
+
+        if self.data.wilt_days > 0:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._determine_harvest_composition.__name__,
+                "suffix": f"field='{field_name}'",
+            }
+            try:
+                # Only the weather fetch can raise the KeyError this guards against
+                # (a wilt window running past the simulation's available weather data)
+                # -- kept narrow so a bug in FieldCuring.simulate_field_curing or the OutputManager
+                # calls below can't be silently swallowed by this handler too.
+                daily_weather: list[CurrentDayConditions] = weather.get_conditions_series(
+                    time=time, starting_offset=0, ending_offset=self.data.wilt_days - 1
+                )
+            except KeyError:
+                OutputManager().add_error(
+                    "Field curing skipped",
+                    f"Weather unavailable for the full {self.data.wilt_days}-day wilt window "
+                    f"starting {time.current_date} for field '{field_name}'.",
+                    info_map,
+                )
+            else:
+                cured = FieldCuring.simulate_field_curing(
+                    initial_dry_matter_mass_kg=self.dry_matter_yield_collected * field_size,
+                    initial_dry_matter_percentage=self.data.dry_matter_percentage,
+                    crude_protein_percent=self.data.crude_protein_percent_at_harvest,
+                    ndf=self.data.ndf_at_harvest,
+                    daily_weather=daily_weather,
+                    swath_density=self.data.swath_density,
+                    soil_moisture_at_mowing=self.data.soil_moisture_at_mowing,
+                )
+                dm_mass = cured.dry_matter_mass_kg
+                dm_pct = cured.dry_matter_percentage
+                cp_pct = cured.crude_protein_percent
+                ndf_pct = cured.ndf
+                storage_date = time.current_date.date() + timedelta(days=self.data.wilt_days)
+                OutputManager().add_variable(
+                    "field_curing_total_loss_fraction",
+                    cured.total_loss_fraction,
+                    {**info_map, "units": MeasurementUnits.FRACTION},
+                )
+
+        return dm_mass, dm_pct, cp_pct, ndf_pct, storage_date
 
     def _record_yield(
         self, harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int
