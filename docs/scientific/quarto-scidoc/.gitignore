@@ -28,5 +28,5 @@ _book/
 # Intermediate jupyter notebook files
 *.quarto_ipynb*
 .ipynb_checkpoints/
-**/*.quarto_ipynb
+**/*.quarto_ipynb*
 .~*#
