@@ -1830,6 +1830,9 @@ def test_execute_manure_application(
             ammonium_fraction=supplied_manure.ammonium_nitrogen_fraction,
             organic_nitrogen_fraction=pytest.approx(expected_total_organic_fraction),
             water_extractable_inorganic_phosphorus_fraction=supplied_manure.inorganic_phosphorus_fraction,
+            carbon_mass=supplied_manure.carbon,
+            lignin_mass=supplied_manure.lignin,
+            total_nitrogen_mass=supplied_manure.nitrogen,
         )
         expected_record_manure_application_calls = [
             mocker.call(
@@ -1845,6 +1848,8 @@ def test_execute_manure_application(
                 year=year,
                 day=day,
                 output_name="manure_application",
+                carbon=supplied_manure.carbon,
+                lignin=supplied_manure.lignin,
             ),
             mocker.call(
                 dry_matter_mass=0.0,
@@ -1917,6 +1922,8 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
         ammonium_nitrogen_fraction=0.25,
         organic_phosphorus_fraction=0.4,
         inorganic_phosphorus_fraction=0.6,
+        carbon=250.0,
+        lignin=18.0,
     )
 
     manure_type = ManureType.LIQUID
@@ -1973,6 +1980,9 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
         ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
         organic_nitrogen_fraction=pytest.approx((60.0 / 200.0) * 0.3),
         water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction,
+        carbon_mass=250.0,
+        lignin_mass=18.0,
+        total_nitrogen_mass=60.0,
     )
 
     mock_record_manure_application.assert_called_once_with(
@@ -1988,6 +1998,8 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
         year=year,
         day=day,
         output_name="manure_application",
+        carbon=250.0,
+        lignin=18.0,
     )
 
 
@@ -2254,6 +2266,9 @@ def test_execute_manure_application_with_invalid_args(
             ammonium_fraction=supplied_nutrients.ammonium_nitrogen_fraction,
             organic_nitrogen_fraction=expected_total_organic_fraction,
             water_extractable_inorganic_phosphorus_fraction=0.5,
+            carbon_mass=0.0,
+            lignin_mass=0.0,
+            total_nitrogen_mass=50.0,
         )
         expected_record_manure_application_calls = [
             mocker.call(
@@ -2269,6 +2284,8 @@ def test_execute_manure_application_with_invalid_args(
                 surface_remainder_fraction=expected_remainder,
                 year=2000,
                 day=133,
+                carbon=0.0,
+                lignin=0.0,
             ),
             mocker.call(
                 dry_matter_mass=0.0,
@@ -2317,6 +2334,8 @@ def test_execute_manure_application_with_invalid_args(
                     "nitrogen": MeasurementUnits.KILOGRAMS.value,
                     "phosphorus": MeasurementUnits.KILOGRAMS.value,
                     "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "carbon": MeasurementUnits.KILOGRAMS.value,
+                    "lignin": MeasurementUnits.KILOGRAMS.value,
                     "manure_type": MeasurementUnits.UNITLESS.value,
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
@@ -2334,6 +2353,8 @@ def test_execute_manure_application_with_invalid_args(
                 "nitrogen": 10,
                 "phosphorus": 15,
                 "potassium": 12.5,
+                "carbon": 0.0,
+                "lignin": 0.0,
                 "manure_type": "solid",
                 "year": 1991,
                 "day": 75,
@@ -2367,6 +2388,8 @@ def test_execute_manure_application_with_invalid_args(
                     "nitrogen": MeasurementUnits.KILOGRAMS.value,
                     "phosphorus": MeasurementUnits.KILOGRAMS.value,
                     "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "carbon": MeasurementUnits.KILOGRAMS.value,
+                    "lignin": MeasurementUnits.KILOGRAMS.value,
                     "manure_type": MeasurementUnits.UNITLESS.value,
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
@@ -2384,6 +2407,8 @@ def test_execute_manure_application_with_invalid_args(
                 "nitrogen": 40,
                 "phosphorus": 43.1,
                 "potassium": 14.55,
+                "carbon": 0.0,
+                "lignin": 0.0,
                 "manure_type": "liquid",
                 "year": 1994,
                 "day": 200,
@@ -2417,6 +2442,8 @@ def test_execute_manure_application_with_invalid_args(
                     "nitrogen": MeasurementUnits.KILOGRAMS.value,
                     "phosphorus": MeasurementUnits.KILOGRAMS.value,
                     "potassium": MeasurementUnits.KILOGRAMS.value,
+                    "carbon": MeasurementUnits.KILOGRAMS.value,
+                    "lignin": MeasurementUnits.KILOGRAMS.value,
                     "manure_type": MeasurementUnits.UNITLESS.value,
                     "day": MeasurementUnits.ORDINAL_DAY.value,
                     "year": MeasurementUnits.CALENDAR_YEAR.value,
@@ -2436,6 +2463,8 @@ def test_execute_manure_application_with_invalid_args(
                 "nitrogen": 100.5,
                 "phosphorus": 78.0,
                 "potassium": None,
+                "carbon": 0.0,
+                "lignin": 0.0,
                 "manure_type": "solid",
                 "field_size": 0.66,
                 "field_name": "test_3",
