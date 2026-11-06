@@ -159,9 +159,8 @@ class ManureExcretionCalculator:
         ) = phosphorus_excretion_values
 
         manure_excretion_values = AnimalManureExcretions(
-            urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation GitHub Issue # 1216
+            urea=9.52,  # 0.340 mol/L
             urine=urine,
-            # TODO: Implement with correct equation GitHub Issue # 1216
             manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
             urine_nitrogen=urine_nitrogen,
             manure_nitrogen=manure_nitrogen,
@@ -229,7 +228,6 @@ class ManureExcretionCalculator:
         Manure K excretion: [AN.EXC.17]
 
         """
-        # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
         dry_matter_intake = nutrient_amount.dry_matter
         crude_protein_concentration = nutrient_amount.crude_protein_percentage
         potassium_concentration = nutrient_amount.potassium_percentage
@@ -595,9 +593,6 @@ class ManureExcretionCalculator:
         Manure K excretion: [AN.EXC.17]
 
         """
-        # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
-        # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
-        # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
         dmi_predicted = nutrient_amounts.dry_matter
         dry_matter_intake = dmi_predicted
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
@@ -610,7 +605,6 @@ class ManureExcretionCalculator:
         ash_concentration = nutrient_amounts.ash_percentage
         neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
 
-        # TODO: Further calculations to account for entire diet:- GitHub Issue #1218
         urine = 15.4
 
         total_manure_excreted = (
