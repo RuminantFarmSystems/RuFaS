@@ -171,6 +171,7 @@ class ManureExcretionCalculator:
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
             potassium=0,
+            manure_lignin=nutrient_amounts.lignin_supply,
         )
 
         return total_phosphorus_excreted, manure_excretion_values
@@ -303,6 +304,7 @@ class ManureExcretionCalculator:
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
             potassium=potassium,
+            manure_lignin=nutrient_amount.lignin_supply,
         )
 
         return total_phosphorus_excreted, manure_excretion_values
@@ -531,6 +533,7 @@ class ManureExcretionCalculator:
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
             potassium=potassium,
+            manure_lignin=nutrient_amounts.lignin_supply,
         )
 
         return total_phosphorus_excreted, manure_excretion_values
@@ -695,6 +698,7 @@ class ManureExcretionCalculator:
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
             potassium=potassium,
+            manure_lignin=nutrient_amounts.lignin_supply,
         )
 
         return total_phosphorus_excreted, manure_excretion_values

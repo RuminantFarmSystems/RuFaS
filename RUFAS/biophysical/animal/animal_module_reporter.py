@@ -618,6 +618,7 @@ class AnimalModuleReporter:
             "phosphorus": MeasurementUnits.GRAMS,
             "phosphorus_fraction": MeasurementUnits.UNITLESS,
             "potassium": MeasurementUnits.GRAMS,
+            "manure_lignin": MeasurementUnits.KILOGRAMS,
         }
         info_map = {
             "class": AnimalModuleReporter.__name__,
@@ -729,6 +730,21 @@ class AnimalModuleReporter:
         om.add_variable(
             "sold_calf_num",
             herd_statistics.sold_calf_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+        )
+        om.add_variable(
+            "dairy_male_sold_calf_num",
+            herd_statistics.dairy_male_sold_calf_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+        )
+        om.add_variable(
+            "dairy_female_sold_calf_num",
+            herd_statistics.dairy_female_sold_calf_num,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+        )
+        om.add_variable(
+            "beef_sold_calf_num",
+            herd_statistics.beef_sold_calf_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(

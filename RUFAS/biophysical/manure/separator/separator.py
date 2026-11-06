@@ -158,7 +158,7 @@ class Separator(Processor):
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
         }
-        if not self.held_manure:
+        if not self.held_manure or self.held_manure.mass <= 0.0:
             self._om.add_variable("empty_separator_output", {}, {**info_map, "units": MeasurementUnits.UNITLESS})
             return {}
         solid_manure_total_solids = self.held_manure.total_solids * self.total_solids_efficiency
@@ -181,6 +181,7 @@ class Separator(Processor):
             pen_manure_data=None,
             bedding_non_degradable_volatile_solids=self.held_manure.bedding_non_degradable_volatile_solids
             * self.volatile_solids_efficiency,
+            lignin=self.held_manure.lignin * self.total_solids_efficiency,
         )
         solid_stream_name = "SeparatedSolids"
         solid_manure_stream_dict = asdict(solid_manure_stream)
@@ -223,6 +224,7 @@ class Separator(Processor):
             pen_manure_data=None,
             bedding_non_degradable_volatile_solids=self.held_manure.bedding_non_degradable_volatile_solids
             * (1 - self.volatile_solids_efficiency),
+            lignin=self.held_manure.lignin * (1 - self.total_solids_efficiency),
         )
         liquid_stream_name = "SeparatedLiquid"
         self._report_manure_stream(liquid_manure_stream, liquid_stream_name, time.simulation_day)
