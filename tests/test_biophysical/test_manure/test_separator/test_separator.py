@@ -110,6 +110,7 @@ def mock_manure_stream() -> ManureStream:
         methane_production_potential=0.24,
         pen_manure_data=None,
         bedding_non_degradable_volatile_solids=10,
+        lignin=16.0,
     )
 
 
@@ -142,6 +143,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert solid.potassium == mock_manure_stream.potassium * mock_separator.potassium_efficiency
     assert solid.ash == mock_manure_stream.ash * mock_separator.ash_efficiency
     assert solid.volume == (solid.water + solid.total_solids) / ManureConstants.SOLID_MANURE_DENSITY
+    assert solid.lignin == mock_manure_stream.lignin * mock_separator.total_solids_efficiency
 
     liquid = result["liquid"]
     assert liquid.water == mock_manure_stream.water - solid.water
@@ -154,6 +156,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert liquid.potassium == mock_manure_stream.potassium * (1 - mock_separator.potassium_efficiency)
     assert liquid.ash == mock_manure_stream.ash * (1 - mock_separator.ash_efficiency)
     assert liquid.volume == (liquid.water + liquid.total_solids) / ManureConstants.LIQUID_MANURE_DENSITY
+    assert liquid.lignin == mock_manure_stream.lignin * (1 - mock_separator.total_solids_efficiency)
 
     assert mock_separator.held_manure is None
     assert mock_report_manure_stream.call_count == 2
@@ -172,6 +175,43 @@ def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator:
 
     # Assert
     assert result == {}
+    mock_om.add_variable.assert_called_once_with(
+        "empty_separator_output",
+        {},
+        {
+            "class": "Separator",
+            "function": "process_manure",
+            "prefix": "Manure.Separator.ScrewPress.TestSeparator",
+            "simulation_day": mock_time.simulation_day,
+            "units": MeasurementUnits.UNITLESS,
+        },
+    )
+
+
+def test_process_manure_zero_mass_held_manure(mocker: MockerFixture, mock_separator: Separator) -> None:
+    """
+    A held manure stream with zero mass (e.g. from an empty pen) must be treated like an
+    empty separator rather than triggering the "more water into solids than present" ValueError.
+
+    Regression test: an all-zero ManureStream is still a truthy object, so guarding only on
+    ``held_manure is None`` let a zero stream through and produced liquid_manure_water == 0.0.
+    """
+    # Arrange: a fully zero-valued stream (water == 0, total_solids == 0 -> mass == 0).
+    zero_stream = ManureStream.make_empty_manure_stream()
+    assert zero_stream.mass == 0.0
+    mock_separator.held_manure = zero_stream
+    mock_conditions = mocker.MagicMock()
+    mock_time = mocker.MagicMock()
+    mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
+    mock_report_manure_stream = mocker.patch.object(mock_separator, "_report_manure_stream", autospec=True)
+
+    # Act
+    result = mock_separator.process_manure(mock_conditions, mock_time)
+
+    # Assert: handled as an empty separator, no separation attempted, no error raised.
+    assert result == {}
+    mock_report_manure_stream.assert_not_called()
+    mock_om.add_error.assert_not_called()
     mock_om.add_variable.assert_called_once_with(
         "empty_separator_output",
         {},
