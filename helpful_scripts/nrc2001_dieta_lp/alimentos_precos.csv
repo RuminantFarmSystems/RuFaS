@@ -1,0 +1,19 @@
+rufas_id,alimento,nel4x_tab15_1,preco_cotado,unidade_cotacao,kg_por_unidade,fixo_kg,calculo,fonte,url,data_preco
+51,Silagem de milho,1.38,195.21,R$/t,1000,,Preço médio do volumoso (silagem) em Goiás,IFAG - Índice de Insumos para a Produção de Leite Cru (ILC),https://sistemafaeg.com.br/storage/arquivos/Índice-de-Insumos-ILC-Janeiro-2025.pdf,jan/2025
+156,Silagem de sorgo,1.04,600.00,R$/t,1000,,Anúncio em Monte Alegre de Goiás/GO,MF Rural,https://www.mfrural.com.br/busca/silagem-tonelada,sem data (consultado em 04/11/2026)
+19,Feno de Tifton 85,1.05,1.43,R$/kg,1,,"Média de R$ 1,10/kg (Luziânia/GO) e R$ 22,00 por fardo de 12,5 kg (Anápolis/GO)",MF Rural,https://www.mfrural.com.br/busca/feno-tifton/estado/goias,sem data (consultado em 04/11/2026)
+106,Feno de alfafa,1.30,2.60,R$/kg,1,,"Mediana de 8 anúncios em MS, RS, SP e SC (R$ 1,53 a 3,25/kg); nenhum em Goiás",MF Rural,https://www.mfrural.com.br/busca/feno,sem data (consultado em 04/11/2026)
+44,Milho moído,1.90,53.67,R$/saca 60 kg,60,,Milho seco em Rio Verde/GO (sem custo de moagem),Agrolink,https://www.agrolink.com.br/regional/go/rio-verde/cotacoes,04/11/2026
+154,Sorgo grão,1.70,45.50,R$/saca 60 kg,60,,Sorgo em Rio Verde/GO,Agrolink,https://www.agrolink.com.br/regional/go/rio-verde/cotacoes,04/11/2026
+167,Farelo de soja,2.09,2020.00,R$/t,1000,,Farelo de soja em Rio Verde/GO,Agrolink,https://www.agrolink.com.br/regional/go/rio-verde/cotacoes,04/11/2026
+169,Soja grão,2.62,141.00,R$/saca 60 kg,60,,Soja em grão em Rio Verde/GO,Agrolink,https://www.agrolink.com.br/regional/go/rio-verde/cotacoes,04/11/2026
+58,Caroço de algodão,1.83,841.91,R$/t,1000,,"Média de MT/IMEA (R$ 710,49/t) e oeste da BA/AIBA (R$ 973,33/t); não há cotação de Goiás",Notícias Agrícolas,https://www.noticiasagricolas.com.br/cotacoes/algodao/caroco-de-algodo,04/11/2026
+60,Farelo de algodão,1.61,1150.00,R$/t,1000,,"Média de Catalão/GO (R$ 1.100/t) e Itumbiara/GO (R$ 1.200/t); produto com 38% de PB, livro com 44,9%",MF Rural,https://www.mfrural.com.br/busca/farelo-algodao/estado/goias,sem data (consultado em 06/11/2026)
+163,Casca de soja,1.37,950.00,R$/t,1000,,Anúncio em São Luís de Montes Belos/GO,MF Rural,https://www.mfrural.com.br/busca/casquinha-soja,sem data (consultado em 06/11/2026)
+33,Polpa cítrica,1.66,1.59,R$/kg,1,,"Anúncio em SP, lote mínimo de 7 t (sem frete até Goiás)",Agro2Business,https://agro2business.com/marketplace/5079/polpa-citrica,sem data (consultado em 06/11/2026)
+193,Farelo de trigo,1.52,1.325,R$/kg,1,,"Média de R$ 50,00/40 kg (Andradas/MG) e R$ 42,00/30 kg (S. J. do Rio Preto/SP)",MF Rural,https://www.mfrural.com.br/detalhe/897133/farelo-de-trigo-ensacado-alta-qualidade,jul/2026
+67,Sabões de cálcio,4.80,169.00,R$/saco 25 kg,25,,Gordura protegida de palma em S. J. do Rio Preto/SP,MF Rural,https://www.mfrural.com.br/busca/gordura-protegida,sem data (consultado em 04/11/2026)
+234,Calcário calcítico,0,34.43,R$/saco 25 kg,25,,"Item 1: calcário calcítico, suplemento alimentar animal",Pregão IF Baiano 90007/2025 (preço de referência),https://www.ifbaiano.edu.br/unidades/itapetinga/files/2025/08/Termo-de-Referencia_Pregao-90007-de-2025.pdf,2025
+231,Fosfato bicálcico,0,6000.00,R$/t,1000,,"Fosfato bicálcico 19%, big bag de 1.000 kg, Itumbiara/GO",MF Rural,https://www.mfrural.com.br/busca/fosfato,sem data (consultado em 04/11/2026)
+239,Cloreto de sódio,0,6.50,R$/saco 25 kg,25,,"Sal moído, retirada em Mossoró/RN (sem frete até Goiás)",MF Rural,https://www.mfrural.com.br/detalhe/336603/sal-moido-para-gado-25-kilos,14/10/2026
+,Premix vitamínico e mineral,0,298.52,R$/saco 25 kg,25,0.49,"Item 5: núcleo para vacas em lactação; quantidade fixa da dieta da Tabela 14-7",Pregão IF Baiano 90007/2025 (preço de referência),https://www.ifbaiano.edu.br/unidades/itapetinga/files/2025/08/Termo-de-Referencia_Pregao-90007-de-2025.pdf,2025
