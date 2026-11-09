@@ -1,4 +1,4 @@
 ﻿Variable,Definition (units),Default Value,Min,Max,Values
-conception_rate_decrease,The proportionate decrease in conception rate of each breeding after the first breeding (%),0.026,0,0.1,fraction
+conception_rate_decrease,The decrease in conception rate of each breeding after the first breeding calculated as rate - n × 0.026 (%). ,0.026,0,0.1,fraction
 decrease_conception_rate_in_rebreeding,Whether or not to decrease the conception rate in rebreeding,FALSE,--,--,Boolean
-decrease_conception_rate_by_parity,Whether or not to decrease the conception rate by parity,FALSE,--,--,Boolean
+decrease_conception_rate_by_parity,Whether or not to decrease the conception rate by parity. The default values are as follows: parity 2 = -0.05 vs. parity 3+ = -0.10,FALSE,--,--,Boolean

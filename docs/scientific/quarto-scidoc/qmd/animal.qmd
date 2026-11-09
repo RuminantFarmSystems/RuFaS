@@ -2094,7 +2094,7 @@ The average daily mortality risk for a cow's parity is calculated as:
 * The mortality-risk calculation uses the cow's parity to select the appropriate `parity_death_probability`, applies the fresh/non-fresh adjustment, and stochastically determines whether the cow dies.
 
 
-#### Reproductive Culls: Heifer II Sales
+#### Heifer II Sales
 
 If the heifer does not have a successful conception or pregnancy and age (days born) exceeds heifer repro cull time, this heifer is culled
 
@@ -2555,7 +2555,7 @@ import_table(
 ```
 
 ::: {.callout-note}
-If `PGFatPD` is chosen, the values for estrus detection rate and conception rate tare determined by `estrus_detection_rate` and `ED_conception_rate`. Anytime an insemination is performed after an ovsynch program, the conception rate will be changed to the `ovsynch_program_conception_rate`.
+If `PGFatPD` is chosen, the values for estrus detection rate and conception rate are determined by `estrus_detection_rate` and `ED_conception_rate`. Anytime an insemination is performed after an ovsynch program, the conception rate will be changed to the `ovsynch_program_conception_rate`.
 :::
 
 ::: {.callout-note}
@@ -2614,11 +2614,10 @@ e.g., one month before calving), the animal either transitions to the Heifer III
 
 The first-service reproductive management strategy for a heifer follows one of three strategies and are described in more detail below: ED, Synch-ED, or TAI.
 
-* **ED (`execute_heifer_ed_protocol`):** The ED strategy simulates spontaneous estrous cycles. Estrous cycle length is determined using a random draw from a 
-normal distribution [@devries2006]. On the day of estrus predicted by the model, a random draw from a uniform distribution U(0,1) 
+* **ED (`execute_heifer_ed_protocol`):** The ED strategy simulates spontaneous estrous cycles. Estrous cycle length is drawn uniformly from 1-21 days after `breeding_start_day_h` [@devries2006]. On the day of estrus predicted by the model, a random draw from a uniform distribution U(0,1) 
 is compared with the estrus detection rate (`estrus_detection_rate`). If the drawn value is lower than the detection rate, AI is scheduled on that day. 
 If estrus is not detected, the next estrus event is scheduled based on the normal estrous cycle. On the scheduled AI day, pregnancy success is 
-determined using a random draw from a uniform distribution U(0,1), which is compared against the conception rate (`conception_rate`).
+determined using a random draw from a uniform distribution U(0,1), which is compared against the conception rate (`estrus_conception_rate`).
 * **Synch-ED (`execute_heifer_synch_ed_protocol`):** In the Synch-ED strategy, hormonal treatment dates are scheduled according to the assigned program
 (`repro_sub_protocol`, 2P or CP), and estrus is simulated based on a program-specific estrous cycle following the hormonal treatment. 
 Estrus detection and AI scheduling follow the same procedure as in the ED program. 
@@ -2676,6 +2675,9 @@ import_table(
   colalign = ["left", "left", "center", "center", "center", "left"]
 )
 ```
+::: {.callout-note}
+`conception_rate_decrease`: should only be in use when `decrease_conception_rate_in_rebreeding` is set to `True`. 
+:::
 
 ![Methodology used for cow breeding and rebreeding in the RuFaS Animal Module. The icon key is available at the beginning of this section (@fig-ani-repro-key)](../resources/images/ani_repro_cow_rebreed.png){#fig-ani-repro-cow-rebreed}
 
