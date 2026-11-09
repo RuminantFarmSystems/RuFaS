@@ -839,6 +839,15 @@ class AnimalModuleReporter:
             dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         om.add_variable(
+            "average_age_at_weaning",
+            herd_statistics.average_age_at_weaning,
+            {
+                **info_map,
+                "units": MeasurementUnits.DAYS,
+                "data_origin": [("HerdManager", "_process_daily_herd_updates")],
+            },
+        )
+        om.add_variable(
             "avg_mature_body_weight",
             herd_statistics.avg_mature_body_weight,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
@@ -947,6 +956,24 @@ class AnimalModuleReporter:
             "num_heiferIII_to_cow_transitions",
             herd_statistics.heiferIII_to_cow_transitions,
             {**info_map, "units": MeasurementUnits.ANIMALS, "data_origin": [("HerdManager", "execute_daily_routines")]},
+        )
+        om.add_variable(
+            "multiparous_calvings",
+            herd_statistics.multiparous_calvings,
+            {
+                **info_map,
+                "units": MeasurementUnits.ANIMALS,
+                "data_origin": [("HerdManager", "_process_daily_herd_updates")],
+            },
+        )
+        om.add_variable(
+            "calves_entering_farm_system",
+            herd_statistics.calves_entering_farm_system,
+            {
+                **info_map,
+                "units": MeasurementUnits.ANIMALS,
+                "data_origin": [("HerdManager", "execute_daily_routines")],
+            },
         )
         sold_and_died_info_map = {
             **info_map,

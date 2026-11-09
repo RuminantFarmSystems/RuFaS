@@ -756,7 +756,6 @@ class HerdManager:
             ("calves", self.calves),
             ("heiferIs", self.heiferIs),
             ("heiferIIs", self.heiferIIs),
-            # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
             ("heiferIIIs", self.heiferIIIs),
             ("cows", self.cows),
         ]
@@ -772,6 +771,24 @@ class HerdManager:
             if animal_group_name == "heiferIIIs":
                 self.herd_statistics.heiferIII_to_cow_transitions += sum(
                     animal.animal_type == AnimalType.LAC_COW for animal in group_graduated_animals
+                )
+            elif animal_group_name == "cows":
+                self.herd_statistics.multiparous_calvings += sum(
+                    animal.events.get_most_recent_date(animal_constants.NEW_BIRTH) == time.simulation_day
+                    and animal.reproduction.calves >= 2
+                    for animal in animals
+                )
+            if animal_group_name == "calves":
+                weaned_calves = [
+                    calf
+                    for calf in group_graduated_animals
+                    if calf.animal_type == AnimalType.HEIFER_I
+                ]
+
+                self.herd_statistics.average_age_at_weaning = (
+                    sum(calf.days_born for calf in weaned_calves) / len(weaned_calves)
+                    if weaned_calves
+                    else None
                 )
             collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
             if collect_birth_results:
@@ -1005,6 +1022,10 @@ class HerdManager:
         self.calf_retention_policy.begin_day(time)
 
         daily_herd_updates = self._process_daily_herd_updates(time)
+        self.herd_statistics.calves_entering_farm_system = sum(
+            calf.sex == Sex.FEMALE and calf.bred_from_semen != SemenType.BEEF
+            for calf in daily_herd_updates.newborn_calves
+        )
         self.herd_statistics.born_calf_num = len(
             daily_herd_updates.stillborn_newborn_calves
             + daily_herd_updates.sold_newborn_calves

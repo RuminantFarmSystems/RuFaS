@@ -231,6 +231,7 @@ class HerdStatistics:
     born_calf_num = 0
     heiferIII_to_cow_transitions = 0
     multiparous_calvings = 0
+    calves_entering_farm_system = 0
 
     calf_percent = 0.0
     heiferI_percent = 0.0
@@ -276,6 +277,7 @@ class HerdStatistics:
     avg_heifer_culling_age = 0.0
     avg_cow_culling_age = 0.0
     avg_mature_body_weight = 0.0
+    average_age_at_weaning: float | None = 0.0
 
     parity_culling_stats_range: dict[str, int]
 
@@ -392,6 +394,7 @@ class HerdStatistics:
         self.born_calf_num = 0
         self.heiferIII_to_cow_transitions = 0
         self.multiparous_calvings = 0
+        self.calves_entering_farm_system = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -444,6 +447,7 @@ class HerdStatistics:
         self.avg_heifer_culling_age = 0.0
         self.avg_cow_culling_age = 0.0
         self.avg_mature_body_weight = 0.0
+        self.average_age_at_weaning = 0.0
 
         self.acute_sale_cows_parity_1 = 0
         self.acute_sale_cows_parity_2 = 0
