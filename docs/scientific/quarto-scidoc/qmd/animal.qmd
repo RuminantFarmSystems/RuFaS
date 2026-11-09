@@ -2521,7 +2521,7 @@ The simulation generates and tracks detailed reproductive performance metrics at
 synchronization treatments, breeding efficiency, and pregnancy outcomes. The key recorded variables include:
 
 * **ED Metrics:** Number of days an animal participates in the ED program (`ED_days`) and the total estrous events detected (`estrus_count`)
-* **Hormonal Treatments:** Counts of synchronization protocol injections, including GnRH (`GnRH_injections`), PGF (`PGF_injections`), and CIDR (`CIDR_injections`)
+* **Hormonal Treatments:** Counts of synchronization protocol injections, including GnRH (`GnRH_injections`), PGF (`PGF_injections`), and CIDR (`CIDR_insert`)
 * **Breeding Interventions:** Number of semen straws used (`semen_number`) and total AI procedures performed (`AI_times`)
 * **Reproductive Efficiency:** Time from first breeding attempt to pregnancy confirmation (`breeding_to_pregnancy_time`) and the interval from calving to confirmed pregnancy (`calving_to_pregnancy_time`)
 * **Pregnancy Monitoring:** Total number of pregnancy checks performed (`pregnancy_diagnoses`)
