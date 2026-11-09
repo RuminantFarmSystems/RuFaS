@@ -361,8 +361,6 @@ def test_task_manager_start(
             workers=workers,
             output_directory=Path("output/directory"),
             verbosity=verbosity,
-            is_end_to_end_test_task=True,
-            is_update_end_to_end_test_task=False,
         )
 
         mock_add_log.assert_any_call(
@@ -411,8 +409,6 @@ def test_task_manager_start(
             workers=workers,
             output_directory=Path("output/directory"),
             verbosity=verbosity,
-            is_end_to_end_test_task=False,
-            is_update_end_to_end_test_task=True,
         )
         mock_summarize.assert_not_called()
 
@@ -795,18 +791,17 @@ def test_handle_update_e2e_test_results(
 
 
 @pytest.mark.parametrize(
-    "is_end_to_end_test_task, is_update_end_to_end_test_task",
+    "task_type",
     [
-        (True, False),
-        (False, True),
+        TaskType.END_TO_END_TESTING,
+        TaskType.UPDATE_E2E_TEST_RESULTS,
     ],
 )
 def test_process_e2e_group_results(
     task_manager: TaskManager,
     mock_output_manager: OutputManager,
     mocker: MockerFixture,
-    is_end_to_end_test_task: bool,
-    is_update_end_to_end_test_task: bool,
+    task_type: TaskType,
 ) -> None:
     """Test successful E2E result comparison and expected-results update processing."""
     e2e_group = "freestall_e2e"
@@ -826,6 +821,7 @@ def test_process_e2e_group_results(
             "filters_directory": Path("/fake/filters"),
             "use_accepted_ranges": False,
             "logs_directory": Path("/fake/logs"),
+            "task_type": task_type,
         }
     ]
     comparison_args = {
@@ -858,6 +854,7 @@ def test_process_e2e_group_results(
         "update_expected_test_results",
     )
     mock_post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
 
     result = task_manager._process_e2e_group_results(
         comparison_args=comparison_args,
@@ -866,8 +863,6 @@ def test_process_e2e_group_results(
         workers=2,
         output_directory=output_directory,
         verbosity=LogVerbosity.ERRORS,
-        is_end_to_end_test_task=is_end_to_end_test_task,
-        is_update_end_to_end_test_task=is_update_end_to_end_test_task,
     )
 
     assert result is None
@@ -884,7 +879,7 @@ def test_process_e2e_group_results(
     )
     assert mock_output_manager.is_first_post_processing is False
 
-    if is_end_to_end_test_task:
+    if task_type == TaskType.END_TO_END_TESTING:
         mock_validate_comparison.assert_called_once_with(
             e2e_group,
             e2e_runs[0]["convert_variable_table_path"],
@@ -914,6 +909,15 @@ def test_process_e2e_group_results(
         mock_validate_comparison.assert_not_called()
         mock_compare.assert_not_called()
         mock_post_processing.assert_not_called()
+        mock_add_log.assert_called_once_with(
+            "End-to-end testing",
+            "Completed generation of new set of end-to-end expected test results",
+            info_map={
+                "class": TaskManager.__name__,
+                "function": TaskManager._process_e2e_group_results.__name__,
+                "units": MeasurementUnits.UNITLESS,
+            },
+        )
 
 
 def test_process_e2e_group_results_invalid_input(
@@ -926,6 +930,8 @@ def test_process_e2e_group_results_invalid_input(
     mock_input_manager = mocker.Mock(spec=InputManager)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
     mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+    for run in e2e_comparison_args["e2e_runs"]:
+        run["task_type"] = TaskType.END_TO_END_TESTING
 
     mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=False)
     mock_averaging = mocker.patch.object(E2ETestResultsHandler, "process_test_result_averaging")
@@ -938,8 +944,6 @@ def test_process_e2e_group_results_invalid_input(
         workers=2,
         output_directory=Path("/fake/output"),
         verbosity=LogVerbosity.ERRORS,
-        is_end_to_end_test_task=True,
-        is_update_end_to_end_test_task=False,
     )
 
     assert result == e2e_comparison_args["e2e_group"]
@@ -954,12 +958,12 @@ def test_process_e2e_group_results_invalid_input(
 
 
 @pytest.mark.parametrize(
-    "failing_method, is_end_to_end_test_task, is_update_end_to_end_test_task",
+    "failing_method, task_type",
     [
-        ("process_test_result_averaging", True, False),
-        ("validate_comparison_configuration", True, False),
-        ("compare_actual_and_expected_test_results", True, False),
-        ("update_expected_test_results", False, True),
+        ("process_test_result_averaging", TaskType.END_TO_END_TESTING),
+        ("validate_comparison_configuration", TaskType.END_TO_END_TESTING),
+        ("compare_actual_and_expected_test_results", TaskType.END_TO_END_TESTING),
+        ("update_expected_test_results", TaskType.UPDATE_E2E_TEST_RESULTS),
     ],
 )
 def test_process_e2e_group_results_exception(
@@ -968,13 +972,15 @@ def test_process_e2e_group_results_exception(
     mocker: MockerFixture,
     e2e_comparison_args: dict[str, Any],
     failing_method: str,
-    is_end_to_end_test_task: bool,
-    is_update_end_to_end_test_task: bool,
+    task_type: TaskType,
 ) -> None:
     """Test that E2E processing failures are logged and reported."""
     mock_input_manager = mocker.Mock(spec=InputManager)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
     mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+
+    for run in e2e_comparison_args["e2e_runs"]:
+        run["task_type"] = task_type
 
     mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mocker.patch.object(
@@ -991,7 +997,7 @@ def test_process_e2e_group_results_exception(
     mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
     mocker.patch.object(TaskManager, "handle_post_processing")
 
-    mocker.patch.object(
+    mock_failing_method = mocker.patch.object(
         E2ETestResultsHandler,
         failing_method,
         side_effect=ValueError("Test processing failure"),
@@ -1006,11 +1012,10 @@ def test_process_e2e_group_results_exception(
         workers=2,
         output_directory=Path("/fake/output"),
         verbosity=LogVerbosity.ERRORS,
-        is_end_to_end_test_task=is_end_to_end_test_task,
-        is_update_end_to_end_test_task=is_update_end_to_end_test_task,
     )
 
     assert result == e2e_comparison_args["e2e_group"]
+    mock_failing_method.assert_called_once()
     mock_add_error.assert_called_once()
     assert "Test processing failure" in mock_add_error.call_args.args[1]
     mock_dump_pools.assert_called_once_with(
