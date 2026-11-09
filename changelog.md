@@ -23,7 +23,11 @@ This **changelog** file keeps a record of updates included in existing version r
 
 ### Current version
 
-v1.0.4
+v1.0.5
+
+### v1.0.5
+- [3242](https://github.com/RuminantFarmSystems/RuFaS/pull/3242) - [minor change] [NoInputChange] [NoOutputChange] Corrects version number
+
 
 ### v1.0.4
 - [3202](https://github.com/RuminantFarmSystems/RuFaS/pull/3202) - [minor change] [EEE] [NoInputChange] [OutputChange] Corrects errors in emissions and resource allocation logic

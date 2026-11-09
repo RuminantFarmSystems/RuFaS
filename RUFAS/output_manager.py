@@ -23,6 +23,7 @@ from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
+NON_FILTER_FILE_SUFFIXES = ("must_change_variables.json", "accepted_ranges.json")
 
 
 class LogVerbosity(Enum):
@@ -1360,6 +1361,8 @@ class OutputManager(object):
             filter_files = []
             all_files = os.listdir(dir_path)
             for filename in all_files:
+                if filename.endswith(NON_FILTER_FILE_SUFFIXES):
+                    continue
                 if filename.endswith(".txt") or filename.endswith(".json"):
                     for supported_prefix in self._filter_prefixes.values():
                         if filename.startswith(supported_prefix):
@@ -1758,7 +1761,7 @@ class OutputManager(object):
                         csv_dir,
                         direction,
                     )
-            report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
+            report_file_path = report_dir / self.generate_file_name(f"{filter_file}", "csv")
             if report_generator.reports:
                 if has_cross_references and has_data_significant_digits:
                     significant_digits_limited_reports = ", ".join(
@@ -2528,7 +2531,13 @@ class OutputManager(object):
                 f"{warnings_count} warning(s), and {logs_count} log(s).\n"
             )
 
-    def summarize_e2e_test_results(self, json_output_directory: Path, output_prefixes: list[str]) -> None:
+    def summarize_e2e_test_results(
+        self,
+        json_output_directory: Path,
+        output_prefixes: list[str],
+        e2e_random_seeds: dict[str, list[int]],
+        failed_e2e_groups: list[str] | None = None,
+    ) -> None:
         """
         Summarizes the end-to-end test results by gathering the results from all the e2e tests and prepares them to be
         printed out to the console.
@@ -2540,19 +2549,28 @@ class OutputManager(object):
             The directory where the JSON output files are located.
         output_prefixes : list[str]
             A list of output prefixes to look for in the filenames.
+        e2e_random_seeds : dict[str, list[int]]
+            The random seeds used for each e2e test group.
+        failed_e2e_groups : list[str] | None, default None
+            The output prefixes of the tasks that failed. They are summarized as not run, and any results files found
+            for them are ignored because they were left by an earlier run.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.summarize_e2e_test_results.__name__,
         }
+        failed_e2e_groups = failed_e2e_groups or []
         self.add_log(
             "Attempting to open e2e test results directory",
             "Opening e2e test results directory to read results files",
             info_map,
         )
-        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure"]
+        module_headers: list[str] = ["Animal", "CropAndSoil", "Manure", "Feed"]
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
-            prefix: {header: "n/a" for header in module_headers} for prefix in output_prefixes
+            prefix: {
+                header: "not run (task failed)" if prefix in failed_e2e_groups else "n/a" for header in module_headers
+            }
+            for prefix in output_prefixes
         }
         all_results_files = os.listdir(json_output_directory)
         for filename in all_results_files:
@@ -2572,6 +2590,8 @@ class OutputManager(object):
                     "Invalid e2e output prefix", f"No matching output_prefix found in filename: {filename}", info_map
                 )
                 continue
+            if matched_prefix in failed_e2e_groups:
+                continue
 
             for key, value in data.items():
                 if key == "DISCLAIMER":
@@ -2583,13 +2603,21 @@ class OutputManager(object):
             "Successfully opened e2e test results directory", "Directory opened and files successfully read", info_map
         )
 
-        self._print_e2e_results_summary(e2e_results_summary)
+        self._print_e2e_results_summary(e2e_results_summary, e2e_random_seeds)
 
-    def _print_e2e_results_summary(self, e2e_results_summary: dict[str, dict[str, bool | str]]) -> None:
+    def _print_e2e_results_summary(
+        self,
+        e2e_results_summary: dict[str, dict[str, bool | str]],
+        e2e_random_seeds: dict[str, list[int]],
+    ) -> None:
         """Prints the end-to-end results summary to the console."""
-        sys.stdout.write("Summary of e2e results:\n\n")
+        sys.stdout.write("\nSummary of e2e results:\n\n")
         for prefix, results in e2e_results_summary.items():
             sys.stdout.write(f"{prefix} results:\n")
+            random_seeds = e2e_random_seeds.get(prefix)
+            if random_seeds:
+                formatted_seeds = ", ".join(str(seed) for seed in random_seeds)
+                sys.stdout.write(f"  Results averaged across random seeds: " f"{formatted_seeds}\n")
             for module, result in results.items():
                 result = "Passing" if result is True else "Failing" if result is False else result
                 sys.stdout.write(f"  {module}: {result}\n")

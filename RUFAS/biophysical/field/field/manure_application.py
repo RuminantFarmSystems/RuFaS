@@ -129,6 +129,9 @@ class ManureApplication:
         organic_nitrogen_fraction: float,
         water_extractable_inorganic_phosphorus_fraction: float | None = None,
         source_animal: str | None = None,
+        carbon_mass: float = 0.0,
+        lignin_mass: float = 0.0,
+        total_nitrogen_mass: float = 0.0,
     ) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
             be tracked.
@@ -160,6 +163,12 @@ class ManureApplication:
             in the range [0.0, 1.0] (unitless).
         source_animal : str, optional
             Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless).
+        carbon_mass : float, default 0.0
+            Mass of organic carbon in this application of manure (kg).
+        lignin_mass : float, default 0.0
+            Mass of lignin in this application of manure (kg).
+        total_nitrogen_mass : float, default 0.0
+            Total mass of nitrogen in this application of manure (kg).
 
         Raises
         ------
@@ -171,6 +180,11 @@ class ManureApplication:
         When manure is applied that contains 15% or less solid matter, the slurry immediately infiltrates the soil. The
         SurPhos theoretical documentation states that "the model assumes slurry liquid immediately infiltrates into soil
         and adds 60% of all manure P to corresponding soil P pools".
+
+        The manure organic carbon is added to the manure carbon residue pools of the soil layers, distributed the
+        same way as manure nitrogen. The lignin and total nitrogen of the application are accumulated so the manure
+        carbon residue can be partitioned between the metabolic and structural litter pools by its lignin to
+        nitrogen ratio.
 
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
@@ -268,10 +282,15 @@ class ManureApplication:
         self.data.machine_manure.manure_moisture_factor = new_vals.get("new_moisture_factor", 0.0)
         self.data.machine_manure.manure_field_coverage = new_vals.get("new_field_coverage", 0.0)
 
+        self._track_manure_residue_composition(carbon_mass, lignin_mass, total_nitrogen_mass, field_size)
+        surface_carbon_mass = carbon_mass * surface_remainder_fraction
+
         if is_liquid_manure:
             top_layer_mass = surface_retention * surface_dry_matter_mass
+            top_layer_carbon_mass = surface_retention * surface_carbon_mass
         else:
             top_layer_mass = surface_dry_matter_mass
+            top_layer_carbon_mass = surface_carbon_mass
 
         self._add_nitrogen_to_soil_layer(
             0,
@@ -281,6 +300,7 @@ class ManureApplication:
             organic_nitrogen_fraction,
             field_size,
         )
+        self._add_manure_carbon_to_soil_layer(0, top_layer_carbon_mass, field_size)
 
         if is_liquid_manure:
             second_layer_mass = SOIL_INFILTRATION * surface_dry_matter_mass
@@ -292,6 +312,7 @@ class ManureApplication:
                 organic_nitrogen_fraction,
                 field_size,
             )
+            self._add_manure_carbon_to_soil_layer(1, SOIL_INFILTRATION * surface_carbon_mass, field_size)
 
         self.data.machine_manure.manure_applied_mass = dry_matter_mass
 
@@ -313,6 +334,7 @@ class ManureApplication:
             application_depth,
             subsurface_fraction,
             field_size,
+            carbon_mass,
         )
 
     def _add_nitrogen_to_soil_layer(
@@ -370,6 +392,62 @@ class ManureApplication:
         self.data.soil_layers[layer_index].stable_organic_nitrogen_content += stable_organic_nitrogen_added
         self.data.soil_layers[layer_index].fresh_organic_nitrogen_content += fresh_organic_nitrogen_added
 
+    def _add_manure_carbon_to_soil_layer(self, layer_index: int, carbon_mass: float, field_size: float) -> None:
+        """
+        Adds manure organic carbon to the manure carbon residue pool of a soil layer.
+
+        Parameters
+        ----------
+        layer_index : int
+            Index of the soil layer to be added to (unitless).
+        carbon_mass : float
+            Mass of manure organic carbon added to the layer (kg).
+        field_size : float
+            Size of the field (ha).
+
+        Notes
+        -----
+        The manure carbon residue pool is analogous to the plant residue pool: carbon accumulates here at each
+        manure application and is transferred to the metabolic and structural litter pools by the daily carbon
+        cycling routine (``ResiduePartition.partition_manure_residue``).
+
+        """
+        assert self.data.soil_layers is not None
+        self.data.soil_layers[layer_index].manure_carbon_residue += carbon_mass / field_size
+
+    def _track_manure_residue_composition(
+        self, carbon_mass: float, lignin_mass: float, total_nitrogen_mass: float, field_size: float
+    ) -> None:
+        """
+        Accumulates the lignin and nitrogen of a manure application for manure carbon residue partitioning.
+
+        Parameters
+        ----------
+        carbon_mass : float
+            Mass of organic carbon in the manure application (kg).
+        lignin_mass : float
+            Mass of lignin in the manure application (kg).
+        total_nitrogen_mass : float
+            Total mass of nitrogen in the manure application (kg).
+        field_size : float
+            Size of the field (ha).
+
+        Notes
+        -----
+        The lignin and nitrogen accumulate until the daily carbon cycling routine partitions the manure carbon
+        residue pools, at which point they define the lignin to nitrogen ratio of the partitioned residue and
+        are reset. The annual total of applied manure carbon is also tracked here for reporting.
+
+        Applications without carbon (e.g. supplemental manure, which carries no carbon estimate) are skipped so
+        their nitrogen does not influence the lignin to nitrogen ratio of the manure carbon that is partitioned.
+
+        """
+        if carbon_mass <= 0.0:
+            return
+        self.data.manure_residue_lignin += lignin_mass / field_size
+        self.data.manure_residue_nitrogen += total_nitrogen_mass / field_size
+        self.data.annual_manure_carbon_applied_total += carbon_mass / field_size
+
     def _apply_subsurface_manure(
         self,
         total_phosphorus_mass: float,
@@ -384,6 +462,7 @@ class ManureApplication:
         application_depth: float,
         subsurface_fraction: float,
         field_size: float,
+        carbon_mass: float = 0.0,
     ) -> None:
         """
         Applies subsurface nutrients to the soil profile.
@@ -418,6 +497,9 @@ class ManureApplication:
             Fraction of total manure application that is applied below the soil surface (unitless).
         field_size : float
             Size of the field (ha).
+        carbon_mass : float, default 0.0
+            Mass of organic carbon in the total manure application (kg). The subsurface portion is distributed
+            among the manure carbon residue pools of the soil layers by the same depth factors as nitrogen.
 
         Notes
         -----
@@ -426,8 +508,9 @@ class ManureApplication:
         practice will be changed when issue #444 is addressed.
 
         """
+        top_depths = self.data.get_vectorized_layer_attribute("top_depth")
         bottom_depths = self.data.get_vectorized_layer_attribute("bottom_depth")
-        depth_factors = FertilizerApplication.generate_depth_factors(application_depth, bottom_depths)
+        depth_factors = FertilizerApplication.generate_depth_factors(application_depth, top_depths, bottom_depths)
         water_extractable_inorganic_phosphorus = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction
         water_extractable_organic_phosphorus = (
             total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * 0.95
@@ -453,6 +536,7 @@ class ManureApplication:
                 organic_nitrogen_fraction,
                 field_size,
             )
+            self._add_manure_carbon_to_soil_layer(index, carbon_mass * subsurface_fraction * depth_factor, field_size)
 
     # --- Static Methods ---
     @staticmethod

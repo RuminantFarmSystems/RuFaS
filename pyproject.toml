@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "RuFaS"
-version = "1.0.3"
+version = "1.0.5"
 description = "Ruminant Farm Systems Model"
 readme = "README.md"
 license = "GPL-3.0-only"
@@ -20,7 +20,7 @@ dependencies = [
     "typing_extensions>=4.12.2",
     "salib==1.5.1",
     "tqdm>=4.67.1",
-    "deepdiff>=8.2.0",
+    "deepdiff>=9.1.0",
     "psutil>=6.1.1",
     "numba>=0.61.0",
 ]
