@@ -103,8 +103,8 @@ class TaskType(Enum):
 
 
 """
-List of ``TaskTypes`` that are exclusive meaning other tasks are not allowed to be run
-concurrently with either of these tasks.
+List of ``TaskType`` members that are exclusive, meaning a task configuration that has one of these
+task types cannot have any other task type.
 """
 EXCLUSIVE_TASK_TYPES = [
     TaskType.END_TO_END_TESTING,
@@ -456,6 +456,8 @@ class TaskManager:
         ------
         ValueError
             - If ``SIMULATION_SINGLE_RUN`` task type and multiple random seeds specified in task inputs.
+            - If an exclusive task type is mixed with another task type in the same task configuration.
+            - If the task configuration has no tasks.
 
         Returns
         -------
@@ -477,7 +479,7 @@ class TaskManager:
                     "function": self._parse_input_tasks.__name__,
                 },
             )
-            raise KeyError("No tasks found in task input config.")
+            raise ValueError("No tasks found in task input config.")
         task_types = {TaskType.from_string(task["task_type"]) for task in tasks_from_input}
 
         for task_type in EXCLUSIVE_TASK_TYPES:
