@@ -99,6 +99,8 @@ class LeafAreaIndex:
             return
         else:  # normal growth
             self.check_previous_leaf_area_values()
+            assert self.previous_optimal_leaf_area_fraction is not None
+            assert self.previous_leaf_area_index is not None
             self.optimal_leaf_area_change = self._determine_max_leaf_area_change(
                 self.optimal_leaf_area_fraction,
                 self.previous_optimal_leaf_area_fraction,
@@ -147,6 +149,7 @@ class LeafAreaIndex:
         SWAT 5:3.2.2
 
         """
+        assert self.optimal_leaf_area_change is not None
         self.leaf_area_added = min(
             self.optimal_leaf_area_change * sqrt(self.data.growth_factor),
             self.optimal_leaf_area_change,
@@ -161,6 +164,8 @@ class LeafAreaIndex:
         SWAT 5:2.1.18
 
         """
+        assert self.previous_leaf_area_index is not None
+        assert self.leaf_area_added is not None
         self.data.leaf_area_index = max(0.0, self.previous_leaf_area_index + self.leaf_area_added)
 
     @staticmethod

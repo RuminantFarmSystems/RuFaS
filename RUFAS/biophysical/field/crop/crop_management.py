@@ -247,6 +247,7 @@ class CropManagement:
             raise ValueError(
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
             )
+        assert self.harvest_index is not None
         roots_harvested = self.harvest_index > 1.0
         if not roots_harvested:
             self.cut_biomass = self.data.above_ground_biomass * self.harvest_index
@@ -308,6 +309,7 @@ class CropManagement:
         harvested, no biomass is left above ground and the fraction of biomass that is below ground is set to 1.0.
 
         """
+        assert self.cut_biomass is not None
         if not roots_harvested:
             self.data.above_ground_biomass -= self.cut_biomass
             self.data.root_fraction = self.data.root_biomass / self.data.biomass

@@ -119,6 +119,7 @@ class NonWaterUptake(NutrientUptake):
 
         optimal_nutrient = self.determine_optimal_nutrient(optimal_fraction, self.crop_data.biomass)
         setattr(self.crop_data, f"optimal_{nutrient_name}", optimal_nutrient)
+        assert self.previous_nutrient is not None
         if optimal_nutrient - self.previous_nutrient < 0:
             self.potential_nutrient_uptake = 0
         else:
@@ -151,6 +152,7 @@ class NonWaterUptake(NutrientUptake):
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_nitrates = self.access_layers(layer_nutrient)
+        assert self.potential_nutrient_uptake is not None
         self.layer_nutrient_potentials = self.determine_layer_nutrient_uptake_potential(
             accessible_depths,
             self.potential_nutrient_uptake,

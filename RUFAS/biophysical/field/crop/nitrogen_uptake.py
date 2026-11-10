@@ -127,6 +127,8 @@ class NitrogenUptake(NonWaterUptake):
         soil_water_factor = soil_data.soil_water_factor
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
 
+        assert self.total_nutrient_uptake is not None
+        assert self.fixed_nitrogen is not None
         self.crop_data.nitrogen = self.determine_stored_nutrient(
             self.total_nutrient_uptake,
             self.crop_data.nitrogen,
@@ -183,8 +185,12 @@ class NitrogenUptake(NonWaterUptake):
             (unitless).
 
         """
+        assert self.potential_nutrient_uptake is not None
+        assert self.total_nutrient_uptake is not None
         unmet_demand = self.potential_nutrient_uptake - self.total_nutrient_uptake
         if unmet_demand > 0:
+            assert self.fixation_stage_factor is not None
+            assert self.nitrate_factor is not None
             self.fixed_nitrogen = self._determine_fixed_nitrogen(
                 unmet_demand,
                 stage_factor=self.fixation_stage_factor,

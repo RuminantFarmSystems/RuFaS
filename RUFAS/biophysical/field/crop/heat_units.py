@@ -94,6 +94,8 @@ class HeatUnits:
 
         """
         if self.use_heat_unit_temperature:
+            assert max_air_temperature is not None
+            assert min_air_temperature is not None
             self.maximum_heat_unit_temperature = HeatUnits._determine_maximum_heat_unit_temperature(
                 max_air_temperature, self.maximum_temperature
             )
@@ -106,6 +108,7 @@ class HeatUnits:
             use_temp = self.heat_unit_temperature
         else:
             use_temp = mean_air_temperature
+        assert use_temp is not None
         self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
 
@@ -140,6 +143,7 @@ class HeatUnits:
 
         """
         if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
+            assert self.heat_unit_temperature is not None
             self.new_heat_units = self._determine_heat_unit_value(
                 self.heat_unit_temperature, self.data.minimum_temperature
             )
@@ -150,6 +154,7 @@ class HeatUnits:
         """
         Add newly acquired heat units to accumulated heat units.
         """
+        assert self.new_heat_units is not None
         self.data.accumulated_heat_units += self.new_heat_units
 
     @staticmethod

@@ -136,6 +136,7 @@ class WaterUptake(NutrientUptake):
         layers in the SoilData object.
 
         """
+        assert self.actual_water_uptakes is not None
         if len(soil_data.soil_layers) != len(self.actual_water_uptakes):
             OutputManager().add_error(
                 "Soil water extraction error",
