@@ -1,18 +1,17 @@
-import logging
 from typing import Any, Callable
 
 import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.post_processing.report_generator import AGGREGATION_FUNCTIONS, ReportGenerator, ReportGeneratorConfig
+from RUFAS.post_processing.report_generator import AGGREGATION_FUNCTIONS, ReportGenerator
 from RUFAS.post_processing.unit_handler import UnitHandler
 from RUFAS.util import Aggregator
 
 
 @pytest.fixture
 def report_generator() -> ReportGenerator:
-    return ReportGenerator(ReportGeneratorConfig(metadata_prefix="test_prefix"))
+    return ReportGenerator()
 
 
 def test_aggregation_functions() -> None:
@@ -27,47 +26,15 @@ def test_aggregation_functions() -> None:
     }
 
 
-def test_report_generator_config_defaults() -> None:
-    """Unit test for the default values of ReportGeneratorConfig."""
-    config = ReportGeneratorConfig()
-
-    assert config.metadata_prefix == ""
-    assert config.time is None
-
-
 def test_report_generator_init(mocker: MockerFixture) -> None:
     """Unit test for the __init__ method of ReportGenerator."""
     mock_time = mocker.MagicMock()
 
-    report_generator = ReportGenerator(ReportGeneratorConfig(metadata_prefix="test_prefix", time=mock_time))
+    report_generator = ReportGenerator(time=mock_time)
 
     assert report_generator.reports == {}
-    assert report_generator.metadata_prefix == "test_prefix"
     assert report_generator.time == mock_time
     assert isinstance(report_generator.unit_handler, UnitHandler)
-    assert report_generator.unit_handler.metadata_prefix == "test_prefix"
-    assert report_generator._logger.name == "RUFAS.ReportGenerator"
-
-
-@pytest.mark.parametrize("level", [logging.INFO, logging.WARNING, logging.ERROR])
-def test_log(level: int, report_generator: ReportGenerator, mocker: MockerFixture) -> None:
-    """Unit test for the _log method of ReportGenerator."""
-    mock_logger_log = mocker.patch.object(report_generator._logger, "log")
-
-    report_generator._log(level, "log_name", "log message", "function_name")
-
-    mock_logger_log.assert_called_once_with(
-        level,
-        "log message",
-        extra={
-            "rufas_log_name": "log_name",
-            "rufas_info_map": {
-                "class": "ReportGenerator",
-                "function": "function_name",
-                "metadata_prefix": "test_prefix",
-            },
-        },
-    )
 
 
 def test_clear_reports(report_generator: ReportGenerator) -> None:
@@ -209,40 +176,42 @@ def test_generate_report(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the generate_report method of ReportGenerator."""
-    mock_log = mocker.patch.object(report_generator, "_log")
-    mocker.patch.object(report_generator.unit_handler, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
+    mocker.patch("RUFAS.post_processing.unit_handler.logger")
 
     for filter_content, filtered_pool in zip(filter_contents, filtered_pools):
         report_generator.generate_report(filter_content, filtered_pool)
 
     assert report_generator.reports == expected_reports
-    start_logs = [call for call in mock_log.call_args_list if call.args[1] == "start_generate_individual_report"]
+    start_logs = [
+        call
+        for call in mock_logger.info.call_args_list
+        if call.kwargs["extra"]["rufas_log_name"] == "start_generate_individual_report"
+    ]
     assert start_logs == [
         mocker.call(
-            logging.INFO,
-            "start_generate_individual_report",
             f"Start generating individual report: {filter_content['name']}",
-            "generate_report",
+            extra={"rufas_log_name": "start_generate_individual_report"},
         )
         for filter_content in filter_contents
     ]
-    assert all(call.args[0] != logging.ERROR for call in mock_log.call_args_list)
+    mock_logger.error.assert_not_called()
 
 
 def test_generate_report_with_untitled_report(report_generator: ReportGenerator, mocker: MockerFixture) -> None:
     """Unit test for the generate_report method of ReportGenerator when the report has no name."""
-    mock_log = mocker.patch.object(report_generator, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
     mocker.patch("RUFAS.post_processing.report_generator.Utility.get_timestamp", return_value="2023-01-01")
 
     report_generator.generate_report({"filters": ["some_filter"]}, {"some_filter": {"values": [1, 2, 3]}})
 
     assert report_generator.reports == {"untitled_2023-01-01": {"values": [1, 2, 3]}}
-    mock_log.assert_called_once_with(
-        logging.INFO,
-        "start_generate_individual_report",
-        "Start generating individual report: untitled_2023-01-01",
-        "generate_report",
-    )
+    assert mock_logger.mock_calls == [
+        mocker.call.info(
+            "Start generating individual report: untitled_2023-01-01",
+            extra={"rufas_log_name": "start_generate_individual_report"},
+        )
+    ]
 
 
 def test_generate_report_calls(report_generator: ReportGenerator, mocker: MockerFixture) -> None:
@@ -253,7 +222,7 @@ def test_generate_report_calls(report_generator: ReportGenerator, mocker: Mocker
     report_data = {"hor_agg": [5.79]}
     rounded_report_data = {"hor_agg": [5.8]}
     report_filter_data = {"report_hor_agg": {"values": [5.8]}}
-    mocker.patch.object(report_generator, "_log")
+    mocker.patch("RUFAS.post_processing.report_generator.logger")
     mock_ensure_unique_name = mocker.patch.object(
         report_generator, "_ensure_unique_report_name_with_timestamp", return_value="unique_report"
     )
@@ -284,7 +253,7 @@ def test_generate_report_calls(report_generator: ReportGenerator, mocker: Mocker
 
 def test_generate_report_without_rounding(report_generator: ReportGenerator, mocker: MockerFixture) -> None:
     """Unit test for the generate_report method of ReportGenerator when the data is not rounded."""
-    mocker.patch.object(report_generator, "_log")
+    mocker.patch("RUFAS.post_processing.report_generator.logger")
     mock_round = mocker.patch("RUFAS.post_processing.report_generator.Utility.round_numeric_values_in_dict")
 
     report_generator.generate_report(
@@ -350,25 +319,23 @@ def test_generate_report_with_error(
 ) -> None:
     """Unit test for the generate_report method of ReportGenerator when the report cannot be generated."""
     report_generator.reports = {"existing_report": {"values": [1, 2, 3]}}
-    mock_log = mocker.patch.object(report_generator, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
 
     report_generator.generate_report(filter_content, filtered_pool)
 
     assert report_generator.reports == {"existing_report": {"values": [1, 2, 3]}}
-    assert mock_log.call_args_list == [
-        mocker.call(
-            logging.INFO,
-            "start_generate_individual_report",
+    assert mock_logger.mock_calls == [
+        mocker.call.info(
             "Start generating individual report: error_report",
-            "generate_report",
+            extra={"rufas_log_name": "start_generate_individual_report"},
         ),
-        mocker.call(logging.ERROR, "report_generation_error", expected_error_message, "generate_report"),
+        mocker.call.error(expected_error_message, extra={"rufas_log_name": "report_generation_error"}),
     ]
 
 
 def test_generate_report_with_unexpected_error(report_generator: ReportGenerator, mocker: MockerFixture) -> None:
     """Unit test for the generate_report method of ReportGenerator when an unexpected error is raised."""
-    mocker.patch.object(report_generator, "_log")
+    mocker.patch("RUFAS.post_processing.report_generator.logger")
     mocker.patch.object(report_generator, "_perform_aggregations", side_effect=TypeError("unexpected"))
 
     with pytest.raises(TypeError, match="unexpected"):
@@ -535,7 +502,7 @@ def test_store_or_graph_report_data(
     """Unit test for the _store_or_graph_report_data method of ReportGenerator."""
     report_generator.reports = {"existing": {"values": [0]}}
     report_filter_data = {"report": {"values": [1, 2]}}
-    mock_log = mocker.patch.object(report_generator, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
     mock_prepare_report_data_to_be_graphed = mocker.patch.object(report_generator, "_prepare_report_data_to_be_graphed")
 
     report_generator._store_or_graph_report_data(report_filter_data, filter_content, "report")
@@ -546,14 +513,14 @@ def test_store_or_graph_report_data(
     else:
         mock_prepare_report_data_to_be_graphed.assert_not_called()
     if is_warning_logged:
-        mock_log.assert_called_once_with(
-            logging.WARNING,
-            "report_generation_warning",
-            "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
-            "_store_or_graph_report_data",
-        )
+        assert mock_logger.mock_calls == [
+            mocker.call.warning(
+                "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
+                extra={"rufas_log_name": "report_generation_warning"},
+            )
+        ]
     else:
-        mock_log.assert_not_called()
+        assert mock_logger.mock_calls == []
 
 
 @pytest.mark.parametrize(
@@ -575,7 +542,7 @@ def test_get_horizontal_first_value(
 def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     """Unit test for the _prepare_report_data_to_be_graphed method of ReportGenerator."""
     mock_time = mocker.MagicMock()
-    report_generator = ReportGenerator(ReportGeneratorConfig(metadata_prefix="test_prefix", time=mock_time))
+    report_generator = ReportGenerator(time=mock_time)
     graph_data = {"test_report": {"values": [1, 2, 3]}}
     graph_details = {
         "metadata_prefix": "prefix",
@@ -928,7 +895,7 @@ def test_route_aggregator_functions(
     """Unit test for the _route_aggregator_functions method of ReportGenerator."""
     report_data = {"data": [1, 2, 3], "constant": [2, 2, 2]}
     filter_content = {"name": "test_report", "display_units": False}
-    mock_log = mocker.patch.object(report_generator, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
     mock_functions = {
         function: mocker.patch.object(report_generator, function, return_value={function: [1]})
         for function in [
@@ -958,29 +925,29 @@ def test_route_aggregator_functions(
         mock_functions[expected_function].assert_called_once_with(report_data, vertical_agg_key, filter_content)
     else:
         assert result == report_data
-    mock_log.assert_called_once_with(
-        logging.INFO,
-        "Report 'test_report' aggregation variables.",
-        "Variables/constants aggregated: ['data', 'constant'].",
-        "_route_aggregator_functions",
-    )
+    assert mock_logger.mock_calls == [
+        mocker.call.info(
+            "Variables/constants aggregated: ['data', 'constant'].",
+            extra={"rufas_log_name": "Report 'test_report' aggregation variables."},
+        )
+    ]
 
 
 def test_route_aggregator_functions_with_unnamed_report(
     report_generator: ReportGenerator, mocker: MockerFixture
 ) -> None:
     """Unit test for the _route_aggregator_functions method of ReportGenerator when the report has no name."""
-    mock_log = mocker.patch.object(report_generator, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
 
     result = report_generator._route_aggregator_functions({"data": [1, 2, 3]}, {}, vertical_agg_key="sum")
 
     assert result == {"ver_agg": [6]}
-    mock_log.assert_called_once_with(
-        logging.INFO,
-        "Report 'Unnamed Report' aggregation variables.",
-        "Variables/constants aggregated: ['data'].",
-        "_route_aggregator_functions",
-    )
+    assert mock_logger.mock_calls == [
+        mocker.call.info(
+            "Variables/constants aggregated: ['data'].",
+            extra={"rufas_log_name": "Report 'Unnamed Report' aggregation variables."},
+        )
+    ]
 
 
 @pytest.mark.parametrize(
@@ -1345,7 +1312,7 @@ def test_apply_horizontal_aggregation(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the _apply_horizontal_aggregation method of ReportGenerator."""
-    mocker.patch.object(report_generator, "_log")
+    mocker.patch("RUFAS.post_processing.report_generator.logger")
 
     result = report_generator._apply_horizontal_aggregation(
         report_data, loop_list, AGGREGATION_FUNCTIONS[aggregator_key], True
@@ -1430,7 +1397,7 @@ def test_apply_vertical_aggregation(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the _apply_vertical_aggregation method of ReportGenerator."""
-    mocker.patch.object(report_generator, "_log")
+    mocker.patch("RUFAS.post_processing.report_generator.logger")
 
     result = report_generator._apply_vertical_aggregation(report_data, AGGREGATION_FUNCTIONS[aggregator_key])
 
@@ -1476,12 +1443,12 @@ def test_handle_aggregation(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the _handle_aggregation method of ReportGenerator."""
-    mock_log = mocker.patch.object(report_generator, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
 
     result = report_generator._handle_aggregation(aggregator, data, "valid_key")
 
     assert result == expected_result
-    mock_log.assert_not_called()
+    assert mock_logger.mock_calls == []
 
 
 @pytest.mark.parametrize(
@@ -1504,34 +1471,34 @@ def test_handle_aggregation_with_unaggregatable_values(
     data: list[Any], report_generator: ReportGenerator, mocker: MockerFixture
 ) -> None:
     """Unit test for the _handle_aggregation method of ReportGenerator when data has values it cannot aggregate."""
-    mock_log = mocker.patch.object(report_generator, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
     mock_aggregator = mocker.MagicMock()
 
     result = report_generator._handle_aggregation(mock_aggregator, data, "invalid_key")
 
     assert result is None
     mock_aggregator.assert_not_called()
-    mock_log.assert_called_once_with(
-        logging.ERROR,
-        "ReportGenerator aggregation error",
-        "Encountered unaggregatable values in variable(s): invalid_key. Returning None instead.",
-        "_handle_aggregation",
-    )
+    assert mock_logger.mock_calls == [
+        mocker.call.error(
+            "Encountered unaggregatable values in variable(s): invalid_key. Returning None instead.",
+            extra={"rufas_log_name": "ReportGenerator aggregation error"},
+        )
+    ]
 
 
 def test_handle_aggregation_with_aggregator_error(report_generator: ReportGenerator, mocker: MockerFixture) -> None:
     """Unit test for the _handle_aggregation method of ReportGenerator when the aggregator raises an error."""
-    mock_log = mocker.patch.object(report_generator, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
 
     result = report_generator._handle_aggregation(lambda x: x[0] / 0, [1.0, 2.0, 3.0], "key")
 
     assert result is None
-    mock_log.assert_called_once_with(
-        logging.ERROR,
-        "ReportGenerator aggregation error",
-        "Error during aggregation of key data: float division by zero, returning None instead.",
-        "_handle_aggregation",
-    )
+    assert mock_logger.mock_calls == [
+        mocker.call.error(
+            "Error during aggregation of key data: float division by zero, returning None instead.",
+            extra={"rufas_log_name": "ReportGenerator aggregation error"},
+        )
+    ]
 
 
 @pytest.mark.parametrize(

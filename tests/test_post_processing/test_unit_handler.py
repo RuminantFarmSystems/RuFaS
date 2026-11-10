@@ -1,4 +1,3 @@
-import logging
 from typing import Any
 
 import pytest
@@ -9,43 +8,7 @@ from RUFAS.post_processing.unit_handler import UnitHandler
 
 @pytest.fixture
 def unit_handler() -> UnitHandler:
-    return UnitHandler("test_prefix")
-
-
-def test_unit_handler_init() -> None:
-    """Unit test for the __init__ method of UnitHandler."""
-    unit_handler = UnitHandler("test_prefix")
-
-    assert unit_handler.metadata_prefix == "test_prefix"
-    assert unit_handler._logger.name == "RUFAS.UnitHandler"
-
-
-def test_unit_handler_init_default_metadata_prefix() -> None:
-    """Unit test for the default metadata prefix of UnitHandler."""
-    unit_handler = UnitHandler()
-
-    assert unit_handler.metadata_prefix == ""
-
-
-@pytest.mark.parametrize("level", [logging.INFO, logging.WARNING, logging.ERROR])
-def test_log(level: int, unit_handler: UnitHandler, mocker: MockerFixture) -> None:
-    """Unit test for the _log method of UnitHandler."""
-    mock_logger_log = mocker.patch.object(unit_handler._logger, "log")
-
-    unit_handler._log(level, "log_name", "log message", "function_name")
-
-    mock_logger_log.assert_called_once_with(
-        level,
-        "log message",
-        extra={
-            "rufas_log_name": "log_name",
-            "rufas_info_map": {
-                "class": "UnitHandler",
-                "function": "function_name",
-                "metadata_prefix": "test_prefix",
-            },
-        },
-    )
+    return UnitHandler()
 
 
 @pytest.mark.parametrize(
@@ -149,17 +112,15 @@ def test_add_units_to_constants(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the add_units_to_constants method of UnitHandler."""
-    mock_log = mocker.patch.object(unit_handler, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.unit_handler.logger")
 
     result = unit_handler.add_units_to_constants(constants_config)
 
     assert result == expected
-    assert mock_log.call_args_list == [
-        mocker.call(
-            logging.WARNING,
-            "report_generation_warning",
+    assert mock_logger.mock_calls == [
+        mocker.call.warning(
             f"No matching GeneralConstant found for filter constant {name}.",
-            "add_units_to_constants",
+            extra={"rufas_log_name": "report_generation_warning"},
         )
         for name in expected_warnings
     ]
@@ -218,7 +179,7 @@ def test_aggregate_units(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the aggregate_units method of UnitHandler."""
-    mocker.patch.object(unit_handler, "_log")
+    mocker.patch("RUFAS.post_processing.unit_handler.logger")
 
     assert unit_handler.aggregate_units(report_data, operation, simplify_units) == expected
 
@@ -274,20 +235,20 @@ def test_combine_units(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the combine_units method of UnitHandler."""
-    mock_log = mocker.patch.object(unit_handler, "_log")
+    mock_logger = mocker.patch("RUFAS.post_processing.unit_handler.logger")
 
     result = unit_handler.combine_units(numerator1, denominator1, numerator2, denominator2, operation, simplify_units)
 
     assert result == expected
     if expect_warning:
-        mock_log.assert_called_once_with(
-            logging.WARNING,
-            "Report Generator Units Warning",
-            f"Report units do not match for operation {operation}.",
-            "combine_units",
-        )
+        assert mock_logger.mock_calls == [
+            mocker.call.warning(
+                f"Report units do not match for operation {operation}.",
+                extra={"rufas_log_name": "Report Generator Units Warning"},
+            )
+        ]
     else:
-        mock_log.assert_not_called()
+        assert mock_logger.mock_calls == []
 
 
 def test_combine_units_does_not_change_units(unit_handler: UnitHandler) -> None:

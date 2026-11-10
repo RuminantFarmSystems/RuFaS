@@ -1,53 +1,15 @@
-import logging
 import re
 from typing import Any
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.post_processing.rufas_logger import get_logger, log
+from RUFAS.post_processing.rufas_logger import get_logger
 from RUFAS.units import MeasurementUnits
+
+logger = get_logger(__name__)
 
 
 class UnitHandler:
-    """
-    Handles the measurement units of the data reported by ReportGenerator.
-
-    Parameters
-    ----------
-    metadata_prefix : str, default ""
-        The identifier for the metadata task being run, used for logging.
-
-    Attributes
-    ----------
-    metadata_prefix : str
-        The identifier for the metadata task being run, used for logging.
-    """
-
-    def __init__(self, metadata_prefix: str = "") -> None:
-        """Initializes the UnitHandler."""
-        self.metadata_prefix: str = metadata_prefix
-        self._logger: logging.Logger = get_logger(self.__class__.__name__)
-
-    def _log(self, level: int, name: str, message: str, function_name: str) -> None:
-        """
-        Logs a message directly to Python's logging system.
-
-        Parameters
-        ----------
-        level : int
-            The Python logging level of the message.
-        name : str
-            The name of the log, warning, or error.
-        message : str
-            The message to be logged.
-        function_name : str
-            The name of the function logging the message.
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": function_name,
-            "metadata_prefix": self.metadata_prefix,
-        }
-        log(self._logger, level, name, message, info_map)
+    """Handles the measurement units of the data reported by ReportGenerator."""
 
     @staticmethod
     def add_var_units(report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
@@ -106,11 +68,9 @@ class UnitHandler:
                     matching_constant = str(attribute)
                     break
             else:
-                self._log(
-                    logging.WARNING,
-                    "report_generation_warning",
+                logger.warning(
                     f"No matching GeneralConstant found for filter constant {name}.",
-                    self.add_units_to_constants.__name__,
+                    extra={"rufas_log_name": "report_generation_warning"},
                 )
             unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
             constant_with_units = f"{name}_({unit_for_constant})"
@@ -177,8 +137,8 @@ class UnitHandler:
 
         return stringified_combined_units
 
+    @staticmethod
     def combine_units(
-        self,
         numerator1: dict[str, int],
         denominator1: dict[str, int],
         numerator2: dict[str, int],
@@ -225,11 +185,9 @@ class UnitHandler:
 
         else:
             if numerator1 != numerator2 or denominator1 != denominator2:
-                self._log(
-                    logging.WARNING,
-                    "Report Generator Units Warning",
+                logger.warning(
                     f"Report units do not match for operation {operation}.",
-                    self.combine_units.__name__,
+                    extra={"rufas_log_name": "Report Generator Units Warning"},
                 )
             combined_numerator = numerator1.copy()
             combined_denominator = denominator1.copy()
