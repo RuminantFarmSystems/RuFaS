@@ -44,7 +44,7 @@ INJECT_PGF = "inject PGF"
 # heifer repro
 INJECT_CIDR = "inject CIDR"
 
-# oversupply cull ranking criteria
+# low production cull ranking criteria
 CULL_RANKING_CRITERIA_MILK = "milk"
 """Cull ranking criterion that ranks eligible cows by their daily milk production."""
 CULL_RANKING_CRITERIA_305_DAY_MILK = "305_day_milk"
@@ -94,14 +94,11 @@ DRY = "dry"
 
 # culling
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
-OVERSUPPLY_CULL = "culled for herd resize"
+LOW_PRODUCTION_CULL = "culled for low production"
 DEATH_CULL = "culled for death"
-LAMENESS_CULL = "culled for lameness"
-INJURY_CULL = "culled for injury"
-MASTITIS_CULL = "culled for mastitis"
-DISEASE_CULL = "culled for disease"
-UDDER_CULL = "culled for udder"
-UNKNOWN_CULL = "culled for unknown"
+ACUTE_SALE_CULL = "culled for acute sale"
+ACUTE_SALE_FRACTION = 0.3
+"""Fraction of all annual cow sales that are acute (forced / involuntary) sales, (unitless)."""
 
 # youngstock mortality (a loss from death, not a cull)
 CALF_MORTALITY_LOSS = "died from pre-wean mortality"
@@ -132,4 +129,14 @@ The parameter 'a' in the Mitscherlich Model 3 (Mills et al., 2003).
 MITS_PARAMETER_B = 0
 """
 The parameter 'b' in the Mitscherlich Model 3 (Mills et al., 2003).
+"""
+
+# male calf rates
+CONVENTIONAL_DAIRY_MALE_CALF_RATE = 0.5
+SEXED_DAIRY_MALE_CALF_RATE = 0.1
+BEEF_MALE_CALF_RATE = 0.5
+
+SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER = 0.85
+"""
+Conception rate of sexed dairy semen relative to conventional semen, (unitless).
 """
