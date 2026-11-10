@@ -14,14 +14,12 @@ class Snow:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
+    soil_data : SoilData
         The object that tracks all soil variables throughout the simulation.
-    field_size : float, optional
-        The field size (ha).
 
     Attributes
     ----------
-    soil_data : SoilData | None
+    soil_data : SoilData
         The object that tracks all soil variables throughout the simulation.
 
     Methods
@@ -42,9 +40,9 @@ class Snow:
         Update snow-related data including snow content and temperatures.
     """
 
-    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
+    def __init__(self, soil_data: SoilData):
         """object that tracks all soil variable throughout the simulation"""
-        self.soil_data = soil_data or SoilData(field_size=field_size)
+        self.soil_data = soil_data
 
     @staticmethod
     def _calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayConditions) -> float:
@@ -68,6 +66,7 @@ class Snow:
         Equation 1:2.5.1 in SWAT 2009 Theoretical Documentation.
 
         """
+        assert soil_data.previous_day_snow_temperature is not None
         return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + (
             current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor
         )
@@ -100,6 +99,7 @@ class Snow:
         melt_factor = Snow._melt_factor(soil_data=soil_data, day=day)
         snow_coverage_fraction = soil_data.snow_coverage_fraction
         snow_temperature = soil_data.current_day_snow_temperature
+        assert snow_temperature is not None
         max_air_temperature = current_day_conditions.max_air_temperature
         snow_melt_base_temperature = soil_data.snow_melt_base_temperature
 

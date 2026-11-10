@@ -10,17 +10,13 @@ class SoilTemp:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        The SoilData object used by this module to track the temperatures within the soil profile, creates new one
-        if one is not provided.
-    field_size : float, optional
-        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-        not provided (ha).
+    soil_data : SoilData
+        The SoilData object used by this module to track the temperatures within the soil profile.
 
     """
 
-    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
     def daily_soil_temperature_update(
         self,

@@ -10,7 +10,7 @@ class BiomassAllocation:
 
     Parameters
     ----------
-    crop_data : CropData, optional
+    crop_data : CropData
         The data object used for biomass calculation. Stores information
         about the plant's growth and environmental factors.
     light_extinction : float, default 0.65
@@ -58,13 +58,13 @@ class BiomassAllocation:
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
+        crop_data: CropData,
         light_extinction: float = 0.65,
         usable_light: float | None = None,
         biomass_growth: float | None = None,
         previous_biomass: float | None = None,
     ) -> None:
-        self.data = crop_data or CropData()
+        self.data = crop_data
         self.light_extinction = light_extinction
         self.usable_light = usable_light
         self.biomass_growth = biomass_growth

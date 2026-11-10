@@ -12,9 +12,8 @@ class RootDevelopment:
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        An instance of ``CropData`` containing specific crop parameters and states. If not provided, a default
-        instance with generic crop parameters is created.
+    crop_data : CropData
+        An instance of ``CropData`` containing specific crop parameters and states.
 
     Attributes
     ----------
@@ -24,8 +23,8 @@ class RootDevelopment:
 
     """
 
-    def __init__(self, crop_data: CropData | None = None):
-        self.data = crop_data or CropData()
+    def __init__(self, crop_data: CropData):
+        self.data = crop_data
 
     def develop_roots(self, time: RufasTime) -> None:
         """
