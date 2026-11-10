@@ -1,4 +1,4 @@
-"""Quick RuFaS herd calculator: calculate values for MANUAL entry into animal JSON to create a fairly stable herd.
+r"""Quick RuFaS herd calculator: calculate values for MANUAL entry into animal JSON to create a fairly stable herd.
 
 PRIMARY CALCULATIONS
 - Annual number of female calves to retain and conventional-semen male calf rate
@@ -20,7 +20,8 @@ IMPORTANT:  calf_retention_method must be "count" for the calculated
 
 To save a reference report, specify the location: --output "C:/Users/you/Documents/herd_results.json"
 You can also supply an existing folder to --output; the default filename is used.
-Note that this is a report of the calculated outputs and values to enter into the animal JSON; it is not a pre-filled copy of the animal_inputs.JSON file itself.
+Note that this is a report of the calculated outputs and values to enter into the animal JSON;
+it is not a pre-filled copy of the animal_inputs.JSON file itself.
 
 
 Counts and milk yield are rounded to integers; fractions to whole percentages.
@@ -31,18 +32,28 @@ Parity rounding allocates exactly 100 percentage points.
 
 
 OPTIONAL: DAIRYCOMP305 COMMANDS FOR INPUTS
-Note that each herd's DC305 set-up is different, so these are suggested guidelines but may not give accurate info for all herds
+Note that each herd's DC305 set-up is different, so these are suggested guidelines
+but may not give accurate info for all herds
 
-COW_NUM: SUM FOR LACT>0 (# cows on day of backup); ECON\ID --> GRID --> LACT>0 --> scroll down to summary = average number of cows over the last year
-ANNUAL_SALE_PROB, ANNUAL_DEATH_PROB: EVENTS\5 SOLD DIED FOR LACT>0 --> divide # by COW_NUM to get %
-ANNUAL_MILK_YIELD: ECON\ID --> GRID --> Total CWT --> scroll down to summary. Multiply this number x 100 x 365 for lbs/year --> divide by 2.205 to convert from lbs to kg
+COW_NUM: ECON\ID --> GRID --> LACT>0 --> scroll down to summary = average number
+    of cows over the last year
+ANNUAL_SALE_PROB, ANNUAL_DEATH_PROB: EVENTS\5 SOLD DIED FOR LACT>0 -->
+    divide # by COW_NUM to get %
+ANNUAL_MILK_YIELD: ECON\ID --> GRID --> Total CWT --> scroll down to summary.
+    Multiply this number x 100 x 365 for lbs/year --> divide by 2.205 to convert from lbs to kg
 MILKING_COW_FRACTION: ECON\ID --> GRID --> %M
 
 CALVING_INTERVAL: SUM CINT
 STILL_BIRTH_RATE: EVENTS\3 --> %D
-BREEDING_START_DAY: SUM AGEFB FOR LACT=0 TBRD>0 (this might be in days or months, depending on the herd)
+BREEDING_START_DAY: SUM AGEFB FOR LACT=0 TBRD>0
+    (this might be in days or months, depending on the herd)
 AGE_FIRST_CALVING_DAYS: SUM AGEFR FOR LACT=1\B
-CALF_MORTALITY_RATE, HEIFER_MORTALITY_RATE: this info is tricky to get out of DC305, but EVENTS\5 SOLD DIED FOR LACT=0 is a starting place, you will then need to decide how to allocate those removals among calves and heifers and determine an appropriate denominator for each group. Note that RuFaS considers all youngstock culls as "mortality" with the exception of heiferII repro culls
+CALF_MORTALITY_RATE, HEIFER_MORTALITY_RATE: this info is tricky to get out of DC305,
+    but EVENTS\5 SOLD DIED FOR LACT=0 is a starting place,
+    you will then need to decide how to allocate those removals among calves and heifers
+    and determine an appropriate denominator for each group.
+    Note that RuFaS considers all youngstock culls as "mortality" with the
+    exception of heiferII repro culls
 
 L3, L4, and L5_PLUS_SHARE_OF_L3_PLUS: SUM BY LACT FOR LACT>2
 """
@@ -71,15 +82,13 @@ CALF_MORTALITY_RATE = 0.05  # animal_config.management_decisions.calf_mortality_
 HEIFER_MORTALITY_RATE = 0.03  # animal_config.management_decisions.heifer_mortality_rate
 PREGNANCY_LOSS_FRACTION = 0.02  # planning assumption; not a one-to-one JSON field
 REPRO_CULL_FRACTION = 0.05  # planning assumption; not a one-to-one JSON field
-REPLACEMENT_CALF_BUFFER_FRACTION = (
-    0.10  # percent extra retained replacements (dairy female calves) above estimated need
-)
-MALE_CALF_RATE_BUFFER_FRACTION = (
-    0.10  # percent extra male calf rate above estimated need; does NOT change count of number of calves to retain
-)
+
+REPLACEMENT_CALF_BUFFER_FRACTION = 0.10  # percent extra dairy females to keep above estimated need
+MALE_CALF_RATE_BUFFER_FRACTION = 0.10  # percent extra male calf rate above estimated need
 # Both are assumptions, not direct RuFaS animal JSON fields.
 
-# Relative shares of the L3+ portion of the herd (percent of animal in L3+ who belong to L3, L4, and L5+. These values should sum to 1.0.)
+# Relative shares of the L3+ portion of the herd
+# (percent of animal in L3+ who belong to L3, L4, and L5+. These values should sum to 1.0.)
 L3_SHARE_OF_L3_PLUS = 0.40
 L4_SHARE_OF_L3_PLUS = 0.40
 L5_PLUS_SHARE_OF_L3_PLUS = 0.20
@@ -132,33 +141,6 @@ def round_parities_to_percentages(fractions):
 
 def calculate():
     """Return only final RuFaS input values, with JSON-compatible field names."""
-    fractions = {
-        "annual_sale_prob": ANNUAL_SALE_PROB,
-        "annual_death_prob": ANNUAL_DEATH_PROB,
-        "milking_cow_fraction": MILKING_COW_FRACTION,
-        "still_birth_rate": STILL_BIRTH_RATE,
-        "calf_mortality_rate": CALF_MORTALITY_RATE,
-        "heifer_mortality_rate": HEIFER_MORTALITY_RATE,
-        "pregnancy_loss_fraction": PREGNANCY_LOSS_FRACTION,
-        "repro_cull_fraction": REPRO_CULL_FRACTION,
-        "replacement_calf_buffer_fraction": REPLACEMENT_CALF_BUFFER_FRACTION,
-        "male_calf_rate_buffer_fraction": MALE_CALF_RATE_BUFFER_FRACTION,
-    }
-    for name, value in fractions.items():
-        if not 0 <= value <= 1:
-            raise ValueError(f"{name} must be between 0 and 1: {value}")
-    if COW_NUM <= 0 or CALVING_INTERVAL <= 0:
-        raise ValueError("cow_num and calving_interval must be positive")
-    if ANNUAL_MILK_YIELD < 0:
-        raise ValueError("annual_milk_yield cannot be negative")
-    if sum((PREGNANCY_LOSS_FRACTION, REPRO_CULL_FRACTION, HEIFER_MORTALITY_RATE, CALF_MORTALITY_RATE)) >= 1:
-        raise ValueError("Combined replacement loss fractions must be below 1")
-    if not 0 <= WEAN_DAY <= BREEDING_START_DAY_H:
-        raise ValueError("wean_day must be between 0 and breeding_start_day_h")
-    if BREEDING_START_DAY_H + PREFRESH_DAY > AGE_FIRST_CALVING_DAYS:
-        raise ValueError("Age at first calving must be >= breeding start + prefresh days")
-    if ANNUAL_SALE_PROB + ANNUAL_DEATH_PROB > 1:
-        raise ValueError("annual_sale_prob + annual_death_prob must be <= 1")
 
     shares = (L3_SHARE_OF_L3_PLUS, L4_SHARE_OF_L3_PLUS, L5_PLUS_SHARE_OF_L3_PLUS)
     if any(s < 0 for s in shares) or sum(shares) <= 0:
