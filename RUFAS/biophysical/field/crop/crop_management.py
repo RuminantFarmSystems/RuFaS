@@ -17,9 +17,8 @@ class CropManagement:
 
     Parameters
     ----------
-    crop_data : CropData, optional
+    crop_data : CropData
         The data class containing crop specifications and tracked attributes.
-        If not provided, default CropData will be used.
     potential_harvest_index : float, optional
         Potential harvest index for a given day (unitless).
     harvest_index : float, optional
@@ -77,7 +76,7 @@ class CropManagement:
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
+        crop_data: CropData,
         potential_harvest_index: float | None = None,
         harvest_index: float | None = None,
         cut_biomass: float | None = None,
@@ -89,7 +88,7 @@ class CropManagement:
         residue_nitrogen: float = 0.0,
         residue_phosphorus: float = 0.0,
     ) -> None:
-        self.data = crop_data or CropData()
+        self.data = crop_data
         self.om = OutputManager()
 
         self.potential_harvest_index = potential_harvest_index

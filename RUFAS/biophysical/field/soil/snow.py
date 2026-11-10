@@ -14,14 +14,12 @@ class Snow:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
+    soil_data : SoilData
         The object that tracks all soil variables throughout the simulation.
-    field_size : float, optional
-        The field size (ha).
 
     Attributes
     ----------
-    soil_data : SoilData | None
+    soil_data : SoilData
         The object that tracks all soil variables throughout the simulation.
 
     Methods
@@ -42,9 +40,9 @@ class Snow:
         Update snow-related data including snow content and temperatures.
     """
 
-    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
+    def __init__(self, soil_data: SoilData):
         """object that tracks all soil variable throughout the simulation"""
-        self.soil_data = soil_data or SoilData(field_size=field_size)
+        self.soil_data = soil_data
 
     @staticmethod
     def _calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayConditions) -> float:

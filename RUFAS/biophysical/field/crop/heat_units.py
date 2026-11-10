@@ -7,9 +7,8 @@ class HeatUnits:
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        An instance of ``CropData`` containing crop specifications and attributes. If not provided, a default
-        ``CropData`` instance is initialized with default values.
+    crop_data : CropData
+        An instance of ``CropData`` containing crop specifications and attributes.
     maximum_temperature : float, default 38
         Maximum temperature for plant growth (Celsius).
     use_heat_unit_temperature : bool, default False
@@ -49,7 +48,7 @@ class HeatUnits:
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
+        crop_data: CropData,
         maximum_temperature: float = 38.0,
         use_heat_unit_temperature: bool = False,
         new_heat_units: float | None = None,
@@ -57,7 +56,7 @@ class HeatUnits:
         maximum_heat_unit_temperature: float | None = None,
         heat_unit_temperature: float | None = None,
     ) -> None:
-        self.data = crop_data or CropData()
+        self.data = crop_data
         self.maximum_temperature = maximum_temperature
         self.use_heat_unit_temperature = use_heat_unit_temperature
         self.new_heat_units = new_heat_units

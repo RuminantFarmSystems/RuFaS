@@ -12,9 +12,8 @@ class WaterUptake(NutrientUptake):
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        An instance of ``CropData`` containing specific crop parameters and states. If not provided, a default
-        instance with generic crop parameters is created.
+    crop_data : CropData
+        An instance of ``CropData`` containing specific crop parameters and states.
     water_distro_parameter : float, default 10
         Water-use distribution parameter governing water-uptake from the soil (unitless).
     potential_water_uptakes : list[float], optional
@@ -54,7 +53,7 @@ class WaterUptake(NutrientUptake):
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
+        crop_data: CropData,
         water_distro_parameter: float = 10,
         potential_water_uptakes: list[float] | None = None,
         water_compensation_factor: float = 0.01,

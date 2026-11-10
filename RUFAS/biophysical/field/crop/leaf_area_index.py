@@ -10,10 +10,9 @@ class LeafAreaIndex:
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        A ``CropData`` instance containing crop specifications and attributes. Defaults to a new instance
-         of ``CropData`` if not provided.
-    lai_shapes : float, optional
+    crop_data : CropData
+        A ``CropData`` instance containing crop specifications and attributes.
+    lai_shapes : list[float], optional
         Shape coefficients for calculating leaf area index (unitless).
     optimal_leaf_area_fraction : float, optional
         Fraction of max leaf area index for current heat fraction (unitless).
@@ -31,8 +30,8 @@ class LeafAreaIndex:
     Attributes
     ----------
     data : CropData
-        Reference to the provided ``CropData`` instance or a new default instance.
-    lai_shapes : float | None
+        Reference to the provided ``CropData`` instance.
+    lai_shapes : list[float] | None
         Shape coefficients for calculating leaf area index (unitless).
     optimal_leaf_area_fraction : float | None
         Fraction of max leaf area index for current heat fraction (unitless).
@@ -51,8 +50,8 @@ class LeafAreaIndex:
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
-        lai_shapes: float | None = None,
+        crop_data: CropData,
+        lai_shapes: list[float] | None = None,
         optimal_leaf_area_fraction: float | None = None,
         canopy_height: float | None = None,
         leaf_area_added: float | None = None,
@@ -60,7 +59,7 @@ class LeafAreaIndex:
         previous_leaf_area_index: float | None = None,
         previous_optimal_leaf_area_fraction: float | None = None,
     ) -> None:
-        self.data = crop_data or CropData()
+        self.data = crop_data
         self.lai_shapes = lai_shapes
         self.optimal_leaf_area_fraction = optimal_leaf_area_fraction
         self.canopy_height = canopy_height
