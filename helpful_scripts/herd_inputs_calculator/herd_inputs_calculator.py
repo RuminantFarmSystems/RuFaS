@@ -34,7 +34,7 @@ OPTIONAL: DAIRYCOMP305 COMMANDS FOR INPUTS
 Note that each herd's DC305 set-up is different, so these are suggested guidelines but may not give accurate info for all herds 
 
 COW_NUM: SUM FOR LACT>0 (# cows on day of backup); ECON\ID --> GRID --> LACT>0 --> scroll down to summary = average number of cows over the last year 
-ANNUAL_SALE_PROB, ANNUAL_DEATH_PROB: EVENTS\5 SOLD DIED --> divide # by COW_NUM to get %
+ANNUAL_SALE_PROB, ANNUAL_DEATH_PROB: EVENTS\5 SOLD DIED FOR LACT>0 --> divide # by COW_NUM to get %
 ANNUAL_MILK_YIELD: ECON\ID --> GRID --> Total CWT --> scroll down to summary. Multiply this number x 100 x 365 for lbs/year --> divide by 2.205 to convert from lbs to kg 
 MILKING_COW_FRACTION: ECON\ID --> GRID --> %M
 
@@ -44,7 +44,7 @@ BREEDING_START_DAY: SUM AGEFB FOR LACT=0 TBRD>0 (this might be in days or months
 AGE_FIRST_CALVING_DAYS: SUM AGEFR FOR LACT=1\B
 CALF_MORTALITY_RATE, HEIFER_MORTALITY_RATE: this info is tricky to get out of DC305, but EVENTS\5 SOLD DIED FOR LACT=0 is a starting place, you will then need to decide how to allocate those removals among calves and heifers and determine an appropriate denominator for each group. Note that RuFaS considers all youngstock culls as "mortality" with the exception of heiferII repro culls
 
-L3, L4, and L5_PLUS_SHARE_OF_L3_PLUS: EVENTS\5 SOLD DIED BY LACT
+L3, L4, and L5_PLUS_SHARE_OF_L3_PLUS: SUM BY LACT FOR LACT>2
 """
 
 import argparse
