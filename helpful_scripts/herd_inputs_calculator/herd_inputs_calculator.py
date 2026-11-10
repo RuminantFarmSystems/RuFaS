@@ -205,7 +205,7 @@ def calculate():
             / 365
         ),
         "herd_information.parity_fractions": parity_fractions,
-        "animal_config.farm_level.calf.male_calf_rate_conventional_semen": round_whole(male_rate * 100) / 100,
+        "animal_config.farm_level.calf.user_defined_male_calf_rate": round_whole(male_rate * 100) / 100,
         "animal_config.farm_level.calf.annual_keep_female_calf_num": round_whole(annual_keep_calves),
     }
 
@@ -225,8 +225,8 @@ def calculate():
         "animal_config.management_decisions.breeding_start_day_h": BREEDING_START_DAY_H,
         "animal_config.management_decisions.calf_mortality_rate": CALF_MORTALITY_RATE,
         "animal_config.management_decisions.heifer_mortality_rate": HEIFER_MORTALITY_RATE,
-        "animal_config.farm_level.calf.male_calf_rate_conventional_semen": calculated_values[
-            "animal_config.farm_level.calf.male_calf_rate_conventional_semen"
+        "animal_config.farm_level.calf.user_defined_male_calf_rate": calculated_values[
+            "animal_config.farm_level.calf.user_defined_male_calf_rate"
         ],
         "animal_config.farm_level.calf.calf_retention_method": "count",
         "animal_config.farm_level.calf.annual_keep_female_calf_num": calculated_values[
