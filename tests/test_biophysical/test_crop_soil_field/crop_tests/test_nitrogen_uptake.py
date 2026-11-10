@@ -338,7 +338,7 @@ def test_incorporate_nitrogen(
         soil.set_vectorized_layer_attribute("top_depth", top_depths)
         soil.set_vectorized_layer_attribute("bottom_depth", depths)
         soil.set_vectorized_layer_attribute("nitrate", nitrates)
-        incorp = NitrogenUptake(mock_crop_data, previous_nutrient=0)
+        incorp = NitrogenUptake(mock_crop_data, previous_nutrient=0, fixed_nitrogen=0)
 
         # mock intermediate functions
         incorp.shift_nutrient_time = MagicMock(return_value=None)
@@ -379,7 +379,7 @@ def test_incorporate_nitrogen(
 
 def test_uptake(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Check that uptake() correctly called functions and variables were updated as expected."""
-    uptake = NitrogenUptake(mock_crop_data)
+    uptake = NitrogenUptake(mock_crop_data, total_nutrient_uptake=0.0, fixed_nitrogen=0.0)
     soil = SoilData(field_size=10)
     mock_main_uptake = mocker.patch.object(uptake, "uptake_main_process")
     mock_determine_stored = mocker.patch.object(uptake, "determine_stored_nutrient", return_value=1)

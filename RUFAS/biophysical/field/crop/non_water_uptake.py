@@ -13,9 +13,8 @@ class NonWaterUptake(NutrientUptake):
 
     Parameters
     ----------
-    crop_data : CropData, optional
+    crop_data : CropData
         An instance of ``CropData`` containing crop specifications and attributes.
-        Defaults to a new instance of ``CropData`` if not provided.
     nutrient_distro_param : float, default 10.0
         Nutrient uptake distribution parameter (unitless).
     nutrient_shapes : list[float], optional
@@ -24,11 +23,11 @@ class NonWaterUptake(NutrientUptake):
         Nutrient in biomass on the previous day (kg/ha).
     potential_nutrient_uptake : float, optional
         Potential nutrient uptake under ideal conditions (kg/ha).
-    layer_nutrient_potentials : float, optional
+    layer_nutrient_potentials : list[float], optional
         Potential nutrient uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : float, optional
+    unmet_nutrient_demands : list[float], optional
         Unmet nutrient demands by overlaying soil layers (kg/ha).
-    nutrient_requests : float, optional
+    nutrient_requests : list[float], optional
         Nutrient requested from each soil layer (kg/ha).
     actual_nutrient_uptakes : list[float], optional
         Actual nutrient uptake from each soil layer (kg/ha).
@@ -45,11 +44,11 @@ class NonWaterUptake(NutrientUptake):
         Nutrient in biomass on the previous day (kg/ha).
     potential_nutrient_uptake : float | None
         Potential nutrient uptake under ideal conditions (kg/ha).
-    layer_nutrient_potentials : float | None
+    layer_nutrient_potentials : List[float] | None
         Potential nutrient uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : float | None
+    unmet_nutrient_demands : List[float] | None
         Unmet nutrient demands by overlaying soil layers (kg/ha).
-    nutrient_requests : float | None
+    nutrient_requests : List[float] | None
         Nutrient requested from each soil layer (kg/ha).
     actual_nutrient_uptakes : List[float] | None
         Actual nutrient uptake from each soil layer (kg/ha).
@@ -60,14 +59,14 @@ class NonWaterUptake(NutrientUptake):
 
     def __init__(
         self,
-        crop_data: CropData | None,
+        crop_data: CropData,
         nutrient_distro_param: float = 10.0,
         nutrient_shapes: list[float] | None = None,
         previous_nutrient: float | None = None,
         potential_nutrient_uptake: float | None = None,
-        layer_nutrient_potentials: float | None = None,
-        unmet_nutrient_demands: float | None = None,
-        nutrient_requests: float | None = None,
+        layer_nutrient_potentials: list[float] | None = None,
+        unmet_nutrient_demands: list[float] | None = None,
+        nutrient_requests: list[float] | None = None,
         actual_nutrient_uptakes: list[float] | None = None,
         total_nutrient_uptake: float | None = None,
     ):
@@ -120,6 +119,7 @@ class NonWaterUptake(NutrientUptake):
 
         optimal_nutrient = self.determine_optimal_nutrient(optimal_fraction, self.crop_data.biomass)
         setattr(self.crop_data, f"optimal_{nutrient_name}", optimal_nutrient)
+        assert self.previous_nutrient is not None
         if optimal_nutrient - self.previous_nutrient < 0:
             self.potential_nutrient_uptake = 0
         else:
@@ -152,6 +152,7 @@ class NonWaterUptake(NutrientUptake):
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_nitrates = self.access_layers(layer_nutrient)
+        assert self.potential_nutrient_uptake is not None
         self.layer_nutrient_potentials = self.determine_layer_nutrient_uptake_potential(
             accessible_depths,
             self.potential_nutrient_uptake,
