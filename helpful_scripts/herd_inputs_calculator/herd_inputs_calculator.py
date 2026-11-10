@@ -31,14 +31,14 @@ Parity rounding allocates exactly 100 percentage points.
 
 
 OPTIONAL: DAIRYCOMP305 COMMANDS FOR INPUTS
-Note that each herd's DC305 set-up is different, so these are suggested guidelines but may not give accurate info for all herds 
+Note that each herd's DC305 set-up is different, so these are suggested guidelines but may not give accurate info for all herds
 
-COW_NUM: SUM FOR LACT>0 (# cows on day of backup); ECON\ID --> GRID --> LACT>0 --> scroll down to summary = average number of cows over the last year 
+COW_NUM: SUM FOR LACT>0 (# cows on day of backup); ECON\ID --> GRID --> LACT>0 --> scroll down to summary = average number of cows over the last year
 ANNUAL_SALE_PROB, ANNUAL_DEATH_PROB: EVENTS\5 SOLD DIED --> divide # by COW_NUM to get %
-ANNUAL_MILK_YIELD: ECON\ID --> GRID --> Total CWT --> scroll down to summary. Multiply this number x 100 x 365 for lbs/year --> divide by 2.205 to convert from lbs to kg 
+ANNUAL_MILK_YIELD: ECON\ID --> GRID --> Total CWT --> scroll down to summary. Multiply this number x 100 x 365 for lbs/year --> divide by 2.205 to convert from lbs to kg
 MILKING_COW_FRACTION: ECON\ID --> GRID --> %M
 
-CALVING_INTERVAL: SUM CINT 
+CALVING_INTERVAL: SUM CINT
 STILL_BIRTH_RATE: EVENTS\3 --> %D
 BREEDING_START_DAY: SUM AGEFB FOR LACT=0 TBRD>0 (this might be in days or months, depending on the herd)
 AGE_FIRST_CALVING_DAYS: SUM AGEFR FOR LACT=1\B
