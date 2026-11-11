@@ -1967,8 +1967,9 @@ The ration formulation will proceed as described in the Automated Methodology ab
 * Recording of which constraints were unable to be met.
 * The simulation proceeds by using the user-defined ration percentages exactly.
 
-
+::: {#sec-an-hsm}
 ### Herd Size Management  
+::: 
 
 #### Introduction
 
@@ -3020,48 +3021,47 @@ This section describes the processes of animals leaving the herd in RuFaS. Reaso
 
 Sale may occur of:
 
-* Calves: all male calves; female calves based on `keep_female_calf_rate`
+* Newborn calves: all male calves and crossbred beef calves; female calves based on `calf_retention_method`
 * Heifer IIs: if the heifer does not have a successful conception or pregnancy and age (days born) exceeds `heifer_repro_cull_time`
-* Heifer IIIs: if cow herd does not have room for additional heifers
 * Cows (through two possible mechanisms): 
-   * Disease-related culling, determined by a statistical distribution of occurrence, or
-   * Production-related culling, which occurs when a cow has been labeled “Do Not Breed” due to reproductive failure past a designated 
-   number of days in milk and then her milk production drops below a designated threshold
+   * Acute culls, determined by a statistical distribution of occurrence, or
+   * Low production culls, driven by the rate of heiferIII calvings causing herd size to increase above the `herd_size_sell_threshold`
 
 Deaths that may occur:
 
 * Cows: determined by a statistical distribution of occurrence 
+* Youngstock: determined by a statistical distribution of occurrence, governed separately for pre-weaned calves and post-weaning heifers
 * Stillborn calves 
 
-::: {.callout-note}
-Stillborn calves are currently combined with calves sold at birth and reported as “calves sold”. 
-:::
+Information about death and sale events are tracked and aggregated daily, including the day of death or sale, body weight, days in milk, and parity. 
 
-Information about death and sale events are tracked and aggregated daily, including the day of death or sale, body weight, cull reason, days in milk, and parity. 
+::: {.callout-note}
+Low production sales are covered in detail in the [Herd Size Management](#sec-an-hsm) section
+:::
 
 #### Cow Removals
 
-Cows can leave the RuFaS herd through three primary removal pathways: acute sales, mortality, and oversupply culling. Acute sales and mortality are stochastic processes based on cow parity and stage of lactation, while oversupply culling is a management-driven process used to regulate herd size.
+Cows can leave the RuFaS herd through three primary removal pathways: acute sales, mortality, and low production culling. Acute sales and mortality are stochastic processes based on cow parity and stage of lactation, while low production culling is a management-driven process used to regulate herd size.
 
-Acute-sale and mortality risks are evaluated daily using separate parity-specific annual removal probabilities. These probabilities are converted to daily risks and adjusted according to whether a cow is classified as fresh (DIM < 50) or non-fresh (DIM ≥ 50). Fresh cows have 2.55 times the daily removal risk of non-fresh cows. This adjustment accounts for the elevated risk of removal during early lactation while maintaining the overall parity-specific removal probability.
+Acute-sale and mortality risks are evaluated daily using separate parity-specific annual removal probabilities. These probabilities are converted to daily risks and adjusted according to whether a cow is classified as fresh (DIM < 50) or non-fresh (DIM ≥ 50). Fresh cows have 2.55 times the daily removal risk of non-fresh cows [@usda_aphis_2018_dairy]. This adjustment accounts for the elevated risk of removal during early lactation while maintaining the overall parity-specific removal probability.
 
 Acute-sale risk is evaluated before mortality risk. If a cow is selected for acute sale, she is removed from further mortality assessment on that day.
 
 **Low Production Sales**
 
+Low production sales are covered in detail in the [Herd Size Management](#sec-an-hsm) section
 
 **Acute Sales**
 
-An acute sale represents an involuntary sale of a cow, rather than mortality or a management-driven oversupply cull.
-As with mortality, acute-sale risk is determined using a parity-specific annual probability. The annual probability is converted to an average daily risk and redistributed between fresh and non-fresh cows. Fresh cows have 2.55 times the daily acute-sale risk of non-fresh cows.
+An acute sale represents the immediately necessary sale of a cow, in contrast to a heifer supply-driven low production cull.
+As with mortality, acute-sale risk is determined using a parity-specific annual probability. The annual probability is converted to an average daily risk and redistributed between fresh and non-fresh cows. Fresh cows have 2.55 times the daily acute-sale risk of non-fresh cows [@usda_aphis_2018_dairy].
 
-Acute-sale and mortality probabilities are separate. A cow can therefore have different annual probabilities for the two removal pathways even though the same parity and fresh-cow adjustment framework is used for both.
-Acute-sale risk is evaluated before mortality risk during the daily removal assessment. If a cow is selected for acute sale, she is marked as sold and is not subsequently evaluated for mortality on that day.
+Acute-sale and mortality probabilities are separate. A cow will likely have different annual probabilities for the two removal pathways even though the same parity and fresh-cow adjustment framework is used for both.
 
 **Cow Death and Mortality**
 
 Cow mortality represents removal of a cow from the herd because of death.
-Each cow is assigned an annual mortality probability according to her parity. Parities 1, 2, and 3 use their corresponding probability, while cows in parity 4 or greater use the parity-4+ probability.
+Each cow is assigned an annual mortality probability according to her parity. Parities 1, 2, and 3+ use their corresponding probability.
 
 The annual mortality probability is converted to an average daily mortality risk. RuFaS then adjusts this risk according to stage of lactation. Cows with fewer than 50 DIM are classified as fresh and receive 2.55 times the daily mortality risk assigned to non-fresh cows.
 
@@ -3069,7 +3069,7 @@ The proportion of fresh cows is calculated from the current cow population. Ther
 Each eligible cow receives a daily stochastic mortality assessment. A cow selected for mortality is recorded as a death and removed from the herd.
 
 ::: {.callout-note}
-Oversupply culling is handled separately through herd-size management. It is not based on the parity-specific mortality or acute-sale probabilities and does not use the fresh/non-fresh risk adjustment.
+Low production culling is handled separately through herd-size management. It is not based on the parity-specific mortality or acute-sale probabilities and does not use the fresh/non-fresh risk adjustment.
 :::
 
 **User Inputs and Constants**
@@ -3082,12 +3082,15 @@ Oversupply culling is handled separately through herd-size management. It is not
 **Parameters and Equations**
 
 The average daily mortality risk for a cow's parity is calculated as: 
+
 * `HerdManager._assess_removal_risk()` determines the proportion of the cow herd that is currently fresh and initiates the individual removal-risk assessment.
 * Fresh cows are identified as cows with DIM < 50.
 * `percent_fresh_cows` is calculated from the entire current cow population.
 * Each cow is passed the current fresh-cow proportion for individual removal-risk assessment.
 * `Animal.assess_removal_risk()` evaluates the cow's daily acute-sale and mortality risks.
 * The mortality-risk calculation uses the cow's parity to select the appropriate `parity_death_probability`, applies the fresh/non-fresh adjustment, and stochastically determines whether the cow dies.
+
+A parallel process determines the acute sale risk. 
 
 
 #### Youngstock Removals: sales
