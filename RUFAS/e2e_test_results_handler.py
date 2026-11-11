@@ -30,7 +30,9 @@ ResultPathType = namedtuple(
     ],
     defaults=["", ""],
 )
-ORDERED_EXPECTED_RESULTS_FILE_KEYS = ["name", "filters", "expected_results_last_updated", "expected_results"]
+ORDERED_EXPECTED_RESULTS_FILE_KEYS = [
+    "name", "filters", "random_seeds", "expected_results_last_updated", "expected_results"
+]
 MUST_CHANGE_VARIABLES_KEY = "must_change_variables"
 ACCEPTED_RANGES_KEY = "accepted_ranges"
 ACCEPTED_RANGE_MIN_KEY = "min"
@@ -1684,7 +1686,7 @@ class E2ETestResultsHandler:
         return diff_result
 
     @staticmethod
-    def update_expected_test_results(output_dir: Path, output_prefix: str) -> None:
+    def update_expected_test_results(output_dir: Path, output_prefix: str, random_seeds: list[int]) -> None:
         """
         Compares the actual end-to-end testing results for various RuFaS domains and updates the expected
         results in the appropriate domain filter file if differences are found.
@@ -1695,6 +1697,8 @@ class E2ETestResultsHandler:
             The directory to which the actual results are written to.
         output_prefix : str
             The prefix to give the output file names.
+        random_seeds : list[int]
+            The list of random seeds over which the new expected results set have been averaged.
 
         Notes
         -----
@@ -1741,7 +1745,7 @@ class E2ETestResultsHandler:
                 )
                 expected_results["expected_results"] = minified_actual_results
                 expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
-                E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results)
+                E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results, random_seeds)
             except (IOError, json.JSONDecodeError) as e:
                 error_message = (
                     f"Failed to update expected results for {path_set.domain} domain. Error: {str(e)}."
@@ -1813,7 +1817,7 @@ class E2ETestResultsHandler:
             raise ValueError(f"E2E testing error: Missing required keys in data for JSON file: {missing_keys}")
 
     @staticmethod
-    def _write_formatted_json(file_path: Path, data: dict[str, str]) -> None:
+    def _write_formatted_json(file_path: Path, data: dict[str, str | list[int]], random_seeds: list[int]) -> None:
         """
         Writes a JSON file with custom serialization settings for the ``expected_results`` field.
 
@@ -1821,17 +1825,20 @@ class E2ETestResultsHandler:
         ----------
         file_path : Path
             The path to the JSON file.
-        data : dict[str, str]
+        data : dict[str, str | list[int]]
             The data to write to the JSON file.
+        random_seeds : list[int]
+            The list of random seeds over which the new expected results set have been averaged.
 
         Raises
         ------
         ValueError
             If the input data is missing required keys.
         """
-        E2ETestResultsHandler._check_expected_results_file_keys(data)
+        updated_data = {**data, "random_seeds": random_seeds}
+        E2ETestResultsHandler._check_expected_results_file_keys(updated_data)
         key_order = ORDERED_EXPECTED_RESULTS_FILE_KEYS
-        ordered_data = {key: data[key] for key in key_order}
+        ordered_data = {key: updated_data[key] for key in key_order}
         compact_expected_results = json.dumps(ordered_data["expected_results"], separators=(",", ":"))
         ordered_data["expected_results"] = "__EXPECTED_RESULTS_PLACEHOLDER__"
 

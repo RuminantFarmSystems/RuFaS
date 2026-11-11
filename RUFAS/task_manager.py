@@ -1300,7 +1300,8 @@ class TaskManager:
                     save_results=True,
                 )
             elif task_type == TaskType.UPDATE_E2E_TEST_RESULTS:
-                E2ETestResultsHandler.update_expected_test_results(averaged_results_path, e2e_group)
+                random_seeds: list[int] = [run["random_seed"] for run in e2e_runs]
+                E2ETestResultsHandler.update_expected_test_results(averaged_results_path, e2e_group, random_seeds)
                 output_manager.add_log(
                     "End-to-end testing",
                     "Completed generation of new set of end-to-end expected test results",
