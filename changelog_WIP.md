@@ -24,6 +24,7 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 
 ### Next Version Updates
 
+- [58](https://github.com/Mon-Systeme-Fourrager/RuFaS-MyForageSystem/pull/58) - [Major change] [Whole code base] [InputChange] [OutputChange] Sync `dev-msf` with upstream RuminantFarmSystems/RuFaS `dev` (`9af6eca23`, 2026-11-05): 2515 upstream commits merged in two merge commits, all fork features kept (beef feedlot / cow-calf / stocker module, silage field curing, MSF dependency tweaks). Fork adaptations to upstream API changes: `G_CH4_TO_MJ_CH4` rename in beef CH4 code, beef newborns provide `sex` / `bred_from_semen`, `BEEF_CALF` newborns bypass the dairy `CalfRetentionPolicy`, tests updated for new signatures, input keys, `HerdManager` attributes and the `RUFAS/input/metadata/properties` path. Developer notes in `UPSTREAM_SYNC_NOTES.md`.
 - [2994](https://github.com/RuminantFarmSystems/RuFaS/pull/2994) - [minor change] [NoInputChange] [OutputChange] Adds minimums to urine nitrogen equation.
 - [2997](https://github.com/RuminantFarmSystems/RuFaS/pull/2997) - [minor change] [NoInputChange] [OutputChange] Updates throughput in tractor dataset for combine headers.
 - [2998](https://github.com/RuminantFarmSystems/RuFaS/pull/2998) - [minor change] [NoInputChange] [OutputChange] Moved changelog entries to reflect what was in v1.0. Brought changes in 2994 and 2997 into one branch.
