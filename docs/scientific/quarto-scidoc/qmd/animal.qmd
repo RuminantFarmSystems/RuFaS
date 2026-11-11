@@ -3035,10 +3035,6 @@ Deaths that may occur:
 
 Information about death and sale events are tracked and aggregated daily, including the day of death or sale, body weight, days in milk, and parity. 
 
-::: {.callout-note}
-Low production sales are covered in detail in the [Herd Size Management](#sec-an-hsm) section
-:::
-
 #### Cow Removals
 
 Cows can leave the RuFaS herd through three primary removal pathways: acute sales, mortality, and low production culling. Acute sales and mortality are stochastic processes based on cow parity and stage of lactation, while low production culling is a management-driven process used to regulate herd size.
@@ -3047,13 +3043,13 @@ Acute-sale and mortality risks are evaluated daily using separate parity-specifi
 
 Acute-sale risk is evaluated before mortality risk. If a cow is selected for acute sale, she is removed from further mortality assessment on that day.
 
-**Low Production Sales**
-
+::: {.callout-note}
 Low production sales are covered in detail in the [Herd Size Management](#sec-an-hsm) section
+:::
 
 **Acute Sales**
 
-An acute sale represents the immediately necessary sale of a cow, in contrast to a heifer supply-driven low production cull.
+An acute sale represents the immediately necessary sale of a cow, in contrast to a heifer-supply-driven low production cull.
 As with mortality, acute-sale risk is determined using a parity-specific annual probability. The annual probability is converted to an average daily risk and redistributed between fresh and non-fresh cows. Fresh cows have 2.55 times the daily acute-sale risk of non-fresh cows [@usda_aphis_2018_dairy].
 
 Acute-sale and mortality probabilities are separate. A cow will likely have different annual probabilities for the two removal pathways even though the same parity and fresh-cow adjustment framework is used for both.
@@ -3097,36 +3093,13 @@ A parallel process determines the acute sale risk.
 
 **Reproduction Culls (Heifer II sales)**
 
-If the heifer does not have a successful conception or pregnancy and age (days born) exceeds heifer repro cull time, this heifer is culled
+If the heifer does not have a successful conception or pregnancy and age (days born) exceeds the user-specified `heifer_repro_cull_ time`, this heifer is culled
 
 
 **Newborn Calf Sales**
 
 All live male calves are sold immediately after birth. Live female calves may either be retained as replacement youngstock or sold. RuFaS provides two alternative methods for determining female-calf retention: a rate-based method and a count-based method.
 
-**User Inputs and Constants**
-
-* `Heifer_repro_cull_time` age (days) when a heifer would be culled for failure to become pregnant (Default: 500 days)
-* `calf_retention_method` method used to determine newborn female-calf retention. Options are `rate` and `count`. Default = `rate`.
-* `keep_female_calf_rate` The percentage of female calves kept and raised on-farm (Default: 1)
-* `keep_female_calf_num_annual` target number of live female calves to retain per year when `calf_retention_method` = `count`.
-
-**Parameters and Equations**
-
-* `Animal._evaluate_heiferII_for_culling()`
-   * Called by `Animal.daily_routines()` → `Animal.animal_life_stage_update()`
-   * This method determines whether a heifer should be culled based on its pregnancy status and age, returning *True* if the heifer is not pregnant and has surpassed the specified culling age.
-
-* `CalfRetentionPolicy` determines whether newborn calves are retained or sold according to the user-selected `calf_retention_method`.
-  * For `rate`, live female calves are retained according to `keep_female_calf_rate`.
-  * For `count`, live female calves consume available retention tags generated from `keep_female_calf_num_annual`.
-  * Male and stillborn calves do not consume retention tags.
-* `HerdManager._create_newborn_calf()`
-  * Creates the newborn calf during the active herd simulation.
-  * Applies `CalfRetentionPolicy` to determine whether a live female calf is retained or sold.
-
-
-** Rate vs. Count Based Retention **
 When `calf_retention_method` = `rate` (default), each live female calf is evaluated using an event-based Monte Carlo process. A random draw is compared with `keep_female_calf_rate` to determine whether the calf is retained or sold.
 
 This is the default calf-retention method and maintains the behavior of simulations that used `keep_female_calf_rate` before the count-based option was introduced.
@@ -3140,6 +3113,26 @@ The annual retention target is prorated for partial simulation years.
 If more than 20% of the retention tags remain unfulfilled at the end of the simulation year because too few live female calves were born, RuFaS records an ERROR and halts the simulation.
 
 The retention decision is managed by `CalfRetentionPolicy`. During the active herd simulation, `HerdManager` applies the policy when newborn calves are created. During herd initialization, female-calf retention continues to use the rate-based method because the count-based annual scheduling process does not apply to the initialization spin-up.
+
+**User Inputs and Constants**
+
+* `Heifer_repro_cull_time` age (days) when a heifer would be culled for failure to become pregnant (Default: 500 days)
+* `calf_retention_method` method used to determine newborn female-calf retention. Options are `rate` and `count`. Default = `rate`.
+* `keep_female_calf_rate` The percentage of female calves kept and raised on-farm (Default: 1)
+* `keep_female_calf_num_annual` target number of live female calves to retain per year when `calf_retention_method` = `count`.
+
+**Parameters and Equations**
+
+* `Animal._evaluate_heiferII_for_culling()`
+   * Called by `Animal.daily_routines()` → `Animal.animal_life_stage_update()`
+   * This method determines whether a heifer should be culled based on its pregnancy status and age, returning *True* if the heifer is not pregnant and has surpassed the specified culling age.
+* `CalfRetentionPolicy` determines whether newborn calves are retained or sold according to the user-selected `calf_retention_method`.
+  * For `rate`, live female calves are retained according to `keep_female_calf_rate`.
+  * For `count`, live female calves consume available retention tags generated from `keep_female_calf_num_annual`.
+  * Male and stillborn calves do not consume retention tags.
+* `HerdManager._create_newborn_calf()`
+  * Creates the newborn calf during the active herd simulation.
+  * Applies `CalfRetentionPolicy` to determine whether a live female calf is retained or sold.
 
 #### Youngstock Removals: deaths
 
@@ -3168,6 +3161,7 @@ For animals already partway through a mortality window when loaded into the init
 Calf losses in RuFaS include two distinct processes: stillbirth and mortality following a live birth. Stillbirth is evaluated when the newborn calf is initialized; the calf is removed on the day of birth if the random draw is less than the `still_birth_rate`. 
 
 **User Inputs and Constants**
+
 * `calf_mortality_rate` cumulative probability that a live-born calf dies between birth and weaning (Default: 0.0).
 * `heifer_mortality_rate` cumulative probability that a post-weaning heifer dies before entering the Heifer III stage (Default: 0.0).
 * `Still_birth_rate` Rate of stillbirths (percent, 0-1) (Default: 0.065)
@@ -3186,181 +3180,6 @@ Calf losses in RuFaS include two distinct processes: stillbirth and mortality fo
       * Creates a newborn calf instance 
    * If a random draw is less than the `still_birth_rate`, then `self.stillborn` = True and added to `stillborn_newborn_calves`
 
-#### Required User Inputs
-
-```{python}
-#| label: tbl-an-cull-inputs
-#| tbl-cap: Inputs used to determine probability and timing of cow death and sales events.
-import_table(
-  "../resources/table_data/animal/tbl-an-cull-inputs.csv",
-  colalign = ["left", "left", "center", "center", "center"]
-)
-```
-::: {.callout-note}
-Variables marked with * are commonly left at default values. Adjusting them changes the timing of cow exit from the herd but does not affect the total number of exits.
-:::
-
-#### Expected Outputs
-
-Information about death and sales events are tracked and aggregated daily by HerdManager, including the animal type, day of death or sale, body weight, cull reason, days in milk, and parity. 
-    
-All of the following are reported by AnimalModuleReporter: 
-
-* `Report_life_cycle_manager_data` - is reported on a daily basis for the numbers of calves, HeiferII, HeiferIII, and Cow sold (calves born deceased tracked as newborns sold). It also reports HeiferIII purchased and documents other cow culls (i.e. sold and died). Culling data is also reported here documenting the average age of cows and HeiferII culled and the reason (e.g. death, poor production, lameness, injury, mastitis, disease, udder, or unkown/other).
-* `Report_sold_animal_information` - this data is reported at the end of a simulation. It creates a list of all animals sold and reports their ID number, type, body weight, day sold (simulation day), cull reason, days in milk, and parity. 
-* `Report_sold_animal_information_sort_by_sell_day` - also reported at the end of a simulation to document the overall number and weight of animals sold on that simulation day. It reports zero's for days on which no animal of that type was sold. This enables using report filters to slice and summarize sales statistics by animal type for a specified time period (e.g., number and body weight of cows sold over the last 365 days of the simulation).
-
-#### Methodology
-
-##### Cow Deaths
-
-At the beginning of each lactation, each cow “rolls the dice” to determine if +/- when she will die in the current lactation. 
-    
-Probability of death associated with each lactation (1, 2, 3, 4+) is specified at the beginning of the simulation as a user input. At the beginning of each lactation for each cow, it is determined whether she will die during that lactation with a random draw compared with the appropriate probability. Then, for individuals assigned to die during that lactation, an empirical Cumulative Distributive Function (CDF) is used to determine on which day the death will occur based on the probability of death occurring during each interval of the lactation. 
-
-**User Inputs and Constants**
-
-* Parity death probability: `parity_death_prob` 
-   * Probability of death during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
-* Death day probability: `death_day_prob`
-   * Values to construct the CDF to determine future death day, given that death is going to occur (default values are given in @tbl-an-cdf-cull-death)
-   * Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days” in @tbl-an-cdf-cull-death)
-
-**Parameters and Equations**
-
-The values for the CDF determining probability of death by day of lactation are located in the animal input json file (`death_day_prob`).
-
-```{python}
-#| label: tbl-an-cdf-cull-death
-#| tbl-cap: Cumulative Distribution Function (CDF) values associated with the conditional probability of death over time. The 'cull_day_count' array defines the segments of the CDF.
-import_table(
-  "../resources/table_data/animal/tbl-an-cull-cdf-death.csv",
-    colalign = ["center", "right", "center", "center", "center"], headersalign = ["same"]
-)
-```
-
-Determination of death date (once already determined that death will occur this lactation): 
-
-::: {#eq-an-anm-1}
-[[**AN.ANM.1**]]{.aside .content-visible when-format="html"}
-$$
-X = x_{\text{i-1}} + a_{\text{i}} \times (R - c_{\text{i-1}})
-$$
-:::
-
-Where:
-
-* R = random float number between 0-1
-* $c_{\text{i-1}},c_{\text{i}}$ = the upper and lower values around R in the death day prob CDF
-* $x_{\text{i-1}},x_{\text{i}}$ = days, corresponds to $c_{\text{i-1}},c_{\text{i}}$
-
-Empirical CDF: 
-$a_{\text{i}} = \frac{x_{\text{i-1}},x_{\text{i}}}{c_{\text{i-1}},c_{\text{i}}}$ 
-
-* `Animal.determine_future_death_date`
-  * Called by `Animal.daily_routines()` at the beginning of each new lactation (on the day a new calf is born).
-  * Returns calculated future death date in simulation days or `sys.maxsize` (effectively no death date).
-  * Logic: Draw random value between 0-1 and compare it to probability of death in that lactation group (`parity_death_probability`).
-    * If drawn value \(\leq \) `parity_death_probability`, then go on to select date that death will occur - draws another random value between 0-1.
-    * Compares random draw to the CDF defined by `death_day_prob` array to determine number of days into the future at which death will occur - adds that number of days to current days born to determine future death date.
-    * If drawn value \( > \) `parity_death_probability`, then future death date is assigned as `sys.maxsize` (a really really big number – effectively, she will never reach her assigned future death date).
-* `Animal.animal_life_stage_update()` 
-   * Called by `HerdManager.daily_routines()` → `Animal.daily_routines()`
-   * Updates the animal status to DEAD if days born = future death date
-
-##### Cow Sales
-
-###### Disease Related
-
-At the beginning of each lactation, each cow “rolls the dice” to determine if +/- when and for what attributed reason she will be sold for disease-related reasons (i.e., involuntary, not directly for production/reproduction reasons) in the current lactation.   
-        
-Probability of disease sales associated with each lactation (1, 2, 3, 4+) is specified at the beginning of the simulation as a user input. At the beginning of each lactation for each cow, it is determined whether she will be sold for disease during that lactation with a random draw compared with the appropriate probability. Then, for individuals assigned to be sold during that lactation, another random draw determines the reason for that sale from one of six possibilities (@tbl-an-cull-reason). Finally, an empirical CDF is used to determine the day of sale based on the probability of sale occurring during each interval of the lactation for that particular sale reason. 
-
-**User Inputs and Constants**
-
-* Parity cull probability: `parity_cull_prob` 
-   * Probability of sale for disease during the current lactation for cows beginning a new lactation, grouped into lactation groups 1, 2, 3, and 4+
-* PFor each of the six reasons:
-   * `Probability` - Conditional probability that a sold animal is removed due to each group of issues. This probability is used to determine the reason for sale after it has been decided that the animal will be sold during the current lactation. The sum of probabilities for the six culling reasons equals 1. See @tbl-an-cull-reason below for default values used to construct the empirical CDF.
-  * `Cull_day_prob`: Values to construct the CDF to determine future sale day, given that disease-related sale is going to occur. Values in the array correspond to the days in `cull_day_count` (another user input; default values are the “days”; default values in @tbl-an-cull-cdf) 
-
-
-**Parameters and Equations**
-
-```{python}
-#| label: tbl-an-cull-reason
-#| tbl-cap: Default values used to construct the Cumulative Distribution Function (CDF) values associated with the conditional probability that a sold animal is removed due to each group of issues.
-import_table(
-  "../resources/table_data/animal/tbl-an-cull-reason.csv",
-  colalign = ["center", "center", "center", "center", "center"]
-)
-```
-
-```{python}
-#| label: tbl-an-cull-cdf
-#| tbl-cap: Cumulative Distribution Function (CDF) values associated with the likelihood over time of sales for each reason.
-import_table(
-  "../resources/table_data/animal/tbl-an-cull-cdf.csv",
-  colalign = ["left", "center", "center", "center", "center"]
-)
-```
-
-Determination of sale date (once already determined that death will occur this lactation): 
-
-::: {#eq-an-anm-2}
-[[**AN.ANM.2**]]{.aside .content-visible when-format="html"}
-$$
-X = x_{\text{i-1}} + a_{\text{i}} * (R - c_{\text{i-1}})
-$$
-:::
-
-Where:
-
-* R = random float number between 0-1  
-* $c_{\text{i-1}},c_{\text{i}}$ = the upper and lower values around R in the sale day prob CDF
-* $x_{\text{i-1}},x_{\text{i}}$ = days, corresponds to $c_{\text{i-1}},c_{\text{i}}$
-* Empirical CDF: $a_{\text{i}} = \frac{x_{\text{i-1}},x_{\text{i}}}{c_{\text{i-1}},c_{\text{i}}}$ 
-
-* `Animal.determine_future_cull_date()`
-   * Called by by `Animal.daily_routines()` at the beginning of each new lactation (on the day a new calf is born)
-   * Returns a tuple with future cull (sale) date in simulation days and reason for culling
-   * Logic: Draw random value between 0-1 and compare it to probability of death in that lactation group (`parity_death_probability`)
-      * If drawn value \(\leq \) p`arity_death_probability`, then go on to select date that death will occur - draws another random value between 0-1
-      * Compares random draw to the CDF defined by `death_day_prob` array to determine number of days into the future at which death will occur - adds that number of days to current days born to determine future death date 
-      * If drawn value \( > \) `parity_death_probability`, then future death date is assigned as `sys.maxsize` (a really really big number – effectively, she will never reach her assigned future death date)
-* `Animal.animal_life_stage_update()` 
-   * Called by `HerdManager.daily_routines()` → `Animal.daily_routines()`
-   * Updates the animal status to SOLD if days born = future cull date
-
-###### Production Related
-
-If a cow is not pregnant when she reaches the days in milk cutoff specified by the user, she will be marked as Do Not Breed and no longer participate in reproductive protocols. When her milk production drops below the production cutoff specified by the user, she is sold for the reason of low production. Note that the only cows who are sold for “low production” are those flagged as DNB for reproductive failure; no low-producing cow who is pregnant or has fewer DIM than the cutoff will be sold for low production. 
-
-**User Inputs and Constants**
-
-* `Do_not_breed_time`: The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant
-* `Cull_milk_production`: Milk production threshold at which 'do not breed' cows are culled if they fall below (in kg/d)
-
-**Parameters and Equations**
-
-* `Reproduction._check_do_not_breed_flag()`
-   * Checks if a cow should be marked as do-not-breed if not pregnant beyond the user-defined breeding window 
-   * Called by cow reproduction update() in Reproduction.py 
-   * If not pregnant and DIM \(>\) `do_not_breed_time` and not already `do_not_breed`:
-      * Updates `reproduction_data_stream` with do not breed event
-      * Updates `self.do_not_breed` to true
-* `Animal.life_stage_update()`
-   * Updates the life stage of an animal based on its type and current simulation time
-   * Called by `Animal.daily_routines()` 
-   * Includes the following logic: 
-      * If a cow is `do_not_breed` and daily milk produced is less than user-defined `cull_milk_production`: 
-         * `Sold_at_day` = `simulation_day` 
-         * `Cull_reason` = `low_prod_cull`
-         * `Animal_status` = sold 
-
-::: {.callout-note}
-If a cow is not pregnant when she reaches the days in milk cutoff specified by the user, she will be marked as Do Not Breed and no longer participate in reproductive protocols. When her milk production drops below the production cutoff specified by the user, she is sold for the reason of low production. Note that the only cows who are sold for “low production” are those flagged as DNB for reproductive failure; no low-producing cow who is pregnant or has fewer DIM than the cutoff will be sold for low production.
-:::
 
 ## Manure Excretion
 
