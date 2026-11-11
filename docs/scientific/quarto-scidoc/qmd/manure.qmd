@@ -644,6 +644,10 @@ Manure can undergo anaerobic digestion in a specialized anaerobic digestion cham
 
 **Implementation in RuFaS**
 
+::: {.callout-note}
+The anaerobic digestion submodule is a relatively simplistic representation of an anaerobic digester. Its methods are currently not responsive to manure composition (beyond VS content), digestion temperature, digester type, retention time, or other factors that influence outcomes of anaerobic digestion on actual dairy farms. Accordingly, please review the implementation and assumption sections below carefully.
+:::
+
 The anaerobic digestion submodule in RuFaS currently represents anaerobic digestion within an enclosed, mechanical digester system. The following assumptions are made in the RuFaS anaerobic digestion submodule:
 
 * The digester represented is assumed to be a mesophilic, continuous stirred-tank reactor (CSTR).
@@ -653,11 +657,11 @@ The anaerobic digestion submodule in RuFaS currently represents anaerobic digest
 * At this time, CH<sub>4</sub> generation and volatile solids destruction is based strictly on the quantity of manure volatile solids loaded; other factors are not considered at this time.
 
 
-The anaerobic submodule has two primary functions in RuFaS: 
+The anaerobic digestion submodule has two primary functions in RuFaS: 
 
 * Estimate daily methane production (kg/d) based on the daily mass of manure volatile solids (VS) loaded into the digester.
     * VS loading is dependent on the number and type of animals contributing manure to the digester, the diet of the animals, quantity and type of bedding, and any upstream manure handling processes, e.g., solid liquid separation, water addition, etc.
-* Update the composition of the liquid manure effluent leaving the digester, which enters the anaerobic lagoon. 
+* Update the composition of the liquid manure effluent leaving the digester. 
     * Reflecting VS loss in effluent exiting the digester is essential to capture the reduction in methane emissions from digestate compared to undigested, liquid manure, as well as changes in proportion of inorganic (ammoniacal) to total nitrogen.
 
 **Classes**
@@ -684,36 +688,36 @@ import_table(
 
 **Other Inputs**
 
-Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
+Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kg VS):
 
-* water
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
 
 * `captured_biogas_volume` (m$^3$): Captured biogas (assumed to be composed of 40% CO<sub>2</sub>, 60% CH<sub>4</sub>) volume after accounting for leakage on the current day
 * `captured_methane_volume` (m$^3$): Captured methane volume on the current day, after accounting for leakage
-* `methane_leakage_mass` (kg): Mass of CH<sub>4</sub> lost to the atmosphere through unintended leakage on the current day. This variable is expressed as mass as opposed to volume as CH<sub>4</sub> emissions are reported in kg in the rest of the manure module and other RuFaS modules
+* `methane_leakage_mass` (kg): Mass of CH<sub>4</sub> lost to the atmosphere through unintended leakage on the current day. This variable is expressed as mass rather than volume for consistency with CH<sub>4</sub> emissions (kg) reporting in the rest of the manure module and other RuFaS modules
 
 ### Methodology
 
 **Calculate Daily Methane Generation**
 
-Calculates volume of methane (CH<sub>4</sub>) generated from a CSTR digester. Methane generation is estimated from the daily loading of manure volatile solids (VS). Degradable (VSd) and non-degradable (VSnd) VS are tracked separately but the ratio of VSd : VSnd does not affect CH<sub>4</sub> estimation; only the total quantity of VS is considered. To perform this calculation, we make several assumptions/simplifications: 
+Calculates volume of methane (CH<sub>4</sub>) generated from a CSTR digester. Methane generation is estimated from the daily loading of manure volatile solids (VS). Degradable (VS<sub>d</sub>) and non-degradable (VS<sub>nd</sub>) VS are tracked separately but the ratio of VS<sub>d</sub> : VS<sub>nd</sub> does not affect CH<sub>4</sub> estimation; only the total quantity of VS is considered. To perform this calculation, we make several assumptions/simplifications: 
 
-* The ratio of chemical oxygen demand (COD): VS in dairy manure is assumed to be 1.2 to 1. 1 kg of COD can generate 0.4 kg of methane. Therefore, 1 kg VS reduction/degradation in the anaerobic digester = 1.2 kg COD = 480 L CH<sub>4</sub>. In other words, each kg VS of reduced is assumed to generate 480 L of CH<sub>4</sub>. 
+* The ratio of chemical oxygen demand (COD): VS in dairy manure is assumed to be 1.2 to 1, and 1 kg of COD can generate 0.4 m$^3$ of methane (Wei Liao, Michigan State University, personal communications). Therefore, 1 kg VS reduction/degradation in the anaerobic digester = 1.2 kg COD = 480 L CH<sub>4</sub>. In other words, each kg VS of reduced in the anaerobic digester is assumed to generate 480 L of CH<sub>4</sub>. 
 * A CSTR reduces manure VS content by approximately 50%. This is a generalization across CSTR digesters of varying efficiencies, based on expert opinion from W. Liao (MSU) and A. Leytem (USDA-ARS). 
 * Considering that 480 L of CH<sub>4</sub> are generated per kg of VS destroyed, and approximately 50% of VS loaded are anticipated to be destroyed, we estimate CH<sub>4</sub> generation by assuming 240 L CH<sub>4</sub> are generated per VS kg loaded into the digester; this is also in alignment with the @IPCC2019 Tier II manure CH<sub>4</sub> B$_0$ value.
 * Lastly, the volumetric ratio of CH<sub>4</sub> to CO<sub>2</sub> generation in the CSTR is assumed to be 6:4 (e.g. generation of 60% CH<sub>4</sub>, 40% CO<sub>2</sub>biogas) based on commonly cited digester performance metrics (e.g., EPA, [@Fernandez2015]). The total quantity of VS destroyed in anaerobic digestion is then assumed to be equal to the quantity of CH<sub>4</sub> and CO<sub>2</sub> generated in the digester. This assumption is made due to a lack of data on destruction of degradable vs. non-degradable VS in anaerobic digestion.
@@ -807,9 +811,9 @@ $$
 $$
 :::
 
-We then utilize the value of `total_volatile_solids_destruction` (kg) to update VSd, manure VSnd, and bedding VSnd. As mentioned above, the total quantity of VS destroyed is partitioned between the three VS fractions according to the proportion of each fraction in manure entering the digester. E.g., if manure entering contained 60% VSd, 10% manure VSnd, and 30% bedding VSnd, 60% of destroyed VS will be subtracted from VSd, 10% from manure VSnd, and 30% from bedding VSnd.
+We then utilize the value of `total_volatile_solids_destruction` (kg) to update VS<sub>d</sub>, manure VS<sub>nd</sub>, and bedding VS<sub>nd</sub>. As mentioned above, the total quantity of VS destroyed is partitioned between the three VS fractions according to the proportion of each fraction in manure entering the digester. E.g., if manure entering contained 60% VS<sub>d</sub>, 10% manure VS<sub>nd</sub>, and 30% bedding VS<sub>nd</sub>, 60% of destroyed VS will be subtracted from VS<sub>d</sub>, 10% from manure VS<sub>nd</sub>, and 30% from bedding VS<sub>nd</sub>.
 
-To do this, we calculate the ratio of VSd to VS (`degradable_volatile_solids_frac`) and manure VSd to VS and apply these fractions to the `total_volatile_solids_destruction` value to determine the updated VS fraction values.
+To do this, we calculate the ratio of VS<sub>d</sub> to VS (`degradable_volatile_solids_frac`) and manure VS<sub>d</sub> to VS and apply these fractions to the `total_volatile_solids_destruction` value to determine the updated VS fraction values.
 
 ::: {#eq-mn-adg-7}
 [[**MN.ADG.7**]]{.aside .content-visible when-format="html"}
@@ -868,7 +872,7 @@ $$
 * `generated_methane_volume` (m$^3$) = volume of CH<sub>4</sub> generated in the digester on a single day, calculated in [MN.ADG.1](#eq-mn-adg-1)
 * `biogas_leakage_fraction` (%) = fraction of biogas generated in the anaerobic digester that escapes to the atmosphere through unintended leakage; Default Value: 0.01 (1%)
 
-**Update Digestor Effluent Composition `_report_anaerobic_digestor_outputs`**
+**Update Digester Effluent Composition `_report_anaerobic_digester_outputs`**
 
 The calculations below are some additional prerequisites to generating anaerobic digestion-specific outputs.
 
