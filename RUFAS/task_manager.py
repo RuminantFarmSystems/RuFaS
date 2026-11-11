@@ -484,9 +484,7 @@ class TaskManager:
 
         for task_type in EXCLUSIVE_TASK_TYPES:
             if task_type in task_types and len(task_types) > 1:
-                conflicting_task_types = sorted(
-                    other_type.name for other_type in task_types - {task_type}
-                )
+                conflicting_task_types = sorted(other_type.name for other_type in task_types - {task_type})
                 error_message = (
                     f"{task_type.name} tasks cannot be run with other task types "
                     "in the same task configuration. "

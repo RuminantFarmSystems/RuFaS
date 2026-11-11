@@ -636,9 +636,7 @@ def test_parse_input_tasks(
         **single_task,
         "task_type": "SIMULATION_MULTI_RUN",
         "random_seeds": [1, 2, 3],
-        "saved_output_pools": [
-            {"name": "previous_pool", "path": "/output/previous_pool.json"}
-        ],
+        "saved_output_pools": [{"name": "previous_pool", "path": "/output/previous_pool.json"}],
     }
     sample_task_config["tasks"].append(multi_task)
 
@@ -664,15 +662,11 @@ def test_parse_input_tasks(
         assert task["export_input_data_to_csv"] is False
         assert task["input_data_csv_export_path"] == Path("")
         assert task["input_data_csv_import_path"] == Path("")
-        assert task["task_manager_metadata_properties"] == {
-            "test_property": "test_value"
-        }
+        assert task["task_manager_metadata_properties"] == {"test_property": "test_value"}
 
         assert task["metadata_file_path"] == Path("/path/to/sim")
         assert task["properties_file_path"] == Path("path/to/properties")
-        assert task["comparison_properties_file_path"] == Path(
-            "path/to/comparison/properties"
-        )
+        assert task["comparison_properties_file_path"] == Path("path/to/comparison/properties")
         assert task["convert_variable_table_path"] == Path("dummy.csv")
         assert task["logs_directory"] == Path("/output/logs")
         assert task["save_animals_directory"] == Path("/output/herd")
@@ -685,9 +679,7 @@ def test_parse_input_tasks(
         assert task["suppress_log_files"] is False
 
     assert single[0]["saved_output_pools"] == []
-    assert multi[0]["saved_output_pools"] == [
-        {"name": "previous_pool", "path": Path("/output/previous_pool.json")}
-    ]
+    assert multi[0]["saved_output_pools"] == [{"name": "previous_pool", "path": Path("/output/previous_pool.json")}]
 
     mock_task_input_manager.get_data.assert_called_once_with("tasks")
     mock_task_input_manager.get_metadata.assert_called_once_with("properties")
@@ -750,10 +742,7 @@ def test_parse_input_tasks_exclusive_task_conflict(
     """Test that exclusive task types cannot be mixed with other task types."""
     base_task = sample_task_config["tasks"][0]
 
-    sample_task_config["tasks"] = [
-        {**base_task, "task_type": task_type}
-        for task_type in task_types
-    ]
+    sample_task_config["tasks"] = [{**base_task, "task_type": task_type} for task_type in task_types]
 
     mock_add_error = mocker.patch.object(task_manager.output_manager, "add_error")
 
@@ -766,14 +755,9 @@ def test_parse_input_tasks_exclusive_task_conflict(
     assert "Conflicting task types:" in error_message
 
     # At least one exclusive type must be identified as the rejected task.
-    exclusive_names = {
-        task_type.name
-        for task_type in EXCLUSIVE_TASK_TYPES
-    }
+    exclusive_names = {task_type.name for task_type in EXCLUSIVE_TASK_TYPES}
     reported_exclusive = next(
-        name
-        for name in exclusive_names
-        if error_message.startswith(f"{name} tasks cannot be run")
+        name for name in exclusive_names if error_message.startswith(f"{name} tasks cannot be run")
     )
 
     expected_conflicts = sorted(
@@ -782,10 +766,7 @@ def test_parse_input_tasks_exclusive_task_conflict(
         if TaskType.from_string(task_type).name != reported_exclusive
     )
 
-    assert (
-        f"Conflicting task types: {', '.join(expected_conflicts)}."
-        in error_message
-    )
+    assert f"Conflicting task types: {', '.join(expected_conflicts)}." in error_message
 
     mock_add_error.assert_called_once_with(
         "Task Type Conflict",
