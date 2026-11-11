@@ -1982,9 +1982,11 @@ The rate of Heifer IIIs calving is largely determined by the rate of dairy femal
 
  More details of the processes at an individual animal level, including acute sales, deaths, and calf retention, are described in the [Culling](#sec-an-cull) section of Animal-level processes and management. 
 
-#### Low Production sales (Oversupply culls)
+#### Low Production sales 
 At each herd-size check, `HerdManager` evaluates the current number of cows relative to the user-defined buying and selling thresholds.
 Low production sales in RuFaS are used to reduce the cow population when cow numbers exceed the user-defined selling threshold, in the same way that springing heifers replace low-producing cows in real herds.
+
+Low production sales are sometimes referred in code or documentation as "oversupply" because the number of sales are regulated by the herd size growth driven by heiferIII's calving. 
 
 Not all cows are eligible for removal. Eligibility is determined using the user-defined days-in-milk and pregnancy thresholds. By default, a cow must have at least 60 days in milk and must have carried her current calf for no more than 180 days to be considered for a low production cull. These limits protect fresh cows and cows in later pregnancy, respectively.
 
@@ -3045,6 +3047,9 @@ Acute-sale and mortality risks are evaluated daily using separate parity-specifi
 
 Acute-sale risk is evaluated before mortality risk. If a cow is selected for acute sale, she is removed from further mortality assessment on that day.
 
+**Low Production Sales**
+
+
 **Acute Sales**
 
 An acute sale represents an involuntary sale of a cow, rather than mortality or a management-driven oversupply cull.
@@ -3085,32 +3090,29 @@ The average daily mortality risk for a cow's parity is calculated as:
 * The mortality-risk calculation uses the cow's parity to select the appropriate `parity_death_probability`, applies the fresh/non-fresh adjustment, and stochastically determines whether the cow dies.
 
 
-#### Heifer II Sales
+#### Youngstock Removals: sales
+
+**Reproduction Culls (Heifer II sales)**
 
 If the heifer does not have a successful conception or pregnancy and age (days born) exceeds heifer repro cull time, this heifer is culled
+
+
+**Newborn Calf Sales**
+
+All live male calves are sold immediately after birth. Live female calves may either be retained as replacement youngstock or sold. RuFaS provides two alternative methods for determining female-calf retention: a rate-based method and a count-based method.
 
 **User Inputs and Constants**
 
 * `Heifer_repro_cull_time` age (days) when a heifer would be culled for failure to become pregnant (Default: 500 days)
+* `calf_retention_method` method used to determine newborn female-calf retention. Options are `rate` and `count`. Default = `rate`.
+* `keep_female_calf_rate` The percentage of female calves kept and raised on-farm (Default: 1)
+* `keep_female_calf_num_annual` target number of live female calves to retain per year when `calf_retention_method` = `count`.
 
 **Parameters and Equations**
 
 * `Animal._evaluate_heiferII_for_culling()`
    * Called by `Animal.daily_routines()` → `Animal.animal_life_stage_update()`
    * This method determines whether a heifer should be culled based on its pregnancy status and age, returning *True* if the heifer is not pregnant and has surpassed the specified culling age.
-
-
-#### Calf Sales
-
-All live male calves are sold immediately after birth. Live female calves may either be retained as replacement youngstock or sold. RuFaS provides two alternative methods for determining female-calf retention: a rate-based method and a count-based method.
-
-**User Inputs and Constants**
-
-* `calf_retention_method` method used to determine female-calf retention. Options are `rate` and `count`. Default = `rate`.
-* `keep_female_calf_rate` The percentage of female calves kept and raised on-farm (Default: 1)
-* `keep_female_calf_num_annual` target number of live female calves to retain per year when `calf_retention_method` = `count`.
-
-**Parameters and Equations**
 
 * `CalfRetentionPolicy` determines whether newborn calves are retained or sold according to the user-selected `calf_retention_method`.
   * For `rate`, live female calves are retained according to `keep_female_calf_rate`.
@@ -3128,19 +3130,44 @@ This is the default calf-retention method and maintains the behavior of simulati
 
 When `calf_retention_method` = `count`, `keep_female_calf_num_annual` specifies a target number of live female calves to retain during each simulation year. RuFaS distributes opportunities to retain calves across the simulation year using an evenly spaced schedule of retention "tags." When a retention tag becomes available, the next live female calf born consumes that tag and is retained. Female calves born when no retention tag is available are sold.
 
-Male calves and stillborn calves do not consume retention tags.
+Male calves, crossbred beef calves, and stillborn calves do not consume retention tags.
 
-The annual retention target is prorated for partial simulation years. If more than 20% of the retention tags remain unfulfilled at the end of the simulation year because too few live female calves were born, RuFaS records an ERROR and halts the simulation.
+The annual retention target is prorated for partial simulation years. 
+
+If more than 20% of the retention tags remain unfulfilled at the end of the simulation year because too few live female calves were born, RuFaS records an ERROR and halts the simulation.
 
 The retention decision is managed by `CalfRetentionPolicy`. During the active herd simulation, `HerdManager` applies the policy when newborn calves are created. During herd initialization, female-calf retention continues to use the rate-based method because the count-based annual scheduling process does not apply to the initialization spin-up.
 
-#### Youngstock Mortality
+#### Youngstock Removals: deaths
+
+**Calf and heifer mortality**
+
 RuFaS represents mortality among live-born calves and post-weaning heifers separately from stillbirth and reproductive culling.
 
+`calf_mortality_rate` specifies the cumulative probability that a live-born calf retained on the farm may subsequently die before weaning. This process applies only to live-born calves and is therefore distinct from stillbirth.
 
-** User Inputs and Constants **
+For each eligible calf, RuFaS first determines whether mortality will occur using an event-based random draw. If mortality is assigned, the future death day is sampled from the period between day 1 and the day before weaning.
+
+Animals removed through this process are assigned the cull reason:
+`died from pre-wean mortality`
+
+`heifer_mortality_rate` specifies the cumulative probability that a post-weaning heifer dies before entering the Heifer III stage. If a heifer is assigned a mortality event, the potential deaths are divided between the Heifer I and Heifer II stages:
+
+* Two-thirds of assigned heifer mortality events occur during the Heifer I period between weaning and the beginning of breeding.
+* One-third occur during the Heifer II period after breeding begins and before entry into the prefresh Heifer III stage.
+
+Heifer III animals are intentionally excluded from the youngstock mortality process. Animals removed through this process are assigned the cull reason: `died from post-wean mortality`
+
+For animals already partway through a mortality window when loaded into the initial herd, a sampled mortality date is retained only when that date occurs after the animal's current age.
+
+**Stillbirths**
+
+Calf losses in RuFaS include two distinct processes: stillbirth and mortality following a live birth. Stillbirth is evaluated when the newborn calf is initialized; the calf is removed on the day of birth if the random draw is less than the `still_birth_rate`. 
+
+**User Inputs and Constants**
 * `calf_mortality_rate` cumulative probability that a live-born calf dies between birth and weaning (Default: 0.0).
 * `heifer_mortality_rate` cumulative probability that a post-weaning heifer dies before entering the Heifer III stage (Default: 0.0).
+* `Still_birth_rate` Rate of stillbirths (percent, 0-1) (Default: 0.065)
 
 **Parameters and Equations**
 
@@ -3151,39 +3178,10 @@ RuFaS represents mortality among live-born calves and post-weaning heifers separ
   * Determines whether a post-weaning heifer is assigned a mortality event.
   * Two-thirds of assigned mortality events occur during the Heifer I stage and one-third during the Heifer II stage.
   * Heifer III animals are excluded from this mortality process.
-
-** Heifer Mortality **
-`heifer_mortality_rate` specifies the cumulative probability that a post-weaning heifer dies before entering the Heifer III stage. If a heifer is assigned a mortality event, the potential deaths are divided between the Heifer I and Heifer II stages:
-
-* Two-thirds of assigned heifer mortality events occur during the Heifer I period between weaning and the beginning of breeding.
-* One-third occur during the Heifer II period after breeding begins and before entry into the prefresh Heifer III stage.
-
-Heifer III animals are intentionally excluded from the youngstock mortality process. Animals removed through this process are assigned the cull reason: `died from post-wean mortality`
-
-The sampled future death day is stored using the same future-death mechanism used elsewhere in the Animal Module. For animals already partway through a mortality window when loaded into the initial herd, a sampled mortality date is retained only when that date occurs after the animal's current age.
-
-**Calf Losses (Death)**
-
-This process applies only to live-born calves and is therefore distinct from stillbirth. Calf losses in RuFaS include two distinct processes: stillbirth and mortality following a live birth. Stillbirth is evaluated when the newborn calf is initialized and removed from the day of birth if the random draw is less than the `still_birth_rate`. 
-
-For each eligible calf, RuFaS first determines whether mortality will occur using an event-based random draw. If mortality is assigned, the future death day is sampled from the period between day 1 and the day before weaning.
-
-Live-born calves retained on the farm may subsequently die before weaning according to `calf_mortality_rate`, as described in the introduction to Youngstock Mortality section above.
-
-Animals removed through this process are assigned the cull reason:
-`died from pre-wean mortality`
-
-**User Inputs and Constants**
-
-* `Still_birth_rate` Rate of stillbirths (percent, 0-1) (Default: 0.065)
-
-**Parameters and Equations**
-
 * `Animal._initialize_newborn_calf()` 
    * Called by `HerdManager._create_newborn_calf()` in `_perform_daily_routines_for_animals()`
       * Creates a newborn calf instance 
-   * If a random draw is less than the `still_birth_rate`, then `self.sold` = True and `STILL\_BIRTH` is added to `self.events`
-   * If assigned to be sold, `sold_at_day` = `simulation_day`
+   * If a random draw is less than the `still_birth_rate`, then `self.stillborn` = True and added to `stillborn_newborn_calves`
 
 #### Required User Inputs
 
