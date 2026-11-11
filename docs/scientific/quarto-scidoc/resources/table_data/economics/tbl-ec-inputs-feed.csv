@@ -1,0 +1,4 @@
+﻿Variable , Description , Units
+animal_inputs.<span class="purple-text">[feed_form]</span>, Feed quantities categorized by feed ingredient and form , kg/yr
+animal_inputs.<span class="purple-text">[milk_class]</span>, Total milk production categorized by milk class
+animal_inputs.<span class="purple-text">[milk_component]</span>, Milk components (milk protein or milk fat) expressed in weight percent, wt. %

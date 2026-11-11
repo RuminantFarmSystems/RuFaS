@@ -1,0 +1,4 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[natgas_commercial]</span>",commodity_prices.natgas_commercial.dollar_per_megajoule.csv,Spatiotemporal,25
+"commodity_prices.<span class=""purple-text"">[natgas_industrial]</span>",commodity_prices.natgas_industrial.dollar_per_megajoule.csv,Spatiotemporal,25
+"commodity_prices.<span class=""purple-text"">[natgas_residential]</span>",commodity_prices.natgas_residential.dollar_per_megajoule.csv,Spatiotemporal,25

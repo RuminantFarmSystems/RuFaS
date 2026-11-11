@@ -1,0 +1,5 @@
+﻿Variable , Description , Units
+labor_hours_crop,"Estimated annual labor hours per hectare for crop management, based on U.S. average labor requirements for corn from FINBIN; values converted from per-acre to per-hectare using a factor of 2.47105",hours/head/year
+labor_hours_animal_total,"Estimated annual labor hours per head of dairy cattle for all management tasks, based on U.S. average values from FINBIN livestock enterprise summaries",hours/head/year
+labor_hours_animal_manure,"Estimated annual labor hours per head of dairy cattle specifically for manure management, derived by applying a 3.82% scaling factor to total animal labor hours based on farm labor allocation data from Ashley Howlett",hours/head/year
+labor_hours_animal_nonmanure,"Estimated annual labor hours per head of dairy cattle for all management tasks excluding manure management, derived by applying a 96.18% scaling factor to total animal labor hours based on farm labor allocation data from Ashley Howlett",hours/head/year

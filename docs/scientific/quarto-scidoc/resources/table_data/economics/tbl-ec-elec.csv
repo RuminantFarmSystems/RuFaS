@@ -1,0 +1,4 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[elec_commercial]</span>",Estimated commercial electricity price per kilowatt-hour,$/kWh
+"<span class=""purple-text"">[elec_industrial]</span>",Estimated industrial electricity price per kilowatt-hour,$/kWh
+"<span class=""purple-text"">[elec_residential]</span>",Estimated commercial residential price per kilowatt-hour,$/kWh

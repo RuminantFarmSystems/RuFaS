@@ -1,0 +1,5 @@
+﻿Variable , Description , Units,Reference
+farm_services.labor_hours_crop,farm_services.labor_hours_crop.hours_per_ha_per_year.csv,Historical U.S. Averages,33
+farm_services.labor_hours_animal_total,farm_services.labor_hours_animal_total.hours_per_head_per_year.csv,Historical U.S. Averages,33
+farm_services.labor_hours_animal_manure,farm_services.labor_hours_animal_manure.hours_per_head_per_year.csv,Historical U.S. Averages,"33,34"
+farm_services.labor_hours_animal_nonmanure,farm_services.labor_hours_animal_nonmanure.hours_per_head_per_year.csv,Historical U.S. Averages,"33,34"

@@ -1,0 +1,4 @@
+﻿Variable , Description , Units,Reference
+"farm_services.<span class=""purple-text"">[tractor_small]</span>",farm_services.tractor_small.dollar_per_hour.csv,Spatiotemporal,30
+"farm_services.<span class=""purple-text"">[tractor_medium]</span>",farm_services.tractor_medium.dollar_per_hour.csv,Spatiotemporal,30
+"farm_services.<span class=""purple-text"">[tractor_large]</span>",farm_services.tractor_large.dollar_per_hour.csv,Spatiotemporal,30

@@ -1,0 +1,13 @@
+﻿Variable , Description , Units
+cashflow_inputs.target_irr,Target internal rate of return (IRR),%
+cashflow_inputs.target_payback_period,Target payback period for the investment being evaluated,years
+"cashflow_inputs.target_product.<span class=""purple-text"">[item_level_variable]</span>",The item_level_variable for which the minimum product selling price is determined,[item_level_variable]
+cashflow_inputs.target_MBSP,Target minimum product selling price (MBSP),$/unit product
+"cashflow_inputs.<span class=""blue-text"">[depreciation_i]</span>","Annual depreciation (for i = 1 to N years). The cash flow defaults to the appropriate depreciation schedule for dairy farm financial analysis, however users may override the default values.",% per year
+cashflow_inputs.tax_rate,Annual income tax rate,%
+cashflow_inputs.loan_term,Loan term in years,years
+cashflow_inputs.loan_int,Loan interest rate,%
+cashflow_inputs.const_term,Construction term in years,years
+cashflow_inputs.const_int,Construction loan interest rate,%
+"cashflow_inputs.<span class=""blue-text"">[const_rate_i]</span>","Construction rate (% of construction completed in each year of the construction term, for i = 1 to N years)",%
+cashflow_inputs.equity,Total project equity (% of total capital expenses),%

@@ -1,0 +1,4 @@
+﻿Variable , Description , Units
+land_ha_rent,"Estimated annual rental cost per hectare of agricultural land, based on 2017 USDA Quickstats county-level data where available, or state-level data when county data was missing; all values adjusted to 2023 dollars using CPI inflation",$/ha/year
+labor_hours,"Estimated hourly wage rate for hired farm labor, based on annual USDA NASS data for hired labor wage rates; state-level values were assigned to counties, with national averages used when state data was unavailable",$/hour
+grain_transportation,"Estimated transportation cost per tonne-kilometer for grain, based on 2023–2024 national average truck rates from the USDA Agricultural Marketing Service. Rates were derived from Table 1 of the Grain Truck and Ocean Rate Advisory and averaged across 25-, 100-, and 200-mile hauls, then converted from $/mi/truckload to $/tonne/km using standard truck weight and unit conversions",$/t/km

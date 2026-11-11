@@ -58,7 +58,6 @@ This harmonized framework allows users to conduct a wide range of economic analy
 
 ![Logic flow of the Flexible Economic Framework (FEF), showing how user-defined scenario configurations determine analysis routing and output metrics. The decision flow distinguishes between single vs. comparative scenarios and the inclusion or exclusion of capital investment (CAPEX), guiding whether the analysis follows a partial budget or discounted cash flow approach.](../resources/images/ecn_fef.png){#fig-ecn-flow-fef}
 
-
 ## Required User Inputs
 
 ### Variable Naming Convention
@@ -69,9 +68,9 @@ To ensure consistency, traceability, and flexibility across the RuFaS Economics 
 
 Biophysical inputs are grouped into four primary system categories: **animal**, **manure_mgmt**, **crop**, and **feed_storage**. Within the first element of the naming convention, the system category is followed by an underscore and a specified function, either **inputs**, **products**, or **variables**, depending on the role of the input parameter.
 
-* **inputs** represent requirements to operate the system (e.g., fuel, labor, maintenance)
-* **products** represent outputs of the system (e.g., milk, calves, RNG, carbon credits)
-* **variables** represent intermediate values used in calculations or passed to other functions (e.g., dynamic costing equations)
+* **Inputs** represent requirements to operate the system (e.g., fuel, labor, maintenance)
+* **Products** represent outputs of the system (e.g., milk, calves, RNG, carbon credits)
+* **Variables** represent intermediate values used in calculations or passed to other functions (e.g., dynamic costing equations)
 
 Economic inputs are grouped into four system categories: **commodity_prices**, **farm_services**, **capital_costs**, and **cashflow_inputs**. These may be followed by sub-categories and item-level variables or may be directly followed by item-level variables.
 
@@ -79,16 +78,84 @@ The subcategory provides a more specific grouping within each system, often base
 
 The item-level variable identifies the specific commodity, service, or output being measured or priced (e.g., `net_fertilizer_nitrogen`, `diesel`, `milk_class_2`).
 
+In the input tables:
+
+* [**Blue text**]{.blue-text} is used for subcategories when there are multiple possible values, such as different crop forms, animal classifications, or distinct comfort investments. 
+* [**Purple text**]{.purple-text} is used to indicate item-level variables only when there is more than one possible item within the same category or subcategory (e.g., different pricing sectors for electricity or natural gas, fertilizer components, or milk classes).
+* **Black text** is used for the variable category or throughout the variable name if the variable has no subcategory or has only a single option for the item-level value. These are scalar (non-indexed) values with no additional levels of specificity.
+
+For example:
+
+* Example 1. crop_inputs.[alfalfa_silage.]{.blue-text}[net_fertilizer_nitrogen]{.purple-text}
+	* **crop_inputs**: system category specifying required inputs for crop production
+	* [**alfalfa_silage**]{.blue-text}: subcategory identifying a specific crop (alfalfa) and crop from (silage) with blue text indicating there are multiple available crops and crop forms
+	* [**net_fertilizer_nitrogen**]{.purple-text}: item-level variable identifying the specific input (nitrogen from fertilizers) with purple text indicating there are multiple fertilizer nutrient types (nitrogen, phosphorus, or potassium)
+* Example 2. commodity_prices.[natgas_industrial]{.purple-text}
+	* **commodity_prices**: system category specifying the variable is a commodity price 
+	* No subcategory is present; subcategory text is not used
+	* [**natgas_industrial**]{.purple-text}: item-level variable identifying the specific commodity and sector (industrial natural gas) with purple text indicating there are multiple natural gas sectors (residential, commercial, industrial)
+* Example 3. manure_mgmt_products.digester_carbon_credits
+	* A scalar variable with no subcategory or item-level indexing; the entire variable is a single value and is shown in standard black text
+
+This naming convention supports clarity and consistency in variable tracking, streamlines integration with the FEF and ensures transparent communication of input data structures. The color-coded formatting in the tables improves usability by helping users quickly identify levels of specificity and variable structure.
 
 ### Economic Inputs
 
-The economics module requires a set of adjustable economic inputs to quantify costs, revenues, and overall financial performance across different farm management strategies. These inputs include variables such as product prices (e.g., milk, feed, fertilizer), capital and operating costs, labor rates, and credit values (e.g., carbon offsets). To support consistent and accessible analysis, a robust set of default values is provided for all economic inputs. These defaults are based on the best available data, incorporating both temporal and geographic resolution where possible—ranging from national averages to county-level estimates, depending on data availability. While users are encouraged to modify these values to reflect site-specific conditions or local market dynamics, the default dataset allows for meaningful analysis even in the absence of detailed economic data, ensuring broad applicability and ease of use.
+The economics module requires a set of adjustable economic inputs to quantify costs, revenues, and overall financial performance across different farm management strategies. These inputs include variables such as product prices (e.g., milk, feed, fertilizer), capital and operating costs, labor rates, and credit values (e.g., carbon offsets). To support consistent and accessible analysis, a robust set of default values is provided for all economic inputs. These defaults are based on the best available data, incorporating both temporal and geographic resolution where possible—ranging from national averages to county-level estimates, depending on data availability. While users are encouraged to modify these values to reflect site-specific conditions or local market dynamics, the default dataset allows for meaningful analysis even in the absence of detailed economic data, ensuring broad applicability and ease of use. Additional variable sub-categories are provided in Appendix A.
+
+```{python}
+#| label: tbl-ec-inputs-commodity
+#| tbl-cap: Required commodity price inputs.
+import_table(
+    "../resources/table_data/economics/tbl-ec-inputs-commodity.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-inputs-services
+#| tbl-cap: Required farm services and maintenance inputs.
+import_table(
+    "../resources/table_data/economics/tbl-ec-inputs-services.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-inputs-capital
+#| tbl-cap: Required capital investment inputs.
+import_table(
+    "../resources/table_data/economics/tbl-ec-inputs-capital.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-inputs-cash
+#| tbl-cap: Required cash flow inputs.
+import_table(
+    "../resources/table_data/economics/tbl-ec-inputs-cash.csv",
+    colalign=["left", "center", "center"],
+)
+```
 
 **Grant Financing for Capital Projects**
 
 Many dairy sustainability projects, especially those involving anaerobic digesters or advanced manure management systems, rely on grant financing to reduce or fully offset capital expenses. Sources may include USDA’s Environmental Quality Incentives Program (EQIP), California’s Dairy Digester Research and Development Program (DDRDP), or private sustainability investment funds.
 
 In the RuFaS Economics Module, grant contributions are modeled by adjusting the `cashflow_inputs.equity` variable, which determines the share of capital costs not financed through loans. Whether funding is secured through equity or grants, this input controls the proportion of the project’s cost base that is not subject to debt servicing, enabling flexible modeling of a wide range of financial structures.
+
+**Discounted Cashflow Rate of Return (DCFROR) Inputs**
+
+```{python}
+#| label: tbl-ec-inputs-dcfror
+#| tbl-cap: User-defined inputs for discounted cashflow rate of return analysis.
+import_table(
+    "../resources/table_data/economics/tbl-ec-inputs-dcfror.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
 
 ### Binary Inputs and Booleans
 
@@ -99,14 +166,42 @@ The economics module includes a small set of targeted binary and Boolean inputs 
 #| tbl-cap: User-defined logic inputs for cost estimations of manure hauling.
 import_table(
     "../resources/table_data/economics/tbl-ec-inputs-mn-hauling.csv",
-    colalign=["left", "left", "center"],
+    colalign=["left", "center", "center"],
 )
 ```
+
 The variables listed in @tbl-ec-inputs-mn-hauling represent the only binary inputs currently required for manure hauling cost estimation. These inputs allow users to define whether hauling costs and manure nutrient value are included in the economic assessment and whether hauling is modeled using owned or rented equipment. As the model evolves, additional logic inputs may be incorporated to accommodate expanded manure management configurations and alternative hauling or export arrangements.
 
 ### Biophysical Inputs
 
-The economics module relies on a suite of biophysical inputs to quantify changes in operational costs and revenue streams. These inputs represent outputs from the RuFaS biophysical model – such as milk production, manure nutrient content, feed use, and greenhouse gas emissions – that are critical for evaluating the economic performance of farm practices. Most biophysical inputs are automatically generated within the RuFaS biophysical model, while others are currently provided through user input but are expected to be integrated into future versions of the RuFaS model. This flexible structure allows the economics module to evolve alongside improvements in system modeling, ensuring that key technical inputs remain accurate and up to date. Required biophysical input variables are listed in Table 1 and organized by target analyses. Unless otherwise specified, all biophysical input parameters are quantified and expressed on an annual basis.
+The economics module relies on a suite of biophysical inputs to quantify changes in operational costs and revenue streams. These inputs represent outputs from the RuFaS biophysical model – such as milk production, manure nutrient content, feed use, and greenhouse gas emissions – that are critical for evaluating the economic performance of farm practices. Most biophysical inputs are automatically generated within the RuFaS biophysical model, while others are currently provided through user input but are expected to be integrated into future versions of the RuFaS model. This flexible structure allows the economics module to evolve alongside improvements in system modeling, ensuring that key technical inputs remain accurate and up to date. Required biophysical input variables are listed in @tbl-ec-inputs-feed, @tbl-ec-inputs-land, @tbl-ec-inputs-mn. Unless otherwise specified, all biophysical input parameters are quantified and expressed on an annual basis. Additional variable sub-categories are provided in Appendix A.
+
+```{python}
+#| label: tbl-ec-inputs-feed
+#| tbl-cap: Required biophysical inputs for high quality feed for increased milk production analysis. The default timestep for all economic inputs is annual.
+import_table(
+    "../resources/table_data/economics/tbl-ec-inputs-feed.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-inputs-land
+#| tbl-cap: Required biophysical inputs for land allocation vs. feed savings analysis. The default timestep for all economic inputs is annual.
+import_table(
+    "../resources/table_data/economics/tbl-ec-inputs-land.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-inputs-mn
+#| tbl-cap: Required biophysical inputs for manure management systems analysis. The default timestep for all economic inputs is annual.
+import_table(
+    "../resources/table_data/economics/tbl-ec-inputs-mn.csv",
+    colalign=["left", "center", "center"],
+)
+```
 
 ## Expected Outputs
 
@@ -114,27 +209,62 @@ The economic module produces a variety of outputs to support user interpretation
 
 For partial budget analyses, the system generates a ROI summary. This includes a stacked bar chart illustrating changes in costs and revenues from a baseline scenario, enabling users to visually assess which variables drive the ROI. In all cases, underlying raw data tables are provided, offering transparency into the numeric values that inform each plot and metric.
 
-
 **Partial Budget Analysis**
+
+<!-- insert section here -->
 
 **Example DCFROR Analysis**
 
 This example scenario evaluates the economic feasibility of adding on-site grain storage to a mid-sized dairy farm as a strategy to reduce annual feed purchasing costs. The analysis considers the capital investment required to install two 10,000-bushel steel grain bins along with augers and electrical systems, totaling $100,000 in upfront costs. It is assumed that 80% of the capital cost is financed, reducing the initial outlay and introducing annual debt service payments into the cash flow analysis. Operating expenses—including labor, electricity, fuel, and maintenance—are estimated at $5,500 annually. The scenario assumes the farm can purchase feed in bulk at harvest prices, resulting in savings of $40 per ton compared to purchasing throughout the year, as well as reducing feed losses by 2% annually through improved storage and reduced spoilage. The investment is evaluated using the MACRS with a 7-year depreciation schedule and a target IRR of 10%. Based on these assumptions, we calculate the breakeven feed purchase price necessary for the investment to be financially justified.
 
-In this example, we find that the maximum feed purchase price or minimum crop selling price is greater than the market feed purchase prices ($672/ton vs $280/ton), Figure 6. Therefore, it would not be financially profitable to install the feed storage equipment on the farm. Figure 5 provides a breakdown of the annual cashflows associated with this analysis. Figure 6 provides a breakdown of Minimum Product Selling Price into economic components. Figure 7 provides a breakdown of net crop emissions compared to conventional feed production emissions. Figure 8 provides a Sankey diagram breakdown of Minimum Product Selling Price into its economic components.
+In this example, we find that the maximum feed purchase price or minimum crop selling price is greater than the market feed purchase prices ($672/ton vs $280/ton), @fig-ecn-dcfror-mpsp. Therefore, it would not be financially profitable to install the feed storage equipment on the farm. @fig-ecn-dcfror-cashflow provides a breakdown of the annual cashflows associated with this analysis. @fig-ecn-dcfror-mpsp provides a breakdown of Minimum Product Selling Price into economic components. @fig-ecn-dcfror-emissions provides a breakdown of net crop emissions compared to conventional feed production emissions. @fig-ecn-dcfror-sankey provides a Sankey diagram breakdown of Minimum Product Selling Price into its economic components.
+
+![Cashflow for the example DCFROR analysis.](../resources/images/ecn_dcfror_cashflow.png){#fig-ecn-dcfror-cashflow}
+
+![Breakdown of Minimum Product Selling Price into economic components.](../resources/images/ecn_dcfror_mpsp.png){#fig-ecn-dcfror-mpsp}
+
+![Breakdown of net crop emissions compared to conventional feed production emissions.](../resources/images/ecn_dcfror_emissions.png){#fig-ecn-dcfror-emissions}
+
+![Sankey diagram breakdown of Minimum Product Selling Price into economic components.](../resources/images/ecn_dcfror_sankey.png){#fig-ecn-dcfror-sankey}
 
 An Excel file containing all inputs, assumptions, and the resulting DCFROR cashflow table is supplied as Appendix B with this document. Appendix files can also be found on the Sustainability Science RuFaS GitHub repository
 
-
 **Example ROI Analysis**
 
-This example assesses the economic return of implementing a higher-cost, more nutritionally rich feed ration for a 200-cow dairy farm operating in a high milk price environment. The farm transitions from a standard feed at $0.12 per pound to a nutrient-dense option at $0.15 per pound. With each cow consuming 50 pounds of feed daily, the additional feed cost totals $109,500 annually. The improved nutrition is projected to increase milk output by 5 pounds per cow per day. Assuming a milk price of $0.40 per pound—reflecting premiums for organic, grass-fed, or value-added markets—the farm sees an annual revenue increase of $146,000. This results in a net profit gain of $36,500 per year and a ROI of 33.3%. The positive return on investment highlights the value of feed optimization when aligned with higher-margin market opportunities and reinforces the importance of integrating both production and pricing dynamics in decision-making. All the assumptions associated with this analysis are shown in Table 12 and the results are shown in Figure 9.
+This example assesses the economic return of implementing a higher-cost, more nutritionally rich feed ration for a 200-cow dairy farm operating in a high milk price environment. The farm transitions from a standard feed at $0.12 per pound to a nutrient-dense option at $0.15 per pound. With each cow consuming 50 pounds of feed daily, the additional feed cost totals $109,500 annually. The improved nutrition is projected to increase milk output by 5 pounds per cow per day. Assuming a milk price of $0.40 per pound—reflecting premiums for organic, grass-fed, or value-added markets—the farm sees an annual revenue increase of $146,000. This results in a net profit gain of $36,500 per year and a ROI of 33.3%. The positive return on investment highlights the value of feed optimization when aligned with higher-margin market opportunities and reinforces the importance of integrating both production and pricing dynamics in decision-making. All the assumptions associated with this analysis are shown in @tbl-ec-roi-a, @tbl-ec-roi-b, and @tbl-ec-roi-summary and the results are shown in @fig-ecn-roi.
+
+```{python}
+#| label: tbl-ec-roi-a
+#| tbl-cap: Annual standard feed cost and milk revenue cost associate with the example ROI analysis.
+import_table(
+    "../resources/table_data/economics/tbl-ec-roi-a.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-roi-b
+#| tbl-cap: Annual nutrient-dense feed cost and milk revenue cost associate with the example ROI analysis.
+import_table(
+    "../resources/table_data/economics/tbl-ec-roi-b.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-roi-summary
+#| tbl-cap: Example ROI analysis.
+import_table(
+    "../resources/table_data/economics/tbl-ec-roi-summary.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+![Stacked bar chart showing the results of the example ROI analysis.](../resources/images/ecn_roi.png){#fig-ecn-roi}
 
 An Excel file containing all inputs, assumptions, and the ROI calculations is supplied as Appendix C with this document. Appendix files can also be found on the Sustainability Science RuFaS GitHub repository.
 
-
 ## Methodology
-
 
 ### Economics Module Inputs Manager
 
@@ -180,73 +310,41 @@ Equations are provided for both covered lagoon and plug flow digesters and for t
 *Scenario 1: Lagoon + RNG*
 
 $$
-\text{CAPEX} = 875 \times \text{COWS} + 625,000
+\text{CAPEX} = 875 \times \text{COWS} + 625,000 \qquad \text{ENERGY} = 34.80 \times \text{COWS} + 21
 $$
 
 $$
-\text{ENERGY} = 34.80 \times \text{COWS} + 21
-$$
-
-$$
-\text{LABOR} = 188.48 \times \text{COWS} + 113.75
-$$
-
-$$
-\text{REPAIRS} = 66.69 \times \text{COWS} + 40.25
+\text{LABOR} = 188.48 \times \text{COWS} + 113.75 \qquad \text{REPAIRS} = 66.69 \times \text{COWS} + 40.25
 $$
 
 *Scenario 2: Lagoon + CHP*
 
 $$
-\text{CAPEX} = 1,312.5 \times \text{COWS} + 937,500
+\text{CAPEX} = 1,312.5 \times \text{COWS} + 937,500 \qquad \text{ENERGY} = 15.75 \times \text{COWS} + 11,250
 $$
 
 $$
-\text{ENERGY} = 15.75 \times \text{COWS} + 11,250
-$$
-
-$$
-\text{LABOR} = 94.5 \times \text{COWS} + 67,500
-$$
-
-$$
-\text{REPAIRS} = 47.25 \times \text{COWS} + 33,750
+\text{LABOR} = 94.5 \times \text{COWS} + 67,500 \qquad \text{REPAIRS} = 47.25 \times \text{COWS} + 33,750
 $$
 
 *Scenario 3: Plug Flow + RNG*
 
 $$
-\text{CAPEX} = 1,750 \times \text{COWS} + 1,000,000
+\text{CAPEX} = 1,750 \times \text{COWS} + 1,000,000 \qquad \text{ENERGY} = 47.91 \times \text{COWS} + 445
 $$
 
 $$
-\text{ENERGY} = 47.91 \times \text{COWS} + 445
-$$
-
-$$
-\text{LABOR} = 287.47 \times \text{COWS} + 2,670
-$$
-
-$$
-\text{REPAIRS} = 143.73 \times \text{COWS} + 1,335
+\text{LABOR} = 287.47 \times \text{COWS} + 2,670 \qquad \text{REPAIRS} = 143.73 \times \text{COWS} + 1,335
 $$
 
 *Scenario 4: Plug Flow + CHP*
 
 $$
-\text{CAPEX} = 2,625 \times \text{COWS} + 2,000,000
+\text{CAPEX} = 2,625 \times \text{COWS} + 2,000,000 \qquad \text{ENERGY} = 12.5 \times \text{COWS} + 7,500
 $$
 
 $$
-\text{ENERGY} = 12.5 \times \text{COWS} + 7,500
-$$
-
-$$
-\text{LABOR} = 75 \times \text{COWS} + 2,670
-$$
-
-$$
-\text{REPAIRS} = 37.5 \times \text{COWS} + 22,500
+\text{LABOR} = 75 \times \text{COWS} + 2,670 \qquad \text{REPAIRS} = 37.5 \times \text{COWS} + 22,500
 $$
 
 In addition to the equations for digester infrastructure and operations, the module includes a separate equation to estimate the annual cost of RNG transport and pipeline injection (2024 USD/yr), applicable to RNG scenarios:
@@ -277,37 +375,21 @@ Costing functions for screw press separators were based on recent vendor quotes 
 *Screw Press [@isley2025]*
 
 $$
-\text{CAPEX} = 107.2 \times \text{COWS} 
+\text{CAPEX} = 107.2 \times \text{COWS} \qquad \text{ENERGY} = 0.85 \times \text{COWS} 
 $$
 
 $$
-\text{ENERGY} = 0.85 \times \text{COWS} 
-$$
-
-$$
-\text{LABOR} = 0.54 \times \text{COWS} 
-$$
-
-$$
-\text{REPAIRS} = 1.07 \times \text{COWS} 
+\text{LABOR} = 0.54 \times \text{COWS} \qquad \text{REPAIRS} = 1.07 \times \text{COWS} 
 $$
 
 *Stationary Screen [@UofInd]*
 
 $$
-\text{CAPEX} = 61.25 \times \text{COWS} 
+\text{CAPEX} = 61.25 \times \text{COWS} \qquad \text{ENERGY} = 0.88 \times \text{COWS} 
 $$
 
 $$
-\text{ENERGY} = 0.88 \times \text{COWS} 
-$$
-
-$$
-\text{LABOR} = 0.16 \times \text{COWS} 
-$$
-
-$$
-\text{REPAIRS} = 0.63 \times \text{COWS} 
+\text{LABOR} = 0.16 \times \text{COWS} \qquad \text{REPAIRS} = 0.63 \times \text{COWS} 
 $$
 
 **Estimation of Manure Hauling Costs and Manure Value**
@@ -320,157 +402,289 @@ This modular and adaptable design allows the RuFaS Economics Module to support c
 
 *On-Farm Hauling and Land Application*
 
-Costs associated with the hauling and on-farm land application of liquid manure were adapted from Hadrich et al. [7]. These costs are itemized into three key components: agitation and pumping from lagoon storages, hauling and land application, and incorporation via either tilling or sub-surface injection. To improve usability, the original data were simplified into two representative scenarios: a small dairy operation with 175 cows and a hauling distance of up to 2 miles, and a large dairy operation with 1,400 cows and a hauling distance of up to 4 miles [8]. Costs are reported on both a per-cow-per-year and per-gallon basis, allowing users to select the format most convenient for their analysis. A summary of these values is provided in Table 8.
+Costs associated with the hauling and on-farm land application of liquid manure were adapted from @hadrich2010. These costs are itemized into three key components: agitation and pumping from lagoon storages, hauling and land application, and incorporation via either tilling or sub-surface injection. To improve usability, the original data were simplified into two representative scenarios: a small dairy operation with 175 cows and a hauling distance of up to 2 miles, and a large dairy operation with 1,400 cows and a hauling distance of up to 4 miles [@harrigan2011]. Costs are reported on both a per-cow-per-year and per-gallon basis, allowing users to select the format most convenient for their analysis. A summary of these values is provided in @tbl-ec-liq-mn.
 
-The total annual operational costs for on-farm manure hauling and land application is simply the product of the variable `manure_mgmt_inputs.on_farm_manure_hauling` (gallons/yr) and the chosen value(s) from Table 7.
+```{python}
+#| label: tbl-ec-liq-mn
+#| tbl-cap: Ownership and operation costs for liquid manure hauling and land application (small dairy = 175 cows with hauling up to 2 miles; large dairy = 1,400 cows with hauling up to 4 miles).
+import_table(
+    "../resources/table_data/economics/tbl-ec-liq-mn.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+The total annual operational costs for on-farm manure hauling and land application is simply the product of the variable `manure_mgmt_inputs.on_farm_manure_hauling` (gallons/yr) and the chosen value(s) from @tbl-ec-liq-mn.
 
 *On-Farm Manure Hauling (Manure Exports)*
 
-Costing functions for the transportation of manure beyond the farm gate were adapted from Marufuzzaman et al. [9], which presents a comprehensive techno-economic analysis of wastewater sludge hauling that is transferable to solid and semi-solid manure transport. Although not specific to dairy manure, the study provides detailed cost estimates on both a per-ton and per-tonne-kilometer basis, enabling flexible and scalable evaluation of transport scenarios. The adapted functions distinguish between owned and rented equipment options, allowing users to reflect realistic operational setups. This flexibility is particularly useful when exploring regional strategies to redistribute excess manure from nutrient-surplus areas to nutrient-deficient regions, where the transport cost becomes a critical factor in feasibility. The equations also support evaluation of trade-offs between transportation distance and the nutrient value of exported manure. Cost estimates and assumptions used in the RuFaS Economics Module are summarized in Table 9.
+Costing functions for the transportation of manure beyond the farm gate were adapted from @marufuzzaman2015, which presents a comprehensive techno-economic analysis of wastewater sludge hauling that is transferable to solid and semi-solid manure transport. Although not specific to dairy manure, the study provides detailed cost estimates on both a per-ton and per-tonne-kilometer basis, enabling flexible and scalable evaluation of transport scenarios. The adapted functions distinguish between owned and rented equipment options, allowing users to reflect realistic operational setups. This flexibility is particularly useful when exploring regional strategies to redistribute excess manure from nutrient-surplus areas to nutrient-deficient regions, where the transport cost becomes a critical factor in feasibility. The equations also support evaluation of trade-offs between transportation distance and the nutrient value of exported manure. Cost estimates and assumptions used in the RuFaS Economics Module are summarized in @tbl-ec-liq-mn-hauling.
 
-To estimate the potential revenue from manure exports, the RuFaS Economics Module draws on nutrient content data generated by the manure module's mass balance, which tracks the flow of nitrogen (N), phosphorus (P), and potassium (K) through each stage of the manure management system. Manure value is calculated based on the bioavailable nutrient content of exported manure, using default market values of $2.76 per kilogram of bioavailable nitrogen, $1.25 per kilogram of bioavailable phosphorus, and $2.30 per kilogram of bioavailable potassium, derived from historical fertilizer price data reported by the USDA (see Table 11).
+```{python}
+#| label: tbl-ec-liq-mn-hauling
+#| tbl-cap: Cost approximations for the transportation of solid manure based on total mass and total transportation distance.
+import_table(
+    "../resources/table_data/economics/tbl-ec-liq-mn-hauling.csv",
+    colalign=["left", "center", "center"],
+)
+```
 
-The net economic impact of off-farm manure exports, accounting for both transportation costs and nutrient value or sales revenue, is estimated using Equation 5:
+To estimate the potential revenue from manure exports, the RuFaS Economics Module draws on nutrient content data generated by the manure module's mass balance, which tracks the flow of nitrogen (N), phosphorus (P), and potassium (K) through each stage of the manure management system. Manure value is calculated based on the bioavailable nutrient content of exported manure, using default market values of $2.76 per kilogram of bioavailable nitrogen, $1.25 per kilogram of bioavailable phosphorus, and $2.30 per kilogram of bioavailable potassium, derived from historical fertilizer price data reported by the USDA (see Appendix B).
 
-	C_(manure disposal)= ∅_1 (C_fixed Α+C_variable Β)-∅_2 (2.76(N)+1.25(P)+2.30(K))	(5)
+The net economic impact of off-farm manure exports, accounting for both transportation costs and nutrient value or sales revenue, is estimated using [EC.5](#eq-ec-5). 
 
-where  C_(manure disposal) (farm_services.manure_export_cost) is the annual cost (if positive) or revenue (if negative) in $/yr associated with manure exports (off-farm manure hauling), ∅_1 is the binary input (manure_mgmt_variables.include_off_farm_transport_costs), C_fixed is the fixed costs of manure hauling per tonne (from Table 8), Α is the total mass of manure exported in tonnes (manure_mgmt_products.manure_exports_tonnes from Table 1),  C_variable is the variable costs of manure hauling per tonne*km (from Table 8), Β is the total tonne*km of manure exported (manure_mgmt_products. manure_exports_tonnes * manure_mgmt_products.manure_exports_transport_distance_km), ∅_2 is the binary input (manure_mgmt_variables.include_manure_value), and N, P, and K are the total mass of manure nitrogen, phosphorus, and potassium contained in the exported manure, respectively (manure_mgmt_products.exported_manure_nitrogen, manure_mgmt_products. exported_manure_phosphorus, and manure_mgmt_products.exported_manure_potassium). 
-The logic variable manure_mgmt_variables.manure_truck_ownership determines whether the fixed and variable costs from Table 8, as used in Equation 5, correspond to the owned or rented truck scenario.
+:::{#eq-ec-5}
+[[**EC.5**]]{.aside .content-visible when-format="html"}
+$$
+\text{C}_{\text{manure disposal}} = \emptyset_1 (\text{C}_\text{fixed}\text{A} + \text{C}_\text{variable}\text{B}) - \emptyset_2 (2.76(\text{N}) + 1.25(\text{P}) + 2.30(\text{K}))
+$$
+:::
+
+*Where*:  
+
+* C_(manure disposal) `farm_services.manure_export_cost` = annual cost (if positive) or revenue (if negative) in $/yr associated with manure exports (off-farm manure hauling) 
+* ∅_1 = binary input `manure_mgmt_variables.include_off_farm_transport_costs` 
+* C_fixed = fixed costs of manure hauling per tonne (from @tbl-ec-inputs-mn-hauling) 
+* Α = total mass of manure exported in tonnes `manure_mgmt_products.manure_exports_tonnes` (from @tbl-ec-inputs-mn)
+* C_variable = variable costs of manure hauling per tonne x km (from @tbl-ec-inputs-mn-hauling)
+* Β = total tonne (`manure_mgmt_products.manure_exports_tonnes`) x km of manure exported (`manure_mgmt_products.manure_exports_transport_distance_km`) 
+* ∅_2 = the binary input `manure_mgmt_variables.include_manure_value`
+* N, P, and K = total mass of manure nitrogen, phosphorus, and potassium contained in the exported manure, `manure_mgmt_products.exported_manure_nitrogen` `manure_mgmt_products.exported_manure_phosphorus` and `manure_mgmt_products.exported_manure_potassium`
+
+The logic variable `manure_mgmt_variables.manure_truck_ownership` determines whether the fixed and variable costs from @tbl-ec-inputs-mn-hauling, as used in [EC.5](#eq-ec-5), are based on owned or rented equipment.
 
 **Costs Associated with the Use of Tractors**
 
-Tractor capital and operating costs were adapted from the University of Illinois Extension’s Tractor Costs 2023 report [10] which provides detailed cost breakdowns across a wide range of tractor horsepower (HP) classes. The dataset includes list and purchase prices, hourly overhead costs, diesel consumption rates, and labor requirements per hour of tractor operation. Capital costs were indexed over multiple years using the Bureau of Labor Statistics (BLS) Producer Price Index (PPI) for farm equipment manufacturing. These were combined with county-level diesel and labor prices across multiple years to develop a spatiotemporal dataset that reflects regional and temporal variation in tractor operating costs.
+Tractor capital and operating costs were adapted from the University of Illinois Extension’s Tractor Costs 2023 report [@althouse_nd] which provides detailed cost breakdowns across a wide range of tractor horsepower (HP) classes. The dataset includes list and purchase prices, hourly overhead costs, diesel consumption rates, and labor requirements per hour of tractor operation. Capital costs were indexed over multiple years using the Bureau of Labor Statistics (BLS) Producer Price Index (PPI) for farm equipment manufacturing. These were combined with county-level diesel and labor prices across multiple years to develop a spatiotemporal dataset that reflects regional and temporal variation in tractor operating costs.
+
 Linear regression was used to derive cost equations as a function of horsepower, which were then applied to three representative tractor sizes: small (90 HP), medium (250 HP), and large (600 HP). Total hourly cost was estimated by multiplying diesel consumption by county-specific fuel prices and labor hours by county-specific wage rates. This resulted in a comprehensive per-hour cost that includes both amortized capital expenditures and all relevant operating expenses, enabling robust integration into the techno-economic analysis framework.
 
 ### Return on Investment (ROI) Calculation
 
-The return on investment (ROI) calculation is used when a user wants to evaluate the financial merit of a specific change within a partial budget framework. This calculation is designed to estimate how much additional revenue is generated per dollar of additional cost incurred. Users typically apply the ROI tool when assessing the value of adopting a new practice or making any change that alters revenue and cost structures, without including capital investments. ROI is calculated using Equation 6. While the equation is simple, the insight it provides—expressed as a percentage return—is critical for comparing options and prioritizing changes based on their potential profitability.
-	ROI=  (Increase in Revenue-Increase in Costs)/(Increase in Costs)×100%
-	(6)
+The return on investment (ROI) calculation is used when a user wants to evaluate the financial merit of a specific change within a partial budget framework. This calculation is designed to estimate how much additional revenue is generated per dollar of additional cost incurred. Users typically apply the ROI tool when assessing the value of adopting a new practice or making any change that alters revenue and cost structures, without including capital investments. ROI is calculated using [EC.6](#eq-ec-6). While the equation is simple, the insight it provides—expressed as a percentage return—is critical for comparing options and prioritizing changes based on their potential profitability.
 
+:::{#eq-ec-6}
+[[**EC.6**]]{.aside .content-visible when-format="html"}
+$$
+\text{ROI} = \frac{\text{Increase in Revenue} - \text{Increase in Costs}}{\text{Increase in Costs}} \times 100\%
+$$
+:::
 
 ### Discounted Cashflow Rate of Return (DCFROR) Analysis
 
-The DCFROR analysis is used when a user needs to evaluate the long-term financial viability of a capital investment that spans multiple years. This analysis accounts for the time value of money by calculating the net present value (NPV) of each year within a projected cash flow. By setting the NPV equal to zero, the tool identifies key financial metrics such as the IRR, payback period, or MPSP. These outputs provide essential insight into whether and when an investment becomes profitable, helping guide decisions that extend beyond a single budget year. Table 9 provides a list of all variables used to perform a DCFROR analysis and the equations thereafter are used for DCFROR calculations.
+The DCFROR analysis is used when a user needs to evaluate the long-term financial viability of a capital investment that spans multiple years. This analysis accounts for the time value of money by calculating the net present value (NPV) of each year within a projected cash flow. By setting the NPV equal to zero, the tool identifies key financial metrics such as the IRR, payback period, or MPSP. These outputs provide essential insight into whether and when an investment becomes profitable, helping guide decisions that extend beyond a single budget year. @tbl-ec-inputs-dcfror provides a list of all input variables used to perform a DCFROR analysis and the equations thereafter are used for DCFROR calculations.
 
-The DCFROR analysis is structured as a step-by-step process designed to evaluate the long-term financial viability of a capital investment. Each step builds upon the last, enabling the calculation of key financial metrics. The following sections describe the order of operations and the rationale for each equation used in the analysis. An example DCFROR analysis is presented in the Error! Reference source not found. section. All assumptions and results are provided in Appendix B (Excel document).
+```{python}
+#| label: tbl-ec-calc-dcfror
+#| tbl-cap: Model calculated parameters used in the DCFROR analysis.
+import_table(
+    "../resources/table_data/economics/tbl-ec-calc-dcfror.csv",
+    colalign=["left", "center", "center"],
+)
+```
+
+The DCFROR analysis is structured as a step-by-step process designed to evaluate the long-term financial viability of a capital investment. Each step builds upon the last, enabling the calculation of key financial metrics. The following sections describe the order of operations and the rationale for each equation used in the analysis.
 
 **Step 1: Define the Timeline**
 
-The analysis begins by establishing the project timeline. If the investment includes a construction period, those years are represented as negative values. For example, a three-year construction phase would include years -2, -1, and 0. The operational phase follows, covering the full duration of the loan term (e.g., years 1 through 30). This approach ensures that pre-revenue capital costs are included in the financial evaluation. Equation 7 is used to establish the range of years used in the analysis, from the start of construction through the final year of the loan. Equation 8 provides an example of a timeline which includes a 3-year construction and at 30-year loan term. These calculations are used to populate the ‘Year’ column in Appendix B’s cash flow table.
+The analysis begins by establishing the project timeline. If the investment includes a construction period, those years are represented as negative values. For example, a three-year construction phase would include years -2, -1, and 0. The operational phase follows, covering the full duration of the loan term (e.g., years 1 through 30). This approach ensures that pre-revenue capital costs are included in the financial evaluation. [EC.7](#eq-ec-7) is used to establish the range of years used in the analysis, from the start of construction through the final year of the loan. [EC.7](#eq-ec-8) provides an example of a timeline which includes a 3-year construction and at 30-year loan term.
 
-	y=1-〖Co〗_T:L_t	(7)
+:::{#eq-ec-7}
+[[**EC.7**]]{.aside .content-visible when-format="html"}
+$$
+\text{y} = 1 - \text{Co}_\text{T}:\text{L}_\text{t}
+$$
+:::
 
-
-	y=1-3:30= -2:30
-	(8)
-
-
+:::{#eq-ec-8}
+[[**EC.8**]]{.aside .content-visible when-format="html"}
+$$
+\text{y} = 1 - 3:30 = -2:30
+$$
+:::
 
 **Step 2: Compute Discount Factors**
 
-To account for the time value of money, a discount factor is calculated for each year of the project timeline. This factor adjusts future cash flows to their present value, allowing financial comparisons across time. Equation 9 is used for discount factor calculation. These calculations are used to populate the ‘DiscountFactor’ column in Appendix B’s cash flow table.
-		
-	DF(y)=1/(1+IRR)^y 	(9)
+To account for the time value of money, a discount factor is calculated for each year of the project timeline. This factor adjusts future cash flows to their present value, allowing financial comparisons across time. [EC.9](#eq-ec-9) is used for discount factor calculation.
 
-
+:::{#eq-ec-9}
+[[**EC.9**]]{.aside .content-visible when-format="html"}
+$$
+\text{DF}(\text{y}) = \frac{1}{(1 + \text{IRR})^{\text{y}}}
+$$
+:::		
 
 **Step 3: Determine Capital Expenditures During Construction**
 
-Capital expenditures are then distributed across the construction years according to a predefined construction rate. This step captures the timing and scale of capital outflows prior to the operational phase. Equation 10 determines the construction time period and Equation 11 calculates annual capital spent. These calculations are used to populate the ‘Capital’ column in Appendix B’s cash flow table.
-	y= 1-〖Co〗_T:0	(10)
+Capital expenditures are then distributed across the construction years according to a predefined construction rate. This step captures the timing and scale of capital outflows prior to the operational phase. [EC.10](#eq-ec-10) determines the construction time period and [EC.11](#eq-ec-11) calculates annual capital spent.
 
-		
-	〖CC〗_y (y)=〖Co〗_y (y)*〖CC〗_tot*E	(11)
+:::{#eq-ec-10}
+[[**EC.10**]]{.aside .content-visible when-format="html"}
+$$
+\text{y} = 1 - \text{Co}_\text{T}:0
+$$
+:::
 
+:::{#eq-ec-11}
+[[**EC.11**]]{.aside .content-visible when-format="html"}
+$$
+\text{CC}_\text{y}(\text{y}) = \text{Co}_\text{y}(\text{y}) \times \text{CC}_\text{tot} \times E
+$$
+:::
 
-For each year of capital spending, the portion financed through debt is calculated, Equation 12. This becomes the loan principal and forms the basis for interest and repayment calculations. These calculations are used to populate the ‘LoanPrinciple’ column in Appendix B’s cash flow table.
+For each year of capital spending, the portion financed through debt is calculated, [EC.12](#eq-ec-12). This becomes the loan principal and forms the basis for interest and repayment calculations.
 
-	L_Prin (y)=〖Co〗_y (y)*〖CC〗_tot*F	(12)
+:::{#eq-ec-12}
+[[**EC.12**]]{.aside .content-visible when-format="html"}
+$$
+\text{L}_\text{Prin}(\text{y}) = \text{Co}_\text{y}(\text{y}) \times \text{CC}_\text{tot} \times F
+$$
+:::
 
+If interest accrues on the loan during construction, it is calculated using the construction interest rate and the annual loan principal, [EC.13](#eq-ec-13). This cost must be included in the present value of the investment. 
 
-If interest accrues on the loan during construction, it is calculated using the construction interest rate and the annual loan principal, Equation 13. This cost must be included in the present value of the investment. These calculations are used to populate the ‘InterestPayment’ column in Appendix B’s cash flow table.
+:::{#eq-ec-13}
+[[**EC.13**]]{.aside .content-visible when-format="html"}
+$$
+\text{L}_\text{InPay}(\text{y}) = \text{L}_\text{Prin}(\text{y}) \times \text{IR}_\text{Co}
+$$
+:::
 
-	L_InPay (y)=L_Prin (y)*〖IR〗_Co	(13)
+The capital costs and interest payments from the construction period are converted to present value terms using the discount factors, [EC.14](#eq-ec-14). This value is later subtracted from the present value of operational cash flows to determine NPV. 
 
-
-The capital costs and interest payments from the construction period are converted to present value terms using the discount factors, Equation 14. This value is later subtracted from the present value of operational cash flows to determine NPV. These calculations are used to populate the ‘NPVCapitalPlusInterest’ column in Appendix B’s cash flow table.
-
-	C_(c+i) (y)=[〖〖CC〗_y (y)+L〗_InPay (y)]*DF(y)
-	(14)
-
-
+:::{#eq-ec-14}
+[[**EC.14**]]{.aside .content-visible when-format="html"}
+$$
+\text{C}_{\text{c+i}}(\text{y}) = [\text{CC}_\text{y}(\text{y}) + \text{L}_\text{InPay}(\text{y})] \times \text{DF}(\text{y})
+$$
+:::
 
 **Step 4: Calculate Annual Loan Payments and Breakdown of Annual Loan Payments**
 
-During the operational period (Equation 15), a fixed annual loan payment is computed based on the financed capital, loan interest rate, and loan term (Equation 16). This payment remains constant each year, though its composition (principal vs. interest) changes over time. These calculations are used to populate in the ‘LoanPayment’ column in Appendix B’s cash flow table.
+During the operational period ([EC.15](#eq-ec-15)), a fixed annual loan payment is computed based on the financed capital, loan interest rate, and loan term ([EC.16](#eq-ec-16)). This payment remains constant each year, though its composition (principal vs. interest) changes over time. 
 
-	y= 1:L_t	(15)
+:::{#eq-ec-15}
+[[**EC.15**]]{.aside .content-visible when-format="html"}
+$$
+\text{y} = 1:\text{L}_\text{t}
+$$
+:::
 
+:::{#eq-ec-16}
+[[**EC.16**]]{.aside .content-visible when-format="html"}
+$$
+\text{L}_\text{Pay} = \frac{\text{CC}_\text{tot} \times \text{IR}_\text{L} \times \text{F}}{1 - (1 + \text{IR}_\text{L})^{-\text{L}_\text{t}}}
+$$
+:::
 
-	L_Pay=(〖CC〗_tot*〖IR〗_L*F)/(1-(1+〖IR〗_L )^(-L_t ) )	(16)
+The loan payment is broken into interest and principal components. Early in the loan term, more of the payment goes toward interest; later, more goes toward principal. [EC.17](#eq-ec-17) calculates the loan interest payments and [EC.18](#eq-ec-18) calculates the annual loan principle. 
 
+:::{#eq-ec-17}
+[[**EC.17**]]{.aside .content-visible when-format="html"}
+$$
+\text{L}_\text{InPay}(\text{y}) = \text{L}_\text{Prin}(\text{y}-1) \times \text{IR}_\text{L}
+$$
+:::
 
-The loan payment is broken into interest and principal components. Early in the loan term, more of the payment goes toward interest; later, more goes toward principal. Equation 17 calculates the loan interest payments and Equation 18 calculates the annual loan principle. These calculations are used to populate the ‘InterestPayment’ and ‘LoanPrinciple’ columns, respectively, in Appendix B’s cash flow table.
-	L_InPay (y)=L_Prin (y-1)*〖IR〗_L	(17)
-
-
-	L_Prin (y)=L_Prin (y-1)-L_Pay+L_InPay (y)	(18)
-
-
+:::{#eq-ec-18}
+[[**EC.18**]]{.aside .content-visible when-format="html"}
+$$
+\text{L}_\text{Prin}(\text{y}) = \text{L}_\text{Prin}(\text{y}-1) - \text{L}_\text{Pay} + \text{L}_\text{InPay}(\text{y})
+$$
+:::
 
 **Step 5: Calculate Depreciation**
 
+Annual depreciation is calculated for the capital cost using a predefined schedule using the IRS MACRS method, [EC.19](#eq-ec-19) (@irs2024). This reduces taxable income and is factored into annual cash flow calculations.
 
-Annual depreciation is calculated for the capital cost using a predefined schedule using the IRS MACRS method, Equation 19 [14]. This reduces taxable income and is factored into annual cash flow calculations. The MACRS values are shown in the ‘DepreciationRate’ column in Appendix B’s cash flow table. The capital depreciation values populate the ‘CapitalDepreciation’ column in Appendix B’s cash flow table.
-
-	D_tot (y)= D_r (y)*〖CC〗_tot	(19)
-
+:::{#eq-ec-19}
+[[**EC.19**]]{.aside .content-visible when-format="html"}
+$$
+\text{D}_{\text{tot}}(\text{y}) = \text{D}_{\text{r}}(\text{y}) \times \text{CC}_{\text{tot}}
+$$
+:::
 
 **Step 6: Determine Net Revenue and Taxable Income**
 
-Net revenue is computed by subtracting operational costs, loan payments, and depreciation from annual revenue, Equation 20. If net revenue is negative, the value is carried forward as a tax loss along with any previous losses, Equation 21. The maximum useable losses are dictated to be 80% of the net revenue based on IRS guidelines, Equation 22 [15]. Taxable income is then adjusted accordingly using Equation 23. Losses to be carried forward are readjusted based on loss used to reduce taxable income, Equation 24. These calculations are used to populate the ‘NetRevenue’, ‘LossesForward’, and ‘TaxableIncome’ columns, respectively, in Appendix B’s cash flow table.
+Net revenue is computed by subtracting operational costs, loan payments, and depreciation from annual revenue, [EC.20](#eq-ec-20). If net revenue is negative, the value is carried forward as a tax loss along with any previous losses, [EC.21](#eq-ec-21). The maximum useable losses are dictated to be 80% of the net revenue based on IRS guidelines, [EC.22](#eq-ec-22) [@tuovila2024]. Taxable income is then adjusted accordingly using [EC.23](#eq-ec-23). Losses to be carried forward are readjusted based on loss used to reduce taxable income, [EC.24](#eq-ec-24). 
 
-	R_net (y)=R(y)-C_op (y)-L_InPay (y)-D_tot (y)	(20)
+:::{#eq-ec-20}
+[[**EC.20**]]{.aside .content-visible when-format="html"}
+$$
+\text{R}_{\text{net}}(\text{y}) = \text{R}(\text{y}) - \text{C}_{\text{op}}(\text{y}) - \text{L}_{\text{InPay}}(\text{y}) - \text{D}_{\text{tot}}(\text{y})
+$$
+:::
 
+:::{#eq-ec-21}
+[[**EC.21**]]{.aside .content-visible when-format="html"}
+$$
+\text{Loss}(\text{y}) = 
+\begin{cases}
+\text{Loss}(\text{y}-1) + \text{I}_{\text{taxable}}(\text{y}-1), & \text{if } \text{I}_{\text{taxable}}(\text{y}-1) < 0 \\[8pt]
+\text{Loss}(\text{y}-1), & \text{otherwise}
+\end{cases}
+$$
+:::
 
-	Loss(y)= Loss(y-1)+I_taxable (y-1),■(if I_taxable (y-1)<0@else Loss(y-1) ) 	(21)
+:::{#eq-ec-22}
+[[**EC.22**]]{.aside .content-visible when-format="html"}
+$$
+\text{Loss}_{\text{usable}}(\text{y}) = \min(0.80 \times \text{R}_{\text{net}}(\text{y}), abs(\text{Loss}(\text{y})))
+$$
+:::
 
+:::{#eq-ec-23}
+[[**EC.23**]]{.aside .content-visible when-format="html"}
+$$
+\text{I}_{\text{taxable}}(\text{y}) = \text{R}_{\text{net}}(\text{y}) - \text{Loss}_{\text{usable}}(\text{y})
+$$
+:::
 
-	〖Loss〗_usable (y)=min(R_net (y)*0.80,abs(Loss(y))  )
-(22)
-
-
-	I_taxable (y)=R_net (y)-〖Loss〗_usable (y)	(23)
-
-
-	Loss(y)= Loss(y)+〖Loss〗_usable (y)	(24)
-
-
+:::{#eq-ec-24}
+[[**EC.24**]]{.aside .content-visible when-format="html"}
+$$
+\text{Loss(y)} = \text{Loss(y)} + \text{Loss}_{\text{usable}}(\text{y})
+$$
+:::
 
 **Step 7: Calculate Taxes and Annual Cash Income**
 
-Income tax is calculated from taxable income, Equation 25. Annual cash income is then derived by subtracting the tax and loan payment from annual revenue and operation costs, Equation 26. These calculations are used to populate the ‘IncomeTax’ and ‘CashIncome’ columns, respectively, in Appendix B’s cash flow table.
-	T_income (y)=I_taxable (y)*T_r	(25)
+Income tax is calculated from taxable income, [EC.25](#eq-ec-25). Annual cash income is then derived by subtracting the tax and loan payment from annual revenue and operation costs, [EC.26](#eq-ec-26). 
 
+:::{#eq-ec-25}
+[[**EC.25**]]{.aside .content-visible when-format="html"}
+$$
+\text{T}_{\text{income}}(\text{y}) = \text{I}_{\text{taxable}}(\text{y}) \times \text{T}_{\text{r}}
+$$
+:::
 
-	A_income (y)= R(y)-C_op (y)-L_Pay-T_income (y)	(26)
-
+:::{#eq-ec-26}
+[[**EC.26**]]{.aside .content-visible when-format="html"}
+$$
+\text{A}_{\text{income}}(\text{y}) = \text{R}(\text{y}) - \text{C}_{\text{op}}(\text{y}) - \text{L}_{\text{Pay}}(\text{y}) - \text{T}_{\text{income}}(\text{y})
+$$
+:::
 
 **Step 8: Convert Annual Income to Present Value**
 
-Each year’s cash income is discounted using the previously calculated discount factor to obtain its present value, Equation 27. These calculations are used to populate the ‘PresentValue’ column in Appendix B’s cash flow table.
+Each year’s cash income is discounted using the previously calculated discount factor to obtain its present value, [EC.27](#eq-ec-27).
 
-	A_PV (y)= A_income (y)*DF(y)	(27)
-
+:::{#eq-ec-27}
+[[**EC.27**]]{.aside .content-visible when-format="html"}
+$$
+\text{A}_{\text{PV}}(\text{y}) = \text{A}_{\text{income}}(\text{y}) \times \text{DF}(\text{y})
+$$
+:::
 
 **Step 9: Calculate Net Present Value**
 
-Finally, the net present value of the investment is determined by summing all discounted operational cash flows and subtracting the present value of capital costs and construction interest using Equation 28. The total annual net present value is shown in the ‘NPVTotal’ column in Appendix B’s cash flow table. The net present value of tax payment, revenue, operation costs, and loan payments are shown in columns ‘NPVTax’, ‘NPVRevenue’, ‘NPVOperationCosts’, and ‘NPVLoanPayment’, respectively, in Appendix B’s cash flow table.
+Finally, the net present value of the investment is determined by summing all discounted operational cash flows and subtracting the present value of capital costs and construction interest using [EC.28](#eq-ec-28).
 
-	NPV= ∑_(y=1)^(L_t)▒〖A_PV (y) 〗-∑_(y=1-〖Co〗_t)^0▒〖C_(c+i) (y)〗	(28)
-
-
+:::{#eq-ec-28}
+[[**EC.28**]]{.aside .content-visible when-format="html"}
+$$
+\text{NPV} = \sum_{y=1}^{L_t} \text{A}_{\text{PV}}(\text{y}) - \sum_{y=1-\text{Co}_\text{t}}^{0} \text{C}_{\text{c+i}}(\text{y})
+$$
+:::
 
 **Goal Seek Optimization**
 
@@ -480,18 +694,70 @@ Because the NPV equation is non-linear and depends on time-sensitive cash flows,
 
 This optimization process can be expressed generically as:
 
-	Goal Seek: NPV(IRR,Payback Time,MPSP) = 0
-(29)
-
+:::{#eq-ec-29}
+[[**EC.29**]]{.aside .content-visible when-format="html"}
+$$
+\text{Goal Seek: NPV(IRR,Payback Time,MPSP)} = 0
+$$
+:::
 
 In practice, the goal seek algorithm evaluates the NPV function over a range of potential values for the unknown variable and adjusts its guess iteratively. For instance, when solving for MPSP, the tool increases or decreases the price across iterations, checking whether the resulting NPV moves closer to zero, and continues adjusting until the difference is negligible. Note that payback time is often constrained to annual intervals, which can limit the granularity of the result. More precise estimates (e.g., monthly payback periods) are technically possible but require more complex implementation and time-resolution of the cash flow data.
 
 Ultimately, this goal seek function allows users to isolate the critical financial thresholds necessary for project feasibility and supports transparent, assumption-driven capital investment planning.
 
-A flow diagram of the DCFROR process including the goal seek optimization is shown in Figure 4.
+A flow diagram of the DCFROR process including the goal seek optimization is shown in @fig-ecn-dcfror-flow.
+
+![Flow chart of Discounted Cash Flow Rate of Return (DCFROR) analysis calculations.](../resources/images/ecn_dcfror_flow.png){#fig-ecn-dcfror-flow}
+
+### Labor Requirements
+
+To estimate on-farm labor requirements for economic modeling in the RuFaS framework, we developed three labor data categories: 
+
+1. Crop production labor
+2. Animal management labor
+3. Manure management labor. 
+
+These estimates are used to approximate labor demands on a per-hectare or per-animal basis, depending on the operation type, and can be scaled according to user-defined farm size and management practices.
+
+Crop labor estimates were derived using U.S. average values from FINBIN—the Farm Financial Management Database maintained by the University of Minnesota Center for Farm Financial Management [@finbin2025]. Specifically, the “Estimated labor hours per acre” metric was extracted from the crop enterprise summaries for corn, with the crop tenure type set to “All Types” and default filters applied. These values were converted to a per-hectare basis by multiplying by a factor of 2.47105 and compiled in the file farm_services.labor_hours_crop.hours_per_ha_per_year.csv. 
+
+To estimate total crop labor for a specific farm, users should multiply the labor hours per hectare by the number of hectares cultivated:
+
+:::{#eq-ec-e1}
+[[**EC.E1**]]{.aside .content-visible when-format="html"}
+$$
+\text{Crop Labor Hours} = \text{Labor per ha} \times \text{Cultivated Area (ha)}
+$$
+:::
+
+Animal labor estimates were similarly obtained using FINBIN livestock enterprise summaries for dairy cows, with default filters. The “Estimated labor hours per unit” was used to derive annual labor hours per dairy cow, stored in farm_services.labor_hours_animal_total.hours_per_head_per_year.csv. 
+
+To calculate total animal management labor, this per-head value should be multiplied by the total number of dairy cows on the farm:
+
+:::{#eq-ec-e2}
+[[**EC.E2**]]{.aside .content-visible when-format="html"}
+$$
+\text{Animal Labor Hours} = \text{Labor per head} \times \text{Number of Cows}
+$$
+:::
+
+Manure management labor estimates were developed due to the absence of direct labor data for this category in FINBIN. To estimate this component, total labor hours from the dairy cow file were scaled using empirical labor allocation data collected by Ashley Howlett and Jason Karszes (Cornell CALS PRO-DAIRY) in a study reported by @howlett2018. Their findings indicate that a median of 3.82% of total on-farm labor hours on dairy operations are dedicated to manure management. 
+
+Accordingly, manure management labor estimates (farm_services.labor_hours_animal_manure.hours_per_head_per_year.csv) were calculated by multiplying the total dairy cow labor hours by 3.82%.
+
+A corresponding file for non-manure management labor (farm_services.labor_hours_animal_nonmanure.hours_per_head_per_year.csv) was created by subtracting the manure portion, i.e., multiplying the total by 96.18%.
+
+These two files allow for more granular analysis when evaluating the implementation of alternative manure management technologies. In such cases, users should:
+
+* Use farm_services.labor_hours_animal_nonmanure.hours_per_head_per_year.csv as the baseline for existing non-manure labor.
+* Pair it with custom estimates of labor required for the new manure management technology, replacing values from farm_services.labor_hours_animal_manure.hours_per_head_per_year.csv.
+
+This separation ensures accurate labor accounting when the intervention affects only a subset of labor activities. However, if no changes are being made to manure management systems, users can use the total labor per cow file (farm_services.labor_hours_animal_total.hours_per_head_per_year.csv) as a default.
+
+By combining these datasets and applying the relevant scaling factors (e.g., hectares, animal count), users can generate detailed and flexible estimates of annual on-farm labor demand under baseline and intervention scenarios.
 
 
-### RuFaS Economic Database and Default Values**
+### RuFaS Economic Database and Default Values
 
 **Data Retrieval Hierarchy**
 
@@ -501,9 +767,322 @@ This hierarchical approach ensures that user customization is prioritized, while
 
 **Economic Data Resolution**
 
-Table 11 includes all economic variables used in the analysis, along with their corresponding default values and links to the CSV files containing historical data and that data’s source. The table also specifies whether each variable is supported by spatiotemporal data, limited to low-resolution sources, or represents a data gap that requires additional input. While many variables are backed by detailed historical datasets—particularly those related to crop prices, milk prices, and labor rates—others, such as feed supplements, vitamins, and minerals for cattle, are based on single-point estimates or literature values with limited resolution. For variables identified as data gaps, where neither public datasets nor internal expertise are sufficient, RuFaS relies on user input to fill in these values.
+Appendix B includes all economic variables used in the analysis, along with their corresponding default values and links to the CSV files containing historical data and that data’s source. The table also specifies whether each variable is supported by spatiotemporal data, limited to low-resolution sources, or represents a data gap that requires additional input. While many variables are backed by detailed historical datasets—particularly those related to crop prices, milk prices, and labor rates—others, such as feed supplements, vitamins, and minerals for cattle, are based on single-point estimates or literature values with limited resolution. For variables identified as data gaps, where neither public datasets nor internal expertise are sufficient, RuFaS relies on user input to fill in these values.
+ 
 
-All CSV files and the associated data dictionary describing the CSV files can be found in the “_RuFaS Input Files” on the Sustainability Science RuFaS GitHub repository. 
+## Appendix A: Variable Sub-Categories and Data Dictionary
+
+```{python}
+#| label: tbl-ec-cow-class
+#| tbl-cap: Variables available in the [[cow-class_breed_sex]]{.purple-text} class.
+import_table(
+    "../resources/table_data/economics/tbl-ec-cow-class.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-milk-class
+#| tbl-cap: Variables available in the [milk_class]{.purple-text} class.
+import_table(
+    "../resources/table_data/economics/tbl-ec-milk-class.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-semen-type
+#| tbl-cap: Variables available in the [semen_type]{.purple-text} class, based on values reported by @cabrera2022.
+import_table(
+    "../resources/table_data/economics/tbl-ec-semen-type.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-bedding
+#| tbl-cap: Variables available in the [bedding_material]{.purple-text} class, calculated using the USDA ERS cost of production data and assumptions from the DMI Economic Feasibility Analysis. These are intended as default values and should be replaced by user input when available.
+import_table(
+    "../resources/table_data/economics/tbl-ec-bedding.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-crop-form
+#| tbl-cap: Variables available in the [crop_form]{.blue-text} class.
+import_table(
+    "../resources/table_data/economics/tbl-ec-crop-form.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-crop-seeds
+#| tbl-cap: Variables available in the [crop_seeds]{.purple-text} class, provided by the USDA's ERS.
+import_table(
+    "../resources/table_data/economics/tbl-ec-crop-seeds.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-fert
+#| tbl-cap: Variables available in the [net_fertilizer_nutrient]{.purple-text} class, based on national average prices from USDA ERS and extended beyond 2014 using the BLS price indexes (as noted in the variable description); prices converted from dollars per short ton to dollars per kilogram.
+import_table(
+    "../resources/table_data/economics/tbl-ec-fert.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+
+```{python}
+#| label: tbl-ec-water
+#| tbl-cap: Variables available in the [water_type]{.purple-text} class.
+import_table(
+    "../resources/table_data/economics/tbl-ec-water.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-liq-fuel
+#| tbl-cap: Variables available in the [liquid_fuel_type]{.purple-text} class, based on data from the U.S. Energy Information Administration. Prices were assigned at the state level when available, or at the PADD region or national average level when needed. Converted from dollars per gallon to dollars per liter.
+import_table(
+    "../resources/table_data/economics/tbl-ec-fuel.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-elec
+#| tbl-cap: Variables available in the [elect_sector]{.purple-text} class, based on historical state-level data from the U.S. Energy Information Administration; state prices were applied uniformly to counties, with national averages used when state data was unavailable. Converted from cents to dollars per kilowatt-hour.
+import_table(
+    "../resources/table_data/economics/tbl-ec-elec.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-natgas
+#| tbl-cap: Variables available in the [natgas_sector]{.purple-text} class, based on historical state-level data from the U.S. Energy Information Administration; values were assigned uniformly to counties and converted from dollars per thousand cubic feet to dollars per megajoule using standard energy conversion factors.
+import_table(
+    "../resources/table_data/economics/tbl-ec-natgas.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-propane
+#| tbl-cap: Variables available in the [propane_tier]{.purple-text} class, based on historical data from the U.S. Energy Information Administration at the state or PADD region level; prices were converted from dollars per gallon to dollars per liter and assigned uniformly to counties.
+import_table(
+    "../resources/table_data/economics/tbl-ec-propane.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-tractor
+#| tbl-cap: Variables available in the [tractor]{.purple-text} class, based on data from University of Illinois Extension and adjusted using regional wage rates, diesel prices, and indexed using the BLS Producer Price Index for farm equipment.
+import_table(
+    "../resources/table_data/economics/tbl-ec-tractor.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-commodity
+#| tbl-cap: Other commodity prices available.
+import_table(
+    "../resources/table_data/economics/tbl-ec-commodity.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-services
+#| tbl-cap: Other farm services available.
+import_table(
+    "../resources/table_data/economics/tbl-ec-services.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-req
+#| tbl-cap: Other farm requirements available.
+import_table(
+    "../resources/table_data/economics/tbl-ec-req.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-other
+#| tbl-cap: Other costs available.
+import_table(
+    "../resources/table_data/economics/tbl-ec-other.csv",
+    colalign=["left", "left", "center"],
+)
+```
+
+
+## Appendix B: Data Sources for the Economic Variables in the Economic Database
+
+All CSV files and the associated data dictionary describing the CSV files can be found in the “_RuFaS Input Files” on the Sustainability Science [RuFaS GitHub repository](https://github.com/bradenlimb/SS-RuFaS/tree/main/_RuFaS%20Input%20Files).
+
+```{python}
+#| label: tbl-ec-var-commodity
+#| tbl-cap: Data sources for commodity_prices.[[cow-class_breed_sex]]{.purple-text} variables (1 = @nass2024, 2 = @ams2025a).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-commodity.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-milk
+#| tbl-cap: Data sources for commodity_prices.[[milk_class]]{.purple-text} variables (1 = @nass2024, 2 = @ams2025a), 3 = @ams2025b)
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-milk.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-semen
+#| tbl-cap: Data sources for commodity_prices.[[semen_type]]{.purple-text} variables (4 = @cabrera2022).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-semen.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-bedding
+#| tbl-cap: Data sources for commodity_prices.[[bedding_material]]{.purple-text} variables (5 = @isley2025).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-bedding.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-feed
+#| tbl-cap: Data sources for commodity_prices.[[feed_form]]{.purple-text} variables (1 = @nass2024, 2 = @ams2025a 6 = @rotz1996, 7 = @ams2025b, 8 = @bcrc2020, 9 = edwards2018, 10 = @sand2023, 11 = @hartschuh2024, 12 = @businsider2025, 13 = @wright2009, 14 = @agcare2025, 15 = hubers2025a, 16 = @hubers2025b).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-feed.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-crop
+#| tbl-cap: Data sources for commodity_prices.[[crop_seeds]]{.purple-text} variables (17 = @ers2025).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-crop.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-fert
+#| tbl-cap: Data sources for commodity_prices.[[net_fertilizer_nutrient]]{.purple-text} variables (18 = @ers2019, 19 = @fr2024a, 20 = @fr2024b, 21 = @fr2023).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-fert.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-water
+#| tbl-cap: Data sources for commodity_prices.[[water_type]]{.purple-text} variables (1 = @nass2024, 22 = @unger2023).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-water.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-liq-fuel
+#| tbl-cap: Data sources for commodity_prices.[[liquid_fuel_type]]{.purple-text} variables (23 = @eia2024a).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-liq-fuel.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-elec
+#| tbl-cap: Data sources for commodity_prices.[[elec_sector]]{.purple-text} variables (24 = @eia2024b).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-elec.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-natgas
+#| tbl-cap: Data sources for commodity_prices.[[natgas_sector]]{.purple-text} variables (25 = @eia2024c).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-natgas.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-propane
+#| tbl-cap: Data sources for commodity_prices.[[propane_tier]]{.purple-text} variables (26 = @eia2024d).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-propane.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-other-commodity
+#| tbl-cap: Data sources for other commodity price variables (18 = @ers2019, 19 = @fr2024a, 20 = @fr2024b, 24 = @eia2024b, 25 = @eia2024c, 27 = @procton2024, 28 = @forg2024, 29 = @carb2025).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-other-commodity.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-tractor
+#| tbl-cap: Data sources for farm_services.[[tractor_size]]{.purple-text} variables (30 = @althouse_nd).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-tractor.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-services
+#| tbl-cap: Data sources for other farm services variables (1 = @nass2024, 31 = @ams2023, 32 = @amn2024).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-services.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-costs
+#| tbl-cap: Data sources for other cost variables (1 = @nass2024).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-costs.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
+
+```{python}
+#| label: tbl-ec-var-req
+#| tbl-cap: Data sources for other farm requirements variables (33 = @finbin2025, 34 = @howlett2018).
+import_table(
+    "../resources/table_data/economics/tbl-ec-var-req.csv",
+    colalign=["left", "left", "center", "center"],
+)
+```
 
 
 ## References

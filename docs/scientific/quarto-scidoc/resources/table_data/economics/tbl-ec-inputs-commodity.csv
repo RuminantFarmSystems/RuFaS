@@ -1,0 +1,22 @@
+﻿Variable , Description , Units
+"commodity_prices.<span class=""blue-text"">[cow-class_breed_sex]</span>","Animal purchase price categorized by class, breed, and sex ",$/kg
+"commodity_prices.<span class=""blue-text"">[semen_type]</span>","Price of a dose of semen categorized by semen type (semen_conventional, semen_sexed, or semen_beef)",$/straw (dose)
+"commodity_prices.<span class=""blue-text"">[feed_form]</span>",Feed prices categorized by feed ingredient and form,$/kg
+"commodity_prices.<span class=""blue-text"">[milk_class]</span>",Milk price received categorized by milk class ,$/CWT
+commodity_prices.carbon_credits_enteric,Price received for carbon credits from enteric emissions reduction,$/tCO2e
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_nutrient]</span>","Purchase price for fertilizer categorized by fertilizer type (net_fertilizer_nitrogen, net_fertilizer_phosphorus, or net_fertilizer_potassium)",$/kg
+"commodity_prices.<span class=""blue-text"">[crop_seeds]</span>",Seed costs for each crop form ,$/kg
+"commodity_prices.<span class=""purple-text"">[liquid_fuel_type]</span>",Cost for each unit of liquid petroleum fuel consumed by fuel type (diesel or gasoline),$/L
+"commodity_prices.<span class=""purple-text"">[propane_tier]</span>",Cost for each unit of propane consumed and categorized by price tier (propane_residential or propane_wholesale),$/L
+"commodity_prices.<span class=""purple-text"">[natgas_sector]</span>","Cost for each unit of natural gas consumed and categorized by natural gas sector (natgas_residential, natgas_commercial, or natgas_industrial)",$/kg NG
+"commodity_prices.<span class=""purple-text"">[elec_sector]</span>","Cost for each unit of electricity consumed and categorized by electricity sector (elec_residential, elec_commercial, or elec_industrial)",$/kWh
+"commodity_prices.<span class=""purple-text"">[water_type]</span>",Cost for each unit of water consumed and categorized by water type (water_irrigation or water_municipal),$/m3
+commodity_prices.carbon_credits_soil,Price received for carbon credits from soil carbon sequestration,$/tCO2e
+commodity_prices.digester_rng,Price received for RNG sales to the grid,$/MJ
+commodity_prices.digester_elec,Price received for electricity sales to the grid,$/kWh
+commodity_prices.digester_nitrogen,Price received for digester nitrogen co-product,$/kg bioavailable nitrogen
+commodity_prices.digester_phosphorus,Price received for digester phosphorus co-product,$/kg bioavailable phosphorus
+commodity_prices.digester_bedding,Price received for bedding co-products sold,$/kg
+commodity_prices.digester_carbon_credits,"Price received from carbon credits from digester activities (renewable energy credits, fertilizer offsets, etc.)",$/tCO2e
+"commodity_prices.<span class=""blue-text"">[bedding_material]</span>",Cost of bedding categorized by bedding materials ,$/kg
+commodity_prices.rng_upgrading_consumables,"Cost of consumables (excluding fuels, electricity, and water) required for biogas upgrading to produce RNG",$/MJ RNG

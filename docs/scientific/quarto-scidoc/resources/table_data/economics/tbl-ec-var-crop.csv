@@ -1,0 +1,10 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[barley_seed]</span>",commodity_prices.barley_seed.dollar_per_square_meter.csv,Spatiotemporal,17
+"commodity_prices.<span class=""purple-text"">[corn_seed]</span>",commodity_prices.corn_seed.dollar_per_square_meter.csv,Spatiotemporal,17
+"commodity_prices.<span class=""purple-text"">[cotton_seed]</span>",commodity_prices.cotton_seed.dollar_per_square_meter.csv,Spatiotemporal,17
+"commodity_prices.<span class=""purple-text"">[oat_seed]</span>",commodity_prices.oat_seed.dollar_per_square_meter.csv,Spatiotemporal,17
+"commodity_prices.<span class=""purple-text"">[peanut_seed]</span>",commodity_prices.peanut_seed.dollar_per_square_meter.csv,Spatiotemporal,17
+"commodity_prices.<span class=""purple-text"">[rice_seed]</span>",commodity_prices.rice_seed.dollar_per_square_meter.csv,Spatiotemporal,17
+"commodity_prices.<span class=""purple-text"">[sorghum_seed]</span>",commodity_prices.sorghum_seed.dollar_per_square_meter.csv,Spatiotemporal,17
+"commodity_prices.<span class=""purple-text"">[soybean_seed]</span>",commodity_prices.soybean_seed.dollar_per_square_meter.csv,Spatiotemporal,17
+"commodity_prices.<span class=""purple-text"">[wheat_seed]</span>",commodity_prices.wheat_seed.dollar_per_square_meter.csv,Spatiotemporal,17

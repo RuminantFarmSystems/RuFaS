@@ -1,0 +1,9 @@
+﻿Variable , Description , Units
+"farm_services.<span class=""blue-text"">[cow-class_breed_sex]</span>","Veterinary costs categorized by class, breed, and sex",$/(animal*yr)
+farm_services.manure_export_cost,Cost of off-farm manure exports calculated by Equation 5 or can be overridden by user with annual expense or revenue (negative) in lieu of Equation 5.,$/yr
+farm_services.land_ha_rent,Cost to rent farmland per hectare per year,$/(ha*yr)
+farm_services.labor_hours,Hourly cost for hired labor on the farm ,$/hour
+"farm_services.<span class=""purple-text"">[tractor_size]</span>","Total operating cost per tractor hour categorized by tractor size (tractor_small, tractor_medium, or tractor_large)",$/tractor hour
+"farm_services.<span class=""blue-text"">[sub_system_i]</span>.annual_maintenance",Annual maintenance costs for each sub-system (for i = 1 to N sub-systems) of the manure management system,$/yr
+"farm_services.<span class=""blue-text"">[comfort_investment_i]</span>.annual_maintenance",Annual maintenance costs associated with each investment in animal comfort (for i = 1 to N investments),$/yr
+"farm_services.<span class=""blue-text"">[storage_investment_i]</span>.annual_maintenance",Annual maintenance costs associated with each investment in feed storage (for i = 1 to N investments),$/yr

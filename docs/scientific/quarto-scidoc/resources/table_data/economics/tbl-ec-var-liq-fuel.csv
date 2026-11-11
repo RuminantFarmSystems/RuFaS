@@ -1,0 +1,3 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[diesel]</span>",commodity_prices.diesel.dollar_per_liter.csv,Spatiotemporal,23
+"commodity_prices.<span class=""purple-text"">[gasoline]</span>",commodity_prices.gasoline.dollar_per_liter.csv,Spatiotemporal,23

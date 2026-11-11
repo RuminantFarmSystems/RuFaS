@@ -1,0 +1,9 @@
+﻿Variable , Value, Units
+Farm Size,200,cows 
+Feed Rate,50,lbs/day 
+Standard Feed,$0.12 ,$/lb 
+Milk Produced,70,lbs/day 
+Milk Price,$0.40 ,$/lb 
+ , , 
+Annual Feed Cost,"$438,000 ", $/yr
+Annual Milk Revenue,"$2,044,000 ", $/yr

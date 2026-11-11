@@ -1,0 +1,3 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[water_irrigation]</span>",commodity_prices.water_irrigation.dollar_per_cubic_meter.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[water_municipal]</span>",commodity_prices.water_municipal.dollar_per_cubic_meter.csv,Spatiotemporal,22

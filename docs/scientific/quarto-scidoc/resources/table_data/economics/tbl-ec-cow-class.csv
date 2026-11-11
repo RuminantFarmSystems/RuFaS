@@ -1,0 +1,17 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[calves_all]</span>",Cattle prices were gathered from the USDA’s National Agricultural Statistics Service (NASS) Quickstats web portal,$/kg
+"<span class=""purple-text"">[cows_all]</span>",Cattle prices were gathered from the USDA’s NASS web portal,$/kg
+"<span class=""purple-text"">[cows_milk]</span>",Cattle prices were gathered from the USDA’s NASS Quickstats web portal,$/kg
+"<span class=""purple-text"">[cows_ge_500]</span>",Cattle prices were gathered from the USDA’s NASS Quickstats web portal. GE_500: Greater than or equal to 500,$/kg
+"<span class=""purple-text"">[cows_steers_and_heifers_ge_500]</span>",Cattle prices were gathered from the USDA's NASS Quickstats web portal,$/kg
+"<span class=""purple-text"">[cow_dairy_fresh]</span>","Price for Fresh Dairy Cow Replacements (recently gave birth and lactating) with weight 1,000-1,600 lbs from USDA’s National Dairy Comprehensive Report",$/animal
+"<span class=""purple-text"">[cow_dairy_bred_t3]</span>","Price for T3 Bred Dairy Cow (mature and pregnant) with weight 1,000-1,600 lbs from USDA’s National Dairy Comprehensive Report",$/animal
+"<span class=""purple-text"">[cow_dairy_heifer_bred_t3]</span>","Price for T3 Bred Dairy Heifer (pregnant and never calved before) with weight 800-1,400 lbs from USDA’s National Dairy Comprehensive Report",$/animal
+"<span class=""purple-text"">[cow_dairy_heifer_open]</span>",Price for Open Dairy Heifer (not yet been bred or is not currently pregnant) with weight 600-900 lbs from USDA’s National Dairy Comprehensive Report,$/animal
+"<span class=""purple-text"">[calf_bull_1]</span>",Price for No.1 Bull Calves (0-14 days) with weight 90-130 lbs from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[calf_bull_2]</span>",Price for No.2 Bull Calves (0-14 days) with weight 85-120 lbs from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[calf_heifer_1]</span>",Price for No.1 Heifer Calves (0-14 days) with weight 80-130 lbs from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[calf_heifer_2]</span>",Price for No.2 Heifer Calves (0-14 days) with weight 85-120 lbs from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[steer_holstein_300]</span>",Price for Feeder Holstein Steers (300-500 lbs) from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[steer_holstein_500]</span>",Price for Feeder Holstein Steers (500-700 lbs) from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[steer_holstein_700]</span>","Price for Feeder Holstein Steers (700-1,000 lbs) from USDA’s National Dairy Comprehensive Report",$/kg

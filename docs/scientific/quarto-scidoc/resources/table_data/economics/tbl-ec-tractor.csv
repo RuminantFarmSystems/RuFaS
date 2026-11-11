@@ -1,0 +1,4 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[tractor_small]</span>","Estimated total cost per hour of operating a small (90 HP) tractor, including capital, labor, and fuel",$/hr
+"<span class=""purple-text"">[tractor_medium]</span>","Estimated total cost per hour of operating a small (250 HP) tractor, including capital, labor, and fuel",$/hr
+"<span class=""purple-text"">[tractor_large]</span>","Estimated total cost per hour of operating a small (600HP) tractor, including capital, labor, and fuel",$/hr

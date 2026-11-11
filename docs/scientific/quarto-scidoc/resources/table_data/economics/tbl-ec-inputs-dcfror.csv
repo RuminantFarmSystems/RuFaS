@@ -1,0 +1,13 @@
+﻿Variable , Description , Symbol (for equations)
+cashflow_inputs.target_irr, Target internal rate of return, IRR
+cashflow_inputs.target_payback_period, Target payback period, years
+cashflow_inputs.target_product.<span class=""purple-text"">[item_level_variable]</span>, The item_leavel_variable for which the minimum product selling price is determined (e.g. milk_class_2), [item_level_variable]
+cashflow_inputs.target_MPSP, Target minimum target selling price, $/unit product
+"cashflow_inputs.<span class=""blue-text"">[depreciation_i]</span>", Depreciation rate for years i = 1 to N, D<sub>r</sub>
+cashflow_inputs.tax_rate, Tax rate, T<sub>r</sub>
+cashflow_inputs.loan_term, Loan term, L<sub>t</sub>
+cashflow_inputs.loan_int, Loan interest rate, IR<sub>L</sub>
+cashflow_inputs.const_term, Construction loan term, Co<sub>t</sub>
+cashflow_inputs.const_int, Construction loan interest rate, IR<sub>Co</sub>
+"cashflow_inputs.<span class=""blue-text"">[const_rate_i]</span>", Construction rate for years i = 1 to N, Co<sub>y</sub>
+cashflow_inputs.equity, Equity, E

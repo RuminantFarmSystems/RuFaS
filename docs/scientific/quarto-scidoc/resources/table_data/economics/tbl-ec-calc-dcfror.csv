@@ -1,0 +1,20 @@
+﻿Variable , Symbol (for equations)
+Financed Amount, F = 1 - E
+Total Capital Cost, CC<sub>tot</sub>
+Yearly Capital Payment, CC<sub>y</sub>
+Loan Payment, L<sub>Pay</sub>
+Loan Interest Payment, L<sub>InPay</sub>
+Loan Principal, L<sub>Prin</sub>
+Revenue, R
+Operation Costs, C<sub>op</sub>
+Depreciation Amount, D<sub>tot</sub>
+Net Revenue, R<sub>net</sub>
+Losses Forward, Loss
+Useable Losses, Loss<sub>useable</sub>
+Taxable Income, I<sub>taxable</sub>
+Income Tax, T<sub>income</sub>
+Annual Cash Income, A<sub>income</sub>
+Discount Factor, DF
+Annual Present Value, A<sub>PV</sub>
+Total Capital Investment + Interest, C<sub>c+i</sub>
+Net Present Value, NPV

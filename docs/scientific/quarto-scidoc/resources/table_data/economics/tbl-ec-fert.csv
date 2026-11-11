@@ -1,0 +1,13 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[net_fertilizer_nitrogen]</span>",Estimated price per kilogram of nitrogen fertilizer (BLS price index = Nitrogenous fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_phosphorus]</span>",Estimated price per kilogram of phosphorus fertilizer (BLS price index = Phosphatic fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_potassium]</span>","Estimated price per kilogram of potassium fertilizer (BLS price index = Potash, soda, borate mineral mining)",$/kg
+"<span class=""purple-text"">[net_fertilizer_ammonium_nitrate]</span>",Estimated price per kilogram of ammonium nitrate fertilizer (BLS price index = Nitrogenous fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_anhydrous_ammonia]</span>",Estimated price per kilogram of anhydrous ammonia fertilizer (BLS price index = Nitrogenous fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_diammonium_phosphate]</span>",Estimated price per kilogram of diammonium phosphate fertilizer (18-46-0) (BLS price index = Phosphatic fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_nitrogen_solutions_30pct]</span>",Estimated price per kilogram of nitrogen solution fertilizer (30% nitrogen) (BLS price index = Nitrogenous fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_potassium_chloride]</span>","Estimated price per kilogram of potassium chloride fertilizer (60% potassium) (BLS price index = Potash, soda, borate mineral mining)",$/kg
+"<span class=""purple-text"">[net_fertilizer_sulfate_of_ammonium]</span>",Estimated price per kilogram of ammonium sulfate fertilizer (BLS price index = Nitrogenous fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_super_phosphate_20pct]</span>",Estimated price per kilogram of super phosphate fertilizer (20% phosphate) (BLS price index = Phosphatic fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_super_phosphate_44to46pct]</span>",Estimated price per kilogram of super phosphate fertilizer (44–46% phosphate (BLS price index = Phosphatic fertilizer manafucturing),$/kg
+"<span class=""purple-text"">[net_fertilizer_urea]</span>",Estimated price per kilogram of urea fertilizer (44–46% nitrogen) (BLS price index = Nitrogenous fertilizer manafucturing),$/kg

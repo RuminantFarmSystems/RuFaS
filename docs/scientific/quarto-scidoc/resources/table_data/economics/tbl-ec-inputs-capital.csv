@@ -1,0 +1,5 @@
+﻿Variable , Description , Units
+capital_costs.land_ha,Purchase price of farmland per hectare,$/ha
+"capital_costs.<span class=""blue-text"">[sub_system_i]</span>","Capital cost of each sub-system (for i = 1 to N sub-systems) of the manure management system. If users do not opt to use the default values (calculated with the dynamic sizing functions) or provide their own values, capital costs default to $0 (assumes equipment is already owned)",$
+"capital_costs.<span class=""blue-text"">[comfort_investment_i]</span>",Total capital cost of investments in animal comfort (for i = 1 to N investments),$
+"capital_costs.<span class=""blue-text"">[storage_investment_i]</span>",Total capital cost of investments in feed storage (for i = 1 to N investments),$

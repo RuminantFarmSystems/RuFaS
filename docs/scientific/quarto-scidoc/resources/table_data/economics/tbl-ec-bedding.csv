@@ -1,0 +1,6 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[bedding_sand]</span>",Estimated annual sand bedding cost per head of cattle,$/head/yr
+"<span class=""purple-text"">[bedding_straw]</span>",Estimated annual straw bedding cost per head of cattle,$/head/yr
+"<span class=""purple-text"">[bedding_sawdust]</span>",Estimated annual sawdust bedding cost per head of cattle,$/head/yr
+"<span class=""purple-text"">[bedding_manure_solids]</span>",Estimated annual manure solids bedding cost per head of cattle,$/head/yr
+"<span class=""purple-text"">[bedding_compost_bedded_pack]</span>",Estimated annual compost bedded pack bedding cost per head of cattle,$/head/yr

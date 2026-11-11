@@ -1,0 +1,8 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[milk_all]</span>",Average price received for all milk by farmers from USDA’s NASS,$/kg
+"<span class=""purple-text"">[milk_class_2]</span>","Average price received for class 2 milk (used for soft dairy products like yogurt, ice cream) by farmers from USDA’s National Dairy Comprehensive Report",$/kg
+"<span class=""purple-text"">[milk_class_3]</span>",Average price received for class 3 milk (used for cheese production) by farmers from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[milk_class_4]</span>",Average price received for class 4 milk (used for butter and nonfat dry milk) by farmers from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[milk_nofat_dry]</span>",Average price received for nonfat dry milk by farmers from USDA’s National Dairy Comprehensive Report,$/kg
+"<span class=""purple-text"">[milk_retail]</span>",Average retail price paid for whole milk from Federal Reserve Bank of St. Louis FRED Economic Data,$/liter
+"<span class=""purple-text"">[whey_dry]</span>",Average price received for dry whey by farmers from USDA’s National Dairy Comprehensive Report,$/kg

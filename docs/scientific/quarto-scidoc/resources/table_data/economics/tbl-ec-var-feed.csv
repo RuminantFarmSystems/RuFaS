@@ -1,0 +1,24 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[alfalfa_hay]</span>",commodity_prices.alfalfa_hay.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[alfalfa_silage]</span>",commodity_prices.alfalfa_silage.dollar_per_kilogram.csv,Scaled Spatiotemporal,6
+"commodity_prices.<span class=""purple-text"">[almond_hulls]</span>",commodity_prices.almond_hulls.dollar_per_kilogram.csv,Historical U.S. Averages,7
+"commodity_prices.<span class=""purple-text"">[barley_silage]</span>",commodity_prices.barley_silage.dollar_per_kilogram.csv,Scaled Spatiotemporal,"1,8"
+"commodity_prices.<span class=""purple-text"">[cotton_seed_hulls]</span>",commodity_prices.cotton_seed_hulls.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[cotton_seed_meal]</span>",commodity_prices.cotton_seed_meal.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[cotton_seed_whole]</span>",commodity_prices.cotton_seed_whole.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[corn_grain]</span>",commodity_prices.corn_grain.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[corn_silage]</span>",commodity_prices.corn_silage.dollar_per_kilogram.csv,Scaled Spatiotemporal,"1,9-11"
+"commodity_prices.<span class=""purple-text"">[distiller_grains_dried_10pct]</span>",commodity_prices.distiller_grains_dried_10pct.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[distiller_grains_modified_wet_50pct]</span>",commodity_prices.distiller_grains_modified_wet_50pct.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[distiller_grains_wet_65pct]</span>",commodity_prices.distiller_grains_wet_65pct.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[hay_excluding_alfalfa]</span>",commodity_prices.hay_excluding_alfalfa.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[hay_all]</span>",commodity_prices.hay_all.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[rye_grain]</span>",commodity_prices.rye_grain.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[soybean_grain]</span>",commodity_prices.soybean_grain.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[soybean_hulls]</span>",commodity_prices.soybean_hulls.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[soybean_meal]</span>",commodity_prices.soybean_meal.dollar_per_kilogram.csv,Historical U.S. Market Price,12
+"commodity_prices.<span class=""purple-text"">[sudan_silage]</span>",commodity_prices.sundan_silage.dollar_per_kilogram.csv,Limited,13
+"commodity_prices.<span class=""purple-text"">[winter_wheat_grain]</span>",commodity_prices.winter_wheat_grain.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[calcium_phosphate_di]</span>",commodity_prices.calcium_phosphate_di.dollar_per_kilogram.csv,Limited,14
+"commodity_prices.<span class=""purple-text"">[calf_starter_18cp]</span>",commodity_prices.calf_starter_18cp.dollar_per_kilogram.csv,Limited,15
+"commodity_prices.<span class=""purple-text"">[limestone]</span>",commodity_prices.limestone.dollar_per_kilogram.csv,Limited,16

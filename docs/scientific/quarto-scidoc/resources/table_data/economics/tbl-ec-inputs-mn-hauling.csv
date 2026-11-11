@@ -1,4 +1,3 @@
-﻿Variable , Description , Format 
-manure_mgmt_variables.include_off_farm_transport_costs, Include the cost of off-farm manure hauling (trucking) in the cost vs. revenue calculation for off-farm manure exports ," Binary (1=Yes, 0=No)"
-manure_mgmt_variables.include_manure_value , Include the value of manure (based on manure NPK content) in the cost vs. revenue calculation for off-farm manure exports ," Binary (1=Yes, 0=No)"
-manure_mgmt_variables.manure_truck_ownership, Off-farm manure hauling truck is owned or rented ," Binary (1=Owned, 0=Rented)"
+﻿Solids Hauling Scenario , Fixed Costs ($/tonne) , Variable Costs ($/tonne) 
+30 m$^3$ Trailer Truck (owned), $3.42 , $0.036
+30 m$^3$ Trailer Truck (rented), $4.56, $0.045

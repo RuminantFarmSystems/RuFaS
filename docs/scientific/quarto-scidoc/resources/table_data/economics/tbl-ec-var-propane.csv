@@ -1,0 +1,3 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[propane_residential]</span>",commodity_prices.propane_residential.dollar_per_liter.csv,Spatiotemporal,26
+"commodity_prices.<span class=""purple-text"">[propane_wholesale]</span>",commodity_prices.propane_wholesale.dollar_per_liter.csv,Spatiotemporal,26

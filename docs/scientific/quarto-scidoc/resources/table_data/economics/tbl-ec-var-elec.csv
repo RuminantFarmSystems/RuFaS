@@ -1,0 +1,4 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[elec_commercial]</span>",commodity_prices.elec_commercial.dollar_per_kwh.csv,Spatiotemporal,24
+"commodity_prices.<span class=""purple-text"">[elec_industrial]</span>",commodity_prices.elec_industrial.dollar_per_kwh.csv,Spatiotemporal,24
+"commodity_prices.<span class=""purple-text"">[elec_residential]</span>",commodity_prices.elec_residential.dollar_per_kwh.csv,Spatiotemporal,24

@@ -1,0 +1,2 @@
+﻿Variable , Description , Units
+land_ha,"Estimated purchase price per hectare of agricultural land, based on 2017 USDA Quickstats county-level data where available, or state-level data when county data was missing; all values adjusted to 2023 dollars using CPI inflation",$/ha

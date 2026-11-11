@@ -1,0 +1,10 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[barley_seed]</span>",Average regional seed price per area of planted land,$/m2
+"<span class=""purple-text"">[corn_seed]</span>",Average regional seed price per area of planted land,$/m2
+"<span class=""purple-text"">[cotton_seed]</span>",Average regional seed price per area of planted land,$/m2
+"<span class=""purple-text"">[oat_seed]</span>",Average regional seed price per area of planted land,$/m2
+"<span class=""purple-text"">[peanut_seed]</span>",Average regional seed price per area of planted land,$/m2
+"<span class=""purple-text"">[rice_seed]</span>",Average regional seed price per area of planted land,$/m2
+"<span class=""purple-text"">[sorghum_seed]</span>",Average regional seed price per area of planted land,$/m2
+"<span class=""purple-text"">[soybean_seed]</span>",Average regional seed price per area of planted land,$/m2
+"<span class=""purple-text"">[wheat_seed]</span>",Average regional seed price per area of planted land,$/m2

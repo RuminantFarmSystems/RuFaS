@@ -1,0 +1,13 @@
+﻿Variable , Description , Units
+"crop_inputs.<span class=""blue-text"">[crop_form]</span>.land_ha", Total land allocated for each crop type and form, ha/yr 
+crop_variables.land_ha_purchase, Total hectares of land that must be purchased for the current scenario, ha
+crop_variables.land_ha_rented, Total hectares of land that must be purchased for the current scenario, ha
+"crop_inputs.<span class=""purple-text"">[crop_seeds]</span>.land_ha", Total seeds planted for each crop type, kg/m$^2$/yr
+"crop_inputs.<span class=""blue-text"">[crop_form]</span>.labor_hours", Total annual labor hours required for each crop type and form, hours/yr 
+"crop_inputs.<span class=""blue-text"">[crop_form]</span>.<span class=""purple-text"">[liquid_fuel_type]</span>", Total annual liquid petroleum fuel consumption for each crop type and form and categorized by fuel type (diesel or gasoline), L/yr
+"crop_inputs.<span class=""blue-text"">[crop_form]</span>.<span class=""purple-text"">[propane_tier]</span>", Total annual propane consumption for each crop type and form and categorized by price tier (propane_residential or propane_wholesale), L/yr 
+"crop_inputs.<span class=""blue-text"">[crop_form]</span>.<span class=""purple-text"">[natgas_sector]</span>"," Total annual natural gasconsumption for each crop type and form and categorized by price tier (natgas_residentia,l natgas_commercial, or natgas_industrial)", L/yr
+"crop_inputs.<span class=""blue-text"">[crop_form]</span>.<span class=""purple-text"">[elec_sector]</span>"," Total annual electricity consumption for each crop type and form and categorized by electricity sector (elec_residential, elec_commercial, or elec_industrial)", kWh/yr
+"crop_inputs.<span class=""blue-text"">[crop_form]</span>.<span class=""purple-text"">[water_type]</span>", Total annual water consumption for each crop type and form and categorized by water type (water_irrigation or water_municipal), m$^3$/yr
+"crop_products.<span class=""purple-text"">[crop_form]</span>.land_ha", Total quantity of each crop type and form sold each year, kg/yr
+"crop_inputs.<span class=""blue-text"">[crop_form]</span>.<span class=""purple-text"">[tractor_hr_size]</span>"," Annual tractor hours required for each crop type and form and categorized by tractor size (tractor_hr_small, tractor_hr_medium, or tractor_hr_large)", tractor hours/yr

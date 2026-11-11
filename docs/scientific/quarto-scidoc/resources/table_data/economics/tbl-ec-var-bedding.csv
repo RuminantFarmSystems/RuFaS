@@ -1,0 +1,6 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[bedding_sand]</span>",commodity_prices.bedding_sand.dollar_per_head.csv ,Limited,5
+"commodity_prices.<span class=""purple-text"">[bedding_straw]</span>",commodity_prices.bedding_straw.dollar_per_head.csv,Limited,5
+"commodity_prices.<span class=""purple-text"">[bedding_sawdust]</span>",commodity_prices.bedding_sawdust.dollar_per_head.csv,Limited,5
+"commodity_prices.<span class=""purple-text"">[bedding_manure_solids]</span>",commodity_prices.bedding_manure_solids.dollar_per_head.csv,Limited,5
+"commodity_prices.<span class=""purple-text"">[bedding_compost_bedded_pack]</span>",commodity_prices.bedding_compost_bedded_pack.dollar_per_head.csv,Limited,5

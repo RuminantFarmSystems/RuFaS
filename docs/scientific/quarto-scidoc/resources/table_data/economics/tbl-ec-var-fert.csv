@@ -1,0 +1,13 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_nitrogen]</span>",commodity_prices.net_fertilizer_nitrogen.dollar_per_kilogram.csv,Historical U.S. Averages,"18,19"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_phosphorus]</span>",commodity_prices.net_fertilizer_phosphorus.dollar_per_kilogram.csv,Historical U.S. Averages,"18,20"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_potassium]</span>",commodity_prices.net_fertilizer_potassium.dollar_per_kilogram.csv,Historical U.S. Averages,"18,21"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_ammonium_nitrate]</span>",commodity_prices.net_fertilizer_ammonium_nitrate.dollar_per_kilogram.csv,Historical U.S. Averages,"18,19"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_anhydrous_ammonia]</span>",commodity_prices.net_fertilizer_anhydrous_ammonia.dollar_per_kilogram.csv,Historical U.S. Averages,"18,19"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_diammonium_phosphate]</span>",commodity_prices.net_fertilizer_diammonium_phosphate.dollar_per_kilogram.csv,Historical U.S. Averages,"18,20"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_nitrogen_solutaion_30pct]</span>",commodity_prices.net_fertilizer_nitrogen_solutions_30pct.dollar_per_kilogram.csv,Historical U.S. Averages,"18,19"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_potassium_chloride]</span>",commodity_prices.net_fertilizer_potassium_chloride.dollar_per_kilogram.csv,Historical U.S. Averages,"18,21"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_sulfate_of_ammonium]</span>",commodity_prices.net_fertilizer_sulfate_of_ammonium.dollar_per_kilogram.csv,Historical U.S. Averages,"18,19"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_super_phosphate_20pct]</span>",commodity_prices.net_fertilizer_super_phosphate_20pct.dollar_per_kilogram.csv,Historical U.S. Averages,"18,20"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_super_phosphate_44to46pct]</span>",commodity_prices.net_fertilizer_super_phosphate_44to46pct.dollar_per_kilogram.csv,Historical U.S. Averages,"18,20"
+"commodity_prices.<span class=""purple-text"">[net_fertilizer_urea]</span>",commodity_prices.net_fertilizer_urea.dollar_per_kilogram.csv,Historical U.S. Averages,"18,19"

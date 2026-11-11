@@ -1,0 +1,17 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[calves_all]</span>",commodity_prices.calves_all.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[cows_all]</span>",commodity_prices.cows_all.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[cows_milk]</span>",commodity_prices.cows_milk.dollar_per_animal.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[cows_ge_500]</span>",commodity_prices.cows_ge_500.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[cows_steers_and_heaifers_ge_500]</span>",commodity_prices.cows_steers_and_heifers_ge_500.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[cows_dairy_fresh]</span>",commodity_prices.cow_dairy_fresh.dollar_per_animal.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[cow_dairy_bred_t3]</span>",commodity_prices.cow_dairy_bred_t3.dollar_per_animal.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[cow_dairy_heifer_bred_t3]</span>",commodity_prices.cow_dairy_heifer_bred_t3.dollar_per_animal.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[cow_dairy_heifer_open]</span>",commodity_prices.cow_dairy_heifer_open.dollar_per_animal.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[calf_bull_1]</span>",commodity_prices.calf_bull_1.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[calf_bull_2]</span>",commodity_prices.calf_bull_2.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[calf_heifer_1]</span>",commodity_prices.calf_heifer_1.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[calf_heifer_2]</span>",commodity_prices.calf_ heifer_2.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[steer_holstein_300]</span>",commodity_prices.steer_holstein_300.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[steer_holstein_500]</span>",commodity_prices.steer_holstein_500.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[steer_holstein_700]</span>",commodity_prices.steer_holstein_700.dollar_per_kilogram.csv,Historical U.S. Averages,2

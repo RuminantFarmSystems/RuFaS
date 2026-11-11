@@ -1,0 +1,3 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[propane_residential]</span>",Estimated residential propane price tier per liter,$/liter
+"<span class=""purple-text"">[propane_wholesale]</span>",Estimated wholesale propane price tier per liter,$/liter

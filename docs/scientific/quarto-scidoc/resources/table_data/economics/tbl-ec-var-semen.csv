@@ -1,0 +1,4 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[semen_conventional]</span>",commodity_prices.semen_conventional.dollar_per_straw.csv,Limited,3
+"commodity_prices.<span class=""purple-text"">[semen_sexed]</span>",commodity_prices.semen_sexed.dollar_per_straw.csv,Limited,3
+"commodity_prices.<span class=""purple-text"">[semen_beef]</span>",commodity_prices.semen_beef.dollar_per_straw.csv,Limited,3

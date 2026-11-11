@@ -1,0 +1,4 @@
+﻿Variable , Description , Units,Reference
+farm_services.land_ha_rent,farm_services.land_ha_rent.dollar_per_hectare.csv,Spatiotemporal,1
+farm_services.labor_hours,farm_services.labor_hours.dollar_per_hour.csv,Spatiotemporal,1
+farm_services.grain_transportation,farm_services.grain_transportation.dollars_per_tonne_km.csv,Limited,"31,32"

@@ -1,0 +1,4 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[semen_conventional]</span>",Fixed estimated price per straw of conventional cattle semen,$/straw
+"<span class=""purple-text"">[semen_sexed]</span>",Fixed estimated price per straw of sexed cattle semen,$/straw
+"<span class=""purple-text"">[semen_beef]</span>",Fixed estimated price per straw of beef cattle semen ,$/straw

@@ -136,3 +136,15 @@ table th:nth-child(2),
 table td:nth-child(2) {
   width: 45%;
 }
+
+/* =========================================
+   TEXT COLORS
+========================================= */
+
+.blue-text {
+  color: #1976D2;
+}
+
+.purple-text {
+  color: #7B1FA2;
+}

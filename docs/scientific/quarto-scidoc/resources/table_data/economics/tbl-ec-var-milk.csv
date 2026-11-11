@@ -1,0 +1,8 @@
+﻿Variable , Description , Units,Reference
+"commodity_prices.<span class=""purple-text"">[milk_all]</span>",commodity_prices.milk_all.dollar_per_kilogram.csv,Spatiotemporal,1
+"commodity_prices.<span class=""purple-text"">[milk_class_2]</span>",commodity_prices.milk_class_2.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[milk_class_3]</span>",commodity_prices.milk_class_3.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[milk_class_4]</span>",commodity_prices.milk_class_4.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[milk_nonfat_dry]</span>",commodity_prices.milk_nonfat_dry.dollar_per_kilogram.csv,Historical U.S. Averages,2
+"commodity_prices.<span class=""purple-text"">[milk_retail]</span>",commodity_prices.milk_retail.dollar_per_liter.csv,Historical U.S. Averages,3
+"commodity_prices.<span class=""purple-text"">[whey_dry]</span>",commodity_prices.whey_dry.dollar_per_kilogram.csv,Historical U.S. Averages,2

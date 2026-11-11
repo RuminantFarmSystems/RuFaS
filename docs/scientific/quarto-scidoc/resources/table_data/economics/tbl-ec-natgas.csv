@@ -1,0 +1,4 @@
+﻿Variable , Description , Units
+"<span class=""purple-text"">[natgas_commercial]</span>",Estimated commercial natural gas price per megajoule,$/MJ
+"<span class=""purple-text"">[natgas_industrial]</span>",Estimated industrial natural gas price per megajoule,$/MJ
+"<span class=""purple-text"">[natgas_residential]</span>",Estimated commercial natural gas price per megajoule,$/MJ
