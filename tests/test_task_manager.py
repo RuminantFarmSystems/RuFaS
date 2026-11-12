@@ -249,10 +249,7 @@ def test_task_manager_start(
     mock_process_e2e_results = mocker.patch.object(
         tm,
         "_process_e2e_results",
-        return_value=(
-            True,
-            expected_results_random_seeds
-        ),
+        return_value=(True, expected_results_random_seeds),
     )
     mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
 

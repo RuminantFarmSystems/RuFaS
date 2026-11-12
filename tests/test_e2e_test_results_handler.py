@@ -1674,9 +1674,7 @@ def patch_output_manager(mocker: MockerFixture) -> tuple[MagicMock, MagicMock]:
 
 
 def write_expected_results_file(
-    path: Path,
-    expected_results: dict[str, Any],
-    random_seeds: list[int] | None = None
+    path: Path, expected_results: dict[str, Any], random_seeds: list[int] | None = None
 ) -> None:
     """Writes a valid expected results file, named after the file stem, for the configuration validation tests."""
     write_json_file(
@@ -1744,7 +1742,7 @@ def test_validate_comparison_configuration(mocker: MockerFixture, tmp_path: Path
 
     assert must_change_variables == {"A.y", flagged_feed_name}
     assert accepted_ranges == {}
-    assert random_seeds == {'Animal': [42], 'Feed': [42]}
+    assert random_seeds == {"Animal": [42], "Feed": [42]}
     add_error.assert_not_called()
 
 

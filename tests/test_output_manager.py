@@ -4102,11 +4102,7 @@ def test_summarize_e2e_test_results_good_path(
         }
     }
 
-    mock_print.assert_called_once_with(
-        expected_summary,
-        random_seeds_by_prefix,
-        expected_results_random_seeds
-    )
+    mock_print.assert_called_once_with(expected_summary, random_seeds_by_prefix, expected_results_random_seeds)
 
 
 def test_summarize_e2e_test_results_failed_task(
@@ -4159,7 +4155,7 @@ def test_summarize_e2e_test_results_failed_task(
             },
         },
         e2e_random_seeds,
-        expected_results_random_seeds
+        expected_results_random_seeds,
     )
 
 
@@ -4191,10 +4187,7 @@ def test_summarize_e2e_test_results_invalid_prefix_logs_error(
     }
 
     mock_output_manager.summarize_e2e_test_results(
-        tmp_path,
-        ["E2E_Animal"],
-        random_seeds_by_prefix,
-        expected_results_random_seeds
+        tmp_path, ["E2E_Animal"], random_seeds_by_prefix, expected_results_random_seeds
     )
 
     mock_add_error.assert_any_call(
@@ -4212,11 +4205,7 @@ def test_summarize_e2e_test_results_invalid_prefix_logs_error(
         }
     }
 
-    mock_print.assert_called_once_with(
-        expected_summary,
-        random_seeds_by_prefix,
-        expected_results_random_seeds
-    )
+    mock_print.assert_called_once_with(expected_summary, random_seeds_by_prefix, expected_results_random_seeds)
 
 
 def test_summarize_e2e_test_results_file_read_error(
@@ -4249,10 +4238,7 @@ def test_summarize_e2e_test_results_file_read_error(
     }
 
     mock_output_manager.summarize_e2e_test_results(
-        tmp_path,
-        ["E2E_Animal"],
-        random_seeds_by_prefix,
-        expected_results_random_seeds
+        tmp_path, ["E2E_Animal"], random_seeds_by_prefix, expected_results_random_seeds
     )
 
     mock_add_error.assert_any_call(
@@ -4270,11 +4256,7 @@ def test_summarize_e2e_test_results_file_read_error(
         }
     }
 
-    mock_print.assert_called_once_with(
-        expected_summary,
-        random_seeds_by_prefix,
-        expected_results_random_seeds
-    )
+    mock_print.assert_called_once_with(expected_summary, random_seeds_by_prefix, expected_results_random_seeds)
 
 
 def test__print_e2e_results_summary_formats_output(
@@ -4300,10 +4282,7 @@ def test__print_e2e_results_summary_formats_output(
     }
 
     OutputManager._print_e2e_results_summary(
-        mock_output_manager,
-        summary,
-        random_seeds_by_prefix,
-        expected_results_random_seeds
+        mock_output_manager, summary, random_seeds_by_prefix, expected_results_random_seeds
     )
 
     out = capsys.readouterr().out
