@@ -10,10 +10,9 @@ class LeafAreaIndex:
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        A ``CropData`` instance containing crop specifications and attributes. Defaults to a new instance
-         of ``CropData`` if not provided.
-    lai_shapes : float, optional
+    crop_data : CropData
+        A ``CropData`` instance containing crop specifications and attributes.
+    lai_shapes : list[float], optional
         Shape coefficients for calculating leaf area index (unitless).
     optimal_leaf_area_fraction : float, optional
         Fraction of max leaf area index for current heat fraction (unitless).
@@ -31,8 +30,8 @@ class LeafAreaIndex:
     Attributes
     ----------
     data : CropData
-        Reference to the provided ``CropData`` instance or a new default instance.
-    lai_shapes : float | None
+        Reference to the provided ``CropData`` instance.
+    lai_shapes : list[float] | None
         Shape coefficients for calculating leaf area index (unitless).
     optimal_leaf_area_fraction : float | None
         Fraction of max leaf area index for current heat fraction (unitless).
@@ -51,8 +50,8 @@ class LeafAreaIndex:
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
-        lai_shapes: float | None = None,
+        crop_data: CropData,
+        lai_shapes: list[float] | None = None,
         optimal_leaf_area_fraction: float | None = None,
         canopy_height: float | None = None,
         leaf_area_added: float | None = None,
@@ -60,7 +59,7 @@ class LeafAreaIndex:
         previous_leaf_area_index: float | None = None,
         previous_optimal_leaf_area_fraction: float | None = None,
     ) -> None:
-        self.data = crop_data or CropData()
+        self.data = crop_data
         self.lai_shapes = lai_shapes
         self.optimal_leaf_area_fraction = optimal_leaf_area_fraction
         self.canopy_height = canopy_height
@@ -100,6 +99,8 @@ class LeafAreaIndex:
             return
         else:  # normal growth
             self.check_previous_leaf_area_values()
+            assert self.previous_optimal_leaf_area_fraction is not None
+            assert self.previous_leaf_area_index is not None
             self.optimal_leaf_area_change = self._determine_max_leaf_area_change(
                 self.optimal_leaf_area_fraction,
                 self.previous_optimal_leaf_area_fraction,
@@ -148,6 +149,7 @@ class LeafAreaIndex:
         SWAT 5:3.2.2
 
         """
+        assert self.optimal_leaf_area_change is not None
         self.leaf_area_added = min(
             self.optimal_leaf_area_change * sqrt(self.data.growth_factor),
             self.optimal_leaf_area_change,
@@ -162,6 +164,8 @@ class LeafAreaIndex:
         SWAT 5:2.1.18
 
         """
+        assert self.previous_leaf_area_index is not None
+        assert self.leaf_area_added is not None
         self.data.leaf_area_index = max(0.0, self.previous_leaf_area_index + self.leaf_area_added)
 
     @staticmethod

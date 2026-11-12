@@ -15,10 +15,8 @@ class SoilErosion:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
+    soil_data : SoilData
         The SoilData object used by this module to track and simulate erosion.
-    field_size : float, optional
-        The size of the field (ha).
 
     Attributes
     ----------
@@ -27,19 +25,16 @@ class SoilErosion:
 
     """
 
-    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
+    def __init__(self, soil_data: SoilData):
+        """This method initializes the SoilData object that this module will work with.
 
         Parameters
         ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track erosion, creates new one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
+        soil_data : SoilData
+            The SoilData object used by this module to track erosion.
 
         """
-        self.data = soil_data or SoilData(field_size=field_size)
+        self.data = soil_data
 
     def erode(
         self,
