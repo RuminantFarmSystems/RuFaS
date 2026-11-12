@@ -273,7 +273,7 @@ When E2E testing runs, special filter files are needed to properly
 collect the actual and expected results. These filters are very similar
 to regular RuFaS filters, but are prefixed with ``e2e_`` (see the full
 list of supported E2E filter prefixes
-`here <https://github.com/RuminantFarmSystems/MASM/blob/dev/RUFAS/output_manager.py#L142>`__).
+`here <https://github.com/RuminantFarmSystems/RuFaS/blob/dev/RUFAS/output_manager.py#L142>`__).
 
 There are only two supported filter types currently:
 
