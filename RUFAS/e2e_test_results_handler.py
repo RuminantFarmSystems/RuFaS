@@ -154,7 +154,7 @@ class E2ETestResultsHandler:
         convert_variable_table_path: str | None,
         filters_directory: Path,
         use_accepted_ranges: bool,
-    ) -> tuple[set[str], dict[str, dict[str, Any]]]:
+    ) -> tuple[set[str], dict[str, dict[str, Any]], dict[str, list[int]]]:
         """
         Validates the comparison configuration of an end-to-end testing input set before the simulation runs.
 
@@ -174,9 +174,11 @@ class E2ETestResultsHandler:
 
         Returns
         -------
-        tuple[set[str], dict[str, dict[str, Any]]]
-            The names of the variables flagged as must change, and the accepted ranges keyed by variable name (empty
-            when ``use_accepted_ranges`` is ``False``), for ``compare_actual_and_expected_test_results``.
+        tuple[set[str], dict[str, dict[str, Any]], dict[str, list[int]]]
+            - The names of the variables flagged as must change
+            - The accepted ranges keyed by variable name (empty when ``use_accepted_ranges`` is ``False``),
+            for ``compare_actual_and_expected_test_results``.
+            - The random seeds used to generate the expected e2e results.
 
         Raises
         ------
@@ -227,6 +229,7 @@ class E2ETestResultsHandler:
         matched_must_change_variables: set[str] = set()
         matched_ranged_variables: set[str] = set()
         all_expected_results_loaded = True
+        expected_results_random_seeds: dict[str, list[int]] = {}
         for path_set in test_result_path_sets:
             file_content = E2ETestResultsHandler._validate_result_path_set(
                 path_set, output_prefix, filters_directory, errors, convert_variable_table_path
@@ -235,6 +238,7 @@ class E2ETestResultsHandler:
                 all_expected_results_loaded = False
                 continue
             expected_results = file_content["expected_results"]
+            expected_results_random_seeds[path_set.domain] = file_content.get("random_seeds", [])
             matched_must_change_variables.update(name for name in must_change_variables if name in expected_results)
             matched_ranged_variables.update(name for name in accepted_ranges if name in expected_results)
 
@@ -256,7 +260,7 @@ class E2ETestResultsHandler:
             E2ETestResultsHandler._record_configuration_error(errors, message)
         if errors:
             E2ETestResultsHandler._raise_configuration_errors(errors)
-        return must_change_variables, accepted_ranges
+        return must_change_variables, accepted_ranges, expected_results_random_seeds
 
     @staticmethod
     def validate_update_configuration(output_prefix: str, filters_directory: Path) -> None:
