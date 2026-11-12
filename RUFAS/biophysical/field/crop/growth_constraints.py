@@ -17,11 +17,11 @@ class GrowthConstraints:
         A ``CropData`` object containing crop specifications and tracked attributes.
     water_stress : float, default 0.0
         Water stress for the day (unitless).
-    temp_stress : float, optional
+    temp_stress : float, default 0.0
         Temperature stress for the day (unitless).
-    nitrogen_stress : float, optional
+    nitrogen_stress : float, default 0.0
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : float, optional
+    phosphorus_stress : float, default 0.0
         Phosphorus stress for the day (unitless).
 
     Attributes
@@ -30,11 +30,11 @@ class GrowthConstraints:
         A reference to the ``crop_data`` object on which the growth constraint operations are conducted.
     water_stress : float
         Water stress for the day (unitless).
-    temp_stress : float | None
+    temp_stress : float
         Temperature stress for the day (unitless).
-    nitrogen_stress : float | None
+    nitrogen_stress : float
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : float, optional
+    phosphorus_stress : float
         Phosphorus stress for the day (unitless).
 
     Methods
@@ -64,9 +64,9 @@ class GrowthConstraints:
         self,
         crop_data: CropData,
         water_stress: float = 0.0,
-        temp_stress: float | None = None,
-        nitrogen_stress: float | None = None,
-        phosphorus_stress: float | None = None,
+        temp_stress: float = 0.0,
+        nitrogen_stress: float = 0.0,
+        phosphorus_stress: float = 0.0,
     ) -> None:
         self.data = crop_data
 

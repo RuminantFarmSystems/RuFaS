@@ -14,7 +14,7 @@ def mock_crop_data() -> CropData:
 
 def test_uptake(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Check that uptake() correctly called functions and variables were updated as expected."""
-    uptake = PhosphorusUptake(mock_crop_data, total_nutrient_uptake=0.0)
+    uptake = PhosphorusUptake(mock_crop_data)
     soil = SoilData(field_size=10)
     mock_main_uptake = mocker.patch.object(uptake, "uptake_main_process")
     mock_determine_stored = mocker.patch.object(uptake, "determine_stored_nutrient", return_value=1)

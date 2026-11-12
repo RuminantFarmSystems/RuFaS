@@ -14,13 +14,13 @@ class LeafAreaIndex:
         A ``CropData`` instance containing crop specifications and attributes.
     lai_shapes : list[float], optional
         Shape coefficients for calculating leaf area index (unitless).
-    optimal_leaf_area_fraction : float, optional
+    optimal_leaf_area_fraction : float, default 0.0
         Fraction of max leaf area index for current heat fraction (unitless).
-    canopy_height : float, optional
+    canopy_height : float, default 0.0
         Current height of the plant (m).
-    leaf_area_added : float, optional
+    leaf_area_added : float, default 0.0
         Leaf area index change during the day (unitless).
-    optimal_leaf_area_change : float, optional
+    optimal_leaf_area_change : float, default 0.0
         Leaf area index added under ideal conditions (unitless).
     previous_leaf_area_index : float, optional
         Leaf area index on the previous day (unitless).
@@ -33,13 +33,13 @@ class LeafAreaIndex:
         Reference to the provided ``CropData`` instance.
     lai_shapes : list[float] | None
         Shape coefficients for calculating leaf area index (unitless).
-    optimal_leaf_area_fraction : float | None
+    optimal_leaf_area_fraction : float
         Fraction of max leaf area index for current heat fraction (unitless).
-    canopy_height : float | None
+    canopy_height : float
         Current height of the plant (m).
-    leaf_area_added : float | None
+    leaf_area_added : float
         Leaf area index change during the day (unitless).
-    optimal_leaf_area_change : float | None
+    optimal_leaf_area_change : float
         Leaf area index added under ideal conditions (unitless).
     previous_leaf_area_index : float | None
         Leaf area index on the previous day (unitless).
@@ -52,10 +52,10 @@ class LeafAreaIndex:
         self,
         crop_data: CropData,
         lai_shapes: list[float] | None = None,
-        optimal_leaf_area_fraction: float | None = None,
-        canopy_height: float | None = None,
-        leaf_area_added: float | None = None,
-        optimal_leaf_area_change: float | None = None,
+        optimal_leaf_area_fraction: float = 0.0,
+        canopy_height: float = 0.0,
+        leaf_area_added: float = 0.0,
+        optimal_leaf_area_change: float = 0.0,
         previous_leaf_area_index: float | None = None,
         previous_optimal_leaf_area_fraction: float | None = None,
     ) -> None:
@@ -149,7 +149,6 @@ class LeafAreaIndex:
         SWAT 5:3.2.2
 
         """
-        assert self.optimal_leaf_area_change is not None
         self.leaf_area_added = min(
             self.optimal_leaf_area_change * sqrt(self.data.growth_factor),
             self.optimal_leaf_area_change,
@@ -165,7 +164,6 @@ class LeafAreaIndex:
 
         """
         assert self.previous_leaf_area_index is not None
-        assert self.leaf_area_added is not None
         self.data.leaf_area_index = max(0.0, self.previous_leaf_area_index + self.leaf_area_added)
 
     @staticmethod

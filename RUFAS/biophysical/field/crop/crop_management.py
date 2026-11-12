@@ -19,12 +19,12 @@ class CropManagement:
     ----------
     crop_data : CropData
         The data class containing crop specifications and tracked attributes.
-    potential_harvest_index : float, optional
+    potential_harvest_index : float, default 0.0
         Potential harvest index for a given day (unitless).
-    harvest_index : float, optional
+    harvest_index : float, default 0.0
         Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
         (unitless).
-    cut_biomass : float, optional
+    cut_biomass : float, default 0.0
         Total amount of the desired crop product (kg/ha).
     wet_yield_collected : float, default 0.0
         Amount of the desired crop product to be removed from the field (kg/ha).
@@ -32,9 +32,9 @@ class CropManagement:
         Dry matter mass collected at harvest (kg/ha).
     yield_residue : float, default 0.0
         Amount of dry matter residue created; unharvested yield (kg/ha).
-    yield_nitrogen : float, optional
+    yield_nitrogen : float, default 0.0
         Nitrogen contained in the harvested yield (kg/ha).
-    yield_phosphorus : float, optional
+    yield_phosphorus : float, default 0.0
         Phosphorus contained in the harvested yield (kg/ha).
     residue_nitrogen : float, default 0.0
         Amount of nitrogen in the residue from this plant (kg/ha).
@@ -45,12 +45,12 @@ class CropManagement:
     ----------
     data : CropData
         A reference to ``crop_data``, on which crop management operations will be conducted.
-    potential_harvest_index : float | None
+    potential_harvest_index : float
         Potential harvest index for a given day (unitless).
-    harvest_index : float | None
+    harvest_index : float
         Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
         (unitless).
-    cut_biomass : float | None
+    cut_biomass : float
         Total amount of the desired crop product (kg/ha).
     wet_yield_collected : float
         Amount of the desired crop product to be removed from the field (kg/ha).
@@ -58,9 +58,9 @@ class CropManagement:
         Dry matter mass collected at harvest (kg/ha).
     yield_residue : float
         Amount of dry matter residue created; unharvested yield (kg/ha).
-    yield_nitrogen : float | None
+    yield_nitrogen : float
         Nitrogen contained in the harvested yield (kg/ha).
-    yield_phosphorus : float | None
+    yield_phosphorus : float
         Phosphorus contained in the harvested yield (kg/ha).
     residue_nitrogen : float
         Amount of nitrogen in the residue from this plant (kg/ha).
@@ -77,14 +77,14 @@ class CropManagement:
     def __init__(
         self,
         crop_data: CropData,
-        potential_harvest_index: float | None = None,
-        harvest_index: float | None = None,
-        cut_biomass: float | None = None,
+        potential_harvest_index: float = 0.0,
+        harvest_index: float = 0.0,
+        cut_biomass: float = 0.0,
         wet_yield_collected: float = 0.0,
         dry_matter_yield_collected: float = 0.0,
         yield_residue: float = 0.0,
-        yield_nitrogen: float | None = None,
-        yield_phosphorus: float | None = None,
+        yield_nitrogen: float = 0.0,
+        yield_phosphorus: float = 0.0,
         residue_nitrogen: float = 0.0,
         residue_phosphorus: float = 0.0,
     ) -> None:
@@ -188,6 +188,7 @@ class CropManagement:
 
         """
         if self.data.do_harvest_index_override:
+            assert self.data.user_harvest_index is not None
             self.harvest_index = self.data.user_harvest_index  # SWAT 5:3.3.1
         else:
             self.potential_harvest_index = self._determine_potential_harvest_index(
@@ -247,7 +248,6 @@ class CropManagement:
             raise ValueError(
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
             )
-        assert self.harvest_index is not None
         roots_harvested = self.harvest_index > 1.0
         if not roots_harvested:
             self.cut_biomass = self.data.above_ground_biomass * self.harvest_index
@@ -309,7 +309,6 @@ class CropManagement:
         harvested, no biomass is left above ground and the fraction of biomass that is below ground is set to 1.0.
 
         """
-        assert self.cut_biomass is not None
         if not roots_harvested:
             self.data.above_ground_biomass -= self.cut_biomass
             self.data.root_fraction = self.data.root_biomass / self.data.biomass

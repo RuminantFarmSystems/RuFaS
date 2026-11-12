@@ -15,11 +15,11 @@ class BiomassAllocation:
         about the plant's growth and environmental factors.
     light_extinction : float, default 0.65
         Light extinction coefficient (unitless).
-    usable_light : float, optional
+    usable_light : float, default 0.0
         Solar radiation captured for photosynthesis (MJ/m^2).
-    biomass_growth : float, optional
+    biomass_growth : float, default 0.0
         Biomass accumulated during the day (kg/ha).
-    previous_biomass : float, optional
+    previous_biomass : float, default 0.0
         Biomass accumulated on the previous day (kg/ha).
 
     Attributes
@@ -29,11 +29,11 @@ class BiomassAllocation:
         about the plant's growth and environmental factors.
     light_extinction : float
         Light extinction coefficient (unitless).
-    usable_light : float | None
+    usable_light : float
         Solar radiation captured for photosynthesis (MJ/m^2).
-    biomass_growth : float | None
+    biomass_growth : float
         Biomass accumulated during the day (kg/ha).
-    previous_biomass : float | None
+    previous_biomass : float
         Biomass accumulated on the previous day (kg/ha).
 
     Methods
@@ -60,9 +60,9 @@ class BiomassAllocation:
         self,
         crop_data: CropData,
         light_extinction: float = 0.65,
-        usable_light: float | None = None,
-        biomass_growth: float | None = None,
-        previous_biomass: float | None = None,
+        usable_light: float = 0.0,
+        biomass_growth: float = 0.0,
+        previous_biomass: float = 0.0,
     ) -> None:
         self.data = crop_data
         self.light_extinction = light_extinction

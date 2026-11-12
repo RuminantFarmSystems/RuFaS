@@ -16,9 +16,9 @@ class NitrogenUptake(NonWaterUptake):
         Nitrogen uptake distribution parameter (unitless).
     nutrient_shapes : list[float], optional
         Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nutrient: float, optional
+    previous_nutrient: float, default 0.0
         Nitrogen in biomass on the previous day (kg/ha).
-    potential_nutrient_uptake : float, optional
+    potential_nutrient_uptake : float, default 0.0
         Potential nitrogen uptake under ideal conditions (kg/ha).
     layer_nutrient_potentials : list[float], optional
         Potential nitrogen uptake from each soil layer (kg/ha).
@@ -28,13 +28,13 @@ class NitrogenUptake(NonWaterUptake):
         Nitrogen requested from each soil layer (kg/ha).
     actual_nutrient_uptakes : list[float], optional
         Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nutrient_uptake : float, optional
+    total_nutrient_uptake : float, default 0.0
         Total nitrogen uptake by the plant (kg/ha).
-    fixed_nitrogen : float, optional
+    fixed_nitrogen : float, default 0.0
         Total nitrogen fixed by the plant (kg/ha).
-    nitrate_factor : float, optional
+    nitrate_factor : float, default 0.0
         Soil nitrate factor (unitless).
-    fixation_stage_factor : float, optional
+    fixation_stage_factor : float, default 0.0
         Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     Attributes
@@ -43,9 +43,9 @@ class NitrogenUptake(NonWaterUptake):
         Nitrogen uptake distribution parameter (unitless).
     nutrient_shapes : List[float] | None
         Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nutrient : float | None
+    previous_nutrient : float
         Nitrogen in biomass on the previous day (kg/ha).
-    potential_nutrient_uptake : float | None
+    potential_nutrient_uptake : float
         Potential nitrogen uptake under ideal conditions (kg/ha).
     layer_nutrient_potentials : List[float] | None
         Potential nitrogen uptake from each soil layer (kg/ha).
@@ -55,13 +55,13 @@ class NitrogenUptake(NonWaterUptake):
         Nitrogen requested from each soil layer (kg/ha).
     actual_nutrient_uptakes : List[float] | None
         Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nutrient_uptake : float | None
+    total_nutrient_uptake : float
         Total nitrogen uptake by the plant (kg/ha).
-    fixed_nitrogen : float | None
+    fixed_nitrogen : float
         Total nitrogen fixed by the plant (kg/ha).
-    nitrate_factor : float | None
+    nitrate_factor : float
         Soil nitrate factor (unitless).
-    fixation_stage_factor : float | None
+    fixation_stage_factor : float
         Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     References
@@ -75,16 +75,16 @@ class NitrogenUptake(NonWaterUptake):
         crop_data: CropData,
         nutrient_distro_param: float = 10.0,
         nutrient_shapes: list[float] | None = None,
-        previous_nutrient: float | None = None,
-        potential_nutrient_uptake: float | None = None,
+        previous_nutrient: float = 0.0,
+        potential_nutrient_uptake: float = 0.0,
         layer_nutrient_potentials: list[float] | None = None,
         unmet_nutrient_demands: list[float] | None = None,
         nutrient_requests: list[float] | None = None,
         actual_nutrient_uptakes: list[float] | None = None,
-        total_nutrient_uptake: float | None = None,
-        fixed_nitrogen: float | None = None,
-        nitrate_factor: float | None = None,
-        fixation_stage_factor: float | None = None,
+        total_nutrient_uptake: float = 0.0,
+        fixed_nitrogen: float = 0.0,
+        nitrate_factor: float = 0.0,
+        fixation_stage_factor: float = 0.0,
     ):
         super().__init__(
             crop_data,
@@ -127,8 +127,6 @@ class NitrogenUptake(NonWaterUptake):
         soil_water_factor = soil_data.soil_water_factor
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
 
-        assert self.total_nutrient_uptake is not None
-        assert self.fixed_nitrogen is not None
         self.crop_data.nitrogen = self.determine_stored_nutrient(
             self.total_nutrient_uptake,
             self.crop_data.nitrogen,
@@ -185,12 +183,8 @@ class NitrogenUptake(NonWaterUptake):
             (unitless).
 
         """
-        assert self.potential_nutrient_uptake is not None
-        assert self.total_nutrient_uptake is not None
         unmet_demand = self.potential_nutrient_uptake - self.total_nutrient_uptake
         if unmet_demand > 0:
-            assert self.fixation_stage_factor is not None
-            assert self.nitrate_factor is not None
             self.fixed_nitrogen = self._determine_fixed_nitrogen(
                 unmet_demand,
                 stage_factor=self.fixation_stage_factor,

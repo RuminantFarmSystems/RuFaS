@@ -13,7 +13,7 @@ class HeatUnits:
         Maximum temperature for plant growth (Celsius).
     use_heat_unit_temperature : bool, default False
         If alternative heat unit method is used.
-    new_heat_units : float, optional
+    new_heat_units : float, default 0.0
         Heat units accumulated on the current day (Celsius).
     minimum_heat_unit_temperature : float, optional
         Minimum temperature for heat unit calculations (Celsius).
@@ -31,7 +31,7 @@ class HeatUnits:
         Maximum temperature for plant growth (Celsius).
     use_heat_unit_temperature : bool
         If alternative heat unit method is used.
-    new_heat_units : float | None
+    new_heat_units : float
         Heat units accumulated on the current day (Celsius*).
     minimum_heat_unit_temperature : float | None
         Minimum temperature for heat unit calculations (Celsius).
@@ -51,7 +51,7 @@ class HeatUnits:
         crop_data: CropData,
         maximum_temperature: float = 38.0,
         use_heat_unit_temperature: bool = False,
-        new_heat_units: float | None = None,
+        new_heat_units: float = 0.0,
         minimum_heat_unit_temperature: float | None = None,
         maximum_heat_unit_temperature: float | None = None,
         heat_unit_temperature: float | None = None,
@@ -154,7 +154,6 @@ class HeatUnits:
         """
         Add newly acquired heat units to accumulated heat units.
         """
-        assert self.new_heat_units is not None
         self.data.accumulated_heat_units += self.new_heat_units
 
     @staticmethod

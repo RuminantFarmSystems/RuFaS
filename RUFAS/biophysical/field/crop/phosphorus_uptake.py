@@ -19,11 +19,11 @@ class PhosphorusUptake(NonWaterUptake):
         Phosphorus uptake distribution parameter (unitless).
     nutrient_shapes : list[float], optional
         First and second shape coefficients for the nitrogen uptake equations (unitless).
-    previous_nutrient : float, optional
+    previous_nutrient : float, default 0.0
         Phosphorus value on the previous day (kg/ha).
-    total_nutrient_uptake : float, optional
+    total_nutrient_uptake : float, default 0.0
         Total amount of phosphorus taken up by the plant (kg/ha).
-    potential_nutrient_uptake : float, optional
+    potential_nutrient_uptake : float, default 0.0
         Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
     actual_nutrient_uptakes : list[float], optional
         Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
@@ -46,13 +46,13 @@ class PhosphorusUptake(NonWaterUptake):
         crop_data: CropData,
         nutrient_distro_param: float = 10.0,
         nutrient_shapes: list[float] | None = None,
-        previous_nutrient: float | None = None,
-        potential_nutrient_uptake: float | None = None,
+        previous_nutrient: float = 0.0,
+        potential_nutrient_uptake: float = 0.0,
         layer_nutrient_potentials: list[float] | None = None,
         unmet_nutrient_demands: list[float] | None = None,
         nutrient_requests: list[float] | None = None,
         actual_nutrient_uptakes: list[float] | None = None,
-        total_nutrient_uptake: float | None = None,
+        total_nutrient_uptake: float = 0.0,
     ):
         super().__init__(
             crop_data,
@@ -84,7 +84,6 @@ class PhosphorusUptake(NonWaterUptake):
 
         """
         self.uptake_main_process(soil_data, "phosphorus", "labile_inorganic_phosphorus_content")
-        assert self.total_nutrient_uptake is not None
         self.crop_data.phosphorus = self.determine_stored_nutrient(
             self.total_nutrient_uptake, self.crop_data.phosphorus, 0
         )
