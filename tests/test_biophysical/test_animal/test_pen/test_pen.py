@@ -1,3 +1,4 @@
+import re
 from typing import Any
 from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec
 
@@ -1653,6 +1654,83 @@ def test_validate_general_manure_stream_proportions(
             pen._validate_general_manure_stream_proportions()
     else:
         pen._validate_general_manure_stream_proportions()
+
+
+@pytest.mark.parametrize(
+    "manure_streams, expected_duplicates",
+    [
+        ([], None),
+        ([{"stream_name": "stream1", "stream_proportion": 1.0}], None),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.5},
+                {"stream_name": "stream2", "stream_proportion": 0.5},
+            ],
+            None,
+        ),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.5},
+                {"stream_name": "stream1", "stream_proportion": 0.5},
+            ],
+            "'stream1'",
+        ),
+        (
+            [
+                {"stream_name": "stream2", "stream_proportion": 0.25},
+                {"stream_name": "stream1", "stream_proportion": 0.25},
+                {"stream_name": "stream2", "stream_proportion": 0.25},
+                {"stream_name": "stream1", "stream_proportion": 0.25},
+            ],
+            "'stream1', 'stream2'",
+        ),
+    ],
+)
+def test_validate_general_manure_stream_names(
+    manure_streams: list[dict[str, str | float]],
+    expected_duplicates: str | None,
+    pen: Pen,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that general manure stream names must be unique within a pen."""
+    mock_module_om = mocker.patch("RUFAS.biophysical.animal.pen.om")
+    pen.manure_streams = manure_streams
+
+    if expected_duplicates is None:
+        pen._validate_general_manure_stream_names()
+        mock_module_om.add_error.assert_not_called()
+    else:
+        expected_message = f"Duplicate manure stream name(s) {expected_duplicates} in pen {pen.id}."
+        with pytest.raises(ValueError, match=re.escape(expected_message)):
+            pen._validate_general_manure_stream_names()
+        mock_module_om.add_error.assert_called_once()
+
+
+def test_pen_init_rejects_duplicate_manure_stream_names(mocker: MockerFixture) -> None:
+    """Tests that a pen cannot be initialized with two manure streams sharing a name."""
+    mock_module_om = mocker.patch("RUFAS.biophysical.animal.pen.om")
+    duplicate_manure_streams: list[dict[str, str | float]] = [
+        {"stream_name": "general_stream", "stream_proportion": 0.6, "bedding_name": "bedding_1"},
+        {"stream_name": "general_stream", "stream_proportion": 0.4, "bedding_name": "bedding_2"},
+    ]
+
+    with pytest.raises(ValueError, match=re.escape("Duplicate manure stream name(s) 'general_stream' in pen 1.")):
+        Pen(
+            pen_id=1,
+            pen_name="Test Pen",
+            vertical_dist_to_milking_parlor=12.5,
+            horizontal_dist_to_milking_parlor=13.5,
+            number_of_stalls=10,
+            housing_type="housing_type",
+            pen_type="freestall",
+            animal_combination=AnimalCombination.LAC_COW,
+            max_stocking_density=19.5,
+            minutes_away_for_milking=7,
+            first_parlor_processor="stream_a",
+            parlor_stream_name="test_stream",
+            manure_streams=duplicate_manure_streams,
+        )
+    mock_module_om.add_error.assert_called_once()
 
 
 def test_get_requested_feed(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
