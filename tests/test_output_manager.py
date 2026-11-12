@@ -4049,6 +4049,12 @@ def test_summarize_e2e_test_results_good_path(
         "crop_and_soil.other": {"values": [False]},
         "DISCLAIMER": "ignored",
     }
+    expected_results_random_seeds = {
+        "E2E_Animal": {
+            "Animal": [42, 44],
+            "CropAndSoil": [42, 44],
+        },
+    }
     (tmp_path / "E2E_Animal_comparison.json").write_text(json.dumps(data))
     (tmp_path / "E2E_Animal_notes.json").write_text("{}")
     (tmp_path / "E2E_Animal_comparison.txt").write_text("text")
@@ -4064,6 +4070,7 @@ def test_summarize_e2e_test_results_good_path(
         tmp_path,
         ["E2E_Animal"],
         random_seeds_by_prefix,
+        expected_results_random_seeds=expected_results_random_seeds,
     )
 
     info_map = {
@@ -4098,6 +4105,7 @@ def test_summarize_e2e_test_results_good_path(
     mock_print.assert_called_once_with(
         expected_summary,
         random_seeds_by_prefix,
+        expected_results_random_seeds
     )
 
 
@@ -4117,11 +4125,18 @@ def test_summarize_e2e_test_results_failed_task(
         "E2E_Failed": [1, 2],
         "E2E_Animal": [1, 2],
     }
+    expected_results_random_seeds = {
+        "E2E_Animal": {
+            "Animal": [42, 44],
+            "CropAndSoil": [42, 44],
+        },
+    }
 
     mock_output_manager.summarize_e2e_test_results(
         tmp_path,
         ["E2E_Failed", "E2E_Animal"],
         e2e_random_seeds,
+        expected_results_random_seeds,
         ["E2E_Failed"],
     )
 
@@ -4144,6 +4159,7 @@ def test_summarize_e2e_test_results_failed_task(
             },
         },
         e2e_random_seeds,
+        expected_results_random_seeds
     )
 
 
@@ -4167,11 +4183,18 @@ def test_summarize_e2e_test_results_invalid_prefix_logs_error(
     random_seeds_by_prefix = {
         "E2E_Animal": [42, 44, 46],
     }
+    expected_results_random_seeds = {
+        "E2E_Animal": {
+            "Animal": [42, 44],
+            "CropAndSoil": [42, 44],
+        },
+    }
 
     mock_output_manager.summarize_e2e_test_results(
         tmp_path,
         ["E2E_Animal"],
         random_seeds_by_prefix,
+        expected_results_random_seeds
     )
 
     mock_add_error.assert_any_call(
@@ -4192,6 +4215,7 @@ def test_summarize_e2e_test_results_invalid_prefix_logs_error(
     mock_print.assert_called_once_with(
         expected_summary,
         random_seeds_by_prefix,
+        expected_results_random_seeds
     )
 
 
@@ -4217,11 +4241,18 @@ def test_summarize_e2e_test_results_file_read_error(
     random_seeds_by_prefix = {
         "E2E_Animal": [42, 44, 46],
     }
+    expected_results_random_seeds = {
+        "E2E_Animal": {
+            "Animal": [42, 44],
+            "CropAndSoil": [42, 44],
+        },
+    }
 
     mock_output_manager.summarize_e2e_test_results(
         tmp_path,
         ["E2E_Animal"],
         random_seeds_by_prefix,
+        expected_results_random_seeds
     )
 
     mock_add_error.assert_any_call(
@@ -4242,6 +4273,7 @@ def test_summarize_e2e_test_results_file_read_error(
     mock_print.assert_called_once_with(
         expected_summary,
         random_seeds_by_prefix,
+        expected_results_random_seeds
     )
 
 
@@ -4260,18 +4292,26 @@ def test__print_e2e_results_summary_formats_output(
     random_seeds_by_prefix = {
         "E2E_Animal": [42, 44, 46],
     }
+    expected_results_random_seeds = {
+        "E2E_Animal": {
+            "Animal": [42, 44],
+            "CropAndSoil": [42, 44],
+        },
+    }
 
     OutputManager._print_e2e_results_summary(
         mock_output_manager,
         summary,
         random_seeds_by_prefix,
+        expected_results_random_seeds
     )
 
     out = capsys.readouterr().out
     expected = (
         "\nSummary of e2e results:\n\n"
         "E2E_Animal results:\n"
-        "  Results averaged across random seeds: 42, 44, 46\n"
+        "  Current E2E testing random seeds: [42, 44, 46]\n"
+        "  Expected results random seeds: [42, 44]\n"
         "  Animal: Passing\n"
         "  CropAndSoil: Failing\n"
         "  Manure: n/a\n"

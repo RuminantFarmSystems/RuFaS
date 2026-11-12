@@ -234,7 +234,26 @@ def test_task_manager_start(
         tm,
         "_run_tasks",
     )
-    mock_process_e2e_results = mocker.patch.object(tm, "_process_e2e_results", return_value=True)
+    expected_results_random_seeds = (
+        {
+            "test_group": {
+                "Animal": [42, 51],
+                "CropAndSoil": [42, 51],
+                "Manure": [42, 51],
+                "Feed": [42, 51],
+            },
+        }
+        if is_end_to_end_test_task
+        else {}
+    )
+    mock_process_e2e_results = mocker.patch.object(
+        tm,
+        "_process_e2e_results",
+        return_value=(
+            True,
+            expected_results_random_seeds
+        ),
+    )
     mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
 
     tm.start(
@@ -370,10 +389,11 @@ def test_task_manager_start(
         )
 
         mock_summarize.assert_called_once_with(
-            Path("out/e2e"),
-            ["test_group"],
-            {"test_group": [42]},
-            [],
+            json_output_directory=Path("out/e2e"),
+            output_prefixes=["test_group"],
+            e2e_random_seeds={"test_group": [42]},
+            failed_e2e_groups=[],
+            expected_results_random_seeds=expected_results_random_seeds,
         )
 
     else:
@@ -1100,6 +1120,7 @@ def test_process_e2e_group_results(
     e2e_runs = [
         {
             "output_prefix": "freestall_e2e_run_1",
+            "random_seed": 42,
             "log_verbosity": LogVerbosity.ERRORS.value,
             "exclude_info_maps": False,
             "chunkification": False,
@@ -1129,10 +1150,21 @@ def test_process_e2e_group_results(
         "process_test_result_averaging",
         return_value=averaged_results_path,
     )
+    expected_results_random_seeds = {
+        "Animal": [42, 51],
+        "CropAndSoil": [42, 51],
+        "Manure": [42, 51],
+        "Feed": [42, 51],
+    }
+
     mock_validate_comparison = mocker.patch.object(
         E2ETestResultsHandler,
         "validate_comparison_configuration",
-        return_value=(False, {}),
+        return_value=(
+            False,
+            {},
+            expected_results_random_seeds,
+        ),
     )
     mock_compare = mocker.patch.object(
         E2ETestResultsHandler,
@@ -1153,8 +1185,17 @@ def test_process_e2e_group_results(
         output_directory=output_directory,
         verbosity=LogVerbosity.ERRORS,
     )
+    if task_type == TaskType.UPDATE_E2E_TEST_RESULTS:
+        print("Result:", result)
+        print("Averaging calls:", mock_averaging.call_args_list)
+        print("Update calls:", mock_update.call_args_list)
+        print("Validation calls:", mock_validate_comparison.call_args_list)
+        print("Error calls:", mock_output_manager.add_error.call_args_list)
 
-    assert result is None
+    if task_type == TaskType.END_TO_END_TESTING:
+        assert result == (None, expected_results_random_seeds)
+    else:
+        assert result == (None, None)
 
     mock_input_audit.assert_called_once_with(
         e2e_runs[0],
@@ -1194,7 +1235,7 @@ def test_process_e2e_group_results(
         mock_update.assert_not_called()
 
     else:
-        mock_update.assert_called_once_with(averaged_results_path, e2e_group)
+        mock_update.assert_called_once_with(averaged_results_path, e2e_group, [42])
         mock_validate_comparison.assert_not_called()
         mock_compare.assert_not_called()
         mock_post_processing.assert_not_called()
@@ -1235,7 +1276,7 @@ def test_process_e2e_group_results_invalid_input(
         verbosity=LogVerbosity.ERRORS,
     )
 
-    assert result == e2e_comparison_args["e2e_group"]
+    assert result == (e2e_comparison_args["e2e_group"], None)
     mock_averaging.assert_not_called()
     mock_post_processing.assert_called_once_with(
         e2e_comparison_args,
@@ -1270,6 +1311,7 @@ def test_process_e2e_group_results_exception(
 
     for run in e2e_comparison_args["e2e_runs"]:
         run["task_type"] = task_type
+        run["random_seed"] = 42
 
     mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mocker.patch.object(
@@ -1280,7 +1322,16 @@ def test_process_e2e_group_results_exception(
     mocker.patch.object(
         E2ETestResultsHandler,
         "validate_comparison_configuration",
-        return_value=(False, {}),
+        return_value=(
+            False,
+            {},
+            {
+                "Animal": [42, 51],
+                "CropAndSoil": [42, 51],
+                "Manure": [42, 51],
+                "Feed": [42, 51],
+            },
+        ),
     )
     mocker.patch.object(E2ETestResultsHandler, "compare_actual_and_expected_test_results")
     mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
@@ -1303,7 +1354,7 @@ def test_process_e2e_group_results_exception(
         verbosity=LogVerbosity.ERRORS,
     )
 
-    assert result == e2e_comparison_args["e2e_group"]
+    assert result == (e2e_comparison_args["e2e_group"], None)
     mock_failing_method.assert_called_once()
     mock_add_error.assert_called_once()
     assert "Test processing failure" in mock_add_error.call_args.args[1]
