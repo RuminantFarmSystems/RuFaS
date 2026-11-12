@@ -31,7 +31,11 @@ ResultPathType = namedtuple(
     defaults=["", ""],
 )
 ORDERED_EXPECTED_RESULTS_FILE_KEYS = [
-    "name", "filters", "random_seeds", "expected_results_last_updated", "expected_results"
+    "name",
+    "filters",
+    "random_seeds",
+    "expected_results_last_updated",
+    "expected_results",
 ]
 MUST_CHANGE_VARIABLES_KEY = "must_change_variables"
 ACCEPTED_RANGES_KEY = "accepted_ranges"

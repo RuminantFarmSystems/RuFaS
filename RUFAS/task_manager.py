@@ -1290,13 +1290,14 @@ class TaskManager:
             expected_results_random_seeds: dict[str, list[int]] | None = None
 
             if task_type == TaskType.END_TO_END_TESTING:
-                must_change_variables, accepted_ranges, expected_results_random_seeds = \
+                must_change_variables, accepted_ranges, expected_results_random_seeds = (
                     E2ETestResultsHandler.validate_comparison_configuration(
                         group_args["output_prefix"],
                         group_args["convert_variable_table_path"],
                         group_args["filters_directory"],
                         group_args["use_accepted_ranges"],
                     )
+                )
 
                 E2ETestResultsHandler.compare_actual_and_expected_test_results(
                     json_output_path=averaged_results_path,
