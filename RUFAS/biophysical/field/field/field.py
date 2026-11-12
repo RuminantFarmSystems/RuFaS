@@ -43,9 +43,9 @@ class Field:
 
     Parameters
     ----------
-    field_data : FieldData, optional
+    field_data : FieldData
         FieldData object that will be simulated.
-    soil : Soil, optional
+    soil : Soil
         The soil component of the field.
     plantings : list[PlantingEvent], optional
         List of all planting events that will occur over the run of the simulation in this field.
@@ -106,8 +106,8 @@ class Field:
 
     def __init__(
         self,
-        field_data: FieldData | None = None,
-        soil: Soil | None = None,
+        field_data: FieldData,
+        soil: Soil,
         plantings: List[PlantingEvent] | None = None,
         harvestings: List[HarvestEvent] | None = None,
         tillage_events: List[TillageEvent] | None = None,
@@ -118,10 +118,10 @@ class Field:
     ) -> None:
         # field-wide attributes
         self.om = OutputManager()
-        self.field_data = field_data or FieldData()
+        self.field_data = field_data
 
         # soil attributes
-        self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
+        self.soil = soil
 
         # crop attributes
         self.crops: list[Crop] = list()  # empty crop list
@@ -142,7 +142,7 @@ class Field:
         self.ONLY_NITROGEN_MIX = "100_0_0"
         self.tiller = TillageApplication(self.field_data, self.soil.data)
 
-        self.tillage_events: list[TillageEvent] | None = tillage_events
+        self.tillage_events: list[TillageEvent] = tillage_events or []
 
         self.manure_applicator = ManureApplication(self.soil.data)
 

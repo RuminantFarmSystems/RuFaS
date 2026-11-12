@@ -43,6 +43,13 @@ from RUFAS.units import MeasurementUnits
 from tests.test_biophysical.test_crop_soil_field.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
+def _create_field(field_data: FieldData | None = None, soil: Soil | None = None, **kwargs: Any) -> Field:
+    """Creates a Field, using a default FieldData and a default Soil of the same field size when they are not given."""
+    field_data = field_data or FieldData(name="test")
+    soil = soil or Soil(SoilData(field_size=field_data.field_size))
+    return Field(field_data=field_data, soil=soil, **kwargs)
+
+
 @pytest.fixture
 def mock_crop_data() -> CropData:
     return CropData(**SAMPLE_CROP_CONFIGURATION)
@@ -62,9 +69,9 @@ def mock_field_data() -> FieldData:
 
 
 def test_field_init_defaults() -> None:
-    """Tests that Field initializes correctly with default values when no parameters are provided."""
+    """Tests that Field initializes correctly with default values when only the required parameters are provided."""
     # Act
-    field = Field()
+    field = _create_field()
 
     # Assert
     assert isinstance(field.om, OutputManager)
@@ -74,7 +81,7 @@ def test_field_init_defaults() -> None:
     assert field.planting_events == []
     assert field.harvest_events == []
     assert field.fertilizer_events == []
-    assert field.tillage_events is None
+    assert field.tillage_events == []
     assert field.manure_events == []
     assert field.available_fertilizer_mixes == {
         "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0},
@@ -88,7 +95,7 @@ def test_field_init_defaults() -> None:
 
 def test_manage_field(mocker: MockerFixture) -> None:
     """Tests that all subroutines are correctly called by the main routine in field."""
-    field = Field()
+    field = _create_field()
     mock_check_fert_app_sched = mocker.patch.object(field, "_check_fertilizer_application_schedule")
     mock_check_tillage_sched = mocker.patch.object(field, "_check_tillage_schedule")
     mock_execute_daily_processes = mocker.patch.object(field, "_execute_daily_processes")
@@ -207,7 +214,7 @@ def test_check_crop_planting_schedule(
     contains four cases: some planting events occur on the current day, all planting events occur on the current day,
     no planting events occur on the current day, and no planting events left.
     """
-    field = Field(plantings=all_events)
+    field = _create_field(plantings=all_events)
     mock_filter = mocker.patch.object(field, "_filter_events", return_value=(events_remaining, events_occurring_today))
     mock_plant = mocker.patch.object(field, "_plant_crop")
     time = MagicMock(RufasTime)
@@ -270,7 +277,7 @@ def test_check_fertilizer_application_schedule(
     mocker: MockerFixture,
 ) -> None:
     """Tests that fertilizer events that occur on the current day are properly selected and executed."""
-    field = Field(fertilizer_events=events)
+    field = _create_field(fertilizer_events=events)
     mock_filter = mocker.patch.object(field, "_filter_events", return_value=(remaining_events, current_events))
     mock_execute = mocker.patch.object(field, "_execute_fertilizer_application")
     mocked_time = MagicMock(RufasTime)
@@ -317,7 +324,7 @@ def test_check_manure_application_schedule(mocker: MockerFixture) -> None:
             80, 30, ManureType.LIQUID, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.85, 0.05, 0.95, 1991, 121
         ),
     ]
-    field = Field(manure_events=manure_events)
+    field = _create_field(manure_events=manure_events)
     field.field_data = MagicMock()
     field.field_data.name = "field1"
 
@@ -348,7 +355,7 @@ def test_check_manure_application_schedule(mocker: MockerFixture) -> None:
 def test_check_manure_application_schedule_integration() -> None:
     """Integration test for check_manure_application_schedule()."""
     # Arrange
-    field = Field()
+    field = _create_field()
     mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "year", 2024)
     setattr(mocked_time, "day", 120)
@@ -388,7 +395,7 @@ def test_check_manure_application_schedule_integration() -> None:
 
 def test_create_daily_spread_event_uses_spread_amounts() -> None:
     """Daily spread event should request the configured spread amounts."""
-    field = Field(
+    field = _create_field(
         daily_spread_settings={
             "is_daily_spreading": True,
             "spread_all_available_manure": False,
@@ -419,7 +426,7 @@ def test_create_daily_spread_event_uses_spread_amounts() -> None:
 
 def test_create_daily_spread_event_propagates_spread_all_flag() -> None:
     """Daily spread event should carry the spread_all_available_manure flag from settings."""
-    field = Field(
+    field = _create_field(
         daily_spread_settings={
             "is_daily_spreading": True,
             "spread_all_available_manure": True,
@@ -448,7 +455,7 @@ def test_create_daily_spread_event_propagates_spread_all_flag() -> None:
 
 def test_create_manure_request_spread_all_skips_zero_nutrient_short_circuit() -> None:
     """spread_all_available_manure events bypass the 'no N or P requested' early return."""
-    field = Field()
+    field = _create_field()
     field.om = MagicMock()
     event = ManureEvent(
         year=2027,
@@ -475,7 +482,7 @@ def test_create_manure_request_spread_all_skips_zero_nutrient_short_circuit() ->
 
 def test_check_manure_application_schedule_daily_spread_request_uses_amounts() -> None:
     """Daily spread request should use spread amounts and mark request source as daily spread."""
-    field = Field(
+    field = _create_field(
         manure_events=[],
         daily_spread_settings={
             "is_daily_spreading": True,
@@ -536,7 +543,7 @@ def test_create_manure_request(
 ) -> None:
     """Tests _create_manure_request for both nutrient-requested and no-nutrient cases."""
     # Arrange
-    field = Field()
+    field = _create_field()
     field.om = MagicMock()
 
     manure_event = ManureEvent(
@@ -629,7 +636,7 @@ def test_check_crop_harvest_schedule(
     expected_harvest_count: int,
 ) -> None:
     """Tests that the schedule of crop harvests is determined correctly for any given day."""
-    field = Field(harvestings=all_harvest_events)
+    field = _create_field(harvestings=all_harvest_events)
 
     mocked_time = MagicMock(RufasTime)
     mocked_time.calendar_year = year
@@ -702,7 +709,7 @@ def test_harvest_heat_scheduled_crops(
         mock_crop.crop_management = mock_crop_management
         crops.append(mock_crop)
 
-    field = Field(
+    field = _create_field(
         field_data=mock_field_data,
     )
     field.crops = crops
@@ -827,7 +834,7 @@ def test_plant_crop(
 ) -> None:
     """Tests that a new Crop instance is properly created and added to a field."""
     field_data = FieldData(name="test", field_size=1.3)
-    field = Field(field_data=field_data)
+    field = _create_field(field_data=field_data)
     mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "current_calendar_year", year)
     setattr(mocked_time, "current_julian_day", day)
@@ -943,7 +950,7 @@ def test_record_planting(
     expected_value: dict[str, Any],
 ) -> None:
     """Tests that crop plantings are correctly recorded to the OutputManager."""
-    field = Field(field_data=FieldData(name=field_name, field_size=field_size))
+    field = _create_field(field_data=FieldData(name=field_name, field_size=field_size))
     with patch(
         "RUFAS.biophysical.field.soil.soil_data.SoilData.average_clay_percent",
         new_callable=PropertyMock,
@@ -982,7 +989,7 @@ def test_harvest_crop(
     other_crop_2 = Crop(crop_data=replace(mock_crop_data))
     other_crop_1.data.id, other_crop_2.data.id = "not this crop", "not this crop"
 
-    field = Field(field_data=mock_field_data)
+    field = _create_field(field_data=mock_field_data)
     field.crops = [harvest_crop, other_crop_1, other_crop_2]
 
     manage_crop_harvest_mocks = [mocker.patch.object(crop, "manage_crop_harvest") for crop in field.crops]
@@ -1041,7 +1048,7 @@ def test_harvest_crop_warnings(
         for crop in crops:
             crop._data.id = "test"
             mock_manage = mocker.patch.object(crop, "manage_crop_harvest")
-        field = Field(
+        field = _create_field(
             field_data=mock_field_data,
         )
         field.crops = crops
@@ -1076,11 +1083,11 @@ def test_remove_dead_crops(mock_crop_data: CropData) -> None:
     This test contains four cases: there are no crops in the field, some crops in the field are dead, no crops in the
     field are dead, and all crops in the field are dead.
     """
-    field_1 = Field()
+    field_1 = _create_field()
     field_1._remove_dead_crops()
     assert field_1.crops == []
 
-    field_2 = Field()
+    field_2 = _create_field()
     crop_1 = Crop(crop_data=mock_crop_data)
     crop_1._data.is_alive = False
     crop_2 = Crop(crop_data=replace(mock_crop_data))
@@ -1090,7 +1097,7 @@ def test_remove_dead_crops(mock_crop_data: CropData) -> None:
     field_2._remove_dead_crops()
     assert field_2.crops == [crop_2, crop_3]
 
-    field_3 = Field()
+    field_3 = _create_field()
     mock_crop_data.is_alive = True
     crop_4 = Crop(crop_data=mock_crop_data)
     crop_5 = Crop(crop_data=mock_crop_data)
@@ -1099,7 +1106,7 @@ def test_remove_dead_crops(mock_crop_data: CropData) -> None:
     field_3._remove_dead_crops()
     assert field_3.crops == [crop_4, crop_5, crop_6]
 
-    field_4 = Field()
+    field_4 = _create_field()
     crop_7 = Crop(crop_data=mock_crop_data)
     crop_8 = Crop(crop_data=mock_crop_data)
     field_4.crops = [crop_7, crop_8]
@@ -1120,7 +1127,7 @@ def test_reset_crop_field_coverage_fractions(
     mock_crop_data: CropData, crop_count: int, expected_field_proportion: float
 ) -> None:
     """Tests that crops in a field correctly have their proportion reset when there are other crops present."""
-    field = Field()
+    field = _create_field()
     crop_list = [Crop(crop_data=mock_crop_data) for _ in range(crop_count)]
     field.crops = crop_list
     field._reset_crop_field_coverage_fractions()
@@ -1139,7 +1146,7 @@ def test_reset_crop_field_coverage_fractions(
 def test_start_dormancy(mock_crop_data: CropData, daylength: float, threshold_daylength: float) -> None:
     """Tests that each crop's dormancy method is called."""
     crop = Crop(mock_crop_data)
-    field = Field()
+    field = _create_field()
     field.field_data.dormancy_threshold_daylength = threshold_daylength
     field.crops = [crop]
     rainfall = 10.3
@@ -1196,7 +1203,7 @@ def test_execute_fertilizer_application(
 ) -> None:
     """Tests that fertilizer applications are being correctly executed and recorded."""
     field_data = FieldData(name="test", field_size=field_size)
-    field = Field(
+    field = _create_field(
         field_data=field_data,
         fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5, "ammonium_fraction": ammonium_fraction}},
     )
@@ -1251,7 +1258,7 @@ def test_execute_fertilizer_application_error(
     """
     Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available mixes.
     """
-    field = Field(
+    field = _create_field(
         field_data=FieldData(name=field_name),
         fertilizer_mixes=available_mixes,
     )
@@ -1278,7 +1285,7 @@ def test_execute_fertilizer_application_with_invalid_args(
 ) -> None:
     """Tests that fertilizer applications with invalid arguments are caught, recorded in the OutputManager and execution
     with corrected values takes place."""
-    field = Field(
+    field = _create_field(
         field_data=FieldData(name="test", field_size=1.2),
     )
     assert field.soil.data.soil_layers is not None
@@ -1507,7 +1514,7 @@ def test_record_fertilizer_application(
     field_size: float,
 ) -> None:
     """Tests that fertilizer applications are correctly recorded in the OutputManager."""
-    field = Field(
+    field = _create_field(
         field_data=FieldData(name=field_name, field_size=field_size),
     )
 
@@ -1776,7 +1783,7 @@ def test_execute_manure_application(
     expected_unmet_phosphorus: float,
 ) -> None:
     """Tests that manure is applied to the soil correctly."""
-    field = Field(field_data=FieldData(name="test", field_size=1.4))
+    field = _create_field(field_data=FieldData(name="test", field_size=1.4))
     mock_add_manure_water = mocker.patch.object(
         field,
         "_add_manure_water",
@@ -1901,7 +1908,7 @@ def test_execute_manure_application(
 
 def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
     """Tests that the manure application is applied and recorded correctly."""
-    field = Field(field_data=MagicMock(name="test", field_size=1.2))
+    field = _create_field(field_data=MagicMock(name="test", field_size=1.2))
 
     manure_supplied = NutrientRequestResults(
         nitrogen=60.0,
@@ -2013,7 +2020,7 @@ def test_validate_application_depth_and_fraction(
     expect_log: bool,
 ) -> None:
     """Tests that the application depth and fraction are validated correctly."""
-    field = Field(field_data=MagicMock(name="test", field_size=1.2))
+    field = _create_field(field_data=MagicMock(name="test", field_size=1.2))
     field.soil = MagicMock()
     field.soil.data.soil_layers = [MagicMock(bottom_depth=soil_max_depth)]
     # field._record_nutrient_application_error = mocker.MagicMock()
@@ -2034,7 +2041,7 @@ def test_validate_application_depth_and_fraction(
 
 
 def test_validate_application_depth_and_fraction_raises_for_missing_soil_layers(mocker: MockerFixture) -> None:
-    field = Field(field_data=MagicMock(name="test", field_size=1.2))
+    field = _create_field(field_data=MagicMock(name="test", field_size=1.2))
     field.soil = MagicMock()
     field.soil.data.soil_layers = None
     mock_add_error = mocker.patch.object(field.om, "add_error")
@@ -2044,7 +2051,7 @@ def test_validate_application_depth_and_fraction_raises_for_missing_soil_layers(
 
 
 def test_validate_application_depth_and_fraction_raises_for_missing_bottom_depth(mocker: MockerFixture) -> None:
-    field = Field(field_data=MagicMock(name="test", field_size=1.2))
+    field = _create_field(field_data=MagicMock(name="test", field_size=1.2))
     field.soil = MagicMock()
     mock_layer = MagicMock()
     mock_layer.bottom_depth = None
@@ -2094,7 +2101,7 @@ def test_handle_unmet_nutrients(
     only_nitrogen_unmet: bool,
 ) -> None:
     """Tests that the handling of unmet nutrients is performed correctly."""
-    field = Field(field_data=MagicMock(name="test", field_size=1.2))
+    field = _create_field(field_data=MagicMock(name="test", field_size=1.2))
     field.om = MagicMock()
     field.ONLY_NITROGEN_MIX = "100_0_0"
     field.available_fertilizer_mixes = {
@@ -2192,7 +2199,7 @@ def test_execute_manure_application_with_invalid_args(
         dry_matter=100.0,
         dry_matter_fraction=0.66,
     )
-    field = Field(field_data=FieldData(name="test", field_size=1.89))
+    field = _create_field(field_data=FieldData(name="test", field_size=1.89))
     assert field.soil.data.soil_layers is not None
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     expected_total_inorganic_fraction = 0.15
@@ -2484,7 +2491,7 @@ def test_record_manure_application(
     manure_type: ManureType,
 ) -> None:
     """Tests that manure applications are recorded correctly."""
-    field = Field(
+    field = _create_field(
         field_data=FieldData(name=field_name, field_size=field_size),
     )
 
@@ -2532,8 +2539,8 @@ def test_add_manure_water(
     converted: bool,
 ) -> None:
     """Tests that manure water is correctly calculated and stored."""
-    field_data = FieldData(field_size=2.3)
-    field = Field(field_data=field_data)
+    field_data = FieldData(name="test", field_size=2.3)
+    field = _create_field(field_data=field_data)
     mocked_converter = mocker.patch.object(field.field_data, "convert_liters_to_millimeters", return_value=10.0)
 
     field._add_manure_water(manure_application, manure_type)
@@ -2592,7 +2599,7 @@ def test_record_nutrient_application_error(
 ) -> None:
     """Tests that manure and fertilizer application errors are correctly recorded to the OutputManager."""
     with patch("RUFAS.output_manager.Utility.get_timestamp") as mocked_timestamp:
-        field = Field(field_data=FieldData(name="test"))
+        field = _create_field(field_data=FieldData(name="test"))
         mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
 
         field._record_nutrient_application_error(depth, remainder, name, year, day)
@@ -2632,6 +2639,7 @@ def test_execute_daily_processes(
         is_dormant=PropertyMock(return_value=not crops_growing),
     ):
         field_data = FieldData(
+            name="test",
             field_size=field_size,
             current_residue=residue,
             simulate_water_stress=stressors,
@@ -2640,7 +2648,7 @@ def test_execute_daily_processes(
             simulate_phosphorus_stress=stressors,
         )
 
-        incorp = Field(field_data=field_data)
+        incorp = _create_field(field_data=field_data)
         crop_1 = Crop(crop_data=mock_crop_data)
         crop_1._data.max_transpiration = transpiration
         crop_2 = Crop(crop_data=mock_crop_data)
@@ -2776,6 +2784,7 @@ def test_cycle_water(
             mean_air_temperature=mean_temp,
         )
         field_data = FieldData(
+            name="test",
             field_size=field_size,
             current_residue=residue,
             seasonal_high_water_table=high_water_table,
@@ -2900,6 +2909,7 @@ def test_determine_watering_amount(
     setattr(mocked_time, "year", 2023)
     setattr(mocked_time, "day", 178)
     data = FieldData(
+        name="test",
         watering_amount_in_liters=50_000,
         watering_interval=5,
         days_into_watering_interval=days_into_interval,
@@ -2907,7 +2917,7 @@ def test_determine_watering_amount(
     data.watering_amount_in_mm = 5.0
     data.watering_occurs = watering_occurs
     data.current_water_deficit = water_deficit
-    incorp = Field(field_data=data)
+    incorp = _create_field(field_data=data)
 
     actual = incorp._determine_watering_amount(rainfall, manure_water, mocked_time.year, mocked_time.day, irrigation)
     if old_method:
@@ -2940,7 +2950,7 @@ def test_determine_watering_amount(
 def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name: str) -> None:
     """Tests that manure water is correctly retrieved and logged."""
     field_data = FieldData(name=field_name, manure_water=water_amount)
-    field = Field(field_data=field_data)
+    field = _create_field(field_data=field_data)
 
     with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
         actual = field._get_manure_water()
@@ -2999,7 +3009,7 @@ def test_handle_water_in_crop_canopies(
         crop1 = Crop(crop_data1)
         crop_data2 = CropData(canopy_water=second_canopy_amount, **SAMPLE_CROP_CONFIGURATION)
         crop2 = Crop(crop_data2)
-        field = Field()
+        field = _create_field()
         field.crops = [crop1, crop2]
 
         actual = field._handle_water_in_crop_canopies(precipitation)
@@ -3029,7 +3039,7 @@ def test_evaporate_from_crop_canopies(
     crop1 = Crop(data1)
     data2 = CropData(canopy_water=canopy_water_2, **SAMPLE_CROP_CONFIGURATION)
     crop2 = Crop(data2)
-    field = Field()
+    field = _create_field()
     field.crops = [crop1, crop2]
 
     actual_demand = field._evaporate_from_crop_canopies(demand)
@@ -3043,7 +3053,7 @@ def test_determine_total_above_ground_biomass(
     mock_crop_data: CropData, biomasses: List[float], expected: float
 ) -> None:
     """Tests that total above ground biomass on the field is correctly calculated."""
-    field = Field()
+    field = _create_field()
     for biomass in biomasses:
         crop = Crop(crop_data=replace(mock_crop_data))
         crop._data.above_ground_biomass = biomass
@@ -3180,7 +3190,7 @@ def test_determine_soil_cover_index(above_ground_biomass: float, residue: float,
 
 def test_annual_reset(mocker: MockerFixture) -> None:
     """Tests that all annual reset subroutines are called properly"""
-    field = Field()
+    field = _create_field()
     mock_do_annual_reset = mocker.patch.object(field.soil.data, "do_annual_reset")
     mock_perform_annual_field_reset = mocker.patch.object(field.field_data, "perform_annual_field_reset")
 
@@ -3337,7 +3347,7 @@ def test_check_tillage_schedule(
     setattr(mocked_time, "current_julian_day", day)
     setattr(mocked_time, "current_date", RufasTime.convert_year_jday_to_date(year, day))
 
-    field = Field(tillage_events=events)
+    field = _create_field(tillage_events=events)
     todays_count = len(is_today)
     mock_till_soil = mocker.patch.object(field.tiller, "till_soil")
     field._check_tillage_schedule(mocked_time)
@@ -3377,6 +3387,7 @@ def test_field_data_initialization(
     )
 
     data = FieldData(
+        name="test",
         field_size=3,
         absolute_latitude=latitude,
         minimum_daylength=min_daylength,
@@ -3410,7 +3421,7 @@ def test_error_field_data_initialization(watering_amount: float, interval: int, 
     """Tests that errors are correctly raised when FieldData is initialized with invalid values."""
     mock_add_error = mocker.patch.object(OutputManager, "add_error")
     with pytest.raises(Exception) as e:
-        FieldData(watering_amount_in_liters=watering_amount, watering_interval=interval)
+        FieldData(name="test", watering_amount_in_liters=watering_amount, watering_interval=interval)
     mock_add_error.assert_called_once()
     if watering_amount < 0:
         assert f"Expected watering amount to be >= 0, received '{watering_amount}'." == str(e.value)
@@ -3477,7 +3488,7 @@ def test_record_field_watering(
     expected_info_map: dict[str, Any],
     expected_value: dict[str, Any],
 ) -> None:
-    field = Field(
+    field = _create_field(
         field_data=FieldData(name=field_name, field_size=field_size),
     )
     field._record_field_watering(year=year, day=day, watering_amount=watering_amount)
@@ -3490,6 +3501,6 @@ def test_record_field_watering(
 @pytest.mark.parametrize("annual_irrigation_water_use_total,expected", [(1500, 0), (063.25, 0), (0, 0)])
 def test_field_data_perform_annual_field_reset(annual_irrigation_water_use_total: float, expected: float) -> None:
     """Tests that annual variable was reset correctly."""
-    data = FieldData(annual_irrigation_water_use_total=annual_irrigation_water_use_total)
+    data = FieldData(name="test", annual_irrigation_water_use_total=annual_irrigation_water_use_total)
     data.perform_annual_field_reset()
     assert expected == data.annual_irrigation_water_use_total

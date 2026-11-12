@@ -11,11 +11,8 @@ class Evaporation:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        An instance of SoilData for tracking the evaporation and transpiration from the soil profile. If not provided, a
-        new instance will be created with the specified field size.
-    field_size : float, optional
-        The size of the field (ha).
+    soil_data : SoilData
+        An instance of SoilData for tracking the evaporation and transpiration from the soil profile.
 
     Attributes
     ----------
@@ -24,8 +21,8 @@ class Evaporation:
 
     """
 
-    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
     def evaporate(self, maximum_soil_water_evaporation: float) -> None:
         """

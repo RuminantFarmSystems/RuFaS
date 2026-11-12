@@ -17,12 +17,8 @@ class ManureApplication:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        The SoilData object used by this module to track manure phosphorus activity, creates new one if one is not
-        provided.
-    field_size : float, optional
-        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-        not provided (ha).
+    soil_data : SoilData
+        The SoilData object used by this module to track manure phosphorus activity.
 
     Attributes
     ----------
@@ -47,8 +43,8 @@ class ManureApplication:
         be tracked.
     """
 
-    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None) -> None:
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData) -> None:
+        self.data = soil_data
 
     def apply_grazing_manure(
         self,
@@ -412,7 +408,6 @@ class ManureApplication:
         cycling routine (``ResiduePartition.partition_manure_residue``).
 
         """
-        assert self.data.soil_layers is not None
         self.data.soil_layers[layer_index].manure_carbon_residue += carbon_mass / field_size
 
     def _track_manure_residue_composition(
