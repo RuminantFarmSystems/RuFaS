@@ -1339,9 +1339,9 @@ def test_update_expected_test_results(
     # Act
     if raise_exception:
         with pytest.raises(type(raise_exception)):
-            E2ETestResultsHandler.update_expected_test_results(output_dir, "dummy_prefix")
+            E2ETestResultsHandler.update_expected_test_results(output_dir, "dummy_prefix", [1])
     else:
-        E2ETestResultsHandler.update_expected_test_results(output_dir, "dummy_prefix")
+        E2ETestResultsHandler.update_expected_test_results(output_dir, "dummy_prefix", [1])
 
     # Assert
     get_result_paths.assert_called_once()
@@ -1429,11 +1429,11 @@ def test_write_formatted_json(data: dict[str, dict[str, str]], should_raise: boo
         mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
         mock_add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
         with pytest.raises(ValueError):
-            E2ETestResultsHandler._write_formatted_json(file_path, data)
+            E2ETestResultsHandler._write_formatted_json(file_path, data, [1])
         mock_add_error.assert_called_once()
     else:
         # Act
-        E2ETestResultsHandler._write_formatted_json(file_path, data)
+        E2ETestResultsHandler._write_formatted_json(file_path, data, [1])
 
         # Assert
         mock_open.assert_called_once_with(file_path, "w")
@@ -1673,7 +1673,9 @@ def patch_output_manager(mocker: MockerFixture) -> tuple[MagicMock, MagicMock]:
     return add_log, add_error
 
 
-def write_expected_results_file(path: Path, expected_results: dict[str, Any]) -> None:
+def write_expected_results_file(
+    path: Path, expected_results: dict[str, Any], random_seeds: list[int] | None = None
+) -> None:
     """Writes a valid expected results file, named after the file stem, for the configuration validation tests."""
     write_json_file(
         path,
@@ -1681,6 +1683,7 @@ def write_expected_results_file(path: Path, expected_results: dict[str, Any]) ->
             "name": path.stem,
             "filters": ["A.*"],
             "expected_results_last_updated": "2026-09-11T00:00:00",
+            "random_seeds": [42] if random_seeds is None else random_seeds,
             "expected_results": expected_results,
         },
     )
@@ -1733,12 +1736,13 @@ def test_validate_comparison_configuration(mocker: MockerFixture, tmp_path: Path
     path_sets = make_validation_path_sets(tmp_path, ["A.y", flagged_feed_name])
     mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
 
-    must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
+    must_change_variables, accepted_ranges, random_seeds = E2ETestResultsHandler.validate_comparison_configuration(
         VALIDATION_OUTPUT_PREFIX, conversion_csv_path, tmp_path, True
     )
 
     assert must_change_variables == {"A.y", flagged_feed_name}
     assert accepted_ranges == {}
+    assert random_seeds == {"Animal": [42], "Feed": [42]}
     add_error.assert_not_called()
 
 
@@ -1892,6 +1896,35 @@ def test_validate_update_configuration(mocker: MockerFixture, tmp_path: Path) ->
     E2ETestResultsHandler.validate_update_configuration(VALIDATION_OUTPUT_PREFIX, tmp_path)
 
     add_error.assert_not_called()
+
+
+def test_validate_update_configuration_missing_random_seeds(
+    mocker: MockerFixture,
+    tmp_path: Path,
+) -> None:
+    """Tests that expected results files missing random_seeds fail validation."""
+    _, add_error = patch_output_manager(mocker)
+    path_sets = make_validation_path_sets(tmp_path)
+
+    for path_set in path_sets:
+        expected_results_path = Path(path_set.expected_results_path)
+        file_content = json.loads(expected_results_path.read_text())
+        file_content.pop("random_seeds", None)
+        expected_results_path.write_text(json.dumps(file_content))
+
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "_get_test_result_paths",
+        return_value=path_sets,
+    )
+
+    with pytest.raises(ValueError, match="Missing required keys.*random_seeds"):
+        E2ETestResultsHandler.validate_update_configuration(
+            VALIDATION_OUTPUT_PREFIX,
+            tmp_path,
+        )
+
+    assert add_error.call_count == 2
 
 
 @pytest.mark.parametrize(
@@ -2228,7 +2261,7 @@ def test_validate_comparison_configuration_with_accepted_ranges(mocker: MockerFi
 
     result = E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
 
-    assert result == ({"A.x"}, accepted_ranges)
+    assert result == ({"A.x"}, accepted_ranges, {"Animal": [42], "Feed": [42]})
     add_error.assert_not_called()
 
 
@@ -2241,7 +2274,7 @@ def test_validate_comparison_configuration_without_accepted_ranges(mocker: Mocke
 
     result = E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, False)
 
-    assert result == ({"A.x"}, {})
+    assert result == ({"A.x"}, {}, {"Animal": [42], "Feed": [42]})
     add_error.assert_not_called()
 
 
