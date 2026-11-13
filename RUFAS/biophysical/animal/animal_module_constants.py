@@ -40,8 +40,8 @@ class AnimalModuleConstants:
     DEFAULT_NDF_PERCENTAGE: float = 0.3
     """Percentage of neutral detergent fiber in a ration when this value is not known for an animal."""
 
-    DEFAULT_TDN_PERCENTAGE: float = 0.7
-    """Percentage of total digestible nutrition in a ration when this value is not known for an animal."""
+    DEFAULT_TDN_FRACTION: float = 0.7
+    """Fraction of total digestible nutrition in a ration when this value is not known for an animal."""
 
     VERTICAL_DIST_TO_MILKING_PARLOR: float = 0.1
     """The default vertical distance from the animal pens to the milking parlor."""
