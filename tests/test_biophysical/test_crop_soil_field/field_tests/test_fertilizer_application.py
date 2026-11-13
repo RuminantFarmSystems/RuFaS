@@ -98,7 +98,7 @@ def test_apply_fertilizer(
 ) -> None:
     """Tests that fertilizer is applied correctly."""
     field_size = 1.7
-    fert_app = FertilizerApplication(field_size=field_size)
+    fert_app = FertilizerApplication(Soil(SoilData(field_size=field_size)))
     fert_app.soil.data.soil_layers[0].nitrate_content = 0
     fert_app.soil.data.soil_layers[0].ammonium_content = 0
 

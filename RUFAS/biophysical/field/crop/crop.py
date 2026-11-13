@@ -30,9 +30,8 @@ class Crop:
 
     Parameters
     ----------
-    crop_data : CropData, optional
+    crop_data : CropData
         A CropData object containing the attributes tracked throughout the simulation.
-        If not provided, default specifications are used.
 
     Attributes
     ----------
@@ -70,8 +69,8 @@ class Crop:
 
     """
 
-    def __init__(self, crop_data: CropData | None = None):
-        self._data = crop_data or CropData()
+    def __init__(self, crop_data: CropData):
+        self._data = crop_data
         self._growth_constraints = GrowthConstraints(self._data)
         self._biomass_allocation = BiomassAllocation(self._data)
         self._water_dynamics = WaterDynamics(self._data)

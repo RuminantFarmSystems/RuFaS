@@ -13,16 +13,15 @@ class GrowthConstraints:
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        A ``CropData`` object containing crop specifications and tracked attributes. If not provided,
-        a default ``CropData`` object is initialized with default values.
+    crop_data : CropData
+        A ``CropData`` object containing crop specifications and tracked attributes.
     water_stress : float, default 0.0
         Water stress for the day (unitless).
-    temp_stress : float, optional
+    temp_stress : float, default 0.0
         Temperature stress for the day (unitless).
-    nitrogen_stress : float, optional
+    nitrogen_stress : float, default 0.0
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : float, optional
+    phosphorus_stress : float, default 0.0
         Phosphorus stress for the day (unitless).
 
     Attributes
@@ -31,11 +30,11 @@ class GrowthConstraints:
         A reference to the ``crop_data`` object on which the growth constraint operations are conducted.
     water_stress : float
         Water stress for the day (unitless).
-    temp_stress : float | None
+    temp_stress : float
         Temperature stress for the day (unitless).
-    nitrogen_stress : float | None
+    nitrogen_stress : float
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : float, optional
+    phosphorus_stress : float
         Phosphorus stress for the day (unitless).
 
     Methods
@@ -63,13 +62,13 @@ class GrowthConstraints:
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
+        crop_data: CropData,
         water_stress: float = 0.0,
-        temp_stress: float | None = None,
-        nitrogen_stress: float | None = None,
-        phosphorus_stress: float | None = None,
+        temp_stress: float = 0.0,
+        nitrogen_stress: float = 0.0,
+        phosphorus_stress: float = 0.0,
     ) -> None:
-        self.data = crop_data or CropData()
+        self.data = crop_data
 
         self.water_stress = water_stress
         self.temp_stress = temp_stress
@@ -78,8 +77,8 @@ class GrowthConstraints:
 
     def constrain_growth(
         self,
-        max_transpiration: float | None,
-        temperature: float | None,
+        max_transpiration: float,
+        temperature: float,
         simulate_water_stress: bool,
         simulate_temp_stress: bool,
         simulate_nitrogen_stress: bool,
@@ -90,9 +89,9 @@ class GrowthConstraints:
 
         Parameters
         ----------
-        max_transpiration : float, optional
+        max_transpiration : float
             The maximum amount of transpiration possible (in mm) on this day, determined by soil conditions.
-        temperature : float, optional
+        temperature : float
             The current air temperature in degrees Celsius.
         simulate_water_stress : bool
             Whether water stress should affect growth of all crops grown in the field.
