@@ -3355,6 +3355,34 @@ def test_calculate_nutrition_requirements_nasem(mock_lactating_cow: Animal, mock
     assert result == dummy_requirements
 
 
+def test_calculate_nutrition_requirements_ndf_percentage(
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+) -> None:
+    """Test that NDF supply is converted to a percentage for NASEM requirements."""
+    animal = mock_lactating_cow
+    animal.animal_type = AnimalType.LAC_COW
+    animal.nutrient_standard = NutrientStandard.NASEM
+
+    supply = MagicMock(spec=NutritionSupply)
+    supply.configure_mock(
+        dry_matter=10.0,
+        ndf_supply=4.0,
+        tdn_supply=5.0,
+        metabolizable_energy=20.0,
+    )
+    animal.previous_nutrition_supply = supply
+
+    mock_calculate_requirements = mocker.patch.object(
+        NASEMRequirementsCalculator,
+        "calculate_requirements",
+    )
+
+    animal.calculate_nutrition_requirements("barn", 10.0, 20.0, [])
+
+    assert mock_calculate_requirements.call_args.kwargs["ndf_percentage"] == pytest.approx(40.0)
+
+
 def test_calculate_nutrition_requirements_nrc(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
     animal.animal_type = AnimalType.LAC_COW
