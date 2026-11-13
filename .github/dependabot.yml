@@ -1,16 +1,43 @@
+# Dependabot configuration — tuned for a high-merge-volume open-source repo.
+# Goal: keep dependencies + CI actions current (security) while minimizing PR
+# noise (grouped non-major updates) and avoiding known-broken bumps.
 version: 2
-
 updates:
+  # ---- Python dependencies (pyproject.toml) ----
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-
-    ignore:
-      - dependency-name: "*"
+    target-branch: "dev-msf"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      # Roll all minor + patch bumps into a single weekly PR to cut review load.
+      python-minor-and-patch:
         update-types:
-          - "version-update:semver-patch"
-          - "version-update:semver-minor"
+          - "minor"
+          - "patch"
+    ignore:
+      # pytest >= 8 breaks pytest-lazy-fixture (unmaintained). This guard stops
+      # Dependabot from re-opening a broken major bump. REMOVE it together with
+      # the migration to `pytest-lazy-fixtures` that unblocks pytest >= 8.
+      - dependency-name: "pytest"
+        update-types: ["version-update:semver-major"]
+
+  # ---- GitHub Actions used by the CI workflows ----
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "dev-msf"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(deps)"
+    groups:
+      github-actions:
+        update-types:
+          - "minor"
+          - "patch"
+          - "major"

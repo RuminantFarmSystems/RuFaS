@@ -1,3 +1,10 @@
+# ── GENERAL ANIMAL CONSTANTS ─────────────────────────────────────────────────
+DAYS_PER_YEAR: int = 365
+"""Number of days in a year used when computing age from birth year offsets."""
+
+DEFAULT_MATURE_BODY_WEIGHT_KG: float = 600.0
+"""Default mature body weight (kg) used when no breed-specific value is supplied."""
+
 # EVENTS
 # calf
 WEAN_DAY = "wean day"
@@ -131,6 +138,52 @@ MITS_PARAMETER_B = 0
 The parameter 'b' in the Mitscherlich Model 3 (Mills et al., 2003).
 """
 
+# ── FEEDLOT EVENTS ────────────────────────────────────────────────────────────
+FEEDLOT_ARRIVAL = "feedlot arrival"
+
+RECEIVING_STRESS_END = "receiving stress period ended"
+SLAUGHTER_WEIGHT_REACHED = "slaughter weight reached"
+MAX_DAYS_ON_FEED_REACHED = "max days on feed reached"
+STEP_UP_STARTER = "diet phase: starter"
+STEP_UP_TRANSITION = "diet phase: transition"
+STEP_UP_FINISHER = "diet phase: finisher"
+
+# ── COW-CALF EVENTS ───────────────────────────────────────────────────────────
+CALF_WEANED = "calf_weaned"
+COW_REBRED = "cow_rebred"
+COW_OPEN_AT_PREGNANCY_CHECK = "cow_open_at_pregnancy_check"
+COW_CULLED_AGE = "cow_culled_age"
+COW_CULLED_OPEN = "cow_culled_open"
+REPLACEMENT_HEIFER_REACHED_BREEDING_WEIGHT = "replacement_heifer_reached_breeding_weight"
+REPLACEMENT_HEIFER_PROMOTED_TO_COW = "replacement_heifer_promoted_to_cow"
+STILLBIRTH = "stillbirth"
+BEEF_CALVING = "beef_calving"
+
+# ── COW-CALF LIMITS ───────────────────────────────────────────────────────────
+MAX_BULL_TO_COW_RATIO: int = 50
+"""Maximum allowable cows-per-bull ratio for natural service breeding."""
+
+# ── COW-CALF HERD SEEDING DEFAULTS ────────────────────────────────────────────
+BEEF_COW_INITIAL_AGE_YEARS: int = 3
+"""Mature cow minimum age (years) used when seeding the initial herd."""
+
+BEEF_HEIFER_INITIAL_AGE_YEARS: int = 1
+"""Replacement heifer initial age (years) used when seeding the initial herd."""
+
+BEEF_BULL_INITIAL_AGE_YEARS: int = 2
+"""Bull minimum breeding age (years) used when seeding the initial herd."""
+
+BEEF_HEIFER_INITIAL_WEIGHT_PCT_MATURE: float = 0.6
+"""Replacement heifer starting weight as a fraction of mature body weight (~60% at ~1 yr)."""
+
+BEEF_BULL_INITIAL_WEIGHT_PCT_MATURE: float = 1.1
+"""Bull starting weight as a fraction of mature cow weight (bulls ~10% heavier)."""
+
+# ── STOCKER / BACKGROUNDING EVENTS ────────────────────────────────────────────
+STOCKER_ARRIVAL = "stocker_arrival"
+STOCKER_EXIT_WEIGHT = "stocker_exit_weight_reached"
+STOCKER_MAX_DAYS = "stocker_max_days_reached"
+STOCKER_TO_FEEDLOT = "stocker_transferred_to_feedlot"
 # male calf rates
 CONVENTIONAL_DAIRY_MALE_CALF_RATE = 0.5
 SEXED_DAIRY_MALE_CALF_RATE = 0.1

@@ -6,6 +6,14 @@ from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingSce
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
+def test_find_animal_combination_beef_cow_in_herd_raises_not_implemented(mocker: MockerFixture) -> None:
+    """BEEF_COW in BEEF_COW_CALF_HERD must raise NotImplementedError until Step 7 runtime dispatch."""
+    animal = mocker.Mock(spec=Animal)
+    animal.animal_type = AnimalType.BEEF_COW
+    with pytest.raises(NotImplementedError, match="reproduction-state dispatch"):
+        AnimalGroupingScenario.BEEF_COW_CALF_HERD.find_animal_combination(animal)
+
+
 def test_find_animal_combination_matches_enum_mapping(mocker: MockerFixture) -> None:
     """
     For each scenario, and for each animal_type listed in its value mapping,

@@ -88,6 +88,16 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             NutritionRequirements instance containing all the required amounts of energy and nutrition.
 
         """
+        if animal_type.is_beef_cow_calf:
+            raise NotImplementedError(
+                f"NRCRequirementsCalculator is dairy-only. "
+                f"Use BeefCowCalfRequirementsCalculator for {animal_type.value}."
+            )
+        if animal_type.is_feedlot:
+            raise NotImplementedError(
+                f"NRCRequirementsCalculator is dairy-only. "
+                f"Use BeefNRCRequirementsCalculator for {animal_type.value}."
+            )
         maintenance_requirement, conceptus_weight, calf_birth_weight = cls._calculate_maintenance_energy_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type
         )

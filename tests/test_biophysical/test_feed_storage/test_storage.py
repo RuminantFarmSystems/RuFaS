@@ -256,6 +256,8 @@ def test_project_degradations(
     }
     expected_last_time_degraded = 25
 
+    harvested_crop.infiltration_cumulative_loss_kg = 12.5
+    harvested_crop.infiltration_max_loss_kg = 40.0
     degradable_crops = [replace(harvested_crop) for _ in range(2)]
     grain_crop = replace(harvested_crop)
     for crop in degradable_crops:
@@ -278,8 +280,19 @@ def test_project_degradations(
         )
         for crop in degradable_crops
     ]
-    for crop in expected_degraded:
-        object.__setattr__(crop, "last_time_degraded", expected_last_time_degraded)
+    for original_crop, expected_crop in zip(degradable_crops, expected_degraded):
+        object.__setattr__(expected_crop, "last_time_degraded", expected_last_time_degraded)
+        # temperature/preseal_finalized/infiltration_cumulative_loss_kg/infiltration_max_loss_kg are
+        # init=False and get recomputed by replace()'s __post_init__; project_degradations now restores
+        # the pre-replace crop's actual values for all four instead of leaving them reset (see
+        # Storage.project_degradations). Non-default infiltration values are set on harvested_crop above
+        # specifically so this test fails if any of the four go unrestored (PR #49 review finding).
+        object.__setattr__(expected_crop, "temperature", original_crop.temperature)
+        object.__setattr__(expected_crop, "preseal_finalized", original_crop.preseal_finalized)
+        object.__setattr__(
+            expected_crop, "infiltration_cumulative_loss_kg", original_crop.infiltration_cumulative_loss_kg
+        )
+        object.__setattr__(expected_crop, "infiltration_max_loss_kg", original_crop.infiltration_max_loss_kg)
 
     mock_degradation = mocker.patch.object(
         storage, "_calculate_degradation_values", side_effect=[copy(loss_values) for _ in range(2)]

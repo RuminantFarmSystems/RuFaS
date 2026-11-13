@@ -54,7 +54,7 @@ def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[li
 
     cow_calving_ages = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in cows]
     cow_calving_ages = [calving_age for calving_age in cow_calving_ages if calving_age > 0]
-    expected_average_age_for_calving = sum(cow_calving_ages) / number_of_cows if number_of_cows > 0 else 0
+    expected_average_age_for_calving = sum(cow_calving_ages) / len(cow_calving_ages) if len(cow_calving_ages) > 0 else 0
 
     calving_to_pregnancy_times = [cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in cows]
     calving_to_pregnancy_times = [

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Dict, Any, List, Union, Optional, Type
 
@@ -1138,6 +1139,74 @@ def test_object_type_validator_key_removal(
 
     assert result
     assert dv.event_logs == expected_event_log
+
+
+def test_object_type_validator_preserves_field_curing_keys(mocker: MockerFixture) -> None:
+    """Regression for PR #51 review: wilt_days/swath_density/soil_moisture_at_mowing must be
+    declared in default.json's crop_configurations schema, or _object_type_validator strips
+    them as extraneous data before CropDataFactory ever sees them (crop_data_factory.py
+    declares them as NotRequired CropConfiguration fields, but the schema is the sole source
+    of truth for what survives validation)."""
+    input_path = Path("input/data/crop_configurations/default_crop_configs.json")
+    with open("RUFAS/input/metadata/properties/default.json") as f:
+        schema = json.load(f)
+    crop_configuration_properties = schema["crop_configuration_properties"]["crop_configurations"]["properties"]
+
+    data: dict[str | int, Any] = {
+        "name": "alfalfa_silage",
+        "wilt_days": 3,
+        "swath_density": 550.0,
+        "soil_moisture_at_mowing": 20.0,
+    }
+    mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=data)
+    mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
+    dv = DataValidator()
+
+    dv._object_type_validator(
+        ["crop_configurations", 0],
+        crop_configuration_properties,
+        {"dummy": "data"},
+        False,
+        "crop_configuration_properties",
+        mocker.MagicMock(),
+        True,
+        {"string", "number", "bool"},
+        input_path,
+    )
+
+    assert data.get("wilt_days") == 3
+    assert data.get("swath_density") == pytest.approx(550.0)
+    assert data.get("soil_moisture_at_mowing") == pytest.approx(20.0)
+
+
+@pytest.mark.component
+def test_default_crop_configs_pass_schema_validation_without_field_curing_keys() -> None:
+    """Regression: wilt_days/swath_density/soil_moisture_at_mowing are opt-in, so default_crop_configs.json
+    (which omits them) must validate by falling back to the schema defaults, not fail as 'missing required value'."""
+    input_path = Path("input/data/crop_configurations/default_crop_configs.json")
+    with open(input_path) as f:
+        input_data = json.load(f)
+    with open("RUFAS/input/metadata/properties/default.json") as f:
+        crop_configuration_properties = json.load(f)["crop_configuration_properties"]
+
+    dv = DataValidator()
+    is_valid = dv.validate_data_by_type(
+        variable_path=["crop_configurations"],
+        variable_properties=crop_configuration_properties["crop_configurations"],
+        data=input_data,
+        eager_termination=False,
+        properties_blob_key="crop_configuration_properties",
+        elements_counter=ElementsCounter(),
+        called_during_initialization=True,
+        fixable_data_types={"string", "number", "bool"},
+        input_path=input_path,
+    )
+
+    assert is_valid
+    for crop_configuration in input_data["crop_configurations"]:
+        assert crop_configuration["wilt_days"] == 0
+        assert crop_configuration["swath_density"] == pytest.approx(700.0)
+        assert crop_configuration["soil_moisture_at_mowing"] == pytest.approx(17.0)
 
 
 @pytest.mark.parametrize(

@@ -14,6 +14,9 @@ on:
         required: false
         default: "dev"
 
+permissions:
+  contents: read  # only checks out the repo and uploads a build artifact
+
 jobs:
   build_latex:
     runs-on: ubuntu-latest

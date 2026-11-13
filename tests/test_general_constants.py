@@ -46,6 +46,8 @@ def test_general_constants() -> None:
 
     # Temperature-related
     assert constants.CELSIUS_TO_KELVIN == approx(273.15)
+    assert constants.CELSIUS_TO_FAHRENHEIT_SCALE == approx(1.8)
+    assert constants.CELSIUS_TO_FAHRENHEIT_OFFSET == approx(32.0)
 
     # Fractions and Percentages
     assert constants.PERCENTAGE_TO_FRACTION == approx(0.01)

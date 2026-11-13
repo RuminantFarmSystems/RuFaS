@@ -1,0 +1,34 @@
+{
+  "env": {
+    "CAVEMAN_DEFAULT_MODE": "lite"
+  },
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "deny": [
+      "Read(./output/**)",
+      "Read(./docs/_build/**)",
+      "Read(./build/**)",
+      "Read(./dist/**)",
+      "Read(./**/*.egg-info/**)",
+      "Read(./**/__pycache__/**)",
+      "Read(./.mypy_cache/**)",
+      "Read(./.pytest_cache/**)",
+      "Read(./DataCollectionApp/js/**)",
+      "Read(./DataCollectionApp/fonts/**)"
+    ]
+  }
+}

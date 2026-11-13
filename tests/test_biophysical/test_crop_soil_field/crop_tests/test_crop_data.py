@@ -132,3 +132,22 @@ def test_heat_fraction(mock_crop_data: CropData, accumulated: float, potential: 
     mock_crop_data.potential_heat_units = potential
 
     assert mock_crop_data.heat_fraction == expected
+
+
+def test_field_curing_fields_default_when_unspecified(mock_crop_data: CropData) -> None:
+    """Tests that the opt-in field-curing fields default to values preserving current (no-curing) behavior when a
+    CropData instance is built without specifying them."""
+    assert mock_crop_data.wilt_days == 0
+    assert mock_crop_data.swath_density == pytest.approx(700.0)
+    assert mock_crop_data.soil_moisture_at_mowing == pytest.approx(17.0)
+
+
+def test_field_curing_fields_are_settable(mock_crop_data: CropData) -> None:
+    """Tests that the opt-in field-curing fields can be set to non-default values."""
+    mock_crop_data.wilt_days = 3
+    mock_crop_data.swath_density = 550.0
+    mock_crop_data.soil_moisture_at_mowing = 20.0
+
+    assert mock_crop_data.wilt_days == 3
+    assert mock_crop_data.swath_density == pytest.approx(550.0)
+    assert mock_crop_data.soil_moisture_at_mowing == pytest.approx(20.0)

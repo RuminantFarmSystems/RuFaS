@@ -182,9 +182,9 @@ class TaskManager:
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
-        self.check_python_version()
-        self.check_dependencies()
-        rufas_version = self.get_rufas_version()
+        # self.check_python_version()
+        # self.check_dependencies()
+        rufas_version = get_installed_version("RUFAS")
         self.output_manager.print_credits(rufas_version)
         info_map = {
             "class": TaskManager.__name__,
@@ -322,29 +322,6 @@ class TaskManager:
             should_flush_im_pool=False,
             export_input_data_to_csv=export_input_data_to_csv,
         )
-
-    def get_rufas_version(self) -> str:
-        """
-        Returns the current version of RUFAS.
-
-        Returns
-        -------
-        str
-            Version string of RuFaS, or ``"Unknown"`` if the version cannot be read.
-        """
-        try:
-            with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
-                import tomllib
-
-                rufas_version = tomllib.load(pyproject_file)["project"]["version"]
-        except Exception as e:
-            self.output_manager.add_error(
-                "Error reading RUFAS version",
-                f"Unable to read RUFAS version from pyproject.toml file. {e}",
-                {"class": self.__class__.__name__, "function": self.get_rufas_version.__name__},
-            )
-            return "Unknown"
-        return str(rufas_version)
 
     def check_dependencies(self) -> None:
         """
@@ -510,7 +487,7 @@ class TaskManager:
             input_task["properties_file_path"] = Path(input_task["properties_file_path"])
             input_task["comparison_properties_file_path"] = Path(input_task["comparison_properties_file_path"])
             input_task["convert_variable_table_path"] = (
-                Path(input_task["convert_variable_table_path"]) if "convert_variable_table_path" in input_task else None
+                Path(p) if (p := input_task.get("convert_variable_table_path")) is not None else None
             )
             input_task["logs_directory"] = Path(input_task["logs_directory"])
             input_task["suppress_log_files"] = input_task["suppress_log_files"]
