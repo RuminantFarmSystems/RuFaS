@@ -2640,7 +2640,7 @@ class Animal:
 
         if self.previous_nutrition_supply is None:
             previous_dmi = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
-            ndf_percentage = AnimalModuleConstants.DEFAULT_NDF_PERCENTAGE
+            ndf_percentage = AnimalModuleConstants.DEFAULT_NDF_FRACTION * GeneralConstants.FRACTION_TO_PERCENTAGE
             tdn_fraction = AnimalModuleConstants.DEFAULT_TDN_FRACTION
             net_energy_diet_conc = AnimalModuleConstants.DEFAULT_NET_ENERGY_DIET_CONCENTRATION
         else:
