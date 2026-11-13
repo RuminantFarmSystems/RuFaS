@@ -24,7 +24,6 @@ from RUFAS.biophysical.animal.data_types.milk_production import (
 )
 from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
-    GeneralConstants,
     NutritionRequirements,
     NutritionSupply,
 )
@@ -67,6 +66,7 @@ from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManage
 from RUFAS.data_structures.feed_storage_to_animal_connection import NASEMFeed, NRCFeed
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 
