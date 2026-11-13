@@ -1079,13 +1079,13 @@ First, we must calculate the value of the Arrhenius exponent (`_calculate_arrhen
 ::: {#eq-mn-met-2}
 [[**MN.MET.2**]]{.aside .content-visible when-format="html"}
 $$
-\text{Arrh\_exp g}(\text{CH}_4\text{ kg}^{-1}\text{VS h}^{-1}) = e^{\text{Ln(A)} - \frac{\text{ACTIVATION\_ENERGY}}{\text{gas_constant} \times \text{manure_temperature}}}
+\text{Arrh\_exp g}(\text{CH}_4\text{ kg}^{-1}\text{VS h}^{-1}) = e^{\text{Ln(A)} - \frac{\text{ACTIVATION\_ENERGY}}{\text{gas\_constant} \times \text{manure\_temperature}}}
 $$
 :::
 
 *Where*:
 
-* `Ln(A`) = The natural log of the Arrhenius parameter (`NATURAL_LOG_ARRHENIUS_CONSTANT`), set at 30.7 based on @Petersen2024. This is an empirically-derived value determined based on observed manure CH<sub>4</sub> emission values.
+* `Ln(A)` = The natural log of the Arrhenius parameter (`NATURAL_LOG_ARRHENIUS_CONSTANT`), set at 30.7 based on @Petersen2024. This is an empirically-derived value determined based on observed manure CH<sub>4</sub> emission values.
 * `ACTIVATION_ENERGY` = the apparent activation energy of methanogenesis in cattle slurry (J/mol), set at 81,000 J/mol, based on @Elsgaard2016. 
 * `gas_constant` = ideal gas constant, set at 8.314 J K/mol.
 * `manure_temperature` (K) = temperature of manure in storage. 
@@ -1115,7 +1115,7 @@ The cover and flare option is applicable to slurry storage outdoor only (i.e., n
 ::: {#eq-mn-met-4}
 [[**MN.MET.4**]]{.aside .content-visible when-format="html"}
 $$
-\text{emitted_storage_CH}_4 (\text{kg}) = \text{total_storage_CH}_4 \times (1 - \text{METHANE\_DESTRUCTION\_EFFICIENCY})
+\text{emitted\_storage\_CH}_4 (\text{kg}) = \text{total\_storage\_CH}_4 \times (1 - \text{METHANE\_DESTRUCTION\_EFFICIENCY})
 $$
 :::
 
@@ -1153,7 +1153,7 @@ First, we need to derive the value of the equilibrium coefficient Q for the NH<s
 
 [See [MN.AMM.1](#eq-mn-amm-1)]{.aside .content-visible when-format="html"}
 $$
-\text{K}_\text{h} = 10^{\frac{1478}{\text{manure_temperature}}} - 1.69
+\text{K}_\text{h} = 10^{\frac{1478}{\text{manure\_temperature}}} - 1.69
 $$
 
 *Where*:
@@ -1164,7 +1164,7 @@ $$
 
 [See [MN.AMM.2](#eq-mn-amm-2)]{.aside .content-visible when-format="html"}
 $$
-\text{K}_\text{h} = 1 + 10^{(0.09018 + \frac{2729.9}{\text{manure_temperature}} - \text{pH})}
+\text{K}_\text{h} = 1 + 10^{(0.09018 + \frac{2729.9}{\text{manure\_temperature}} - \text{pH})}
 $$
 
 *Where*:
@@ -1219,7 +1219,7 @@ N<sub>2</sub>O emissions (kg N<sub>2</sub>O-N) are based on the daily quantity o
 ::: {#eq-mn-nit-1}
 [[**MN.NIT.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{N}_2\text{O-N emissions (kg)} = \text{Received\_N} \times \text{N}_2\text{O_factor}
+\text{N}_2\text{O-N emissions (kg)} = \text{Received\_N} \times \text{N}_2\text{O\_factor}
 $$
 :::
 
