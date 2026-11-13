@@ -23,7 +23,10 @@ from RUFAS.biophysical.animal.data_types.milk_production import (
     MilkProductionStatistics,
 )
 from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
+    NutritionRequirements,
+    NutritionSupply,
+)
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.data_types.reproduction import (
     ReproductionInputs,
@@ -63,6 +66,7 @@ from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManage
 from RUFAS.data_structures.feed_storage_to_animal_connection import NASEMFeed, NRCFeed
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 
@@ -2636,13 +2640,15 @@ class Animal:
 
         if self.previous_nutrition_supply is None:
             previous_dmi = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
-            ndf_percentage = AnimalModuleConstants.DEFAULT_NDF_PERCENTAGE
-            tdn_percentage = AnimalModuleConstants.DEFAULT_TDN_PERCENTAGE
+            ndf_percentage = AnimalModuleConstants.DEFAULT_NDF_FRACTION * GeneralConstants.FRACTION_TO_PERCENTAGE
+            tdn_fraction = AnimalModuleConstants.DEFAULT_TDN_FRACTION
             net_energy_diet_conc = AnimalModuleConstants.DEFAULT_NET_ENERGY_DIET_CONCENTRATION
         else:
             previous_dmi = self.previous_nutrition_supply.dry_matter
-            ndf_percentage = self.previous_nutrition_supply.ndf_supply / previous_dmi
-            tdn_percentage = self.previous_nutrition_supply.tdn_supply / previous_dmi
+            ndf_percentage = (
+                self.previous_nutrition_supply.ndf_supply / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
+            )
+            tdn_fraction = self.previous_nutrition_supply.tdn_supply / previous_dmi
             net_energy_diet_conc = self.previous_nutrition_supply.metabolizable_energy / previous_dmi
 
         if self.nutrient_standard is NutrientStandard.NASEM:
@@ -2686,7 +2692,7 @@ class Animal:
                 previous_temperature=previous_temperature,
                 net_energy_diet_concentration=net_energy_diet_conc,
                 days_born=self.days_born,
-                TDN_percentage=tdn_percentage,
+                TDN_fraction=tdn_fraction,
                 process_based_phosphorus_requirement=self.nutrients.phosphorus_requirement,
             )
 
