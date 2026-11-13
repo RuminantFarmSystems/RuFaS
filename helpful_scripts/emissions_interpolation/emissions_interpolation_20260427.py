@@ -7,7 +7,7 @@ from math import radians, sin, cos, sqrt, atan2
 # User settings #
 #################
 # Datasets to modify
-EEEnames = ["feed_emissions_total_20260512", "feed_emissions_luc_20260512"]
+EEEnames = ["feed_emissions_total_11112026", "feed_emissions_luc_11112026"]
 
 # start distance for neighbor search.
 km_radius_start = 50
@@ -169,16 +169,16 @@ for EEEname in EEEnames:
     for fips_code in county_codes:
         zipcodes = []
         statecode = get_statecode(fips_code)
-        while not zipcodes and get_statecode(fips_code) == statecode:
-            if fips_code == 9001:
-                print("9001")
-            if fips_code == 9007:
-                print("9007")
-            zipcodes = get_zips_from_fips(fips_to_county_sheet, fips_code)
-            if not zipcodes:
-                print(f"No ZIPs available for county {fips_code}")
-                fips_gps_map.append(None)
-                continue
+        # while not zipcodes and get_statecode(fips_code) == statecode:
+        if fips_code == 9001:
+            print("9001")
+        if fips_code == 9007:
+            print("9007")
+        zipcodes = get_zips_from_fips(fips_to_county_sheet, fips_code)
+        if not zipcodes:
+            print(f"No ZIPs available for county {fips_code}")
+            fips_gps_map.append(None)
+            continue
         averagelatlong, latlongs = get_latlong_from_zip(zip_to_latlong_sheet, zipcodes)
         fips_gps_map.append(averagelatlong)
 
@@ -196,6 +196,9 @@ for EEEname in EEEnames:
     for idx_county_code, county_code in enumerate(county_codes):  # noqa: C901
         statecode = get_statecode(county_code)
         gps_county = fips_gps_map[idx_county_code]
+        if gps_county is None:
+            print(f"Skipping county {county_code}: no GPS coordinates")
+            continue
 
         county_codes_without_self = county_codes.copy()
         county_codes_without_self.remove(county_code)
@@ -203,7 +206,9 @@ for EEEname in EEEnames:
         tempmap.remove(gps_county)
         if len(tempmap) != len(county_codes_without_self):
             raise ValueError("temp map and county codes don't match")
-        gps_points_in_state = [x for x, y in zip(tempmap, county_codes_without_self) if get_statecode(y) == statecode]
+        gps_points_in_state = [
+            x for x, y in zip(tempmap, county_codes_without_self) if x is not None and get_statecode(y) == statecode
+            ]
         for idx_feed, feed_id in enumerate(feed_columns):
             if feed_id == "1" and statecode == "09":
                 print("catchit")
