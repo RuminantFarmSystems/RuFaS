@@ -982,19 +982,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$, and manure methane production potential, m$^3$/kgVS):
 
-* water 
+* `water` 
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
+* `mass` (equal to sum of water and total solids)
 * `total volatile solids` (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -1066,7 +1066,7 @@ $$
 *Where*:
 
 * `storage_surface_area` = the user-defined or model-estimated storage surface area (m$^2$). 
-* Precipitation = the daily amount of precipitation (m).
+* `precipitation` = the daily amount of precipitation (m).
 
 **Calculate Methane Emissions** `_calculate_methane_emissions`
 
@@ -1079,16 +1079,16 @@ First, we must calculate the value of the Arrhenius exponent (`_calculate_arrhen
 ::: {#eq-mn-met-2}
 [[**MN.MET.2**]]{.aside .content-visible when-format="html"}
 $$
-\text{Arrh\_exp g}(\text{CH}_4\text{ kg}^{-1}\text{VS h}^{-1}) = e^{\text{Ln(A)} - \frac{\text{ACTIVATION\_ENERGY}}{\text{Gas constant} \times \text{manure temperature}}}
+\text{Arrh\_exp g}(\text{CH}_4\text{ kg}^{-1}\text{VS h}^{-1}) = e^{\text{Ln(A)} - \frac{\text{ACTIVATION\_ENERGY}}{\text{gas_constant} \times \text{manure_temperature}}}
 $$
 :::
 
 *Where*:
 
-* Ln(A) = The natural log of the Arrhenius parameter (`NATURAL_LOG_ARRHENIUS_CONSTANT`), set at 30.7 based on @Petersen2024. This is an empirically-derived value determined based on observed manure CH<sub>4</sub> emission values.
+* `Ln(A`) = The natural log of the Arrhenius parameter (`NATURAL_LOG_ARRHENIUS_CONSTANT`), set at 30.7 based on @Petersen2024. This is an empirically-derived value determined based on observed manure CH<sub>4</sub> emission values.
 * `ACTIVATION_ENERGY` = the apparent activation energy of methanogenesis in cattle slurry (J/mol), set at 81,000 J/mol, based on @Elsgaard2016. 
-* Gas constant = ideal gas constant, set at 8.314 J K/mol.
-* Manure temperature (K) = temperature of manure in storage. 
+* `gas_constant` = ideal gas constant, set at 8.314 J K/mol.
+* `manure_temperature` (K) = temperature of manure in storage. 
 
 Now we can calculate actual daily CH<sub>4</sub> emission, based on the total quantity of VSd and VSnd in stored manure. The basic equation, used to calculate CH<sub>4</sub> emissions for each VS fraction, is as follows:
 
@@ -1101,27 +1101,28 @@ $$
 
 *Where*:
 
-* 24 = conversion factor from hours to day. 
+* `24` = conversion factor from hours to day. 
 * `Arrh_exp` = Arrhenius parameter for CH<sub>4</sub> emission rate (g CH<sub>4</sub> kg$^{-1}$ VS h$^{-1}$), calculated in [MN.MET.2](#eq-mn-met-2). 
-* `VSd_or_nd` = The mass (kg) of VSd or VSnd in manure in slurry storage.
-* `rate_factor` = The unitless rate-correcting factor, set to 1 for VS$_d$ and 0.01 for VS$_{nd}$. 
+* `VS<sub>d_or_nd</sub>` = The mass (kg) of VSd or VSnd in manure in slurry storage.
+* `rate_factor` = The unitless rate-correcting factor, set to 1 for VS$_\text{d}$ and 0.01 for VS$_{\text{nd}}$. 
 
 The total daily CH<sub>4</sub> emission is equal to the sum of emissions from the VS<sub>d</sub> and VS<sub>nd</sub> fractions.
 
 **Calculate Cover and Flare Emissions** `_calculate_cover_and_flare_emissions`
 
-The cover and flare option is applicable to slurry storage outdoor only (i.e., not usable with slurry storage underfloor). If the cover and flare option is selected, daily CH<sub>4</sub> emission from slurry storage is multiplied by a methane destruction efficiency value. The set value for methane destruction efficiency is 81%, based on a white paper commissioned by Dairy Management, Inc. on cover and flare efficiency [@wallaceDMI]. The updated daily CH<sub>4</sub> emission (kg) from a cover and flare slurry storage is as follows:
+The cover and flare option is applicable to slurry storage outdoor only (i.e., not usable with slurry storage underfloor). If the cover and flare option is selected, daily CH<sub>4</sub> emission from slurry storage is multiplied by a methane destruction efficiency value. The set value for methane destruction efficiency is 81%, based on a white paper commissioned by Dairy Management, Inc. on cover and flare efficiency [@wallaceDMI] and published in [@afshar2026]. The updated daily CH<sub>4</sub> emission (kg) from a cover and flare slurry storage is as follows:
 
 ::: {#eq-mn-met-4}
 [[**MN.MET.4**]]{.aside .content-visible when-format="html"}
 $$
-\text{Daily storage CH}_4 (\text{kg}) = \text{storage CH}_4 \times (1 - \text{METHANE\_DESTRUCTION\_EFFICIENCY})
+\text{emitted_storage_CH}_4 (\text{kg}) = \text{total_storage_CH}_4 \times (1 - \text{METHANE\_DESTRUCTION\_EFFICIENCY})
 $$
 :::
 
 *Where*:
 
-* Storage CH<sub>4</sub> (kg) = total daily kg of CH<sub>4</sub> emitted from stored manure, calculated in [MN.MET.3](#eq-mn-met-3).
+* `emitted_storage_CH<sub>4</sub>` (kg) = daily kg of CH<sub>4</sub> emitted from stored manure
+* `total_storage_CH<sub>4</sub>` (kg) = daily kg of CH<sub>4</sub> generated, calculated in [MN.MET.3](#eq-mn-met-3). 
 * `METHANE_DESTRUCTION_EFFICIENCY` = coefficient for destruction of methane by the flare, set to 0.81.
 
 **Calculate Volatile Solids Loss** `_apply_methane_emissions`
@@ -1139,7 +1140,7 @@ $$
 
 *Where*:
 
-* CH<sub>4</sub> emission from VS<sub>d or nd</sub> (kg) = total daily kg of CH<sub>4</sub> emitted from VS<sub>d or nd</sub>, calculated in [MN.MET.3](#eq-mn-met-3)
+* `CH<sub>4</sub> emission from VS<sub>d or nd</sub>` (kg) = total daily kg of CH<sub>4</sub> emitted from VS<sub>d or nd</sub>, calculated in [MN.MET.3](#eq-mn-met-3)
 * `VS_TO_METHANE_LOSS_RATIO` = default ratio of VS degraded per kg of CH<sub>4</sub> emitted from slurry storage, set to 6.665
 
 **Calculate Ammonia Emissions `_calculate_ammonia_emissions`**
@@ -1152,23 +1153,23 @@ First, we need to derive the value of the equilibrium coefficient Q for the NH<s
 
 [See [MN.AMM.1](#eq-mn-amm-1)]{.aside .content-visible when-format="html"}
 $$
-\text{K}_\text{h} = 10^{\frac{1478}{\text{manure temperature}}} - 1.69
+\text{K}_\text{h} = 10^{\frac{1478}{\text{manure_temperature}}} - 1.69
 $$
 
 *Where*:
 
-* Manure temperature (K) = temperature of manure storage.
+* `manure_temperature` (K) = temperature of manure storage.
 
 *Dissociation coefficient of ammonium (K<sub>a</sub>)*
 
 [See [MN.AMM.2](#eq-mn-amm-2)]{.aside .content-visible when-format="html"}
 $$
-\text{K}_\text{h} = 1 + 10^{(0.09018 + \frac{2729.9}{\text{manure temperature}} - \text{pH})}
+\text{K}_\text{h} = 1 + 10^{(0.09018 + \frac{2729.9}{\text{manure_temperature}} - \text{pH})}
 $$
 
 *Where*:
 
-* Manure temperature (K) = temperature of stored manure.
+* `manure_temperature` (K) = temperature of stored manure.
 * `DEFAULT_STORED_MANURE_PH` = the pH of the manure in storage, set to 7.5 by default
 
 *Equilibrium coefficient (Q)*
@@ -1180,8 +1181,8 @@ $$
 
 *Where*:
 
-* K<sub>h</sub> = Henry’s law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1).
-* K<sub>a</sub> = Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#-eq-mn-amm-2).
+* `K<sub>h</sub>` = Henry’s law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1).
+* `K<sub>a</sub>` = Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#-eq-mn-amm-2).
 
 Next, the rate of NH<sub>3</sub>-N loss in kg N/m$^2$ from stored manure is calculated:
 
@@ -1192,12 +1193,12 @@ $$
 
 *Where*:
 
-* TAN (kg) = Mass of ammoniacal N in stored manure
-* c = time conversion constant (86400 s per d)
-* y = manure density, set to 990 kg/m$^3$ 
+* `TAN` (kg) = Mass of ammoniacal N in stored manure
+* `c` = time conversion constant (86400 s per d)
+* `y` = manure density, set to 990 kg/m$^3$ 
 * `STORAGE_RESISTANCE` = A constant value representing the sum of resistance of NH<sub>3</sub> transfer from solution to manure surface, and from manure surface to atmosphere, set at 23.1 s/m.
-* M (kg) = Total mass of stored manure
-* Q = Equilibrium coefficient calculated in [MN.AMM.3](#eq-mn-amm-3)
+* `M` (kg) = Total mass of stored manure
+*` Q` = Equilibrium coefficient calculated in [MN.AMM.3](#eq-mn-amm-3)
 
 Lastly, we calculate total NH<sub>3</sub>-N emissions (kg), based on the emission rate we just calculated and the manure storage surface area.
 
@@ -1213,19 +1214,19 @@ $$
 
 **Calculate Nitrous Oxide Emissions** `_calculate_nitrous_oxide_emissions`
 
-N<sub>2</sub>O emissions (kg N<sub>2</sub>O-N) are based on the daily quantity of manure N loaded into storage, whether the manure storage is covered or uncovered. This method is based on @IPCC2019; however, it should be noted that the original @IPCC2006 method is based on daily manure N excretion by animals, whereas the current method is based on manure N loading into storage, which may reflect upstream N losses from NH<sub>3</sub> emissions in housing, solid liquid separation, etc. The calculation is as follows:
+N<sub>2</sub>O emissions (kg N<sub>2</sub>O-N) are based on the daily quantity of manure N loaded into storage, and depends on whether the manure storage is covered or uncovered. This method is based on @IPCC2019; however, it should be noted that the original @IPCC2006 method is based on daily manure N excretion by animals, whereas the current method is based on manure N loading into storage, which may reflect upstream N losses from NH<sub>3</sub> emissions in housing, solid liquid separation, etc. The calculation is as follows:
 
 ::: {#eq-mn-nit-1}
 [[**MN.NIT.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{N}_2\text{O-N emissions (kg)} = \text{Received\_N} \times \text{N}_2\text{O factor}
+\text{N}_2\text{O-N emissions (kg)} = \text{Received\_N} \times \text{N}_2\text{O_factor}
 $$
 :::
 
 *Where*:
 
 * `Received_N` (kg) = Quantity of manure total N loaded into storage on the current day
-* N<sub>2</sub>O factor = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to storage, based on the following logic:
+* `N<sub>2</sub>O_factor` = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to storage, based on the following logic:
     * Cover type = crust OR cover; 0.005
     * Cover type = no cover; 0 (no N<sub>2</sub>O emissions)
 
