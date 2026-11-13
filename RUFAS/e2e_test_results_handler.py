@@ -1641,7 +1641,7 @@ class E2ETestResultsHandler:
         return True
 
     @staticmethod
-    def filter_nested(values_changed: dict[str, dict[str, float | str]], tolerance: float) -> None:
+    def filter_nested(values_changed: dict[str, Any], tolerance: float) -> None:
         """
         Recursively filters out insignificant numerical changes from a nested structure.
 

@@ -1418,7 +1418,7 @@ def test_get_matching_path(mocker: MockerFixture, dir_contents: list[str], expec
         ),
     ],
 )
-def test_write_formatted_json(data: dict[str, dict[str, str]], should_raise: bool, mocker: MockerFixture) -> None:
+def test_write_formatted_json(data: dict[str, Any], should_raise: bool, mocker: MockerFixture) -> None:
     """Tests _write_formatted_json in E2ETestResultsHandler."""
 
     # Arrange
