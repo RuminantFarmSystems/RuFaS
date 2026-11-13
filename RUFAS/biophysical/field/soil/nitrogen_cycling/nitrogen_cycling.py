@@ -12,12 +12,8 @@ class NitrogenCycling:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        The SoilData object used by this module to track and manage nitrogen cycling in the soil. If not provided,
-        a new SoilData object will be created.
-    field_size : float, optional
-        The size of the field in hectares utilized to initialize a SoilData object if one is not directly
-        supplied (ha).
+    soil_data : SoilData
+        The SoilData object used by this module to track and manage nitrogen cycling in the soil.
 
     Attributes
     ----------
@@ -36,8 +32,8 @@ class NitrogenCycling:
 
     """
 
-    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
         self.leaching_runoff_erode = LeachingRunoffErosion(self.data)
         self.nitrification_volatilization = NitrificationVolatilization(self.data)

@@ -13,26 +13,25 @@ class PhosphorusUptake(NonWaterUptake):
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        An instance of ``CropData`` containing crop specifications and attributes. If not provided, a default
-        ``CropData`` instance is initialized with default values.
+    crop_data : CropData
+        An instance of ``CropData`` containing crop specifications and attributes.
     nutrient_distro_param : float, default 10
         Phosphorus uptake distribution parameter (unitless).
     nutrient_shapes : list[float], optional
         First and second shape coefficients for the nitrogen uptake equations (unitless).
-    previous_nutrient : float, optional
+    previous_nutrient : float, default 0.0
         Phosphorus value on the previous day (kg/ha).
-    total_nutrient_uptake : float, optional
+    total_nutrient_uptake : float, default 0.0
         Total amount of phosphorus taken up by the plant (kg/ha).
-    potential_nutrient_uptake : float, optional
+    potential_nutrient_uptake : float, default 0.0
         Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
     actual_nutrient_uptakes : list[float], optional
         Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
-    layer_nutrient_potentials : float, optional
+    layer_nutrient_potentials : list[float], optional
         Potential phosphorus uptake from each soil layer (kg/ha).
-    unmet_nutrient_demands : float, optional
+    unmet_nutrient_demands : list[float], optional
         Unmet phosphorus demands by overlaying soil layers (kg/ha).
-    nutrient_requests : float, optional
+    nutrient_requests : list[float], optional
         Phosphorus requested from each soil layer (kg/ha).
 
 
@@ -44,16 +43,16 @@ class PhosphorusUptake(NonWaterUptake):
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
+        crop_data: CropData,
         nutrient_distro_param: float = 10.0,
         nutrient_shapes: list[float] | None = None,
-        previous_nutrient: float | None = None,
-        potential_nutrient_uptake: float | None = None,
-        layer_nutrient_potentials: float | None = None,
-        unmet_nutrient_demands: float | None = None,
-        nutrient_requests: float | None = None,
+        previous_nutrient: float = 0.0,
+        potential_nutrient_uptake: float = 0.0,
+        layer_nutrient_potentials: list[float] | None = None,
+        unmet_nutrient_demands: list[float] | None = None,
+        nutrient_requests: list[float] | None = None,
         actual_nutrient_uptakes: list[float] | None = None,
-        total_nutrient_uptake: float | None = None,
+        total_nutrient_uptake: float = 0.0,
     ):
         super().__init__(
             crop_data,
