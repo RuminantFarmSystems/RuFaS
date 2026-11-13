@@ -33,7 +33,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         previous_temperature: float | None,
         net_energy_diet_concentration: float,
         days_born: float,
-        TDN_percentage: float,
+        TDN_fraction: float,
         process_based_phosphorus_requirement: float,
     ) -> NutritionRequirements:
         """
@@ -77,8 +77,8 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Metabolizable energy density of formulated ration.
         days_born : float
             Number of days since birth (days).
-        TDN_percentage : float
-            Percentage of Total Digestible Nutrients in previously fed ration (%).
+        TDN_fraction : float
+            Fraction of Total Digestible Nutrients in previously fed ration (%).
         process_based_phosphorus_requirement : float
             The phosphorus requirement (kg).
 
@@ -126,7 +126,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             average_daily_gain,
             shrunk_body_weight,
             dry_matter_intake,
-            TDN_percentage,
+            TDN_fraction,
         )
         calcium_requirement = cls._calculate_calcium_requirement(
             body_weight, mature_body_weight, day_of_pregnancy, animal_type, average_daily_gain, milk_production
