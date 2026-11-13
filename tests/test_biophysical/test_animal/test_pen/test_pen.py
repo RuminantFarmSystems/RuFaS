@@ -1706,6 +1706,53 @@ def test_validate_general_manure_stream_names(
         mock_module_om.add_error.assert_called_once()
 
 
+@pytest.mark.parametrize(
+    "manure_streams, expected_unnamed_count",
+    [
+        ([{"stream_proportion": 1.0}], 1),
+        ([{"stream_name": None, "stream_proportion": 1.0}], 1),
+        (
+            [
+                {"stream_proportion": 0.5},
+                {"stream_name": None, "stream_proportion": 0.5},
+            ],
+            2,
+        ),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.5},
+                {"stream_proportion": 0.5},
+            ],
+            1,
+        ),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.25},
+                {"stream_proportion": 0.25},
+                {"stream_name": "stream1", "stream_proportion": 0.25},
+                {"stream_name": None, "stream_proportion": 0.25},
+            ],
+            2,
+        ),
+    ],
+)
+def test_validate_general_manure_stream_names_missing_name(
+    manure_streams: list[dict[str, str | float]],
+    expected_unnamed_count: int,
+    pen: Pen,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that a general manure stream without a name is rejected with its own error."""
+    mock_module_om = mocker.patch("RUFAS.biophysical.animal.pen.om")
+    pen.manure_streams = manure_streams
+
+    expected_message = f"Missing manure stream name for {expected_unnamed_count} manure stream(s) in pen {pen.id}."
+    with pytest.raises(ValueError, match=re.escape(expected_message)):
+        pen._validate_general_manure_stream_names()
+    mock_module_om.add_error.assert_called_once()
+    assert mock_module_om.add_error.call_args.args[0] == "Missing pen manure stream names"
+
+
 def test_pen_init_rejects_duplicate_manure_stream_names(mocker: MockerFixture) -> None:
     """Tests that a pen cannot be initialized with two manure streams sharing a name."""
     mock_module_om = mocker.patch("RUFAS.biophysical.animal.pen.om")
