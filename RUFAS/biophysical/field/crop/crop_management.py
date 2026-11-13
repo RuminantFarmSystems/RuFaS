@@ -187,8 +187,7 @@ class CropManagement:
         SWAT 5:2.4, 5:3.3
 
         """
-        if self.data.do_harvest_index_override:
-            assert self.data.user_harvest_index is not None
+        if self.data.user_harvest_index is not None:
             self.harvest_index = self.data.user_harvest_index  # SWAT 5:3.3.1
         else:
             self.potential_harvest_index = self._determine_potential_harvest_index(

@@ -1,4 +1,5 @@
 from RUFAS.biophysical.field.crop.crop_data import CropData
+from RUFAS.output_manager import OutputManager
 
 
 class HeatUnits:
@@ -82,6 +83,12 @@ class HeatUnits:
         max_air_temperature : float, optional
             Maximum air temperature for the day (°C).
 
+        Raises
+        ------
+        ValueError
+            If the alternative heat unit method is used without the minimum and maximum air temperature, or if neither
+            a mean air temperature nor a heat unit temperature is available.
+
         Notes
         -----
         If the attribute ``use_heat_unit_temperature`` in CropData is False, both ``min_air_temperature`` and
@@ -94,8 +101,16 @@ class HeatUnits:
 
         """
         if self.use_heat_unit_temperature:
-            assert max_air_temperature is not None
-            assert min_air_temperature is not None
+            if max_air_temperature is None or min_air_temperature is None:
+                OutputManager().add_error(
+                    "Missing air temperature",
+                    "The alternative heat unit method needs the minimum and maximum air temperature, received "
+                    f"{min_air_temperature=} and {max_air_temperature=}.",
+                    info_map={"class": self.__class__.__name__, "function": self.absorb_heat_units.__name__},
+                )
+                raise ValueError(
+                    "min_air_temperature and max_air_temperature are required when use_heat_unit_temperature is True"
+                )
             self.maximum_heat_unit_temperature = HeatUnits._determine_maximum_heat_unit_temperature(
                 max_air_temperature, self.maximum_temperature
             )
@@ -108,7 +123,15 @@ class HeatUnits:
             use_temp = self.heat_unit_temperature
         else:
             use_temp = mean_air_temperature
-        assert use_temp is not None
+        if use_temp is None:
+            OutputManager().add_error(
+                "Missing air temperature",
+                "No mean air temperature was provided and no heat unit temperature is set, so heat units cannot be "
+                "absorbed. Provide the mean air temperature, or the minimum and maximum air temperature with the "
+                "alternative heat unit method.",
+                info_map={"class": self.__class__.__name__, "function": self.absorb_heat_units.__name__},
+            )
+            raise ValueError("mean_air_temperature is required when heat_unit_temperature is not set")
         self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
 
@@ -141,9 +164,22 @@ class HeatUnits:
             ``self._determine_heat_unit_value``. If None or if ``self.use_heat_unit_temperature=True``, then
             ``self.heat_unit_temperature`` is used instead.
 
+        Raises
+        ------
+        ValueError
+            If ``self.heat_unit_temperature`` is needed but has not been set.
+
         """
         if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
-            assert self.heat_unit_temperature is not None
+            if self.heat_unit_temperature is None:
+                OutputManager().add_error(
+                    "Missing heat unit temperature",
+                    "The heat unit temperature is needed to determine the day's heat units but has not been set. "
+                    "Provide the average air temperature, or calculate the heat unit temperature with "
+                    "absorb_heat_units first.",
+                    info_map={"class": self.__class__.__name__, "function": self.assign_current_heat_units.__name__},
+                )
+                raise ValueError("heat_unit_temperature must be set when no air temperature is used")
             self.new_heat_units = self._determine_heat_unit_value(
                 self.heat_unit_temperature, self.data.minimum_temperature
             )

@@ -126,6 +126,8 @@ class WaterUptake(NutrientUptake):
 
         Raises
         ------
+        ValueError
+            If ``self.actual_water_uptakes`` has not been calculated.
         Exception
             If the lengths of ``soil_data.soil_layers`` and ``self.actual_water_uptakes`` aren't equal.
 
@@ -136,7 +138,14 @@ class WaterUptake(NutrientUptake):
         layers in the SoilData object.
 
         """
-        assert self.actual_water_uptakes is not None
+        if self.actual_water_uptakes is None:
+            OutputManager().add_error(
+                "Soil water extraction error",
+                "actual_water_uptakes has not been calculated, so no water can be extracted from the soil. Calculate "
+                "the water uptakes with the uptake method first.",
+                info_map={"class": self.__class__.__name__, "function": self.extract_water_from_soil.__name__},
+            )
+            raise ValueError("actual_water_uptakes must be calculated before water is extracted from the soil")
         if len(soil_data.soil_layers) != len(self.actual_water_uptakes):
             OutputManager().add_error(
                 "Soil water extraction error",

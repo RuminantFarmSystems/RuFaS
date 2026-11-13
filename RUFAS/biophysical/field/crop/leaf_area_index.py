@@ -22,9 +22,9 @@ class LeafAreaIndex:
         Leaf area index change during the day (unitless).
     optimal_leaf_area_change : float, default 0.0
         Leaf area index added under ideal conditions (unitless).
-    previous_leaf_area_index : float, optional
+    previous_leaf_area_index : float, default 0.0
         Leaf area index on the previous day (unitless).
-    previous_optimal_leaf_area_fraction : float, optional
+    previous_optimal_leaf_area_fraction : float, default 0.0
         Optimal leaf area fraction on the previous day (unitless).
 
     Attributes
@@ -41,9 +41,9 @@ class LeafAreaIndex:
         Leaf area index change during the day (unitless).
     optimal_leaf_area_change : float
         Leaf area index added under ideal conditions (unitless).
-    previous_leaf_area_index : float | None
+    previous_leaf_area_index : float
         Leaf area index on the previous day (unitless).
-    previous_optimal_leaf_area_fraction : float | None
+    previous_optimal_leaf_area_fraction : float
         Optimal leaf area fraction on the previous day (unitless).
 
     """
@@ -56,8 +56,8 @@ class LeafAreaIndex:
         canopy_height: float = 0.0,
         leaf_area_added: float = 0.0,
         optimal_leaf_area_change: float = 0.0,
-        previous_leaf_area_index: float | None = None,
-        previous_optimal_leaf_area_fraction: float | None = None,
+        previous_leaf_area_index: float = 0.0,
+        previous_optimal_leaf_area_fraction: float = 0.0,
     ) -> None:
         self.data = crop_data
         self.lai_shapes = lai_shapes
@@ -99,8 +99,6 @@ class LeafAreaIndex:
             return
         else:  # normal growth
             self.check_previous_leaf_area_values()
-            assert self.previous_optimal_leaf_area_fraction is not None
-            assert self.previous_leaf_area_index is not None
             self.optimal_leaf_area_change = self._determine_max_leaf_area_change(
                 self.optimal_leaf_area_fraction,
                 self.previous_optimal_leaf_area_fraction,
@@ -163,7 +161,6 @@ class LeafAreaIndex:
         SWAT 5:2.1.18
 
         """
-        assert self.previous_leaf_area_index is not None
         self.data.leaf_area_index = max(0.0, self.previous_leaf_area_index + self.leaf_area_added)
 
     @staticmethod
