@@ -1182,12 +1182,6 @@ def test_process_e2e_group_results(
         output_directory=output_directory,
         verbosity=LogVerbosity.ERRORS,
     )
-    if task_type == TaskType.UPDATE_E2E_TEST_RESULTS:
-        print("Result:", result)
-        print("Averaging calls:", mock_averaging.call_args_list)
-        print("Update calls:", mock_update.call_args_list)
-        print("Validation calls:", mock_validate_comparison.call_args_list)
-        print("Error calls:", mock_output_manager.add_error.call_args_list)
 
     if task_type == TaskType.END_TO_END_TESTING:
         assert result == (None, expected_results_random_seeds)
