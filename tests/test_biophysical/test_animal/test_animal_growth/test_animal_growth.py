@@ -57,6 +57,7 @@ def test_growth_init(
 
     assert growth.daily_growth == expected_daily_growth
     assert growth.tissue_changed == expected_tissue_changed
+    assert growth.daily_tissue_change == 0.0
     assert isinstance(growth.body_weight_history, list)
     assert growth.body_weight_history == expected_history
 
@@ -305,6 +306,7 @@ def test_calculate_cow_body_weight_change(
     assert result_body_growth == expected_body_growth
     assert result_conceptus_weight == expected_conceptus_weight
     assert result_tissue_changed == expected_tissue_changed
+    assert growth.daily_tissue_change == body_weight_tissue
 
 
 @pytest.mark.parametrize(
