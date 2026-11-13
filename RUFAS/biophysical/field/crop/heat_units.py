@@ -170,7 +170,7 @@ class HeatUnits:
             If ``self.heat_unit_temperature`` is needed but has not been set.
 
         """
-        if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
+        if self.use_heat_unit_temperature or (air_temperature is None):
             if self.heat_unit_temperature is None:
                 OutputManager().add_error(
                     "Missing heat unit temperature",
