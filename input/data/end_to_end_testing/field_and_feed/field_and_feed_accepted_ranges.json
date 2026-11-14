@@ -1,0 +1,4 @@
+{
+    "description": "Accepted 'min' and 'max' for each variable name. All values of a listed variable must fall within them.",
+    "accepted_ranges": {}
+}

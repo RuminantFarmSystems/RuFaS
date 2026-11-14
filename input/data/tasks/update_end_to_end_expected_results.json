@@ -8,7 +8,7 @@
         "filters_directory": "input/data/end_to_end_testing/freestall",
         "log_verbosity": "logs",
         "exclude_info_maps": true,
-        "random_seed": 42
+        "random_seeds": [42]
       },
       {
         "task_type": "UPDATE_E2E_TEST_RESULTS",
@@ -17,7 +17,7 @@
         "filters_directory": "input/data/end_to_end_testing/open_lot",
         "log_verbosity": "logs",
         "exclude_info_maps": true,
-        "random_seed": 42
+        "random_seeds": [42]
       },
       {
         "task_type": "UPDATE_E2E_TEST_RESULTS",
@@ -26,7 +26,7 @@
         "filters_directory": "input/data/end_to_end_testing/field_and_feed",
         "log_verbosity": "logs",
         "exclude_info_maps": true,
-        "random_seed": 42
+        "random_seeds": [42]
       },
       {
         "task_type": "UPDATE_E2E_TEST_RESULTS",
@@ -35,7 +35,7 @@
         "filters_directory": "input/data/end_to_end_testing/animals_only",
         "log_verbosity": "logs",
         "exclude_info_maps": true,
-        "random_seed": 42
+        "random_seeds": [42]
       }
     ]
   }

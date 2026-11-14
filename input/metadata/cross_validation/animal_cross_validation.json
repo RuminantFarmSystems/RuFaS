@@ -228,7 +228,7 @@
       ]
     },
     {
-      "description": "When heifer repro method is ED, repro_sub_protocol must be NA",
+      "description": "When heifer repro method is ED, repro_sub_protocol must be null",
       "aliases": {
         "variables": {
           "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
@@ -236,7 +236,7 @@
         },
         "constants": {
           "ED": "ED",
-          "NA": "N/A"
+          "true_constant": true
         }
       },
       "apply_when": [
@@ -267,10 +267,10 @@
           "right_hand": {
             "aggregation": {
               "operation": "no_op",
-              "operands": ["NA"]
+              "operands": ["true_constant"]
             }
           },
-          "relationship": "equal"
+          "relationship": "is_null"
         }
       ]
     },
@@ -371,7 +371,7 @@
       ]
     },
     {
-      "description": "When cow repro method is ED: voluntary_waiting_period must be positive, presynch_program, presynch_program_start_day, and ovsynch_program_start_day must be null, and estrus_detection_rate and ED_conception_rate must be positive",
+      "description": "When cow repro method is ED: voluntary_waiting_period must be positive, presynch_program, presynch_program_start_day, ovsynch_program, ovsynch_program_start_day, and resynch_program must be null, and estrus_detection_rate and ED_conception_rate must be positive",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -1054,15 +1054,10 @@
       ]
     },
     {
-      "description": "Sum of all cull reason probabilities must equal 1.0",
+      "description": "Sum of parity death distribution fractions must equal 1.0",
       "aliases": {
         "variables": {
-          "feet_leg_prob": "animal.animal_config.from_literature.culling.feet_leg_cull.probability",
-          "injury_prob": "animal.animal_config.from_literature.culling.injury_cull.probability",
-          "mastitis_prob": "animal.animal_config.from_literature.culling.mastitis_cull.probability",
-          "disease_prob": "animal.animal_config.from_literature.culling.disease_cull.probability",
-          "udder_prob": "animal.animal_config.from_literature.culling.udder_cull.probability",
-          "unknown_prob": "animal.animal_config.from_literature.culling.unknown_cull.probability"
+          "parity_death_dist": "animal.animal_config.from_literature.culling.parity_death_dist"
         },
         "constants": {
           "one": 1.0
@@ -1073,14 +1068,8 @@
           "left_hand": {
             "aggregation": {
               "operation": "sum",
-              "operands": [
-                "feet_leg_prob",
-                "injury_prob",
-                "mastitis_prob",
-                "disease_prob",
-                "udder_prob",
-                "unknown_prob"
-              ]
+              "mode": "aggregate",
+              "operands": ["parity_death_dist"]
             }
           },
           "right_hand": {
@@ -1094,138 +1083,31 @@
       ]
     },
     {
-      "description": "All cull_day_prob and death_day_prob must have the same length as cull_day_count",
+      "description": "Sum of parity sale distribution fractions must equal 1.0",
       "aliases": {
         "variables": {
-          "cull_day_count": "animal.animal_config.from_literature.culling.cull_day_count",
-          "feet_leg_cull_day_prob": "animal.animal_config.from_literature.culling.feet_leg_cull.cull_day_prob",
-          "injury_cull_day_prob": "animal.animal_config.from_literature.culling.injury_cull.cull_day_prob",
-          "mastitis_cull_day_prob": "animal.animal_config.from_literature.culling.mastitis_cull.cull_day_prob",
-          "disease_cull_day_prob": "animal.animal_config.from_literature.culling.disease_cull.cull_day_prob",
-          "udder_cull_day_prob": "animal.animal_config.from_literature.culling.udder_cull.cull_day_prob",
-          "unknown_cull_day_prob": "animal.animal_config.from_literature.culling.unknown_cull.cull_day_prob",
-          "death_day_prob": "animal.animal_config.from_literature.culling.death_day_prob"
+          "parity_sale_dist": "animal.animal_config.from_literature.culling.parity_sale_dist"
+        },
+        "constants": {
+          "one": 1.0
         }
       },
       "rules": [
         {
           "left_hand": {
             "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["cull_day_count"]
+              "operation": "sum",
+              "mode": "aggregate",
+              "operands": ["parity_sale_dist"]
             }
           },
           "right_hand": {
             "aggregation": {
               "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["feet_leg_cull_day_prob"]
+              "operands": ["one"]
             }
           },
-          "relationship": "is_equal_length"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["cull_day_count"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["injury_cull_day_prob"]
-            }
-          },
-          "relationship": "is_equal_length"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["cull_day_count"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["mastitis_cull_day_prob"]
-            }
-          },
-          "relationship": "is_equal_length"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["cull_day_count"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["disease_cull_day_prob"]
-            }
-          },
-          "relationship": "is_equal_length"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["cull_day_count"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["udder_cull_day_prob"]
-            }
-          },
-          "relationship": "is_equal_length"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["cull_day_count"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["unknown_cull_day_prob"]
-            }
-          },
-          "relationship": "is_equal_length"
-        },
-        {
-          "left_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["cull_day_count"]
-            }
-          },
-          "right_hand": {
-            "aggregation": {
-              "operation": "no_op",
-              "mode": "element_wise",
-              "operands": ["death_day_prob"]
-            }
-          },
-          "relationship": "is_equal_length"
+          "relationship": "equal"
         }
       ]
     },
@@ -1252,6 +1134,222 @@
             }
           },
           "relationship": "greater_or_equal_to"
+        }
+      ]
+    },
+    {
+      "description": "When selective_repro_strategy is false, ranking_method must be null",
+      "aliases": {
+        "variables": {
+          "selective_repro_strategy": "animal.animal_config.farm_level.repro.selective_repro_strategy",
+          "ranking_method": "animal.animal_config.farm_level.repro.ranking_method"
+        },
+        "constants": {
+          "true_constant": true,
+          "false_constant": false
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["selective_repro_strategy"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["false_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ranking_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_null"
+        }
+      ]
+    },
+    {
+      "description": "When selective_repro_strategy is true and ranking_method is 'genetic', simulate_genetics must be true",
+      "aliases": {
+        "variables": {
+          "selective_repro_strategy": "animal.animal_config.farm_level.repro.selective_repro_strategy",
+          "ranking_method": "animal.animal_config.farm_level.repro.ranking_method",
+          "simulate_genetics": "animal.herd_information.simulate_genetics"
+        },
+        "constants": {
+          "genetic": "genetic",
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["selective_repro_strategy"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        },
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ranking_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["genetic"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["simulate_genetics"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "When selective_repro_strategy is true, ranking_method cannot be null",
+      "aliases": {
+        "variables": {
+          "selective_repro_strategy": "animal.animal_config.farm_level.repro.selective_repro_strategy",
+          "ranking_method": "animal.animal_config.farm_level.repro.ranking_method"
+        },
+        "constants": {
+          "true_constant": true
+        }
+      },
+      "apply_when": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["selective_repro_strategy"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ],
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["ranking_method"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["true_constant"]
+            }
+          },
+          "relationship": "is_not_null"
+        }
+      ]
+    },
+    {
+      "description": "Heifer semen_allocation_proportions must sum up to 1",
+      "aliases": {
+        "variables": {
+          "sexed_dairy": "animal.animal_config.farm_level.repro.heifers.semen_allocation_proportions.sexed_dairy",
+          "conventional_dairy": "animal.animal_config.farm_level.repro.heifers.semen_allocation_proportions.conventional_dairy",
+          "beef": "animal.animal_config.farm_level.repro.heifers.semen_allocation_proportions.beef"
+        },
+        "constants": {
+          "one": 1
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "operands": ["sexed_dairy", "conventional_dairy", "beef"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["one"]
+            }
+          },
+          "relationship": "equal"
+        }
+      ]
+    },
+    {
+      "description": "Cow semen_allocation_proportions must sum up to 1",
+      "aliases": {
+        "variables": {
+          "sexed_dairy": "animal.animal_config.farm_level.repro.cows.semen_allocation_proportions.sexed_dairy",
+          "conventional_dairy": "animal.animal_config.farm_level.repro.cows.semen_allocation_proportions.conventional_dairy",
+          "beef": "animal.animal_config.farm_level.repro.cows.semen_allocation_proportions.beef"
+        },
+        "constants": {
+          "one": 1
+        }
+      },
+      "rules": [
+        {
+          "left_hand": {
+            "aggregation": {
+              "operation": "sum",
+              "operands": ["sexed_dairy", "conventional_dairy", "beef"]
+            }
+          },
+          "right_hand": {
+            "aggregation": {
+              "operation": "no_op",
+              "operands": ["one"]
+            }
+          },
+          "relationship": "equal"
         }
       ]
     }

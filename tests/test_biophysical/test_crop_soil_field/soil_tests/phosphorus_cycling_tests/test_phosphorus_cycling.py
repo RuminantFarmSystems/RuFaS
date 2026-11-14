@@ -7,6 +7,7 @@ from RUFAS.biophysical.field.soil.phosphorus_cycling.manure import Manure
 from RUFAS.biophysical.field.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
 from RUFAS.biophysical.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
 from RUFAS.biophysical.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
+from RUFAS.biophysical.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
@@ -23,7 +24,7 @@ def test_phosphorus_cycling(rainfall: float, runoff: float, field_size: float, m
     mineralization.mineralize_phosphorus = MagicMock()
     soluble_phosphorus = MagicMock(SolublePhosphorus)
     soluble_phosphorus.daily_update_routine = MagicMock()
-    cycle = PhosphorusCycling(field_size=field_size)
+    cycle = PhosphorusCycling(SoilData(field_size=field_size))
     cycle.manure = manure
     cycle.fertilizer = fert
     cycle.mineralization = mineralization

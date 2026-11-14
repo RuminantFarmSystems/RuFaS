@@ -1,0 +1,4 @@
+{
+    "description": "Names of variables that must differ from the expected results. Empty this list after updating the expected results.",
+    "must_change_variables": []
+}

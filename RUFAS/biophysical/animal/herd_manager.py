@@ -10,8 +10,8 @@ from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, RemovalRiskParityGroup, Sex
 from RUFAS.biophysical.animal.calf_retention_policy import CalfRetentionPolicy
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
@@ -24,7 +24,9 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.daily_herd_updates import DailyHerdUpdates
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import ReproStateEnum
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -107,13 +109,13 @@ class HerdManager:
     buying_threshold : int | float
         Herd size threshold below which replacement animals may be purchased.
     cull_eligibility_minimum_days_in_milk : int | float
-        Minimum days in milk a cow must have reached to be eligible for an oversupply cull,
+        Minimum days in milk a cow must have reached to be eligible for a low production cull,
         (simulation days). Protects fresh cows from being sold.
     cull_eligibility_maximum_days_carried_calf : int | float
         Maximum days carrying a calf (days in pregnancy) a cow may have to remain eligible for an
-        oversupply cull, (simulation days). Protects late-pregnant cows from being sold.
+        low production cull, (simulation days). Protects late-pregnant cows from being sold.
     cull_ranking_criteria : str
-        Attribute used to rank eligible cows when selecting which to sell for an oversupply cull.
+        Attribute used to rank eligible cows when selecting which to sell for a low production cull.
         One of ``"milk"`` (daily milk production) or ``"305_day_milk"`` (305-day milk yield); the
         lowest-ranked eligible cows are sold first.
     housing : dict[str, Any]
@@ -212,6 +214,7 @@ class HerdManager:
         if self.is_ration_defined_by_user:
             RationManager.set_user_defined_rations(ration_feed_config)
             RationManager.set_user_defined_ration_tolerance(ration_feed_config)
+            RationManager.set_intake_options(ration_feed_config)
         else:
             RationManager.set_ration_feeds(ration_feed_config)
         RationManager.maximum_ration_reformulation_attempts = animal_config_data["ration"][
@@ -261,6 +264,8 @@ class HerdManager:
             herd_population.cows,
             herd_population.replacement,
         )
+        pregnant_animals = [animal for animal in (self.heiferIIs + self.heiferIIIs + self.cows) if animal.is_pregnant]
+        self._initialize_pregnancy_for_pregnant_animals_entering_the_herd(pregnant_animals, time)
 
         self.allocate_animals_to_pens(time.simulation_day)
         self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -545,8 +550,21 @@ class HerdManager:
         sold_newborn_calves: list[Animal] = []
         newborn_calves: list[Animal] = []
 
+        animal_ranking_indexes: list[float] | None = None
+        if (
+            AnimalConfig.simulate_genetics
+            and AnimalConfig.selective_repro_strategy
+            and AnimalConfig.ranking_method == "genetic"
+            and all([(animal.animal_type == AnimalType.HEIFER_II or animal.animal_type.is_cow) for animal in animals])
+        ):
+            animal_ranking_indexes = [
+                animal.genetics.ranking_index
+                for animal in animals
+                if animal.is_eligible_for_breeding and animal.genetics is not None
+            ]
+
         for animal in animals:
-            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
+            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time, animal_ranking_indexes)
             self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
             self.daily_herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
             if animal_daily_routines_output.animal_status == AnimalStatus.DEAD:
@@ -568,6 +586,116 @@ class HerdManager:
                 sold_animals.append(animal)
             animal.update_genetic_history(simulation_day=time.simulation_day)
         return (graduated_animals, sold_animals, stillborn_newborn_calves, newborn_calves, sold_newborn_calves)
+
+    def _calculate_annual_risk_by_parity(
+        self,
+        herd_annual_risk: float,
+        event_fractions_by_parity: dict[RemovalRiskParityGroup, float],
+        parity_group_fractions: dict[RemovalRiskParityGroup, float],
+    ) -> dict[RemovalRiskParityGroup, float]:
+        """
+        Converts a whole-herd annual risk into an annual risk for each parity group.
+
+        Parameters
+        ----------
+        herd_annual_risk : float
+            Annual risk of the event for the whole cow herd, (unitless).
+        event_fractions_by_parity : dict[RemovalRiskParityGroup, float]
+            Fractions of all events that come from each parity group, keyed by :class:`RemovalRiskParityGroup`,
+            (unitless).
+        parity_group_fractions : dict[RemovalRiskParityGroup, float]
+            Fractions of the cow herd currently in each parity group, keyed by :class:`RemovalRiskParityGroup`,
+            (unitless).
+
+        Returns
+        -------
+        dict[RemovalRiskParityGroup, float]
+            Annual risk of the event for a cow in each of the ``ONE``, ``TWO``, and ``THREE_PLUS``
+            parity groups, (unitless). A parity group with no cows is assigned a risk of 0.
+
+        Notes
+        -----
+        The expected number of events coming from parity group ``p`` is
+        ``herd_annual_risk * event_fractions_by_parity[p] * N``, spread over the
+        ``parity_group_fractions[p] * N`` cows in that group, so the per-cow risk for the group is
+        ``herd_annual_risk * event_fractions_by_parity[p] / parity_group_fractions[p]``.
+        """
+        annual_risk_by_parity: dict[RemovalRiskParityGroup, float] = {
+            RemovalRiskParityGroup.ONE: 0.0,
+            RemovalRiskParityGroup.TWO: 0.0,
+            RemovalRiskParityGroup.THREE_PLUS: 0.0,
+        }
+        for parity in annual_risk_by_parity:
+            if parity_group_fractions[parity] > 0:
+                annual_risk_by_parity[parity] = (
+                    herd_annual_risk * event_fractions_by_parity[parity] / parity_group_fractions[parity]
+                )
+        return annual_risk_by_parity
+
+    def _process_daily_removals(self, animals: list[Animal], time: RufasTime) -> tuple[list[Animal], list[Animal]]:
+        """
+        Assess daily removal risk for each cow and collect those removed.
+
+        Computes the fresh fraction and the 1st, 2nd, and 3rd+ parity group fractions across all
+        cows in the herd, converts the whole-herd annual death and acute-sale risks into annual
+        risks for each parity group, then randomly determines death and acute sale for every cow in
+        ``animals`` via :meth:`Animal.assess_and_schedule_removal`. Non-cow animals are skipped.
+
+        Parameters
+        ----------
+        animals : list of Animal objects.
+            Animals to assess on the current day.
+        time : RufasTime
+            Current simulation time, passed through to the per-animal risk assessment.
+
+        Returns
+        -------
+        tuple[list[Animal], list[Animal]]
+            A ``(sold_cows, dead_cows)`` pair listing the cows selected for acute sale
+            and the cows selected to die, respectively.
+        """
+        sold_cows: list[Animal] = []
+        dead_cows: list[Animal] = []
+
+        all_cows = [animal for animal in self.all_animals if animal.animal_type.is_cow]
+        num_cows = len(all_cows)
+        if num_cows == 0:
+            return sold_cows, dead_cows
+
+        fresh_cow_count = sum(cow.days_in_milk < 50 for cow in all_cows)
+        fresh_cow_fraction = fresh_cow_count / num_cows
+
+        parity_group_counts = {
+            RemovalRiskParityGroup.ONE: 0,
+            RemovalRiskParityGroup.TWO: 0,
+            RemovalRiskParityGroup.THREE_PLUS: 0,
+        }
+        for cow in all_cows:
+            parity_group_counts[cow.parity_index] += 1
+        parity_group_fractions: dict[RemovalRiskParityGroup, float] = {
+            parity: count / num_cows for parity, count in parity_group_counts.items()
+        }
+
+        annual_death_risk_by_parity = self._calculate_annual_risk_by_parity(
+            AnimalConfig.annual_death_probability, AnimalConfig.parity_death_distribution, parity_group_fractions
+        )
+        annual_acute_sale_risk_by_parity = self._calculate_annual_risk_by_parity(
+            animal_constants.ACUTE_SALE_FRACTION * AnimalConfig.annual_sale_probability,
+            AnimalConfig.parity_sale_distribution,
+            parity_group_fractions,
+        )
+
+        for animal in animals:
+            if animal.animal_type.is_cow:
+                animal.assess_and_schedule_removal(
+                    fresh_cow_fraction, annual_death_risk_by_parity, annual_acute_sale_risk_by_parity, time
+                )
+                if animal.sold:
+                    sold_cows.append(animal)
+                if animal.dead:
+                    dead_cows.append(animal)
+                    self.herd_statistics.animals_deaths_by_stage[animal.animal_type] += 1
+        return sold_cows, dead_cows
 
     def _update_genetic_values_at_lactation_start(self, animal: Animal, time: RufasTime) -> None:
         """
@@ -641,18 +769,31 @@ class HerdManager:
                 group_newborn_calves,
                 group_sold_newborn_calves,
             ) = self._perform_daily_routines_for_animals(time, animals)
+            if animal_group_name == "heiferIIIs":
+                self.herd_statistics.heiferIII_to_cow_transitions += sum(
+                    animal.animal_type == AnimalType.LAC_COW for animal in group_graduated_animals
+                )
             collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
-            daily_herd_updates.graduated_animals += group_graduated_animals
-            daily_herd_updates.removed_animals += sold_animals
             if collect_birth_results:
                 daily_herd_updates.stillborn_newborn_calves += group_stillborn_newborn_calves
                 daily_herd_updates.newborn_calves += group_newborn_calves
                 daily_herd_updates.sold_newborn_calves += group_sold_newborn_calves
             if animal_group_name == "heiferIIs":
                 daily_herd_updates.sold_heiferIIs = sold_animals
+            elif animal_group_name == "heiferIIIs":
+                sold_cows, dead_cows = self._process_daily_removals(group_graduated_animals, time)
+                sold_animals.extend(sold_cows)
+                sold_animals.extend(dead_cows)
+                daily_herd_updates.sold_and_died_cows.extend(sold_cows)
+                daily_herd_updates.sold_and_died_cows.extend(dead_cows)
             elif animal_group_name == "cows":
-                daily_herd_updates.sold_and_died_cows = sold_animals
+                sold_cows, dead_cows = self._process_daily_removals(animals, time)
+                sold_animals.extend(sold_cows)
+                sold_animals.extend(dead_cows)
+                daily_herd_updates.sold_and_died_cows.extend(sold_animals)
 
+            daily_herd_updates.graduated_animals += group_graduated_animals
+            daily_herd_updates.removed_animals += sold_animals
         return daily_herd_updates
 
     def _apply_daily_herd_structure_updates(
@@ -668,11 +809,15 @@ class HerdManager:
         newly_added_animals: list[Animal] = []
         adjust_herd_size: bool = time.simulation_day > 0 and time.simulation_day % self.adjustment_period == 0
         if adjust_herd_size:
-            removed_animals += self._check_if_cows_need_to_be_sold(
+            herd_resize_sold_cows = self._check_if_cows_need_to_be_sold(
                 simulation_day=time.simulation_day, removed_animal=removed_animals
             )
-            self._update_sold_and_died_cow_statistics(removed_animals)
+            self._update_sold_and_died_cow_statistics(herd_resize_sold_cows)
+            removed_animals += herd_resize_sold_cows
             newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
+            if newly_added_animals:
+                pregnant_newly_added_animals = [animal for animal in newly_added_animals if animal.is_pregnant]
+                self._initialize_pregnancy_for_pregnant_animals_entering_the_herd(pregnant_newly_added_animals, time)
 
         self._update_herd_structure(
             graduated_animals=graduated_animals,
@@ -772,12 +917,12 @@ class HerdManager:
                 if cow.milk_production.daily_milk_produced == 0 and cow.is_milking and cow.days_in_milk > 1
             ]
         )
-
+        all_milking_cow_num = len([cow for cow in self.cows if cow.is_milking and cow.days_in_milk > 1])
         if no_milk_cow_num > 0:
             self.om.add_warning(
                 "Warning: Lactating cows with no production.",
-                f"There are {no_milk_cow_num} lactating cows with no milking production on simulation"
-                f" day {time.simulation_day}.",
+                f"There are {no_milk_cow_num}/{all_milking_cow_num} lactating cows with no milking production "
+                f"on simulation day {time.simulation_day}.",
                 info_map={
                     "class": self.__class__.__name__,
                     "function": self.execute_daily_routines.__name__,
@@ -882,6 +1027,10 @@ class HerdManager:
             weather,
         )
 
+        self.daily_herd_reproduction_statistics.num_do_not_breed_cows = sum(
+            cow.reproduction.do_not_breed for cow in self.cows
+        )
+
         # On the last day of the simulation year, warn if too few female calves were born to
         # meet the count-based keep target (no-op under rate-based retention).
         self.calf_retention_policy.finalize_day(time)
@@ -963,6 +1112,8 @@ class HerdManager:
         newborn_calf_config["id"] = AnimalPopulation.next_id()
         newborn_calf: Animal = Animal(args=newborn_calf_config, time=time)
         self.calf_retention_policy.apply_retention_decision(newborn_calf, time.simulation_day)
+        if newborn_calf.sold or newborn_calf.stillborn:
+            return newborn_calf
         if AnimalConfig.simulate_genetics and newborn_calf.genetics is not None:
             mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
                 [animal.genetics for animal in self.calves if animal.genetics is not None]
@@ -970,12 +1121,12 @@ class HerdManager:
             newborn_calf.genetics.calculate_ebv_and_ranking_index(
                 newborn_calf.animal_type, mean_tbv_fat, mean_tbv_protein, newborn_calf.calves
             )
-        if not (newborn_calf.sold or newborn_calf.stillborn):
-            newborn_calf.events.add_event(newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD)
+        newborn_calf.events.add_event(newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD)
         return newborn_calf
 
     def _cull_ranking_value(self, cow: Animal) -> float:
-        """Returns the value used to rank ``cow`` for an oversupply cull, based on the user-defined
+        """
+        Returns the value used to rank ``cow`` for a low production cull, based on the user-defined
         ``cull_ranking_criteria``.
 
         Parameters
@@ -1006,7 +1157,7 @@ class HerdManager:
 
     def _get_cow_removal_index(self, removed_animal: list[Animal]) -> int | None:
         """
-        Finds the index of the lowest-ranked cow that is eligible for an oversupply cull.
+        Finds the index of the lowest-ranked cow that is eligible for a low production cull.
 
         Eligibility is governed by the ``cull_eligibility_minimum_days_in_milk`` and
         ``cull_eligibility_maximum_days_carried_calf`` user inputs (protecting fresh and
@@ -1056,7 +1207,7 @@ class HerdManager:
 
             removed_cow = self.cows.pop(remove_index)
             removed_cow.sold_at_day = simulation_day
-            removed_cow.cull_reason = "culled for herd resize"
+            removed_cow.cull_reason = animal_constants.LOW_PRODUCTION_CULL
             animals_removed.append(removed_cow)
 
         return animals_removed
@@ -2215,8 +2366,21 @@ class HerdManager:
                 [cow for cow in sold_and_died_cows if cow.cull_reason == cull_reason]
             )
 
-        oversupply_cows_num = sum(cow.cull_reason == animal_constants.OVERSUPPLY_CULL for cow in sold_and_died_cows)
-        self.herd_statistics.sold_cow_oversupply_num += oversupply_cows_num
+        low_production_cows = [
+            cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL
+        ]
+
+        self.herd_statistics.sold_cow_low_production_num += len(low_production_cows)
+
+        self.herd_statistics.sold_cow_low_production_parity_1 += sum(
+            cow.reproduction.calves == 1 for cow in low_production_cows
+        )
+        self.herd_statistics.sold_cow_low_production_parity_2 += sum(
+            cow.reproduction.calves == 2 for cow in low_production_cows
+        )
+        self.herd_statistics.sold_cow_low_production_parity_3_plus += sum(
+            cow.reproduction.calves >= 3 for cow in low_production_cows
+        )
 
         sold_cows: list[Animal] = [cow for cow in sold_and_died_cows if cow.cull_reason != animal_constants.DEATH_CULL]
         self.herd_statistics.sold_cows_info += [
@@ -2233,6 +2397,34 @@ class HerdManager:
             for cow in sold_cows
         ]
         self.herd_statistics.sold_cow_num += len(sold_cows)
+
+        acute_sale_cows = [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.ACUTE_SALE_CULL]
+
+        self.herd_statistics.acute_sale_cows_parity_1 += sum(cow.reproduction.calves == 1 for cow in acute_sale_cows)
+        self.herd_statistics.acute_sale_cows_parity_2 += sum(cow.reproduction.calves == 2 for cow in acute_sale_cows)
+        self.herd_statistics.acute_sale_cows_parity_3_plus += sum(
+            cow.reproduction.calves >= 3 for cow in acute_sale_cows
+        )
+
+        self.herd_statistics.total_cow_removals_parity_1 += sum(
+            cow.reproduction.calves == 1 for cow in sold_and_died_cows
+        )
+        self.herd_statistics.total_cow_removals_parity_2 += sum(
+            cow.reproduction.calves == 2 for cow in sold_and_died_cows
+        )
+        self.herd_statistics.total_cow_removals_parity_3_plus += sum(
+            cow.reproduction.calves >= 3 for cow in sold_and_died_cows
+        )
+
+        dead_cows = [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DEATH_CULL]
+
+        self.herd_statistics.cow_deaths_parity_1 += sum(cow.reproduction.calves == 1 for cow in dead_cows)
+        self.herd_statistics.cow_deaths_parity_2 += sum(cow.reproduction.calves == 2 for cow in dead_cows)
+        self.herd_statistics.cow_deaths_parity_3_plus += sum(cow.reproduction.calves >= 3 for cow in dead_cows)
+
+        for cow in sold_and_died_cows:
+            self.herd_statistics.milk_production_at_removal_sum += cow.milk_production.daily_milk_produced
+            self.herd_statistics.milk_production_at_removal_count += 1
 
         for parity in self.herd_statistics.parity_culling_stats_range.keys():
             if parity == "greater_than_5":
@@ -2296,11 +2488,19 @@ class HerdManager:
 
         Notes
         -----
-        It increments the count of sold calves and appends detailed information about each sold newborn
-        calf to the corresponding statistics.
+        It increments the count of sold calves, increments the counts of sold calves by category (dairy male,
+        dairy female, and beef), and appends detailed information about each sold newborn calf to the
+        corresponding statistics. Calves bred from beef semen are counted as beef regardless of sex.
 
         """
         self.herd_statistics.sold_calf_num += len(sold_newborn_calves)
+        for calf in sold_newborn_calves:
+            if calf.bred_from_semen == SemenType.BEEF:
+                self.herd_statistics.beef_sold_calf_num += 1
+            elif calf.sex == Sex.MALE:
+                self.herd_statistics.dairy_male_sold_calf_num += 1
+            else:
+                self.herd_statistics.dairy_female_sold_calf_num += 1
         self.herd_statistics.sold_calves_info += [
             SoldAnimalTypedDict(
                 id=calf.id,
@@ -2436,6 +2636,41 @@ class HerdManager:
                     self.herd_statistics.total_enteric_methane[animal_type] = {
                         k: float(current_totals.get(k, 0) + new_emissions.get(k, 0)) for k in all_keys
                     }
+
+    def _initialize_pregnancy_for_pregnant_animals_entering_the_herd(
+        self, animals: list[Animal], time: RufasTime
+    ) -> None:
+        """
+        Assign a random embryo sex to pregnant animals imported into the herd.
+
+        Parameters
+        ----------
+        animals : list[Animal]
+            Pregnant animals entering the herd whose embryo sex has not yet
+            been determined.
+        time : RufasTime
+            RufasTime object containing the current simulation day.
+        """
+        for animal in animals:
+            if animal.is_pregnant:
+                if not animal.reproduction.repro_state_manager.is_in(ReproStateEnum.PREGNANT):
+                    animal.reproduction.repro_state_manager.enter(ReproStateEnum.PREGNANT, keep_existing=True)
+                animal.reproduction.semen_type = SemenType.USER_DEFINED
+                animal.reproduction.embryo_sex = animal.reproduction.determine_embryo_sex()
+                log_message = (
+                    f"Assigned semen type {SemenType.USER_DEFINED.name} and sex {animal.reproduction.embryo_sex} "
+                    f"for pregnant {animal.animal_type.name} entering the herd on day {time.simulation_day} "
+                    f"based on a user-defined male calf rate of {AnimalConfig.user_defined_male_calf_rate}."
+                )
+                OutputManager().add_log(
+                    "Imported Pregnant Cow Assignment",
+                    log_message,
+                    {
+                        "class": self.__class__.__name__,
+                        "function": self._initialize_pregnancy_for_pregnant_animals_entering_the_herd.__name__,
+                    },
+                )
+                animal.events.add_event(animal.days_born, time.simulation_day, log_message)
 
     def update_herd_305_day_milk_yields(self) -> None:
         """Refresh each cow's 305-day milk yield estimate (used by reporting and culling)."""

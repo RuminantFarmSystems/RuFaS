@@ -1,5 +1,6 @@
 from typing import Any
 
+from RUFAS.biophysical.animal.data_types.animal_enums import RemovalRiskParityGroup
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     CowReproductionProtocol,
@@ -37,18 +38,14 @@ class AnimalConfig:
         Maximum day at which a heifer is culled if not pregnant, (simulation day).
     do_not_breed_time : int
         The duration after which breeding is stopped, (simulation day).
-    semen_type : str
-        Types of semen used for reproduction, e.g., "conventional", (unitless).
-    male_calf_rate_conventional_semen : float
-        Proportion of male calves when conventional semen is used, (unitless).
-    male_calf_rate_sexed_semen : float
-        Proportion of male calves when sexed semen is used, (unitless).
-    keep_female_calf_rate : float
-        Rate at which female calves are kept, used when ``calf_retention_method`` is
+    user_defined_male_calf_rate : float
+        Proportion of male calves, (unitless).
+    keep_dairy_female_rate : float
+        Rate at which dairy female calves are kept, used when ``calf_retention_method`` is
         ``"rate"`` (unitless).
     calf_retention_method : str
         Method used to decide female-calf retention: ``"rate"`` (keep each live female
-        calf with probability ``keep_female_calf_rate``) or ``"count"`` (keep a target
+        calf with probability ``keep_dairy_female_rate``) or ``"count"`` (keep a target
         number of female calves per year, ``annual_keep_female_calf_num``).
     annual_keep_female_calf_num : int
         Target number of female calves to keep per year, used when
@@ -145,38 +142,14 @@ class AnimalConfig:
         Third pregnancy check day post-breeding, (simulation day).
     third_pregnancy_check_loss_rate : float
         Pregnancy loss probability during the third pregnancy check, (unitless).
-    parity_death_probability : list[float]
-        List of probabilities of death based on parity number, (unitless).
-    death_day_probability : list[float]
-        Cumulative probability of cow death as a function of days in production, (unitless).
-    parity_cull_probability : list[float]
-        List of culling probabilities based on parity number, (unitless).
-    cull_day_count : list[int]
-        List of day intervals for culling analysis, (simulation day).
-    feet_leg_cull_probability : float
-        Probability of feet and leg-related culling, (unitless).
-    feet_leg_cull_day_probability : list[float]
-        Feet and leg-related culling probability over time, (unitless).
-    injury_cull_probability : float
-        Probability of culling due to injuries, (unitless).
-    injury_cull_day_probability : list[float]
-        Cumulative distribution for injury-related culling over time, (unitless).
-    mastitis_cull_probability : float
-        Probability of culling due to mastitis, (unitless).
-    mastitis_cull_day_probability : list[float]
-        Cumulative distribution for mastitis-related culling over time, (unitless).
-    disease_cull_probability : float
-        Probability of culling due to diseases, (unitless).
-    disease_cull_day_probability : list[float]
-        Cumulative distribution for disease-related culling over time, (unitless).
-    udder_cull_probability : float
-        Probability of culling due to udder-related issues, (unitless).
-    udder_cull_day_probability : list[float]
-        Cumulative distribution for udder-related culling over time, (unitless).
-    unknown_cull_probability : float
-        Probability of culling for unknown reasons, (unitless).
-    unknown_cull_day_probability : list[float]
-        Cumulative distribution for unknown reasons of culling over time, (unitless).
+    annual_death_probability : float
+        Annual probability that a cow in the whole cow herd dies during a given year, (unitless).
+    parity_death_distribution : dict[RemovalRiskParityGroup, float]
+        Fractions of all cow deaths that come from the 1st, 2nd, and 3rd+ parity groups, (unitless).
+    annual_sale_probability : float
+        Annual probability that a cow in the whole cow herd is sold during a given year, (unitless).
+    parity_sale_distribution : dict[RemovalRiskParityGroup, float]
+        Fractions of all cow sales that come from the 1st, 2nd, and 3rd+ parity groups, (unitless).
     methane_mitigation_method : str
         The mitigation method applied for methane reduction, e.g., "None", (unitless).
     methane_mitigation_additive_amount : float
@@ -192,6 +165,33 @@ class AnimalConfig:
         Semen sire information used for genetic simulations and breeding selection.
     simulate_genetics : bool
         Whether genetic simulation functionality is enabled.
+    tbv_fat_variance : float
+        Variance of the true breeding value (TBV) for fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    tbv_protein_variance : float
+        Variance of the true breeding value (TBV) for protein yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    tbv_correlation : float
+        Correlation between the fat and protein true breeding values, (unitless). Defaults to the CDCB
+        national average.
+    permanent_environment_fat_variance : float
+        Variance of the permanent environmental effect on fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    permanent_environment_protein_variance : float
+        Variance of the permanent environmental effect on protein yield in the herd, (kg^2). Defaults to the
+        CDCB national average.
+    permanent_environment_correlation : float
+        Correlation between the fat and protein permanent environmental effects, (unitless). Defaults to the
+        CDCB national average.
+    temporary_environment_fat_variance : float
+        Variance of the temporary environmental effect on fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    temporary_environment_protein_variance : float
+        Variance of the temporary environmental effect on protein yield in the herd, (kg^2). Defaults to the
+        CDCB national average.
+    temporary_environment_correlation : float
+        Correlation between the fat and protein temporary environmental effects, (unitless). Defaults to the
+        CDCB national average.
 
     """
 
@@ -207,10 +207,24 @@ class AnimalConfig:
     calf_mortality_rate: float = 0.0
     heifer_mortality_rate: float = 0.0
 
-    semen_type: str = "conventional"
-    male_calf_rate_conventional_semen: float = 0.53
-    male_calf_rate_sexed_semen: float = 0.10
-    keep_female_calf_rate: float = 1
+    user_defined_male_calf_rate: float = 0.1
+    selective_repro_strategy: bool = False
+    ranking_method: str = "genetic"
+    genetic_selection_index_weights: dict[str, float] = {
+        "fat": 0.318,
+        "protein": 0.13,
+    }
+    heiferII_semen_allocation_proportions: dict[str, float] = {
+        "sexed_dairy": 0.5,
+        "conventional_dairy": 0.5,
+        "beef": 0.0,
+    }
+    cow_semen_allocation_proportions: dict[str, float] = {
+        "sexed_dairy": 0.2,
+        "conventional_dairy": 0.5,
+        "beef": 0.3,
+    }
+    keep_dairy_female_rate: float = 1
     calf_retention_method: str = "rate"
     annual_keep_female_calf_num: int = 0
     still_birth_rate: float = 0.065
@@ -267,113 +281,18 @@ class AnimalConfig:
     third_pregnancy_check_day: int = 200
     third_pregnancy_check_loss_rate: float = 0.017
 
-    parity_death_probability: list[float] = [0.039, 0.056, 0.085, 0.117]
-    death_day_probability: list[float] = [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1]
-
-    parity_cull_probability: list[float] = [0.169, 0.233, 0.301, 0.408]
-    cull_day_count: list[int] = [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530]
-    feet_leg_cull_probability: float = 0.1633
-    feet_leg_cull_day_probability: list[float] = [
-        0,
-        0.03,
-        0.08,
-        0.16,
-        0.25,
-        0.36,
-        0.48,
-        0.59,
-        0.69,
-        0.78,
-        0.85,
-        0.90,
-        0.95,
-        1,
-    ]
-    injury_cull_probability: float = 0.2883
-    injury_cull_day_probability: list[float] = [
-        0,
-        0.08,
-        0.18,
-        0.28,
-        0.38,
-        0.47,
-        0.56,
-        0.64,
-        0.71,
-        0.78,
-        0.85,
-        0.90,
-        0.95,
-        1,
-    ]
-    mastitis_cull_probability: float = 0.2439
-    mastitis_cull_day_probability: list[float] = [
-        0,
-        0.06,
-        0.12,
-        0.19,
-        0.30,
-        0.43,
-        0.56,
-        0.68,
-        0.78,
-        0.85,
-        0.90,
-        0.94,
-        0.97,
-        1,
-    ]
-    disease_cull_probability: float = 0.1391
-    disease_cull_day_probability: list[float] = [
-        0,
-        0.04,
-        0.12,
-        0.24,
-        0.34,
-        0.42,
-        0.50,
-        0.57,
-        0.64,
-        0.72,
-        0.81,
-        0.89,
-        0.95,
-        1,
-    ]
-    udder_cull_probability: float = 0.0645
-    udder_cull_day_probability: list[float] = [
-        0,
-        0.12,
-        0.24,
-        0.33,
-        0.41,
-        0.48,
-        0.55,
-        0.62,
-        0.68,
-        0.76,
-        0.82,
-        0.89,
-        0.95,
-        1,
-    ]
-    unknown_cull_probability: float = 0.1009
-    unknown_cull_day_probability: list[float] = [
-        0,
-        0.05,
-        0.11,
-        0.18,
-        0.27,
-        0.37,
-        0.45,
-        0.54,
-        0.62,
-        0.70,
-        0.77,
-        0.84,
-        0.92,
-        1,
-    ]
+    annual_death_probability: float = 0.05
+    parity_death_distribution: dict[RemovalRiskParityGroup, float] = {
+        RemovalRiskParityGroup.ONE: 0.2,
+        RemovalRiskParityGroup.TWO: 0.3,
+        RemovalRiskParityGroup.THREE_PLUS: 0.5,
+    }
+    annual_sale_probability: float = 0.32
+    parity_sale_distribution: dict[RemovalRiskParityGroup, float] = {
+        RemovalRiskParityGroup.ONE: 0.2,
+        RemovalRiskParityGroup.TWO: 0.3,
+        RemovalRiskParityGroup.THREE_PLUS: 0.5,
+    }
 
     methane_model: dict[str, Any] = {
         "calves": "Pattanaik",
@@ -399,6 +318,15 @@ class AnimalConfig:
     average_phenotype: dict[str, dict[int, float]] = {}
     top_listing_semen: dict[str, dict[str, float]] = {}
     simulate_genetics: bool = False
+    tbv_fat_variance: float = 25.8
+    tbv_protein_variance: float = 13.4
+    tbv_correlation: float = 0.59
+    permanent_environment_fat_variance: float = 38.8
+    permanent_environment_protein_variance: float = 20.1
+    permanent_environment_correlation: float = 0.95
+    temporary_environment_fat_variance: float = 64.5
+    temporary_environment_protein_variance: float = 33.4
+    temporary_environment_correlation: float = 0.78
 
     @classmethod
     def initialize_animal_config(cls) -> None:
@@ -419,12 +347,34 @@ class AnimalConfig:
         cls.calf_mortality_rate = animal_config_data["management_decisions"]["calf_mortality_rate"]
         cls.heifer_mortality_rate = animal_config_data["management_decisions"]["heifer_mortality_rate"]
 
-        cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
-        cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
-            "male_calf_rate_conventional_semen"
-        ]
-        cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
-        cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
+        cls.user_defined_male_calf_rate = animal_config_data["farm_level"]["calf"]["user_defined_male_calf_rate"]
+        cls.selective_repro_strategy = animal_config_data["farm_level"]["repro"]["selective_repro_strategy"]
+        cls.ranking_method = animal_config_data["farm_level"]["repro"]["ranking_method"]
+        cls.genetic_selection_index_weights["fat"] = animal_config_data["farm_level"]["repro"][
+            "genetic_selection_index_weights"
+        ]["fat"]
+        cls.genetic_selection_index_weights["protein"] = animal_config_data["farm_level"]["repro"][
+            "genetic_selection_index_weights"
+        ]["protein"]
+        cls.heiferII_semen_allocation_proportions["sexed_dairy"] = animal_config_data["farm_level"]["repro"]["heifers"][
+            "semen_allocation_proportions"
+        ]["sexed_dairy"]
+        cls.heiferII_semen_allocation_proportions["conventional_dairy"] = animal_config_data["farm_level"]["repro"][
+            "heifers"
+        ]["semen_allocation_proportions"]["conventional_dairy"]
+        cls.heiferII_semen_allocation_proportions["beef"] = animal_config_data["farm_level"]["repro"]["heifers"][
+            "semen_allocation_proportions"
+        ]["beef"]
+        cls.cow_semen_allocation_proportions["sexed_dairy"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["sexed_dairy"]
+        cls.cow_semen_allocation_proportions["conventional_dairy"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["conventional_dairy"]
+        cls.cow_semen_allocation_proportions["beef"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["beef"]
+        cls.keep_dairy_female_rate = animal_config_data["farm_level"]["calf"]["keep_dairy_female_rate"]
         cls.calf_retention_method = animal_config_data["farm_level"]["calf"].get("calf_retention_method", "rate")
         cls.annual_keep_female_calf_num = int(
             animal_config_data["farm_level"]["calf"].get("annual_keep_female_calf_num", 0)
@@ -514,33 +464,15 @@ class AnimalConfig:
         cls.third_pregnancy_check_day = animal_config_data["from_literature"]["repro"]["preg_check_day_3"]
         cls.third_pregnancy_check_loss_rate = animal_config_data["from_literature"]["repro"]["preg_loss_rate_3"]
 
-        cls.parity_death_probability = animal_config_data["from_literature"]["culling"]["parity_death_prob"]
-        cls.death_day_probability = animal_config_data["from_literature"]["culling"]["death_day_prob"]
-
-        cls.parity_cull_probability = animal_config_data["from_literature"]["culling"]["parity_cull_prob"]
-        cls.cull_day_count = animal_config_data["from_literature"]["culling"]["cull_day_count"]
-        cls.feet_leg_cull_probability = animal_config_data["from_literature"]["culling"]["feet_leg_cull"]["probability"]
-        cls.feet_leg_cull_day_probability = animal_config_data["from_literature"]["culling"]["feet_leg_cull"][
-            "cull_day_prob"
-        ]
-        cls.injury_cull_probability = animal_config_data["from_literature"]["culling"]["injury_cull"]["probability"]
-        cls.injury_cull_day_probability = animal_config_data["from_literature"]["culling"]["injury_cull"][
-            "cull_day_prob"
-        ]
-        cls.mastitis_cull_probability = animal_config_data["from_literature"]["culling"]["mastitis_cull"]["probability"]
-        cls.mastitis_cull_day_probability = animal_config_data["from_literature"]["culling"]["mastitis_cull"][
-            "cull_day_prob"
-        ]
-        cls.disease_cull_probability = animal_config_data["from_literature"]["culling"]["disease_cull"]["probability"]
-        cls.disease_cull_day_probability = animal_config_data["from_literature"]["culling"]["disease_cull"][
-            "cull_day_prob"
-        ]
-        cls.udder_cull_probability = animal_config_data["from_literature"]["culling"]["udder_cull"]["probability"]
-        cls.udder_cull_day_probability = animal_config_data["from_literature"]["culling"]["udder_cull"]["cull_day_prob"]
-        cls.unknown_cull_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"]["probability"]
-        cls.unknown_cull_day_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"][
-            "cull_day_prob"
-        ]
+        culling_data = animal_config_data["from_literature"]["culling"]
+        cls.annual_death_probability = culling_data["annual_death_prob"]
+        cls.parity_death_distribution[RemovalRiskParityGroup.ONE] = culling_data["parity_death_dist"][0]
+        cls.parity_death_distribution[RemovalRiskParityGroup.TWO] = culling_data["parity_death_dist"][1]
+        cls.parity_death_distribution[RemovalRiskParityGroup.THREE_PLUS] = culling_data["parity_death_dist"][2]
+        cls.annual_sale_probability = culling_data["annual_sale_prob"]
+        cls.parity_sale_distribution[RemovalRiskParityGroup.ONE] = culling_data["parity_sale_dist"][0]
+        cls.parity_sale_distribution[RemovalRiskParityGroup.TWO] = culling_data["parity_sale_dist"][1]
+        cls.parity_sale_distribution[RemovalRiskParityGroup.THREE_PLUS] = culling_data["parity_sale_dist"][2]
 
         cls.methane_model = animal_data["methane_model"]
         methane_mitigation_data = animal_data["methane_mitigation"]
@@ -588,3 +520,14 @@ class AnimalConfig:
             if trait != "year_month"
         }
         cls.simulate_genetics = animal_data["herd_information"]["simulate_genetics"]
+
+        genetics_data = animal_data["genetics"]
+        cls.tbv_fat_variance = genetics_data["tbv_fat_variance"]
+        cls.tbv_protein_variance = genetics_data["tbv_protein_variance"]
+        cls.tbv_correlation = genetics_data["tbv_correlation"]
+        cls.permanent_environment_fat_variance = genetics_data["permanent_environment_fat_variance"]
+        cls.permanent_environment_protein_variance = genetics_data["permanent_environment_protein_variance"]
+        cls.permanent_environment_correlation = genetics_data["permanent_environment_correlation"]
+        cls.temporary_environment_fat_variance = genetics_data["temporary_environment_fat_variance"]
+        cls.temporary_environment_protein_variance = genetics_data["temporary_environment_protein_variance"]
+        cls.temporary_environment_correlation = genetics_data["temporary_environment_correlation"]
