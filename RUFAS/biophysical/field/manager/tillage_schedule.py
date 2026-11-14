@@ -82,7 +82,7 @@ class TillageSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
-        fraction_parameters: list[tuple[str, list[Any]] | None] = [
+        fraction_parameters: list[tuple[str, list[Any]]] = [
             ("incorporation fractions", self.incorporation_fractions),
             ("mixing fractions", self.mixing_fractions),
         ]
