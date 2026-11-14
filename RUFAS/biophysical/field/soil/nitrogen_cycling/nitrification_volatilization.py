@@ -10,27 +10,19 @@ class NitrificationVolatilization:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
+    soil_data : SoilData
         The SoilData object used by this module for tracking the nitrification and volatilization of ammonium in the
-        soil. If not provided, a new SoilData object will be instantiated.
-    field_size : float, optional
-        The size of the field in hectares used to initialize a SoilData object if one is not directly provided (ha).
+        soil.
 
     Attributes
     ----------
     data : SoilData
         Holds the SoilData object for tracking nitrification and volatilization processes.
 
-    Notes
-    -----
-    The provision of a field size is crucial when a pre-configured SoilData object is not available, as it enables the
-    initialization of a SoilData object. This allows for the simulation of nitrification and volatilization processes
-    specific to the given field size.
-
     """
 
-    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
     def do_daily_nitrification_and_volatilization(self) -> None:
         """

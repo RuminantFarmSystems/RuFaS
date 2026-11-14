@@ -11,12 +11,8 @@ class ResiduePartition:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        The SoilData object used by this module to track residue in the soil profile, creates new one if one is not
-        provided.
-    field_size : float, optional
-        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-        not provided (ha).
+    soil_data : SoilData
+        The SoilData object used by this module to track residue in the soil profile.
 
     Attributes
     ----------
@@ -29,8 +25,8 @@ class ResiduePartition:
 
     """
 
-    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
     def add_residue_to_pools(self, rainfall: float) -> None:
         """
@@ -196,7 +192,6 @@ class ResiduePartition:
         the residue.
 
         """
-        assert self.data.soil_layers is not None
         for layer in self.data.soil_layers:
             layer.manure_carbon_to_metabolic_amount = 0.0
             layer.manure_carbon_to_structural_amount = 0.0
