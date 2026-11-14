@@ -771,7 +771,7 @@ def test_build_bounds_user_defined_ration(
         user_defined_ration_tolerance=user_defined_ration_tolerance,
     )
 
-    assert bounds == pytest.approx(expected_bounds)
+    assert bounds == [pytest.approx(bound) for bound in expected_bounds]
 
 
 def test_handle_failed_constraints_lac_cow(mocker: MockerFixture) -> None:
@@ -938,7 +938,7 @@ def test_build_bounds_user_defined_ration_pins_feed_at_limit_when_target_exceeds
     )
 
     # feed 1 wants 22.5-27.5 kg and feed 2 wants 45-55 kg; both exceed the 10 kg limit.
-    assert bounds == pytest.approx([(10.0, 10.0), (10.0, 10.0)])
+    assert bounds == [pytest.approx((10.0, 10.0)), pytest.approx((10.0, 10.0))]
     assert all(lower <= upper for lower, upper in bounds)
     mock_om.return_value.add_warning.assert_called_once()
     assert "100.00 kg/animal/day" in mock_om.return_value.add_warning.call_args.args[1]
@@ -961,5 +961,5 @@ def test_build_bounds_user_defined_ration_pins_feed_at_minimum_when_target_is_be
     )
 
     # feed 1 wants 0.225-0.275 kg and is fine; feed 2 wants 0.45-0.55 kg, below its 1.0 kg minimum.
-    assert bounds == pytest.approx([(0.225, 0.275), (1.0, 1.0)])
+    assert bounds == [pytest.approx((0.225, 0.275)), pytest.approx((1.0, 1.0))]
     mock_om.return_value.add_warning.assert_called_once()

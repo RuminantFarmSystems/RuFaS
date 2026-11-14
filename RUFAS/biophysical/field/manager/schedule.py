@@ -102,7 +102,7 @@ class Schedule:
         self,
         years: list[int],
         days: list[int],
-        additional_attributes: list[Any] | None,
+        additional_attributes: list[Any],
         additional_attributes_events: list[list[Any]],
         event_class: Any,
         pattern_skip: int,
@@ -244,8 +244,8 @@ class Schedule:
     @classmethod
     def _validate_parameters(
         cls,
-        non_negative_parameters: list[tuple[str, list[Any]] | None],
-        fraction_parameters: list[tuple[str, list[Any]] | None],
+        non_negative_parameters: list[tuple[str, list[Any]]],
+        fraction_parameters: list[tuple[str, list[Any]]],
         years: list[int],
         days: list[int],
         name: str,

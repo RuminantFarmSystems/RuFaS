@@ -1063,13 +1063,14 @@ def test_handle_spread_all_available_manure_pools_and_clears(mocker: MockerFixtu
         phosphorus=1.5,
         potassium=2.0,
         ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        non_degradable_volatile_solids=2.0,
+        degradable_volatile_solids=8.0,
         total_solids=15.0,
         volume=0.0,
         methane_production_potential=0.0,
         pen_manure_data=None,
-        bedding_non_degradable_volatile_solids=0.0,
+        bedding_non_degradable_volatile_solids=2.0,
+        lignin=1.2,
     )
     liquid_stream = ManureStream(
         water=80.0,
@@ -1079,12 +1080,13 @@ def test_handle_spread_all_available_manure_pools_and_clears(mocker: MockerFixtu
         potassium=0.5,
         ash=0.0,
         non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
+        degradable_volatile_solids=3.0,
         total_solids=5.0,
         volume=0.0,
         methane_production_potential=0.0,
         pen_manure_data=None,
         bedding_non_degradable_volatile_solids=0.0,
+        lignin=0.4,
     )
     solid_storage = MagicMock(spec=DailySpread)
     solid_storage.available_for_field_application = solid_stream
@@ -1102,6 +1104,9 @@ def test_handle_spread_all_available_manure_pools_and_clears(mocker: MockerFixtu
     assert result.total_manure_mass == pytest.approx(solid_stream.mass + liquid_stream.mass)
     assert result.dry_matter == pytest.approx(20.0)
     assert result.dry_matter_fraction == pytest.approx(20.0 / (solid_stream.mass + liquid_stream.mass))
+    # Total VS is 15 kg, so raw carbon is 6.75 kg and the C:N ratio of 1.6875 is raised to the minimum of 4.24.
+    assert result.carbon == pytest.approx(4.24 * 4.0)
+    assert result.lignin == pytest.approx(1.6)
     solid_storage.set_available_for_field_application.assert_called_once()
     cleared_solid = solid_storage.set_available_for_field_application.call_args.args[0]
     assert cleared_solid.is_empty
@@ -1461,6 +1466,8 @@ def test_determine_limiting_nutrient_proportion_to_be_removed(
                 "inorganic_phosphorus_fraction": 0.0,
                 "nitrogen": 0.0,
                 "phosphorus": 0.0,
+                "carbon": 0.0,
+                "lignin": 0.0,
                 "request_julian_day": 150,
                 "request_calendar_year": 2025,
             },
@@ -1479,6 +1486,8 @@ def test_determine_limiting_nutrient_proportion_to_be_removed(
                 inorganic_phosphorus_fraction=0.02,
                 nitrogen=50.0,
                 phosphorus=10.0,
+                carbon=90.0,
+                lignin=12.0,
             ),
             {
                 "manure_source": "stored_manure(field_1)",
@@ -1492,6 +1501,8 @@ def test_determine_limiting_nutrient_proportion_to_be_removed(
                 "inorganic_phosphorus_fraction": 0.02,
                 "nitrogen": 50.0,
                 "phosphorus": 10.0,
+                "carbon": 90.0,
+                "lignin": 12.0,
                 "request_julian_day": 150,
                 "request_calendar_year": 2025,
             },
@@ -1545,6 +1556,8 @@ def test_record_manure_request_results_parametrized(
                     "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
                     "nitrogen": MeasurementUnits.KILOGRAMS,
                     "phosphorus": MeasurementUnits.KILOGRAMS,
+                    "carbon": MeasurementUnits.KILOGRAMS,
+                    "lignin": MeasurementUnits.KILOGRAMS,
                     "request_julian_day": MeasurementUnits.ORDINAL_DAY,
                     "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
                 },
@@ -1574,6 +1587,8 @@ def test_record_manure_request_results_parametrized(
             "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
             "nitrogen": MeasurementUnits.KILOGRAMS,
             "phosphorus": MeasurementUnits.KILOGRAMS,
+            "carbon": MeasurementUnits.KILOGRAMS,
+            "lignin": MeasurementUnits.KILOGRAMS,
             "request_julian_day": MeasurementUnits.ORDINAL_DAY,
             "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
         },

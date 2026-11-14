@@ -8,6 +8,7 @@ from RUFAS.biophysical.field.soil.nitrogen_cycling.leaching_runoff_erosion impor
 from RUFAS.biophysical.field.soil.nitrogen_cycling.mineralization_decomp import MineralizationDecomposition
 from RUFAS.biophysical.field.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
 from RUFAS.biophysical.field.soil.nitrogen_cycling.nitrogen_cycling import NitrogenCycling
+from RUFAS.biophysical.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
@@ -25,7 +26,7 @@ def test_cycle_nitrogen(field_size: float) -> None:
     MineralizationDecomposition.mineralize_and_decompose_nitrogen = MagicMock()
     LeachingRunoffErosion.leach_runoff_and_erode_nitrogen = MagicMock()
 
-    cycle = NitrogenCycling(field_size=field_size)
+    cycle = NitrogenCycling(SoilData(field_size=field_size))
     cycle.cycle_nitrogen(field_size=field_size)
 
     LeachingRunoffErosion.leach_runoff_and_erode_nitrogen.assert_called_once_with(field_size)

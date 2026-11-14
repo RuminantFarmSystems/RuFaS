@@ -2,8 +2,10 @@ from typing import TypedDict
 
 from typing_extensions import NotRequired
 
+from RUFAS.biophysical.animal.data_types.animal_enums import Sex
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
+from RUFAS.biophysical.animal.data_types.semen_type import SemenType
 
 
 class CalfValuesTypedDict(TypedDict):
@@ -30,6 +32,8 @@ class NewBornCalfValuesTypedDict(TypedDict):
 
     id: NotRequired[int]
     breed: str
+    bred_from_semen: SemenType | None
+    sex: Sex
     animal_type: str
     birth_date: str
     days_born: int
@@ -78,8 +82,8 @@ class HeiferIIValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
-    heifer_reproduction_program: str
-    heifer_reproduction_sub_protocol: str
+    heifer_reproduction_program: str | None
+    heifer_reproduction_sub_protocol: str | None
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
@@ -112,8 +116,8 @@ class HeiferIIIValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
-    heifer_reproduction_program: str
-    heifer_reproduction_sub_protocol: str
+    heifer_reproduction_program: str | None
+    heifer_reproduction_sub_protocol: str | None
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
@@ -146,8 +150,8 @@ class CowValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: float
 
-    heifer_reproduction_program: str
-    heifer_reproduction_sub_protocol: str
+    heifer_reproduction_program: str | None
+    heifer_reproduction_sub_protocol: str | None
 
     cow_reproduction_program: str
     cow_presynch_program: str
