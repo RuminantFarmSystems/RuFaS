@@ -50,7 +50,7 @@ class FieldDataReporter:
             for index, layer in enumerate(field.soil.data.soil_layers):
                 self.send_soil_layer_annual_variables(layer, field.field_data.name, index)
 
-    def send_crop_daily_variables(self, crop: Crop, field_name: str | None, time: RufasTime) -> None:
+    def send_crop_daily_variables(self, crop: Crop, field_name: str, time: RufasTime) -> None:
         """Sends crop related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
@@ -481,9 +481,7 @@ class FieldDataReporter:
             ),
         )
 
-    def send_soil_layer_daily_variables(
-        self, layer: LayerData, index: int, field_name: str | None, time: RufasTime
-    ) -> None:
+    def send_soil_layer_daily_variables(self, layer: LayerData, index: int, field_name: str, time: RufasTime) -> None:
         """Sends soil layer related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
@@ -2096,7 +2094,7 @@ class FieldDataReporter:
             ),
         )
 
-    def send_soil_layer_annual_variables(self, layer: LayerData, field_name: str | None, index: int) -> None:
+    def send_soil_layer_annual_variables(self, layer: LayerData, field_name: str, index: int) -> None:
         """Sends layer related annual variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
