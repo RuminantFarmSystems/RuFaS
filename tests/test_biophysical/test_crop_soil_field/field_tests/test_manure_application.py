@@ -428,7 +428,7 @@ def test_apply_subsurface_manure(
     expected_nitrogen_calls: list,
 ) -> None:
     """Tests that nutrients from injection manure applications are correctly distributed between soil layers."""
-    manure_app = ManureApplication(field_size=area)
+    manure_app = ManureApplication(SoilData(field_size=area))
 
     top_depths = [0.0, 20.0, 50.0, 200.0]
     bottom_depths = [20.0, 50.0, 200.0, 400.0]
@@ -514,7 +514,7 @@ def test_add_nitrogen_to_soil_layer(
     expected: List[float],
 ) -> None:
     """Tests that nitrogen is added to the top soil layer correctly."""
-    man_app = ManureApplication(field_size=field_size)
+    man_app = ManureApplication(SoilData(field_size=field_size))
     man_app.data.soil_layers[index].nitrate_content = 5
     man_app.data.soil_layers[index].ammonium_content = 5
     man_app.data.soil_layers[index].stable_organic_nitrogen_content = 5
@@ -680,7 +680,7 @@ def test_apply_machine_manure_adds_surface_carbon_to_top_layer() -> None:
     """Tests that a solid surface application puts all manure carbon in the top layer's manure carbon residue
     pool and accumulates the lignin and nitrogen awaiting partitioning."""
     field_size = 2.0
-    manure_app = ManureApplication(field_size=field_size)
+    manure_app = ManureApplication(SoilData(field_size=field_size))
 
     manure_app.apply_machine_manure(
         dry_matter_mass=1000.0,
@@ -711,7 +711,7 @@ def test_apply_machine_manure_splits_liquid_carbon_between_top_layers() -> None:
     """Tests that a liquid surface application splits manure carbon between the top two layers following the
     liquid manure infiltration split used for nitrogen."""
     field_size = 1.0
-    manure_app = ManureApplication(field_size=field_size)
+    manure_app = ManureApplication(SoilData(field_size=field_size))
 
     manure_app.apply_machine_manure(
         dry_matter_mass=1000.0,
@@ -740,7 +740,7 @@ def test_apply_machine_manure_splits_liquid_carbon_between_top_layers() -> None:
 def test_apply_machine_manure_distributes_subsurface_carbon_by_depth_factors() -> None:
     """Tests that the injected portion of manure carbon is distributed among layers by the depth factors."""
     field_size = 1.0
-    manure_app = ManureApplication(field_size=field_size)
+    manure_app = ManureApplication(SoilData(field_size=field_size))
 
     with patch(
         "RUFAS.biophysical.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors",

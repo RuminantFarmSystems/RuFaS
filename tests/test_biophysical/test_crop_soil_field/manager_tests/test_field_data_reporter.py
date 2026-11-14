@@ -50,7 +50,7 @@ def test_send_crop_daily_variables(
     crop = Crop(mock_crop_data)
     mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=1)
 
-    field_1 = Field(field_data=field_data_1)
+    field_1 = Field(field_data=field_data_1, soil=Soil(SoilData(field_size=1.0)))
 
     og = FieldDataReporter([field_1])
     mock_add = mocker.patch.object(og.om, "add_variable", side_effect=output_manager.add_variable)
@@ -84,7 +84,7 @@ def test_send_soil_layer_daily_variables(
     field_data_1 = FieldData(name="name 1")
     mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=1)
 
-    field_1 = Field(field_data=field_data_1)
+    field_1 = Field(field_data=field_data_1, soil=Soil(SoilData(field_size=1.0)))
 
     og = FieldDataReporter([field_1])
     layer = LayerData(
@@ -138,7 +138,8 @@ def test_send_vadose_zone_layer_daily_variables(
         labile_inorganic_phosphorus_content=3,
         active_inorganic_phosphorus_content=4,
     )
-    soil_data = SoilData(vadose_zone_layer=layer, field_size=6)
+    soil_data = SoilData(field_size=6)
+    soil_data.vadose_zone_layer = layer
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
@@ -187,7 +188,8 @@ def test_send_soil_daily_variables(mocker: MockerFixture, mock_time: RufasTime, 
         labile_inorganic_phosphorus_content=3,
         active_inorganic_phosphorus_content=4,
     )
-    soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil_data = SoilData(field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil_data.vadose_zone_layer = layer
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
@@ -226,7 +228,8 @@ def test_send_field_daily_variables(mocker: MockerFixture, mock_time: RufasTime,
         labile_inorganic_phosphorus_content=3,
         active_inorganic_phosphorus_content=4,
     )
-    soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil_data = SoilData(field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil_data.vadose_zone_layer = layer
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
@@ -250,7 +253,7 @@ def test_send_soil_layer_annual_variables(mocker: MockerFixture, output_manager:
     """Tests that soil layer annual variables are sent correctly."""
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
     field_data_1 = FieldData(name="name 1")
-    field_1 = Field(field_data=field_data_1)
+    field_1 = Field(field_data=field_data_1, soil=Soil(SoilData(field_size=1.0)))
 
     og = FieldDataReporter([field_1])
     layer = LayerData(
@@ -310,7 +313,8 @@ def test_send_field_annual_variables(mocker: MockerFixture, output_manager: Outp
         labile_inorganic_phosphorus_content=3,
         active_inorganic_phosphorus_content=4,
     )
-    soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil_data = SoilData(field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil_data.vadose_zone_layer = layer
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
@@ -345,12 +349,12 @@ def test_send_soil_annual_variables(mocker: MockerFixture, output_manager: Outpu
     )
     soil_data = SoilData(
         field_size=25,
-        vadose_zone_layer=layer,
         initial_water_content=1,
         initial_nitrates_total=2,
         annual_soil_evaporation_total=3,
         annual_eroded_sediment_total=4,
     )
+    soil_data.vadose_zone_layer = layer
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
@@ -383,8 +387,8 @@ def test_send_daily_variables(mocker: MockerFixture, mock_time: RufasTime, mock_
     crop_data_2 = replace(mock_crop_data, name="crop 2", planting_day=215, planting_year=1993)
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
-    field_1 = Field(field_data=field_data_1)
-    field_2 = Field(field_data=field_data_2)
+    field_1 = Field(field_data=field_data_1, soil=Soil(SoilData(field_size=1.0)))
+    field_2 = Field(field_data=field_data_2, soil=Soil(SoilData(field_size=1.0)))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
@@ -424,8 +428,8 @@ def test_send_annual_variables(mocker: MockerFixture, mock_crop_data: CropData) 
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data=field_data_1)
-    field_2 = Field(field_data=field_data_2)
+    field_1 = Field(field_data=field_data_1, soil=Soil(SoilData(field_size=1.0)))
+    field_2 = Field(field_data=field_data_2, soil=Soil(SoilData(field_size=1.0)))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
