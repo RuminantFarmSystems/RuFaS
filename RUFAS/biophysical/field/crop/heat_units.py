@@ -1,4 +1,5 @@
 from RUFAS.biophysical.field.crop.crop_data import CropData
+from RUFAS.output_manager import OutputManager
 
 
 class HeatUnits:
@@ -7,14 +8,13 @@ class HeatUnits:
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        An instance of ``CropData`` containing crop specifications and attributes. If not provided, a default
-        ``CropData`` instance is initialized with default values.
+    crop_data : CropData
+        An instance of ``CropData`` containing crop specifications and attributes.
     maximum_temperature : float, default 38
         Maximum temperature for plant growth (Celsius).
     use_heat_unit_temperature : bool, default False
         If alternative heat unit method is used.
-    new_heat_units : float, optional
+    new_heat_units : float, default 0.0
         Heat units accumulated on the current day (Celsius).
     minimum_heat_unit_temperature : float, optional
         Minimum temperature for heat unit calculations (Celsius).
@@ -32,7 +32,7 @@ class HeatUnits:
         Maximum temperature for plant growth (Celsius).
     use_heat_unit_temperature : bool
         If alternative heat unit method is used.
-    new_heat_units : float | None
+    new_heat_units : float
         Heat units accumulated on the current day (Celsius*).
     minimum_heat_unit_temperature : float | None
         Minimum temperature for heat unit calculations (Celsius).
@@ -49,15 +49,15 @@ class HeatUnits:
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
+        crop_data: CropData,
         maximum_temperature: float = 38.0,
         use_heat_unit_temperature: bool = False,
-        new_heat_units: float | None = None,
+        new_heat_units: float = 0.0,
         minimum_heat_unit_temperature: float | None = None,
         maximum_heat_unit_temperature: float | None = None,
         heat_unit_temperature: float | None = None,
     ) -> None:
-        self.data = crop_data or CropData()
+        self.data = crop_data
         self.maximum_temperature = maximum_temperature
         self.use_heat_unit_temperature = use_heat_unit_temperature
         self.new_heat_units = new_heat_units
@@ -83,6 +83,12 @@ class HeatUnits:
         max_air_temperature : float, optional
             Maximum air temperature for the day (°C).
 
+        Raises
+        ------
+        ValueError
+            If the alternative heat unit method is used without the minimum and maximum air temperature, or if neither
+            a mean air temperature nor a heat unit temperature is available.
+
         Notes
         -----
         If the attribute ``use_heat_unit_temperature`` in CropData is False, both ``min_air_temperature`` and
@@ -95,6 +101,16 @@ class HeatUnits:
 
         """
         if self.use_heat_unit_temperature:
+            if max_air_temperature is None or min_air_temperature is None:
+                OutputManager().add_error(
+                    "Missing air temperature",
+                    "The alternative heat unit method needs the minimum and maximum air temperature, received "
+                    f"{min_air_temperature=} and {max_air_temperature=}.",
+                    info_map={"class": self.__class__.__name__, "function": self.absorb_heat_units.__name__},
+                )
+                raise ValueError(
+                    "min_air_temperature and max_air_temperature are required when use_heat_unit_temperature is True"
+                )
             self.maximum_heat_unit_temperature = HeatUnits._determine_maximum_heat_unit_temperature(
                 max_air_temperature, self.maximum_temperature
             )
@@ -107,6 +123,15 @@ class HeatUnits:
             use_temp = self.heat_unit_temperature
         else:
             use_temp = mean_air_temperature
+        if use_temp is None:
+            OutputManager().add_error(
+                "Missing air temperature",
+                "No mean air temperature was provided and no heat unit temperature is set, so heat units cannot be "
+                "absorbed. Provide the mean air temperature, or the minimum and maximum air temperature with the "
+                "alternative heat unit method.",
+                info_map={"class": self.__class__.__name__, "function": self.absorb_heat_units.__name__},
+            )
+            raise ValueError("mean_air_temperature is required when heat_unit_temperature is not set")
         self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
 
@@ -139,8 +164,22 @@ class HeatUnits:
             ``self._determine_heat_unit_value``. If None or if ``self.use_heat_unit_temperature=True``, then
             ``self.heat_unit_temperature`` is used instead.
 
+        Raises
+        ------
+        ValueError
+            If ``self.heat_unit_temperature`` is needed but has not been set.
+
         """
-        if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
+        if self.use_heat_unit_temperature or (air_temperature is None):
+            if self.heat_unit_temperature is None:
+                OutputManager().add_error(
+                    "Missing heat unit temperature",
+                    "The heat unit temperature is needed to determine the day's heat units but has not been set. "
+                    "Provide the average air temperature, or calculate the heat unit temperature with "
+                    "absorb_heat_units first.",
+                    info_map={"class": self.__class__.__name__, "function": self.assign_current_heat_units.__name__},
+                )
+                raise ValueError("heat_unit_temperature must be set when no air temperature is used")
             self.new_heat_units = self._determine_heat_unit_value(
                 self.heat_unit_temperature, self.data.minimum_temperature
             )

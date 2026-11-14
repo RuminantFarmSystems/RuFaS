@@ -11,26 +11,18 @@ class Denitrification:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
+    soil_data : SoilData
         The SoilData object used by this module to track the denitrification of nitrates in the soil profile.
-        If not provided, a new SoilData object will be created.
-    field_size : float, optional
-        The size of the field in hectares (ha). This is used to initialize a SoilData object if one is not provided.
 
     Attributes
     ----------
     data : SoilData
         The SoilData object used for tracking denitrification.
 
-    Notes
-    -----
-    The field size is used to initialize a SoilData object for this module to work with, if a pre-configured
-    SoilData object is not provided.
-
     """
 
-    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None) -> None:
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData) -> None:
+        self.data = soil_data
 
     def denitrify(self, field_size: float) -> None:
         """
