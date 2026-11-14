@@ -12,9 +12,8 @@ class CarbonCycling:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        An instance of ``SoilData`` containing initial soil properties and state. If not provided,
-        a default instance with initialized values is used.
+    soil_data : SoilData
+        An instance of ``SoilData`` containing initial soil properties and state.
 
     Attributes
     ----------
@@ -38,8 +37,8 @@ class CarbonCycling:
 
     """
 
-    def __init__(self, soil_data: SoilData | None = None):
-        self.data = soil_data or SoilData()  # initialize with defaults, if not given
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
         self.decomposition = Decomposition(self.data)
         self.pool_gas_partition = PoolGasPartition(self.data)

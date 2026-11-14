@@ -98,12 +98,15 @@ def mock_weather(mocker: MockerFixture) -> Weather:
             [
                 Field(
                     field_data=FieldData(name="field1"),
+                    soil=Soil(SoilData(field_size=1.0)),
                 ),
                 Field(
                     field_data=FieldData(name="field2"),
+                    soil=Soil(SoilData(field_size=1.0)),
                 ),
                 Field(
                     field_data=FieldData(name="field3"),
+                    soil=Soil(SoilData(field_size=1.0)),
                 ),
             ],
             6,
@@ -199,12 +202,15 @@ def test_daily_update_routine(
         [
             Field(
                 field_data=FieldData(name="field1"),
+                soil=Soil(SoilData(field_size=1.0)),
             ),
             Field(
                 field_data=FieldData(name="field2"),
+                soil=Soil(SoilData(field_size=1.0)),
             ),
             Field(
                 field_data=FieldData(name="field3"),
+                soil=Soil(SoilData(field_size=1.0)),
             ),
         ],
         [],
