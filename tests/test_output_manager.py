@@ -2700,11 +2700,12 @@ def test_list_filter_files_in_dir_skips_e2e_configuration_files(
     tmpdir: py.path.local,
     mocker: MockerFixture,
 ) -> None:
-    """Tests that a scenario's must-change and accepted ranges files are skipped without a warning."""
+    """Tests that a scenario's must-change, accepted ranges, and variable tolerances files are skipped silently."""
     mock_add_warning = mocker.patch.object(mock_output_manager, "add_warning")
     tmpdir.join("json_file1.json").write("File 1 content")
     tmpdir.join("freestall_must_change_variables.json").write("{}")
     tmpdir.join("freestall_accepted_ranges.json").write("{}")
+    tmpdir.join("freestall_variable_tolerances.json").write("{}")
 
     filter_files = mock_output_manager._list_filter_files_in_dir(Path(tmpdir))
 

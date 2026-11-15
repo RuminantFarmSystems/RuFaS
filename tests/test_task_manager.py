@@ -1132,7 +1132,7 @@ def test_process_e2e_group_results(
     mock_validate_comparison = mocker.patch.object(
         E2ETestResultsHandler,
         "validate_comparison_configuration",
-        return_value=(False, {}),
+        return_value=(False, {}, {}),
     )
     mock_compare = mocker.patch.object(
         E2ETestResultsHandler,
@@ -1181,6 +1181,7 @@ def test_process_e2e_group_results(
             output_prefix=e2e_group,
             must_change_variables=False,
             accepted_ranges={},
+            variable_tolerances={},
         )
         mock_post_processing.assert_called_once_with(
             args={**e2e_runs[0], "output_prefix": e2e_group},
@@ -1280,7 +1281,7 @@ def test_process_e2e_group_results_exception(
     mocker.patch.object(
         E2ETestResultsHandler,
         "validate_comparison_configuration",
-        return_value=(False, {}),
+        return_value=(False, {}, {}),
     )
     mocker.patch.object(E2ETestResultsHandler, "compare_actual_and_expected_test_results")
     mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")

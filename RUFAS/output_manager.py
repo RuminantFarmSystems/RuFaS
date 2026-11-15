@@ -23,7 +23,7 @@ from RUFAS.user_constants import UserConstants
 from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
-NON_FILTER_FILE_SUFFIXES = ("must_change_variables.json", "accepted_ranges.json")
+NON_FILTER_FILE_SUFFIXES = ("must_change_variables.json", "accepted_ranges.json", "variable_tolerances.json")
 
 
 class LogVerbosity(Enum):
