@@ -78,7 +78,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         days_born : float
             Number of days since birth (days).
         TDN_fraction : float
-            Fraction of Total Digestible Nutrients in previously fed ration (%).
+            Fraction of Total Digestible Nutrients in previously fed ration (fraction).
         process_based_phosphorus_requirement : float
             The phosphorus requirement (kg).
 
