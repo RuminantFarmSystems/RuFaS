@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 
@@ -542,6 +542,51 @@ class OutputManager:
         self.file_manager.create_directory(path)
         self.pool_manager.dump_variable_names_and_contexts(path, exclude_info_maps, format_option)
         self.pool_manager.report_variables_usage_counts(path)
+
+    def load_saved_output_pools(self, saved_pools: Sequence[tuple[str | None, Path] | dict[str, Any]]) -> None:
+        """
+        Replaces the ``variables_pool`` with previously saved output pools for post-processing.
+
+        Parameters
+        ----------
+        saved_pools : Sequence[tuple[str | None, Path] | dict[str, Any]]
+            Saved pool descriptors, either ``(prefix, path)`` tuples or dictionaries with ``"prefix"`` and ``"path"``
+            keys. See ``PoolManager.load_multiple_variables_pools_from_files()``.
+
+        Notes
+        -----
+        The ``metadata_prefix`` is set to ``"reload"`` once the pools are loaded. If no pools are given, a warning is
+        logged and the ``variables_pool`` is left unchanged.
+        """
+        if not saved_pools:
+            self.add_warning(
+                "No saved pools provided",
+                "load_saved_output_pools was enabled, but no saved_output_pools were supplied.",
+                self._info_map(self.load_saved_output_pools.__name__),
+            )
+            return
+        self.pool_manager.flush_pools()
+        self.pool_manager.load_multiple_variables_pools_from_files(saved_pools)
+        self.set_metadata_prefix("reload")
+
+    def save_variables_pool_to_directory(self, directory: Path) -> Path:
+        """
+        Saves the ``variables_pool`` to a timestamped ``saved_pool`` JSON file in the given directory.
+
+        Parameters
+        ----------
+        directory : Path
+            The directory the ``variables_pool`` is saved to. It is created if it does not exist.
+
+        Returns
+        -------
+        Path
+            The path of the saved JSON file.
+        """
+        self.file_manager.create_directory(directory)
+        saved_pool_file_path = directory / self.file_manager.generate_file_name("saved_pool", "json")
+        self.pool_manager.save_variable_pool_to_file(saved_pool_file_path)
+        return saved_pool_file_path
 
     def summarize_e2e_test_results(
         self,

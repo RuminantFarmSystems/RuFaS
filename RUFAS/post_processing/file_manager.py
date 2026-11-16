@@ -428,11 +428,11 @@ class FileManager:
         """
         pass
 
-    def _read_variables_pool_file(
+    def read_variables_pool_file(
         self,
         file_path: Path,
         info_map: dict[str, Any],
-    ) -> dict[str, list[Any]]:
+    ) -> dict[str, POOL_ELEMENT_TYPE]:
         """Reads a ``variables_pool`` JSON file and returns its contents."""
         pass
 
