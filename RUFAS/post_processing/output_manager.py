@@ -9,14 +9,13 @@ from typing import Any
 
 import numpy as np
 
-from RUFAS.output_manager import LogVerbosity
 from RUFAS.post_processing.file_manager import FileManager
 from RUFAS.post_processing.graph_generator import GraphGenerator
 from RUFAS.post_processing.output_config_validator import OutputConfigValidator
 from RUFAS.post_processing.pool_manager import PoolManager
 from RUFAS.post_processing.report_generator import ReportGenerator, ReportGeneratorConfig
 from RUFAS.post_processing.rufas_logger import configure_logging, get_log_level, get_logger
-from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
+from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE, LogVerbosity
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
@@ -135,23 +134,20 @@ class OutputManager:
         is_end_to_end_testing_run : bool
             Whether the current run is an end-to-end testing run.
         """
+        if LogVerbosity.CREDITS <= verbosity:
+            sys.stdout.write(f"Starting task: {task_id} ({output_prefix})\n")
         self.set_metadata_prefix(output_prefix)
+        self.file_manager.create_directory(output_directory)
         configure_logging(
             log_directory=output_directory,
             log_level=get_log_level(verbosity),
             output_prefix=output_prefix,
             metadata_prefix=output_prefix,
         )
-        self.add_log(
-            "start_task",
-            f"Starting task: {task_id} ({output_prefix})",
-            self._info_map(self.run_startup_sequence.__name__),
-        )
         self.pool_manager.flush_pools()
         self.set_exclude_info_maps_flag(exclude_info_maps)
         self.is_end_to_end_testing_run = is_end_to_end_testing_run
         self.file_manager.supported_filter_types_prefixes = self._filter_prefixes
-        self.file_manager.create_directory(output_directory)
         if clear_output_directory:
             self.file_manager.clear_output_dir(variables_file_path, output_directory)
 
@@ -217,12 +213,12 @@ class OutputManager:
             ReportGeneratorConfig(metadata_prefix=self.__metadata_prefix, time=self.time)
         )
         if self.pool_manager.chunkification:
-            self.pool_manager._save_current_variable_pool()
+            self.pool_manager.save_current_variable_pool()
             self.pool_manager.load_saved_pools()
         for filter_file in list_of_filter_files:
             input_path = filters_dir_path / filter_file
-            filter_contents, direction = self.file_manager._load_filter_file_content(input_path)
-            is_report = filter_file.startswith(self.__supported_filter_types_prefixes["report"])
+            filter_contents, direction = self.file_manager.load_filter_file_content(input_path)
+            is_report = self._has_filter_prefix(filter_file, "report")
             if is_report:
                 self.add_log(
                     "init_report_generation",
@@ -399,7 +395,7 @@ class OutputManager:
             )
         self.file_manager.create_directory(report_dir)
         report_file_path = report_dir / self.file_manager.generate_file_name(f"{filter_file}", "csv")
-        self.file_manager._dict_to_file_csv(report_generator.reports, report_file_path, direction)
+        self.file_manager.dict_to_file_csv(report_generator.reports, report_file_path, direction)
         report_generator.clear_reports()
 
     def _route_save_functions(
@@ -451,14 +447,14 @@ class OutputManager:
 
         if self._has_filter_prefix(filter_file, "json") and self.is_first_post_processing:
             self.file_manager.create_directory(json_dir)
-            self.file_manager._save_to_json(filter_file, json_dir, filtered_pool, filter_content)
+            self.file_manager.save_to_json(filter_file, json_dir, filtered_pool, filter_content)
             return
         if self._has_filter_prefix(filter_file, "csv"):
             self.file_manager.create_directory(csv_dir)
             variable_csv_file_path = csv_dir / self.file_manager.generate_file_name(
                 f"saved_variables_{filter_file}", "csv"
             )
-            self.file_manager._dict_to_file_csv(filtered_pool, variable_csv_file_path, direction)
+            self.file_manager.dict_to_file_csv(filtered_pool, variable_csv_file_path, direction)
             return
         if self._has_filter_prefix(filter_file, "graph"):
             self.file_manager.create_directory(graphics_dir)
@@ -466,7 +462,7 @@ class OutputManager:
             return
         if self._has_filter_prefix(filter_file, "comparison") and not self.is_first_post_processing:
             self.file_manager.create_directory(json_dir)
-            self.file_manager._save_to_json(filter_file, json_dir, filtered_pool, filter_content)
+            self.file_manager.save_to_json(filter_file, json_dir, filtered_pool, filter_content)
 
     def _generate_graph(
         self,
@@ -608,7 +604,7 @@ class OutputManager:
             for key, value in data.items():
                 if key == "DISCLAIMER":
                     continue
-                module = self.file_manager._normalize_module_header(key)
+                module = self.file_manager.normalize_module_header(key)
                 e2e_results_summary[matched_prefix][module] = value["values"][0]
 
         self.add_log(
@@ -697,7 +693,7 @@ class OutputManager:
         )
 
         filtered_pool: dict[str, POOL_ELEMENT_TYPE] = Utility.filter_dictionary(
-            dict_to_filter=self.pool_manager._get_flat_variables_pool(),
+            dict_to_filter=self.pool_manager.get_flat_variables_pool(),
             filter_patterns=filter_content.get("filters", []),
             filter_by_exclusion=filter_by_exclusion,
         )
@@ -824,7 +820,6 @@ class OutputManager:
             Dictionary containing data from the filtered pool of data, with data from within dictionaries unpacked and
             separated.
         """
-        usage_counter = self.pool_manager._variables_usage_counter
         results: dict[str, POOL_ELEMENT_TYPE] = {}
         for key, entry in filtered_pool.items():
             info_maps: list[dict[str, Any]] = entry.get("info_maps", [])
@@ -832,7 +827,7 @@ class OutputManager:
             is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
                 results[key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
-                usage_counter.update([key])
+                self.pool_manager.record_variables_usage([key])
                 continue
 
             if not isinstance(selected_variables, list):
@@ -846,6 +841,7 @@ class OutputManager:
                         filter_by_exclusion=filter_by_exclusion,
                     ),
                 )
+                continue
             temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
             filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
             for filtered_key, filtered_value in filtered_data.items():
@@ -855,7 +851,7 @@ class OutputManager:
                 results[combined_key] = ({"info_maps": merged_info_maps} if merged_info_maps else {}) | {
                     "values": existing.get("values", []) + filtered_value
                 }
-                usage_counter.update([combined_key])
+                self.pool_manager.record_variables_usage([combined_key])
         return results
 
     def _list_filter_files_in_dir(self, dir_path: Path) -> list[str]:

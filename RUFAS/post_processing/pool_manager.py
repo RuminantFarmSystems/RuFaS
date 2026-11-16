@@ -210,7 +210,7 @@ class PoolManager:
         """
         pass
 
-    def _save_current_variable_pool(self) -> None:
+    def save_current_variable_pool(self) -> None:
         """
         Save the current ``variables_pool`` into a JSON file. Flush the ``variables_pool`` and reset the pool size.
         """
@@ -320,6 +320,17 @@ class PoolManager:
 
         """
         pass
+
+    def record_variables_usage(self, variable_names: list[str]) -> None:
+        """
+        Increments the filter usage count of each of the given variables.
+
+        Parameters
+        ----------
+        variable_names : list[str]
+            Names of the variables (or ``variable.subkey`` names) selected by a post-processing filter.
+        """
+        self._variables_usage_counter.update(variable_names)
 
     def report_variables_usage_counts(self, path: Path) -> None:
         """
@@ -442,7 +453,7 @@ class PoolManager:
         """
         pass
 
-    def _get_flat_variables_pool(self) -> dict[str, Any]:
+    def get_flat_variables_pool(self) -> dict[str, Any]:
         """Returns a flattened mapping of variable names to data when multiple pools are loaded."""
         pass
 
