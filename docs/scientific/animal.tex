@@ -3564,7 +3564,7 @@ The gestation length for cows is estimated with the same methods that are used f
      \vspace{0.5cm}
      
 \begin{center}
-    \(bodyweight\_tissue\_change = \frac{P1}{P2}\ *\ exp\ (1\ -\ \frac{DIM}{P2})\ +\ DIM\ x\ exp\ (1\ -\ \frac{DIM}{P2})\)
+    \(bodyweight\_tissue\_change = -\ \frac{P_1}{P_2}\ *\ exp\ (1\ -\ \frac{DIM}{P_2})\ +\ \frac{P_1}{P_2^2}\ *\ DIM\ *\ exp\ (1\ -\ \frac{DIM}{P_2})\)
 \end{center}
     \vspace{0.5cm}
     
@@ -3583,18 +3583,18 @@ The gestation length for cows is estimated with the same methods that are used f
     \multicolumn{1}{c}{\textbf{Primiparous}} & 
     \multicolumn{1}{c}{\textbf{Multiparous}} \\
     \midrule
-    P\textsubscript{1}    & 20   & 65 \\
-    P\textsubscript{2}    & 40 & 70 \\
+    P\textsubscript{1}    & 20 & 40 \\
+    P\textsubscript{2}    & 65 & 75 \\
     \bottomrule
     \end{tabular}
     \end{table}
 
 
-    During the dry period, the net tissue change is assumed to be restored during the dry period. The net tissue change is estimated on the last day of lactation as: 
+    During the dry period, the net tissue mobilized during lactation is assumed to be restored \parencite{Li2023}. The net tissue change is estimated on each day of the dry period as:
     \vspace{0.5cm}
     
     \begin{center}
-    \(tissue\_changed = P_1\ *\ \frac{DIMlast}{P_2}\ *\ exp\ (1\ -\ \frac{DIMlast}{P_2})\ +\ DIM\ *\ exp\ (1\ -\ \frac{DIM}{P_2})\)
+    \(tissue\_changed = P_1\ *\ \frac{DIM}{P_2}\ *\ exp\ (1\ -\ \frac{DIM}{P_2})\)
     \end{center}
     \vspace{0.5cm}
     
@@ -3602,7 +3602,7 @@ The gestation length for cows is estimated with the same methods that are used f
          \vspace{0.5cm}
          
     \begin{center}
-    \(bodyweight\_tissue\_change = \frac{tissue\ changed}{gestation\ length\ -\ DIPdry}\)
+    \(bodyweight\_tissue\_change = \frac{tissue\_changed}{gestation\ length\ -\ DIPdry}\)
     \end{center}
     \vspace{0.5cm}
     
