@@ -1,0 +1,9 @@
+Variable name,Description,Units (feed fed / intensity)
+direct_n2o_nitrogen_emissions_for_feed_[ID],Direct soil N2O emissions allocated to the feed,kg N2O-N / kg N2O-N per kg DM
+ammonia_nitrogen_emissions_for_feed_[ID],Soil NH3 emissions allocated to the feed,kg NH3-N / kg NH3-N per kg DM
+nitrogen_fertilizer_applied_for_feed_[ID],Synthetic fertilizer N allocated to the feed,kg N / kg N per kg DM
+phosphorus_fertilizer_applied_for_feed_[ID],Synthetic fertilizer P allocated to the feed,kg P / kg P per kg DM
+potassium_fertilizer_applied_for_feed_[ID],Synthetic fertilizer K allocated to the feed,kg K / kg K per kg DM
+manure_nitrogen_applied_for_feed_[ID],Manure N allocated to the feed,kg N / kg N per kg DM
+lca_carbon_emissions_for_feed_[ID],LCA-based carbon footprint of the feed fed (EM.HFE.8),kg CO2-eq
+lca_land_use_change_emissions_for_feed_[ID],LCA-based land use change emissions of the feed fed (EM.HFE.9),kg CO2-eq

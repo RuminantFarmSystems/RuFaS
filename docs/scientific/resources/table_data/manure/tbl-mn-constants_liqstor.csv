@@ -1,0 +1,14 @@
+Variable, Value, Definition
+ACTIVATION_ENERGY , 81 000 J/mol , Apparent activation energy of methanogenesis in dairy manure 
+ANAEROBIC_LAGOON_MANURE_RETENTION ,0.1, Fraction of stored manure retained in anaerobic lagoon when storage interval is reached 
+DEFAULT_STORED_MANURE_PH ,7.5, Default pH of manure in slurry storage or anaerobic lagoon 
+DEPTH_CONSTANT , 4.572 m , Depth of slurry/liquid manure storage used for surface area calculation 
+FREEBOARD_CONSTANT ,1.2, 20% volume allowance above max volume if surface area not user-defined 
+MANURE_CONVERSION_CONSTANT , 0.1175 m$^3$ , Factor to estimate manure volume per cow per day
+MANURE_DAMPING_FACTOR ,0.65, Fixed damping factor applied to the air temperature amplitude 
+MANURE_TEMPERATURE_LAG , 30 d , Lag constant representing delayed thermal response of manure temperature relative to air temperature
+METHANE_DESTRUCTION_EFFICIENCY ,0.81, Percent methane destroyed with cover and flare system 
+NATURAL_LOG_ARRHENIUS_CONSTANT , 30.6 g CH<sub>4</sub>/kg VS/h , Log of Arrhenius parameter for methane emissions from stored manure 
+PRECIPITATION_CONSTANT , 0.25 m , Annual precipitation constant for determining storage surface area 
+STORAGE_RESISTANCE , 23.1 s/m , Default resistance to ammonia volatilization  
+VS_TO_METHANE_LOSS_RATIO , 6.665 kg , Mass ratio of CO<sub>2</sub>+CH<sub>4</sub> to CH<sub>4</sub> from storage
